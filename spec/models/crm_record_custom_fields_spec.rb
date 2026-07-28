@@ -62,7 +62,8 @@ RSpec.describe "CrmRecord custom fields", type: :model do
       b.update!(custom_fields: { field.key => "beta" })
       missing = workspace.companies.create!(name: "No value Co")
 
-      ordered = Company.sorted_by_custom_field(workspace, field.key, :asc).to_a
+      ordered = Company.where(id: [ a.id, b.id, missing.id ])
+        .sorted_by_custom_field(workspace, field.key, :asc).to_a
 
       expect(ordered.index(a)).to be < ordered.index(b)
       expect(ordered.last).to eq(missing)
