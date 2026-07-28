@@ -1,0 +1,121 @@
+require "rails_helper"
+
+RSpec.describe "OmniauthCallbacks", type: :request do
+  fixtures :users, :workspaces, :memberships
+
+  let(:user) { users(:one) }
+
+  before do
+    OmniAuth.config.test_mode = true
+  end
+
+  after do
+    OmniAuth.config.mock_auth[:google_oauth2] = nil
+    OmniAuth.config.test_mode = false
+  end
+
+  def mock_google_auth(uid:, email:, name:)
+    OmniAuth.config.mock_auth[:google_oauth2] = OmniAuth::AuthHash.new(
+      provider: "google_oauth2",
+      uid: uid,
+      info: OmniAuth::AuthHash::InfoHash.new(email: email, name: name)
+    )
+  end
+
+  describe "GET /auth/google_oauth2/callback" do
+    it "signs in an existing user matched by provider and uid" do
+      user.update!(provider: "google_oauth2", uid: "12345")
+      mock_google_auth(uid: "12345", email: user.email_address, name: user.name)
+
+      get "/auth/google_oauth2/callback"
+
+      expect(response).to redirect_to(root_path)
+      expect(cookies[:session_id]).to be_present
+    end
+
+    it "links Google to an existing user matched by email" do
+      mock_google_auth(uid: "67890", email: user.email_address, name: user.name)
+
+      expect {
+        get "/auth/google_oauth2/callback"
+      }.not_to change(User, :count)
+
+      expect(user.reload.provider).to eq("google_oauth2")
+      expect(user.uid).to eq("67890")
+      expect(response).to redirect_to(root_path)
+      expect(cookies[:session_id]).to be_present
+    end
+
+    it "creates a user and workspace for a new Google account" do
+      mock_google_auth(uid: "new-user", email: "new@example.com", name: "New User")
+
+      expect {
+        get "/auth/google_oauth2/callback"
+      }.to change(User, :count).by(1)
+        .and change(Workspace, :count).by(1)
+        .and change(Membership, :count).by(1)
+
+      new_user = User.find_by!(email_address: "new@example.com")
+      expect(new_user.provider).to eq("google_oauth2")
+      expect(new_user.uid).to eq("new-user")
+      expect(new_user.workspaces.count).to eq(1)
+      expect(new_user.memberships.first.role).to eq("admin")
+      expect(response).to redirect_to(root_path)
+      expect(cookies[:session_id]).to be_present
+    end
+
+    it "also joins the demo workspace for a new Google account when it exists" do
+      demo = Workspace.create!(name: "Cream Demo", slug: "cream-demo")
+      mock_google_auth(uid: "new-user", email: "new@example.com", name: "New User")
+
+      expect {
+        get "/auth/google_oauth2/callback"
+      }.to change(User, :count).by(1)
+        .and change(Workspace, :count).by(1)
+        .and change(Membership, :count).by(2)
+
+      new_user = User.find_by!(email_address: "new@example.com")
+      personal_workspace = new_user.workspaces.find_by!(name: "New User's Workspace")
+      expect(new_user.workspaces).to contain_exactly(demo, personal_workspace)
+      expect(new_user.memberships.find_by!(workspace: demo).role).to eq("salesperson")
+      expect(new_user.memberships.find_by!(workspace: personal_workspace).role).to eq("admin")
+    end
+
+    it "joins the organization workspace for new matching Google accounts" do
+      original_domain = ENV["CREAM_ORGANIZATION_EMAIL_DOMAIN"]
+      original_name = ENV["CREAM_ORGANIZATION_WORKSPACE_NAME"]
+      ENV["CREAM_ORGANIZATION_EMAIL_DOMAIN"] = "example.com"
+      ENV["CREAM_ORGANIZATION_WORKSPACE_NAME"] = "Example"
+
+      org = Workspace.create!(name: "Example", slug: "example")
+      org.memberships.create!(user: users(:two), role: "admin")
+
+      mock_google_auth(uid: "org-user", email: "new.colleague@example.com", name: "New Colleague")
+
+      demo = Workspace.create!(name: "Cream Demo", slug: "cream-demo")
+
+      expect {
+        get "/auth/google_oauth2/callback"
+      }.to change(User, :count).by(1)
+        .and change(Membership, :count).by(2)
+        .and change(Workspace, :count).by(0)
+
+      new_user = User.find_by!(email_address: "new.colleague@example.com")
+      expect(new_user.workspaces).to contain_exactly(org, demo)
+      expect(new_user.memberships.find_by!(workspace: org).role).to eq("salesperson")
+      expect(new_user.memberships.find_by!(workspace: demo).role).to eq("salesperson")
+    ensure
+      ENV["CREAM_ORGANIZATION_EMAIL_DOMAIN"] = original_domain
+      ENV["CREAM_ORGANIZATION_WORKSPACE_NAME"] = original_name
+    end
+  end
+
+  describe "GET /auth/failure" do
+    it "redirects to sign in with an alert" do
+      get "/auth/failure"
+
+      expect(response).to redirect_to(new_session_path)
+      expect(flash[:alert]).to eq("Could not sign in with Google.")
+    end
+  end
+end

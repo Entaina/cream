@@ -1,0 +1,13 @@
+<% page_title "Import #{@record_type.pluralize}" %>
+<%= render "shared/page_header", title: "Import #{@record_type.pluralize}", icon_name: :upload %>
+
+<div class="p-5 max-w-lg">
+  <div class="card p-4">
+    <%= form_with url: import_path, multipart: true do |f| %>
+      <%= hidden_field_tag :record_type, @record_type %>
+      <p class="text-base text-ink-soft mb-3">Upload a CSV file to import <%= @record_type.pluralize.downcase %>.</p>
+      <%= file_field_tag :file, accept: ".csv", required: true, class: "mb-3 block max-w-full" %>
+      <%= f.submit "Import CSV", class: "btn-primary" %>
+    <% end %>
+  </div>
+</div>

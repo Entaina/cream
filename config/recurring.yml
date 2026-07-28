@@ -1,0 +1,37 @@
+# examples:
+#   periodic_cleanup:
+#     class: CleanSoftDeletedRecordsJob
+#     queue: background
+#     args: [ 1000, { batch_size: 500 } ]
+#     schedule: every hour
+#   periodic_cleanup_with_command:
+#     command: "SoftDeletedRecord.due.delete_all"
+#     priority: 2
+#     schedule: at 5am every day
+
+production:
+  clear_solid_queue_finished_jobs:
+    command: "SolidQueue::Job.clear_finished_in_batches(sleep_between_batches: 0.3)"
+    schedule: every hour at minute 12
+  deliver_scheduled_reports:
+    class: ScheduledReportsJob
+    schedule: every day at 7am
+  sync_gmail_inboxes:
+    class: GmailSyncSchedulerJob
+    schedule: every 10 minutes
+  sync_stripe_payments:
+    class: StripeSyncSchedulerJob
+    schedule: every 15 minutes
+  sales_director_briefing:
+    class: SalesDirectorBriefingJob
+    schedule: every weekday at 2:30am
+  database_backup:
+    class: DatabaseBackupJob
+    schedule: every day at 2am
+
+development:
+  sync_stripe_payments:
+    class: StripeSyncSchedulerJob
+    schedule: every 15 minutes
+
+# Recurring tasks are loaded per environment. database_backup is production-only.

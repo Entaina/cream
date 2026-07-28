@@ -1,0 +1,2 @@
+class StageConditionPolicy < WorkspaceRecordPolicy
+end

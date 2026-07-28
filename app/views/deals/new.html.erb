@@ -1,0 +1,17 @@
+<% page_title "New deal" %>
+<%= render "shared/page_header", title: "New deal", icon_name: :banknote, count: nil, actions: nil %>
+<div class="flex-1 overflow-y-auto p-5">
+  <div class="max-w-xl space-y-3">
+    <% if @stripe_payment %>
+      <div class="rounded-lg bg-canvas-tint ring-1 ring-line px-3 py-2 text-sm text-ink-soft">
+        Creating from a Stripe payment of
+        <strong><%= number_to_currency(@stripe_payment.amount_decimal,
+          unit: @stripe_payment.currency.casecmp?("eur") ? "€" : @stripe_payment.currency.upcase,
+          precision: 2, delimiter: ".", separator: ",", format: "%n %u") %></strong>
+        by <%= @stripe_payment.customer_email || @stripe_payment.customer_name %>.
+        The payment will be linked to this deal on save.
+      </div>
+    <% end %>
+    <%= render "form", deal: @deal %>
+  </div>
+</div>

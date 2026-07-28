@@ -1,0 +1,8 @@
+<div class="space-y-3">
+  <div>
+    <%= f.label :organization_ia_stage, "¿Dónde crees que está tu organización respecto a la IA: sin empezar, probando o escalando?", class: "label" %>
+    <%= f.text_area :organization_ia_stage, rows: 4, class: "input w-full resize-y", placeholder: "Opcional" %>
+  </div>
+
+  <%= render "public/lead_forms/how_heard_field", f: f %>
+</div>

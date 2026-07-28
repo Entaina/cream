@@ -1,0 +1,56 @@
+<% page_title "Merge #{@company.name}" %>
+<%= render "shared/page_header", title: "Merge companies", icon_name: :building, count: nil, actions: nil %>
+
+<div class="flex-1 overflow-y-auto p-5">
+  <div class="max-w-2xl space-y-6">
+    <section class="card p-4">
+      <h2 class="text-sm font-semibold uppercase tracking-wider text-ink-faint mb-3">Company to keep</h2>
+      <div class="flex items-center gap-3">
+        <%= avatar @company, size: "size-12", text: "text-base" %>
+        <div>
+          <p class="font-semibold text-lg"><%= @company.name %></p>
+          <p class="text-sm text-ink-faint"><%= @company.domain.presence || "No domain" %></p>
+        </div>
+      </div>
+    </section>
+
+    <%= form_with url: merge_company_path(@company), method: :post, class: "space-y-4",
+          data: { turbo_confirm: "Merge the selected companies into #{@company.name}? This cannot be undone." } do %>
+      <section class="card p-4">
+        <h2 class="text-sm font-semibold uppercase tracking-wider text-ink-faint mb-1">Companies to merge in</h2>
+        <p class="text-sm text-ink-faint mb-4">
+          People, deals, notes, tasks, emails and timeline activity from the selected companies will move to the company above.
+        </p>
+
+        <% if @merge_candidates.any? %>
+          <div class="space-y-2">
+            <% @merge_candidates.each do |candidate| %>
+              <label class="flex items-start gap-3 rounded-lg border border-line px-3 py-2.5 hover:bg-canvas-sunken cursor-pointer">
+                <%= check_box_tag "secondary_ids[]", candidate.id, @selected_secondary_ids.include?(candidate.id),
+                      class: "mt-1 rounded border-line text-accent focus:ring-accent" %>
+                <span class="min-w-0">
+                  <span class="font-medium block"><%= candidate.name %></span>
+                  <span class="text-sm text-ink-faint block">
+                    <%= [
+                      candidate.domain,
+                      candidate.industry,
+                      pluralize(candidate.people.size, "person"),
+                      pluralize(candidate.deals.size, "deal")
+                    ].compact_blank.join(" · ") %>
+                  </span>
+                </span>
+              </label>
+            <% end %>
+          </div>
+        <% else %>
+          <p class="text-sm text-ink-faint">No suggested duplicate companies are available to merge with <%= @company.name %>.</p>
+        <% end %>
+      </section>
+
+      <div class="flex items-center gap-2">
+        <%= submit_tag "Merge companies", class: "btn-primary", disabled: @merge_candidates.empty? %>
+        <%= link_to "Cancel", @company, class: "btn-secondary" %>
+      </div>
+    <% end %>
+  </div>
+</div>

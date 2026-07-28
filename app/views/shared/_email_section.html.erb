@@ -1,0 +1,138 @@
+<%# locals: (record:, email_message:) %>
+<% templates_enabled = feature_enabled?(:email_templates) %>
+<% templates = templates_enabled ? current_workspace.email_templates.visible_to(current_user).ordered.includes(attachments_attachments: :blob) : EmailTemplate.none %>
+<section
+  data-controller="template-picker"
+  data-template-picker-first-name-value="<%= record.try(:first_name) %>"
+  data-template-picker-last-name-value="<%= record.try(:last_name) %>"
+  data-template-picker-name-value="<%= record.try(:display_name) || record.try(:name) %>"
+  data-template-picker-company-value="<%= record.try(:company)&.name %>"
+  data-template-picker-email-value="<%= record.try(:email) %>">
+  <h3 class="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-ink-faint mb-2">
+    <%= icon :mail, classes: "size-3.5" %> Send email
+  </h3>
+
+  <%= form_with model: email_message, url: record_emails_path(record_type: record.class.name, record_id: record.id), class: "card p-3 mb-3", multipart: true do |f| %>
+    <% if templates_enabled %>
+      <div class="mb-2">
+        <%= select_tag :template_picker,
+              safe_join(templates.map { |t|
+                attachment_meta = t.attachments.map { |file| { id: file.id, filename: file.filename.to_s, byte_size: file.byte_size } }
+                tag.option(t.name, value: t.id, data: { subject: t.subject, body: t.body, attachments: attachment_meta.to_json })
+              }),
+              include_blank: templates.any? ? "Insertar plantilla…" : "No hay plantillas disponibles",
+              disabled: templates.none?,
+              class: "input w-full",
+              data: { "template-picker-target" => "select", action: "template-picker#apply" } %>
+        <%= hidden_field_tag :email_template_id, nil, data: { "template-picker-target" => "templateId" } %>
+        <% if templates.none? %>
+          <p class="text-sm text-ink-faint mt-1">
+            <%= link_to "Crear plantillas", email_templates_path, class: "text-accent hover:underline" %> para reutilizarlas al redactar correos.
+          </p>
+        <% end %>
+      </div>
+    <% end %>
+    <%= f.email_field :to_address, placeholder: "To", class: "input w-full mb-2" %>
+    <%= f.text_field :subject, placeholder: "Subject", class: "input w-full mb-2", data: { "template-picker-target" => "subject" } %>
+    <%= f.text_area :body, rows: 4, placeholder: "Message body...", class: "input w-full mb-2 resize-y", data: { "template-picker-target" => "body" } %>
+    <div class="mb-2">
+      <label class="label">Attachments</label>
+      <p class="text-xs text-ink-faint mb-1">Desmarca los que no quieras enviar.</p>
+      <ul class="space-y-1 mb-2" data-template-picker-target="attachmentList">
+        <% if feature_enabled?(:attachments) %>
+          <% record.record_attachments.includes(file_attachment: :blob).each do |attachment| %>
+            <li class="flex items-center gap-2 text-sm">
+              <label class="flex items-center gap-2 cursor-pointer">
+                <%= check_box_tag "record_attachment_ids[]", attachment.id, false, class: "rounded border-line" %>
+                <%= icon :paperclip, classes: "size-3.5 text-ink-faint" %>
+                <span class="text-ink-soft"><%= attachment.display_name %></span>
+                <span class="text-xs text-ink-faint"><%= number_to_human_size(attachment.file.byte_size) %></span>
+              </label>
+            </li>
+          <% end %>
+        <% end %>
+      </ul>
+      <%= f.file_field :attachments, multiple: true, class: "file-input" %>
+    </div>
+    <div class="flex items-end justify-between gap-2 flex-wrap">
+      <div class="flex gap-2 flex-wrap">
+        <label class="text-sm text-ink-faint flex items-center gap-1.5">
+          Send later
+          <%= datetime_field_tag :scheduled_at, nil, class: "input py-1 text-sm" %>
+        </label>
+        <label class="text-sm text-ink-faint flex items-center gap-1.5">
+          Follow up
+          <%= select_tag :follow_up_days,
+                options_for_select([ [ "No reminder", "" ], [ "in 2 days", 2 ], [ "in 3 days", 3 ], [ "in 1 week", 7 ], [ "in 2 weeks", 14 ] ]),
+                class: "input py-1 text-sm" %>
+        </label>
+      </div>
+      <%= f.submit "Send email", class: "btn-primary" %>
+    </div>
+  <% end %>
+
+  <% if record.email_messages.any? %>
+    <ul class="space-y-1.5">
+      <% record.email_messages.recent_first.limit(10).each do |message| %>
+        <% timestamp = message.scheduled? ? message.scheduled_at : message.created_at %>
+        <li class="card p-2.5">
+          <details class="group">
+            <summary class="flex items-start justify-between gap-2 cursor-pointer list-none">
+              <div class="min-w-0">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <%= icon :chevron_right, classes: "size-3 text-ink-faint transition-transform group-open:rotate-90" %>
+                  <span class="text-base font-medium text-ink truncate"><%= message.subject.presence || "(no subject)" %></span>
+                  <% if message.inbound? %>
+                    <%= badge "Received", color: "hoki" %>
+                  <% elsif message.scheduled? %>
+                    <%= badge "Scheduled", color: "golden" %>
+                  <% elsif message.failed? %>
+                    <%= badge "Failed to send", color: "red" %>
+                  <% else %>
+                    <%= badge "Sent", color: "green" %>
+                    <% if message.opened? %><%= badge "Opened", color: "green" %><% end %>
+                    <% if message.awaiting_follow_up? %>
+                      <%= badge "Follow up #{message.follow_up_at.strftime('%-d %b')}", color: "copperfield" %>
+                    <% elsif message.replied? %>
+                      <%= badge "Replied", color: "chicago" %>
+                    <% end %>
+                  <% end %>
+                </div>
+                <% if message.inbound? %>
+                  <div class="text-xs text-ink-faint truncate mt-0.5">From: <%= message.from_address.presence || "Unknown sender" %></div>
+                <% else %>
+                  <div class="text-xs text-ink-faint truncate mt-0.5">To: <%= message.to_address %></div>
+                <% end %>
+                <p class="text-sm text-ink-soft truncate mt-0.5 group-open:hidden"><%= truncate(message.body.to_s, length: 90) %></p>
+              </div>
+              <time class="text-xs text-ink-faint whitespace-nowrap shrink-0" datetime="<%= timestamp&.iso8601 %>">
+                <%= timestamp&.strftime("%-d %b %Y, %H:%M") %>
+              </time>
+            </summary>
+            <div class="mt-2 pt-2 border-t border-line text-sm text-ink-soft whitespace-pre-wrap break-words"><%= message.body %></div>
+            <% if message.attachments.attached? %>
+              <ul class="mt-2 space-y-1">
+                <% message.attachments.each do |file| %>
+                  <li class="flex items-center gap-2 text-sm">
+                    <%= icon :paperclip, classes: "size-3.5 text-ink-faint" %>
+                    <%= link_to file.filename, rails_blob_path(file, disposition: "attachment"), class: "text-accent hover:underline truncate" %>
+                    <span class="text-xs text-ink-faint"><%= number_to_human_size(file.byte_size) %></span>
+                  </li>
+                <% end %>
+              </ul>
+            <% end %>
+            <% if message.outbound? && (message.scheduled? || message.awaiting_follow_up?) %>
+              <div class="mt-2 flex gap-2 flex-wrap">
+                <% if message.scheduled? %>
+                  <%= button_to "Cancel send", record_email_path(message), method: :delete, class: "btn-ghost text-xs px-1.5 py-0.5", form_class: "inline-block" %>
+                <% elsif message.awaiting_follow_up? %>
+                  <%= button_to "Mark replied", mark_replied_record_email_path(message), method: :patch, class: "btn-ghost text-xs px-1.5 py-0.5", form_class: "inline-block" %>
+                <% end %>
+              </div>
+            <% end %>
+          </details>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+</section>

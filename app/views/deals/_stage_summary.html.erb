@@ -1,0 +1,15 @@
+<%# locals: (stage:, deals:, reorderable: false) %>
+<header id="stage_summary_<%= stage.id %>" class="flex items-center gap-2 px-3 py-2.5 shrink-0">
+  <% if reorderable %>
+    <span role="button" tabindex="-1" data-kanban-target="columnHandle"
+          class="cursor-grab active:cursor-grabbing text-ink-faint hover:text-ink-soft p-0.5 -ml-1 touch-none select-none shrink-0"
+          title="Drag to reorder column" aria-label="Reorder column"
+          data-action="pointerdown->kanban#columnPointerDown">
+      <%= icon :grip, classes: "size-3.5 pointer-events-none" %>
+    </span>
+  <% end %>
+  <span class="text-base font-semibold text-ink truncate" data-board-pager-stage-name><%= stage.name %></span>
+  <span class="text-xs text-ink-faint tabular-nums"><%= stage.probability %>%</span>
+  <span class="text-sm text-ink-faint"><%= deals.size %></span>
+  <span class="ml-auto text-sm text-ink-faint tabular-nums"><%= money(deals.sum(&:value)) %></span>
+</header>

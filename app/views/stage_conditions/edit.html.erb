@@ -1,0 +1,5 @@
+<% page_title "Editar condición" %>
+<%= render "shared/page_header", title: "Editar condición — #{@stage_condition.field_label}", icon_name: :lock %>
+<div class="p-5 max-w-xl overflow-y-auto">
+  <%= render "form", stage_condition: @stage_condition, stage: @stage_condition.pipeline_stage %>
+</div>

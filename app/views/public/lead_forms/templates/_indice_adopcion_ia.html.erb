@@ -1,0 +1,24 @@
+<div class="space-y-3">
+  <% if lead_form.collects_company? %>
+    <div>
+      <%= render "public/lead_forms/field_label", f: f, field: :company_name, text: "Empresa", required: true %>
+      <%= f.text_field :company_name, required: true, class: "input w-full", autocomplete: "organization" %>
+    </div>
+  <% end %>
+
+  <div>
+    <%= render "public/lead_forms/field_label", f: f, field: :job_title, text: "Cargo", required: true %>
+    <%= f.text_field :job_title, required: true, class: "input w-full", autocomplete: "organization-title" %>
+  </div>
+
+  <div>
+    <%= render "public/lead_forms/field_label", f: f, field: :employee_range, text: "Tamaño (nº de empleados)", required: true %>
+    <%= f.select :employee_range,
+          options_for_select(LeadForm::COMPANY_EMPLOYEE_RANGE_OPTIONS),
+          { include_blank: "Selecciona una opción" },
+          class: "input w-full",
+          required: true %>
+  </div>
+
+  <%= render "public/lead_forms/how_heard_field", f: f %>
+</div>

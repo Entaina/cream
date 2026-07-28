@@ -1,0 +1,190 @@
+- generic [ref=e2]:
+  - complementary [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]: C
+      - generic [ref=e6]: Cream Demo
+    - link "Search... /" [ref=e8] [cursor=pointer]:
+      - /url: /search
+      - img [ref=e9]
+      - generic [ref=e11]: Search...
+      - generic [ref=e12]: /
+    - navigation [ref=e13]:
+      - link "Dashboard" [ref=e14] [cursor=pointer]:
+        - /url: /
+        - img [ref=e15]
+        - text: Dashboard
+      - link "People" [ref=e17] [cursor=pointer]:
+        - /url: /people
+        - img [ref=e18]
+        - text: People
+      - link "Companies" [ref=e20] [cursor=pointer]:
+        - /url: /companies
+        - img [ref=e21]
+        - text: Companies
+      - link "Deals" [ref=e23] [cursor=pointer]:
+        - /url: /deals/board
+        - img [ref=e24]
+        - text: Deals
+      - link "Tasks" [ref=e26] [cursor=pointer]:
+        - /url: /tasks
+        - img [ref=e27]
+        - text: Tasks
+    - generic [ref=e29]:
+      - generic [ref=e30]:
+        - generic [ref=e31]: Lists
+        - link "New list" [ref=e32] [cursor=pointer]:
+          - /url: /lists/new
+          - img [ref=e33]
+      - link "Champions" [ref=e35] [cursor=pointer]:
+        - /url: /lists/5
+        - generic [ref=e37]: Champions
+      - link "Hot deals Q3" [ref=e38] [cursor=pointer]:
+        - /url: /lists/4
+        - generic [ref=e40]: Hot deals Q3
+      - link "Spain accounts" [ref=e41] [cursor=pointer]:
+        - /url: /lists/6
+        - generic [ref=e43]: Spain accounts
+    - generic [ref=e44]:
+      - generic [ref=e45]: JD
+      - generic [ref=e46]:
+        - paragraph [ref=e47]: Josemi Díez
+        - paragraph [ref=e48]: josemi@entaina.ai
+      - button "Sign out" [ref=e50]:
+        - img [ref=e51]
+  - main [ref=e53]:
+    - generic [ref=e54]:
+      - generic [ref=e55]:
+        - img [ref=e56]
+        - heading "Factorial" [level=1] [ref=e58]
+      - generic [ref=e59]:
+        - link "Add person" [ref=e60] [cursor=pointer]:
+          - /url: /people/new?company_id=12
+          - img [ref=e61]
+          - text: Add person
+        - link "Add deal" [ref=e63] [cursor=pointer]:
+          - /url: /deals/new?company_id=12
+          - img [ref=e64]
+          - text: Add deal
+        - link "Edit" [ref=e66] [cursor=pointer]:
+          - /url: /companies/12/edit
+          - img [ref=e67]
+          - text: Edit
+        - button "Delete" [ref=e70] [cursor=pointer]:
+          - img [ref=e71]
+          - text: Delete
+    - generic [ref=e73]:
+      - complementary [ref=e74]:
+        - generic [ref=e75]:
+          - generic [ref=e76]: F
+          - generic [ref=e77]:
+            - heading "Factorial" [level=2] [ref=e78]
+            - link "factorialhr.com" [ref=e79] [cursor=pointer]:
+              - /url: https://factorialhr.com
+        - generic [ref=e80]:
+          - generic [ref=e81]:
+            - generic [ref=e82]:
+              - img [ref=e83]
+              - text: Industry
+            - generic [ref=e85]: HR Tech
+          - generic [ref=e86]:
+            - generic [ref=e87]:
+              - img [ref=e88]
+              - text: Employees
+            - generic [ref=e90]: 501-1000
+          - generic [ref=e91]:
+            - generic [ref=e92]:
+              - img [ref=e93]
+              - text: Location
+            - generic [ref=e95]: Barcelona, Spain
+          - generic [ref=e96]:
+            - generic [ref=e97]:
+              - img [ref=e98]
+              - text: Revenue
+            - generic [ref=e100]: 80.000.000 €
+          - generic [ref=e101]:
+            - generic [ref=e102]:
+              - img [ref=e103]
+              - text: LinkedIn
+            - generic [ref=e105]: —
+          - generic [ref=e106]:
+            - generic [ref=e107]:
+              - img [ref=e108]
+              - text: Owner
+            - generic [ref=e110]: Josemi Díez
+          - generic [ref=e111]:
+            - generic [ref=e112]:
+              - img [ref=e113]
+              - text: Created
+            - generic [ref=e115]: 11 Jun 08:18
+        - generic [ref=e116]:
+          - heading "About" [level=3] [ref=e117]
+          - paragraph [ref=e118]: HR software for SMBs.
+        - generic [ref=e119]:
+          - heading "People (2)" [level=3] [ref=e120]
+          - list [ref=e121]:
+            - listitem [ref=e122]:
+              - link "JR Jordi Romero CEO" [ref=e123] [cursor=pointer]:
+                - /url: /people/17
+                - generic [ref=e124]: JR
+                - generic [ref=e125]: Jordi Romero
+                - generic [ref=e126]: CEO
+            - listitem [ref=e127]:
+              - link "BF Bernat Farrero CRO" [ref=e128] [cursor=pointer]:
+                - /url: /people/18
+                - generic [ref=e129]: BF
+                - generic [ref=e130]: Bernat Farrero
+                - generic [ref=e131]: CRO
+        - generic [ref=e132]:
+          - heading "Deals (1)" [level=3] [ref=e133]
+          - list [ref=e134]:
+            - listitem [ref=e135]:
+              - link "Factorial — Integration partnership Won" [ref=e136] [cursor=pointer]:
+                - /url: /deals/13
+                - generic [ref=e137]: Factorial — Integration partnership
+                - generic [ref=e138]: Won
+        - generic [ref=e139]:
+          - heading "Lists" [level=3] [ref=e140]
+          - link "Spain accounts" [ref=e142] [cursor=pointer]:
+            - /url: /lists/6
+      - generic [ref=e143]:
+        - generic [ref=e144]:
+          - heading "Notes (1)" [level=3] [ref=e145]:
+            - img [ref=e146]
+            - text: Notes
+            - generic [ref=e148]: (1)
+          - generic [ref=e149]:
+            - textbox "Note title (optional)" [ref=e150]
+            - textbox "Write a note..." [ref=e151]
+            - button "Add note" [ref=e153] [cursor=pointer]
+          - article [ref=e155]:
+            - generic [ref=e156]:
+              - generic [ref=e157]: AT
+              - generic [ref=e158]: Ana Torres
+              - generic [ref=e159]: 11 Jun 08:18
+              - button "Delete note" [ref=e161] [cursor=pointer]:
+                - img [ref=e162]
+            - paragraph [ref=e164]: Partnership context
+            - paragraph [ref=e165]: They want to embed our widget in their marketplace. Legal review pending on data processing terms.
+        - generic [ref=e166]:
+          - heading "Tasks (0 open)" [level=3] [ref=e167]:
+            - img [ref=e168]
+            - text: Tasks
+            - generic [ref=e170]: (0 open)
+          - generic [ref=e171]:
+            - textbox "Add a task..." [ref=e172]
+            - textbox [ref=e173]
+            - button "Add" [ref=e174] [cursor=pointer]
+          - list
+        - generic [ref=e175]:
+          - heading "Activity" [level=3] [ref=e176]:
+            - img [ref=e177]
+            - text: Activity
+          - list [ref=e179]:
+            - listitem [ref=e180]:
+              - generic [ref=e183]:
+                - paragraph [ref=e184]: Ana Torres added a note
+                - paragraph [ref=e185]: 7 minutes ago
+            - listitem [ref=e186]:
+              - generic [ref=e189]:
+                - paragraph [ref=e190]: Josemi Díez created this record
+                - paragraph [ref=e191]: 7 minutes ago

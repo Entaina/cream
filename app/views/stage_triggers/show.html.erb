@@ -1,0 +1,40 @@
+<% page_title @stage_trigger.name %>
+<% actions = capture do %>
+  <%= link_to pipeline_stage_stage_triggers_path(@stage_trigger.pipeline_stage), class: "btn-secondary" do %>
+    <%= icon :arrow_left, classes: "size-3.5" %> Disparadores
+  <% end %>
+  <%= link_to "Editar", edit_stage_trigger_path(@stage_trigger), class: "btn-primary" %>
+<% end %>
+<%= render "shared/page_header", title: @stage_trigger.name, icon_name: :zap, count: @runs.size, actions: actions %>
+
+<div class="flex-1 overflow-y-auto scrollbar-subtle p-5 space-y-3">
+  <p class="text-sm text-ink-faint">
+    Etapa <strong><%= @stage_trigger.pipeline_stage.name %></strong> (<%= @stage_trigger.pipeline.name %>) ·
+    modo <strong><%= @stage_trigger.llm? ? "IA" : "nativo" %></strong> · últimas <%= @runs.size %> ejecuciones.
+  </p>
+  <% if @runs.empty? %>
+    <p class="text-base text-ink-soft">Este disparador no se ha ejecutado todavía.</p>
+  <% end %>
+  <% @runs.each do |run| %>
+    <article class="card p-4 space-y-1">
+      <div class="flex items-center gap-2">
+        <%= badge run.status, color: { "succeeded" => "green", "failed" => "red", "running" => "golden" }.fetch(run.status, "chicago") %>
+        <%= link_to run.deal.name, deal_path(run.deal), class: "text-base font-medium hover:underline" %>
+        <span class="text-sm text-ink-faint">
+          <%= run.created_at.strftime("%d/%m/%Y %H:%M") %>
+          <% if run.user %> · por <%= run.user.name %><% end %>
+          <% if run.duration %> · <%= number_with_precision(run.duration, precision: 1) %>s<% end %>
+        </span>
+      </div>
+      <% if run.error.present? %>
+        <p class="text-sm text-danger-strong"><%= run.error %></p>
+      <% end %>
+      <% if run.transcript.present? %>
+        <details class="text-sm text-ink-faint">
+          <summary class="cursor-pointer select-none">Transcript (<%= run.transcript.size %> pasos)</summary>
+          <pre class="mt-1 p-2 rounded bg-canvas-sunken overflow-x-auto text-xs"><%= JSON.pretty_generate(run.transcript) %></pre>
+        </details>
+      <% end %>
+    </article>
+  <% end %>
+</div>

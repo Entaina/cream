@@ -1,0 +1,91 @@
+<% page_title @person.display_name %>
+<% actions = capture do %>
+  <%= render "quick_deal_dialog", person: @person %>
+  <%= link_to merge_person_path(@person), class: "btn-secondary" do %>
+    <%= icon :users, classes: "size-3.5" %> Merge
+  <% end %>
+  <%= link_to edit_person_path(@person), class: "btn-secondary" do %>
+    <%= icon :pencil, classes: "size-3.5" %> Edit
+  <% end %>
+  <%= button_to person_path(@person), method: :delete, form: { data: { turbo_confirm: "Delete #{@person.display_name}? This cannot be undone." } }, class: "btn-danger" do %>
+    <%= icon :trash, classes: "size-3.5" %> Delete
+  <% end %>
+<% end %>
+<%= render "shared/page_header", title: @person.display_name, icon_name: :users, count: nil, actions: actions %>
+
+<div class="flex-1 flex min-h-0 overflow-x-auto snap-x snap-mandatory md:overflow-x-visible md:snap-none">
+  <%# Attributes panel %>
+  <aside class="w-80 shrink-0 snap-start border-r border-line overflow-y-auto scrollbar-subtle p-4">
+    <div class="flex items-center gap-3 mb-4">
+      <%= avatar @person, size: "size-12", text: "text-base" %>
+      <div class="min-w-0">
+        <h2 class="font-semibold text-lg truncate"><%= @person.display_name %></h2>
+        <% if @person.job_title.present? %>
+          <p class="text-sm text-ink-faint truncate"><%= @person.job_title %></p>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="divide-y divide-line/60">
+      <%= render "emails_section", person: @person %>
+      <%= render "shared/attribute", label: "Phone", icon_name: :phone, value: @person.phone %>
+      <%= render "shared/attribute", label: "Company", icon_name: :building,
+            value: @person.company ? link_to(@person.company.name, company_path(@person.company), class: "text-accent hover:underline") : nil %>
+      <%= render "shared/attribute", label: "Location", icon_name: :map_pin, value: @person.location %>
+      <%= render "shared/attribute", label: "LinkedIn", icon_name: :external,
+            value: @person.linkedin_url.present? ? link_to("Profile", @person.linkedin_url, target: "_blank", class: "text-accent hover:underline") : nil %>
+      <%= render "shared/attribute", label: "Owner", icon_name: :users, value: @person.owner&.name %>
+      <%= render "shared/attribute", label: "Created", icon_name: :clock, value: l(@person.created_at, format: :short) %>
+      <%= render "shared/custom_attributes", record: @person %>
+    </div>
+
+    <% if @person.description.present? %>
+      <div class="mt-4">
+        <h3 class="text-sm font-semibold uppercase tracking-wider text-ink-faint mb-1.5">About</h3>
+        <p class="text-base text-ink-soft whitespace-pre-wrap"><%= @person.description %></p>
+      </div>
+    <% end %>
+
+    <div class="mt-4">
+      <h3 class="text-sm font-semibold uppercase tracking-wider text-ink-faint mb-1.5">Deals</h3>
+      <% if @person.deals.any? %>
+        <ul class="space-y-1">
+          <% @person.deals.each do |deal| %>
+            <li>
+              <%= link_to deal_path(deal), class: "flex items-center justify-between gap-2 rounded-md px-2 py-1.5 hover:bg-canvas-sunken text-base" do %>
+                <span class="truncate font-medium"><%= deal.name %></span>
+                <%= stage_badge deal %>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p class="text-sm text-ink-faint px-2">No deals yet.</p>
+      <% end %>
+    </div>
+
+    <% if @person.lists.any? %>
+      <div class="mt-4">
+        <h3 class="text-sm font-semibold uppercase tracking-wider text-ink-faint mb-1.5">Lists</h3>
+        <div class="flex flex-wrap gap-1.5">
+          <% @person.lists.each do |list| %>
+            <%= link_to list.name, list_path(list), class: "inline-flex items-center gap-1.5 rounded-full bg-canvas-sunken px-2 py-0.5 text-sm hover:bg-line" %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <%= render "relationships_section", person: @person %>
+  </aside>
+
+  <%# Main: notes, tasks, timeline %>
+  <div class="w-full shrink-0 snap-start md:flex-1 md:w-auto overflow-y-auto scrollbar-subtle p-5 space-y-6 bg-canvas-soft/50">
+    <%= render "shared/tasks_section", record: @person, task: @task %>
+    <%= render "shared/ai_assistant_section", record: @person if feature_enabled?(:ai_assistant) %>
+    <%= render "shared/notes_section", record: @person, note: @note %>
+    <%= render "shared/comments_section", record: @person, comment: @comment if feature_enabled?(:comments) %>
+    <%= render "shared/attachments_section", record: @person if feature_enabled?(:attachments) %>
+    <%= render "shared/email_section", record: @person, email_message: @email_message if feature_enabled?(:record_email) %>
+    <%= render "shared/timeline", activities: @activities %>
+  </div>
+</div>

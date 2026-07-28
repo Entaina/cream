@@ -1,0 +1,161 @@
+- generic [ref=e158]:
+  - complementary [ref=e159]:
+    - generic [ref=e160]:
+      - generic [ref=e161]: C
+      - generic [ref=e162]: Cream Demo
+    - link "Search... /" [ref=e164] [cursor=pointer]:
+      - /url: /search
+      - img [ref=e165]
+      - generic [ref=e167]: Search...
+      - generic [ref=e168]: /
+    - navigation [ref=e169]:
+      - link "Dashboard" [ref=e170] [cursor=pointer]:
+        - /url: /
+        - img [ref=e171]
+        - text: Dashboard
+      - link "People" [ref=e173] [cursor=pointer]:
+        - /url: /people
+        - img [ref=e174]
+        - text: People
+      - link "Companies" [ref=e176] [cursor=pointer]:
+        - /url: /companies
+        - img [ref=e177]
+        - text: Companies
+      - link "Deals" [ref=e179] [cursor=pointer]:
+        - /url: /deals/board
+        - img [ref=e180]
+        - text: Deals
+      - link "Tasks" [ref=e182] [cursor=pointer]:
+        - /url: /tasks
+        - img [ref=e183]
+        - text: Tasks
+    - generic [ref=e185]:
+      - generic [ref=e186]:
+        - generic [ref=e187]: Lists
+        - link "New list" [ref=e188] [cursor=pointer]:
+          - /url: /lists/new
+          - img [ref=e189]
+      - link "Champions" [ref=e191] [cursor=pointer]:
+        - /url: /lists/5
+        - generic [ref=e193]: Champions
+      - link "Hot deals Q3" [ref=e194] [cursor=pointer]:
+        - /url: /lists/4
+        - generic [ref=e196]: Hot deals Q3
+      - link "Spain accounts" [ref=e197] [cursor=pointer]:
+        - /url: /lists/6
+        - generic [ref=e199]: Spain accounts
+    - generic [ref=e200]:
+      - generic [ref=e201]: JD
+      - generic [ref=e202]:
+        - paragraph [ref=e203]: Josemi Díez
+        - paragraph [ref=e204]: josemi@entaina.ai
+      - button "Sign out" [ref=e206]:
+        - img [ref=e207]
+  - main [ref=e209]:
+    - generic [ref=e210]:
+      - img [ref=e211]
+      - text: Note added.
+    - generic [ref=e213]:
+      - generic [ref=e214]:
+        - img [ref=e215]
+        - heading "Cabify — Pilot program" [level=1] [ref=e217]
+      - generic [ref=e218]:
+        - link "Edit" [ref=e219] [cursor=pointer]:
+          - /url: /deals/14/edit
+          - img [ref=e220]
+          - text: Edit
+        - button "Delete" [ref=e223] [cursor=pointer]:
+          - img [ref=e224]
+          - text: Delete
+    - generic [ref=e226]:
+      - complementary [ref=e227]:
+        - generic [ref=e228]:
+          - paragraph [ref=e229]: 12.000 €
+          - generic [ref=e231]: Qualified
+        - generic [ref=e232]:
+          - heading "Move to stage" [level=3] [ref=e233]
+          - generic [ref=e234]:
+            - button "Lead" [ref=e236] [cursor=pointer]
+            - generic [ref=e237]: Qualified
+            - button "Proposal" [ref=e239] [cursor=pointer]
+            - button "Negotiation" [ref=e241] [cursor=pointer]
+            - button "Won" [ref=e243] [cursor=pointer]
+            - button "Lost" [ref=e245] [cursor=pointer]
+        - generic [ref=e246]:
+          - generic [ref=e247]:
+            - generic [ref=e248]:
+              - img [ref=e249]
+              - text: Probability
+            - generic [ref=e251]: 15%
+          - generic [ref=e252]:
+            - generic [ref=e253]:
+              - img [ref=e254]
+              - text: Close date
+            - generic [ref=e256]: Sep 09
+          - generic [ref=e257]:
+            - generic [ref=e258]:
+              - img [ref=e259]
+              - text: Company
+            - link "Cabify" [ref=e262] [cursor=pointer]:
+              - /url: /companies/13
+          - generic [ref=e263]:
+            - generic [ref=e264]:
+              - img [ref=e265]
+              - text: Contact
+            - link "Juan de Antonio" [ref=e268] [cursor=pointer]:
+              - /url: /people/19
+          - generic [ref=e269]:
+            - generic [ref=e270]:
+              - img [ref=e271]
+              - text: Owner
+            - generic [ref=e273]: Ana Torres
+          - generic [ref=e274]:
+            - generic [ref=e275]:
+              - img [ref=e276]
+              - text: Created
+            - generic [ref=e278]: 11 Jun 08:18
+      - generic [ref=e279]:
+        - generic [ref=e280]:
+          - heading "Notes (1)" [level=3] [ref=e281]:
+            - img [ref=e282]
+            - text: Notes
+            - generic [ref=e284]: (1)
+          - generic [ref=e285]:
+            - textbox "Note title (optional)" [ref=e286]
+            - textbox "Write a note..." [ref=e287]
+            - button "Add note" [ref=e289] [cursor=pointer]
+          - article [ref=e291]:
+            - generic [ref=e292]:
+              - generic [ref=e293]: JD
+              - generic [ref=e294]: Josemi Díez
+              - generic [ref=e295]: 11 Jun 08:23
+              - button "Delete note" [ref=e297] [cursor=pointer]:
+                - img [ref=e298]
+            - paragraph [ref=e300]: Llamada programada con el equipo de innovación para la semana que viene.
+        - generic [ref=e301]:
+          - heading "Tasks (0 open)" [level=3] [ref=e302]:
+            - img [ref=e303]
+            - text: Tasks
+            - generic [ref=e305]: (0 open)
+          - generic [ref=e306]:
+            - textbox "Add a task..." [ref=e307]
+            - textbox [ref=e308]
+            - button "Add" [ref=e309] [cursor=pointer]
+          - list
+        - generic [ref=e310]:
+          - heading "Activity" [level=3] [ref=e311]:
+            - img [ref=e312]
+            - text: Activity
+          - list [ref=e314]:
+            - listitem [ref=e315]:
+              - generic [ref=e318]:
+                - paragraph [ref=e319]: Josemi Díez added a note
+                - paragraph [ref=e320]: less than a minute ago
+            - listitem [ref=e321]:
+              - generic [ref=e324]:
+                - paragraph [ref=e325]: Josemi Díez moved the deal from Lead to Qualified
+                - paragraph [ref=e326]: 2 minutes ago
+            - listitem [ref=e327]:
+              - generic [ref=e330]:
+                - paragraph [ref=e331]: Ana Torres created this record
+                - paragraph [ref=e332]: 5 minutes ago

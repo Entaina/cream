@@ -1,0 +1,13 @@
+es:
+  booking:
+    errors:
+      slot_unavailable: "Ese horario ya no está disponible."
+      invalid_datetime: "La fecha u hora seleccionada no es válida."
+      rate_limited: "Demasiadas peticiones. Inténtalo de nuevo en un minuto."
+
+en:
+  booking:
+    errors:
+      slot_unavailable: "That time slot is no longer available."
+      invalid_datetime: "The selected date or time is invalid."
+      rate_limited: "Too many requests. Please try again in a minute."

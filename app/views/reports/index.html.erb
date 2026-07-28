@@ -1,0 +1,120 @@
+<% page_title "Reports" %>
+<%= render "shared/page_header", title: "Reports", icon_name: :bar_chart %>
+
+<div class="flex-1 overflow-y-auto scrollbar-subtle p-5 space-y-6">
+  <%= form_with url: reports_path, method: :get, data: { controller: "report-builder" }, class: "card p-4" do %>
+    <%= hidden_field_tag :closed, "1" if show_closed? %>
+    <div class="grid grid-cols-1 sm:grid-cols-5 gap-3">
+      <div>
+        <label class="label">Record</label>
+        <%= select_tag :record_type, options_for_select(Report::RECORD_TYPES, @config[:record_type]),
+              class: "input w-full",
+              data: { "report-builder-target" => "recordType", action: "report-builder#recordTypeChanged" } %>
+      </div>
+      <div data-report-builder-target="pipelineField">
+        <label class="label">Pipeline</label>
+        <%= select_tag :pipeline_id,
+              options_for_select(@pipelines.map { |p| [p.name, p.id] }, @config[:pipeline_id]),
+              include_blank: "All pipelines",
+              class: "input w-full",
+              data: { action: "report-builder#submit" } %>
+      </div>
+      <div>
+        <label class="label">Measure</label>
+        <select name="metric" class="input w-full" data-report-builder-target="metric" data-action="report-builder#submit">
+          <option value="count" data-types="Deal Person Company" <%= "selected" if @config[:metric] == "count" %>>Count</option>
+          <option value="sum_value" data-types="Deal" <%= "selected" if @config[:metric] == "sum_value" %>>Total value</option>
+          <option value="avg_value" data-types="Deal" <%= "selected" if @config[:metric] == "avg_value" %>>Average value</option>
+        </select>
+      </div>
+      <div>
+        <label class="label">Group by</label>
+        <select name="group_by" class="input w-full" data-report-builder-target="groupBy" data-action="report-builder#submit">
+          <option value="stage" data-types="Deal" <%= "selected" if @config[:group_by] == "stage" %>>Stage</option>
+          <option value="owner" data-types="Deal Person Company" <%= "selected" if @config[:group_by] == "owner" %>>Owner</option>
+          <option value="company" data-types="Person" <%= "selected" if @config[:group_by] == "company" %>>Company</option>
+          <option value="industry" data-types="Company" <%= "selected" if @config[:group_by] == "industry" %>>Industry</option>
+          <option value="month" data-types="Deal Person Company" <%= "selected" if @config[:group_by] == "month" %>>Month created</option>
+        </select>
+      </div>
+      <div>
+        <label class="label">Period</label>
+        <%= select_tag :date_range,
+              options_for_select([ [ "All time", "all" ], [ "This month", "month" ], [ "This quarter", "quarter" ], [ "This year", "year" ] ], @config[:date_range]),
+              class: "input w-full", data: { action: "report-builder#submit" } %>
+      </div>
+    </div>
+  <% end %>
+
+  <section class="card p-4">
+    <div class="flex items-center justify-between gap-2 mb-3 flex-wrap">
+      <h2 class="text-base font-semibold"><%= @result.metric_label %> by <%= @config[:group_by] %></h2>
+      <div class="flex items-center gap-2 flex-wrap">
+        <% if @config[:group_by] == "stage" %>
+          <%= link_to reports_path(@config.except(:include_closed).merge(closed: show_closed? ? nil : "1")),
+                class: show_closed? ? "btn-secondary" : "btn-ghost" do %>
+            <%= icon :check_circle, classes: "size-3.5" %>
+            <%= show_closed? ? "Closed shown" : "Show closed" %>
+          <% end %>
+        <% end %>
+        <%= link_to "Export CSV", reports_path(@config.except(:include_closed).merge(format: :csv, closed: show_closed? ? "1" : nil)), class: "btn-ghost text-sm" %>
+        <%= form_with url: reports_path, method: :post, class: "flex items-center gap-2" do %>
+          <%= hidden_field_tag "report[record_type]", @config[:record_type] %>
+          <%= hidden_field_tag "report[metric]", @config[:metric] %>
+          <%= hidden_field_tag "report[group_by]", @config[:group_by] %>
+          <%= hidden_field_tag "report[date_range]", @config[:date_range] %>
+          <%= hidden_field_tag "report[pipeline_id]", @config[:pipeline_id] %>
+          <%= text_field_tag "report[name]", nil, placeholder: "Name this report", class: "input py-1 text-sm" %>
+          <%= select_tag "report[schedule]",
+                options_for_select([ [ "Don't email", "none" ], [ "Email daily", "daily" ], [ "Email weekly", "weekly" ], [ "Email monthly", "monthly" ] ]),
+                class: "input py-1 text-sm" %>
+          <%= submit_tag "Save", class: "btn-secondary" %>
+        <% end %>
+      </div>
+    </div>
+
+    <% if @result.rows.empty? %>
+      <p class="text-sm text-ink-faint">No data for this selection.</p>
+    <% else %>
+      <div class="space-y-1.5">
+        <% @result.rows.each do |row| %>
+          <% drill_down = ReportDrillDown.new(config: @config, row: row, workspace: current_workspace) %>
+          <%= link_to drill_down.path,
+                class: "flex items-center gap-3 text-sm rounded-md -mx-1 px-1 py-0.5 hover:bg-canvas-soft transition-colors group",
+                title: "View #{row.label} in list" do %>
+            <span class="w-36 shrink-0 truncate text-ink-soft group-hover:text-ink" title="<%= row.label %>"><%= row.label %></span>
+            <div class="flex-1 <%= row.color ? "bg-canvas-raised ring-1 ring-inset ring-line" : "bg-canvas-sunken" %> rounded h-5 overflow-hidden">
+              <div class="<%= row.color ? stage_bar_classes(row.color) : "bg-accent" %> h-5 group-hover:opacity-90" style="width: <%= @result.max.positive? ? (row.value / @result.max * 100).round(1) : 0 %>%"></div>
+            </div>
+            <span class="w-28 shrink-0 text-right tabular-nums text-ink group-hover:text-accent">
+              <%= @result.metric == "count" ? row.value.to_i : money(row.value) %>
+            </span>
+          <% end %>
+        <% end %>
+      </div>
+      <p class="text-sm text-ink-faint mt-3">
+        Total: <%= @result.metric == "count" ? @result.total.to_i : money(@result.total) %>
+      </p>
+    <% end %>
+  </section>
+
+  <% if @reports.any? %>
+    <section>
+      <h2 class="text-sm font-semibold uppercase tracking-wider text-ink-faint mb-2">Saved reports</h2>
+      <div class="space-y-2">
+        <% @reports.each do |report| %>
+          <div class="card p-3 flex items-center gap-2">
+            <%= link_to report.name, reports_path(report.config_params), class: "font-medium text-base hover:text-accent" %>
+            <span class="text-sm text-ink-faint"><%= report.record_type %> · <%= report.metric.humanize.downcase %> · <%= report.group_by %></span>
+            <%= form_with url: report_path(report), method: :patch, class: "ml-auto flex items-center gap-2", data: { controller: "auto-submit" } do %>
+              <%= select_tag "report[schedule]",
+                    options_for_select([ [ "Not emailed", "none" ], [ "Daily", "daily" ], [ "Weekly", "weekly" ], [ "Monthly", "monthly" ] ], report.schedule),
+                    class: "input py-0.5 text-xs", data: { action: "change->auto-submit#submit" } %>
+            <% end %>
+            <%= button_to "Delete", report_path(report), method: :delete, class: "btn-ghost text-xs", form_class: "inline-block" %>
+          </div>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+</div>

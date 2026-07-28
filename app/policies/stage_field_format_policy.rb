@@ -1,0 +1,2 @@
+class StageFieldFormatPolicy < WorkspaceRecordPolicy
+end

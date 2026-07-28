@@ -1,0 +1,84 @@
+<%= form_with model: automation, html: { data: { controller: "automation-form" } }, class: "card p-4 space-y-4" do |f| %>
+  <div>
+    <%= f.label :name, class: "label" %>
+    <%= f.text_field :name, class: "input w-full" %>
+  </div>
+
+  <div>
+    <%= f.label :trigger_event, "When this happens", class: "label" %>
+    <%= f.select :trigger_event, Automation::TRIGGER_EVENTS, {},
+          class: "input w-full",
+          data: { "automation-form-target" => "trigger", action: "automation-form#refresh" } %>
+    <p class="text-sm text-ink-faint mt-1" data-automation-form-target="hint" data-trigger="deal.stage_changed">
+      Fires when a deal changes stage. Conditions can match <code>to</code> (the new stage name) or any deal field.
+    </p>
+    <p class="text-sm text-ink-faint mt-1" data-automation-form-target="hint" data-trigger="record.created" hidden>
+      Fires when a person, company or deal is created. Conditions can match any field of the new record.
+    </p>
+    <p class="text-sm text-ink-faint mt-1" data-automation-form-target="hint" data-trigger="task.completed" hidden>
+      Fires when a task is completed. Conditions can match <code>title</code> (the task title).
+    </p>
+  </div>
+
+  <div data-controller="nested-form">
+    <span class="label">Only if (optional)</span>
+    <p class="text-sm text-ink-faint mb-2">Each row must match exactly. Leave empty to run on every trigger.</p>
+    <div class="space-y-2" data-nested-form-target="list">
+      <% automation.trigger_conditions.each do |key, value| %>
+        <div class="flex gap-2" data-nested-form-target="row">
+          <%= text_field_tag "automation[condition_keys][]", key, class: "input flex-1", placeholder: "field" %>
+          <%= text_field_tag "automation[condition_values][]", value, class: "input flex-1", placeholder: "equals" %>
+          <button type="button" class="btn-ghost" data-action="nested-form#remove" aria-label="Remove condition">✕</button>
+        </div>
+      <% end %>
+    </div>
+    <template data-nested-form-target="template">
+      <div class="flex gap-2" data-nested-form-target="row">
+        <%= text_field_tag "automation[condition_keys][]", nil, class: "input flex-1", placeholder: "field" %>
+        <%= text_field_tag "automation[condition_values][]", nil, class: "input flex-1", placeholder: "equals" %>
+        <button type="button" class="btn-ghost" data-action="nested-form#remove" aria-label="Remove condition">✕</button>
+      </div>
+    </template>
+    <button type="button" class="btn-secondary mt-2" data-action="nested-form#add">
+      <%= icon :plus, classes: "size-3.5" %> Add condition
+    </button>
+  </div>
+
+  <div>
+    <%= f.label :action_type, "Do this", class: "label" %>
+    <%= f.select :action_type, Automation::ACTION_TYPES, {},
+          class: "input w-full",
+          data: { "automation-form-target" => "actionType", action: "automation-form#refresh" } %>
+  </div>
+
+  <div data-automation-form-target="actionFields" data-action-type="create_task" class="space-y-2">
+    <div>
+      <label class="label">Task title</label>
+      <%= text_field_tag "automation[action_params][title]", automation.action_params["title"], class: "input w-full", placeholder: "Follow up" %>
+    </div>
+    <div>
+      <label class="label">Due date</label>
+      <%= date_field_tag "automation[action_params][due_on]", automation.action_params["due_on"], class: "input w-full" %>
+      <p class="text-sm text-ink-faint mt-1">Leave empty to default to one week ahead.</p>
+    </div>
+  </div>
+
+  <div data-automation-form-target="actionFields" data-action-type="send_email" class="space-y-2" hidden>
+    <div>
+      <label class="label">Email subject</label>
+      <%= text_field_tag "automation[action_params][subject]", automation.action_params["subject"], class: "input w-full", placeholder: "Follow up" %>
+    </div>
+    <div>
+      <label class="label">Email body</label>
+      <%= text_area_tag "automation[action_params][body]", automation.action_params["body"], rows: 4, class: "input w-full resize-y", placeholder: "Checking in." %>
+    </div>
+    <p class="text-sm text-ink-faint">Sent to the record's email (or its first contact). Requires the record to have an email.</p>
+  </div>
+
+  <div data-automation-form-target="actionFields" data-action-type="notify_slack" class="space-y-2" hidden>
+    <p class="text-sm text-ink-faint">Posts a Slack message using this automation's name. <strong>Requires the Slack integration to be enabled</strong>; until then this action does nothing.</p>
+  </div>
+
+  <label class="flex items-center gap-2 text-base"><%= f.check_box :active %> Active</label>
+  <%= f.submit class: "btn-primary" %>
+<% end %>

@@ -1,0 +1,7 @@
+acme:
+  name: Acme Corp
+  workspace: one
+
+globex:
+  name: Globex
+  workspace: two

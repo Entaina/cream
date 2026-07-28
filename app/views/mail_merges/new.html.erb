@@ -1,0 +1,58 @@
+<% page_title "Mail merge" %>
+<%= render "shared/page_header", title: "Mail merge", icon_name: :mail %>
+
+<%
+  view_options = @saved_views.map { |v| [ "#{v.record_type} — #{v.name}", "view:#{v.id}" ] }
+  list_options = @lists.map { |l| [ "#{l.record_type} — #{l.name}", "list:#{l.id}" ] }
+  grouped = []
+  grouped << [ "Saved views", view_options ] if view_options.any?
+  grouped << [ "Lists", list_options ] if list_options.any?
+%>
+
+<div class="p-5 max-w-xl">
+  <div class="card p-4"
+       data-controller="mail-merge-form"
+       data-mail-merge-form-count-url-value="<%= recipients_count_mail_merge_path %>">
+    <%= form_with url: mail_merge_path, class: "space-y-3" do %>
+      <div>
+        <label class="label">Recipients</label>
+        <%= select_tag :source,
+              grouped_options_for_select(grouped) + tag.option("Enter record IDs manually", value: "manual"),
+              class: "input w-full",
+              data: { "mail-merge-form-target" => "source", action: "mail-merge-form#sourceChanged" } %>
+        <p class="text-sm text-ink-faint mt-1">
+          <span data-mail-merge-form-target="count">…</span> will receive this email.
+        </p>
+      </div>
+
+      <div data-mail-merge-form-target="manual" hidden class="space-y-3 border-l-2 border-line pl-3">
+        <div>
+          <label class="label">Record type</label>
+          <%= select_tag :record_type, options_for_select(MailMergesController::RECORD_TYPES, @record_type),
+                class: "input w-full",
+                data: { "mail-merge-form-target" => "recordType", action: "mail-merge-form#manualChanged" } %>
+        </div>
+        <div>
+          <label class="label">Record IDs (comma-separated)</label>
+          <%= text_field_tag :record_ids, nil, class: "input w-full", placeholder: "1,2,3",
+                data: { "mail-merge-form-target" => "recordIds", action: "input->mail-merge-form#manualChanged" } %>
+        </div>
+      </div>
+
+      <div>
+        <label class="label">Plantilla (opcional)</label>
+        <%= select_tag :template_id, options_from_collection_for_select(@templates, :id, :name), include_blank: "Mensaje personalizado", class: "input w-full" %>
+        <p class="text-sm text-ink-faint mt-1">Si eliges una plantilla, se envía su cuerpo (personalizado por destinatario); si no, se usa el mensaje de abajo.</p>
+      </div>
+      <div>
+        <label class="label">Subject</label>
+        <%= text_field_tag :subject, "Hello {name}", class: "input w-full" %>
+      </div>
+      <div>
+        <label class="label">Body</label>
+        <%= text_area_tag :body, "Hi {first_name},", rows: 6, class: "input w-full resize-y" %>
+      </div>
+      <%= submit_tag "Send mail merge", class: "btn-primary" %>
+    <% end %>
+  </div>
+</div>

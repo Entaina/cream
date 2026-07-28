@@ -1,0 +1,5 @@
+<% page_title "Editar formato" %>
+<%= render "shared/page_header", title: "Editar formato — #{StageFieldFormat::FIELDS[@stage_field_format.field]}", icon_name: :eye %>
+<div class="p-5 max-w-xl overflow-y-auto">
+  <%= render "form", stage_field_format: @stage_field_format, stage: @stage_field_format.pipeline_stage %>
+</div>

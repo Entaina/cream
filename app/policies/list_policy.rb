@@ -1,0 +1,2 @@
+class ListPolicy < WorkspaceRecordPolicy
+end

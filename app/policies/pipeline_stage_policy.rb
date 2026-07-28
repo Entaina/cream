@@ -1,0 +1,2 @@
+class PipelineStagePolicy < WorkspaceRecordPolicy
+end

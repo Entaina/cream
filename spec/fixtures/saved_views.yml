@@ -1,0 +1,40 @@
+person_gold:
+  workspace: one
+  user: one
+  record_type: Person
+  name: Gold tier
+  filters: <%= { "cf" => { "customer_tier" => "Gold" } }.to_json %>
+  sort: first_name
+  direction: asc
+  shared: false
+  position: 0
+
+person_shared:
+  workspace: one
+  user: one
+  record_type: Person
+  name: All at Acme
+  filters: <%= { "company_id" => ActiveRecord::FixtureSet.identify(:acme) }.to_json %>
+  direction: asc
+  shared: true
+  position: 1
+
+member_private:
+  workspace: one
+  user: two
+  record_type: Person
+  name: Member private
+  filters: <%= {}.to_json %>
+  direction: asc
+  shared: false
+  position: 2
+
+other_workspace:
+  workspace: two
+  user: two
+  record_type: Person
+  name: Other workspace view
+  filters: <%= {}.to_json %>
+  direction: asc
+  shared: false
+  position: 0

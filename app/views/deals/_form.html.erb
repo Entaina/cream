@@ -1,0 +1,239 @@
+<% form_data = deal.persisted? ? {
+  controller: "deal-stage-celebration",
+  deal_stage_celebration_initial_stage_id_value: deal.pipeline_stage_id,
+  action: "turbo:submit-end->deal-stage-celebration#onSubmitEnd turbo:before-visit@document->deal-stage-celebration#onBeforeVisit"
+} : {} %>
+<%= form_with model: deal, class: "space-y-4", data: form_data do |f| %>
+  <%= hidden_field_tag :stripe_payment_id, @stripe_payment.id if @stripe_payment %>
+  <% if deal.errors.any? %>
+    <div class="rounded-lg bg-danger-soft ring-1 ring-danger-line px-3 py-2 text-sm text-danger-strong">
+      <ul class="list-disc list-inside">
+        <% deal.errors.full_messages.each do |msg| %><li><%= msg %></li><% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= f.label :name, class: "label" %>
+    <%= f.text_field :name, class: "input", autofocus: true, placeholder: "Acme — Annual plan" %>
+  </div>
+
+  <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+    <% if deal.new_record? %>
+      <div data-controller="pipeline-stage-select" class="contents">
+        <div>
+          <%= f.label :pipeline_id, "Pipeline", class: "label" %>
+          <%= f.collection_select :pipeline_id, current_workspace.pipelines.ordered, :id, :name, {},
+                class: "input",
+                data: { pipeline_stage_select_target: "pipeline", action: "change->pipeline-stage-select#pipelineChanged" } %>
+        </div>
+        <div>
+          <%= f.label :pipeline_stage_id, "Stage", class: "label" %>
+          <%= f.select :pipeline_stage_id,
+                options_for_select(
+                  current_workspace.pipelines.ordered.flat_map { |p|
+                    p.pipeline_stages.ordered.map { |s|
+                      [s.name, s.id, { data: { pipeline_id: p.id } }]
+                    }
+                  },
+                  deal.pipeline_stage_id
+                ),
+                {}, class: "input", data: { pipeline_stage_select_target: "stage" } %>
+        </div>
+      </div>
+    <% else %>
+      <div>
+        <%= f.label :pipeline_stage_id, "Stage", class: "label" %>
+        <%= f.select :pipeline_stage_id,
+              options_for_select(
+                deal.pipeline.pipeline_stages.ordered.map { |s|
+                  [s.name, s.id, { data: { "stage-won": s.won?, "stage-closed": s.closed? } }]
+                },
+                deal.pipeline_stage_id
+              ),
+              {}, class: "input" %>
+      </div>
+    <% end %>
+    <div>
+      <%= f.label :value, "Value", class: "label" %>
+      <%= f.number_field :value, class: "input", min: 0, step: 100 %>
+    </div>
+    <div>
+      <%= f.label :currency, class: "label" %>
+      <%= f.select :currency, %w[EUR USD], {}, class: "input" %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+    <div>
+      <%= f.label :probability, "Probability (%)", class: "label" %>
+      <%= f.number_field :probability, class: "input", min: 0, max: 100, step: 5 %>
+    </div>
+    <div>
+      <%= f.label :expected_close_date, class: "label" %>
+      <%= f.date_field :expected_close_date, class: "input" %>
+    </div>
+  </div>
+
+  <div data-controller="deal-contacts" data-deal-contacts-people-url-value="<%= people_path %>" class="space-y-4">
+    <%= render "shared/company_select", form: f,
+          select_data: {"deal-contacts-target": "companySelect", action: "change->deal-contacts#companyChanged"} %>
+
+    <%= render RecordPickerComponent.new(
+          form: f,
+          attribute: :partner_id,
+          label: "Partner",
+          scope: current_workspace.companies.order(:name),
+          search_url: picker_companies_path(format: :json),
+          create_url: companies_path(format: :json),
+          create_param: "company",
+          selected_name: f.object.partner&.name,
+          required: false,
+          hidden_data: {"deal-contacts-target": "partnerSelect", action: "change->deal-contacts#companyChanged"},
+          hint_method: :domain
+        ) %>
+
+    <div>
+      <%= f.label :contact_ids, "Contacts", class: "label" %>
+      <div class="flex items-start gap-2">
+        <% deal_contacts = []
+           deal_contacts += f.object.company.people.order(:first_name, :last_name) if f.object.company
+           deal_contacts += f.object.partner.people.order(:first_name, :last_name) if f.object.partner
+           deal_contacts.uniq! %>
+        <%= f.select :contact_ids,
+              options_from_collection_for_select(deal_contacts, :id, :display_name, f.object.contact_ids),
+              {}, multiple: true, size: 5, class: "input", data: {"deal-contacts-target": "select"} %>
+        <button type="button" class="btn-secondary shrink-0 whitespace-nowrap" data-action="deal-contacts#open">
+          <%= icon :plus, classes: "size-3.5" %> New
+        </button>
+      </div>
+      <p class="mt-1 text-xs text-ink-faint">Optional. Contacts of the client company or partner. Hold ⌘/Ctrl to pick several.</p>
+      <p data-deal-contacts-target="notice" class="hidden mt-1 text-xs text-danger"></p>
+    </div>
+
+    <dialog data-deal-contacts-target="dialog" class="modal-dialog max-w-md rounded-xl border border-line shadow-lg backdrop:bg-chicago-950/40">
+      <div class="p-4 space-y-3">
+        <h3 class="text-base font-semibold">New contact</h3>
+        <p data-deal-contacts-target="error" class="hidden text-sm text-danger"></p>
+        <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
+          <div>
+            <label class="label">First name</label>
+            <%# No `required`: this nameless input lives in a closed <dialog> inside the deal
+                form, and Chrome aborts the WHOLE form submit on hidden invalid controls.
+                The dialog's Create button is type=button, so presence is enforced in JS/server. %>
+            <input type="text" data-deal-contacts-target="firstName" class="input" data-action="keydown.enter->deal-contacts#create" />
+          </div>
+          <div>
+            <label class="label">Last name</label>
+            <input type="text" data-deal-contacts-target="lastName" class="input" data-action="keydown.enter->deal-contacts#create" />
+          </div>
+        </div>
+        <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
+          <div>
+            <label class="label">Email</label>
+            <input type="email" data-deal-contacts-target="email" class="input" />
+          </div>
+          <div>
+            <label class="label">Phone</label>
+            <input type="tel" data-deal-contacts-target="phone" class="input" />
+          </div>
+        </div>
+        <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
+          <div>
+            <label class="label">Contact source</label>
+            <select data-deal-contacts-target="source" class="input" data-action="change->deal-contacts#sourceChanged">
+              <option value="">Select source</option>
+              <% Person::SOURCES.each do |value, label| %>
+                <option value="<%= value %>"><%= label %></option>
+              <% end %>
+            </select>
+            <div data-deal-contacts-target="broughtByRow" class="hidden mt-3">
+              <label class="label">Team member</label>
+              <select data-deal-contacts-target="broughtBy" class="input">
+                <option value="">Select team member</option>
+                <% current_workspace.users.order(:name).each do |user| %>
+                  <option value="<%= user.id %>"><%= user.name %></option>
+                <% end %>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label class="label">First contact date</label>
+            <input type="date" data-deal-contacts-target="firstContactOn" class="input" />
+          </div>
+        </div>
+        <div class="flex justify-end gap-2">
+          <button type="button" class="btn-secondary" data-action="deal-contacts#close">Cancel</button>
+          <button type="button" class="btn-primary" data-deal-contacts-target="submit" data-action="deal-contacts#create">Create contact</button>
+        </div>
+      </div>
+    </dialog>
+  </div>
+
+  <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+    <div>
+      <%= f.label :owner_id, "Owner", class: "label" %>
+      <%= f.collection_select :owner_id, current_workspace.users, :id, :name, { include_blank: "Unassigned" }, class: "input" %>
+    </div>
+  </div>
+
+  <% if deal.new_record? %>
+    <datalist id="editions-list">
+      <% current_workspace.editions.ordered.each do |edition| %>
+        <option value="<%= edition.name %>"></option>
+      <% end %>
+    </datalist>
+
+    <div data-controller="nested-form">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="text-sm font-semibold uppercase tracking-wider text-ink-faint">Products of interest</h3>
+        <% if current_workspace.products.any? %>
+          <button type="button" data-action="nested-form#add" class="btn-secondary">
+            <%= icon :plus, classes: "size-3.5" %> Add product
+          </button>
+        <% end %>
+      </div>
+
+      <% if current_workspace.products.any? %>
+        <div data-nested-form-target="list" class="space-y-2">
+          <%= f.fields_for :deal_products do |pf| %>
+            <%= render "product_fields", f: pf %>
+          <% end %>
+        </div>
+
+        <template data-nested-form-target="template">
+          <%= f.fields_for :deal_products, DealProduct.new, child_index: "NEW_RECORD" do |pf| %>
+            <%= render "product_fields", f: pf %>
+          <% end %>
+        </template>
+      <% else %>
+        <p class="text-base text-ink-faint">
+          No products in the catalogue. <%= link_to "Create one", new_product_path, class: "text-accent hover:underline" %>.
+        </p>
+      <% end %>
+    </div>
+
+    <div class="rounded-lg border border-line bg-canvas-sunken/40 p-3">
+      <h3 class="text-sm font-semibold uppercase tracking-wider text-ink-faint mb-2">Next action (required)</h3>
+      <%= f.fields_for :tasks, (deal.tasks.first || deal.tasks.build) do |tf| %>
+        <div class="grid grid-cols-1 gap-3 md:grid-cols-[1fr_12rem]">
+          <div>
+            <%= tf.label :title, "Task", class: "label" %>
+            <%= mention_text_field tf, :title, wrapper_class: "", class: "input", placeholder: "Call to follow up" %>
+          </div>
+          <div>
+            <%= tf.label :due_on, "Due date", class: "label" %>
+            <%= tf.date_field :due_on, class: "input", min: Date.current %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <%= render "shared/custom_fields_form", form: f, record: deal %>
+
+  <div class="flex items-center gap-2 pt-2">
+    <%= f.submit deal.persisted? ? "Save changes" : "Create deal", class: "btn-primary" %>
+    <%= link_to "Cancel", deal.persisted? ? deal_path(deal) : board_deals_path, class: "btn-secondary" %>
+  </div>
+<% end %>

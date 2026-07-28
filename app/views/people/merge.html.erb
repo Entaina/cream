@@ -1,0 +1,65 @@
+<% page_title "Merge #{@person.display_name}" %>
+<%= render "shared/page_header", title: "Merge contacts", icon_name: :users, count: nil, actions: nil %>
+
+<div class="flex-1 overflow-y-auto p-5">
+  <div class="max-w-2xl space-y-6">
+    <section class="card p-4">
+      <h2 class="text-sm font-semibold uppercase tracking-wider text-ink-faint mb-3">Contact to keep</h2>
+      <div class="flex items-center gap-3">
+        <%= avatar @person, size: "size-12", text: "text-base" %>
+        <div>
+          <p class="font-semibold text-lg"><%= @person.display_name %></p>
+          <p class="text-sm text-ink-faint"><%= @person.email.presence || "No email" %> · <%= @person.company.name %></p>
+        </div>
+      </div>
+    </section>
+
+    <%= form_with url: merge_person_path(@person), method: :post, class: "space-y-4",
+          data: {
+            controller: "merge-person-search",
+            merge_person_search_exclude_id_value: @person.id,
+            merge_person_search_search_url_value: people_path(format: :json),
+            turbo_confirm: "Merge the selected contacts into #{@person.display_name}? This cannot be undone."
+          } do %>
+      <section class="card p-4">
+        <h2 class="text-sm font-semibold uppercase tracking-wider text-ink-faint mb-1">Contacts to merge in</h2>
+        <p class="text-sm text-ink-faint mb-4">
+          Notes, tasks, deals, emails and timeline activity from the selected contacts will move to the contact above.
+          <% if @person.email.present? %>
+            Contacts with the same email in other companies are also listed.
+          <% end %>
+        </p>
+
+        <div class="relative mb-4">
+          <label for="merge-person-search" class="label">Search for other contacts</label>
+          <input type="text"
+                 id="merge-person-search"
+                 autocomplete="off"
+                 class="input w-full"
+                 placeholder="Type to search…"
+                 data-merge-person-search-target="input"
+                 data-action="input->merge-person-search#query keydown->merge-person-search#keydown blur->merge-person-search#hide focus->merge-person-search#focus" />
+          <ul data-merge-person-search-target="menu"
+              role="listbox"
+              class="hidden absolute left-0 right-0 top-full z-50 mt-1 max-h-56 overflow-y-auto rounded-md border border-line bg-canvas shadow-sm"></ul>
+        </div>
+
+        <div class="space-y-2" data-merge-person-search-target="list">
+          <% @merge_candidates.each do |candidate| %>
+            <%= render "merge_candidate_row", candidate: candidate, selected: @selected_secondary_ids.include?(candidate.id) %>
+          <% end %>
+        </div>
+
+        <% if @merge_candidates.empty? %>
+          <p class="text-sm text-ink-faint mt-3">No suggested contacts to merge. Use the search above to find other contacts in this workspace.</p>
+        <% end %>
+      </section>
+
+      <div class="flex items-center gap-2">
+        <%= submit_tag "Merge contacts", class: "btn-primary",
+              data: { merge_person_search_target: "submit", turbo_submits_with: "Merging…" } %>
+        <%= link_to "Cancel", @person, class: "btn-secondary" %>
+      </div>
+    <% end %>
+  </div>
+</div>

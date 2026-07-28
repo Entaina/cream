@@ -1,0 +1,40 @@
+<% page_title "Sign in" %>
+<div class="w-full max-w-sm">
+  <div class="text-center mb-6">
+    <span class="inline-flex size-10 rounded-xl bg-accent text-on-dark items-center justify-center text-lg font-bold font-display mb-3">C</span>
+    <h1 class="text-xl font-semibold">Sign in to cream<span class="tracking-widest"><span class="text-hoki-500">.</span><span class="text-copperfield-400">.</span><span class="text-golden-300">.</span></span></h1>
+    <p class="text-base text-ink-faint mt-1">The CRM your team will love.</p>
+  </div>
+
+  <div class="card p-6 shadow-sm">
+    <%= render "shared/google_sign_in" %>
+
+    <div class="relative my-5">
+      <div class="absolute inset-0 flex items-center" aria-hidden="true">
+        <div class="w-full border-t border-line"></div>
+      </div>
+      <div class="relative flex justify-center text-sm">
+        <span class="bg-canvas-raised px-2 text-ink-faint">or</span>
+      </div>
+    </div>
+
+    <%= form_with url: session_path, class: "space-y-4" do |f| %>
+      <div>
+        <%= f.label :email_address, "Email", class: "label" %>
+        <%= f.email_field :email_address, required: true, autofocus: true, autocomplete: "username",
+              placeholder: "you@company.com", value: params[:email_address], class: "input" %>
+      </div>
+      <div>
+        <%= f.label :password, class: "label" %>
+        <%= f.password_field :password, required: true, autocomplete: "current-password",
+              placeholder: "••••••••", maxlength: 72, class: "input" %>
+      </div>
+      <%= f.submit "Sign in", class: "btn-primary w-full justify-center" %>
+    <% end %>
+
+    <div class="flex items-center justify-between mt-4 text-sm">
+      <%= link_to "Forgot password?", new_password_path, class: "text-ink-faint hover:text-ink" %>
+      <%= link_to "Create account", new_registration_path, class: "font-medium text-accent hover:underline" %>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,149 @@
+<%# locals: (form:) %>
+<% event_type = form.object %>
+<% summary_name = event_type.name_i18n["es"].presence || event_type.slug.presence || "Nuevo tipo de evento" %>
+<% starts_open = event_type.new_record? %>
+<div class="border border-line rounded-lg overflow-hidden bg-canvas-raised"
+     data-nested-form-target="row"
+     data-controller="collapse"
+     data-collapse-open-value="<%= starts_open %>">
+  <%= form.hidden_field :_destroy %>
+  <%= form.hidden_field :id %>
+  <%= form.hidden_field :position, value: event_type.position || 0 %>
+
+  <div class="flex items-center gap-2 px-3 py-2.5 cursor-pointer hover:bg-canvas-sunken transition-colors"
+       data-action="click->collapse#toggle">
+    <span role="button" tabindex="-1"
+          data-sortable-list-target="handle"
+          class="relative cursor-grab active:cursor-grabbing text-ink-faint hover:text-ink-soft p-1 touch-none select-none shrink-0"
+          title="Arrastrar para reordenar" aria-label="Reordenar tipo de evento"
+          data-action="pointerdown->sortable-list#pointerDown click->collapse#stop">
+      <%= icon :grip, classes: "size-3.5 pointer-events-none" %>
+    </span>
+    <span class="size-2.5 rounded-full shrink-0 <%= booking_event_type_color_class(event_type.color) %>" aria-hidden="true"></span>
+    <div class="flex-1 min-w-0 flex flex-wrap items-center gap-x-2 gap-y-0.5">
+      <span class="font-medium text-sm truncate"><%= summary_name %></span>
+      <span class="text-xs text-ink-faint"><%= event_type.duration_minutes %> min</span>
+      <span class="text-xs text-ink-faint hidden sm:inline">· <%= BookingEventType.location_type_label(event_type.location_type) %></span>
+      <% if event_type.visible? %>
+        <%= badge "Visible", color: "green" %>
+      <% else %>
+        <%= badge "Oculto", color: "chicago" %>
+      <% end %>
+    </div>
+    <span data-collapse-target="icon"
+          class="shrink-0 transition-transform <%= 'rotate-90' if starts_open %>">
+      <%= icon :chevron_right, classes: "size-3.5 text-ink-faint" %>
+    </span>
+    <button type="button"
+            data-action="click->collapse#stop click->nested-form#remove"
+            class="relative btn-ghost text-danger shrink-0 p-1"
+            title="Eliminar tipo de evento">
+      <%= icon :trash, classes: "size-3.5" %>
+      <span class="sr-only">Eliminar</span>
+    </button>
+  </div>
+
+  <div data-collapse-target="panel"
+       class="<%= "hidden" unless starts_open %> border-t border-line p-4 space-y-4 bg-canvas">
+    <div class="space-y-3">
+      <p class="text-xs font-medium text-ink-soft uppercase tracking-wide">Identificación</p>
+      <div class="grid gap-3 sm:grid-cols-2">
+        <div>
+          <%= form.label :slug, "Slug (URL)", class: "label" %>
+          <%= form.text_field :slug, class: "input mt-1 w-full", placeholder: "consultoria" %>
+        </div>
+        <div>
+          <%= form.label :duration_minutes, "Duración (min)", class: "label" %>
+          <%= form.number_field :duration_minutes, min: 5, class: "input mt-1 w-full" %>
+        </div>
+      </div>
+      <div class="grid gap-3 sm:grid-cols-2">
+        <div>
+          <%= label_tag nil, "Nombre (ES)", class: "label" %>
+          <%= text_field_tag "booking_page[event_types_attributes][#{form.index}][name_i18n][es]",
+                event_type.name_i18n["es"], class: "input mt-1 w-full", required: true %>
+        </div>
+        <div>
+          <%= label_tag nil, "Nombre (EN)", class: "label" %>
+          <%= text_field_tag "booking_page[event_types_attributes][#{form.index}][name_i18n][en]",
+                event_type.name_i18n["en"], class: "input mt-1 w-full" %>
+        </div>
+      </div>
+      <div class="grid gap-3 sm:grid-cols-2">
+        <div>
+          <%= label_tag nil, "Descripción (ES)", class: "label" %>
+          <%= text_area_tag "booking_page[event_types_attributes][#{form.index}][description_i18n][es]",
+                event_type.description_i18n["es"], rows: 2, class: "input mt-1 w-full" %>
+        </div>
+        <div>
+          <%= label_tag nil, "Descripción (EN)", class: "label" %>
+          <%= text_area_tag "booking_page[event_types_attributes][#{form.index}][description_i18n][en]",
+                event_type.description_i18n["en"], rows: 2, class: "input mt-1 w-full" %>
+        </div>
+      </div>
+    </div>
+
+    <div class="space-y-3">
+      <p class="text-xs font-medium text-ink-soft uppercase tracking-wide">Disponibilidad y reserva</p>
+      <div data-controller="weekly-hours-editor"
+           data-weekly-hours-editor-default-schedule-value="<%= BookingEventType::DEFAULT_WEEKLY_HOURS.to_json %>"
+           class="space-y-2">
+        <div class="flex items-center justify-between gap-2">
+          <p class="label mb-0">Franjas horarias semanales</p>
+          <button type="button"
+                  class="btn-ghost text-xs py-1 px-2"
+                  data-action="weekly-hours-editor#resetToDefault">
+            Horario laboral por defecto
+          </button>
+        </div>
+        <%= form.hidden_field :weekly_hours,
+              value: (event_type.weekly_hours.presence || BookingEventType.empty_weekly_hours).to_json,
+              data: { weekly_hours_editor_target: "input" } %>
+        <div data-weekly-hours-editor-target="list" class="rounded-md border border-line px-3 py-1"></div>
+      </div>
+      <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <div>
+          <%= form.label :slot_increment_minutes, "Incremento (min)", class: "label" %>
+          <%= form.number_field :slot_increment_minutes, min: 5, class: "input mt-1 w-full" %>
+        </div>
+        <div>
+          <%= form.label :min_notice_hours, "Antelación (h)", class: "label" %>
+          <%= form.number_field :min_notice_hours, min: 0, class: "input mt-1 w-full" %>
+        </div>
+        <div>
+          <%= form.label :buffer_before_minutes, "Buffer antes (min)", class: "label" %>
+          <%= form.number_field :buffer_before_minutes, min: 0, class: "input mt-1 w-full" %>
+        </div>
+        <div>
+          <%= form.label :buffer_after_minutes, "Buffer después (min)", class: "label" %>
+          <%= form.number_field :buffer_after_minutes, min: 0, class: "input mt-1 w-full" %>
+        </div>
+      </div>
+    </div>
+
+    <div class="space-y-3">
+      <p class="text-xs font-medium text-ink-soft uppercase tracking-wide">Ubicación y apariencia</p>
+      <div class="grid gap-3 sm:grid-cols-2">
+        <div>
+          <%= form.label :location_type, "Tipo de ubicación", class: "label" %>
+          <%= form.select :location_type, booking_location_type_options, {}, class: "input mt-1 w-full" %>
+        </div>
+        <div>
+          <%= form.label :color, "Color en calendario", class: "label" %>
+          <%= form.select :color, booking_color_options, {}, class: "input mt-1 w-full" %>
+        </div>
+      </div>
+      <div>
+        <%= form.label :location_address, "Dirección (presencial)", class: "label" %>
+        <%= form.text_field :location_address, class: "input mt-1 w-full", placeholder: "Calle, ciudad…" %>
+      </div>
+    </div>
+
+    <div>
+      <%= form.label :visible, class: "inline-flex items-center gap-2" do %>
+        <%= form.check_box :visible %>
+        <span>Visible en la página pública</span>
+      <% end %>
+    </div>
+  </div>
+</div>

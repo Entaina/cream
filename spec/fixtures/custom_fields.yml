@@ -1,0 +1,40 @@
+person_tier:
+  workspace: one
+  record_type: Person
+  name: Customer tier
+  key: customer_tier
+  field_type: select
+  options: ["Bronze", "Silver", "Gold"]
+  position: 0
+  required: false
+
+company_segment:
+  workspace: one
+  record_type: Company
+  name: Segment
+  key: segment
+  field_type: text
+  options: []
+  position: 0
+  required: false
+
+deal_priority:
+  workspace: one
+  record_type: Deal
+  name: Priority
+  key: priority
+  field_type: number
+  options: []
+  position: 0
+  required: true
+
+person_related_company:
+  workspace: one
+  record_type: Person
+  name: Related company
+  key: related_company
+  field_type: record_reference
+  reference_type: Company
+  options: []
+  position: 1
+  required: false

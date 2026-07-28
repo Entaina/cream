@@ -1,0 +1,18 @@
+# Development uses solid_cable on the primary database (not async): jobs run
+# in a separate bin/jobs process, and the async adapter only delivers within
+# one process — broadcasts from jobs would never reach the browser.
+development:
+  adapter: solid_cable
+  polling_interval: 0.1.seconds
+  message_retention: 1.day
+
+test:
+  adapter: test
+
+production:
+  adapter: solid_cable
+  connects_to:
+    database:
+      writing: cable
+  polling_interval: 0.1.seconds
+  message_retention: 1.day

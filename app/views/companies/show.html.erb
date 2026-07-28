@@ -1,0 +1,115 @@
+<% page_title @company.name %>
+<% actions = capture do %>
+  <%= link_to new_person_path(company_id: @company.id), class: "btn-secondary" do %>
+    <%= icon :plus, classes: "size-3.5" %> Add person
+  <% end %>
+  <%= link_to new_deal_path(company_id: @company.id), class: "btn-secondary" do %>
+    <%= icon :plus, classes: "size-3.5" %> Add deal
+  <% end %>
+  <%= link_to merge_company_path(@company), class: "btn-secondary" do %>
+    <%= icon :building, classes: "size-3.5" %> Merge
+  <% end %>
+  <%= link_to edit_company_path(@company), class: "btn-secondary" do %>
+    <%= icon :pencil, classes: "size-3.5" %> Edit
+  <% end %>
+  <%= button_to company_path(@company), method: :delete, form: { data: { turbo_confirm: "Delete #{@company.name}? This cannot be undone." } }, class: "btn-danger" do %>
+    <%= icon :trash, classes: "size-3.5" %> Delete
+  <% end %>
+<% end %>
+<%= render "shared/page_header", title: @company.name, icon_name: :building, count: nil, actions: actions %>
+
+<div class="flex-1 flex min-h-0 overflow-x-auto snap-x snap-mandatory md:overflow-x-visible md:snap-none">
+  <aside class="w-80 shrink-0 snap-start border-r border-line overflow-y-auto scrollbar-subtle p-4">
+    <div class="flex items-center gap-3 mb-4">
+      <%= avatar @company, size: "size-12", text: "text-base" %>
+      <div class="min-w-0">
+        <h2 class="font-semibold text-lg truncate"><%= @company.name %></h2>
+        <% if @company.domain.present? %>
+          <%= link_to @company.domain, "https://#{@company.domain}", target: "_blank",
+                class: "text-sm text-accent hover:underline" %>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="divide-y divide-line/60">
+      <%= render "shared/attribute", label: "Industry", icon_name: :briefcase, value: @company.industry %>
+      <%= render "shared/attribute", label: "Employees", icon_name: :users, value: @company.employee_range %>
+      <%= render "shared/attribute", label: "Location", icon_name: :map_pin, value: @company.location %>
+      <%= render "shared/attribute", label: "Revenue", icon_name: :banknote,
+            value: @company.annual_revenue.present? ? money(@company.annual_revenue) : nil %>
+      <%= render "shared/attribute", label: "LinkedIn", icon_name: :external,
+            value: @company.linkedin_url.present? ? link_to("Profile", @company.linkedin_url, target: "_blank", class: "text-accent hover:underline") : nil %>
+      <%= render "shared/attribute", label: "Owner", icon_name: :users, value: @company.owner&.name %>
+      <%= render "shared/attribute", label: "Created", icon_name: :clock, value: l(@company.created_at, format: :short) %>
+      <%= render "shared/custom_attributes", record: @company %>
+    </div>
+
+    <% if @company.description.present? %>
+      <div class="mt-4">
+        <h3 class="text-sm font-semibold uppercase tracking-wider text-ink-faint mb-1.5">About</h3>
+        <p class="text-base text-ink-soft whitespace-pre-wrap"><%= @company.description %></p>
+      </div>
+    <% end %>
+
+    <div class="mt-4">
+      <h3 class="text-sm font-semibold uppercase tracking-wider text-ink-faint mb-1.5">Fiscal information</h3>
+      <% if @company.fiscal_information.present? %>
+        <p class="text-base text-ink-soft whitespace-pre-wrap"><%= @company.fiscal_information %></p>
+      <% else %>
+        <p class="text-base text-ink-faint">—</p>
+      <% end %>
+    </div>
+
+    <div class="mt-4">
+      <h3 class="text-sm font-semibold uppercase tracking-wider text-ink-faint mb-1.5">People (<%= @company.people.size %>)</h3>
+      <ul class="space-y-1">
+        <% @company.people.each do |person| %>
+          <li>
+            <%= link_to person_path(person), class: "flex items-center gap-2 rounded-md px-2 py-1.5 hover:bg-canvas-sunken text-base" do %>
+              <%= avatar person, size: "size-5", text: "text-2xs" %>
+              <span class="truncate font-medium"><%= person.display_name %></span>
+              <span class="text-ink-faint truncate text-sm"><%= person.job_title %></span>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+
+    <% if @company.deals.any? %>
+      <div class="mt-4">
+        <h3 class="text-sm font-semibold uppercase tracking-wider text-ink-faint mb-1.5">Deals (<%= @company.deals.size %>)</h3>
+        <ul class="space-y-1">
+          <% @company.deals.each do |deal| %>
+            <li>
+              <%= link_to deal_path(deal), class: "flex items-center justify-between gap-2 rounded-md px-2 py-1.5 hover:bg-canvas-sunken text-base" do %>
+                <span class="truncate font-medium"><%= deal.name %></span>
+                <%= stage_badge deal %>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <% if @company.lists.any? %>
+      <div class="mt-4">
+        <h3 class="text-sm font-semibold uppercase tracking-wider text-ink-faint mb-1.5">Lists</h3>
+        <div class="flex flex-wrap gap-1.5">
+          <% @company.lists.each do |list| %>
+            <%= link_to list.name, list_path(list), class: "inline-flex items-center gap-1.5 rounded-full bg-canvas-sunken px-2 py-0.5 text-sm hover:bg-line" %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </aside>
+
+  <div class="w-full shrink-0 snap-start md:flex-1 md:w-auto overflow-y-auto scrollbar-subtle p-5 space-y-6 bg-canvas-soft/50">
+    <%= render "shared/tasks_section", record: @company, task: @task %>
+    <%= render "shared/ai_assistant_section", record: @company if feature_enabled?(:ai_assistant) %>
+    <%= render "shared/notes_section", record: @company, note: @note %>
+    <%= render "shared/comments_section", record: @company, comment: @comment if feature_enabled?(:comments) %>
+    <%= render "shared/attachments_section", record: @company if feature_enabled?(:attachments) %>
+    <%= render "shared/email_section", record: @company, email_message: @email_message if feature_enabled?(:record_email) %>
+    <%= render "shared/timeline", activities: @activities %>
+  </div>
+</div>

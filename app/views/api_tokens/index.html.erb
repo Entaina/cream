@@ -1,0 +1,54 @@
+<% page_title "API tokens" %>
+<%= render "shared/page_header", title: "API tokens", icon_name: :globe, count: @api_tokens.size, actions: nil %>
+
+<div class="flex-1 overflow-y-auto scrollbar-subtle p-5">
+  <div class="max-w-2xl space-y-6">
+    <p class="text-base text-ink-soft">
+      Use API tokens to connect MCP clients (Claude, Cursor, etc.) to your workspace.
+      OAuth is also available via the MCP authorization flow.
+    </p>
+
+    <% if flash[:api_token].present? %>
+      <div class="card p-4 border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950">
+        <p class="text-base font-medium text-ink mb-2">Your new token (copy it now):</p>
+        <code class="block text-sm font-mono bg-canvas-raised border border-line rounded-md px-3 py-2 break-all select-all"><%= flash[:api_token] %></code>
+      </div>
+    <% end %>
+
+    <%= form_with url: api_tokens_path, method: :post, class: "flex items-end gap-2" do %>
+      <div class="flex-1">
+        <label for="name" class="block text-sm font-medium text-ink-soft mb-1">Token name</label>
+        <input type="text" name="name" id="name" placeholder="My MCP client" class="input w-full">
+      </div>
+      <%= submit_tag "Create token", class: "btn-primary" %>
+    <% end %>
+
+    <% if @api_tokens.any? %>
+      <ul class="space-y-2">
+        <% @api_tokens.each do |token| %>
+          <li class="card flex items-center gap-3 px-4 py-3">
+            <div class="min-w-0 flex-1">
+              <p class="text-base font-medium truncate"><%= token.name %></p>
+              <p class="text-xs text-ink-faint mt-0.5">
+                Created <%= l token.created_at, format: :short %>
+                <% if token.last_used_at %>
+                  · Last used <%= l token.last_used_at, format: :short %>
+                <% end %>
+              </p>
+            </div>
+            <%= button_to api_token_path(token), method: :delete,
+                  class: "text-ink-faint hover:text-danger p-1.5 rounded-md hover:bg-danger-soft",
+                  title: "Revoke token" do %>
+              <%= icon :trash, classes: "size-4" %>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <%= render "shared/empty_state",
+            icon_name: :globe,
+            title: "No API tokens yet",
+            subtitle: "Create a token to connect an MCP client to this workspace." %>
+    <% end %>
+  </div>
+</div>

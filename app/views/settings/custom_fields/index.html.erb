@@ -1,0 +1,61 @@
+<% page_title "Custom fields" %>
+<% actions = capture do %>
+  <% if @admin %>
+    <%= link_to new_settings_custom_field_path, class: "btn-primary" do %>
+      <%= icon :plus, classes: "size-3.5" %> New field
+    <% end %>
+  <% end %>
+<% end %>
+<%= render "shared/page_header", title: "Custom fields", icon_name: :columns, count: nil, actions: actions %>
+
+<div class="flex-1 overflow-y-auto scrollbar-subtle p-5">
+  <div class="max-w-2xl space-y-6">
+    <p class="text-base text-ink-soft">
+      Define extra attributes for People, Companies and Deals in <strong><%= current_workspace.name %></strong>.
+      <% unless @admin %>
+        Only workspace admins can add or edit fields.
+      <% end %>
+    </p>
+
+    <% CustomField::RECORD_TYPES.each do |record_type| %>
+      <% fields = @fields_by_type[record_type] || [] %>
+      <section class="space-y-2">
+        <h2 class="text-base font-semibold text-ink px-1"><%= record_type.pluralize %></h2>
+        <% if fields.any? %>
+          <ul class="space-y-2">
+            <% fields.each do |field| %>
+              <li class="card flex items-center gap-3 px-4 py-3">
+                <div class="min-w-0 flex-1">
+                  <p class="text-base font-medium truncate"><%= field.name %></p>
+                  <p class="text-xs text-ink-faint mt-0.5">
+                    <%= field.field_type_label %>
+                    <% if field.required? %> · Required<% end %>
+                    · <code class="text-2xs"><%= field.key %></code>
+                  </p>
+                </div>
+                <% if @admin %>
+                  <%= link_to edit_settings_custom_field_path(field), class: "btn-ghost text-sm" do %>
+                    <%= icon :pencil, classes: "size-3.5" %> Edit
+                  <% end %>
+                  <%= button_to settings_custom_field_path(field), method: :delete,
+                        class: "text-ink-faint hover:text-danger p-1.5 rounded-md hover:bg-danger-soft",
+                        form: { data: { turbo_confirm: "Delete the “#{field.name}” field? Existing values will be removed." } },
+                        title: "Delete field" do %>
+                    <%= icon :trash, classes: "size-4" %>
+                  <% end %>
+                <% end %>
+              </li>
+            <% end %>
+          </ul>
+        <% else %>
+          <p class="text-sm text-ink-faint px-1">No custom fields yet.</p>
+        <% end %>
+        <% if @admin %>
+          <%= link_to new_settings_custom_field_path(record_type: record_type), class: "inline-flex items-center gap-1.5 text-sm text-accent hover:underline px-1" do %>
+            <%= icon :plus, classes: "size-3.5" %> Add <%= record_type.downcase %> field
+          <% end %>
+        <% end %>
+      </section>
+    <% end %>
+  </div>
+</div>

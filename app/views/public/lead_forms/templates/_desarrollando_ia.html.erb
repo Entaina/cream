@@ -1,0 +1,26 @@
+<div class="space-y-3">
+  <div>
+    <%= render "public/lead_forms/field_label", f: f, field: :tech_profile, text: "Tu perfil técnico", required: true %>
+    <%= f.select :tech_profile,
+          options_for_select(LeadForm::DESARROLLANDO_IA_TECH_PROFILE_OPTIONS),
+          { include_blank: "Selecciona una opción" },
+          class: "input w-full",
+          required: true %>
+  </div>
+
+  <div>
+    <%= render "public/lead_forms/field_label", f: f, field: :audience, text: "Para ti o para tu equipo", required: true %>
+    <%= f.select :audience,
+          options_for_select(LeadForm::LIDERANDO_IA_AUDIENCE_OPTIONS),
+          { include_blank: "Selecciona una opción" },
+          class: "input w-full",
+          required: true %>
+  </div>
+
+  <div>
+    <%= f.label :ia_build_automation, "¿Qué querrías construir o automatizar con IA en tu trabajo?", class: "label" %>
+    <%= f.text_area :ia_build_automation, rows: 4, class: "input w-full resize-y", placeholder: "Opcional" %>
+  </div>
+
+  <%= render "public/lead_forms/how_heard_field", f: f %>
+</div>

@@ -1,0 +1,170 @@
+require "rails_helper"
+
+RSpec.describe "Booking pages CRUD", type: :request do
+  fixtures :users, :workspaces, :memberships
+
+  let(:user) { users(:one) }
+  let(:workspace) { workspaces(:one) }
+  let(:pipeline) { Pipeline.default_for(workspace) || Pipeline.create_default!(workspace) }
+
+  before do
+    allow(CreamFeatures).to receive(:enabled?).and_call_original
+    allow(CreamFeatures).to receive(:enabled?).with(:calendar_booking).and_return(true)
+    sign_in_as(user)
+  end
+
+  describe "PATCH /booking_pages/:id" do
+    let!(:booking_page) do
+      page = workspace.booking_pages.new(
+        name: "Agenda",
+        slug: "agenda-crud-test",
+        host: user,
+        pipeline: pipeline,
+        timezone: "Europe/Madrid",
+        calendar_ids: [ "primary" ]
+      )
+      page.event_types.build(
+        slug: "video",
+        name_i18n: { "es" => "Video", "en" => "Video" },
+        duration_minutes: 30,
+        location_type: "google_meet",
+        weekly_hours: BookingEventType::DEFAULT_WEEKLY_HOURS,
+        slot_increment_minutes: 15,
+        min_notice_hours: 0,
+        visible: true,
+        position: 0
+      )
+      page.save!
+      page
+    end
+    let!(:video_type) { booking_page.event_types.find_by!(slug: "video") }
+    let!(:reunion_type) do
+      booking_page.event_types.create!(
+        slug: "reunion",
+        name_i18n: { "es" => "Reunión", "en" => "Meeting" },
+        duration_minutes: 60,
+        location_type: "physical",
+        weekly_hours: BookingEventType::DEFAULT_WEEKLY_HOURS,
+        slot_increment_minutes: 15,
+        min_notice_hours: 0,
+        visible: true,
+        position: 1
+      )
+    end
+
+    it "adds and removes event types" do
+      patch booking_page_path(booking_page), params: {
+        booking_page: {
+          name: booking_page.name,
+          slug: booking_page.slug,
+          host_id: user.id,
+          pipeline_id: pipeline.id,
+          timezone: "Europe/Madrid",
+          booking_window_days: 60,
+          active: true,
+          calendar_ids: [ "primary" ],
+          event_types_attributes: {
+            "0" => {
+              id: video_type.id,
+              slug: "video",
+              duration_minutes: 30,
+              location_type: "google_meet",
+              color: "hoki",
+              slot_increment_minutes: 15,
+              buffer_before_minutes: 0,
+              buffer_after_minutes: 0,
+              min_notice_hours: 0,
+              visible: "1",
+              position: 0,
+              weekly_hours: BookingEventType::DEFAULT_WEEKLY_HOURS.to_json,
+              name_i18n: { es: "Video", en: "Video" },
+              description_i18n: { es: "", en: "" },
+              _destroy: "1"
+            },
+            "1" => {
+              id: reunion_type.id,
+              slug: "reunion",
+              duration_minutes: 60,
+              location_type: "physical",
+              color: "golden",
+              slot_increment_minutes: 15,
+              buffer_before_minutes: 0,
+              buffer_after_minutes: 0,
+              min_notice_hours: 0,
+              visible: "1",
+              position: 1,
+              weekly_hours: BookingEventType::DEFAULT_WEEKLY_HOURS.to_json,
+              name_i18n: { es: "Reunión", en: "Meeting" },
+              description_i18n: { es: "", en: "" }
+            },
+            "2" => {
+              slug: "consultoria",
+              duration_minutes: 45,
+              location_type: "google_meet",
+              color: "blue",
+              slot_increment_minutes: 15,
+              buffer_before_minutes: 0,
+              buffer_after_minutes: 0,
+              min_notice_hours: 4,
+              visible: "1",
+              position: 2,
+              weekly_hours: BookingEventType::DEFAULT_WEEKLY_HOURS.to_json,
+              name_i18n: { es: "Consultoría", en: "Consulting" },
+              description_i18n: { es: "Sesión de consultoría.", en: "Consulting session." }
+            }
+          }
+        }
+      }
+
+      expect(response).to redirect_to(booking_pages_path)
+      booking_page.reload
+      slugs = booking_page.event_types.order(:position).pluck(:slug)
+      expect(slugs).to eq([ "reunion", "consultoria" ])
+    end
+
+    it "persists custom weekly hours" do
+      patch booking_page_path(booking_page), params: {
+        booking_page: {
+          name: booking_page.name,
+          slug: booking_page.slug,
+          host_id: user.id,
+          pipeline_id: pipeline.id,
+          timezone: "Europe/Madrid",
+          booking_window_days: 60,
+          active: true,
+          calendar_ids: [ "primary" ],
+          event_types_attributes: {
+            "0" => {
+              id: video_type.id,
+              slug: "video",
+              duration_minutes: 30,
+              location_type: "google_meet",
+              color: "hoki",
+              slot_increment_minutes: 15,
+              buffer_before_minutes: 0,
+              buffer_after_minutes: 0,
+              min_notice_hours: 0,
+              visible: "1",
+              position: 0,
+              weekly_hours: {
+                monday: [ [ "09:00", "12:00" ] ],
+                tuesday: [],
+                wednesday: [],
+                thursday: [],
+                friday: [],
+                saturday: [],
+                sunday: []
+              }.to_json,
+              name_i18n: { es: "Video", en: "Video" },
+              description_i18n: { es: "", en: "" }
+            }
+          }
+        }
+      }
+
+      expect(response).to redirect_to(booking_pages_path)
+      expect(video_type.reload.weekly_hours["monday"]).to eq([ [ "09:00", "12:00" ] ])
+      expect(video_type.weekly_hours["tuesday"]).to eq([])
+    end
+  end
+end

@@ -1,0 +1,201 @@
+- generic [ref=e2]:
+  - complementary [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]: C
+      - generic [ref=e6]: Cream Demo
+    - link "Search... /" [ref=e8] [cursor=pointer]:
+      - /url: /search
+      - img [ref=e9]
+      - generic [ref=e11]: Search...
+      - generic [ref=e12]: /
+    - navigation [ref=e13]:
+      - link "Dashboard" [ref=e14] [cursor=pointer]:
+        - /url: /
+        - img [ref=e15]
+        - text: Dashboard
+      - link "People" [ref=e17] [cursor=pointer]:
+        - /url: /people
+        - img [ref=e18]
+        - text: People
+      - link "Companies" [ref=e20] [cursor=pointer]:
+        - /url: /companies
+        - img [ref=e21]
+        - text: Companies
+      - link "Deals" [ref=e23] [cursor=pointer]:
+        - /url: /deals/board
+        - img [ref=e24]
+        - text: Deals
+      - link "Tasks" [ref=e26] [cursor=pointer]:
+        - /url: /tasks
+        - img [ref=e27]
+        - text: Tasks
+    - generic [ref=e29]:
+      - generic [ref=e30]:
+        - generic [ref=e31]: Lists
+        - link "New list" [ref=e32] [cursor=pointer]:
+          - /url: /lists/new
+          - img [ref=e33]
+      - link "Champions" [ref=e35] [cursor=pointer]:
+        - /url: /lists/5
+        - generic [ref=e37]: Champions
+      - link "Hot deals Q3" [ref=e38] [cursor=pointer]:
+        - /url: /lists/4
+        - generic [ref=e40]: Hot deals Q3
+      - link "Spain accounts" [ref=e41] [cursor=pointer]:
+        - /url: /lists/6
+        - generic [ref=e43]: Spain accounts
+    - generic [ref=e44]:
+      - generic [ref=e45]: JD
+      - generic [ref=e46]:
+        - paragraph [ref=e47]: Josemi Díez
+        - paragraph [ref=e48]: josemi@entaina.ai
+      - button "Sign out" [ref=e50]:
+        - img [ref=e51]
+  - main [ref=e53]:
+    - generic [ref=e54]:
+      - generic [ref=e55]:
+        - img [ref=e56]
+        - heading "Companies" [level=1] [ref=e58]
+        - generic [ref=e59]: "8"
+      - link "New company" [ref=e61] [cursor=pointer]:
+        - /url: /companies/new
+        - img [ref=e62]
+        - text: New company
+    - generic [ref=e65]:
+      - generic [ref=e66]:
+        - img [ref=e68]
+        - textbox "Search companies..." [ref=e70]
+      - combobox [ref=e71]:
+        - option "All industries" [selected]
+        - option "Developer Tools"
+        - option "Fintech"
+        - option "HR Tech"
+        - option "Marketplace"
+        - option "Mobility"
+        - option "Productivity"
+        - option "SaaS"
+    - table [ref=e73]:
+      - rowgroup [ref=e74]:
+        - row "Name Domain Industry Employees Location People Owner" [ref=e75]:
+          - columnheader "Name" [ref=e76]:
+            - link "Name" [ref=e77] [cursor=pointer]:
+              - /url: /companies?dir=asc&sort=name
+          - columnheader "Domain" [ref=e78]:
+            - link "Domain" [ref=e79] [cursor=pointer]:
+              - /url: /companies?dir=asc&sort=domain
+          - columnheader "Industry" [ref=e80]:
+            - link "Industry" [ref=e81] [cursor=pointer]:
+              - /url: /companies?dir=asc&sort=industry
+          - columnheader "Employees" [ref=e82]:
+            - link "Employees" [ref=e83] [cursor=pointer]:
+              - /url: /companies?dir=asc&sort=employee_range
+          - columnheader "Location" [ref=e84]:
+            - link "Location" [ref=e85] [cursor=pointer]:
+              - /url: /companies?dir=asc&sort=location
+          - columnheader "People" [ref=e86]
+          - columnheader "Owner" [ref=e87]
+      - rowgroup [ref=e88]:
+        - row "C Cabify cabify.com Mobility 1000+ Madrid, Spain 1 AT" [ref=e89] [cursor=pointer]:
+          - cell "C Cabify" [ref=e90]:
+            - generic [ref=e91]:
+              - generic [ref=e92]: C
+              - text: Cabify
+          - cell "cabify.com" [ref=e93]
+          - cell "Mobility" [ref=e94]:
+            - generic [ref=e95]: Mobility
+          - cell "1000+" [ref=e96]
+          - cell "Madrid, Spain" [ref=e97]
+          - cell "1" [ref=e98]
+          - cell "AT" [ref=e99]:
+            - generic [ref=e100]: AT
+        - row "F Factorial factorialhr.com HR Tech 501-1000 Barcelona, Spain 2 JD" [ref=e101] [cursor=pointer]:
+          - cell "F Factorial" [ref=e102]:
+            - generic [ref=e103]:
+              - generic [ref=e104]: F
+              - text: Factorial
+          - cell "factorialhr.com" [ref=e105]
+          - cell "HR Tech" [ref=e106]:
+            - generic [ref=e107]: HR Tech
+          - cell "501-1000" [ref=e108]
+          - cell "Barcelona, Spain" [ref=e109]
+          - cell "2" [ref=e110]
+          - cell "JD" [ref=e111]:
+            - generic [ref=e112]: JD
+        - row "L Linear linear.app SaaS 51-200 Remote 2 AT" [ref=e113] [cursor=pointer]:
+          - cell "L Linear" [ref=e114]:
+            - generic [ref=e115]:
+              - generic [ref=e116]: L
+              - text: Linear
+          - cell "linear.app" [ref=e117]
+          - cell "SaaS" [ref=e118]:
+            - generic [ref=e119]: SaaS
+          - cell "51-200" [ref=e120]
+          - cell "Remote" [ref=e121]
+          - cell "2" [ref=e122]
+          - cell "AT" [ref=e123]:
+            - generic [ref=e124]: AT
+        - row "N Notion notion.so Productivity 501-1000 San Francisco, USA 1 JD" [ref=e125] [cursor=pointer]:
+          - cell "N Notion" [ref=e126]:
+            - generic [ref=e127]:
+              - generic [ref=e128]: "N"
+              - text: Notion
+          - cell "notion.so" [ref=e129]
+          - cell "Productivity" [ref=e130]:
+            - generic [ref=e131]: Productivity
+          - cell "501-1000" [ref=e132]
+          - cell "San Francisco, USA" [ref=e133]
+          - cell "1" [ref=e134]
+          - cell "JD" [ref=e135]:
+            - generic [ref=e136]: JD
+        - row "S Stripe stripe.com Fintech 1000+ Dublin, Ireland 1 JD" [ref=e137] [cursor=pointer]:
+          - cell "S Stripe" [ref=e138]:
+            - generic [ref=e139]:
+              - generic [ref=e140]: S
+              - text: Stripe
+          - cell "stripe.com" [ref=e141]
+          - cell "Fintech" [ref=e142]:
+            - generic [ref=e143]: Fintech
+          - cell "1000+" [ref=e144]
+          - cell "Dublin, Ireland" [ref=e145]
+          - cell "1" [ref=e146]
+          - cell "JD" [ref=e147]:
+            - generic [ref=e148]: JD
+        - row "T Typeform typeform.com SaaS 201-500 Barcelona, Spain 1 JD" [ref=e149] [cursor=pointer]:
+          - cell "T Typeform" [ref=e150]:
+            - generic [ref=e151]:
+              - generic [ref=e152]: T
+              - text: Typeform
+          - cell "typeform.com" [ref=e153]
+          - cell "SaaS" [ref=e154]:
+            - generic [ref=e155]: SaaS
+          - cell "201-500" [ref=e156]
+          - cell "Barcelona, Spain" [ref=e157]
+          - cell "1" [ref=e158]
+          - cell "JD" [ref=e159]:
+            - generic [ref=e160]: JD
+        - row "V Vercel vercel.com Developer Tools 201-500 San Francisco, USA 1 AT" [ref=e161] [cursor=pointer]:
+          - cell "V Vercel" [ref=e162]:
+            - generic [ref=e163]:
+              - generic [ref=e164]: V
+              - text: Vercel
+          - cell "vercel.com" [ref=e165]
+          - cell "Developer Tools" [ref=e166]:
+            - generic [ref=e167]: Developer Tools
+          - cell "201-500" [ref=e168]
+          - cell "San Francisco, USA" [ref=e169]
+          - cell "1" [ref=e170]
+          - cell "AT" [ref=e171]:
+            - generic [ref=e172]: AT
+        - row "W Wallapop wallapop.com Marketplace 201-500 Barcelona, Spain 1 AT" [ref=e173] [cursor=pointer]:
+          - cell "W Wallapop" [ref=e174]:
+            - generic [ref=e175]:
+              - generic [ref=e176]: W
+              - text: Wallapop
+          - cell "wallapop.com" [ref=e177]
+          - cell "Marketplace" [ref=e178]:
+            - generic [ref=e179]: Marketplace
+          - cell "201-500" [ref=e180]
+          - cell "Barcelona, Spain" [ref=e181]
+          - cell "1" [ref=e182]
+          - cell "AT" [ref=e183]:
+            - generic [ref=e184]: AT

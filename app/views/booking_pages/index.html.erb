@@ -1,0 +1,54 @@
+<% page_title "Reservas" %>
+<% actions = capture do %>
+  <%= link_to(
+        @calendar_connection&.connected? ? "Google Calendar" : "Conectar Google Calendar",
+        calendar_connection_path,
+        class: "btn-secondary"
+      ) %>
+  <%= link_to new_booking_page_path, class: "btn-primary" do %>
+    <%= icon :plus, classes: "size-3.5" %> Nueva página
+  <% end %>
+<% end %>
+<%= render "shared/page_header", title: "Reservas", icon_name: :calendar, count: @booking_pages.size, actions: actions %>
+
+<div class="flex-1 overflow-y-auto scrollbar-subtle p-5 space-y-3">
+  <% if @booking_pages.empty? %>
+    <p class="text-ink-faint">Todavía no hay páginas de reservas configuradas.</p>
+    <% unless @calendar_connection&.connected? %>
+      <p class="text-sm text-ink-soft">Conecta Google Calendar antes de publicar una página.</p>
+      <%= link_to "Conectar Google Calendar", calendar_connection_path, class: "btn-secondary mt-2" %>
+    <% end %>
+  <% end %>
+
+  <% @booking_pages.each do |page| %>
+    <article class="card p-4 space-y-3">
+      <div class="flex items-center gap-2">
+        <h2 class="font-semibold text-base"><%= page.name %></h2>
+        <% if page.ready_for_booking? %>
+          <%= badge "Lista", color: "green" %>
+        <% else %>
+          <%= badge "Incompleta", color: "golden" %>
+        <% end %>
+        <%= badge page.active? ? "Activa" : "Inactiva", color: page.active? ? "green" : "chicago" %>
+        <div class="ml-auto flex gap-2">
+          <%= link_to "Editar", edit_booking_page_path(page), class: "btn-secondary" %>
+          <%= button_to "Eliminar", booking_page_path(page), method: :delete, class: "btn-danger", data: { turbo_confirm: "¿Eliminar esta página?" } %>
+        </div>
+      </div>
+
+      <dl class="grid gap-2 text-sm sm:grid-cols-2">
+        <div><dt class="text-ink-faint">Slug</dt><dd><code class="text-xs"><%= page.slug %></code></dd></div>
+        <div><dt class="text-ink-faint">Anfitrión</dt><dd><%= page.host.name %></dd></div>
+        <div><dt class="text-ink-faint">Pipeline</dt><dd><%= page.pipeline.name %></dd></div>
+        <div><dt class="text-ink-faint">Tipos de evento</dt><dd><%= page.event_types.count %></dd></div>
+      </dl>
+
+      <div>
+        <p class="label">URL pública</p>
+        <%= link_to public_booking_page_url(page.slug), public_booking_page_url(page.slug),
+            class: "block rounded-md border border-line bg-canvas-sunken px-3 py-2 text-sm break-all text-accent hover:underline",
+            target: "_blank", rel: "noopener noreferrer" %>
+      </div>
+    </article>
+  <% end %>
+</div>

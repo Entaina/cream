@@ -1,0 +1,85 @@
+<% page_title @deal.name %>
+<% actions = capture do %>
+  <%= link_to deal_versions_path(@deal), class: "btn-secondary" do %>
+    <%= icon :activity, classes: "size-3.5" %> Version history
+  <% end %>
+  <%= button_to duplicate_deal_path(@deal), method: :post, class: "btn-secondary" do %>
+    <%= icon :copy, classes: "size-3.5" %> Duplicar
+  <% end %>
+  <%= link_to edit_deal_path(@deal), class: "btn-secondary" do %>
+    <%= icon :pencil, classes: "size-3.5" %> Edit
+  <% end %>
+  <%= button_to deal_path(@deal), method: :delete, form: { data: { turbo_confirm: "Delete #{@deal.name}? This cannot be undone." } }, class: "btn-danger" do %>
+    <%= icon :trash, classes: "size-3.5" %> Delete
+  <% end %>
+<% end %>
+<%= render "shared/page_header", title: @deal.name, icon_name: :banknote, count: nil, actions: actions %>
+
+<div class="flex-1 flex min-h-0 overflow-x-auto snap-x snap-mandatory md:overflow-x-visible md:snap-none">
+  <aside class="w-80 shrink-0 snap-start border-r border-line overflow-y-auto scrollbar-subtle p-4">
+    <div class="mb-4">
+      <%= render "value_display", deal: @deal %>
+      <div class="mt-2"><%= render "stage_badge", deal: @deal %></div>
+    </div>
+
+    <%# Pipeline switcher — moving to another pipeline lands on its first stage %>
+    <% pipelines = current_workspace.pipelines.ordered %>
+    <% if pipelines.size > 1 %>
+      <div class="mb-4">
+        <h3 class="text-sm font-semibold uppercase tracking-wider text-ink-faint mb-2">Pipeline</h3>
+        <%= form_with url: move_pipeline_deal_path(@deal), method: :patch,
+              data: { turbo_confirm: "Move this deal to the selected pipeline? It will start at that pipeline's first stage." } do %>
+          <%= select_tag :pipeline_id, options_for_select(pipelines.map { |p| [p.name, p.id] }, @deal.pipeline_id),
+                class: "input", onchange: "this.form.requestSubmit()" %>
+        <% end %>
+      </div>
+    <% end %>
+
+    <%# Stage stepper %>
+    <div class="mb-4">
+      <%= render "stage_stepper", deal: @deal %>
+    </div>
+
+    <div class="divide-y divide-line/60">
+      <%= render "shared/attribute", label: "Probability", icon_name: :activity,
+            value: deal_field_display(@deal, :probability) %>
+      <%= render "shared/attribute", label: "Close date", icon_name: :calendar,
+            value: deal_field_display(@deal, :expected_close_date) %>
+      <%= render "shared/attribute", label: "Company", icon_name: :building,
+            value: @deal.company ? link_to(@deal.company.name, company_path(@deal.company), class: "text-accent hover:underline") : nil %>
+      <%= render "shared/attribute", label: "Partner", icon_name: :building,
+            value: @deal.partner ? link_to(@deal.partner.name, company_path(@deal.partner), class: "text-accent hover:underline") : nil %>
+      <%= render "shared/attribute", label: "Contacts", icon_name: :users,
+            value: @deal.contacts.any? ? safe_join(@deal.contacts.map { |p| link_to(p.display_name, person_path(p), class: "text-accent hover:underline") }, ", ") : nil %>
+      <%= render "shared/attribute", label: "Owner", icon_name: :users, value: @deal.owner&.name %>
+      <%= render "shared/attribute", label: "Created", icon_name: :clock, value: l(@deal.created_at, format: :short) %>
+      <%= render "shared/custom_attributes", record: @deal %>
+    </div>
+
+    <% if @deal.lists.any? %>
+      <div class="mt-4">
+        <h3 class="text-sm font-semibold uppercase tracking-wider text-ink-faint mb-1.5">Lists</h3>
+        <div class="flex flex-wrap gap-1.5">
+          <% @deal.lists.each do |list| %>
+            <%= link_to list.name, list_path(list), class: "inline-flex items-center gap-1.5 rounded-full bg-canvas-sunken px-2 py-0.5 text-sm hover:bg-line" %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </aside>
+
+  <div class="w-full shrink-0 snap-start md:flex-1 md:w-auto overflow-y-auto scrollbar-subtle p-5 space-y-6 bg-canvas-soft/50">
+    <%= render "trigger_panel", deal: @deal, run: StageTriggerRun.latest_panel_for(@deal) if feature_enabled?(:stage_triggers) %>
+    <%= render "shared/tasks_section", record: @deal, task: @task %>
+    <%= render "lead_submission_section", deal: @deal if @deal.lead_submission.present? %>
+    <%= render "booking_submission_section", deal: @deal if @deal.booking.present? %>
+    <%= render "shared/ai_assistant_section", record: @deal if feature_enabled?(:ai_assistant) %>
+    <%= render "products_section", deal: @deal, line_items: @line_items, products: @products, editions: @editions %>
+    <%= render "collaborators_section", deal: @deal %>
+    <%= render "shared/notes_section", record: @deal, note: @note %>
+    <%= render "shared/comments_section", record: @deal, comment: @comment if feature_enabled?(:comments) %>
+    <%= render "shared/attachments_section", record: @deal if feature_enabled?(:attachments) %>
+    <%= render "shared/email_section", record: @deal, email_message: @email_message if feature_enabled?(:record_email) %>
+    <%= render "shared/timeline", activities: @activities %>
+  </div>
+</div>

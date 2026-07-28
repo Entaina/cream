@@ -1,0 +1,29 @@
+<h2><%= @report.name %></h2>
+<p style="color:#666;"><%= @result.metric_label %> by <%= @config[:group_by] %> · <%= @config[:date_range] == "all" ? "all time" : "this #{@config[:date_range]}" %></p>
+
+<% if @result.rows.empty? %>
+  <p>No data for this report.</p>
+<% else %>
+  <table cellpadding="6" cellspacing="0" style="border-collapse:collapse;">
+    <thead>
+      <tr>
+        <th align="left" style="border-bottom:1px solid #ddd;"><%= @config[:group_by].capitalize %></th>
+        <th align="right" style="border-bottom:1px solid #ddd;"><%= @result.metric_label %></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @result.rows.each do |row| %>
+        <tr>
+          <td><%= row.label %></td>
+          <td align="right"><%= @result.metric == "count" ? row.value.to_i : format("%.2f €", row.value) %></td>
+        </tr>
+      <% end %>
+      <tr>
+        <td style="border-top:1px solid #ddd;"><strong>Total</strong></td>
+        <td align="right" style="border-top:1px solid #ddd;"><strong><%= @result.metric == "count" ? @result.total.to_i : format("%.2f €", @result.total) %></strong></td>
+      </tr>
+    </tbody>
+  </table>
+<% end %>
+
+<p style="color:#999;font-size:12px;margin-top:16px;">You're receiving this because this report is scheduled <%= @report.schedule %> in Cream.</p>

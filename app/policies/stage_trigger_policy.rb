@@ -1,0 +1,2 @@
+class StageTriggerPolicy < WorkspaceRecordPolicy
+end

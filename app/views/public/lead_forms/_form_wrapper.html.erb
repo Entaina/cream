@@ -1,0 +1,28 @@
+<%= form_with url: public_lead_form_path(lead_form.slug), scope: :lead, method: :post,
+      class: "space-y-4", data: { controller: "lead-form" } do |f| %>
+  <%= render "public/lead_forms/hidden_fields", lead_form: lead_form %>
+
+  <div class="hidden" aria-hidden="true">
+    <%= label_tag "lead_#{LeadForm::HONEYPOT_FIELD}", "No rellenar" %>
+    <%= text_field_tag "lead[#{LeadForm::HONEYPOT_FIELD}]", nil, tabindex: "-1", autocomplete: "off" %>
+  </div>
+
+  <div class="space-y-4">
+    <%= render "public/lead_forms/base_fields",
+          f: f,
+          show_how_heard: lead_form.show_how_heard_in_base? %>
+
+    <%= render "public/lead_forms/templates/#{lead_form.template_key}", f: f, lead_form: lead_form %>
+
+    <%= render "public/lead_forms/consent_fields", f: f %>
+  </div>
+
+  <% if TurnstileVerifier.enabled? %>
+    <div class="cf-turnstile" data-sitekey="<%= TurnstileVerifier.site_key %>" data-appearance="interaction-only"></div>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <% end %>
+
+  <div>
+    <%= f.submit "Enviar", class: "btn-primary w-full" %>
+  </div>
+<% end %>

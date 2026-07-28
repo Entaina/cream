@@ -1,0 +1,70 @@
+<% page_title "Formularios de captación" %>
+<% actions = capture do %>
+  <%= link_to new_lead_form_path, class: "btn-primary" do %>
+    <%= icon :plus, classes: "size-3.5" %> Nuevo formulario
+  <% end %>
+<% end %>
+<%= render "shared/page_header", title: "Formularios de captación", icon_name: :globe, count: @lead_forms.size, actions: actions %>
+
+<div class="flex-1 overflow-y-auto scrollbar-subtle p-5 space-y-3">
+  <% if @lead_forms.empty? %>
+    <p class="text-ink-faint">Todavía no hay formularios configurados.</p>
+  <% end %>
+
+  <% @lead_forms.each do |form| %>
+    <article class="card p-4 space-y-3">
+      <div class="flex items-center gap-2">
+        <h2 class="font-semibold text-base"><%= form.name %></h2>
+        <%= badge form.active? ? "Activo" : "Inactivo", color: form.active? ? "green" : "chicago" %>
+        <% if form.collects_company? %>
+          <%= badge "Con empresa", color: "hoki" %>
+        <% end %>
+        <div class="ml-auto flex gap-2">
+          <%= link_to "Editar", edit_lead_form_path(form), class: "btn-secondary" %>
+          <%= button_to "Eliminar", lead_form_path(form), method: :delete, class: "btn-danger" %>
+        </div>
+      </div>
+
+      <dl class="grid gap-2 text-sm sm:grid-cols-2">
+        <div><dt class="text-ink-faint">Plantilla</dt><dd><%= form.template_key %></dd></div>
+        <div><dt class="text-ink-faint">Pipeline</dt><dd><%= form.pipeline.name %></dd></div>
+        <div><dt class="text-ink-faint">Responsable</dt><dd><%= form.responsible.name %></dd></div>
+        <div><dt class="text-ink-faint">Email al lead</dt><dd><%= link_to form.email_template.name, edit_email_template_path(form.email_template), class: "text-accent hover:underline" %></dd></div>
+      </dl>
+
+      <div>
+        <p class="label">URL pública</p>
+        <%= link_to public_lead_form_url(form.slug), public_lead_form_url(form.slug),
+            class: "block rounded-md border border-line bg-canvas-sunken px-3 py-2 text-sm break-all text-accent hover:underline",
+            target: "_blank", rel: "noopener noreferrer" %>
+      </div>
+
+      <div data-controller="clipboard">
+        <p class="label">Código iframe</p>
+        <div class="relative">
+          <textarea readonly tabindex="-1" rows="3"
+                class="input w-full resize-y font-mono text-sm cursor-default bg-canvas-sunken pr-28"
+                aria-readonly="true"
+                data-clipboard-target="source"><%= form.iframe_snippet %></textarea>
+          <div class="absolute top-2 right-2 flex items-center gap-1.5">
+            <span data-clipboard-target="feedback"
+                  class="hidden rounded-md bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700 dark:bg-green-950 dark:text-green-300"
+                  role="status"
+                  aria-live="polite">
+              Copiado
+            </span>
+            <button type="button"
+                  class="rounded-md p-1.5 text-ink-faint hover:text-ink hover:bg-canvas-raised"
+                  title="Copiar al portapapeles"
+                  aria-label="Copiar al portapapeles"
+                  data-action="clipboard#copy"
+                  data-clipboard-target="button">
+              <span data-clipboard-target="copyIcon"><%= icon :copy, classes: "size-4" %></span>
+              <span data-clipboard-target="copiedIcon" class="hidden"><%= icon :check, classes: "size-4" %></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </article>
+  <% end %>
+</div>

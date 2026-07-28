@@ -1,0 +1,40 @@
+<% page_title "Formatos — #{@stage.name}" %>
+<% actions = capture do %>
+  <%= link_to edit_pipeline_path(@stage.pipeline), class: "btn-secondary" do %>
+    <%= icon :arrow_left, classes: "size-3.5" %> Pipeline
+  <% end %>
+  <%= link_to new_pipeline_stage_stage_field_format_path(@stage), class: "btn-primary" do %>
+    <%= icon :plus, classes: "size-3.5" %> Nuevo formato
+  <% end %>
+<% end %>
+<%= render "shared/page_header", title: "Formatos de campos — #{@stage.name} (#{@stage.pipeline.name})",
+      icon_name: :eye, count: @stage_field_formats.size, actions: actions %>
+
+<div class="flex-1 overflow-y-auto scrollbar-subtle p-5 space-y-3">
+  <p class="text-sm text-ink-faint">
+    Cuando un deal está en la etapa <strong><%= @stage.name %></strong> y se cumple la condición,
+    el campo se muestra con el texto configurado en lugar de su valor (ficha, tabla y tablero).
+    Gana la primera regla activa que coincida.
+  </p>
+  <% if @stage_field_formats.empty? %>
+    <p class="text-base text-ink-soft">No hay formatos para esta etapa todavía.</p>
+  <% end %>
+  <% @stage_field_formats.each do |format| %>
+    <article class="card p-4">
+      <div class="flex items-center gap-2">
+        <h2 class="font-semibold text-base"><%= StageFieldFormat::FIELDS[format.field] %></h2>
+        <%= badge format.active? ? "Activo" : "Inactivo", color: format.active? ? "green" : "chicago" %>
+        <div class="ml-auto flex gap-2">
+          <%= link_to "Editar", edit_stage_field_format_path(format), class: "btn-secondary" %>
+          <%= button_to "Eliminar", stage_field_format_path(format), method: :delete, class: "btn-danger",
+                data: { turbo_confirm: "¿Eliminar este formato?" } %>
+        </div>
+      </div>
+      <p class="text-sm text-ink-faint mt-1">
+        Si <strong><%= StageFieldFormat::FIELDS[format.field].downcase %></strong>
+        <%= StageFieldFormat::OPERATORS[format.operator] %><%= " #{format.compare_value}" unless format.blank_operator? %>
+        → se muestra «<strong><%= format.display_text %></strong>»
+      </p>
+    </article>
+  <% end %>
+</div>

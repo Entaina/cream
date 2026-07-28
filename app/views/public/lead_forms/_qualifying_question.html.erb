@@ -1,0 +1,15 @@
+<%# locals: f, label:, field: :qualifying_answer, required: false, input_type: :text, options: [] %>
+<% return unless local_assigns[:label].present? %>
+
+<div>
+  <%= render "public/lead_forms/field_label", f: f, field: field, text: label, required: local_assigns.fetch(:required, false) %>
+  <% if local_assigns[:input_type] == :select %>
+    <%= f.select field,
+          options_for_select(Array(options)),
+          { include_blank: required ? false : "Selecciona una opción" },
+          class: "input w-full",
+          required: required %>
+  <% else %>
+    <%= f.text_field field, class: "input w-full", required: required %>
+  <% end %>
+</div>

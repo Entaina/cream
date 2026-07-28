@@ -1,0 +1,19 @@
+one_one:
+  user: one
+  workspace: one
+  role: admin
+
+one_member:
+  user: two
+  workspace: one
+  role: salesperson
+
+one_sales_director:
+  user: three
+  workspace: one
+  role: sales_director
+
+two_two:
+  user: two
+  workspace: two
+  role: admin

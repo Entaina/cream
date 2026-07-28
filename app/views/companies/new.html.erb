@@ -1,0 +1,7 @@
+<% page_title "New company" %>
+<%= render "shared/page_header", title: "New company", icon_name: :building, count: nil, actions: nil %>
+<div class="flex-1 overflow-y-auto p-5">
+  <div class="max-w-xl">
+    <%= render "form", company: @company %>
+  </div>
+</div>

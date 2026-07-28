@@ -1,0 +1,76 @@
+<% page_title @list.name %>
+<% actions = capture do %>
+  <%= link_to edit_list_path(@list), class: "btn-secondary" do %>
+    <%= icon :pencil, classes: "size-3.5" %> Edit
+  <% end %>
+  <%= button_to list_path(@list), method: :delete, form: { data: { turbo_confirm: "Delete the list “#{@list.name}”? Records themselves won't be deleted." } }, class: "btn-danger" do %>
+    <%= icon :trash, classes: "size-3.5" %> Delete
+  <% end %>
+<% end %>
+<%= render "shared/page_header", title: @list.name, icon_name: :list, count: @entries.size, actions: actions %>
+
+<div class="flex flex-wrap items-center gap-2 border-b border-line px-5 py-2 shrink-0">
+  <%= form_with url: list_entries_path(@list), method: :post, class: "flex flex-wrap items-center gap-2" do %>
+    <%= select_tag :record_id,
+          options_from_collection_for_select(@candidates, :id, :display_name),
+          include_blank: "Add #{@list.record_type.downcase} to list...", class: "input w-64 max-w-full" %>
+    <%= submit_tag "Add", class: "btn-secondary" %>
+  <% end %>
+</div>
+
+<div class="flex-1 overflow-auto scrollbar-subtle">
+  <% if @entries.any? %>
+    <table class="table-base">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <% if @list.record_type == "Deal" %>
+            <th>Stage</th>
+            <th>Value</th>
+          <% elsif @list.record_type == "Person" %>
+            <th>Email</th>
+            <th>Company</th>
+          <% else %>
+            <th>Domain</th>
+            <th>Industry</th>
+          <% end %>
+          <th>Added</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @entries.each do |entry| %>
+          <% record = entry.record %>
+          <tr>
+            <td>
+              <%= link_to record_path_for(record), class: "flex items-center gap-2 font-medium hover:text-accent" do %>
+                <%= avatar record %>
+                <%= record.display_name %>
+              <% end %>
+            </td>
+            <% if @list.record_type == "Deal" %>
+              <td><%= stage_badge record %></td>
+              <td class="text-ink-soft tabular-nums"><%= money(record.value, record.currency) %></td>
+            <% elsif @list.record_type == "Person" %>
+              <td class="text-ink-soft"><%= record.email %></td>
+              <td class="text-ink-soft"><%= record.company&.name %></td>
+            <% else %>
+              <td class="text-ink-soft"><%= record.domain %></td>
+              <td class="text-ink-soft"><%= record.industry %></td>
+            <% end %>
+            <td class="text-ink-faint text-sm"><%= l entry.created_at, format: :short %></td>
+            <td class="text-right">
+              <%= button_to list_entry_path(@list, entry), method: :delete,
+                    class: "text-ink-faint hover:text-danger p-1 rounded cursor-pointer", title: "Remove from list" do %>
+                <%= icon :x, classes: "size-3.5" %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% else %>
+    <%= render "shared/empty_state", icon_name: :list, title: "This list is empty",
+          subtitle: "Use the selector above to add #{@list.record_type.downcase.pluralize} to this list.", action: nil %>
+  <% end %>
+</div>

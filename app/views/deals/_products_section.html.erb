@@ -1,0 +1,80 @@
+<section class="card">
+  <div class="flex items-center justify-between px-4 py-3 border-b border-line">
+    <h2 class="text-base font-semibold flex items-center gap-2">
+      <%= icon :briefcase, classes: "size-4 text-ink-faint" %> Products
+    </h2>
+    <span class="text-base text-ink-soft tabular-nums font-medium"><%= money(deal.value, deal.currency) %></span>
+  </div>
+
+  <%# Shared list of existing editions: type to pick one, or a new name to create it. %>
+  <datalist id="editions-list">
+    <% editions.each do |edition| %>
+      <option value="<%= edition.name %>"></option>
+    <% end %>
+  </datalist>
+
+  <% if line_items.any? %>
+    <div class="overflow-x-auto">
+    <table class="table-base">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th class="w-40">Edition</th>
+          <th class="w-20">Qty</th>
+          <th class="w-32">Unit price</th>
+          <th class="w-28">Subtotal</th>
+          <th class="w-10"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% line_items.each do |line| %>
+          <tr>
+            <td class="font-medium"><%= line.product.name %></td>
+            <td colspan="3" class="p-0">
+              <%= form_with model: [deal, line], url: deal_line_item_path(deal, line), method: :patch, class: "flex items-center gap-2 px-3 py-1.5" do |f| %>
+                <%= f.text_field :edition_name, value: line.edition&.name, list: "editions-list", placeholder: "Edition", class: "input w-36 py-1", onchange: "this.form.requestSubmit()" %>
+                <%= f.number_field :quantity, min: 1, step: 1, class: "input w-16 py-1", onchange: "this.form.requestSubmit()" %>
+                <%= f.number_field :unit_price, min: 0, step: 0.01, class: "input w-28 py-1", onchange: "this.form.requestSubmit()" %>
+              <% end %>
+            </td>
+            <td class="text-ink-soft tabular-nums"><%= money(line.subtotal, deal.currency) %></td>
+            <td>
+              <%= button_to deal_line_item_path(deal, line), method: :delete, class: "text-ink-faint hover:text-danger p-1",
+                    form: { data: { turbo_confirm: "Remove #{line.product.name}?" } } do %>
+                <%= icon :trash, classes: "size-3.5" %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+    </div>
+  <% else %>
+    <p class="px-4 py-3 text-base text-ink-faint">No products yet. Add one below.</p>
+  <% end %>
+
+  <div class="px-4 py-3 border-t border-line">
+    <% if products.any? %>
+      <%= form_with url: deal_line_items_path(deal), scope: :deal_product, class: "flex flex-wrap items-end gap-2" do |f| %>
+        <div class="flex-1 min-w-40">
+          <%= f.label :product_id, "Add product", class: "label" %>
+          <%= f.collection_select :product_id, products, :id, ->(p) { "#{p.name} — #{money(p.price)}" },
+                { prompt: "Select a product" }, class: "input", required: true %>
+        </div>
+        <div class="w-40">
+          <%= f.label :edition_name, "Edition", class: "label" %>
+          <%= f.text_field :edition_name, list: "editions-list", placeholder: "Optional", class: "input" %>
+        </div>
+        <div class="w-20">
+          <%= f.label :quantity, "Qty", class: "label" %>
+          <%= f.number_field :quantity, value: 1, min: 1, step: 1, class: "input" %>
+        </div>
+        <%= f.submit "Add", class: "btn-primary" %>
+      <% end %>
+    <% else %>
+      <p class="text-base text-ink-faint">
+        No products in the catalogue. <%= link_to "Create one", new_product_path, class: "text-accent hover:underline" %>.
+      </p>
+    <% end %>
+  </div>
+</section>

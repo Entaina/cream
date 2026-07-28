@@ -1,0 +1,83 @@
+<% page_title "Gmail connection" %>
+<%= render "shared/page_header", title: "Gmail connection", icon_name: :mail %>
+
+<div class="p-5 max-w-xl">
+  <div class="card p-4 space-y-3">
+    <% if @connection.persisted? && @connection.connected? %>
+      <p class="text-base text-ink-soft">Gmail connected for <strong><%= @connection.email %></strong>.</p>
+      <p class="text-sm text-ink-faint">
+        <% if @connection.send_receive_full_mode? %>
+          Mode: send emails, detect replies, and log full reply text.
+        <% elsif @connection.send_and_receive_mode? %>
+          Mode: send emails and detect replies.
+        <% elsif @connection.send_only_mode? %>
+          Mode: send emails only.
+        <% else %>
+          Mode: connected (reconnect to refresh permissions).
+        <% end %>
+      </p>
+
+      <%= form_with model: @connection, url: gmail_connection_path, method: :patch, data: { controller: "auto-submit" } do |f| %>
+        <% if @connection.can_send? %>
+          <label class="flex items-center gap-2 text-base mb-2">
+            <%= f.check_box :send_enabled, data: { action: "change->auto-submit#submit" } %>
+            Send emails from records through Gmail
+          </label>
+        <% end %>
+        <% if @connection.can_read_metadata? %>
+          <label class="flex items-center gap-2 text-base">
+            <%= f.check_box :sync_enabled, data: { action: "change->auto-submit#submit" } %>
+            Detect replies in your inbox
+          </label>
+        <% end %>
+      <% end %>
+
+      <% unless @connection.can_read_metadata? %>
+        <p class="text-sm text-ink-faint">
+          Reply detection needs inbox header access. Grant it without disconnecting your account.
+        </p>
+        <%= button_to "Enable reply detection", gmail_auth_url(:send_receive), method: :post, data: { turbo: false }, class: "btn-secondary" %>
+      <% end %>
+
+      <% if @connection.full_read_blocked_by_metadata? %>
+        <p class="text-sm text-copperfield">
+          Reply text cannot be saved yet because inbox header access and body access are both on your Google token (Google blocks reading the body in that case). Click <strong>Enable full reply logging</strong> below to re-authorize with read-only access only, then run <strong>Sync now</strong>.
+        </p>
+      <% end %>
+
+      <% if @connection.can_read_metadata? && !@connection.can_read_body? %>
+        <p class="text-sm text-ink-faint">
+          Full reply logging saves the text of inbound replies on the record conversation. Grant read access to message bodies.
+        </p>
+        <%= button_to "Enable full reply logging", gmail_auth_url(:full), method: :post, data: { turbo: false }, class: "btn-secondary" %>
+      <% end %>
+
+      <p class="text-sm text-ink-faint">
+        When send is on, emails you send from a record go out from your Gmail account (and land in your Sent folder).
+        When reply detection is on, Cream checks your inbox for replies to those emails and marks them as replied automatically.
+        With full reply logging, the reply text also appears in the record email list.
+      </p>
+      <% if @connection.last_synced_at.present? %>
+        <p class="text-sm text-ink-faint">Last synced: <%= l(@connection.last_synced_at, format: :short) %>.</p>
+      <% end %>
+
+      <div class="flex gap-2 flex-wrap">
+        <% if @connection.can_read_metadata? %>
+          <%= button_to "Sync now", sync_gmail_connection_path, method: :post, class: "btn-secondary" %>
+        <% end %>
+        <%= button_to "Disconnect", gmail_connection_path, method: :delete, class: "btn-danger" %>
+      </div>
+    <% else %>
+      <p class="text-base text-ink-soft">Connect your Gmail account to send record emails from your own address. You can start with send-only and add reply detection later.</p>
+      <div class="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+        <%= button_to "Connect for sending only", gmail_auth_url(:send), method: :post, data: { turbo: false }, class: "btn-primary" %>
+        <%= button_to "Connect for sending and reply detection", gmail_auth_url(:send_receive), method: :post, data: { turbo: false }, class: "btn-secondary" %>
+        <%= button_to "Connect with full reply logging", gmail_auth_url(:full), method: :post, data: { turbo: false }, class: "btn-secondary" %>
+      </div>
+      <p class="text-sm text-ink-faint">
+        Sending needs permission to send mail on your behalf. Reply detection needs read access to message headers.
+        Full reply logging additionally reads message bodies to save replies on the record.
+      </p>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,83 @@
+name: cream
+
+services:
+  web:
+    image: ghcr.io/entaina/cream:latest
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      RAILS_ENV: production
+      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
+      CREAM_DATABASE_HOST: db
+      CREAM_DATABASE_PORT: 5432
+      CREAM_DATABASE_USER: ${CREAM_DATABASE_USER}
+      CREAM_DATABASE_PASSWORD: ${CREAM_DATABASE_PASSWORD}
+      CREAM_APP_URL: https://${CREAM_DOMAIN}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      CREAM_ORGANIZATION_EMAIL_DOMAIN: ${CREAM_ORGANIZATION_EMAIL_DOMAIN}
+      CREAM_ORGANIZATION_WORKSPACE_NAME: ${CREAM_ORGANIZATION_WORKSPACE_NAME}
+      MAILER_FROM: ${MAILER_FROM}
+      SMTP_ADDRESS: ${SMTP_ADDRESS}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USERNAME: ${SMTP_USERNAME}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      SMTP_DOMAIN: ${SMTP_DOMAIN}
+      SMTP_AUTHENTICATION: ${SMTP_AUTHENTICATION:-plain}
+      GOOGLE_DRIVE_SERVICE_ACCOUNT_KEY_PATH: ${GOOGLE_DRIVE_SERVICE_ACCOUNT_KEY_PATH}
+      GOOGLE_DRIVE_BACKUP_FOLDER_ID: ${GOOGLE_DRIVE_BACKUP_FOLDER_ID}
+      SOLID_QUEUE_IN_PUMA: "1"
+      PORT: "80"
+      RAILS_LOG_LEVEL: ${RAILS_LOG_LEVEL:-info}
+    volumes:
+      - cream_storage:/rails/storage
+      - ./cream-backup.json:${GOOGLE_DRIVE_SERVICE_ACCOUNT_KEY_PATH:-/run/secrets/cream-backup.json}:ro
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/up"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 90s
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.cream.rule=Host(`${CREAM_DOMAIN}`)
+      - traefik.http.routers.cream.entrypoints=websecure
+      - traefik.http.routers.cream.tls=true
+      - traefik.http.routers.cream.tls.certresolver=letsencrypt
+      - traefik.http.services.cream.loadbalancer.server.port=80
+    networks:
+      - cream
+      - proxy
+
+  db:
+    image: pgvector/pgvector:pg16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${CREAM_DATABASE_USER}
+      POSTGRES_PASSWORD: ${CREAM_DATABASE_PASSWORD}
+      POSTGRES_DB: cream_production
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${CREAM_DATABASE_USER} -d cream_production"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - cream
+
+# Traefik (TLS + routing por dominio) es un stack aparte, compartido con las
+# demás apps del servidor. Requiere la red externa `proxy`.
+networks:
+  cream:
+  proxy:
+    external: true
+
+volumes:
+  pgdata:
+  cream_storage:

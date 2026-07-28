@@ -1,0 +1,17 @@
+<div class="space-y-3 border-t border-line pt-4">
+  <label class="flex items-start gap-2.5 text-sm text-ink-soft cursor-pointer">
+    <%= f.check_box :newsletter_opt_in, { class: "mt-0.5 rounded border-line" }, "1", "0" %>
+    <span>Quiero recibir la newsletter de <%= cream_operator_name %></span>
+  </label>
+
+  <label class="flex items-start gap-2.5 text-sm text-ink-soft cursor-pointer">
+    <%= f.check_box :gdpr_consent, { required: true, class: "mt-0.5 rounded border-line" }, "1", "0" %>
+    <span>
+      He leído y acepto la
+      <%= link_to "política de privacidad", privacy_path, target: "_blank", rel: "noopener", class: "text-accent hover:underline" %>.
+      Consiento el tratamiento de mis datos personales para gestionar mi solicitud en el CRM de <%= cream_operator_name %>
+      y, en su caso, el envío de comunicaciones a través de la plataforma beehiiv.
+      <%= render "public/lead_forms/required_marker" %>
+    </span>
+  </label>
+</div>

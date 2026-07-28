@@ -1,0 +1,146 @@
+class BookingEventType < ApplicationRecord
+  LOCATION_TYPES = %w[google_meet physical to_be_decided].freeze
+  COLORS = %w[hoki copperfield golden chicago green blue].freeze
+  WEEKDAYS = %w[monday tuesday wednesday thursday friday saturday sunday].freeze
+  LOCATION_TYPE_LABELS = {
+    "google_meet" => "Google Meet",
+    "physical" => "Presencial",
+    "to_be_decided" => "A coordinar"
+  }.freeze
+
+  COLOR_LABELS = {
+    "hoki" => "Azul gris",
+    "copperfield" => "Cobre",
+    "golden" => "Dorado",
+    "chicago" => "Gris",
+    "green" => "Verde",
+    "blue" => "Azul"
+  }.freeze
+
+  DEFAULT_WEEKLY_HOURS = {
+    "monday" => [ [ "10:00", "14:00" ], [ "16:30", "20:00" ] ],
+    "tuesday" => [ [ "10:00", "14:00" ], [ "16:30", "20:00" ] ],
+    "wednesday" => [ [ "10:00", "14:00" ], [ "16:30", "20:00" ] ],
+    "thursday" => [ [ "10:00", "14:00" ], [ "16:30", "20:00" ] ],
+    "friday" => [ [ "10:00", "14:00" ], [ "16:30", "18:30" ] ],
+    "saturday" => [],
+    "sunday" => []
+  }.freeze
+
+  belongs_to :booking_page, inverse_of: :event_types
+
+  validates :slug, presence: true, format: { with: /\A[a-z0-9-]+\z/ }
+  validates :slug, uniqueness: { scope: :booking_page_id }
+  validates :duration_minutes, numericality: { greater_than: 0 }
+  validates :slot_increment_minutes, numericality: { greater_than: 0 }
+  validates :min_notice_hours, numericality: { greater_than_or_equal_to: 0 }
+  validates :location_type, inclusion: { in: LOCATION_TYPES }
+  validates :color, inclusion: { in: COLORS }
+  validate :name_i18n_present
+
+  before_validation :normalize_weekly_hours, :normalize_slug
+
+  scope :visible, -> { where(visible: true) }
+  scope :ordered, -> { order(:position, :id) }
+
+  def self.empty_weekly_hours
+    WEEKDAYS.index_with { [] }
+  end
+
+  def self.blank_attributes
+    {
+      duration_minutes: 30,
+      location_type: "google_meet",
+      color: "hoki",
+      weekly_hours: empty_weekly_hours,
+      slot_increment_minutes: 15,
+      min_notice_hours: 4,
+      buffer_before_minutes: 0,
+      buffer_after_minutes: 0,
+      visible: true,
+      position: 0
+    }
+  end
+
+  def self.location_type_label(type)
+    LOCATION_TYPE_LABELS.fetch(type.to_s, type.to_s.humanize)
+  end
+
+  def self.color_label(color)
+    COLOR_LABELS.fetch(color.to_s, color.to_s.humanize)
+  end
+
+  def localized_name(locale = I18n.locale)
+    fetch_i18n(name_i18n, locale)
+  end
+
+  def localized_description(locale = I18n.locale)
+    fetch_i18n(description_i18n, locale)
+  end
+
+  def google_meet?
+    location_type == "google_meet"
+  end
+
+  def payload(locale: I18n.locale)
+    {
+      slug: slug,
+      name: localized_name(locale),
+      description: localized_description(locale),
+      duration_minutes: duration_minutes,
+      color: color,
+      location_type: location_type,
+      location_address: location_address
+    }
+  end
+
+  def hours_for_weekday(weekday_name)
+    weekly_hours.fetch(weekday_name.to_s, [])
+  end
+
+  private
+
+  def normalize_weekly_hours
+    if weekly_hours.is_a?(String)
+      begin
+        self.weekly_hours = JSON.parse(weekly_hours)
+      rescue JSON::ParserError
+        self.weekly_hours = self.class.empty_weekly_hours
+      end
+    end
+
+    self.weekly_hours = normalize_weekly_hours_hash(weekly_hours)
+  end
+
+  def normalize_weekly_hours_hash(value)
+    return self.class.empty_weekly_hours if value.blank?
+
+    WEEKDAYS.index_with do |day|
+      Array(value[day]).filter_map do |window|
+        next unless window.is_a?(Array) && window.size >= 2
+
+        start_time = window[0].to_s.strip
+        end_time = window[1].to_s.strip
+        next if start_time.blank? || end_time.blank?
+
+        [ start_time, end_time ]
+      end
+    end
+  end
+
+  def normalize_slug
+    self.slug = slug.to_s.parameterize if slug.present?
+  end
+
+  def name_i18n_present
+    data = name_i18n.is_a?(Hash) ? name_i18n : {}
+    return if data["es"].present?
+
+    errors.add(:name_i18n, "debe incluir nombre en español")
+  end
+
+  def fetch_i18n(hash, locale)
+    data = hash.is_a?(Hash) ? hash : {}
+    data[locale.to_s].presence || data["es"].presence || data.values.first.to_s
+  end
+end

@@ -1,0 +1,143 @@
+- generic [ref=e104]:
+  - complementary [ref=e105]:
+    - generic [ref=e106]:
+      - generic [ref=e107]: C
+      - generic [ref=e108]: Cream Demo
+    - link "Search... /" [ref=e110] [cursor=pointer]:
+      - /url: /search
+      - img [ref=e111]
+      - generic [ref=e113]: Search...
+      - generic [ref=e114]: /
+    - navigation [ref=e115]:
+      - link "Dashboard" [ref=e116] [cursor=pointer]:
+        - /url: /
+        - img [ref=e117]
+        - text: Dashboard
+      - link "People" [ref=e119] [cursor=pointer]:
+        - /url: /people
+        - img [ref=e120]
+        - text: People
+      - link "Companies" [ref=e122] [cursor=pointer]:
+        - /url: /companies
+        - img [ref=e123]
+        - text: Companies
+      - link "Deals" [ref=e125] [cursor=pointer]:
+        - /url: /deals/board
+        - img [ref=e126]
+        - text: Deals
+      - link "Tasks" [ref=e128] [cursor=pointer]:
+        - /url: /tasks
+        - img [ref=e129]
+        - text: Tasks
+    - generic [ref=e131]:
+      - generic [ref=e132]:
+        - generic [ref=e133]: Lists
+        - link "New list" [ref=e134] [cursor=pointer]:
+          - /url: /lists/new
+          - img [ref=e135]
+      - link "Champions" [ref=e137] [cursor=pointer]:
+        - /url: /lists/5
+        - generic [ref=e139]: Champions
+      - link "Hot deals Q3" [ref=e140] [cursor=pointer]:
+        - /url: /lists/4
+        - generic [ref=e142]: Hot deals Q3
+      - link "Spain accounts" [ref=e143] [cursor=pointer]:
+        - /url: /lists/6
+        - generic [ref=e145]: Spain accounts
+    - generic [ref=e146]:
+      - generic [ref=e147]: JD
+      - generic [ref=e148]:
+        - paragraph [ref=e149]: Josemi Díez
+        - paragraph [ref=e150]: josemi@entaina.ai
+      - button "Sign out" [ref=e152]:
+        - img [ref=e153]
+  - main [ref=e155]:
+    - generic [ref=e156]:
+      - img [ref=e157]
+      - text: Person created.
+    - generic [ref=e159]:
+      - generic [ref=e160]:
+        - img [ref=e161]
+        - heading "Elena Ruiz" [level=1] [ref=e163]
+      - generic [ref=e164]:
+        - link "Edit" [ref=e165] [cursor=pointer]:
+          - /url: /people/25/edit
+          - img [ref=e166]
+          - text: Edit
+        - button "Delete" [ref=e169] [cursor=pointer]:
+          - img [ref=e170]
+          - text: Delete
+    - generic [ref=e172]:
+      - complementary [ref=e173]:
+        - generic [ref=e174]:
+          - generic [ref=e175]: ER
+          - generic [ref=e176]:
+            - heading "Elena Ruiz" [level=2] [ref=e177]
+            - paragraph [ref=e178]: Head of Design
+        - generic [ref=e179]:
+          - generic [ref=e180]:
+            - generic [ref=e181]:
+              - img [ref=e182]
+              - text: Email
+            - link "elena.ruiz@linear.app" [ref=e185] [cursor=pointer]:
+              - /url: mailto:elena.ruiz@linear.app
+          - generic [ref=e186]:
+            - generic [ref=e187]:
+              - img [ref=e188]
+              - text: Phone
+            - generic [ref=e190]: —
+          - generic [ref=e191]:
+            - generic [ref=e192]:
+              - img [ref=e193]
+              - text: Company
+            - link "Linear" [ref=e196] [cursor=pointer]:
+              - /url: /companies/10
+          - generic [ref=e197]:
+            - generic [ref=e198]:
+              - img [ref=e199]
+              - text: Location
+            - generic [ref=e201]: —
+          - generic [ref=e202]:
+            - generic [ref=e203]:
+              - img [ref=e204]
+              - text: LinkedIn
+            - generic [ref=e206]: —
+          - generic [ref=e207]:
+            - generic [ref=e208]:
+              - img [ref=e209]
+              - text: Owner
+            - generic [ref=e211]: Josemi Díez
+          - generic [ref=e212]:
+            - generic [ref=e213]:
+              - img [ref=e214]
+              - text: Created
+            - generic [ref=e216]: 11 Jun 08:29
+      - generic [ref=e217]:
+        - generic [ref=e218]:
+          - heading "Notes (0)" [level=3] [ref=e219]:
+            - img [ref=e220]
+            - text: Notes
+            - generic [ref=e222]: (0)
+          - generic [ref=e223]:
+            - textbox "Note title (optional)" [ref=e224]
+            - textbox "Write a note..." [ref=e225]
+            - button "Add note" [ref=e227] [cursor=pointer]
+        - generic [ref=e228]:
+          - heading "Tasks (0 open)" [level=3] [ref=e229]:
+            - img [ref=e230]
+            - text: Tasks
+            - generic [ref=e232]: (0 open)
+          - generic [ref=e233]:
+            - textbox "Add a task..." [ref=e234]
+            - textbox [ref=e235]
+            - button "Add" [ref=e236] [cursor=pointer]
+          - list
+        - generic [ref=e237]:
+          - heading "Activity" [level=3] [ref=e238]:
+            - img [ref=e239]
+            - text: Activity
+          - list [ref=e241]:
+            - listitem [ref=e242]:
+              - generic [ref=e245]:
+                - paragraph [ref=e246]: Josemi Díez created this record
+                - paragraph [ref=e247]: less than a minute ago

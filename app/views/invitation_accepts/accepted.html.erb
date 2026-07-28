@@ -1,0 +1,10 @@
+<% page_title "Invitation accepted" %>
+<div class="w-full max-w-sm text-center">
+  <div class="card p-6 shadow-sm">
+    <h1 class="text-xl font-semibold mb-2">Invitation already accepted</h1>
+    <p class="text-base text-ink-soft mb-4">
+      This invitation to <%= @invitation.workspace.name %> has already been used.
+    </p>
+    <%= link_to "Sign in", new_session_path, class: "btn-primary inline-flex" %>
+  </div>
+</div>

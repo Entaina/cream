@@ -1,0 +1,31 @@
+<% page_title "Tasks" %>
+<%= render "shared/page_header", title: "Tasks", icon_name: :check_circle, count: @tasks.size, actions: nil %>
+
+<div class="flex items-center gap-1 border-b border-line px-5 py-2 shrink-0">
+  <% { "pending" => "Open", "completed" => "Completed", "all" => "All" }.each do |key, label| %>
+    <%= link_to label, tasks_path(filter: key),
+          class: [ "rounded-md px-2.5 py-1 text-sm font-medium",
+                   @filter == key ? "bg-canvas-sunken text-ink" : "text-ink-faint hover:text-ink" ] %>
+  <% end %>
+</div>
+
+<div class="flex-1 overflow-y-auto scrollbar-subtle p-5">
+  <div class="max-w-3xl space-y-4">
+    <%= form_with model: Task.new(due_on: Task.default_due_on), url: tasks_path, class: "relative z-0 flex items-center gap-2 overflow-visible" do |f| %>
+      <%= mention_text_field f, :title, placeholder: "Add a task...", class: "input flex-1" %>
+      <%= f.date_field :due_on, class: "input w-36" %>
+      <%= f.submit "Add task", class: "btn-primary" %>
+    <% end %>
+
+    <% if @tasks.any? %>
+      <ul class="space-y-1.5">
+        <% @tasks.each do |task| %>
+          <%= render "shared/task_row", task: task, show_taskable: true %>
+        <% end %>
+      </ul>
+    <% else %>
+      <%= render "shared/empty_state", icon_name: :check_circle, title: "No tasks here",
+            subtitle: "Stay on top of follow-ups by adding tasks.", action: nil %>
+    <% end %>
+  </div>
+</div>

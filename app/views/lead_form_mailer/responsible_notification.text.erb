@@ -1,0 +1,17 @@
+Hola <%= @responsible.name %>,
+
+Se ha recibido un nuevo envío en el formulario <%= @lead_form.name %>.
+
+Datos del formulario:
+<% @data.each do |key, value| %>
+- <%= key.humanize %>: <%= value %>
+<% end %>
+
+<% if @metadata.present? %>
+Origen:
+<% @metadata.each do |key, value| %>
+- <%= key.humanize %>: <%= value %>
+<% end %>
+<% end %>
+
+Ver deal en Cream: <%= deal_url(@deal) %>

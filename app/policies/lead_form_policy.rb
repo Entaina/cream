@@ -1,0 +1,2 @@
+class LeadFormPolicy < WorkspaceRecordPolicy
+end

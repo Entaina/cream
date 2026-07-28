@@ -1,0 +1,34 @@
+# PostgreSQL runs in Docker Compose (see docker-compose.yml), mapped to localhost:5470.
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  host: <%= ENV.fetch("CREAM_DATABASE_HOST", "localhost") %>
+  port: <%= ENV.fetch("CREAM_DATABASE_PORT", 5470) %>
+  username: <%= ENV.fetch("CREAM_DATABASE_USER", "cream") %>
+  password: <%= ENV.fetch("CREAM_DATABASE_PASSWORD", "cream") %>
+  max_connections: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+
+development:
+  <<: *default
+  database: cream_development
+
+test:
+  <<: *default
+  database: cream_test
+
+production:
+  primary: &primary_production
+    <<: *default
+    database: cream_production
+  cache:
+    <<: *primary_production
+    database: cream_production_cache
+    migrations_paths: db/cache_migrate
+  queue:
+    <<: *primary_production
+    database: cream_production_queue
+    migrations_paths: db/queue_migrate
+  cable:
+    <<: *primary_production
+    database: cream_production_cable
+    migrations_paths: db/cable_migrate

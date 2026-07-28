@@ -1,0 +1,24 @@
+name: cream
+
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${CREAM_DATABASE_USER}
+      POSTGRES_PASSWORD: ${CREAM_DATABASE_PASSWORD}
+      POSTGRES_DB: cream_development
+    ports:
+      - "${CREAM_DATABASE_PORT}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${CREAM_DATABASE_USER}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pgdata:

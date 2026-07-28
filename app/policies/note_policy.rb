@@ -1,0 +1,2 @@
+class NotePolicy < WorkspaceRecordPolicy
+end

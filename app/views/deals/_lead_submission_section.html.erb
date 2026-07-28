@@ -1,0 +1,19 @@
+<div class="mt-4 card p-4">
+  <h3 class="text-sm font-semibold uppercase tracking-wider text-ink-faint mb-3">Formulario de origen</h3>
+  <% submission = deal.lead_submission %>
+  <p class="text-sm text-ink-faint mb-3">
+    Enviado el <%= l(submission.created_at, format: :short) %> desde
+    <strong><%= submission.lead_form.name %></strong>
+  </p>
+  <div class="divide-y divide-line/60">
+    <% submission.data.each do |key, value| %>
+      <% display_value = value.is_a?(TrueClass) || value.is_a?(FalseClass) ? (value ? "Sí" : "No") : value %>
+      <%= render "shared/attribute", label: key.humanize, icon_name: :mail, value: display_value %>
+    <% end %>
+    <% %w[lead_form_name lead_form_slug source_page referrer utm_source utm_medium utm_campaign utm_term utm_content ip user_agent].each do |key| %>
+      <% value = submission.metadata[key] %>
+      <% next if value.blank? %>
+      <%= render "shared/attribute", label: key.humanize, icon_name: :globe, value: value %>
+    <% end %>
+  </div>
+</div>

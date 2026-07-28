@@ -1,0 +1,5 @@
+company_segment_acme:
+  custom_field: company_segment
+  workspace: one
+  record: acme (Company)
+  value: "Enterprise"

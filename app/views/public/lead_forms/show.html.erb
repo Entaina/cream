@@ -1,0 +1,5 @@
+<% content_for :title, @lead_form.name %>
+<div class="mx-auto max-w-xl">
+  <h1 class="font-display text-2xl font-semibold mb-4"><%= @lead_form.name %></h1>
+  <%= render "form_wrapper", lead_form: @lead_form %>
+</div>

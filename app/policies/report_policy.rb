@@ -1,0 +1,2 @@
+class ReportPolicy < WorkspaceRecordPolicy
+end

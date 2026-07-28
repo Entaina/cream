@@ -1,0 +1,7 @@
+mention:
+  workspace: one
+  user: two
+  actor: one
+  kind: mention
+  title: User One mentioned you
+  body: Hey @two check this

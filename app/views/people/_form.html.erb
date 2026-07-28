@@ -1,0 +1,94 @@
+<%= form_with model: person, class: "space-y-4",
+      data: { controller: "linkedin-suggest", linkedin_suggest_entity_value: "person" } do |f| %>
+  <% if person.errors.any? %>
+    <div class="rounded-lg bg-danger-soft ring-1 ring-danger-line px-3 py-2 text-sm text-danger-strong">
+      <ul class="list-disc list-inside">
+        <% person.errors.full_messages.each do |msg| %><li><%= msg %></li><% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+    <div>
+      <%= f.label :first_name, class: "label" %>
+      <%= f.text_field :first_name, class: "input", autofocus: true %>
+    </div>
+    <div>
+      <%= f.label :last_name, class: "label" %>
+      <%= f.text_field :last_name, class: "input" %>
+    </div>
+  </div>
+
+  <div data-controller="nested-form">
+    <div class="flex items-center justify-between gap-2 mb-1">
+      <%= f.label :person_emails, "Emails", class: "label mb-0" %>
+      <button type="button" data-action="nested-form#add" class="btn-secondary">
+        <%= icon :plus, classes: "size-3.5" %> Add email
+      </button>
+    </div>
+    <div data-nested-form-target="list" class="space-y-2">
+      <%= f.fields_for :person_emails do |email_form| %>
+        <%= render "email_fields", form: email_form %>
+      <% end %>
+    </div>
+    <template data-nested-form-target="template">
+      <%= f.fields_for :person_emails, PersonEmail.new, child_index: "NEW_RECORD" do |email_form| %>
+        <%= render "email_fields", form: email_form %>
+      <% end %>
+    </template>
+  </div>
+
+  <div>
+    <%= f.label :phone, class: "label" %>
+    <%= f.telephone_field :phone, class: "input" %>
+  </div>
+
+  <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+    <div>
+      <%= f.label :job_title, class: "label" %>
+      <%= f.text_field :job_title, class: "input" %>
+    </div>
+    <%= render "shared/company_select", form: f %>
+  </div>
+
+  <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+    <div>
+      <%= f.label :location, class: "label" %>
+      <%= f.text_field :location, class: "input", placeholder: "City, Country" %>
+    </div>
+    <div>
+      <%= f.label :owner_id, "Owner", class: "label" %>
+      <%= f.collection_select :owner_id, current_workspace.users, :id, :name, { include_blank: "Unassigned" }, class: "input" %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+    <div>
+      <div class="flex items-center justify-between gap-2">
+        <%= f.label :linkedin_url, "LinkedIn URL", class: "label mb-0" %>
+        <button type="button" class="btn-ghost shrink-0 text-sm py-1 px-2"
+                data-action="linkedin-suggest#search"
+                title="Abre la búsqueda de LinkedIn con el nombre y la empresa">
+          <%= icon :search, classes: "size-3.5" %> Buscar en LinkedIn
+        </button>
+      </div>
+      <%= f.url_field :linkedin_url, class: "input" %>
+    </div>
+    <div>
+      <%= f.label :twitter_url, "X / Twitter URL", class: "label" %>
+      <%= f.url_field :twitter_url, class: "input" %>
+    </div>
+  </div>
+
+  <div>
+    <%= f.label :description, class: "label" %>
+    <%= f.text_area :description, rows: 3, class: "input" %>
+  </div>
+
+  <%= render "shared/custom_fields_form", form: f, record: person %>
+
+  <div class="flex items-center gap-2 pt-2">
+    <%= f.submit person.persisted? ? "Save changes" : "Create person", class: "btn-primary" %>
+    <%= link_to "Cancel", person.persisted? ? person_path(person) : people_path, class: "btn-secondary" %>
+  </div>
+<% end %>

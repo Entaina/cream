@@ -1,0 +1,131 @@
+<aside data-mobile-nav-target="sidebar"
+       class="w-60 shrink-0 border-r border-line bg-canvas-tint flex flex-col fixed inset-y-0 left-0 z-50 -translate-x-full transition-transform duration-200 ease-out md:static md:translate-x-0 md:transition-none">
+  <%# Workspace header %>
+  <%= render "shared/workspace_switcher" %>
+  <%= render "shared/pipeline_switcher" %>
+
+  <%# Quick search %>
+  <div class="p-2 space-y-1">
+    <%= link_to search_path, class: "flex items-center gap-2 rounded-md border border-line-strong bg-canvas-raised px-2.5 py-1.5 text-ink-faint hover:border-ink-faint transition-colors text-base" do %>
+      <%= icon :search, classes: "size-3.5" %>
+      <span>Search...</span>
+      <kbd class="ml-auto text-2xs text-ink-faint border border-line rounded px-1">/</kbd>
+    <% end %>
+    <%= link_to notifications_path, class: "flex items-center gap-2 rounded-md border border-line-strong bg-canvas-raised px-2.5 py-1.5 text-ink-soft hover:border-ink-faint transition-colors text-base" do %>
+      <%= icon :bell, classes: "size-3.5" %>
+      <span>Notifications</span>
+      <% if unread_notifications_count.positive? %>
+        <span class="ml-auto rounded-full bg-accent text-on-dark text-2xs px-1.5 py-0.5"><%= unread_notifications_count %></span>
+      <% end %>
+    <% end if feature_enabled?(:notifications) %>
+  </div>
+
+  <%# Navigation %>
+  <div class="mt-1 px-2"
+       data-controller="sidebar-edit"
+       data-sidebar-edit-url-value="<%= sidebar_preferences_path %>">
+    <div class="flex items-center justify-between px-2.5 mb-1">
+      <span class="text-xs font-semibold uppercase tracking-wider text-ink-faint">Menu</span>
+      <button type="button"
+              title="Customize menu"
+              aria-label="Customize menu"
+              aria-pressed="false"
+              data-sidebar-edit-target="toggleBtn"
+              data-action="sidebar-edit#toggleEdit"
+              class="text-ink-faint hover:text-ink p-1 rounded-md hover:bg-accent-soft/70 transition-colors">
+        <%= icon :settings, classes: "size-3.5" %>
+      </button>
+    </div>
+
+    <nav class="space-y-0.5" data-sidebar-edit-target="list">
+      <% sidebar_nav_items.each do |item| %>
+        <div data-sidebar-edit-target="item"
+             data-key="<%= item[:key] %>"
+             data-hidden="<%= item[:hidden] %>"
+             class="<%= 'hidden' if item[:hidden] %>">
+          <div class="flex items-center gap-0.5">
+            <button type="button"
+                    title="Drag to reorder"
+                    aria-label="Drag to reorder"
+                    data-sidebar-edit-target="handle"
+                    data-action="pointerdown->sidebar-edit#pointerDown"
+                    class="hidden shrink-0 cursor-grab active:cursor-grabbing text-ink-faint hover:text-ink p-1 rounded-md hover:bg-accent-soft/70 touch-none">
+              <%= icon :grip, classes: "size-3.5" %>
+            </button>
+            <%= link_to item[:path],
+                  data: { sidebar_edit_target: "link", action: "click->sidebar-edit#preventNav" },
+                  class: [ "flex flex-1 min-w-0 items-center gap-2.5 rounded-md px-2.5 py-1.5 text-base font-medium transition-colors",
+                           item[:active] ? "bg-accent-soft text-ink" : "text-ink-soft hover:bg-accent-soft/70 hover:text-ink" ] do %>
+              <%= icon item[:icon], classes: "size-4 shrink-0 #{item[:active] ? 'text-ink' : 'text-ink-faint'}" %>
+              <span class="truncate"><%= item[:label] %></span>
+            <% end %>
+            <button type="button"
+                    title="<%= item[:hidden] ? 'Show in menu' : 'Hide from menu' %>"
+                    aria-label="<%= item[:hidden] ? 'Show in menu' : 'Hide from menu' %>"
+                    data-sidebar-edit-target="visibilityBtn"
+                    data-action="click->sidebar-edit#toggleVisibility"
+                    class="hidden shrink-0 text-ink-faint hover:text-ink p-1 rounded-md hover:bg-accent-soft/70">
+              <span data-sidebar-edit-target="eyeIcon" class="<%= 'hidden' if item[:hidden] %>"><%= icon :eye, classes: "size-3.5" %></span>
+              <span data-sidebar-edit-target="eyeOffIcon" class="<%= 'hidden' unless item[:hidden] %>"><%= icon :eye_off, classes: "size-3.5" %></span>
+            </button>
+          </div>
+          <% if item[:saved_views]&.any? %>
+            <div class="ml-6 space-y-0.5 mb-1">
+              <% item[:saved_views].each do |view| %>
+                <%= link_to saved_views_index_path(view.record_type, view: view.id),
+                      data: { action: "click->sidebar-edit#preventNav" },
+                      class: [ "flex items-center gap-2 rounded-md px-2.5 py-1 text-sm transition-colors truncate",
+                               params[:view].to_s == view.id.to_s ? "bg-accent-soft text-ink font-medium" : "text-ink-faint hover:bg-accent-soft/70 hover:text-ink-soft" ] do %>
+                  <%= icon :list, classes: "size-3 shrink-0" %>
+                  <span class="truncate"><%= view.name %></span>
+                <% end %>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </nav>
+  </div>
+
+  <%# Lists %>
+  <div class="mt-5 px-2 flex-1 overflow-y-auto scrollbar-subtle">
+    <div class="flex items-center justify-between px-2.5 mb-1">
+      <span class="text-xs font-semibold uppercase tracking-wider text-ink-faint">Lists</span>
+      <%= link_to new_list_path, class: "text-ink-faint hover:text-ink", title: "New list" do %>
+        <%= icon :plus, classes: "size-3.5" %>
+      <% end %>
+    </div>
+    <% current_workspace&.lists&.order(:name)&.each do |list| %>
+      <%= link_to list_path(list),
+            class: [ "flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-base font-medium transition-colors",
+                     current_page?(list_path(list)) ? "bg-accent-soft text-ink" : "text-ink-soft hover:bg-accent-soft/70 hover:text-ink" ] do %>
+        <span class="size-2 rounded-full bg-<%= list.color %>-500 shrink-0"></span>
+        <span class="truncate"><%= list.name %></span>
+      <% end %>
+    <% end %>
+  </div>
+
+  <%# User footer %>
+  <div class="border-t border-line p-2 flex items-center gap-2">
+    <%= link_to settings_profile_path, class: "flex items-center gap-2 min-w-0 flex-1 rounded-md p-1 -m-1 hover:bg-accent-soft/70 transition-colors" do %>
+      <%= avatar current_user, size: "size-7", text: "text-xs" %>
+      <div class="min-w-0 flex-1">
+        <p class="text-base font-medium truncate"><%= current_user.name %></p>
+        <p class="text-xs text-ink-faint truncate"><%= current_user.email_address %></p>
+      </div>
+    <% end %>
+    <button type="button"
+            class="text-ink-faint hover:text-ink p-1.5 rounded-md hover:bg-accent-soft/70 cursor-pointer"
+            data-controller="theme"
+            data-action="theme#cycle"
+            data-theme-url-value="<%= theme_preference_path %>"
+            data-theme-theme-value="<%= current_user.theme %>">
+      <span data-theme-target="option" data-theme="light" class="hidden"><%= icon :sun, classes: "size-4" %></span>
+      <span data-theme-target="option" data-theme="dark" class="hidden"><%= icon :moon, classes: "size-4" %></span>
+      <span data-theme-target="option" data-theme="system" class="hidden"><%= icon :monitor, classes: "size-4" %></span>
+    </button>
+    <%= button_to session_path, method: :delete, class: "text-ink-faint hover:text-ink p-1.5 rounded-md hover:bg-accent-soft/70", title: "Sign out" do %>
+      <%= icon :logout, classes: "size-4" %>
+    <% end %>
+  </div>
+</aside>

@@ -1,0 +1,125 @@
+<% page_title "Dashboard" %>
+<%= render "shared/page_header", title: "Dashboard", icon_name: :home, count: nil, actions: nil %>
+
+<div class="flex-1 overflow-y-auto scrollbar-subtle p-5 space-y-5">
+  <%= render "sales_director" if sales_director_enabled? %>
+
+  <%# Metric cards %>
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+    <% [
+      [ "People", @people_count, :users, people_path ],
+      [ "Companies", @companies_count, :building, companies_path ],
+      [ "Open pipeline", money(@open_deals_value), :banknote, board_deals_path ],
+      [ "Won revenue", money(@won_deals_value), :check_circle, board_deals_path ],
+    ].each do |label, value, icon_name, path| %>
+      <%= link_to path, class: "card p-4 hover:border-line-strong transition-colors" do %>
+        <div class="flex items-center gap-2 text-ink-faint text-sm font-medium mb-2">
+          <%= icon icon_name, classes: "size-3.5" %> <%= label %>
+        </div>
+        <p class="text-xl font-semibold tracking-tight"><%= value %></p>
+      <% end %>
+    <% end %>
+  </div>
+
+  <div class="grid lg:grid-cols-2 gap-5">
+    <%# Pipeline by stage %>
+    <section class="card p-4">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-base font-semibold">Pipeline by stage</h2>
+        <div class="flex items-center gap-2">
+          <%= link_to root_path(closed: show_closed? ? nil : "1"),
+                class: show_closed? ? "btn-secondary" : "btn-ghost" do %>
+            <%= icon :check_circle, classes: "size-3.5" %>
+            <%= show_closed? ? "Closed shown" : "Show closed" %>
+          <% end %>
+          <% if @pipelines.size > 1 %>
+            <%= render "shared/active_pipeline_select",
+                  pipelines: @pipelines,
+                  selected_pipeline: current_pipeline,
+                  include_all: true,
+                  select_class: "input w-40",
+                  return_to: root_path(closed: show_closed? ? "1" : nil) %>
+          <% end %>
+        </div>
+      </div>
+      <% if @stages.any? %>
+        <% max = [ @deals_by_stage.values.max || 0, 1 ].max %>
+        <div class="space-y-2">
+          <% @stages.each do |stage| %>
+            <% count = @deals_by_stage[stage.id] || 0 %>
+            <% drill_down = ReportDrillDown.new(
+                  config: { record_type: "Deal", group_by: "stage", date_range: "all",
+                            pipeline_id: current_pipeline&.id, include_closed: show_closed? },
+                  row: ReportRunner::Row.new(key: stage.id, label: stage.name, value: count, color: stage.color),
+                  workspace: current_workspace) %>
+            <%= link_to drill_down.path,
+                  class: "flex items-center gap-3 rounded-md -mx-1 px-1 py-0.5 hover:bg-canvas-soft transition-colors group",
+                  title: "View #{stage.name} deals in list" do %>
+              <span class="w-24 text-sm text-ink-soft shrink-0 group-hover:text-ink"><%= stage.name %></span>
+              <div class="flex-1 h-5 rounded bg-canvas-raised ring-1 ring-inset ring-line overflow-hidden">
+                <div class="h-full rounded <%= stage_bar_classes(stage.color) %> group-hover:opacity-90" style="width: <%= count.zero? ? 0 : (count * 100.0 / max).round %>%"></div>
+              </div>
+              <span class="w-6 text-right text-sm text-ink-faint group-hover:text-accent"><%= count %></span>
+            <% end %>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="text-base text-ink-faint">No stages in this pipeline.</p>
+      <% end %>
+    </section>
+
+    <%# Upcoming tasks %>
+    <section class="card p-4">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-base font-semibold">My tasks</h2>
+        <%= link_to "View all", tasks_path, class: "text-sm text-accent hover:underline" %>
+      </div>
+      <% if @pending_tasks.any? %>
+        <ul class="space-y-1.5">
+          <% @pending_tasks.each do |task| %>
+            <li class="flex items-center gap-2.5">
+              <%= button_to toggle_task_path(task), method: :patch,
+                    class: "size-4 rounded-full border border-line-strong hover:border-green-500 cursor-pointer shrink-0" do %><% end %>
+              <span class="text-base truncate flex-1"><%= mention_html(task.title) %></span>
+              <% if task.taskable %>
+                <%= link_to task.taskable.display_name, record_path_for(task.taskable),
+                      class: "text-xs text-ink-faint hover:text-ink truncate max-w-32" %>
+              <% end %>
+              <% if task.due_on %>
+                <span class="text-xs shrink-0 <%= task.overdue? ? "text-danger" : "text-ink-faint" %>"><%= l task.due_on, format: :short %></span>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p class="text-base text-ink-faint">No pending tasks. Enjoy the calm 🍦</p>
+      <% end %>
+    </section>
+  </div>
+
+  <%# Recent activity %>
+  <section class="card p-4">
+    <h2 class="text-base font-semibold mb-3">Recent activity</h2>
+    <% if @recent_activities.any? %>
+      <ul class="space-y-2.5">
+        <% @recent_activities.each do |activity| %>
+          <li class="flex items-center gap-2.5 text-base">
+            <% if activity.user %>
+              <%= avatar activity.user, size: "size-5", text: "text-2xs" %>
+            <% else %>
+              <span class="size-5 rounded-full bg-canvas-sunken shrink-0"></span>
+            <% end %>
+            <span class="text-ink-soft truncate"><%= activity_sentence(activity) %></span>
+            <% if activity.subject %>
+              <%= link_to activity.subject.display_name, record_path_for(activity.subject),
+                    class: "font-medium text-ink hover:text-accent truncate" %>
+            <% end %>
+            <span class="ml-auto text-xs text-ink-faint shrink-0"><%= time_ago_in_words(activity.created_at) %> ago</span>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="text-base text-ink-faint">Nothing has happened yet — create your first record.</p>
+    <% end %>
+  </section>
+</div>

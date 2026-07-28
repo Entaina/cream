@@ -1,0 +1,114 @@
+- generic [ref=e2]:
+  - complementary [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]: C
+      - generic [ref=e6]: Cream Demo
+    - link "Search... /" [ref=e8] [cursor=pointer]:
+      - /url: /search
+      - img [ref=e9]
+      - generic [ref=e11]: Search...
+      - generic [ref=e12]: /
+    - navigation [ref=e13]:
+      - link "Dashboard" [ref=e14] [cursor=pointer]:
+        - /url: /
+        - img [ref=e15]
+        - text: Dashboard
+      - link "People" [ref=e17] [cursor=pointer]:
+        - /url: /people
+        - img [ref=e18]
+        - text: People
+      - link "Companies" [ref=e20] [cursor=pointer]:
+        - /url: /companies
+        - img [ref=e21]
+        - text: Companies
+      - link "Deals" [ref=e23] [cursor=pointer]:
+        - /url: /deals/board
+        - img [ref=e24]
+        - text: Deals
+      - link "Tasks" [ref=e26] [cursor=pointer]:
+        - /url: /tasks
+        - img [ref=e27]
+        - text: Tasks
+    - generic [ref=e29]:
+      - generic [ref=e30]:
+        - generic [ref=e31]: Lists
+        - link "New list" [ref=e32] [cursor=pointer]:
+          - /url: /lists/new
+          - img [ref=e33]
+      - link "Champions" [ref=e35] [cursor=pointer]:
+        - /url: /lists/5
+        - generic [ref=e37]: Champions
+      - link "Hot deals Q3" [ref=e38] [cursor=pointer]:
+        - /url: /lists/4
+        - generic [ref=e40]: Hot deals Q3
+      - link "Spain accounts" [ref=e41] [cursor=pointer]:
+        - /url: /lists/6
+        - generic [ref=e43]: Spain accounts
+    - generic [ref=e44]:
+      - generic [ref=e45]: JD
+      - generic [ref=e46]:
+        - paragraph [ref=e47]: Josemi Díez
+        - paragraph [ref=e48]: josemi@entaina.ai
+      - button "Sign out" [ref=e50]:
+        - img [ref=e51]
+  - main [ref=e53]:
+    - generic [ref=e55]:
+      - img [ref=e56]
+      - heading "New person" [level=1] [ref=e58]
+    - generic [ref=e61]:
+      - generic [ref=e62]:
+        - generic [ref=e63]:
+          - generic [ref=e64]: First name
+          - textbox "First name" [active] [ref=e65]
+        - generic [ref=e66]:
+          - generic [ref=e67]: Last name
+          - textbox "Last name" [ref=e68]
+      - generic [ref=e69]:
+        - generic [ref=e70]:
+          - generic [ref=e71]: Email
+          - textbox "Email" [ref=e72]:
+            - /placeholder: name@company.com
+        - generic [ref=e73]:
+          - generic [ref=e74]: Phone
+          - textbox "Phone" [ref=e75]
+      - generic [ref=e76]:
+        - generic [ref=e77]:
+          - generic [ref=e78]: Job title
+          - textbox "Job title" [ref=e79]
+        - generic [ref=e80]:
+          - generic [ref=e81]: Company
+          - combobox "Company" [ref=e82]:
+            - option "No company" [selected]
+            - option "Cabify"
+            - option "Factorial"
+            - option "Linear"
+            - option "Notion"
+            - option "Stripe"
+            - option "Typeform"
+            - option "Vercel"
+            - option "Wallapop"
+      - generic [ref=e83]:
+        - generic [ref=e84]:
+          - generic [ref=e85]: Location
+          - textbox "Location" [ref=e86]:
+            - /placeholder: City, Country
+        - generic [ref=e87]:
+          - generic [ref=e88]: Owner
+          - combobox "Owner" [ref=e89]:
+            - option "Unassigned" [selected]
+            - option "Josemi Díez"
+            - option "Ana Torres"
+      - generic [ref=e90]:
+        - generic [ref=e91]:
+          - generic [ref=e92]: LinkedIn URL
+          - textbox "LinkedIn URL" [ref=e93]
+        - generic [ref=e94]:
+          - generic [ref=e95]: X / Twitter URL
+          - textbox "X / Twitter URL" [ref=e96]
+      - generic [ref=e97]:
+        - generic [ref=e98]: Description
+        - textbox "Description" [ref=e99]
+      - generic [ref=e100]:
+        - button "Create person" [ref=e101] [cursor=pointer]
+        - link "Cancel" [ref=e102] [cursor=pointer]:
+          - /url: /people

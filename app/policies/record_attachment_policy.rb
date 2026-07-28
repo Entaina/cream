@@ -1,0 +1,2 @@
+class RecordAttachmentPolicy < WorkspaceRecordPolicy
+end

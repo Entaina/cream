@@ -1,0 +1,39 @@
+<% page_title "Perfil" %>
+<%= render "shared/page_header", title: "Perfil", icon_name: :users, actions: nil %>
+
+<div class="flex-1 overflow-y-auto scrollbar-subtle p-5">
+  <div class="max-w-2xl space-y-6">
+    <p class="text-base text-ink-soft">
+      Preferencias personales en <strong><%= current_workspace.name %></strong>.
+    </p>
+
+    <section class="card p-4 space-y-3">
+      <h2 class="text-base font-semibold text-ink">Preferencias</h2>
+      <%= form_with model: current_membership, url: settings_profile_path, method: :patch, class: "space-y-3" do |f| %>
+        <div>
+          <%= f.label :current_pipeline_id, "Pipeline predeterminado", class: "label" %>
+          <%= f.collection_select :current_pipeline_id, current_workspace.pipelines.ordered,
+                :id, :name, {}, class: "input mt-1 w-full" %>
+          <p class="mt-1 text-sm text-ink-faint">
+            Se seleccionará al iniciar sesión y al abrir el add-on de Gmail.
+          </p>
+        </div>
+
+        <% if feature_enabled?(:sales_director) && current_workspace.sales_director_enabled? %>
+          <label class="flex items-center gap-2 text-base">
+            <%= f.check_box :sales_director_briefing_enabled %>
+            Mostrar briefing del director de ventas en el dashboard
+          </label>
+          <p class="text-sm text-ink-faint">
+            Preferencia personal en este workspace. El administrador debe tenerlo activado en
+            <%= link_to "Team", settings_team_path, class: "text-accent hover:underline" %>.
+          </p>
+          <% unless Ai::Configuration.configured? %>
+            <p class="text-sm text-ink-faint">Requiere configurar <code>CREAM_AI_API_KEY</code> en el servidor.</p>
+          <% end %>
+        <% end %>
+        <%= f.submit "Guardar", class: "btn-secondary" %>
+      <% end %>
+    </section>
+  </div>
+</div>

@@ -1,0 +1,20 @@
+<% if local_assigns.fetch(:show_stage, true) %>
+  <%= select_tag :stage,
+        grouped_options_for_select(stage_filter_options(@pipelines, include_closed: show_closed?), filter_value(:stage)&.to_i),
+        include_blank: "All stages", class: "input w-44",
+        onchange: "this.form.requestSubmit()" %>
+<% end %>
+<%= select_tag :owner_id,
+      options_for_select([ [ "Unassigned", ListFilters::NONE ] ] + @owners.map { |owner| [ owner.name, owner.id ] }, filter_value(:owner_id)),
+      include_blank: "All owners", class: "input w-44",
+      onchange: "this.form.requestSubmit()" %>
+<%= select_tag :product_id,
+      options_from_collection_for_select(@products, :id, :name, filter_value(:product_id)),
+      include_blank: "All products", class: "input w-44",
+      onchange: "this.form.requestSubmit()" %>
+<%= select_tag :edition_id,
+      options_from_collection_for_select(@editions, :id, :name, filter_value(:edition_id)),
+      include_blank: "All editions", class: "input w-44",
+      onchange: "this.form.requestSubmit()" %>
+<%= render "shared/date_range_filter", label: "First contact", from: :first_contact_from, to: :first_contact_to %>
+<%= render "shared/date_range_filter", label: "Created", from: :created_from, to: :created_to %>

@@ -1,0 +1,59 @@
+<% page_title "Create account" %>
+<div class="w-full max-w-sm">
+  <div class="text-center mb-6">
+    <span class="inline-flex size-10 rounded-xl bg-accent text-on-dark items-center justify-center text-lg font-bold font-display mb-3">C</span>
+    <h1 class="text-xl font-semibold">Create your account<span class="tracking-widest"><span class="text-hoki-500">.</span><span class="text-copperfield-400">.</span><span class="text-golden-300">.</span></span></h1>
+    <p class="text-base text-ink-faint mt-1">Start managing relationships in minutes.</p>
+  </div>
+
+  <div class="card p-6 shadow-sm">
+    <%= render "shared/google_sign_in" %>
+
+    <div class="relative my-5">
+      <div class="absolute inset-0 flex items-center" aria-hidden="true">
+        <div class="w-full border-t border-line"></div>
+      </div>
+      <div class="relative flex justify-center text-sm">
+        <span class="bg-canvas-raised px-2 text-ink-faint">or</span>
+      </div>
+    </div>
+
+    <% if @user.errors.any? %>
+      <div class="mb-4 rounded-lg bg-danger-soft ring-1 ring-danger-line px-3 py-2 text-sm text-danger-strong">
+        <ul class="list-disc list-inside">
+          <% @user.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <%= form_with model: @user, url: registration_path, class: "space-y-4" do |f| %>
+      <div>
+        <%= f.label :name, class: "label" %>
+        <%= f.text_field :name, required: true, autofocus: true, placeholder: "Jane Doe", class: "input" %>
+      </div>
+      <div>
+        <%= label_tag :workspace_name, "Workspace name", class: "label" %>
+        <%= text_field_tag :workspace_name, params[:workspace_name], placeholder: "Acme Inc", class: "input" %>
+      </div>
+      <div>
+        <%= f.label :email_address, "Email", class: "label" %>
+        <%= f.email_field :email_address, required: true, autocomplete: "username", placeholder: "you@company.com", class: "input" %>
+      </div>
+      <div>
+        <%= f.label :password, class: "label" %>
+        <%= f.password_field :password, required: true, autocomplete: "new-password", placeholder: "At least 8 characters", maxlength: 72, class: "input" %>
+      </div>
+      <div>
+        <%= f.label :password_confirmation, "Confirm password", class: "label" %>
+        <%= f.password_field :password_confirmation, required: true, autocomplete: "new-password", maxlength: 72, class: "input" %>
+      </div>
+      <%= f.submit "Create account", class: "btn-primary w-full justify-center" %>
+    <% end %>
+
+    <p class="mt-4 text-center text-sm text-ink-faint">
+      Already have an account? <%= link_to "Sign in", new_session_path, class: "font-medium text-accent hover:underline" %>
+    </p>
+  </div>
+</div>

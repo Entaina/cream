@@ -1,0 +1,12 @@
+<p>
+  <%= @inviter_name %> invited you to join <strong><%= @workspace_name %></strong> on Cream
+  as a <%= @invitation.role %>.
+</p>
+
+<p>
+  <%= link_to "Accept invitation", @accept_url %>
+</p>
+
+<p>
+  This link will expire on <%= l @invitation.expires_at, format: :long %>.
+</p>

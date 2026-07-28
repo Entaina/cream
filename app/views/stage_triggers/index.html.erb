@@ -1,0 +1,46 @@
+<% page_title "Disparadores — #{@stage.name}" %>
+<% actions = capture do %>
+  <%= link_to edit_pipeline_path(@stage.pipeline), class: "btn-secondary" do %>
+    <%= icon :arrow_left, classes: "size-3.5" %> Pipeline
+  <% end %>
+  <%= link_to new_pipeline_stage_stage_trigger_path(@stage), class: "btn-primary" do %>
+    <%= icon :plus, classes: "size-3.5" %> Nuevo disparador
+  <% end %>
+<% end %>
+<%= render "shared/page_header", title: "Disparadores — #{@stage.name} (#{@stage.pipeline.name})",
+      icon_name: :zap, count: @stage_triggers.size, actions: actions %>
+
+<div class="flex-1 overflow-y-auto scrollbar-subtle p-5 space-y-3">
+  <p class="text-sm text-ink-faint">
+    Se ejecutan cuando un deal entra en la etapa <strong><%= @stage.name %></strong>. Las acciones se muestran
+    en el navegador del usuario que movió el deal.
+  </p>
+  <% if @stage_triggers.empty? %>
+    <p class="text-base text-ink-soft">No hay disparadores para esta etapa todavía.</p>
+  <% end %>
+  <% @stage_triggers.each do |trigger| %>
+    <article class="card p-4">
+      <div class="flex items-center gap-2">
+        <h2 class="font-semibold text-base"><%= link_to trigger.name, stage_trigger_path(trigger), class: "hover:underline" %></h2>
+        <%= badge trigger.llm? ? "IA" : "Nativo", color: trigger.llm? ? "hoki" : "copperfield" %>
+        <%= badge trigger.active? ? "Activo" : "Inactivo", color: trigger.active? ? "green" : "chicago" %>
+        <% if (last_run = trigger.runs.recent_first.first) %>
+          <span class="text-sm text-ink-faint">último run: <%= last_run.status %></span>
+        <% end %>
+        <div class="ml-auto flex gap-2">
+          <%= link_to "Runs", stage_trigger_path(trigger), class: "btn-ghost" %>
+          <%= link_to "Editar", edit_stage_trigger_path(trigger), class: "btn-secondary" %>
+          <%= button_to "Eliminar", stage_trigger_path(trigger), method: :delete, class: "btn-danger",
+                data: { turbo_confirm: "¿Eliminar el disparador «#{trigger.name}»?" } %>
+        </div>
+      </div>
+      <p class="text-sm text-ink-faint mt-1">
+        <% if trigger.llm? %>
+          <%= truncate(trigger.instructions, length: 180) %>
+        <% else %>
+          Función nativa: <strong><%= StageTriggers::NativeRegistry.fetch(trigger.native_function).label %></strong>
+        <% end %>
+      </p>
+    </article>
+  <% end %>
+</div>

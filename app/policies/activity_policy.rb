@@ -1,0 +1,2 @@
+class ActivityPolicy < WorkspaceRecordPolicy
+end

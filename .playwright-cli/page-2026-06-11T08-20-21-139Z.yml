@@ -1,0 +1,215 @@
+- generic [ref=e2]:
+  - complementary [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]: C
+      - generic [ref=e6]: Cream Demo
+    - link "Search... /" [ref=e8] [cursor=pointer]:
+      - /url: /search
+      - img [ref=e9]
+      - generic [ref=e11]: Search...
+      - generic [ref=e12]: /
+    - navigation [ref=e13]:
+      - link "Dashboard" [ref=e14] [cursor=pointer]:
+        - /url: /
+        - img [ref=e15]
+        - text: Dashboard
+      - link "People" [ref=e17] [cursor=pointer]:
+        - /url: /people
+        - img [ref=e18]
+        - text: People
+      - link "Companies" [ref=e20] [cursor=pointer]:
+        - /url: /companies
+        - img [ref=e21]
+        - text: Companies
+      - link "Deals" [ref=e23] [cursor=pointer]:
+        - /url: /deals/board
+        - img [ref=e24]
+        - text: Deals
+      - link "Tasks" [ref=e26] [cursor=pointer]:
+        - /url: /tasks
+        - img [ref=e27]
+        - text: Tasks
+    - generic [ref=e29]:
+      - generic [ref=e30]:
+        - generic [ref=e31]: Lists
+        - link "New list" [ref=e32] [cursor=pointer]:
+          - /url: /lists/new
+          - img [ref=e33]
+      - link "Champions" [ref=e35] [cursor=pointer]:
+        - /url: /lists/5
+        - generic [ref=e37]: Champions
+      - link "Hot deals Q3" [ref=e38] [cursor=pointer]:
+        - /url: /lists/4
+        - generic [ref=e40]: Hot deals Q3
+      - link "Spain accounts" [ref=e41] [cursor=pointer]:
+        - /url: /lists/6
+        - generic [ref=e43]: Spain accounts
+    - generic [ref=e44]:
+      - generic [ref=e45]: JD
+      - generic [ref=e46]:
+        - paragraph [ref=e47]: Josemi Díez
+        - paragraph [ref=e48]: josemi@entaina.ai
+      - button "Sign out" [ref=e50]:
+        - img [ref=e51]
+  - main [ref=e53]:
+    - generic [ref=e54]:
+      - generic [ref=e55]:
+        - img [ref=e56]
+        - heading "Deals" [level=1] [ref=e58]
+        - generic [ref=e59]: "9"
+      - generic [ref=e60]:
+        - link "Table" [ref=e61] [cursor=pointer]:
+          - /url: /deals
+          - img [ref=e62]
+          - text: Table
+        - link "New deal" [ref=e64] [cursor=pointer]:
+          - /url: /deals/new
+          - img [ref=e65]
+          - text: New deal
+    - generic [ref=e68]:
+      - generic [ref=e69]:
+        - generic [ref=e70]:
+          - generic [ref=e71]: Lead
+          - generic [ref=e72]: "2"
+          - generic [ref=e73]: 20.000 €
+        - generic [ref=e74]:
+          - article [ref=e75]:
+            - generic [ref=e76]:
+              - link "Cabify — Pilot program" [ref=e77] [cursor=pointer]:
+                - /url: /deals/14
+              - generic [ref=e78]: AT
+            - paragraph [ref=e79]: 12.000 €
+            - generic [ref=e80]:
+              - generic [ref=e81]:
+                - generic [ref=e82]: C
+                - generic [ref=e83]: Cabify
+              - generic [ref=e84]:
+                - img [ref=e85]
+                - text: Sep 09
+          - article [ref=e87]:
+            - generic [ref=e88]:
+              - link "Stripe — Co-marketing deal" [ref=e89] [cursor=pointer]:
+                - /url: /deals/17
+              - generic [ref=e90]: AT
+            - paragraph [ref=e91]: 8.000 €
+            - generic [ref=e92]:
+              - generic [ref=e93]:
+                - generic [ref=e94]: S
+                - generic [ref=e95]: Stripe
+              - generic [ref=e96]:
+                - img [ref=e97]
+                - text: Oct 09
+      - generic [ref=e99]:
+        - generic [ref=e100]:
+          - generic [ref=e101]: Qualified
+          - generic [ref=e102]: "1"
+          - generic [ref=e103]: 65.000 €
+        - article [ref=e105]:
+          - generic [ref=e106]:
+            - link "Notion — Annual contract" [ref=e107] [cursor=pointer]:
+              - /url: /deals/12
+            - generic [ref=e108]: JD
+          - paragraph [ref=e109]: 65.000 €
+          - generic [ref=e110]:
+            - generic [ref=e111]:
+              - generic [ref=e112]: "N"
+              - generic [ref=e113]: Notion
+            - generic [ref=e114]:
+              - img [ref=e115]
+              - text: Aug 10
+      - generic [ref=e117]:
+        - generic [ref=e118]:
+          - generic [ref=e119]: Proposal
+          - generic [ref=e120]: "2"
+          - generic [ref=e121]: 40.500 €
+        - generic [ref=e122]:
+          - article [ref=e123]:
+            - generic [ref=e124]:
+              - link "Linear — Team expansion" [ref=e125] [cursor=pointer]:
+                - /url: /deals/11
+              - generic [ref=e126]: AT
+            - paragraph [ref=e127]: 18.500 €
+            - generic [ref=e128]:
+              - generic [ref=e129]:
+                - generic [ref=e130]: L
+                - generic [ref=e131]: Linear
+              - generic [ref=e132]:
+                - img [ref=e133]
+                - text: Jul 16
+          - article [ref=e135]:
+            - generic [ref=e136]:
+              - link "Wallapop — API licensing" [ref=e137] [cursor=pointer]:
+                - /url: /deals/16
+              - generic [ref=e138]: JD
+            - paragraph [ref=e139]: 22.000 €
+            - generic [ref=e140]:
+              - generic [ref=e141]:
+                - generic [ref=e142]: W
+                - generic [ref=e143]: Wallapop
+              - generic [ref=e144]:
+                - img [ref=e145]
+                - text: Jul 21
+      - generic [ref=e147]:
+        - generic [ref=e148]:
+          - generic [ref=e149]: Negotiation
+          - generic [ref=e150]: "2"
+          - generic [ref=e151]: 75.500 €
+        - generic [ref=e152]:
+          - article [ref=e153]:
+            - generic [ref=e154]:
+              - link "Vercel — Enterprise plan" [ref=e155] [cursor=pointer]:
+                - /url: /deals/10
+              - generic [ref=e156]: JD
+            - paragraph [ref=e157]: 48.000 €
+            - generic [ref=e158]:
+              - generic [ref=e159]:
+                - generic [ref=e160]: V
+                - generic [ref=e161]: Vercel
+              - generic [ref=e162]:
+                - img [ref=e163]
+                - text: Jul 01
+          - article [ref=e165]:
+            - generic [ref=e166]:
+              - link "Typeform — Renewal + upsell" [ref=e167] [cursor=pointer]:
+                - /url: /deals/15
+              - generic [ref=e168]: AT
+            - paragraph [ref=e169]: 27.500 €
+            - generic [ref=e170]:
+              - generic [ref=e171]:
+                - generic [ref=e172]: T
+                - generic [ref=e173]: Typeform
+              - generic [ref=e174]:
+                - img [ref=e175]
+                - text: Jun 23
+      - generic [ref=e177]:
+        - generic [ref=e178]:
+          - generic [ref=e179]: Won
+          - generic [ref=e180]: "1"
+          - generic [ref=e181]: 32.000 €
+        - article [ref=e183]:
+          - generic [ref=e184]:
+            - link "Factorial — Integration partnership" [ref=e185] [cursor=pointer]:
+              - /url: /deals/13
+            - generic [ref=e186]: JD
+          - paragraph [ref=e187]: 32.000 €
+          - generic [ref=e188]:
+            - generic [ref=e189]:
+              - generic [ref=e190]: F
+              - generic [ref=e191]: Factorial
+            - generic [ref=e192]:
+              - img [ref=e193]
+              - text: Jun 01
+      - generic [ref=e195]:
+        - generic [ref=e196]:
+          - generic [ref=e197]: Lost
+          - generic [ref=e198]: "1"
+          - generic [ref=e199]: 4.500 €
+        - article [ref=e201]:
+          - generic [ref=e202]:
+            - link "StartupXYZ — Starter plan" [ref=e203] [cursor=pointer]:
+              - /url: /deals/18
+            - generic [ref=e204]: AT
+          - paragraph [ref=e205]: 4.500 €
+          - generic [ref=e207]:
+            - img [ref=e208]
+            - text: May 12

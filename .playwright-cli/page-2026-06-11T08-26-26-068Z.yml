@@ -1,0 +1,99 @@
+- generic [ref=e2]:
+  - complementary [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]: C
+      - generic [ref=e6]: Cream Demo
+    - link "Search... /" [ref=e8] [cursor=pointer]:
+      - /url: /search
+      - img [ref=e9]
+      - generic [ref=e11]: Search...
+      - generic [ref=e12]: /
+    - navigation [ref=e13]:
+      - link "Dashboard" [ref=e14] [cursor=pointer]:
+        - /url: /
+        - img [ref=e15]
+        - text: Dashboard
+      - link "People" [ref=e17] [cursor=pointer]:
+        - /url: /people
+        - img [ref=e18]
+        - text: People
+      - link "Companies" [ref=e20] [cursor=pointer]:
+        - /url: /companies
+        - img [ref=e21]
+        - text: Companies
+      - link "Deals" [ref=e23] [cursor=pointer]:
+        - /url: /deals/board
+        - img [ref=e24]
+        - text: Deals
+      - link "Tasks" [ref=e26] [cursor=pointer]:
+        - /url: /tasks
+        - img [ref=e27]
+        - text: Tasks
+    - generic [ref=e29]:
+      - generic [ref=e30]:
+        - generic [ref=e31]: Lists
+        - link "New list" [ref=e32] [cursor=pointer]:
+          - /url: /lists/new
+          - img [ref=e33]
+      - link "Champions" [ref=e35] [cursor=pointer]:
+        - /url: /lists/5
+        - generic [ref=e37]: Champions
+      - link "Hot deals Q3" [ref=e38] [cursor=pointer]:
+        - /url: /lists/4
+        - generic [ref=e40]: Hot deals Q3
+      - link "Spain accounts" [ref=e41] [cursor=pointer]:
+        - /url: /lists/6
+        - generic [ref=e43]: Spain accounts
+    - generic [ref=e44]:
+      - generic [ref=e45]: JD
+      - generic [ref=e46]:
+        - paragraph [ref=e47]: Josemi Díez
+        - paragraph [ref=e48]: josemi@entaina.ai
+      - button "Sign out" [ref=e50]:
+        - img [ref=e51]
+  - main [ref=e53]:
+    - generic [ref=e55]:
+      - img [ref=e56]
+      - heading "Search" [level=1] [ref=e58]
+    - generic [ref=e60]:
+      - generic [ref=e62]:
+        - img [ref=e64]
+        - textbox "Search people, companies and deals..." [active] [ref=e66]: linear
+      - generic [ref=e67]:
+        - generic [ref=e68]:
+          - heading "People" [level=2] [ref=e69]:
+            - img [ref=e70]
+            - text: People
+          - generic [ref=e72]:
+            - link "TA Tuomas Artman CTO · Linear" [ref=e73] [cursor=pointer]:
+              - /url: /people/15
+              - generic [ref=e74]: TA
+              - generic [ref=e75]: Tuomas Artman
+              - generic [ref=e76]: CTO · Linear
+              - img [ref=e77]
+            - link "KS Karri Saarinen CEO & Co-founder · Linear" [ref=e79] [cursor=pointer]:
+              - /url: /people/14
+              - generic [ref=e80]: KS
+              - generic [ref=e81]: Karri Saarinen
+              - generic [ref=e82]: CEO & Co-founder · Linear
+              - img [ref=e83]
+        - generic [ref=e85]:
+          - heading "Companies" [level=2] [ref=e86]:
+            - img [ref=e87]
+            - text: Companies
+          - link "L Linear linear.app · SaaS" [ref=e90] [cursor=pointer]:
+            - /url: /companies/10
+            - generic [ref=e91]: L
+            - generic [ref=e92]: Linear
+            - generic [ref=e93]: linear.app · SaaS
+            - img [ref=e94]
+        - generic [ref=e96]:
+          - heading "Deals" [level=2] [ref=e97]:
+            - img [ref=e98]
+            - text: Deals
+          - link "#< Linear — Team expansion 18.500 € · Proposal" [ref=e101] [cursor=pointer]:
+            - /url: /deals/11
+            - generic [ref=e102]: "#<"
+            - generic [ref=e103]: Linear — Team expansion
+            - generic [ref=e104]: 18.500 € · Proposal
+            - img [ref=e105]

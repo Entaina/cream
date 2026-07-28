@@ -1,0 +1,7 @@
+pending:
+  workspace: one
+  email_address: invitee@example.com
+  role: salesperson
+  token_digest: <%= Invitation.digest("inv_testtoken123") %>
+  invited_by: one
+  expires_at: <%= 7.days.from_now %>

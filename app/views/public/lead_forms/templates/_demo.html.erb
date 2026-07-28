@@ -1,0 +1,8 @@
+<div class="space-y-3">
+  <div>
+    <%= f.label :message, "¿Qué te gustaría ver en la demo?", class: "label" %>
+    <%= f.text_area :message, rows: 4, class: "input w-full resize-y", placeholder: "Opcional" %>
+  </div>
+
+  <%= render "public/lead_forms/how_heard_field", f: f %>
+</div>

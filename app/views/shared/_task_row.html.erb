@@ -1,0 +1,63 @@
+<%# locals: (task:, show_taskable: false) %>
+<li class="flex items-center gap-2.5 card px-3 py-2 <%= "opacity-60" if task.completed? %>" data-controller="task-edit">
+  <%= button_to toggle_task_path(task), method: :patch,
+        class: [ "size-4 rounded-full border flex items-center justify-center cursor-pointer transition-colors shrink-0",
+                 task.completed? ? "bg-green-500 border-green-500 text-white" : "border-line-strong hover:border-green-500" ] do %>
+    <%= icon(:check, classes: "size-2.5") if task.completed? %>
+  <% end %>
+  <button type="button"
+          class="text-base flex-1 min-w-0 truncate text-left cursor-pointer hover:text-accent <%= "line-through text-ink-faint" if task.completed? %>"
+          data-action="task-edit#open"
+          title="Edit task">
+    <%= mention_html(task.title) %>
+  </button>
+  <% if show_taskable && task.taskable %>
+    <%= link_to record_path_for(task.taskable), class: "flex items-center gap-1 text-xs text-ink-faint hover:text-ink shrink-0" do %>
+      <%= icon record_icon_for(task.taskable_type), classes: "size-3" %>
+      <span class="truncate max-w-36"><%= task.taskable.display_name %></span>
+    <% end %>
+  <% end %>
+  <% if task.due_on %>
+    <span class="text-xs flex items-center gap-1 shrink-0 <%= task.overdue? ? "text-danger" : "text-ink-faint" %>">
+      <%= icon :calendar, classes: "size-3" %><%= l task.due_on, format: :short %>
+    </span>
+  <% end %>
+  <% if task.assignee %>
+    <%= avatar task.assignee, size: "size-5", text: "text-2xs" %>
+  <% end %>
+  <button type="button"
+          class="text-ink-faint hover:text-ink p-0.5 rounded cursor-pointer"
+          title="Edit task"
+          data-action="task-edit#open">
+    <%= icon :pencil, classes: "size-3.5" %>
+  </button>
+  <%= button_to task_path(task), method: :delete, form: { data: { turbo_confirm: "Delete this task?" } },
+        class: "text-ink-faint hover:text-danger p-0.5 rounded cursor-pointer", title: "Delete task" do %>
+    <%= icon :trash, classes: "size-3.5" %>
+  <% end %>
+
+  <dialog data-task-edit-target="dialog" class="modal-dialog max-w-md rounded-xl border border-line shadow-lg backdrop:bg-chicago-950/40">
+    <div class="p-4 space-y-3">
+      <h3 class="text-base font-semibold">Edit task</h3>
+      <%= form_with model: task, url: task_path(task), method: :patch, class: "space-y-3" do |f| %>
+        <div>
+          <label class="label">Title</label>
+          <%= mention_text_field f, :title, class: "input w-full", wrapper_class: "w-full" %>
+        </div>
+        <div>
+          <label class="label">Due date</label>
+          <%= f.date_field :due_on, class: "input w-full" %>
+        </div>
+        <div>
+          <label class="label">Assignee</label>
+          <%= f.collection_select :assignee_id, current_workspace.users.order(:name), :id, :name,
+                { include_blank: "Unassigned" }, class: "input w-full" %>
+        </div>
+        <div class="flex justify-end gap-2 pt-1">
+          <button type="button" class="btn-secondary" data-action="task-edit#close">Cancel</button>
+          <%= f.submit "Save", class: "btn-primary" %>
+        </div>
+      <% end %>
+    </div>
+  </dialog>
+</li>
