@@ -45,6 +45,8 @@
             value: deal_field_display(@deal, :probability) %>
       <%= render "shared/attribute", label: "Close date", icon_name: :calendar,
             value: deal_field_display(@deal, :expected_close_date) %>
+      <%= render "shared/attribute", label: "Nº factura", icon_name: :note,
+            value: deal_field_display(@deal, :invoice_number) %>
       <%= render "shared/attribute", label: "Company", icon_name: :building,
             value: @deal.company ? link_to(@deal.company.name, company_path(@deal.company), class: "text-accent hover:underline") : nil %>
       <%= render "shared/attribute", label: "Partner", icon_name: :building,

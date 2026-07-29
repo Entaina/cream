@@ -754,6 +754,15 @@ RSpec.describe "Deals", type: :request do
   end
 
   describe "PATCH /deals/:id (stage change through the edit form)" do
+    it "updates the invoice number" do
+      sign_in_as(member)
+
+      patch deal_path(deal), params: { deal: { invoice_number: "FAC-2026-099" } }
+
+      expect(response).to redirect_to(deal_path(deal))
+      expect(deal.reload.invoice_number).to eq("FAC-2026-099")
+    end
+
     it "routes stage changes through move_to_stage! so activity and hooks fire" do
       sign_in_as(member)
       target = pipeline.pipeline_stages.find_by(name: "Won")

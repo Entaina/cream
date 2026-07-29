@@ -160,6 +160,7 @@ module ApplicationHelper
     when "value" then money(deal.value, deal.currency)
     when "probability" then deal.probability.present? ? "#{deal.probability}%" : nil
     when "expected_close_date" then deal.expected_close_date && l(deal.expected_close_date, format: :short)
+    when "invoice_number" then deal.invoice_number.presence
     end
   end
 

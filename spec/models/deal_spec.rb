@@ -105,6 +105,15 @@ RSpec.describe Deal, type: :model do
     expect(results).not_to include(other)
   end
 
+  it "finds deals by invoice number" do
+    match = create_deal!(workspace, pipeline: pipeline, name: "Annual plan", invoice_number: "FAC-2026-042")
+    other = create_deal!(workspace, pipeline: pipeline, name: "Other deal")
+
+    results = workspace.deals.search("FAC-2026-042")
+    expect(results).to include(match)
+    expect(results).not_to include(other)
+  end
+
   it "scopes open and won deals" do
     open_deal = deal
     won_deal = create_deal!(workspace, pipeline: pipeline, stage: pipeline.pipeline_stages.find_by(name: "Won"))
@@ -288,6 +297,7 @@ RSpec.describe Deal, type: :model do
     end
 
     before do
+      source.update!(invoice_number: "FAC-2026-001")
       source.tasks.create!(title: "Pending follow-up", due_on: Date.current - 2,
         workspace: workspace, user: actor, assignee: actor)
       source.tasks.create!(title: "Done task", due_on: Date.current + 5, completed_at: Time.current,
@@ -311,6 +321,7 @@ RSpec.describe Deal, type: :model do
       expect(copy.probability).to eq(60)
       expect(copy.expected_close_date).to eq(Date.current + 30)
       expect(copy.owner).to eq(actor)
+      expect(copy.invoice_number).to be_nil
       expect(copy.contact_ids).to eq(source.contact_ids)
       expect(copy.tasks.map(&:title)).to contain_exactly("Next action", "Pending follow-up")
       expect(copy.deal_products).to be_empty

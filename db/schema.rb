@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_29_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_29_130000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -305,6 +305,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_29_120000) do
     t.datetime "created_at", null: false
     t.string "currency", default: "EUR", null: false
     t.date "expected_close_date"
+    t.string "invoice_number"
     t.string "name", null: false
     t.bigint "owner_id"
     t.bigint "partner_id"
@@ -320,6 +321,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_29_120000) do
     t.index ["partner_id"], name: "index_deals_on_partner_id"
     t.index ["pipeline_id"], name: "index_deals_on_pipeline_id"
     t.index ["pipeline_stage_id"], name: "index_deals_on_pipeline_stage_id"
+    t.index ["workspace_id", "invoice_number"], name: "index_deals_on_workspace_id_and_invoice_number"
     t.index ["workspace_id", "pipeline_stage_id", "position"], name: "index_deals_on_workspace_id_and_pipeline_stage_id_and_position"
     t.index ["workspace_id"], name: "index_deals_on_workspace_id"
   end

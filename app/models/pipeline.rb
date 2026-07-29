@@ -15,6 +15,7 @@ class Pipeline < ApplicationRecord
     "owner" => "Responsable",
     "expected_close_date" => "Fecha de cierre",
     "probability" => "Probabilidad",
+    "invoice_number" => "Nº factura",
     "contacts" => "Contactos",
     "products" => "Productos y ediciones"
   }.freeze

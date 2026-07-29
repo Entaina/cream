@@ -44,7 +44,10 @@ class Deal < ApplicationRecord
   scope :search, ->(q) {
     next if q.blank?
     left_outer_joins(:company)
-      .where("deals.name ILIKE :q OR companies.name ILIKE :q", q: "%#{sanitize_sql_like(q)}%")
+      .where(
+        "deals.name ILIKE :q OR companies.name ILIKE :q OR deals.invoice_number ILIKE :q",
+        q: "%#{sanitize_sql_like(q)}%"
+      )
   }
   scope :open_deals, -> { joins(:pipeline_stage).where(pipeline_stages: { closed: false }) }
   scope :won, -> { joins(:pipeline_stage).where(pipeline_stages: { won: true }) }
