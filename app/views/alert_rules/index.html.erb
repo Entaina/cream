@@ -1,0 +1,36 @@
+<% page_title "Alertas" %>
+<% actions = capture do %>
+  <%= link_to new_alert_rule_path, class: "btn-primary" do %>
+    <%= icon :plus, classes: "size-3.5" %> Nueva alerta
+  <% end %>
+<% end %>
+<%= render "shared/page_header", title: "Alertas", icon_name: :bell, count: @alert_rules.size, actions: actions %>
+
+<div class="flex-1 overflow-y-auto scrollbar-subtle p-5 space-y-3">
+  <% if @alert_rules.empty? %>
+    <%= render "shared/empty_state", title: "Sin alertas", description: "Crea una regla para avisar automáticamente cuando se cumplan condiciones de fecha y datos del deal." %>
+  <% else %>
+    <% @alert_rules.each do |alert_rule| %>
+      <article class="card p-4">
+        <div class="flex items-center gap-2">
+          <h2 class="font-semibold text-base"><%= alert_rule.name %></h2>
+          <%= badge alert_rule.active? ? "Activa" : "Inactiva", color: alert_rule.active? ? "green" : "chicago" %>
+          <div class="ml-auto flex gap-2">
+            <%= link_to "Editar", edit_alert_rule_path(alert_rule), class: "btn-secondary" %>
+            <%= button_to "Eliminar", alert_rule_path(alert_rule), method: :delete, class: "btn-danger" %>
+          </div>
+        </div>
+        <p class="text-sm text-ink-faint mt-1">
+          Cuando <strong><%= alert_rule.trigger_field_label %></strong>
+          <% if alert_rule.offset_days != 0 %>
+            (<%= alert_rule.offset_days %> días)
+          <% end %>
+          <% if alert_rule.conditions.present? %>
+            y <%= alert_rule.condition_labels.join(" y ") %>
+          <% end %>
+          → <strong><%= alert_rule.recipient_label %></strong>
+        </p>
+      </article>
+    <% end %>
+  <% end %>
+</div>

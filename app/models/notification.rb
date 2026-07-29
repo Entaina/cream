@@ -1,5 +1,5 @@
 class Notification < ApplicationRecord
-  KINDS = %w[mention task_overdue email_opened email_followup email_replied lead_submission automation].freeze
+  KINDS = %w[mention task_overdue email_opened email_followup email_replied lead_submission automation alert].freeze
 
   belongs_to :workspace
   belongs_to :user

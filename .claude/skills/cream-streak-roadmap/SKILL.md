@@ -46,7 +46,8 @@ record_email + email_tracking (SMTP + public URL)
   └── mail_merge
   └── gmail_sync (optional channel: SendViaGmailJob)
 slack_integrations (wire NotificationService events)
-automations (conditions UI + hooks already gated)
+automations (event-driven: conditions UI + hooks already gated)
+alerts (time-based: AlertRuleEngine + AlertRulesJob; depends on notifications + optional email)
 reports (builder before menu)
 ```
 
@@ -61,7 +62,7 @@ reports (builder before menu)
 ## Tests
 
 - Mock `Net::HTTP` for webhooks/Slack
-- Use `ActiveJob::Base.queue_adapter = :test` and `have_enqueued_job` for mail merge
+- Use `ActiveJob::Base.queue_adapter = :test` and `have_enqueued_job` / `have_enqueued_mail` for mail merge and alert delivery
 - Do not call real Gmail API in specs
 
 ## Quick audit command

@@ -35,5 +35,28 @@
         <%= f.submit "Guardar", class: "btn-secondary" %>
       <% end %>
     </section>
+
+    <% if feature_enabled?(:alerts) %>
+      <section class="card p-4 space-y-3">
+        <h2 class="text-base font-semibold text-ink">Alertas</h2>
+        <p class="text-sm text-ink-faint">
+          Elige cómo quieres recibir las alertas configuradas por el administrador en este workspace.
+        </p>
+        <%= form_with model: current_membership, url: settings_profile_path, method: :patch, class: "space-y-3" do |f| %>
+          <label class="flex items-center gap-2 text-base">
+            <%= f.check_box :alert_in_app %>
+            Notificación in-app (campana)
+          </label>
+          <label class="flex items-center gap-2 text-base">
+            <%= f.check_box :alert_email %>
+            Email
+          </label>
+          <p class="text-sm text-ink-faint">
+            Si desactivas ambos canales, no recibirás alertas aunque una regla te incluya como destinatario.
+          </p>
+          <%= f.submit "Guardar", class: "btn-secondary" %>
+        <% end %>
+      </section>
+    <% end %>
   </div>
 </div>

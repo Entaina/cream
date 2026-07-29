@@ -23,11 +23,11 @@ The workspace is the **tenant boundary** — all CRM data lives inside one.
 ```
 User ←── Membership ──→ Workspace
               │
-         role: admin | member
+         role: admin | sales_director | salesperson
 ```
 
 - **`Workspace`**: `name` + unique `slug`. Owns companies, people, deals, notes, tasks, lists, activities.
-- **`Membership`**: joins user ↔ workspace. Roles `admin` | `member` (`Membership::ROLES`). One membership per user/workspace pair.
+- **`Membership`**: joins user ↔ workspace. Roles `admin` | `sales_director` | `salesperson` (`Membership::ROLES`). One membership per user/workspace pair. Per-workspace prefs: `current_pipeline_id`, `sales_director_briefing_enabled`, `alert_in_app` (default true), `alert_email` (default false).
 - **`User`**: can belong to **many** workspaces (`has_many :workspaces, through: :memberships`).
 
 **Registration** (`RegistrationsController#create`): creates user + workspace (form `workspace_name` or `"#{name}'s Workspace"`) + membership as `admin`.
@@ -46,7 +46,7 @@ User ←── Membership ──→ Workspace
 - `WorkspaceRecordPolicy` scopes with `scope.where(workspace: workspace)` and checks `in_workspace?`
 - Controllers always query via `current_workspace` (e.g. `policy_scope(current_workspace.deals)`)
 
-**Roles**: `admin` and `member` exist on `Membership`, but policies currently only check `member?` — admin grants no extra permissions yet.
+**Roles**: `admin`, `sales_director` and `salesperson` on `Membership`. Admin-only mutations (via Pundit `admin?`) include team/invites, automations, **alert rules**, webhooks, stripe connection, etc. Members can view most workspace data; alert rule CRUD is admin-only, list is member-visible.
 
 **Seeds**: demo workspace `Cream Demo` with multiple users (e.g. admin=admin, member=salesperson) sharing one workspace.
 
@@ -92,6 +92,27 @@ Shared service [`MentionParser`](../../../app/services/mention_parser.rb): patte
 | **Tasks** (`Task#assign_from_mentions`) | yes → sets `assignee` | `mention_html` in task lists / dashboard | yes (`mention_controller` + `mention_text_field`) | no (yet) |
 
 Task title fields with mentions: `shared/_tasks_section`, `tasks/index`, `deals/_form` (nested «Next action»).
+
+## Notifications & alerts
+
+**In-app notifications** — model `Notification` (`kind`, `title`, `body`, `url`, `read_at`), scoped per user + workspace. Kinds include `mention`, `task_overdue`, `email_*`, `lead_submission`, `automation`, **`alert`**. Created via `NotificationService`; inbox at `/notifications`.
+
+**Configurable alerts** (time-based, separate from event-driven **Automations**):
+
+```
+Admin CRUD /alert_rules → AlertRule (trigger_field, offset_days, conditions[], recipient)
+AlertRulesJob (daily, recurring.yml) → AlertRuleEngine → matching deals
+  → AlertDelivery dedupe (rule + deal + user, once ever)
+  → channels from Membership: alert_in_app / alert_email
+  → NotificationService.notify_alert + AlertMailer#alert_email
+```
+
+- **`AlertRule`**: `TRIGGER_FIELDS` = `edition_ends_on` | `edition_starts_on` | `deal_expected_close_date` (fires when `date + offset_days <= Date.current`; negative offset = advance warning). `CONDITIONS` = `company_without_fiscal_info` (`companies.fiscal_information` blank), `deal_open` (stage not closed). `RECIPIENTS` = `deal_owner` | `admins`.
+- Edition dates live on `Edition` (`starts_on`, `ends_on`); deal lines link via `deal_products.edition_id`.
+- Feature flag `:alerts` in `CreamFeatures`; menu **Alertas**; `AlertRulesController` + `RequiresFeature`.
+- User channel prefs: **Settings → Profile → Alertas** (`Settings::ProfileController` permits `alert_in_app`, `alert_email`). If both off, no delivery and no `AlertDelivery` row.
+
+When adding a new alert trigger or condition, extend constants + `AlertRuleEngine#apply_trigger` / `#apply_conditions` and the form checkboxes in `alert_rules/_form.html.erb`.
 
 ## Testing
 

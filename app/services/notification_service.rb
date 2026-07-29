@@ -66,6 +66,16 @@ class NotificationService
     )
   end
 
+  def self.notify_alert(recipient:, rule:, deal:)
+    recipient.notifications.create!(
+      workspace: rule.workspace,
+      kind: "alert",
+      title: rule.name,
+      body: "#{deal.name} (#{deal.company.name})",
+      url: record_path_for(deal)
+    )
+  end
+
   def self.check_overdue_tasks!(workspace)
     workspace.tasks.pending.where("due_on < ?", Date.current).find_each do |task|
       next unless task.assignee

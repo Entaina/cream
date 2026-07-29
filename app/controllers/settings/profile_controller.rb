@@ -21,7 +21,8 @@ module Settings
     private
 
     def membership_params
-      params.require(:membership).permit(:current_pipeline_id, :sales_director_briefing_enabled)
+      params.require(:membership).permit(:current_pipeline_id, :sales_director_briefing_enabled,
+        :alert_in_app, :alert_email)
     end
   end
 end

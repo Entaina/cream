@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_29_100000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_29_110002) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -56,6 +56,31 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_29_100000) do
     t.index ["user_id"], name: "index_activities_on_user_id"
     t.index ["workspace_id", "created_at"], name: "index_activities_on_workspace_id_and_created_at"
     t.index ["workspace_id"], name: "index_activities_on_workspace_id"
+  end
+
+  create_table "alert_deliveries", force: :cascade do |t|
+    t.bigint "alert_rule_id", null: false
+    t.datetime "created_at", null: false
+    t.bigint "deal_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["alert_rule_id", "deal_id", "user_id"], name: "idx_on_alert_rule_id_deal_id_user_id_5c7d586558", unique: true
+    t.index ["alert_rule_id"], name: "index_alert_deliveries_on_alert_rule_id"
+    t.index ["deal_id"], name: "index_alert_deliveries_on_deal_id"
+    t.index ["user_id"], name: "index_alert_deliveries_on_user_id"
+  end
+
+  create_table "alert_rules", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.jsonb "conditions", default: [], null: false
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.integer "offset_days", default: 0, null: false
+    t.string "recipient", default: "deal_owner", null: false
+    t.string "trigger_field", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "workspace_id", null: false
+    t.index ["workspace_id"], name: "index_alert_rules_on_workspace_id"
   end
 
   create_table "api_tokens", force: :cascade do |t|
@@ -551,6 +576,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_29_100000) do
   end
 
   create_table "memberships", force: :cascade do |t|
+    t.boolean "alert_email", default: false, null: false
+    t.boolean "alert_in_app", default: true, null: false
     t.datetime "created_at", null: false
     t.bigint "current_pipeline_id"
     t.string "role", default: "salesperson", null: false
@@ -1150,6 +1177,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_29_100000) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "activities", "users"
   add_foreign_key "activities", "workspaces"
+  add_foreign_key "alert_deliveries", "alert_rules"
+  add_foreign_key "alert_deliveries", "deals"
+  add_foreign_key "alert_deliveries", "users"
+  add_foreign_key "alert_rules", "workspaces"
   add_foreign_key "api_tokens", "users"
   add_foreign_key "api_tokens", "workspaces"
   add_foreign_key "automations", "workspaces"

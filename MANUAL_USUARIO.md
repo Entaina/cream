@@ -4,7 +4,7 @@
 
 Cream es un CRM por **workspaces** para gestionar **personas**, **empresas** y **deals** (oportunidades), con notas, tareas, listas y un historial de actividad compartido en el equipo.
 
-> **Última revisión:** 2026-07-28 (condiciones de entrada a etapas del pipeline)
+> **Última revisión:** 2026-07-29 (alertas configurables por el administrador)
 > Este documento describe la funcionalidad **visible para el usuario**. Las funcionalidades desactivadas aparecen al final en «Próximamente».
 
 ---
@@ -27,17 +27,18 @@ Cream es un CRM por **workspaces** para gestionar **personas**, **empresas** y *
 14. [Importar y exportar CSV](#14-importar-y-exportar-csv)
 15. [Email desde registros](#15-email-desde-registros)
 16. [Automatizaciones](#16-automatizaciones)
-17. [Webhooks](#17-webhooks)
-18. [Notificaciones](#18-notificaciones)
-19. [Equipo e invitaciones](#19-equipo-e-invitaciones)
-20. [Tokens de API](#20-tokens-de-api)
-21. [Reports](#21-reports)
-22. [Asistente IA](#22-asistente-ia)
-23. [Chat de conocimiento](#23-chat-de-conocimiento)
-24. [Pagos de Stripe](#24-pagos-de-stripe)
-25. [Formularios de captación](#25-formularios-de-captación)
-26. [Reservas de calendario](#26-reservas-de-calendario)
-27. [Próximamente](#27-próximamente)
+17. [Alertas configurables](#17-alertas-configurables)
+18. [Webhooks](#18-webhooks)
+19. [Notificaciones](#19-notificaciones)
+20. [Equipo e invitaciones](#20-equipo-e-invitaciones)
+21. [Tokens de API](#21-tokens-de-api)
+22. [Reports](#22-reports)
+23. [Asistente IA](#23-asistente-ia)
+24. [Chat de conocimiento](#24-chat-de-conocimiento)
+25. [Pagos de Stripe](#25-pagos-de-stripe)
+26. [Formularios de captación](#26-formularios-de-captación)
+27. [Reservas de calendario](#27-reservas-de-calendario)
+28. [Próximamente](#28-próximamente)
 
 ---
 
@@ -102,16 +103,17 @@ El menú lateral izquierdo concentra el acceso principal. En **pantallas pequeñ
 | **Tasks**        | Todas las tareas del workspace |
 | **Mail merge**   | Envío de email personalizado a varios registros |
 | **Plantillas**   | Plantillas de email reutilizables |
+| **Alertas**      | Reglas de aviso basadas en fechas y condiciones del deal |
 | **Webhooks**     | Integraciones salientes por HTTP |
 | **Stripe**       | Pagos importados de Stripe y su conciliación con deals |
 | **Pipelines**    | Configuración de pipelines de venta |
 | **API tokens**   | Tokens para clientes MCP / API |
-| **Profile**      | Preferencias personales en el workspace |
+| **Profile**      | Preferencias personales en el workspace (pipeline, briefing, canales de alerta) |
 | **Team**         | Miembros e invitaciones |
 | **Custom fields**| Campos extra por tipo de registro |
 | **Lists**        | Listas personalizadas (parte inferior del menú) |
 
-Las entradas del menú que dependen de funcionalidades desactivadas no aparecen hasta que se habiliten (ver [Próximamente](#24-próximamente)).
+Las entradas del menú que dependen de funcionalidades desactivadas no aparecen hasta que se habiliten (ver [Próximamente](#28-próximamente)).
 
 ### Personalizar el menú
 
@@ -659,7 +661,7 @@ Entrada **Automations** en el menú lateral; pulsa **New automation**.
 ### Notas
 
 - Las automatizaciones **inactivas** no se ejecutan.
-- *Notify Slack* no hace nada hasta que se habilite la integración de Slack (ver [Próximamente](#24-próximamente)).
+- *Notify Slack* no hace nada hasta que se habilite la integración de Slack (ver [Próximamente](#28-próximamente)).
 
 ### Disparadores de etapa (IA)
 
@@ -678,7 +680,46 @@ Los avisos solo los ve **el usuario que movió el deal**; si el cambio de etapa 
 
 ---
 
-## 17. Webhooks
+## 17. Alertas configurables
+
+Las **alertas** avisan automáticamente cuando se cumple una **fecha** (p. ej. fin de la edición de un producto en un deal) y, opcionalmente, **condiciones adicionales** sobre el deal o su empresa. Solo los **administradores** pueden crearlas y editarlas.
+
+### Cómo acceder
+
+Entrada **Alertas** en el menú lateral; pulsa **Nueva alerta**.
+
+### Configurar una alerta
+
+1. **Nombre:** texto descriptivo (aparece en la notificación).
+2. **Campo de fecha:** cuándo evaluar la regla:
+   - *Fin de edición* — alguna línea del deal con edición cuya fecha de fin se ha alcanzado.
+   - *Inicio de edición* — fecha de inicio de la edición en una línea del deal.
+   - *Fecha de cierre esperada del deal* — campo del deal.
+3. **Desfase (días):** `0` = el mismo día; valores negativos avisan con antelación (p. ej. `-7` = una semana antes).
+4. **Condiciones adicionales** (opcional; todas deben cumplirse):
+   - *La empresa no tiene información fiscal*
+   - *El deal está abierto (no ganado ni perdido)*
+5. **Destinatario:** *Owner del deal* o *Administradores del workspace*.
+6. Marca **Activa** y guarda.
+
+### Canales de aviso (cada usuario)
+
+En **Settings → Profile**, sección **Alertas**, cada miembro elige:
+
+- **Notificación in-app (campana)** — activada por defecto.
+- **Email** — desactivado por defecto.
+
+Si desactivas ambos canales, no recibirás alertas aunque una regla te incluya como destinatario.
+
+### Notas
+
+- Cada regla avisa **una sola vez** por deal y destinatario; no se repite en días siguientes.
+- Las alertas se evalúan **una vez al día** en el servidor.
+- Las alertas aparecen en **Notifications** con enlace al deal.
+
+---
+
+## 18. Webhooks
 
 En **Webhooks** configuras URLs que Cream llamará cuando ocurran eventos (p. ej. creación o cambio de un deal).
 
@@ -689,9 +730,9 @@ En **Webhooks** configuras URLs que Cream llamará cuando ocurran eventos (p. ej
 
 ---
 
-## 18. Notificaciones
+## 19. Notificaciones
 
-**Notifications** en el menú lateral muestra avisos del workspace (p. ej. cuando alguien te menciona en un **comentario**). Las menciones en el título de una **tarea** asignan la tarea pero no generan aviso por ahora.
+**Notifications** en el menú lateral muestra avisos del workspace: menciones en **comentarios**, **alertas** configuradas por el administrador, leads de formularios, etc. Las menciones en el título de una **tarea** asignan la tarea pero no generan aviso por ahora.
 
 - El contador en el menú indica notificaciones sin leer.
 - **Mark read** en cada aviso o **Mark all read** para limpiar la bandeja.
@@ -699,7 +740,7 @@ En **Webhooks** configuras URLs que Cream llamará cuando ocurran eventos (p. ej
 
 ---
 
-## 19. Equipo e invitaciones
+## 20. Equipo e invitaciones
 
 En **Team** (admins):
 
@@ -723,7 +764,7 @@ Los invitados aceptan con el enlace recibido y crean cuenta o inician sesión si
 
 ---
 
-## 20. Tokens de API
+## 21. Tokens de API
 
 En **API tokens** generas tokens de acceso para conectar clientes **MCP** (Claude, Cursor, etc.) o la **API REST v1** a tu workspace.
 
@@ -735,7 +776,7 @@ Cada token está ligado a tu usuario y al workspace activo en el momento de crea
 
 ---
 
-## 21. Reports
+## 22. Reports
 
 Los **informes** te dejan medir tu actividad combinando una métrica, un agrupamiento y un periodo, y guardar las combinaciones que más uses.
 
@@ -771,7 +812,7 @@ Cream te enviará el informe por correo según esa frecuencia. *(El envío progr
 
 ---
 
-## 22. Asistente IA
+## 23. Asistente IA
 
 Cuando el asistente IA está habilitado y configurado (`CREAM_AI_API_KEY`), puedes usarlo en las fichas de **personas**, **empresas** y **deals**, y también vía MCP/API.
 
@@ -811,7 +852,7 @@ Las herramientas MCP `summarize_record`, `suggest_next_steps`, `draft_email`, `n
 
 ---
 
-## 23. Chat de conocimiento
+## 24. Chat de conocimiento
 
 En el workspace **Example** (cuando está habilitado y configurado en el servidor), verás un **botón flotante de chat** en la esquina inferior derecha de cualquier pantalla.
 
@@ -856,7 +897,7 @@ La cabecera del panel indica el contexto activo (p. ej. *Contexto: Acme Corp*) o
 
 ---
 
-## 24. Pagos de Stripe
+## 25. Pagos de Stripe
 
 Si tu organización cobra a través de Stripe (por ejemplo desde otra aplicación), Cream puede importar esos pagos y ayudarte a **conciliarlos con tus deals**: cada pago se relaciona con un deal existente o te propone crear uno nuevo.
 
@@ -910,7 +951,7 @@ Al conciliar, el deal registra en su timeline la actividad de **pago recibido** 
 
 ---
 
-## 25. Formularios de captación
+## 26. Formularios de captación
 
 Los **formularios de captación** permiten recibir leads desde páginas externas. Cada formulario es una página pública de Cream que puedes enlazar o embeber en un `<iframe>`.
 
@@ -945,7 +986,7 @@ En el menú lateral, abre **Formularios**.
 
 ---
 
-## 26. Reservas de calendario
+## 27. Reservas de calendario
 
 Las **reservas de calendario** permiten ofrecer una experiencia tipo Calendly en una página pública de Cream: el visitante elige un tipo de reunión, consulta huecos reales en Google Calendar, reserva y recibe invitación por email (con Google Meet si aplica).
 
@@ -1008,7 +1049,7 @@ Flujo en tres pasos: elegir tipo de evento → calendario y hora (con selector d
 
 ---
 
-## 27. Próximamente
+## 28. Próximamente
 
 Estas funcionalidades existen en el código pero **no están disponibles** en la interfaz hasta completar su implementación (controladas por `CreamFeatures`):
 

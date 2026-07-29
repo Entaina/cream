@@ -74,6 +74,14 @@ module CreamFeatures
       blockers: [ "notify_slack action is a no-op until slack_integrations is enabled (gated in AutomationEngine)" ],
       enable_steps: []
     },
+    alerts: {
+      enabled: true,
+      menu: true,
+      label: "Alertas",
+      status: :ready,
+      blockers: [],
+      enable_steps: []
+    },
     slack_integrations: {
       enabled: false,
       menu: true,
@@ -267,6 +275,7 @@ module CreamFeatures
     when :email_templates then helper.email_templates_path
     when :gmail_sync then helper.gmail_connection_path
     when :automations then helper.automations_path
+    when :alerts then helper.alert_rules_path
     when :slack_integrations then helper.slack_integrations_path
     when :webhooks then helper.webhooks_path
     when :stripe_payments then helper.stripe_payments_path
@@ -283,6 +292,7 @@ module CreamFeatures
       email_templates: :mail,
       gmail_sync: :mail,
       automations: :zap,
+      alerts: :bell,
       slack_integrations: :message,
       webhooks: :globe,
       stripe_payments: :credit_card,

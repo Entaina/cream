@@ -1,6 +1,8 @@
 require "rails_helper"
 
 RSpec.describe Ai::SalesSnapshots do
+  include ActiveSupport::Testing::TimeHelpers
+
   fixtures :users, :workspaces
 
   let(:workspace) { workspaces(:one) }
@@ -31,6 +33,8 @@ RSpec.describe Ai::SalesSnapshots do
   end
 
   describe ".deal_snapshot" do
+    around { |example| travel_to(briefing_date.in_time_zone) { example.run } }
+
     it "includes scheduled next action and omits inactivity when a future task exists" do
       deal = build_deal(task_due_on: briefing_date + 21.days, task_title: "Llamada comercial")
       allow(deal).to receive(:magic_column_value).with(:days_in_stage).and_return(13)

@@ -91,15 +91,30 @@ Los nombres de badges en la lista de emails (**Sent**, **Opened**, **Replied**, 
 
 ## Menciones `@usuario`
 
-Documentar en **MANUAL_USUARIO.md** §7 (Tareas) y, si aplica, §13 (ficha) y §18 (Notificaciones):
+Documentar en **MANUAL_USUARIO.md** §7 (Tareas) y, si aplica, §13 (ficha) y §19 (Notificaciones):
 
 | Superficie | UX visible | Manual |
 |------------|------------|--------|
 | Título de tarea | Desplegable al escribir `@`; asigna al mencionado; título resaltado | §7 «Mencionar y asignar con @» |
-| Comentario | `@nombre` manual; resaltado; notificación | §13 fila Comments; §18 Notificaciones |
-| Cambio futuro | Notificación al mencionar en tarea | Añadir a §18 cuando exista en código |
+| Comentario | `@nombre` manual; resaltado; notificación | §13 fila Comments; §19 Notificaciones |
+| Cambio futuro | Notificación al mencionar en tarea | Añadir a §19 cuando exista en código |
 
 No documentar `MentionParser`, `mention_controller.js` ni helpers en el manual (solo comportamiento visible).
+
+## Alertas configurables (referencia para §17)
+
+Al cambiar triggers, condiciones o canales en código, actualizar **MANUAL_USUARIO.md** §17 y **USER_MANUAL.md** §17 (Configurable alerts), y §19 Notificaciones si cambia el inbox.
+
+| Pieza | Ubicación en código | Manual (usuario) |
+|-------|---------------------|------------------|
+| CRUD admin | `/alert_rules`, menú **Alertas** | §17 «Cómo acceder» + «Configurar una alerta» |
+| Canales por usuario | **Settings → Profile → Alertas** | §17 «Canales de aviso» |
+| Tipos de fecha | `AlertRule::TRIGGER_FIELD_LABELS` | §17 paso 2 (nombres en español en UI) |
+| Condiciones | `AlertRule::CONDITION_LABELS` | §17 paso 4 |
+| Destinatarios | `AlertRule::RECIPIENT_LABELS` | §17 paso 5 |
+| Evaluación diaria / dedupe | no documentar jobs | §17 «Notas» (una vez por deal, una vez al día) |
+
+Diferenciar en el manual: **Automatizaciones** (§16, event-driven) vs **Alertas** (§17, time-based). No mezclar con disparadores de etapa (§16 «Disparadores de etapa»).
 
 ## Filtros de listados (referencia para §5 y §9)
 

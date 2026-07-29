@@ -158,6 +158,7 @@ Rails.application.routes.draw do
 
   resources :webhooks, except: %i[show]
   resources :automations, except: %i[show]
+  resources :alert_rules, except: %i[show]
   resources :slack_integrations, except: %i[show]
   resources :lead_forms, except: %i[show]
   resources :booking_pages, except: %i[show] do

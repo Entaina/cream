@@ -16,6 +16,9 @@ production:
   deliver_scheduled_reports:
     class: ScheduledReportsJob
     schedule: every day at 7am
+  evaluate_alert_rules:
+    class: AlertRulesJob
+    schedule: every day at 7am
   sync_gmail_inboxes:
     class: GmailSyncSchedulerJob
     schedule: every 10 minutes

@@ -66,8 +66,17 @@ bundle exec rspec spec/requests/sessions_spec.rb  # single file
 
 Conventions:
 - Use RSpec (`describe`/`it`, `expect`) — all specs live under `spec/`; the `test/` directory is not used.
-- Mock external HTTP calls and background jobs (e.g. Celery/Solid Queue workers) — do not hit real services in specs.
+- Mock external HTTP calls and background jobs (Solid Queue / `deliver_later`) — do not hit real services in specs.
 - `SessionHelper` (`spec/support/session_helper.rb`) provides `sign_in_as` / `sign_out` for authenticated request specs.
+- `DealHelper` (`spec/support/deal_helper.rb`) provides `create_deal!`, `create_company!`, `create_person!` for deal-related specs.
+
+### Recurring jobs (Solid Queue)
+
+Defined in [`config/recurring.yml`](../../../config/recurring.yml). Production examples: `ScheduledReportsJob`, `AlertRulesJob` (daily alert evaluation), `GmailSyncSchedulerJob`, `StripeSyncSchedulerJob`. Run manually in dev:
+
+```bash
+bin/rails runner 'AlertRulesJob.perform_now'
+```
 
 ## Lint (local — not in CI)
 
