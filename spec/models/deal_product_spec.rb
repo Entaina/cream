@@ -62,5 +62,20 @@ RSpec.describe DealProduct, type: :model do
       line.update!(edition_name: "")
       expect(line.reload.edition).to be_nil
     end
+
+    it "assigns an edition by id" do
+      edition = workspace.editions.create!(name: "Madrid 2026")
+      line = deal.deal_products.create!(product: product, quantity: 1, edition_id: edition.id)
+
+      expect(line.edition).to eq(edition)
+    end
+
+    it "clears the edition when edition_id is blank" do
+      edition = workspace.editions.create!(name: "Madrid 2026")
+      line = deal.deal_products.create!(product: product, quantity: 1, edition_id: edition.id)
+      line.update!(edition_id: nil)
+
+      expect(line.reload.edition).to be_nil
+    end
   end
 end

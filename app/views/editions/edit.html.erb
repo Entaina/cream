@@ -1,0 +1,8 @@
+<% page_title "Edit #{@edition.name}" %>
+<%= render "shared/page_header", title: "Edit #{@edition.name}", icon_name: :briefcase, count: nil, actions: nil %>
+<%= render "products/tabs", active: "editions" %>
+<div class="flex-1 overflow-y-auto p-5">
+  <div class="max-w-xl">
+    <%= render "form", edition: @edition %>
+  </div>
+</div>

@@ -38,6 +38,6 @@ class DealProductsController < ApplicationController
   end
 
   def line_item_params
-    params.require(:deal_product).permit(:product_id, :quantity, :unit_price, :edition_name)
+    params.require(:deal_product).permit(:product_id, :quantity, :unit_price, :edition_id, :edition_name)
   end
 end

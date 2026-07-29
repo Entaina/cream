@@ -6,20 +6,13 @@
     <span class="text-base text-ink-soft tabular-nums font-medium"><%= money(deal.value, deal.currency) %></span>
   </div>
 
-  <%# Shared list of existing editions: type to pick one, or a new name to create it. %>
-  <datalist id="editions-list">
-    <% editions.each do |edition| %>
-      <option value="<%= edition.name %>"></option>
-    <% end %>
-  </datalist>
-
   <% if line_items.any? %>
     <div class="overflow-x-auto">
     <table class="table-base">
       <thead>
         <tr>
           <th>Product</th>
-          <th class="w-40">Edition</th>
+          <th class="w-48">Edition</th>
           <th class="w-20">Qty</th>
           <th class="w-32">Unit price</th>
           <th class="w-28">Subtotal</th>
@@ -31,8 +24,13 @@
           <tr>
             <td class="font-medium"><%= line.product.name %></td>
             <td colspan="3" class="p-0">
-              <%= form_with model: [deal, line], url: deal_line_item_path(deal, line), method: :patch, class: "flex items-center gap-2 px-3 py-1.5" do |f| %>
-                <%= f.text_field :edition_name, value: line.edition&.name, list: "editions-list", placeholder: "Edition", class: "input w-36 py-1", onchange: "this.form.requestSubmit()" %>
+              <%= form_with model: [deal, line], url: deal_line_item_path(deal, line), method: :patch,
+                    class: "flex items-center gap-2 px-3 py-1.5",
+                    data: {
+                      controller: "auto-submit",
+                      action: "change->auto-submit#submit record-picker:selected->auto-submit#submit"
+                    } do |f| %>
+                <%= render "edition_picker", form: f, compact: true %>
                 <%= f.number_field :quantity, min: 1, step: 1, class: "input w-16 py-1", onchange: "this.form.requestSubmit()" %>
                 <%= f.number_field :unit_price, min: 0, step: 0.01, class: "input w-28 py-1", onchange: "this.form.requestSubmit()" %>
               <% end %>
@@ -61,9 +59,8 @@
           <%= f.collection_select :product_id, products, :id, ->(p) { "#{p.name} — #{money(p.price)}" },
                 { prompt: "Select a product" }, class: "input", required: true %>
         </div>
-        <div class="w-40">
-          <%= f.label :edition_name, "Edition", class: "label" %>
-          <%= f.text_field :edition_name, list: "editions-list", placeholder: "Optional", class: "input" %>
+        <div class="w-48">
+          <%= render "edition_picker", form: f %>
         </div>
         <div class="w-20">
           <%= f.label :quantity, "Qty", class: "label" %>

@@ -178,12 +178,6 @@
   </div>
 
   <% if deal.new_record? %>
-    <datalist id="editions-list">
-      <% current_workspace.editions.ordered.each do |edition| %>
-        <option value="<%= edition.name %>"></option>
-      <% end %>
-    </datalist>
-
     <div data-controller="nested-form">
       <div class="flex items-center justify-between mb-2">
         <h3 class="text-sm font-semibold uppercase tracking-wider text-ink-faint">Products of interest</h3>

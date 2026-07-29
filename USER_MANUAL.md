@@ -246,7 +246,7 @@ When merging, the contacts, deals, notes, tasks, emails and timeline activity of
   - Choose **Pipeline** and **Stage** to decide which stage the opportunity enters.
   - In **Company**, type to search for the company and pick a suggestion; if it doesn't exist, use **+ Create "…"** to create it on the spot. **Contacts** are optional (you can create a new one with **New** without leaving the form).
   - In the **New contact** dialog you can enter **First name** (required), **Last name**, **Email**, **Phone**, **Contact source** (*Formulario web*, *Recomendado*, *Lo trae alguien del equipo* — web form, referral, brought in by a team member) and **First contact date**.
-  - In **Products of interest** you can add catalog products with **Edition** and quantity before saving.
+  - In **Products of interest** you can add catalog products with **Edition** (searchable picker: select an existing one or **+ Create "…"**) and quantity before saving.
   - You must define a **Next action** (a task with a future date) to be able to create the deal.
 - They have a **Version history** that stores every change to the deal's attributes (value, name, probability, etc.) and lets you check what the deal looked like at a specific moment.
 - When **editing** a deal and saving a stage change to **Won**, a brief celebration animation is shown on screen before returning to the record. If the new stage is **closed** but not a winning one (e.g. *Lost*), a defeat animation is shown. The same happens when changing stage with the **Move to stage** buttons on the deal page. It does not happen when moving cards on the kanban board. If the target stage has **entry conditions** that the deal does not meet, the change is rejected, an error notice is shown and the deal remains in its original stage.
@@ -282,6 +282,12 @@ On the board, a saved view with a **stage** filter does not restrict the columns
 The **Products** catalog stores reusable products for creating lines in a deal. From a deal page — or when **creating a new deal** — you can add products with quantity, edition and unit price; the deal value can reflect those lines.
 
 Each product can be tagged with a **B2B** or **B2C** **segment** when creating or editing it. In the product list you can filter and sort by segment.
+
+### Editions
+
+Use the **Editions** tab (next to **Products** in the catalog) to manage product variants or cohorts. Each edition has a **name** and optional **start** and **end** dates.
+
+On deal product lines, the **Edition** field is a **searchable picker**: type to filter existing editions (dates appear next to the name), pick one or use **+ Create "…"** to add a new edition without leaving the form. Editions created on the fly have no dates until you complete them on the **Editions** tab.
 
 ---
 

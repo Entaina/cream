@@ -246,7 +246,7 @@ class DealsController < ApplicationController
     params.require(:deal).permit(:name, :pipeline_id, :pipeline_stage_id, :value, :currency, :probability,
       :expected_close_date, :company_id, :partner_id, :owner_id,
       contact_ids: [], tasks_attributes: %i[title due_on], custom_fields: {},
-      deal_products_attributes: %i[id product_id edition_name quantity unit_price _destroy])
+      deal_products_attributes: %i[id product_id edition_id edition_name quantity unit_price _destroy])
   end
 
   def quick_from_person?

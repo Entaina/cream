@@ -1,0 +1,52 @@
+<% page_title "Editions" %>
+<% actions = capture do %>
+  <%= link_to new_edition_path, class: "btn-primary" do %>
+    <%= icon :plus, classes: "size-3.5" %> New edition
+  <% end %>
+<% end %>
+<%= render "shared/page_header", title: "Editions", icon_name: :briefcase, count: @editions.size, actions: actions %>
+<%= render "products/tabs", active: "editions" %>
+
+<div class="flex-1 overflow-auto scrollbar-subtle">
+  <% if @editions.any? %>
+    <table class="table-base">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Dates</th>
+          <th>Lines in use</th>
+          <th class="w-10"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @editions.each do |edition| %>
+          <tr class="cursor-pointer" onclick="Turbo.visit('<%= edit_edition_path(edition) %>')">
+            <td class="font-medium"><%= edition.name %></td>
+            <td class="text-ink-soft">
+              <% if edition.date_range_label.present? %>
+                <%= edition.date_range_label %>
+              <% else %>
+                <span class="text-ink-faint">—</span>
+              <% end %>
+            </td>
+            <td class="text-ink-soft tabular-nums"><%= edition.deal_products.size %></td>
+            <td onclick="event.stopPropagation()">
+              <%= button_to edition_path(edition), method: :delete, class: "text-ink-faint hover:text-danger p-1",
+                    form: { data: { turbo_confirm: "Delete #{edition.name}?" } } do %>
+                <%= icon :trash, classes: "size-3.5" %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% else %>
+    <% action = capture do %>
+      <%= link_to new_edition_path, class: "btn-primary" do %>
+        <%= icon :plus, classes: "size-3.5" %> New edition
+      <% end %>
+    <% end %>
+    <%= render "shared/empty_state", icon_name: :briefcase, title: "No editions yet",
+          subtitle: "Create editions to tag product variants on deals (e.g. cohort or location).", action: action %>
+  <% end %>
+</div>

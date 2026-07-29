@@ -1,8 +1,8 @@
-<div class="grid grid-cols-[1fr_10rem_5rem_auto] gap-2 items-end rounded-lg ring-1 ring-transparent hover:ring-line p-1"
+<div class="grid grid-cols-[1fr_minmax(10rem,1fr)_5rem_auto] gap-2 items-end rounded-lg ring-1 ring-transparent hover:ring-line p-1"
      data-nested-form-target="row">
   <%= f.collection_select :product_id, current_workspace.products.ordered, :id, :name,
         { prompt: "Select a product" }, class: "input" %>
-  <%= f.text_field :edition_name, list: "editions-list", placeholder: "Edition", class: "input" %>
+  <%= render "edition_picker", form: f, compact: true %>
   <%= f.number_field :quantity, value: f.object.quantity || 1, min: 1, step: 1, class: "input" %>
   <%= f.hidden_field :_destroy %>
   <button type="button" data-action="nested-form#remove" class="text-ink-faint hover:text-danger p-1.5 mb-0.5" title="Remove product">

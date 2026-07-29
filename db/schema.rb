@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_28_160000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_29_100000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -301,7 +301,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_28_160000) do
 
   create_table "editions", force: :cascade do |t|
     t.datetime "created_at", null: false
+    t.date "ends_on"
     t.string "name", null: false
+    t.date "starts_on"
     t.datetime "updated_at", null: false
     t.bigint "workspace_id", null: false
     t.index ["workspace_id", "name"], name: "index_editions_on_workspace_id_and_name", unique: true

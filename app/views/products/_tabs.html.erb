@@ -1,0 +1,11 @@
+<%# locals: active ("products" | "editions") %>
+<nav class="flex gap-1 border-b border-line px-5 shrink-0">
+  <% tabs = [
+       [ "products", "Products", products_path ],
+       [ "editions", "Editions", editions_path ]
+     ] %>
+  <% tabs.each do |key, label, path| %>
+    <%= link_to label, path,
+          class: "px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors #{active == key ? "border-accent text-accent" : "border-transparent text-ink-soft hover:text-ink hover:border-line"}" %>
+  <% end %>
+</nav>

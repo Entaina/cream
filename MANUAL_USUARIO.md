@@ -246,7 +246,7 @@ Al fusionar, los contactos, deals, notas, tareas, emails y actividad del timelin
   - Elige **Pipeline** y **Stage** para decidir en qué etapa entra la oportunidad.
   - En **Company**, escribe para buscar la empresa y elige una sugerencia; si no existe, usa **+ Create "…"** para crearla al momento. Los **Contacts** son opcionales (puedes crear uno nuevo con **New** sin salir del formulario).
   - En el diálogo **New contact** puedes indicar **First name** (obligatorio), **Last name**, **Email**, **Phone**, **Contact source** (*Formulario web*, *Recomendado*, *Lo trae alguien del equipo*) y **First contact date**.
-  - En **Products of interest** puedes añadir productos del catálogo con **Edition** y cantidad antes de guardar.
+  - En **Products of interest** puedes añadir productos del catálogo con **Edition** (buscador con selección de una existente o **+ Create "…"**) y cantidad antes de guardar.
   - Debes definir una **Next action** (tarea con fecha futura) para poder crear el deal.
 - Tienen un **Version history** (historial de versiones) que guarda cada cambio de atributos del deal (valor, nombre, probabilidad, etc.) y permite consultar cómo estaba el deal en un momento concreto.
 - Al **editar** un deal y guardar un cambio de etapa a **Won**, se muestra una breve animación de celebración en pantalla antes de volver a la ficha. Si la nueva etapa es **cerrada** pero no de ganancia (p. ej. *Lost*), se muestra una animación de derrota. Lo mismo ocurre al cambiar de etapa con los botones **Move to stage** de la ficha del deal. No ocurre al mover tarjetas en el tablero kanban. Si la etapa destino tiene **condiciones de entrada** que el deal no cumple, el cambio se rechaza, se muestra un aviso de error y el deal permanece en la etapa original.
@@ -282,6 +282,12 @@ En el tablero, una vista guardada con filtro de **etapa** no restringe las colum
 El catálogo de **Products** guarda productos reutilizables al crear líneas en un deal. Desde la ficha de un deal — o al **crear un deal nuevo** — puedes añadir productos con cantidad, edición y precio unitario; el valor del deal puede reflejar esas líneas.
 
 Cada producto puede marcarse con un **segmento** **B2B** o **B2C** al crearlo o editarlo. En el listado de productos puedes filtrar y ordenar por segmento.
+
+### Ediciones
+
+En la pestaña **Editions** (junto a **Products** en el catálogo) gestionas las convocatorias o variantes de producto. Cada edición tiene **nombre** y, opcionalmente, **fecha de inicio** y **fecha de fin**.
+
+En las líneas de producto de un deal, el campo **Edition** es un **buscador**: escribe para filtrar ediciones existentes (se muestran las fechas junto al nombre), selecciona una o usa **+ Create "…"** para darla de alta al momento sin salir del formulario. Las ediciones creadas así nacen sin fechas; complétalas después en la pestaña **Editions**.
 
 ---
 

@@ -1,0 +1,15 @@
+<%# locals: form, compact: false %>
+<% selected = form.object.respond_to?(:edition) ? form.object.edition&.name : nil %>
+<div class="<%= "min-w-36 [&_.label]:hidden" if local_assigns[:compact] %>">
+  <%= render RecordPickerComponent.new(
+        form: form,
+        attribute: :edition_id,
+        label: "Edition",
+        scope: current_workspace.editions.ordered,
+        search_url: picker_editions_path(format: :json),
+        create_url: editions_path(format: :json),
+        create_param: "edition",
+        selected_name: selected,
+        hint_method: :date_range_label
+      ) %>
+</div>

@@ -1,0 +1,2 @@
+class EditionPolicy < WorkspaceRecordPolicy
+end
