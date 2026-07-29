@@ -747,6 +747,10 @@ En **Team** (admins):
 ### Ajustes del workspace
 
 - Cambiar el **nombre del workspace**.
+- **Los vendedores pueden ver los deals de otros** — si está activo, los vendedores ven todos los deals del workspace en listados, tablero y ficha (no solo los propios ni los compartidos como colaboradores).
+- **Los vendedores pueden editar los deals de otros** — si está activo, los vendedores pueden actualizar, mover y eliminar cualquier deal del workspace. Activar editar también permite ver esos deals.
+
+Por defecto ambas opciones están desactivadas: los vendedores solo ven y editan sus propios deals y los que se les comparten explícitamente como colaboradores.
 
 ### Invitar miembros
 

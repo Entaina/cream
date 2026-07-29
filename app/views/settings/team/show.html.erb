@@ -25,6 +25,15 @@
             </div>
             <%= f.submit "Save", class: "btn-secondary" %>
           </div>
+          <label class="flex items-center gap-2 text-base">
+            <%= f.check_box :salespeople_can_view_all_deals %>
+            Los vendedores pueden ver los deals de otros
+          </label>
+          <label class="flex items-center gap-2 text-base">
+            <%= f.check_box :salespeople_can_edit_all_deals %>
+            Los vendedores pueden editar los deals de otros
+          </label>
+          <p class="text-sm text-ink-faint">Si solo activas editar, los vendedores también podrán ver esos deals.</p>
           <% if feature_enabled?(:sales_director) %>
             <label class="flex items-center gap-2 text-base">
               <%= f.check_box :sales_director_enabled %>

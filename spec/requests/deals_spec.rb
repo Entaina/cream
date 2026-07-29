@@ -953,5 +953,51 @@ RSpec.describe "Deals", type: :request do
       expect(response.body).to include("Shared deal")
       expect(response.body).to include("Colaboradores")
     end
+
+    context "when salespeople_can_view_all_deals is enabled" do
+      before { workspace.update!(salespeople_can_view_all_deals: true) }
+
+      it "allows a salesperson to list and view other users' deals but not edit them" do
+        other_deal = create_deal!(workspace, pipeline: pipeline, owner: admin, name: "Other deal")
+        sign_in_to_workspace!(salesperson)
+
+        get deals_path
+        expect(response.body).to include("Other deal")
+
+        get deal_path(other_deal)
+        expect(response).to have_http_status(:ok)
+
+        patch deal_path(other_deal), params: { deal: { name: "Blocked rename" } }
+        expect(response).to redirect_to(root_path)
+        expect(other_deal.reload.name).to eq("Other deal")
+      end
+    end
+
+    context "when salespeople_can_edit_all_deals is enabled" do
+      before { workspace.update!(salespeople_can_edit_all_deals: true) }
+
+      it "allows a salesperson to view and update other users' deals" do
+        other_deal = create_deal!(workspace, pipeline: pipeline, owner: admin, name: "Other deal")
+        sign_in_to_workspace!(salesperson)
+
+        get deal_path(other_deal)
+        expect(response).to have_http_status(:ok)
+
+        patch deal_path(other_deal), params: { deal: { name: "Renamed by salesperson" } }
+        expect(response).to redirect_to(deal_path(other_deal))
+        expect(other_deal.reload.name).to eq("Renamed by salesperson")
+      end
+
+      it "allows a salesperson to move another user's deal on the board" do
+        other_deal = create_deal!(workspace, pipeline: pipeline, owner: admin, name: "Other deal")
+        target = pipeline.pipeline_stages.find_by!(name: "Qualified")
+        sign_in_to_workspace!(salesperson)
+
+        patch move_deal_path(other_deal), params: { pipeline_stage_id: target.id }
+
+        expect(response).to have_http_status(:redirect)
+        expect(other_deal.reload.pipeline_stage).to eq(target)
+      end
+    end
   end
 end

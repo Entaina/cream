@@ -28,7 +28,7 @@ class ListEntriesController < ApplicationController
     case list.record_type
     when "Person" then current_workspace.people
     when "Company" then current_workspace.companies
-    when "Deal" then current_workspace.deals
+    when "Deal" then policy_scope(current_workspace.deals)
     else raise ActiveRecord::RecordNotFound
     end
   end

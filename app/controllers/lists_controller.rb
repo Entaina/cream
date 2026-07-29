@@ -7,7 +7,7 @@ class ListsController < ApplicationController
 
   def show
     authorize @list
-    @entries = @list.list_entries.includes(:record)
+    @entries = visible_list_entries
     @candidates = candidate_records
   end
 
@@ -56,11 +56,18 @@ class ListsController < ApplicationController
     params.require(:list).permit(:name, :record_type, :color)
   end
 
+  def visible_list_entries
+    entries = @list.list_entries.includes(:record)
+    return entries unless @list.record_type == "Deal"
+
+    entries.where(record_type: "Deal", record_id: policy_scope(current_workspace.deals).select(:id))
+  end
+
   def candidate_records
     scope = case @list.record_type
     when "Person" then current_workspace.people.order(:first_name, :last_name)
     when "Company" then current_workspace.companies.order(:name)
-    when "Deal" then current_workspace.deals.order(:name)
+    when "Deal" then policy_scope(current_workspace.deals).order(:name)
     end
     existing_ids = @list.list_entries.where(record_type: @list.record_type).pluck(:record_id)
     scope.where.not(id: existing_ids)

@@ -77,5 +77,36 @@ RSpec.describe "Settings::Team", type: :request do
       expect(response).to redirect_to(root_path)
       expect(workspaces(:one).reload.sales_director_enabled?).to be(false)
     end
+
+    it "allows admins to configure salesperson deal scope" do
+      patch settings_team_path, params: {
+        workspace: {
+          salespeople_can_view_all_deals: true,
+          salespeople_can_edit_all_deals: true
+        }
+      }
+
+      expect(response).to redirect_to(settings_team_path)
+      workspace.reload
+      expect(workspace.salespeople_can_view_all_deals?).to be(true)
+      expect(workspace.salespeople_can_edit_all_deals?).to be(true)
+    end
+
+    it "forbids members from configuring salesperson deal scope" do
+      sign_in_as(member)
+      patch switch_workspace_path, params: { workspace_id: workspace.id }
+
+      patch settings_team_path, params: {
+        workspace: {
+          salespeople_can_view_all_deals: true,
+          salespeople_can_edit_all_deals: true
+        }
+      }
+
+      expect(response).to redirect_to(root_path)
+      workspace.reload
+      expect(workspace.salespeople_can_view_all_deals?).to be(false)
+      expect(workspace.salespeople_can_edit_all_deals?).to be(false)
+    end
   end
 end

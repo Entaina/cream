@@ -25,7 +25,12 @@ module Settings
     private
 
     def workspace_params
-      params.require(:workspace).permit(:name, :sales_director_enabled)
+      params.require(:workspace).permit(
+        :name,
+        :sales_director_enabled,
+        :salespeople_can_view_all_deals,
+        :salespeople_can_edit_all_deals
+      )
     end
   end
 end

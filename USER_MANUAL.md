@@ -747,6 +747,10 @@ In **Team** (admins):
 ### Workspace settings
 
 - Change the **workspace name**.
+- **Salespeople can view other users' deals** — when enabled, salespeople see all deals in the workspace on lists, boards and detail pages (not only their own or shared as collaborators).
+- **Salespeople can edit other users' deals** — when enabled, salespeople can update, move and delete any deal in the workspace. Enabling edit also allows viewing those deals.
+
+By default both options are off: salespeople only see and edit their own deals and those explicitly shared with them as collaborators.
 
 ### Inviting members
 
