@@ -26,7 +26,7 @@ module Ai
     MAX_TOOL_ITERATIONS = 12
 
     def initialize(workspace:, user:, record: nil, message:, history: [], session_id: nil,
-      client: Ai::Client.new, drive: Okm::DriveClient.new, on_status: nil, memory: nil)
+      client: Ai::Client.new, drive: nil, on_status: nil, memory: nil)
       @workspace = workspace
       @user = user
       @record = record

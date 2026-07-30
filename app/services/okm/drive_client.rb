@@ -26,7 +26,10 @@ module Okm
       application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
     ].freeze
 
-    def initialize(drive_service: nil)
+    def initialize(workspace:, drive_service: nil)
+      @workspace = workspace
+      raise Error, "OKM is not configured for this workspace" unless workspace.okm_configured?
+
       @drive_service = drive_service || build_drive_service
     end
 
@@ -63,6 +66,12 @@ module Okm
 
     private
 
+    attr_reader :workspace
+
+    def drive_id
+      workspace.okm_drive_id
+    end
+
     def sanitize_query(text)
       text.to_s.strip.gsub(/['\\]/, " ").squish.first(200)
     end
@@ -72,15 +81,15 @@ module Okm
     end
 
     def cache_key(file_id)
-      "okm/drive_file/#{file_id}"
+      "okm/#{drive_id}/drive_file/#{file_id}"
     end
 
     def search_cache_key(query)
-      "okm/search/#{Digest::SHA256.hexdigest(query)}"
+      "okm/#{drive_id}/search/#{Digest::SHA256.hexdigest(query)}"
     end
 
     def folder_cache_key(folder_id)
-      "okm/folder/#{folder_id}"
+      "okm/#{drive_id}/folder/#{folder_id}"
     end
 
     def serialize_entry(entry)
@@ -102,7 +111,7 @@ module Okm
       response = @drive_service.list_files(
         q: q,
         corpora: "drive",
-        drive_id: Configuration.drive_id,
+        drive_id: drive_id,
         include_items_from_all_drives: true,
         supports_all_drives: true,
         fields: "files(id,name,mimeType,parents)",
@@ -123,7 +132,7 @@ module Okm
       response = @drive_service.list_files(
         q: "'#{escape_drive_query(folder_id)}' in parents and trashed = false",
         corpora: "drive",
-        drive_id: Configuration.drive_id,
+        drive_id: drive_id,
         include_items_from_all_drives: true,
         supports_all_drives: true,
         fields: "files(id,name,mimeType,parents)",
@@ -181,11 +190,8 @@ module Okm
     end
 
     def build_drive_service
-      key_path = Configuration.service_account_key_path
-      raise Error, "OKM is not configured" unless Configuration.configured?
-
       credentials = Google::Auth::ServiceAccountCredentials.make_creds(
-        json_key_io: File.open(key_path),
+        json_key_io: StringIO.new(workspace.okm_service_account_key),
         scope: DRIVE_SCOPE
       )
 

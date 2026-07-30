@@ -1,0 +1,78 @@
+<% page_title "Settings" %>
+<%= render "shared/page_header", title: "Settings", icon_name: :settings, actions: nil %>
+
+<div class="flex-1 overflow-y-auto scrollbar-subtle p-5">
+  <div class="max-w-2xl space-y-6">
+    <p class="text-base text-ink-soft">
+      Configure workspace options for <strong><%= current_workspace.name %></strong>.
+    </p>
+
+    <section class="card p-4 space-y-3">
+      <h2 class="text-base font-semibold text-ink">General</h2>
+      <%= form_with model: current_workspace, url: settings_workspace_path, method: :patch, class: "space-y-3" do |f| %>
+        <div class="flex items-end gap-2">
+          <div class="flex-1">
+            <%= f.label :name, "Workspace name", class: "block text-sm font-medium text-ink-soft mb-1" %>
+            <%= f.text_field :name, class: "input w-full" %>
+          </div>
+          <%= f.submit "Save", class: "btn-secondary" %>
+        </div>
+        <label class="flex items-center gap-2 text-base">
+          <%= f.check_box :salespeople_can_view_all_deals %>
+          Los vendedores pueden ver los deals de otros
+        </label>
+        <label class="flex items-center gap-2 text-base">
+          <%= f.check_box :salespeople_can_edit_all_deals %>
+          Los vendedores pueden editar los deals de otros
+        </label>
+        <p class="text-sm text-ink-faint">Si solo activas editar, los vendedores también podrán ver esos deals.</p>
+        <% if feature_enabled?(:sales_director) %>
+          <label class="flex items-center gap-2 text-base">
+            <%= f.check_box :sales_director_enabled %>
+            Briefing diario del director de ventas (IA)
+          </label>
+          <% unless Ai::Configuration.configured? %>
+            <p class="text-sm text-ink-faint">Requiere configurar <code>CREAM_AI_API_KEY</code> en el servidor.</p>
+          <% end %>
+        <% end %>
+      <% end %>
+    </section>
+
+    <% if feature_enabled?(:okm_chat) %>
+      <section class="card p-4 space-y-3">
+        <h2 class="text-base font-semibold text-ink">OKM</h2>
+        <p class="text-sm text-ink-soft">
+          Conecta el OKM corporativo (Google Shared Drive) para el chat contextual y los briefings de IA.
+        </p>
+        <%= form_with model: current_workspace, url: settings_workspace_path, method: :patch, class: "space-y-3" do |f| %>
+          <label class="flex items-center gap-2 text-base">
+            <%= f.check_box :okm_chat_enabled %>
+            Habilitar chat OKM en este workspace
+          </label>
+          <% unless Ai::Configuration.configured? %>
+            <p class="text-sm text-ink-faint">Requiere configurar <code>CREAM_AI_API_KEY</code> en el servidor.</p>
+          <% end %>
+          <div>
+            <%= f.label :okm_drive_id, "Google Shared Drive ID", class: "block text-sm font-medium text-ink-soft mb-1" %>
+            <%= f.text_field :okm_drive_id, class: "input w-full font-mono text-sm", placeholder: "0AxxxxxxxxxxxxUk9PVA" %>
+            <p class="text-sm text-ink-faint mt-1">ID del shared drive desde la URL de Google Drive.</p>
+          </div>
+          <div>
+            <%= f.label :okm_service_account_key, "Service account JSON", class: "block text-sm font-medium text-ink-soft mb-1" %>
+            <% if current_workspace.okm_configured? %>
+              <p class="text-sm text-green-700 dark:text-green-400 mb-2">
+                Configurada: <%= current_workspace.okm_service_account_client_email %>
+              </p>
+            <% end %>
+            <%= f.text_area :okm_service_account_key,
+                  class: "input w-full font-mono text-xs min-h-[8rem]",
+                  placeholder: "Pega aquí el JSON de la service account con acceso de lectura al drive…",
+                  value: "" %>
+            <p class="text-sm text-ink-faint mt-1">Deja en blanco para conservar la clave actual. El JSON no se vuelve a mostrar.</p>
+          </div>
+          <%= f.submit "Save OKM settings", class: "btn-secondary" %>
+        <% end %>
+      </section>
+    <% end %>
+  </div>
+</div>

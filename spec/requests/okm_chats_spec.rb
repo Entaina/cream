@@ -22,13 +22,27 @@ RSpec.describe "OKM chat", type: :request do
     body.to_s.split("\n").filter_map { |line| JSON.parse(line) if line.present? }
   end
 
+  let(:okm_service_account_key) do
+    {
+      "type" => "service_account",
+      "project_id" => "test-project",
+      "private_key_id" => "key123",
+      "private_key" => "-----BEGIN PRIVATE KEY-----\ntest\n-----END PRIVATE KEY-----\n",
+      "client_email" => "okm@test.iam.gserviceaccount.com",
+      "client_id" => "123456789"
+    }.to_json
+  end
+
   before do
     sign_in_as(user)
-    workspace.update!(okm_chat_enabled: true)
+    workspace.update!(
+      okm_chat_enabled: true,
+      okm_drive_id: "drive123",
+      okm_service_account_key: okm_service_account_key
+    )
     allow(CreamFeatures).to receive(:enabled?).and_call_original
     allow(CreamFeatures).to receive(:enabled?).with(:okm_chat).and_return(true)
     allow(Ai::Configuration).to receive(:configured?).and_return(true)
-    allow(Okm).to receive(:configured?).and_return(true)
     allow(Ai::ContextualAgent).to receive(:new) do |**kwargs|
       kwargs[:on_status]&.call("Preparando contexto…")
       chat_agent

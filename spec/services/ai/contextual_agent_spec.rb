@@ -20,8 +20,19 @@ RSpec.describe Ai::ContextualAgent do
     )
   end
 
+  let(:okm_service_account_key) do
+    {
+      "type" => "service_account",
+      "project_id" => "test-project",
+      "private_key_id" => "key123",
+      "private_key" => "-----BEGIN PRIVATE KEY-----\ntest\n-----END PRIVATE KEY-----\n",
+      "client_email" => "okm@test.iam.gserviceaccount.com",
+      "client_id" => "123456789"
+    }.to_json
+  end
+
   before do
-    allow(Okm).to receive(:configured?).and_return(true)
+    workspace.update!(okm_drive_id: "drive123", okm_service_account_key: okm_service_account_key)
     allow(client).to receive(:chat_with_tools).and_return("Respuesta del asistente")
     allow(drive).to receive(:search).and_return([])
     allow(drive).to receive(:read_file).and_return("")

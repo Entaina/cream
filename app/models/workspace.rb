@@ -43,9 +43,22 @@ class Workspace < ApplicationRecord
 
   validates :name, presence: true
   validates :slug, presence: true, uniqueness: true, format: { with: /\A[a-z0-9-]+\z/ }
+  validate :okm_service_account_key_format, if: -> { okm_service_account_key.present? }
 
   scope :sales_director_enabled, -> { where(sales_director_enabled: true) }
   scope :okm_chat_enabled, -> { where(okm_chat_enabled: true) }
+
+  def okm_configured?
+    okm_drive_id.present? && okm_service_account_key.present?
+  end
+
+  def okm_service_account_client_email
+    return unless okm_service_account_key.present?
+
+    JSON.parse(okm_service_account_key)["client_email"]
+  rescue JSON::ParserError
+    nil
+  end
 
   def briefing_actor
     memberships.admins.includes(:user).first&.user || users.first
@@ -62,5 +75,14 @@ class Workspace < ApplicationRecord
 
   def create_default_pipeline
     Pipeline.create_default!(self)
+  end
+
+  def okm_service_account_key_format
+    data = JSON.parse(okm_service_account_key)
+    unless data.is_a?(Hash) && data["client_email"].present? && data["private_key"].present?
+      errors.add(:okm_service_account_key, "must be a valid service account JSON with client_email and private_key")
+    end
+  rescue JSON::ParserError
+    errors.add(:okm_service_account_key, "must be valid JSON")
   end
 end

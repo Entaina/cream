@@ -17,7 +17,8 @@ Rails.application.routes.draw do
   resources :api_tokens, only: %i[index create destroy]
 
   namespace :settings do
-    resource :team, only: %i[show update], controller: :team
+    resource :workspace, only: %i[show update], controller: :workspace
+    resource :team, only: :show, controller: :team
     resource :profile, only: %i[show update], controller: :profile
     resources :custom_fields, except: %i[show]
   end

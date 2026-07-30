@@ -31,7 +31,7 @@ module Ai
         workspace: @workspace,
         user: @user,
         write: false,
-        okm: Okm.configured?,
+        okm: @workspace.okm_configured?,
         memory: @memory,
         drive: @drive
       )
@@ -68,7 +68,7 @@ module Ai
     end
 
     def prefetch_okm(registry)
-      return "" unless Okm.configured?
+      return "" unless @workspace.okm_configured?
 
       sections = @prefetch_terms.first(2).filter_map do |term|
         next if term.blank?

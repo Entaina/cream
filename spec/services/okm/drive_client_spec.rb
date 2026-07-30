@@ -1,13 +1,29 @@
 require "rails_helper"
 
 RSpec.describe Okm::DriveClient do
+  fixtures :workspaces
+
   let(:drive_service) { instance_double(Google::Apis::DriveV3::DriveService) }
-  let(:client) { described_class.new(drive_service: drive_service) }
+  let(:okm_service_account_key) do
+    {
+      "type" => "service_account",
+      "project_id" => "test-project",
+      "private_key_id" => "key123",
+      "private_key" => "-----BEGIN PRIVATE KEY-----\ntest\n-----END PRIVATE KEY-----\n",
+      "client_email" => "okm@test.iam.gserviceaccount.com",
+      "client_id" => "123456789"
+    }.to_json
+  end
+  let(:workspace) do
+    workspaces(:one).tap do |record|
+      record.update!(okm_drive_id: "drive123", okm_service_account_key: okm_service_account_key)
+    end
+  end
+  let(:client) { described_class.new(workspace: workspace, drive_service: drive_service) }
   let(:memory_cache) { ActiveSupport::Cache::MemoryStore.new }
 
   before do
     allow(Okm::Configuration).to receive_messages(
-      drive_id: "drive123",
       cache_ttl: 3600,
       index_cache_ttl: 600,
       max_file_chars: 100,
@@ -206,5 +222,13 @@ RSpec.describe Okm::DriveClient do
         supports_all_drives: true
       ).once
     end
+  end
+
+  it "raises when the workspace is not configured" do
+    unconfigured = workspaces(:two)
+
+    expect {
+      described_class.new(workspace: unconfigured, drive_service: drive_service)
+    }.to raise_error(Okm::DriveClient::Error, /not configured/)
   end
 end

@@ -193,7 +193,7 @@ module CreamFeatures
       status: :ready,
       blockers: [
         "Requires CREAM_AI_API_KEY and the OpenAI Responses API (or compatible endpoint)",
-        "Uses OKM and llmemory when configured (OKM_DRIVE_ID + service account)"
+        "Uses OKM and llmemory when configured per workspace in Settings"
       ],
       enable_steps: []
     },
@@ -203,7 +203,7 @@ module CreamFeatures
       label: "OKM contextual chat",
       status: :ready,
       blockers: [
-        "Requires CREAM_AI_API_KEY, OKM_DRIVE_ID and GOOGLE_DRIVE_SERVICE_ACCOUNT_KEY_PATH with read access to the OKM shared drive"
+        "Requires CREAM_AI_API_KEY and OKM configured per workspace in Settings (Shared Drive ID + service account JSON)"
       ],
       enable_steps: []
     },

@@ -26,7 +26,7 @@ RSpec.describe "Settings::Team", type: :request do
       get settings_team_path
 
       expect(response.body).to include("Invite member")
-      expect(response.body).to include("Workspace settings")
+      expect(response.body).not_to include("Workspace settings")
     end
 
     it "hides management controls from members" do
@@ -37,76 +37,6 @@ RSpec.describe "Settings::Team", type: :request do
 
       expect(response).to have_http_status(:success)
       expect(response.body).not_to include("Invite member")
-    end
-  end
-
-  describe "PATCH /settings/team" do
-    it "renames the workspace for admins" do
-      patch settings_team_path, params: { workspace: { name: "Renamed Workspace" } }
-
-      expect(response).to redirect_to(settings_team_path)
-      expect(workspaces(:one).reload.name).to eq("Renamed Workspace")
-    end
-
-    it "forbids members from updating workspace settings" do
-      sign_in_as(member)
-      patch switch_workspace_path, params: { workspace_id: workspace.id }
-
-      patch settings_team_path, params: { workspace: { name: "Blocked" } }
-
-      expect(response).to redirect_to(root_path)
-      expect(workspaces(:one).reload.name).not_to eq("Blocked")
-    end
-
-    it "allows admins to enable sales director for the workspace" do
-      allow(CreamFeatures).to receive(:enabled?).and_call_original
-      allow(CreamFeatures).to receive(:enabled?).with(:sales_director).and_return(true)
-
-      patch settings_team_path, params: { workspace: { sales_director_enabled: true } }
-
-      expect(response).to redirect_to(settings_team_path)
-      expect(workspaces(:one).reload.sales_director_enabled?).to be(true)
-    end
-
-    it "forbids members from enabling sales director" do
-      sign_in_as(member)
-      patch switch_workspace_path, params: { workspace_id: workspace.id }
-
-      patch settings_team_path, params: { workspace: { sales_director_enabled: true } }
-
-      expect(response).to redirect_to(root_path)
-      expect(workspaces(:one).reload.sales_director_enabled?).to be(false)
-    end
-
-    it "allows admins to configure salesperson deal scope" do
-      patch settings_team_path, params: {
-        workspace: {
-          salespeople_can_view_all_deals: true,
-          salespeople_can_edit_all_deals: true
-        }
-      }
-
-      expect(response).to redirect_to(settings_team_path)
-      workspace.reload
-      expect(workspace.salespeople_can_view_all_deals?).to be(true)
-      expect(workspace.salespeople_can_edit_all_deals?).to be(true)
-    end
-
-    it "forbids members from configuring salesperson deal scope" do
-      sign_in_as(member)
-      patch switch_workspace_path, params: { workspace_id: workspace.id }
-
-      patch settings_team_path, params: {
-        workspace: {
-          salespeople_can_view_all_deals: true,
-          salespeople_can_edit_all_deals: true
-        }
-      }
-
-      expect(response).to redirect_to(root_path)
-      workspace.reload
-      expect(workspace.salespeople_can_view_all_deals?).to be(false)
-      expect(workspace.salespeople_can_edit_all_deals?).to be(false)
     end
   end
 end

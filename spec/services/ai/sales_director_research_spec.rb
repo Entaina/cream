@@ -14,10 +14,20 @@ RSpec.describe Ai::SalesDirectorResearch do
     )
   end
   let(:registry) { instance_double(Ai::Agent::ToolRegistry, definitions: [ { name: "search_records" } ]) }
+  let(:okm_service_account_key) do
+    {
+      "type" => "service_account",
+      "project_id" => "test-project",
+      "private_key_id" => "key123",
+      "private_key" => "-----BEGIN PRIVATE KEY-----\ntest\n-----END PRIVATE KEY-----\n",
+      "client_email" => "okm@test.iam.gserviceaccount.com",
+      "client_id" => "123456789"
+    }.to_json
+  end
 
   before do
+    workspace.update!(okm_drive_id: "drive123", okm_service_account_key: okm_service_account_key)
     allow(Ai::Configuration).to receive(:configured?).and_return(true)
-    allow(Okm).to receive(:configured?).and_return(true)
     allow(Ai::Agent::ToolRegistry).to receive(:new).and_return(registry)
     allow(registry).to receive(:execute).and_return("resultado")
     allow(registry).to receive(:prefetch_okm).and_return("Contexto OKM")

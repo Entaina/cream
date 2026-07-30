@@ -4,7 +4,7 @@
 
 Cream is a **workspace**-based CRM for managing **people**, **companies** and **deals** (opportunities), with notes, tasks, lists and an activity history shared across the team.
 
-> **Last revision:** 2026-07-29 (invoice number on deals)
+> **Last revision:** 2026-07-30 (OKM per workspace, Settings page)
 > This document describes the functionality **visible to the user**. Disabled features are listed at the end under "Coming soon".
 
 ---
@@ -31,14 +31,15 @@ Cream is a **workspace**-based CRM for managing **people**, **companies** and **
 18. [Webhooks](#18-webhooks)
 19. [Notifications](#19-notifications)
 20. [Team and invitations](#20-team-and-invitations)
-21. [API tokens](#21-api-tokens)
-22. [Reports](#22-reports)
-23. [AI assistant](#23-ai-assistant)
-24. [Knowledge chat](#24-knowledge-chat)
-25. [Stripe payments](#25-stripe-payments)
-26. [Lead capture forms](#26-lead-capture-forms)
-27. [Calendar bookings](#27-calendar-bookings)
-28. [Coming soon](#28-coming-soon)
+21. [Workspace settings](#21-workspace-settings)
+22. [API tokens](#22-api-tokens)
+23. [Reports](#23-reports)
+24. [AI assistant](#24-ai-assistant)
+25. [Knowledge chat](#25-knowledge-chat)
+26. [Stripe payments](#26-stripe-payments)
+27. [Lead capture forms](#27-lead-capture-forms)
+28. [Calendar bookings](#28-calendar-bookings)
+29. [Coming soon](#29-coming-soon)
 
 ---
 
@@ -109,11 +110,12 @@ The left sidebar concentrates the main navigation. On **small screens (mobile)**
 | **Pipelines**    | Sales pipeline configuration |
 | **API tokens**   | Tokens for MCP / API clients |
 | **Profile**      | Personal preferences in the workspace (pipeline, briefing, alert channels) |
+| **Settings**     | Workspace configuration (admins only): name, deal visibility, sales director, OKM |
 | **Team**         | Members and invitations |
 | **Custom fields**| Extra fields per record type |
 | **Lists**        | Custom lists (bottom of the menu) |
 
-Menu entries that depend on disabled features do not appear until they are enabled (see [Coming soon](#28-coming-soon)).
+Menu entries that depend on disabled features do not appear until they are enabled (see [Coming soon](#29-coming-soon)).
 
 ### Customizing the menu
 
@@ -152,7 +154,7 @@ The preference is stored on your user, so it persists across sessions and device
 
 The dashboard shows a workspace overview:
 
-- **Director de ventas (sales director):** daily AI-generated briefing with guidance for the team, classified as **Urgente** (urgent) and **Importante** (important). It only appears in workspaces where an administrator has enabled it in **Settings → Team** (checkbox *Briefing diario del director de ventas*), and it also requires AI to be configured on the server (`CREAM_AI_API_KEY`). Each user can turn it off for themselves in **Settings → Profile** (checkbox *Mostrar briefing del director de ventas en el dashboard*); you can also open Profile from your name at the bottom of the sidebar. To enrich the report, the director uses CRM read tools, Example's **OKM** (if configured) and **persistent memory** (llmemory) with learnings from previous briefings. In addition, each user who has it enabled receives a **Para ti** (for you) block with direct guidance, **Aciertos** (congratulations on recent wins) and **A mejorar** (mistakes or omissions with a recommendation). If a deal already has a **next action** (an open task with a future date), the briefing does not ask for parallel actions nor flags it as inactive; at most it may suggest **moving that date up**. Deals without an open task can appear as pending a defined next step. If there is no briefing for the day yet, you can click **Generar ahora** (generate now); if one already exists, you can click **Regenerar** (regenerate) up to 5 times a day (the number of regenerations you have left is shown). Guidance items can link to deals, people, companies or tasks; in the team block, the ones assigned to you are highlighted.
+- **Director de ventas (sales director):** daily AI-generated briefing with guidance for the team, classified as **Urgente** (urgent) and **Importante** (important). It only appears in workspaces where an administrator has enabled it in **Settings** (checkbox *Briefing diario del director de ventas*), and it also requires AI to be configured on the server (`CREAM_AI_API_KEY`). Each user can turn it off for themselves in **Settings → Profile** (checkbox *Mostrar briefing del director de ventas en el dashboard*); you can also open Profile from your name at the bottom of the sidebar. To enrich the report, the director uses CRM read tools, the workspace **OKM** (if configured) and **persistent memory** (llmemory) with learnings from previous briefings. In addition, each user who has it enabled receives a **Para ti** (for you) block with direct guidance, **Aciertos** (congratulations on recent wins) and **A mejorar** (mistakes or omissions with a recommendation). If a deal already has a **next action** (an open task with a future date), the briefing does not ask for parallel actions nor flags it as inactive; at most it may suggest **moving that date up**. Deals without an open task can appear as pending a defined next step. If there is no briefing for the day yet, you can click **Generar ahora** (generate now); if one already exists, you can click **Regenerar** (regenerate) up to 5 times a day (the number of regenerations you have left is shown). Guidance items can link to deals, people, companies or tasks; in the team block, the ones assigned to you are highlighted.
 - **Metric cards:** number of people, companies, open pipeline value and won revenue (deals in a *won* stage). Deal metrics respect the **active pipeline** (see above); people and companies cover the whole workspace.
 - **Pipeline by stage:** bars showing the distribution of deals per stage. If you have an active pipeline, the chart and the deal cards use that pipeline; if you choose **Todos los pipelines**, the chart shows the workspace's default pipeline and the cards add up all deals.
 - **Upcoming tasks:** upcoming pending tasks (mark them complete with one click).
@@ -662,7 +664,7 @@ account; do not share authorization links or tokens.
 ### Notes
 
 - **Inactive** automations do not run.
-- *Notify Slack* does nothing until the Slack integration is enabled (see [Coming soon](#28-coming-soon)).
+- *Notify Slack* does nothing until the Slack integration is enabled (see [Coming soon](#29-coming-soon)).
 
 ### Stage triggers (AI)
 
@@ -745,14 +747,6 @@ Useful for integrating Cream with other systems (Zapier, your own scripts, etc.)
 
 In **Team** (admins):
 
-### Workspace settings
-
-- Change the **workspace name**.
-- **Salespeople can view other users' deals** — when enabled, salespeople see all deals in the workspace on lists, boards and detail pages (not only their own or shared as collaborators).
-- **Salespeople can edit other users' deals** — when enabled, salespeople can update, move and delete any deal in the workspace. Enabling edit also allows viewing those deals.
-
-By default both options are off: salespeople only see and edit their own deals and those explicitly shared with them as collaborators.
-
 ### Inviting members
 
 1. Your colleague's email.
@@ -769,7 +763,33 @@ Invitees accept with the link they received and create an account, or sign in if
 
 ---
 
-## 21. API tokens
+## 21. Workspace settings
+
+In **Settings** (admins only):
+
+### General
+
+- Change the **workspace name**.
+- **Salespeople can view other users' deals** — when enabled, salespeople see all deals in the workspace on lists, boards and detail pages (not only their own or shared as collaborators).
+- **Salespeople can edit other users' deals** — when enabled, salespeople can update, move and delete any deal in the workspace. Enabling edit also allows viewing those deals.
+
+By default both options are off: salespeople only see and edit their own deals and those explicitly shared with them as collaborators.
+
+- **Sales director briefing (AI)** — enables the daily team briefing on the dashboard (requires `CREAM_AI_API_KEY` on the server).
+
+### OKM
+
+Connect the corporate knowledge base (Google Shared Drive) for the contextual chat and AI briefings:
+
+1. Enable **OKM chat for this workspace**.
+2. Enter the **Google Shared Drive ID** (from the Drive URL).
+3. Paste the **service account JSON** with read access to that drive. Once saved, the JSON is not shown again; the configured account email is displayed. Leave the field blank on later edits to keep the current key.
+
+Each workspace can use a different drive and service account.
+
+---
+
+## 22. API tokens
 
 In **API tokens** you generate access tokens to connect **MCP** clients (Claude, Cursor, etc.) or the **REST API v1** to your workspace.
 
@@ -781,7 +801,7 @@ Each token is tied to your user and to the workspace that was active when it was
 
 ---
 
-## 22. Reports
+## 23. Reports
 
 **Reports** let you measure your activity by combining a metric, a grouping and a period, and save the combinations you use most.
 
@@ -817,7 +837,7 @@ Cream will email you the report at that frequency. *(Scheduled delivery runs in 
 
 ---
 
-## 23. AI assistant
+## 24. AI assistant
 
 When the AI assistant is enabled and configured (`CREAM_AI_API_KEY`), you can use it on **person**, **company** and **deal** detail pages, and also via MCP/API.
 
@@ -857,7 +877,7 @@ The MCP tools `summarize_record`, `suggest_next_steps`, `draft_email`, `natural_
 
 ---
 
-## 24. Knowledge chat
+## 25. Knowledge chat
 
 In the **Example** workspace (when it is enabled and configured on the server), you will see a **floating chat button** in the bottom-right corner of any screen.
 
@@ -895,14 +915,13 @@ The panel header indicates the active context (e.g. *Contexto: Acme Corp*) or *C
 
 ### Requirements
 
-- Example workspace with the OKM chat enabled.
-- `CREAM_AI_API_KEY` configured.
-- Server read access to the OKM in Google Drive (`OKM_DRIVE_ID` and the backups service account).
+- Workspace with **OKM chat** enabled in **Settings** and a valid OKM configuration (Shared Drive ID + service account).
+- `CREAM_AI_API_KEY` configured on the server.
 - Database with the **pgvector** extension (for agent memory with llmemory).
 
 ---
 
-## 25. Stripe payments
+## 26. Stripe payments
 
 If your organization charges through Stripe (for example from another application), Cream can import those payments and help you **reconcile them with your deals**: each payment is linked to an existing deal or Cream proposes creating a new one.
 
@@ -956,7 +975,7 @@ When reconciling, the deal records the **payment received** activity with the am
 
 ---
 
-## 26. Lead capture forms
+## 27. Lead capture forms
 
 **Lead capture forms** let you receive leads from external pages. Each form is a public Cream page you can link to or embed in an `<iframe>`.
 
@@ -991,7 +1010,7 @@ In the sidebar menu, open **Formularios** (Forms).
 
 ---
 
-## 27. Calendar bookings
+## 28. Calendar bookings
 
 **Calendar bookings** let you offer a Calendly-like experience on a public Cream page: the visitor picks a meeting type, checks real availability in Google Calendar, books, and receives an email invitation (with Google Meet if applicable).
 
@@ -1054,7 +1073,7 @@ Three-step flow: choose event type → calendar and time (with an ES/EN time zon
 
 ---
 
-## 28. Coming soon
+## 29. Coming soon
 
 These features exist in the code but are **not available** in the interface until their implementation is complete (controlled by `CreamFeatures`):
 

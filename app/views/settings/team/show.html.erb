@@ -16,37 +16,6 @@
 
     <% if @admin %>
       <section class="card p-4 space-y-3">
-        <h2 class="text-base font-semibold text-ink">Workspace settings</h2>
-        <%= form_with model: current_workspace, url: settings_team_path, method: :patch, class: "space-y-3" do |f| %>
-          <div class="flex items-end gap-2">
-            <div class="flex-1">
-              <%= f.label :name, "Workspace name", class: "block text-sm font-medium text-ink-soft mb-1" %>
-              <%= f.text_field :name, class: "input w-full" %>
-            </div>
-            <%= f.submit "Save", class: "btn-secondary" %>
-          </div>
-          <label class="flex items-center gap-2 text-base">
-            <%= f.check_box :salespeople_can_view_all_deals %>
-            Los vendedores pueden ver los deals de otros
-          </label>
-          <label class="flex items-center gap-2 text-base">
-            <%= f.check_box :salespeople_can_edit_all_deals %>
-            Los vendedores pueden editar los deals de otros
-          </label>
-          <p class="text-sm text-ink-faint">Si solo activas editar, los vendedores también podrán ver esos deals.</p>
-          <% if feature_enabled?(:sales_director) %>
-            <label class="flex items-center gap-2 text-base">
-              <%= f.check_box :sales_director_enabled %>
-              Briefing diario del director de ventas (IA)
-            </label>
-            <% unless Ai::Configuration.configured? %>
-              <p class="text-sm text-ink-faint">Requiere configurar <code>CREAM_AI_API_KEY</code> en el servidor.</p>
-            <% end %>
-          <% end %>
-        <% end %>
-      </section>
-
-      <section class="card p-4 space-y-3">
         <h2 class="text-base font-semibold text-ink">Invite member</h2>
         <%= form_with url: invitations_path, class: "flex flex-wrap items-end gap-2" do %>
           <div class="flex-1 min-w-[12rem]">

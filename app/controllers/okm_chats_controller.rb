@@ -78,7 +78,7 @@ class OkmChatsController < ApplicationController
   private
 
   def ensure_okm_chat_workspace!
-    return if current_workspace&.okm_chat_enabled? && Okm.configured?
+    return if current_workspace&.okm_chat_enabled? && current_workspace.okm_configured?
 
     render json: { error: "OKM chat is not available for this workspace." }, status: :not_found
   end

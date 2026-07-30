@@ -97,7 +97,7 @@ Sales briefings, the contextual assistant and agent memory are enabled when an A
 |---|---|
 | `GOOGLE_DRIVE_SERVICE_ACCOUNT_KEY_PATH` | GCP service account JSON key for Drive backups — see [deploy/BACKUP_SETUP.md](deploy/BACKUP_SETUP.md) |
 | `GOOGLE_DRIVE_BACKUP_FOLDER_ID` | Destination folder in a Google Shared Drive |
-| `OKM_DRIVE_ID` | Shared Drive ID for the knowledge chat (uses the same service account) |
+| `OKM_CACHE_TTL` / `OKM_INDEX_CACHE_TTL` | OKM document and index cache TTLs (Drive ID and service account are set per workspace in **Settings**) |
 
 ### Anti-spam (optional)
 

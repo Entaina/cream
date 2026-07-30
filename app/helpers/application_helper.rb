@@ -323,7 +323,13 @@ module ApplicationHelper
     settings = [
       sidebar_nav_item("profile", "Profile", settings_profile_path, :users, request.path.start_with?("/settings/profile")),
       sidebar_nav_item("pipelines", "Pipelines", pipelines_path, :columns, request.path.start_with?("/pipelines")),
-      sidebar_nav_item("api_tokens", "API tokens", api_tokens_path, :globe, request.path.start_with?("/api_tokens")),
+      sidebar_nav_item("api_tokens", "API tokens", api_tokens_path, :globe, request.path.start_with?("/api_tokens"))
+    ]
+    if current_membership&.admin?
+      settings << sidebar_nav_item("workspace", "Settings", settings_workspace_path, :settings,
+        request.path.start_with?("/settings/workspace"))
+    end
+    settings += [
       sidebar_nav_item("team", "Team", settings_team_path, :users, request.path.start_with?("/settings/team")),
       sidebar_nav_item("custom_fields", "Custom fields", settings_custom_fields_path, :columns, request.path.start_with?("/settings/custom_fields"))
     ]
@@ -458,7 +464,7 @@ module ApplicationHelper
   def okm_chat_enabled?
     feature_enabled?(:okm_chat) &&
       Ai::Configuration.configured? &&
-      Okm.configured? &&
+      current_workspace&.okm_configured? &&
       current_workspace&.okm_chat_enabled?
   end
 
