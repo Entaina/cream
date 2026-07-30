@@ -4,7 +4,7 @@ class AlertRulesController < ApplicationController
   before_action :set_alert_rule, only: %i[edit update destroy]
 
   def index
-    @alert_rules = policy_scope(current_workspace.alert_rules).order(:name)
+    @alert_rules = policy_scope(current_workspace.alert_rules).includes(:alert_conditions).order(:name)
     authorize AlertRule
   end
 
@@ -12,8 +12,7 @@ class AlertRulesController < ApplicationController
     @alert_rule = current_workspace.alert_rules.new(
       trigger_field: AlertRule::TRIGGER_FIELDS.first,
       recipient: AlertRule::RECIPIENTS.first,
-      offset_days: 0,
-      conditions: []
+      offset_days: 0
     )
     authorize @alert_rule
   end
@@ -55,8 +54,6 @@ class AlertRulesController < ApplicationController
   end
 
   def alert_rule_params
-    permitted = params.require(:alert_rule).permit(:name, :trigger_field, :offset_days, :recipient, :active, conditions: [])
-    permitted[:conditions] = Array(permitted[:conditions]).map(&:to_s).select(&:present?) & AlertRule::CONDITIONS
-    permitted
+    params.require(:alert_rule).permit(:name, :trigger_field, :offset_days, :recipient, :active)
   end
 end

@@ -35,16 +35,18 @@
 
       <fieldset class="space-y-2">
         <legend class="label">Condiciones adicionales</legend>
-        <p class="text-sm text-ink-faint">Todas las condiciones marcadas deben cumplirse.</p>
-        <% AlertRule::CONDITIONS.each do |condition| %>
-          <label class="flex items-center gap-2 text-base">
-            <%= check_box_tag "alert_rule[conditions][]", condition,
-                  Array(alert_rule.conditions).include?(condition),
-                  id: "alert_rule_conditions_#{condition}" %>
-            <%= AlertRule::CONDITION_LABELS.fetch(condition) %>
-          </label>
+        <% if alert_rule.persisted? %>
+          <p class="text-sm text-ink-faint">
+            Todas las condiciones activas deben cumplirse además del disparador de fecha.
+          </p>
+          <%= link_to alert_rule_alert_conditions_path(alert_rule), class: "btn-secondary inline-flex" do %>
+            Condiciones adicionales (<%= alert_rule.alert_conditions.count %>)
+          <% end %>
+        <% else %>
+          <p class="text-sm text-ink-faint">
+            Tras crear la alerta podrás añadir condiciones sobre campos del deal, la empresa o los contactos.
+          </p>
         <% end %>
-        <%= hidden_field_tag "alert_rule[conditions][]", "" %>
       </fieldset>
 
       <div>

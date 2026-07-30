@@ -19,23 +19,18 @@ RSpec.describe AlertRule, type: :model do
     expect(rule).not_to be_valid
   end
 
-  it "rejects unknown conditions" do
-    rule = workspace.alert_rules.new(
+  it "destroys associated alert conditions" do
+    rule = workspace.alert_rules.create!(
       name: "Test",
       trigger_field: "edition_ends_on",
-      recipient: "deal_owner",
-      conditions: [ "unknown" ]
+      recipient: "deal_owner"
     )
-    expect(rule).not_to be_valid
-  end
+    rule.alert_conditions.create!(
+      workspace: workspace,
+      field: "company.fiscal_information",
+      operator: "blank"
+    )
 
-  it "accepts known conditions" do
-    rule = workspace.alert_rules.new(
-      name: "Test",
-      trigger_field: "edition_ends_on",
-      recipient: "deal_owner",
-      conditions: %w[company_without_fiscal_info deal_open]
-    )
-    expect(rule).to be_valid
+    expect { rule.destroy }.to change(AlertCondition, :count).by(-1)
   end
 end

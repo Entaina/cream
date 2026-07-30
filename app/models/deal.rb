@@ -92,6 +92,11 @@ class Deal < ApplicationRecord
   def stage_label = pipeline_stage&.name
   def stage_color = pipeline_stage&.color
 
+  # Used by field conditions (alerts, stage entry rules): deal is not in a closed stage.
+  def open
+    pipeline_stage.present? && !pipeline_stage.closed?
+  end
+
   def display_name = name
 
   def next_pending_task

@@ -25,6 +25,7 @@ class Workspace < ApplicationRecord
   has_many :webhooks, dependent: :destroy
   has_many :automations, dependent: :destroy
   has_many :alert_rules, dependent: :destroy
+  has_many :alert_conditions, dependent: :destroy
   has_many :slack_integrations, dependent: :destroy
   has_many :reports, dependent: :destroy
   has_many :sales_briefings, dependent: :destroy

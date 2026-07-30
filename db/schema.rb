@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_30_100000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_30_120001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -58,6 +58,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_100000) do
     t.index ["workspace_id"], name: "index_activities_on_workspace_id"
   end
 
+  create_table "alert_conditions", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.bigint "alert_rule_id", null: false
+    t.string "compare_value"
+    t.datetime "created_at", null: false
+    t.string "field", null: false
+    t.string "operator", default: "eq", null: false
+    t.integer "position", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.bigint "workspace_id", null: false
+    t.index ["alert_rule_id"], name: "index_alert_conditions_on_alert_rule_id"
+    t.index ["workspace_id"], name: "index_alert_conditions_on_workspace_id"
+  end
+
   create_table "alert_deliveries", force: :cascade do |t|
     t.bigint "alert_rule_id", null: false
     t.datetime "created_at", null: false
@@ -72,7 +86,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_100000) do
 
   create_table "alert_rules", force: :cascade do |t|
     t.boolean "active", default: true, null: false
-    t.jsonb "conditions", default: [], null: false
     t.datetime "created_at", null: false
     t.string "name", null: false
     t.integer "offset_days", default: 0, null: false
@@ -1186,6 +1199,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_100000) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "activities", "users"
   add_foreign_key "activities", "workspaces"
+  add_foreign_key "alert_conditions", "alert_rules"
+  add_foreign_key "alert_conditions", "workspaces"
   add_foreign_key "alert_deliveries", "alert_rules"
   add_foreign_key "alert_deliveries", "deals"
   add_foreign_key "alert_deliveries", "users"

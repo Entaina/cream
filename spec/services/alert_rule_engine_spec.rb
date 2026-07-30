@@ -13,8 +13,14 @@ RSpec.describe AlertRuleEngine, type: :service do
       name: "Edición finalizada sin datos fiscales",
       trigger_field: "edition_ends_on",
       offset_days: 0,
-      conditions: %w[company_without_fiscal_info],
       recipient: "deal_owner"
+    )
+  end
+  let!(:fiscal_condition) do
+    rule.alert_conditions.create!(
+      workspace: workspace,
+      field: "company.fiscal_information",
+      operator: "blank"
     )
   end
 
@@ -75,6 +81,17 @@ RSpec.describe AlertRuleEngine, type: :service do
   it "does not match when the company has fiscal information" do
     company.update!(fiscal_information: "B12345678")
     create_matching_deal
+
+    expect {
+      described_class.run!(workspace)
+    }.not_to change(AlertDelivery, :count)
+  end
+
+  it "does not match when deal open condition fails" do
+    rule.alert_conditions.create!(workspace: workspace, field: "open", operator: "eq", compare_value: "true")
+    deal = create_matching_deal
+    closed_stage = pipeline.pipeline_stages.find_by!(closed: true)
+    deal.update!(pipeline_stage: closed_stage)
 
     expect {
       described_class.run!(workspace)

@@ -8,10 +8,13 @@ class AlertRuleEngine
   def initialize(rule)
     @rule = rule
     @workspace = rule.workspace
+    @active_conditions = rule.alert_conditions.active.ordered.to_a
   end
 
   def run!
-    matching_deals.find_each do |deal|
+    candidate_deals.find_each do |deal|
+      next unless conditions_met?(deal)
+
       recipients_for(deal).each do |user, membership|
         next if already_delivered?(deal, user)
 
@@ -23,14 +26,13 @@ class AlertRuleEngine
 
   private
 
-  attr_reader :rule, :workspace
+  attr_reader :rule, :workspace, :active_conditions
 
-  def matching_deals
+  def candidate_deals
     scope = workspace.deals
     scope = apply_trigger(scope)
-    scope = apply_conditions(scope)
     scope = scope.where.not(owner_id: nil) if rule.recipient == "deal_owner"
-    scope.distinct
+    scope.distinct.preload(:company, :contacts, :pipeline_stage)
   end
 
   def apply_trigger(scope)
@@ -52,17 +54,8 @@ class AlertRuleEngine
     end
   end
 
-  def apply_conditions(scope)
-    Array(rule.conditions).each do |condition|
-      case condition
-      when "company_without_fiscal_info"
-        scope = scope.joins(:company)
-          .where("companies.fiscal_information IS NULL OR companies.fiscal_information = ''")
-      when "deal_open"
-        scope = scope.joins(:pipeline_stage).where(pipeline_stages: { closed: false })
-      end
-    end
-    scope
+  def conditions_met?(deal)
+    active_conditions.all? { |condition| condition.met?(deal) }
   end
 
   def recipients_for(deal)

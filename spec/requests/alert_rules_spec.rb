@@ -35,14 +35,13 @@ RSpec.describe "AlertRules", type: :request do
             trigger_field: "edition_ends_on",
             offset_days: 0,
             recipient: "deal_owner",
-            active: "1",
-            conditions: [ "company_without_fiscal_info", "" ]
+            active: "1"
           }
         }
       }.to change(AlertRule, :count).by(1)
 
       rule = AlertRule.order(:id).last
-      expect(rule.conditions).to eq([ "company_without_fiscal_info" ])
+      expect(rule.name).to eq("Fin de edición")
       expect(response).to redirect_to(alert_rules_path)
     end
 

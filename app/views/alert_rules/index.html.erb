@@ -26,8 +26,9 @@
           <% if alert_rule.offset_days != 0 %>
             (<%= alert_rule.offset_days %> días)
           <% end %>
-          <% if alert_rule.conditions.present? %>
-            y <%= alert_rule.condition_labels.join(" y ") %>
+          <% active_conditions = alert_rule.alert_conditions.select(&:active?) %>
+          <% if active_conditions.any? %>
+            y <%= active_conditions.map(&:describe).join(" y ") %>
           <% end %>
           → <strong><%= alert_rule.recipient_label %></strong>
         </p>
