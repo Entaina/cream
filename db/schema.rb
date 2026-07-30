@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_29_130000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_30_100000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -532,6 +532,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_29_130000) do
     t.datetime "created_at", null: false
     t.jsonb "data", default: {}, null: false
     t.text "search_text"
+    t.text "search_tokens"
     t.datetime "updated_at", null: false
     t.string "user_id", null: false
     t.index ["user_id"], name: "index_llmemory_episodes_on_user_id"
@@ -543,6 +544,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_29_130000) do
     t.datetime "created_at", null: false
     t.float "importance", default: 0.7
     t.jsonb "provenance"
+    t.text "search_tokens"
     t.string "source_resource_id"
     t.datetime "updated_at", null: false
     t.string "user_id", null: false
@@ -561,6 +563,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_29_130000) do
 
   create_table "llmemory_resources", id: :string, force: :cascade do |t|
     t.datetime "created_at", null: false
+    t.text "search_tokens"
     t.text "text", null: false
     t.datetime "updated_at", null: false
     t.string "user_id", null: false
@@ -571,7 +574,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_29_130000) do
     t.datetime "archived_at"
     t.datetime "created_at", null: false
     t.jsonb "data", default: {}, null: false
+    t.text "name_det"
     t.text "search_text"
+    t.text "search_tokens"
     t.datetime "updated_at", null: false
     t.string "user_id", null: false
     t.index ["user_id"], name: "index_llmemory_skills_on_user_id"
