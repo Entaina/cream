@@ -5,7 +5,8 @@ class StageCondition < ApplicationRecord
     "value" => "Valor",
     "probability" => "Probabilidad",
     "expected_close_date" => "Fecha de cierre",
-    "name" => "Nombre"
+    "name" => "Nombre",
+    "invoice_number" => "Nº factura"
   }.freeze
 
   COMPANY_FIELDS = {

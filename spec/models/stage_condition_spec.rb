@@ -117,6 +117,23 @@ RSpec.describe StageCondition, type: :model do
       deal.update!(name: "Acme — Annual plan")
       expect(condition.met?(deal)).to be(true)
     end
+
+    it "evaluates invoice_number present/blank" do
+      condition = build_condition(field: "invoice_number", operator: "present", compare_value: nil)
+      condition.save!
+      expect(condition.met?(deal)).to be(false)
+
+      deal.update_column(:invoice_number, "FAC-2026-001")
+      expect(condition.reload.met?(deal)).to be(true)
+    end
+  end
+
+  describe ".field_options" do
+    it "includes invoice_number among deal fields" do
+      deal_group = described_class.field_options(workspace).find { |label, _| label == "Deal" }
+      keys = deal_group.last.map(&:last)
+      expect(keys).to include("invoice_number")
+    end
   end
 
   describe "deal stage validation" do
