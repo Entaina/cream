@@ -697,7 +697,7 @@ The alerts are only seen by **the user who moved the deal**; if the stage change
    - *Inicio de edición* (Edition start) — edition start date on a deal line.
    - *Fecha de cierre esperada del deal* (Deal expected close date) — deal field.
 3. **Offset (days):** `0` = same day; negative values notify in advance (e.g. `-7` = one week before).
-4. **Additional conditions** (optional; all must be met): after creating the alert, open **Condiciones adicionales** (Additional conditions) and add rules on deal, company or contact fields (same system as pipeline stage entry conditions: field, operator and value). Common examples:
+4. **Additional conditions** (optional; all must be met): on the same create or edit screen, click **Añadir condición** (Add condition) and define rules on deal, company or contact fields (same system as pipeline stage entry conditions: field, operator and value). Common examples:
    - *Información fiscal de la empresa* (Company fiscal information) → *está vacío* (is blank)
    - *Abierto (no ganado ni perdido)* (Open — not won or lost) → *es igual a* (equals) → `true`
 5. **Recipient:** *Owner del deal* (Deal owner) or *Administradores del workspace* (Workspace admins).

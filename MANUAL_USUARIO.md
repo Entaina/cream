@@ -697,7 +697,7 @@ Entrada **Alertas** en el menú lateral; pulsa **Nueva alerta**.
    - *Inicio de edición* — fecha de inicio de la edición en una línea del deal.
    - *Fecha de cierre esperada del deal* — campo del deal.
 3. **Desfase (días):** `0` = el mismo día; valores negativos avisan con antelación (p. ej. `-7` = una semana antes).
-4. **Condiciones adicionales** (opcional; todas deben cumplirse): tras crear la alerta, entra en **Condiciones adicionales** y añade reglas sobre campos del deal, la empresa o los contactos (mismo sistema que las condiciones de entrada a una etapa del pipeline: campo, operador y valor). Ejemplos habituales:
+4. **Condiciones adicionales** (opcional; todas deben cumplirse): en la misma pantalla de creación o edición, pulsa **Añadir condición** y define reglas sobre campos del deal, la empresa o los contactos (mismo sistema que las condiciones de entrada a una etapa del pipeline: campo, operador y valor). Ejemplos habituales:
    - *Información fiscal de la empresa* → *está vacío*
    - *Abierto (no ganado ni perdido)* → *es igual a* → `true`
 5. **Destinatario:** *Owner del deal* o *Administradores del workspace*.

@@ -5,6 +5,8 @@ class AlertCondition < ApplicationRecord
   belongs_to :workspace
   belongs_to :alert_rule
 
+  before_validation { self.workspace ||= alert_rule&.workspace }
+
   validate :alert_rule_belongs_to_workspace
 
   private

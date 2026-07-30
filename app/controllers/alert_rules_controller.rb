@@ -50,10 +50,13 @@ class AlertRulesController < ApplicationController
   private
 
   def set_alert_rule
-    @alert_rule = policy_scope(current_workspace.alert_rules).find(params[:id])
+    @alert_rule = policy_scope(current_workspace.alert_rules).includes(:alert_conditions).find(params[:id])
   end
 
   def alert_rule_params
-    params.require(:alert_rule).permit(:name, :trigger_field, :offset_days, :recipient, :active)
+    params.require(:alert_rule).permit(
+      :name, :trigger_field, :offset_days, :recipient, :active,
+      alert_conditions_attributes: %i[id field operator compare_value active _destroy]
+    )
   end
 end

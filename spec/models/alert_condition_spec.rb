@@ -33,6 +33,12 @@ RSpec.describe AlertCondition, type: :model do
       expect(build_condition(alert_rule: other_rule)).not_to be_valid
     end
 
+    it "inherits workspace from the alert rule" do
+      condition = rule.alert_conditions.build(field: "value", operator: "gt", compare_value: "1000")
+      condition.valid?
+      expect(condition.workspace).to eq(workspace)
+    end
+
     it "evaluates company fiscal information blank" do
       condition = build_condition(field: "company.fiscal_information", operator: "blank", compare_value: nil)
       condition.save!
