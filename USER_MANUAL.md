@@ -745,15 +745,23 @@ Useful for integrating Cream with other systems (Zapier, your own scripts, etc.)
 
 ## 20. Team and invitations
 
-In **Team** (admins):
+**Team** is available to all workspace members. Use the search box to find members by name or email; the list is paginated.
 
-### Inviting members
+### For all members
+
+- Browse the **Members** list with each person's name, email and role.
+
+### For admins only
+
+In **Team**, administrators can also:
+
+#### Inviting members
 
 1. Your colleague's email.
 2. Role: **Admin**, **Director comercial** (Sales director) or **Vendedor** (Salesperson).
 3. **Send invitation** — an email with a link is sent (or the link is displayed to copy).
 
-### Managing members
+#### Managing members
 
 - Change a member's role (dropdown selector).
 - Remove a member from the workspace.

@@ -113,7 +113,7 @@ class User < ApplicationRecord
   def self.sidebar_default_keys
     base = %w[dashboard people companies deals products tasks]
     feature_keys = CreamFeatures.menu_entries.keys.map(&:to_s)
-    base + feature_keys + %w[pipelines api_tokens profile team custom_fields]
+    base + feature_keys + %w[pipelines api_tokens profile workspace team custom_fields]
   end
 
   def sidebar_order

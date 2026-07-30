@@ -745,15 +745,23 @@ En **Webhooks** configuras URLs que Cream llamará cuando ocurran eventos (p. ej
 
 ## 20. Equipo e invitaciones
 
-En **Team** (admins):
+**Team** está disponible para todos los miembros del workspace. Usa el buscador para encontrar miembros por nombre o email; el listado está paginado.
 
-### Invitar miembros
+### Para todos los miembros
+
+- Consultar el listado de **Members** con nombre, email y rol de cada persona.
+
+### Solo para admins
+
+En **Team**, los administradores además pueden:
+
+#### Invitar miembros
 
 1. Email del compañero.
 2. Rol: **Admin**, **Director comercial** o **Vendedor**.
 3. **Send invitation** — se envía un email con enlace (o se muestra el enlace para copiar).
 
-### Gestionar miembros
+#### Gestionar miembros
 
 - Cambiar el rol de un miembro (selector desplegable).
 - Eliminar un miembro del workspace.

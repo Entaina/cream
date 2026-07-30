@@ -5,7 +5,7 @@ class InvitationPolicy < ApplicationPolicy
 
   class Scope < Scope
     def resolve
-      return scope.none unless member?
+      return scope.none unless context.admin?
 
       scope.where(workspace: workspace)
     end

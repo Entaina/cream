@@ -21,6 +21,15 @@ class Membership < ApplicationRecord
 
   scope :admins, -> { where(role: "admin") }
 
+  scope :search, ->(q) {
+    if q.present?
+      joins(:user).where(
+        "users.name ILIKE :q OR users.email_address ILIKE :q",
+        q: "%#{sanitize_sql_like(q)}%"
+      )
+    end
+  }
+
   def admin?
     role == "admin"
   end

@@ -1,13 +1,29 @@
 <% page_title "Team" %>
-<%= render "shared/page_header", title: "Team", icon_name: :users, count: @memberships.size, actions: nil %>
+<%= render "shared/page_header", title: "Team", icon_name: :users, count: @pagy.count, actions: nil %>
 
-<div class="flex-1 overflow-y-auto scrollbar-subtle p-5">
-  <div class="max-w-2xl space-y-6">
+<div class="flex flex-wrap items-center gap-2 border-b border-line px-5 py-2 shrink-0">
+  <%= form_with url: settings_team_path, method: :get, class: "flex flex-wrap items-center gap-2 flex-1", data: { turbo_frame: "_top" } do %>
+    <div class="relative max-w-xs min-w-40 flex-1">
+      <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-ink-faint"><%= icon :search, classes: "size-3.5" %></span>
+      <%= text_field_tag :q, params[:q], placeholder: "Search members...", class: "input pl-8" %>
+    </div>
+    <% if params[:q].present? %>
+      <%= link_to "Clear", settings_team_path, class: "btn-ghost" %>
+    <% end %>
+  <% end %>
+</div>
+
+<div class="flex-1 overflow-y-auto scrollbar-subtle p-5 flex flex-col">
+  <div class="max-w-2xl space-y-6 flex-1">
     <p class="text-base text-ink-soft">
-      Manage workspace members, roles, and invitations for <strong><%= current_workspace.name %></strong>.
+      <% if @admin %>
+        Manage workspace members, roles, and invitations for <strong><%= current_workspace.name %></strong>.
+      <% else %>
+        Workspace members of <strong><%= current_workspace.name %></strong>.
+      <% end %>
     </p>
 
-    <% if flash[:invitation_link].present? %>
+    <% if @admin && flash[:invitation_link].present? %>
       <div class="card p-4 border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950">
         <p class="text-base font-medium text-ink mb-2">Invitation link (copy and share):</p>
         <code class="block text-sm font-mono bg-canvas-raised border border-line rounded-md px-3 py-2 break-all select-all"><%= flash[:invitation_link] %></code>
@@ -37,32 +53,38 @@
 
     <section class="space-y-2">
       <h2 class="text-base font-semibold text-ink px-1">Members</h2>
-      <ul class="space-y-2">
-        <% @memberships.each do |membership| %>
-          <li class="card flex items-center gap-3 px-4 py-3">
-            <%= avatar membership.user, size: "size-8", text: "text-sm" %>
-            <div class="min-w-0 flex-1">
-              <p class="text-base font-medium truncate"><%= membership.user.name %></p>
-              <p class="text-xs text-ink-faint truncate"><%= membership.user.email_address %></p>
-            </div>
-            <% if @admin && membership.user_id != current_user.id %>
-              <%= form_with model: membership, url: membership_path(membership), method: :patch, class: "flex items-center gap-2" do |f| %>
-                <%= f.select :role, Membership::ROLES.map { |r| [ Membership::ROLE_LABELS[r], r ] }, {}, class: "input text-sm py-1", onchange: "this.form.requestSubmit()" %>
+      <% if @memberships.any? %>
+        <ul class="space-y-2">
+          <% @memberships.each do |membership| %>
+            <li class="card flex items-center gap-3 px-4 py-3">
+              <%= avatar membership.user, size: "size-8", text: "text-sm" %>
+              <div class="min-w-0 flex-1">
+                <p class="text-base font-medium truncate"><%= membership.user.name %></p>
+                <p class="text-xs text-ink-faint truncate"><%= membership.user.email_address %></p>
+              </div>
+              <% if @admin && membership.user_id != current_user.id %>
+                <%= form_with model: membership, url: membership_path(membership), method: :patch, class: "flex items-center gap-2" do |f| %>
+                  <%= f.select :role, Membership::ROLES.map { |r| [ Membership::ROLE_LABELS[r], r ] }, {}, class: "input text-sm py-1", onchange: "this.form.requestSubmit()" %>
+                <% end %>
+                <%= button_to membership_path(membership), method: :delete,
+                      class: "text-ink-faint hover:text-danger p-1.5 rounded-md hover:bg-danger-soft",
+                      title: "Remove member" do %>
+                  <%= icon :trash, classes: "size-4" %>
+                <% end %>
+              <% else %>
+                <span class="text-sm font-medium text-ink-soft"><%= membership.role_label %></span>
               <% end %>
-              <%= button_to membership_path(membership), method: :delete,
-                    class: "text-ink-faint hover:text-danger p-1.5 rounded-md hover:bg-danger-soft",
-                    title: "Remove member" do %>
-                <%= icon :trash, classes: "size-4" %>
-              <% end %>
-            <% else %>
-              <span class="text-sm font-medium text-ink-soft"><%= membership.role_label %></span>
-            <% end %>
-          </li>
-        <% end %>
-      </ul>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p class="text-base text-ink-soft px-1">
+          <%= params[:q].present? ? "No members match your search." : "No members yet." %>
+        </p>
+      <% end %>
     </section>
 
-    <% if @pending_invitations.any? %>
+    <% if @admin && @pending_invitations.any? %>
       <section class="space-y-2">
         <h2 class="text-base font-semibold text-ink px-1">Pending invitations</h2>
         <ul class="space-y-2">
@@ -75,17 +97,15 @@
                   · expires <%= l invitation.expires_at, format: :short %>
                 </p>
               </div>
-              <% if @admin %>
-                <%= button_to resend_invitation_path(invitation), method: :post,
-                      class: "btn-ghost text-sm",
-                      title: "Resend invitation" do %>
-                  Resend
-                <% end %>
-                <%= button_to invitation_path(invitation), method: :delete,
-                      class: "text-ink-faint hover:text-danger p-1.5 rounded-md hover:bg-danger-soft",
-                      title: "Revoke invitation" do %>
-                  <%= icon :trash, classes: "size-4" %>
-                <% end %>
+              <%= button_to resend_invitation_path(invitation), method: :post,
+                    class: "btn-ghost text-sm",
+                    title: "Resend invitation" do %>
+                Resend
+              <% end %>
+              <%= button_to invitation_path(invitation), method: :delete,
+                    class: "text-ink-faint hover:text-danger p-1.5 rounded-md hover:bg-danger-soft",
+                    title: "Revoke invitation" do %>
+                <%= icon :trash, classes: "size-4" %>
               <% end %>
             </li>
           <% end %>
@@ -93,4 +113,6 @@
       </section>
     <% end %>
   </div>
+
+  <%= render "shared/pagination", pagy: @pagy %>
 </div>
