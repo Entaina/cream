@@ -388,6 +388,10 @@ module ApplicationHelper
     raw MentionParser.render_html(text, workspace: current_workspace)
   end
 
+  def auto_link_html(text)
+    raw AutoLinker.render_html(text)
+  end
+
   def resolve_reference_record(field, value)
     return nil if value.blank? || field.reference_type.blank? || current_workspace.nil?
 

@@ -30,7 +30,7 @@
         <% if n.title.present? %>
           <p class="text-base font-semibold mb-0.5"><%= n.title %></p>
         <% end %>
-        <p class="text-base text-ink-soft whitespace-pre-wrap"><%= n.body %></p>
+        <p class="text-base text-ink-soft whitespace-pre-wrap"><%= auto_link_html(n.body) %></p>
       </article>
     <% end %>
   </div>

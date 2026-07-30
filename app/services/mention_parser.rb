@@ -11,16 +11,15 @@ class MentionParser
   end
 
   def self.render_html(text, workspace:)
-    return "" if text.blank?
-
-    escaped = ERB::Util.html_escape(text)
-    escaped.gsub(MENTION_PATTERN) do |match|
-      handle = Regexp.last_match(1)
-      user = user_for_handle(handle, workspace: workspace)
-      if user
-        %(<span class="text-accent font-medium">@#{ERB::Util.html_escape(user.name)}</span>)
-      else
-        match
+    AutoLinker.render_html(text) do |segment|
+      segment.gsub(MENTION_PATTERN) do |match|
+        handle = Regexp.last_match(1)
+        user = user_for_handle(handle, workspace: workspace)
+        if user
+          %(<span class="text-accent font-medium">@#{CGI.escapeHTML(user.name)}</span>)
+        else
+          match
+        end
       end
     end
   end
