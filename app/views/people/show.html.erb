@@ -48,9 +48,9 @@
 
     <div class="mt-4">
       <h3 class="text-sm font-semibold uppercase tracking-wider text-ink-faint mb-1.5">Deals</h3>
-      <% if @person.deals.any? %>
+      <% if @deals.any? %>
         <ul class="space-y-1">
-          <% @person.deals.each do |deal| %>
+          <% @deals.each do |deal| %>
             <li>
               <%= link_to deal_path(deal), class: "flex items-center justify-between gap-2 rounded-md px-2 py-1.5 hover:bg-canvas-sunken text-base" do %>
                 <span class="truncate font-medium"><%= deal.name %></span>

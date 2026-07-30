@@ -31,6 +31,12 @@ class PeopleController < ApplicationController
 
   def show
     authorize @person
+    @deals = policy_scope(current_workspace.deals)
+      .joins(:contacts)
+      .where(people: { id: @person.id })
+      .distinct
+      .includes(:pipeline_stage)
+      .order(:name)
     @okm_chat_record = @person
     @activities = @person.activities.includes(:user, :subject).recent_first.limit(50)
     @note = Note.new

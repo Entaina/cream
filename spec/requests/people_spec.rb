@@ -199,6 +199,47 @@ RSpec.describe "People", type: :request do
       expect(response.body).to include('selected="selected" value="' + other.id.to_s + '"')
       expect(response.body).to include("No deals yet.")
     end
+
+    describe "deal visibility" do
+      let(:admin) { users(:one) }
+      let(:salesperson) { users(:two) }
+      let!(:pipeline) { Pipeline.create_default!(workspace) }
+      let(:company) { create_company!(workspace) }
+      let(:person) { create_person!(workspace, company: company) }
+
+      def sign_in_to_workspace!(user)
+        sign_in_as(user)
+        patch switch_workspace_path, params: { workspace_id: workspace.id }
+      end
+
+      it "limits a salesperson to owned and shared deals" do
+        create_deal!(workspace, pipeline: pipeline, company: company, contacts: [ person ], owner: salesperson, name: "Own person deal")
+        shared_deal = create_deal!(workspace, pipeline: pipeline, company: company, contacts: [ person ], owner: admin, name: "Shared person deal")
+        shared_deal.deal_accesses.create!(user: salesperson)
+        create_deal!(workspace, pipeline: pipeline, company: company, contacts: [ person ], owner: admin, name: "Hidden person deal")
+        sign_in_to_workspace!(salesperson)
+
+        get person_path(person)
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include("Own person deal")
+        expect(response.body).to include("Shared person deal")
+        expect(response.body).not_to include("Hidden person deal")
+      end
+
+      context "when salespeople_can_view_all_deals is enabled" do
+        before { workspace.update!(salespeople_can_view_all_deals: true) }
+
+        it "allows a salesperson to see all person deals" do
+          create_deal!(workspace, pipeline: pipeline, company: company, contacts: [ person ], owner: admin, name: "Other person deal")
+          sign_in_to_workspace!(salesperson)
+
+          get person_path(person)
+
+          expect(response.body).to include("Other person deal")
+        end
+      end
+    end
   end
 
   describe "POST /people.json (inline contact creation)" do

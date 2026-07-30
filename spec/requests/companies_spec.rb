@@ -110,6 +110,47 @@ RSpec.describe "Companies", type: :request do
       expect(response).to have_http_status(:success)
       expect(response.body).to include("Fiscal information")
     end
+
+    describe "deal visibility" do
+      let(:admin) { users(:one) }
+      let(:salesperson) { users(:two) }
+      let!(:pipeline) { Pipeline.create_default!(workspace) }
+
+      def sign_in_to_workspace!(user)
+        sign_in_as(user)
+        patch switch_workspace_path, params: { workspace_id: workspace.id }
+      end
+
+      it "limits a salesperson to owned and shared deals" do
+        company = create_company!(workspace)
+        create_deal!(workspace, pipeline: pipeline, company: company, owner: salesperson, name: "Own company deal")
+        shared_deal = create_deal!(workspace, pipeline: pipeline, company: company, owner: admin, name: "Shared company deal")
+        shared_deal.deal_accesses.create!(user: salesperson)
+        create_deal!(workspace, pipeline: pipeline, company: company, owner: admin, name: "Hidden company deal")
+        sign_in_to_workspace!(salesperson)
+
+        get company_path(company)
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include("Own company deal")
+        expect(response.body).to include("Shared company deal")
+        expect(response.body).not_to include("Hidden company deal")
+      end
+
+      context "when salespeople_can_view_all_deals is enabled" do
+        before { workspace.update!(salespeople_can_view_all_deals: true) }
+
+        it "allows a salesperson to see all company deals" do
+          company = create_company!(workspace)
+          create_deal!(workspace, pipeline: pipeline, company: company, owner: admin, name: "Other company deal")
+          sign_in_to_workspace!(salesperson)
+
+          get company_path(company)
+
+          expect(response.body).to include("Other company deal")
+        end
+      end
+    end
   end
 
   describe "PATCH /companies/:id" do

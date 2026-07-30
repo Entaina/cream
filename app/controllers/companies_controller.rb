@@ -39,6 +39,10 @@ class CompaniesController < ApplicationController
 
   def show
     authorize @company
+    @deals = policy_scope(current_workspace.deals)
+      .where(company_id: @company.id)
+      .includes(:pipeline_stage)
+      .order(:name)
     @okm_chat_record = @company
     @activities = @company.activities.includes(:user, :subject).recent_first.limit(50)
     @note = Note.new

@@ -75,11 +75,11 @@
       </ul>
     </div>
 
-    <% if @company.deals.any? %>
+    <% if @deals.any? %>
       <div class="mt-4">
-        <h3 class="text-sm font-semibold uppercase tracking-wider text-ink-faint mb-1.5">Deals (<%= @company.deals.size %>)</h3>
+        <h3 class="text-sm font-semibold uppercase tracking-wider text-ink-faint mb-1.5">Deals (<%= @deals.size %>)</h3>
         <ul class="space-y-1">
-          <% @company.deals.each do |deal| %>
+          <% @deals.each do |deal| %>
             <li>
               <%= link_to deal_path(deal), class: "flex items-center justify-between gap-2 rounded-md px-2 py-1.5 hover:bg-canvas-sunken text-base" do %>
                 <span class="truncate font-medium"><%= deal.name %></span>
