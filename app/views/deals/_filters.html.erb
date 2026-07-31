@@ -13,7 +13,7 @@
       include_blank: "All products", class: "input w-44",
       onchange: "this.form.requestSubmit()" %>
 <%= select_tag :edition_id,
-      options_from_collection_for_select(@editions, :id, :name, filter_value(:edition_id)),
+      grouped_options_for_select(@edition_groups, filter_value(:edition_id)),
       include_blank: "All editions", class: "input w-44",
       onchange: "this.form.requestSubmit()" %>
 <%= render "shared/date_range_filter", label: "First contact", from: :first_contact_from, to: :first_contact_to %>

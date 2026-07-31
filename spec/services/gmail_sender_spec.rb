@@ -76,7 +76,7 @@ RSpec.describe GmailSender do
       success({ id: "gm1", threadId: "gt1" })
     end
 
-    attachments = [{ filename: "doc.pdf", content_type: "application/pdf", content: "%PDF-1.4" }]
+    attachments = [ { filename: "doc.pdf", content_type: "application/pdf", content: "%PDF-1.4" } ]
     described_class.new(connection).send_email(
       to: "x@y.com", subject: "Hi", html: "<p>hi</p>", attachments: attachments
     )

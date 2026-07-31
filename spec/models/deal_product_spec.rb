@@ -37,10 +37,11 @@ RSpec.describe DealProduct, type: :model do
   end
 
   describe "edition resolution" do
-    it "creates a workspace edition from a typed name" do
+    it "creates a product edition from a typed name" do
       line = deal.deal_products.create!(product: product, quantity: 1, edition_name: "Madrid 2026")
 
       expect(line.edition.name).to eq("Madrid 2026")
+      expect(line.edition.product).to eq(product)
       expect(line.edition.workspace).to eq(workspace)
     end
 
@@ -49,7 +50,16 @@ RSpec.describe DealProduct, type: :model do
       second = deal.deal_products.create!(product: product, quantity: 1, edition_name: "Madrid 2026")
 
       expect(second.edition).to eq(first.edition)
-      expect(workspace.editions.count).to eq(1)
+      expect(product.editions.count).to eq(1)
+    end
+
+    it "creates separate editions with the same name on different products" do
+      other_product = workspace.products.create!(name: "Other", price: 50)
+      first = deal.deal_products.create!(product: product, quantity: 1, edition_name: "2026")
+      second = deal.deal_products.create!(product: other_product, quantity: 1, edition_name: "2026")
+
+      expect(first.edition).not_to eq(second.edition)
+      expect(first.edition.name).to eq(second.edition.name)
     end
 
     it "leaves the edition blank when no name is given" do
@@ -64,14 +74,23 @@ RSpec.describe DealProduct, type: :model do
     end
 
     it "assigns an edition by id" do
-      edition = workspace.editions.create!(name: "Madrid 2026")
+      edition = product.editions.create!(name: "Madrid 2026")
       line = deal.deal_products.create!(product: product, quantity: 1, edition_id: edition.id)
 
       expect(line.edition).to eq(edition)
     end
 
+    it "rejects an edition from a different product" do
+      other_product = workspace.products.create!(name: "Other", price: 50)
+      edition = other_product.editions.create!(name: "Madrid 2026")
+      line = deal.deal_products.new(product: product, quantity: 1, edition: edition)
+
+      expect(line).not_to be_valid
+      expect(line.errors[:edition]).to be_present
+    end
+
     it "clears the edition when edition_id is blank" do
-      edition = workspace.editions.create!(name: "Madrid 2026")
+      edition = product.editions.create!(name: "Madrid 2026")
       line = deal.deal_products.create!(product: product, quantity: 1, edition_id: edition.id)
       line.update!(edition_id: nil)
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_30_140000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_31_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -343,10 +343,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_140000) do
     t.datetime "created_at", null: false
     t.date "ends_on"
     t.string "name", null: false
+    t.bigint "product_id", null: false
     t.date "starts_on"
     t.datetime "updated_at", null: false
     t.bigint "workspace_id", null: false
-    t.index ["workspace_id", "name"], name: "index_editions_on_workspace_id_and_name", unique: true
+    t.index ["product_id", "name"], name: "index_editions_on_product_id_and_name", unique: true
+    t.index ["product_id"], name: "index_editions_on_product_id"
     t.index ["workspace_id"], name: "index_editions_on_workspace_id"
   end
 
@@ -1242,6 +1244,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_140000) do
   add_foreign_key "deals", "pipelines"
   add_foreign_key "deals", "users", column: "owner_id"
   add_foreign_key "deals", "workspaces"
+  add_foreign_key "editions", "products"
   add_foreign_key "editions", "workspaces"
   add_foreign_key "email_messages", "email_messages", column: "in_reply_to_id"
   add_foreign_key "email_messages", "users"

@@ -72,7 +72,7 @@ class PersonMerger
   def merge_person_emails!
     secondaries.each do |secondary|
       secondary_email_addresses(secondary).each do |address|
-        next if primary.person_emails.exists?(["LOWER(TRIM(address)) = ?", address])
+        next if primary.person_emails.exists?([ "LOWER(TRIM(address)) = ?", address ])
 
         primary.add_email!(address, primary: false)
       end

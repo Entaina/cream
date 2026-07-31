@@ -7,10 +7,11 @@ class RecordPickerComponent < ViewComponent::Base
   INLINE_LIMIT = 200
 
   attr_reader :form, :attribute, :label, :scope, :search_url, :create_url, :create_param,
-              :selected_name, :required, :hidden_data, :name_method, :hint_method
+              :selected_name, :required, :hidden_data, :name_method, :hint_method, :disabled
 
   def initialize(form:, attribute:, label:, scope:, search_url:, create_url: nil, create_param: nil,
-                 selected_name: nil, required: false, hidden_data: {}, name_method: :name, hint_method: nil)
+                 selected_name: nil, required: false, hidden_data: {}, name_method: :name, hint_method: nil,
+                 disabled: false)
     @form = form
     @attribute = attribute
     @label = label
@@ -23,10 +24,14 @@ class RecordPickerComponent < ViewComponent::Base
     @hidden_data = hidden_data
     @name_method = name_method
     @hint_method = hint_method
+    @disabled = disabled
   end
 
   def inline_records
-    return if scope.count > INLINE_LIMIT
+    return if scope.nil?
+
+    count = scope.count
+    return if count.zero? || count > INLINE_LIMIT
 
     scope.map { |record| record_payload(record) }
   end

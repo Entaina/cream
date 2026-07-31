@@ -5,7 +5,6 @@
   <% end %>
 <% end %>
 <%= render "shared/page_header", title: "Products", icon_name: :briefcase, count: @products.size, actions: actions %>
-<%= render "tabs", active: "products" %>
 
 <div class="flex flex-wrap items-center gap-2 border-b border-line px-5 py-2 shrink-0">
   <%= form_with url: products_path, method: :get, class: "flex flex-wrap items-center gap-2 flex-1" do %>

@@ -11,6 +11,7 @@ class DealProduct < ApplicationRecord
 
   validates :quantity, numericality: { only_integer: true, greater_than: 0 }
   validates :unit_price, numericality: { greater_than_or_equal_to: 0 }
+  validate :edition_belongs_to_product
 
   # On creation the unit price is taken from the catalogue, unless one was
   # explicitly provided; it can be edited afterwards (see DealProductsController#update).
@@ -34,9 +35,17 @@ class DealProduct < ApplicationRecord
   # A blank name clears the association.
   def resolve_edition
     return if edition_name.nil?
+    return unless product
 
     name = edition_name.strip
-    self.edition = name.blank? ? nil : deal.workspace.editions.find_or_create_by(name: name)
+    self.edition = name.blank? ? nil : product.editions.find_or_create_by(name: name)
+  end
+
+  def edition_belongs_to_product
+    return if edition.nil? || product.nil?
+    return if edition.product_id == product_id
+
+    errors.add(:edition, "must belong to the same product")
   end
 
   def sync_deal_value

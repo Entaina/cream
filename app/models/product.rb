@@ -3,6 +3,7 @@ class Product < ApplicationRecord
   SEGMENT_LABELS = { "b2b" => "B2B", "b2c" => "B2C" }.freeze
 
   belongs_to :workspace
+  has_many :editions, dependent: :destroy
   has_many :deal_products, dependent: :restrict_with_error
 
   validates :name, presence: true

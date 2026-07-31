@@ -47,6 +47,13 @@ RSpec.describe RecordPickerComponent, type: :component do
     expect(page).not_to have_css("[data-record-picker-records-value]")
   end
 
+  it "omits inline records when scope is empty" do
+    render_component(scope: Company.none, search_url: "/companies/picker.json")
+
+    expect(page).to have_css('[data-record-picker-search-url-value="/companies/picker.json"]')
+    expect(page).not_to have_css("[data-record-picker-records-value]")
+  end
+
   it "omits create attributes when create is disabled" do
     render_component(create_url: nil, create_param: nil)
 

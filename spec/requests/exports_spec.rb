@@ -22,7 +22,7 @@ RSpec.describe "Exports", type: :request do
     pipeline = Pipeline.create_default!(workspace)
     company = create_company!(workspace)
     product = workspace.products.create!(name: "Premium", price: 100)
-    edition = workspace.editions.create!(name: "2026")
+    edition = product.editions.create!(name: "2026")
     contact = create_person!(workspace, company: company, first_contact_on: Date.new(2026, 1, 10))
     match = create_deal!(workspace, pipeline: pipeline, name: "Export match", company: company, contacts: [ contact ])
     match.deal_products.create!(product: product, edition: edition, quantity: 1)

@@ -9,24 +9,49 @@ export default class extends Controller {
     searchUrl: String,
     createUrl: String,
     createParam: String,
-    records: { type: Array, default: [] }
+    records: Array
   }
 
   connect() {
     this.activeIndex = -1
     this.results = []
-    this.inlineRecords = this.hasRecordsValue ? [ ...this.recordsValue ] : null
+    this.loadInlineRecords()
+    this.menuEl = this.menuTarget
+    this.menuPortaled = false
+    this.menuAnchor = document.createComment("record-picker-menu")
     this.onMenuMouseDown = (event) => event.preventDefault()
-    this.menuTarget.addEventListener("mousedown", this.onMenuMouseDown)
+    this.onMenuClick = (event) => this.handleMenuClick(event)
+    this.boundRepositionMenu = this.repositionMenu.bind(this)
+    this.boundOnScroll = this.onScroll.bind(this)
+    this.menuEl.addEventListener("mousedown", this.onMenuMouseDown)
+    this.menuEl.addEventListener("click", this.onMenuClick)
   }
 
   disconnect() {
-    this.menuTarget.removeEventListener("mousedown", this.onMenuMouseDown)
+    this.menuEl.removeEventListener("mousedown", this.onMenuMouseDown)
+    this.menuEl.removeEventListener("click", this.onMenuClick)
     clearTimeout(this.debounce)
+    this.removeMenuListeners()
+    if (this.menuPortaled) {
+      this.menuEl.remove()
+      this.menuAnchor.remove()
+    }
   }
 
   get inlineMode() {
-    return this.inlineRecords !== null
+    return Array.isArray(this.inlineRecords) && this.inlineRecords.length > 0
+  }
+
+  loadInlineRecords() {
+    if (this.hasRecordsValue && this.recordsValue.length > 0) {
+      this.inlineRecords = [ ...this.recordsValue ]
+    } else {
+      this.inlineRecords = null
+    }
+  }
+
+  setInlineRecords(records) {
+    this.inlineRecords = records.length > 0 ? records : null
   }
 
   get createEnabled() {
@@ -50,7 +75,7 @@ export default class extends Controller {
       return
     }
 
-    if (q.length < 2) {
+    if (!this.searchUrlValue || q.length < 1) {
       this.hideMenu()
       return
     }
@@ -96,27 +121,95 @@ export default class extends Controller {
     }
 
     if (items.length === 0) {
-      this.menuTarget.innerHTML = `<li class="px-3 py-1.5 text-sm text-ink-faint">No results</li>`
-      this.menuTarget.classList.remove("hidden")
+      this.menuEl.innerHTML = `<li class="px-3 py-1.5 text-sm text-ink-faint">No results</li>`
+      this.openMenu()
       this.activeIndex = -1
       return
     }
 
     this.activeIndex = -1
-    this.menuTarget.innerHTML = items.join("")
-    this.menuTarget.classList.remove("hidden")
+    this.menuEl.innerHTML = items.join("")
+    this.openMenu()
+  }
+
+  openMenu() {
+    this.portalMenu()
+    this.repositionMenu()
+    this.menuEl.classList.remove("hidden")
+  }
+
+  portalMenu() {
+    if (this.menuPortaled) return
+
+    this.menuEl.parentNode.insertBefore(this.menuAnchor, this.menuEl)
+    document.body.appendChild(this.menuEl)
+    this.menuPortaled = true
+    window.addEventListener("scroll", this.boundOnScroll, true)
+    window.addEventListener("resize", this.boundRepositionMenu)
+  }
+
+  unportalMenu() {
+    if (!this.menuPortaled) return
+
+    this.removeMenuListeners()
+    this.menuAnchor.parentNode?.insertBefore(this.menuEl, this.menuAnchor)
+    this.menuAnchor.remove()
+    this.resetMenuStyles()
+    this.menuPortaled = false
+  }
+
+  removeMenuListeners() {
+    window.removeEventListener("scroll", this.boundOnScroll, true)
+    window.removeEventListener("resize", this.boundRepositionMenu)
+  }
+
+  repositionMenu() {
+    const rect = this.inputTarget.getBoundingClientRect()
+    const menu = this.menuEl
+
+    menu.style.position = "fixed"
+    menu.style.top = `${rect.bottom + 4}px`
+    menu.style.left = `${rect.left}px`
+    menu.style.width = `${rect.width}px`
+    menu.style.zIndex = "9999"
+  }
+
+  onScroll() {
+    if (this.menuEl.classList.contains("hidden")) return
+    this.repositionMenu()
+  }
+
+  resetMenuStyles() {
+    this.menuEl.style.position = ""
+    this.menuEl.style.top = ""
+    this.menuEl.style.left = ""
+    this.menuEl.style.width = ""
+    this.menuEl.style.zIndex = ""
+  }
+
+  handleMenuClick(event) {
+    const option = event.target.closest('[role="option"]')
+    if (!option) return
+
+    event.preventDefault()
+    if (option.dataset.create === "true") {
+      this.createPick(event)
+      return
+    }
+
+    this.pick({ currentTarget: option })
   }
 
   resultItem(record, index) {
     const hint = record.hint ? `<span class="text-ink-faint"> · ${this.escape(record.hint)}</span>` : ""
-    return `<li role="option" data-index="${index}" data-action="click->record-picker#pick"
+    return `<li role="option" data-index="${index}"
                 class="cursor-pointer px-3 py-1.5 text-sm hover:bg-canvas-sunken">
               <span class="font-medium">${this.escape(record.name)}</span>${hint}
             </li>`
   }
 
   createItem(query, index) {
-    return `<li role="option" data-create="true" data-index="${index}" data-action="click->record-picker#createPick"
+    return `<li role="option" data-create="true" data-index="${index}"
                 class="cursor-pointer px-3 py-1.5 text-sm text-accent hover:bg-canvas-sunken">
               <span class="font-medium">+ Create "${this.escape(query)}"</span>
             </li>`
@@ -176,7 +269,7 @@ export default class extends Controller {
       return
     }
 
-    if (this.menuTarget.classList.contains("hidden") || options.length === 0) return
+    if (this.menuEl.classList.contains("hidden") || options.length === 0) return
 
     if (event.key === "ArrowDown") {
       this.activeIndex = Math.min(this.activeIndex + 1, options.length - 1)
@@ -199,7 +292,7 @@ export default class extends Controller {
   }
 
   menuOptions() {
-    return Array.from(this.menuTarget.querySelectorAll('[role="option"]'))
+    return Array.from(this.menuEl.querySelectorAll('[role="option"]'))
   }
 
   highlightOption(options) {
@@ -214,8 +307,9 @@ export default class extends Controller {
   }
 
   hideMenu() {
-    this.menuTarget.classList.add("hidden")
+    this.menuEl.classList.add("hidden")
     this.activeIndex = -1
+    this.unportalMenu()
   }
 
   showError(message) {
@@ -226,6 +320,13 @@ export default class extends Controller {
   clearError() {
     this.errorTarget.textContent = ""
     this.errorTarget.classList.add("hidden")
+  }
+
+  clear() {
+    this.inputTarget.value = ""
+    this.hiddenTarget.value = ""
+    this.hideMenu()
+    this.clearError()
   }
 
   normalize(text) {

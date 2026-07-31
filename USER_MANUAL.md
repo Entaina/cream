@@ -4,7 +4,7 @@
 
 Cream is a **workspace**-based CRM for managing **people**, **companies** and **deals** (opportunities), with notes, tasks, lists and an activity history shared across the team.
 
-> **Last revision:** 2026-07-30 (OKM per workspace, Settings page)
+> **Last revision:** 2026-07-31 (editions per product, scoped picker)
 > This document describes the functionality **visible to the user**. Disabled features are listed at the end under "Coming soon".
 
 ---
@@ -267,7 +267,7 @@ In the **table view** and on the **kanban board** you can combine several filter
 | **Search deals…** | yes | yes | Searches by deal or company name, or invoice number |
 | **All stages** | yes | no | Shows only deals in the chosen stage (not applicable on the board: columns already are stages) |
 | **All products** | yes | yes | Deals that include that product in their lines |
-| **All editions** | yes | yes | Deals with a line that has that product **and** that edition |
+| **All editions** | yes | yes | Deals with a line that has that specific edition (the dropdown **groups editions by product**; the same name may exist on different products) |
 | **First contact from / to** (date fields) | yes | yes | Deals whose contact has a **First contact date** within the range (if there are several contacts, it is enough that one matches) |
 | Custom fields | yes | no | Same as for people and companies |
 
@@ -290,9 +290,19 @@ Each product can be tagged with a **B2B** or **B2C** **segment** when creating o
 
 ### Editions
 
-Use the **Editions** tab (next to **Products** in the catalog) to manage product variants or cohorts. Each edition has a **name** and optional **start** and **end** dates.
+Each product has **its own editions** (variants or cohorts). **There is no global Editions tab** — they are managed inside each product.
 
-On deal product lines, the **Edition** field is a **searchable picker**: type to filter existing editions (dates appear next to the name), pick one or use **+ Create "…"** to add a new edition without leaving the form. Editions created on the fly have no dates until you complete them on the **Editions** tab.
+1. Go to **Products** and open a product (**Edit**).
+2. In the **Editions** section you will see the edition table (name, dates, lines in use).
+3. Click **New edition** to create one; edit or delete from the same section.
+4. Each edition has a **name** and optional **start** and **end** dates.
+
+On deal product lines:
+
+- The **Edition** field is a **searchable picker** that only shows editions **for that line's product**.
+- When **adding** a new line, choose the product first; then Edition is enabled and loads that product's editions.
+- Type to filter (dates appear next to the name), pick one or use **+ Create "…"** to add a new edition on the fly (it is linked to that product).
+- Editions created on the fly have no dates until you complete them on the product page.
 
 ---
 

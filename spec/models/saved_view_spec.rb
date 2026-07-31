@@ -175,7 +175,7 @@ RSpec.describe SavedView do
     let!(:pipeline) { Pipeline.create_default!(workspace) }
     let(:company) { create_company!(workspace) }
     let(:product) { workspace.products.create!(name: "Premium", price: 100) }
-    let(:edition) { workspace.editions.create!(name: "2026") }
+    let(:edition) { product.editions.create!(name: "2026") }
 
     it "applies product, edition and first contact filters" do
       contact = create_person!(workspace, company: company, first_contact_on: Date.new(2026, 1, 10))

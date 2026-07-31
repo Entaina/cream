@@ -140,13 +140,14 @@ RSpec.describe Deal, type: :model do
     let(:qualified_stage) { pipeline.pipeline_stages.find_by!(name: "Qualified") }
     let(:product_a) { workspace.products.create!(name: "Plan A", price: 100) }
     let(:product_b) { workspace.products.create!(name: "Plan B", price: 200) }
-    let(:edition_2025) { workspace.editions.create!(name: "2025") }
-    let(:edition_2026) { workspace.editions.create!(name: "2026") }
+    let(:edition_2025) { product_a.editions.create!(name: "2025") }
+    let(:edition_2026) { product_a.editions.create!(name: "2026") }
 
     def deal_with_line(name:, stage: lead_stage, product: product_a, edition: edition_2025, contact_date: Date.new(2026, 1, 15))
+      line_edition = edition&.product_id == product.id ? edition : product.editions.find_or_create_by!(name: edition&.name || "2025")
       contact = create_person!(workspace, company: company, first_contact_on: contact_date)
       deal = create_deal!(workspace, pipeline: pipeline, stage: stage, name: name, company: company, contacts: [ contact ])
-      deal.deal_products.create!(product: product, edition: edition, quantity: 1)
+      deal.deal_products.create!(product: product, edition: line_edition, quantity: 1)
       deal
     end
 
@@ -173,8 +174,8 @@ RSpec.describe Deal, type: :model do
     it "filters by edition" do
       results = described_class.filter_by(workspace.deals, edition_id: edition_2025.id)
 
-      expect(results).to include(matching, other_stage, other_product, other_date)
-      expect(results).not_to include(other_edition)
+      expect(results).to include(matching, other_stage, other_date)
+      expect(results).not_to include(other_product, other_edition)
     end
 
     it "filters by first contact date range" do

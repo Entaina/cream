@@ -75,7 +75,6 @@ class DealsController < ApplicationController
     @activities = @deal.activities.includes(:user, :subject).recent_first.limit(50)
     @line_items = @deal.deal_products.includes(:product, :edition)
     @products = current_workspace.products.ordered
-    @editions = current_workspace.editions.ordered
     @note = Note.new
     @comment = Comment.new
     @email_message = EmailMessage.new(to_address: @deal.contacts.first&.email)
@@ -199,7 +198,12 @@ class DealsController < ApplicationController
   def load_deal_filter_options
     @pipelines = current_workspace.pipelines.ordered.includes(:pipeline_stages)
     @products = current_workspace.products.ordered
-    @editions = current_workspace.editions.ordered
+    @edition_groups = @products.includes(:editions).filter_map do |product|
+      options = product.editions.ordered.map { |edition| [ edition.name, edition.id ] }
+      next if options.empty?
+
+      [ product.name, options ]
+    end
     @owners = current_workspace.users.order(:name)
   end
 

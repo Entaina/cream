@@ -31,6 +31,7 @@ class ProductsController < ApplicationController
 
   def edit
     authorize @product
+    @editions = @product.editions.ordered
   end
 
   def update

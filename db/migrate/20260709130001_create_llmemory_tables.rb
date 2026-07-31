@@ -28,7 +28,7 @@ class CreateLlmemoryTables < ActiveRecord::Migration[8.0]
       t.text :content, null: false
       t.datetime :updated_at, null: false
     end
-    add_index :llmemory_categories, [:user_id, :category_name], unique: true
+    add_index :llmemory_categories, [ :user_id, :category_name ], unique: true
 
     # Episodic long-term memory (trajectories) — JSONB document per episode
     create_table :llmemory_episodes, id: false do |t|
@@ -58,7 +58,7 @@ class CreateLlmemoryTables < ActiveRecord::Migration[8.0]
       t.jsonb :state, null: false, default: {}
       t.timestamps
     end
-    add_index :llmemory_checkpoints, [:user_id, :session_id], unique: true
+    add_index :llmemory_checkpoints, [ :user_id, :session_id ], unique: true
 
     # Graph-based long-term memory (nodes = entities)
     create_table :llmemory_nodes do |t|
@@ -68,7 +68,7 @@ class CreateLlmemoryTables < ActiveRecord::Migration[8.0]
       t.jsonb :properties, default: {}
       t.timestamps
     end
-    add_index :llmemory_nodes, [:user_id, :entity_type, :name], unique: true
+    add_index :llmemory_nodes, [ :user_id, :entity_type, :name ], unique: true
 
     # Graph-based long-term memory (edges = SPO relations)
     create_table :llmemory_edges do |t|
@@ -80,7 +80,7 @@ class CreateLlmemoryTables < ActiveRecord::Migration[8.0]
       t.datetime :archived_at
       t.timestamps
     end
-    add_index :llmemory_edges, [:user_id, :subject_id, :predicate]
+    add_index :llmemory_edges, [ :user_id, :subject_id, :predicate ]
 
     # Vector store for hybrid retrieval (requires pgvector extension)
     enable_extension "vector"
@@ -92,6 +92,6 @@ class CreateLlmemoryTables < ActiveRecord::Migration[8.0]
       t.text :text_content
       t.timestamps
     end
-    add_index :llmemory_embeddings, [:user_id, :source_type, :source_id], unique: true
+    add_index :llmemory_embeddings, [ :user_id, :source_type, :source_id ], unique: true
   end
 end

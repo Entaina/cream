@@ -415,7 +415,7 @@ RSpec.describe "Deals", type: :request do
   describe "GET /deals/board (saved views)" do
     let(:company) { create_company!(workspace) }
     let(:product) { workspace.products.create!(name: "Premium", price: 100) }
-    let(:edition) { workspace.editions.create!(name: "2026") }
+    let(:edition) { product.editions.create!(name: "2026") }
 
     def filtered_deal(name:, contact_date: Date.new(2026, 1, 15))
       contact = create_person!(workspace, company: company, first_contact_on: contact_date)
@@ -532,7 +532,7 @@ RSpec.describe "Deals", type: :request do
     let(:company) { create_company!(workspace) }
     let(:lead_stage) { pipeline.pipeline_stages.find_by!(name: "Lead") }
     let(:product) { workspace.products.create!(name: "Premium", price: 100) }
-    let(:edition) { workspace.editions.create!(name: "2026") }
+    let(:edition) { product.editions.create!(name: "2026") }
 
     def filtered_deal(name:, stage: lead_stage, product_line: product, edition_line: edition, contact_date: Date.new(2026, 1, 15))
       contact = create_person!(workspace, company: company, first_contact_on: contact_date)
@@ -544,7 +544,7 @@ RSpec.describe "Deals", type: :request do
     it "filters the index by product, edition and first contact range" do
       sign_in_as(member)
       filtered_deal(name: "Matching deal")
-      filtered_deal(name: "Other edition", edition_line: workspace.editions.create!(name: "2025"))
+      filtered_deal(name: "Other edition", edition_line: product.editions.create!(name: "2025"))
       filtered_deal(name: "Other date", contact_date: Date.new(2026, 3, 1))
 
       get deals_path, params: {
@@ -617,7 +617,7 @@ RSpec.describe "Deals", type: :request do
 
     let(:company) { create_company!(workspace, name: "Acme Corp") }
     let(:product) { workspace.products.create!(name: "Premium", price: 100) }
-    let(:edition) { workspace.editions.create!(name: "2026") }
+    let(:edition) { product.editions.create!(name: "2026") }
 
     it "does not show products on cards when products is not selected" do
       sign_in_as(member)

@@ -53,7 +53,23 @@ pw goto "$CREAM_APP_URL/deals/board"
 pw snapshot   # sin All stages; con product/edition/fechas
 ```
 
-Combina filtros y comprueba que **Clear** restablece la lista; en tabla, **Export** debe respetar los filtros activos.
+Combina filtros y comprueba que **Clear** restablece la lista; en tabla, **Export** debe respetar los filtros activos. El desplegable **All editions** agrupa ediciones por producto.
+
+## Verificar ediciones por producto
+
+Tras cambios en catálogo de productos, ediciones anidadas o picker en líneas de deal:
+
+```bash
+pw goto "$CREAM_APP_URL/products"
+# Abrir un producto → debe verse sección Editions (sin pestaña global Editions)
+pw goto "$CREAM_APP_URL/products/<id>/edit"
+pw snapshot   # tabla Editions, botón New edition
+
+pw goto "$CREAM_APP_URL/deals/<id>"
+pw snapshot   # en Products: campo Edition por línea; al añadir producto, Edition deshabilitado hasta elegir producto
+```
+
+En una ficha de deal: selecciona producto en «Add product», escribe en Edition — deben listarse solo las ediciones de ese producto (no «+ Create» si ya existe). En una línea existente, el picker debe usar las ediciones del producto de esa fila.
 
 ## Production smoke test
 

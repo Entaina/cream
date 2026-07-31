@@ -1,9 +1,12 @@
 class Edition < ApplicationRecord
   belongs_to :workspace
+  belongs_to :product
   has_many :deal_products, dependent: :restrict_with_error
 
+  before_validation :set_workspace_from_product, on: :create
+
   validates :name, presence: true,
-    uniqueness: { scope: :workspace_id, case_sensitive: false }
+    uniqueness: { scope: :product_id, case_sensitive: false }
 
   before_validation :strip_name
   validate :ends_on_not_before_starts_on
@@ -26,6 +29,10 @@ class Edition < ApplicationRecord
   end
 
   private
+
+  def set_workspace_from_product
+    self.workspace = product.workspace if product.present?
+  end
 
   def strip_name
     self.name = name.strip if name.present?

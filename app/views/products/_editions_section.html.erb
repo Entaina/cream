@@ -1,0 +1,46 @@
+<section class="mt-8">
+  <div class="flex items-center justify-between mb-3">
+    <h2 class="text-base font-semibold">Editions</h2>
+    <%= link_to new_product_edition_path(product), class: "btn-secondary" do %>
+      <%= icon :plus, classes: "size-3.5" %> New edition
+    <% end %>
+  </div>
+
+  <% if editions.any? %>
+    <div class="card overflow-hidden">
+      <table class="table-base">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Dates</th>
+            <th>Lines in use</th>
+            <th class="w-10"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% editions.each do |edition| %>
+            <tr class="cursor-pointer" onclick="Turbo.visit('<%= edit_product_edition_path(product, edition) %>')">
+              <td class="font-medium"><%= edition.name %></td>
+              <td class="text-ink-soft">
+                <% if edition.date_range_label.present? %>
+                  <%= edition.date_range_label %>
+                <% else %>
+                  <span class="text-ink-faint">—</span>
+                <% end %>
+              </td>
+              <td class="text-ink-soft tabular-nums"><%= edition.deal_products.size %></td>
+              <td onclick="event.stopPropagation()">
+                <%= button_to product_edition_path(product, edition), method: :delete, class: "text-ink-faint hover:text-danger p-1",
+                      form: { data: { turbo_confirm: "Delete #{edition.name}?" } } do %>
+                  <%= icon :trash, classes: "size-3.5" %>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <p class="text-base text-ink-faint">No editions yet. Add one to offer variants or cohorts for this product.</p>
+  <% end %>
+</section>

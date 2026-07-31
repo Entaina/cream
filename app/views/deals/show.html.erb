@@ -76,7 +76,7 @@
     <%= render "lead_submission_section", deal: @deal if @deal.lead_submission.present? %>
     <%= render "booking_submission_section", deal: @deal if @deal.booking.present? %>
     <%= render "shared/ai_assistant_section", record: @deal if feature_enabled?(:ai_assistant) %>
-    <%= render "products_section", deal: @deal, line_items: @line_items, products: @products, editions: @editions %>
+    <%= render "products_section", deal: @deal, line_items: @line_items, products: @products %>
     <%= render "collaborators_section", deal: @deal %>
     <%= render "shared/notes_section", record: @deal, note: @note %>
     <%= render "shared/comments_section", record: @deal, comment: @comment if feature_enabled?(:comments) %>

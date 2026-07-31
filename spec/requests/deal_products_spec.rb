@@ -20,7 +20,7 @@ RSpec.describe "Deal product lines", type: :request do
 
   it "adds a product line with an edition by id" do
     sign_in_as(member)
-    edition = workspace.editions.create!(name: "Madrid 2026")
+    edition = product.editions.create!(name: "Madrid 2026")
 
     post deal_line_items_path(deal), params: {
       deal_product: { product_id: product.id, quantity: 1, edition_id: edition.id }
@@ -33,7 +33,7 @@ RSpec.describe "Deal product lines", type: :request do
 
   it "updates the edition on a line by id" do
     sign_in_as(member)
-    edition = workspace.editions.create!(name: "Madrid 2026")
+    edition = product.editions.create!(name: "Madrid 2026")
     line = deal.deal_products.create!(product: product, quantity: 1)
 
     patch deal_line_item_path(deal, line), params: { deal_product: { edition_id: edition.id } }

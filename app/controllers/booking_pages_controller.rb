@@ -152,5 +152,4 @@ class BookingPagesController < ApplicationController
       help_url: error.help_url
     }.compact
   end
-
 end

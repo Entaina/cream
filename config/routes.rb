@@ -66,10 +66,11 @@ Rails.application.routes.draw do
     end
     resources :relationships, only: %i[create destroy], controller: "person_relationships"
   end
-  resources :products
-  resources :editions, except: %i[show] do
-    collection do
-      get :picker
+  resources :products do
+    resources :editions, except: %i[show index] do
+      collection do
+        get :picker
+      end
     end
   end
   resources :pipelines, except: %i[show] do

@@ -133,9 +133,21 @@ Comportamiento visible a documentar:
 - **Show closed** y paginación conservan filtros en la URL.
 - Vistas guardadas y **Export** respetan los filtros de la vista tabla (incl. producto, edición y fechas en deals).
 
-Partial compartido: `app/views/deals/_filters.html.erb` (`show_stage: false` en board).
+Partial compartido: `app/views/deals/_filters.html.erb` (`show_stage: false` en board). El filtro **All editions** agrupa ediciones por producto (el mismo nombre puede repetirse en productos distintos).
 
-## Checklist antes de cerrar la tarea
+## Productos y ediciones (referencia para §6)
+
+Al cambiar catálogo, picker o rutas de ediciones, actualizar **MANUAL_USUARIO.md** §6 y **USER_MANUAL.md** §6 (Products / Ediciones).
+
+| Pieza | Ubicación en código | Manual (usuario) |
+|-------|---------------------|------------------|
+| Catálogo productos | `/products`, menú **Products** | §6 primer párrafo + segmento B2B/B2C |
+| CRUD ediciones | Anidadas bajo producto: `/products/:id/editions`, sección en **Edit product** | §6 «Ediciones» — ya no hay pestaña global Editions |
+| Picker en líneas de deal | `deals/_edition_picker`, `product_edition_picker_controller.js` | §6 — buscador filtrado por producto de la línea; deshabilitado hasta elegir producto al añadir línea |
+| Crear edición al vuelo | `POST /products/:id/editions.json` desde picker | §6 «+ Create "…"» |
+| Filtro deals por edición | `deals/_filters` — `grouped_options_for_select` por producto | §5 fila **All editions** |
+
+Modelo: `Edition` `belongs_to :product`; unicidad de nombre por producto. No documentar rutas ni Stimulus en el manual.
 
 - [ ] ¿Cambió algo que un usuario vería o haría distinto? → manual actualizado
 - [ ] ¿Se movió una feature entre activa / próximamente? → ambas secciones coherentes

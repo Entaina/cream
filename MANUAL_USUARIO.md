@@ -4,7 +4,7 @@
 
 Cream es un CRM por **workspaces** para gestionar **personas**, **empresas** y **deals** (oportunidades), con notas, tareas, listas y un historial de actividad compartido en el equipo.
 
-> **Última revisión:** 2026-07-30 (OKM por workspace, página Settings)
+> **Última revisión:** 2026-07-31 (ediciones por producto, picker filtrado)
 > Este documento describe la funcionalidad **visible para el usuario**. Las funcionalidades desactivadas aparecen al final en «Próximamente».
 
 ---
@@ -267,7 +267,7 @@ En la **vista tabla** y en el **tablero kanban** puedes combinar varios filtros;
 | **Search deals…** | sí | sí | Busca por nombre del deal, de la empresa o por número de factura |
 | **All stages** | sí | no | Muestra solo deals en la etapa elegida (en el tablero no aplica: las columnas ya son etapas) |
 | **All products** | sí | sí | Deals que incluyen ese producto en sus líneas |
-| **All editions** | sí | sí | Deals con una línea que tenga ese producto **y** esa edición |
+| **All editions** | sí | sí | Deals con una línea que tenga esa edición concreta (el desplegable agrupa ediciones **por producto**; el mismo nombre puede existir en varios productos) |
 | **First contact from / to** (campos de fecha) | sí | sí | Deals cuyo contacto tenga **First contact date** dentro del rango (si hay varios contactos, basta con que uno cumpla) |
 | Campos personalizados | sí | no | Igual que en personas y empresas |
 
@@ -290,9 +290,19 @@ Cada producto puede marcarse con un **segmento** **B2B** o **B2C** al crearlo o 
 
 ### Ediciones
 
-En la pestaña **Editions** (junto a **Products** en el catálogo) gestionas las convocatorias o variantes de producto. Cada edición tiene **nombre** y, opcionalmente, **fecha de inicio** y **fecha de fin**.
+Cada producto tiene **sus propias ediciones** (convocatorias o variantes). **No hay pestaña global de ediciones**: se gestionan dentro de cada producto.
 
-En las líneas de producto de un deal, el campo **Edition** es un **buscador**: escribe para filtrar ediciones existentes (se muestran las fechas junto al nombre), selecciona una o usa **+ Create "…"** para darla de alta al momento sin salir del formulario. Las ediciones creadas así nacen sin fechas; complétalas después en la pestaña **Editions**.
+1. Ve a **Products** y abre un producto (**Edit**).
+2. En la sección **Editions** verás la tabla de ediciones (nombre, fechas, líneas en uso).
+3. Pulsa **New edition** para crear una; edita o elimina desde la misma sección.
+4. Cada edición tiene **nombre** y, opcionalmente, **fecha de inicio** y **fecha de fin**.
+
+En las líneas de producto de un deal:
+
+- El campo **Edition** es un **buscador** que solo muestra ediciones **del producto de esa línea**.
+- Al **añadir** una línea nueva, primero elige el producto; entonces se habilita Edition y se cargan sus ediciones.
+- Escribe para filtrar (las fechas aparecen junto al nombre), selecciona una o usa **+ Create "…"** para darla de alta al momento (queda ligada a ese producto).
+- Las ediciones creadas al vuelo nacen sin fechas; complétalas después en la ficha del producto.
 
 ---
 

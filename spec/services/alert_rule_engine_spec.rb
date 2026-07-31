@@ -31,7 +31,7 @@ RSpec.describe AlertRuleEngine, type: :service do
 
   def create_matching_deal
     deal = create_deal!(workspace, pipeline: pipeline, company: company, owner: owner)
-    edition = workspace.editions.create!(name: "Madrid 2026", ends_on: Date.current - 1)
+    edition = product.editions.create!(name: "Madrid 2026", ends_on: Date.current - 1)
     deal.deal_products.create!(product: product, quantity: 1, edition: edition)
     deal
   end

@@ -109,7 +109,7 @@ class EmailMessage < ApplicationRecord
   end
 
   def sent_activity_recorded?
-    record.activities.exists?(["action = ? AND metadata->>'email_message_id' = ?", "email_sent", id.to_s])
+    record.activities.exists?([ "action = ? AND metadata->>'email_message_id' = ?", "email_sent", id.to_s ])
   end
 
   def attachments_within_limits

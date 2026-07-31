@@ -13,6 +13,9 @@ Cream replicates Attio's CRM: workspace-scoped records (People, Companies, Deals
 - Shared concerns: `CrmRecord` (workspace, owner, notes/tasks/list_entries associations) and `Trackable` (auto-logs `created`/`updated` activities with field diffs; per-model `tracked_ignored_attributes`).
 - `Note` / `Task` are polymorphic (`notable` / `taskable`) and log activities on their parent record.
 - **`Task` assignee:** optional `assignee_id`; default on create is the current user. If the title contains `@handle` for a workspace member, `before_save` assigns the first match via `MentionParser` (same parser as comments).
+- **`Product`**: workspace catalog (`name`, `price`, `segment`). `has_many :editions`, `has_many :deal_products`.
+- **`Edition`**: belongs to **`Product`** (and denormalized `workspace` for policies/scoping). Unique `name` per product (`[product_id, name]`). Optional `starts_on` / `ends_on`. `has_many :deal_products` (`restrict_with_error` on delete).
+- **`DealProduct`**: deal line — `product`, optional `edition` (must belong to the same product). `edition_name` resolves via `product.editions.find_or_create_by(name:)`. Value rolls up to `deal.value`.
 - `List` + `ListEntry`: typed lists (record_type Person|Company|Deal) shown in the sidebar.
 - `Activity`: polymorphic timeline (`subject`), rendered by `ApplicationHelper#activity_sentence`.
 
@@ -68,18 +71,17 @@ Per-user, per-workspace bearer tokens for programmatic access (MCP, etc.).
 - Layout: fixed left sidebar (`shared/_sidebar`), pages are flex columns: `shared/_page_header` (h-13 title bar with actions capture) + scrollable content.
 - Record show pages: left attributes panel (w-80, `shared/_attribute` rows) + main column with `shared/_notes_section`, `shared/_tasks_section`, `shared/_timeline`.
 - Components are CSS classes in `app/assets/tailwind/application.css`: `.btn-primary/.btn-secondary/.btn-ghost/.btn-danger`, `.input`, `.label`, `.table-base`, `.card`.
-- **ViewComponents** (`gem "view_component"`, `app/components/`): reusable UI pieces with Ruby class + ERB template. Use `RecordPickerComponent` for searchable form pickers with optional on-the-fly creation (companies today; people etc. later). Hybrid search: embeds full list when `scope.count <= RecordPickerComponent::INLINE_LIMIT` (200), otherwise queries `search_url` (e.g. `GET /companies/picker.json?q=`). Stimulus: `record_picker_controller.js`.
-- **ViewComponents** (`gem "view_component"`, `app/components/`): reusable UI pieces with Ruby class + ERB template. Use `RecordPickerComponent` for searchable form pickers with optional on-the-fly creation (companies today; people etc. later). Hybrid search: embeds full list when `scope.count <= RecordPickerComponent::INLINE_LIMIT` (200), otherwise queries `search_url` (e.g. `GET /companies/picker.json?q=`). Stimulus: `record_picker_controller.js`.
+- **ViewComponents** (`gem "view_component"`, `app/components/`): reusable UI pieces with Ruby class + ERB template. Use `RecordPickerComponent` for searchable form pickers with optional on-the-fly creation (companies, editions per product, etc.). Hybrid search: embeds full list when `scope.count` is between 1 and `RecordPickerComponent::INLINE_LIMIT` (200); **empty scope** → remote-only (never embed an empty inline list). Otherwise queries `search_url` (e.g. `GET /companies/picker.json?q=`, `GET /products/:id/editions/picker.json?q=`). Stimulus: `record_picker_controller.js`; edition lines on deals also use `product_edition_picker_controller.js` to reload editions when the product `<select>` changes.
 - Theme tokens (`@theme`): `ink` (text), `ink-soft`, `ink-faint`, `line` (borders), `canvas` (bg), `canvas-soft`, `canvas-sunken`, `canvas-tint` (sidebar), `accent`/`accent-dark`/`accent-soft` (Hoki), `on-dark`. Typography scale: `text-base` 15px (body), `text-sm` 14px (buttons/inputs), `text-xs` 13px (labels/meta), `text-2xs` 12px (badges/kbd). Fonts: Lato body, Comfortaa display.
 - Helpers: `icon(:name)` (inline SVG set in `IconHelper::ICONS`), `avatar(record)` (initials, deterministic color), `badge`, `stage_badge`, `money`, `sort_link` (sortable table headers preserving query params), `mention_html(text)` (highlight `@mentions` in comments and task titles), `mention_text_field(form, field, **options)` (task title input + mention autocomplete wrapper).
-- Stimulus: `kanban_controller.js` (HTML5 drag&drop, PATCH /deals/:id/move), `flash_controller.js` (auto-dismiss), `hotkeys_controller.js` ("/" → search), `mention_controller.js` (`@` autocomplete in task title fields; users JSON in `data-mention-users-json-value`), `record_picker_controller.js` (generic searchable record combobox; used by `RecordPickerComponent`), `row_link_controller.js` (whole-row table navigation: plain click → Turbo, cmd/ctrl+click or middle-click → new tab).
+- Stimulus: `kanban_controller.js` (HTML5 drag&drop, PATCH /deals/:id/move), `flash_controller.js` (auto-dismiss), `hotkeys_controller.js` ("/" → search), `mention_controller.js` (`@` autocomplete in task title fields; users JSON in `data-mention-users-json-value`), `record_picker_controller.js` (generic searchable record combobox; used by `RecordPickerComponent`), `product_edition_picker_controller.js` (deal product line: wires product select → edition picker URLs + inline edition list), `row_link_controller.js` (whole-row table navigation: plain click → Turbo, cmd/ctrl+click or middle-click → new tab).
 - Index pages: search `?q=` + per-type filters + `sort_link` columns; rows use `row-link` Stimulus + `link_to` on the name cell. Deals table and board share `deals/_filters` partial; board omits stage filter (`show_stage: false`) and strips `:stage` from `@effective_filters`.
 
 ## List filtering & saved views
 
 - **`ViewScoped`** concern (`app/controllers/concerns/view_scoped.rb`): `load_saved_views`, `@effective_filters`, `filter_value`, `filter_form_params`, `filters_active?`; merges saved-view JSON with URL overrides (`q`, native key, `cf`, `sort`, `dir`, `closed`, plus `@extra_filter_keys`).
 - **`SavedView`**: `NATIVE_FILTER_KEYS` (Deal → `stage`); `EXTRA_FILTER_KEYS` (Deal → `product_id`, `edition_id`, `first_contact_from`, `first_contact_to`). `#resolve` applies native + custom fields + `Deal.apply_extra_filters` for Deal.
-- **`Deal.filter_by(scope, filters)`** / **`Deal.apply_extra_filters`**: shared by `DealsController#filtered_deals`, `ExportsController`, and `SavedView#resolve`. Product + edition match the same `deal_products` row; first contact filters join `contacts` on `people.first_contact_on` range.
+- **`Deal.filter_by(scope, filters)`** / **`Deal.apply_extra_filters`**: shared by `DealsController#filtered_deals`, `ExportsController`, and `SavedView#resolve`. Product + edition match the same `deal_products` row; first contact filters join `contacts` on `people.first_contact_on` range. Deal filter UI groups editions by product (`grouped_options_for_select` in `deals/_filters`).
 - **`DealsController#board`**: `load_saved_views("Deal")` then `@effective_filters.except(:stage)` before filtering.
 
 ## Mentions (`@usuario`)
@@ -108,7 +110,7 @@ AlertRulesJob (daily, recurring.yml) → AlertRuleEngine → matching deals
 ```
 
 - **`AlertRule`**: `TRIGGER_FIELDS` = `edition_ends_on` | `edition_starts_on` | `deal_expected_close_date` (fires when `date + offset_days <= Date.current`; negative offset = advance warning). `CONDITIONS` = `company_without_fiscal_info` (`companies.fiscal_information` blank), `deal_open` (stage not closed). `RECIPIENTS` = `deal_owner` | `admins`.
-- Edition dates live on `Edition` (`starts_on`, `ends_on`); deal lines link via `deal_products.edition_id`.
+- Edition dates live on `Edition` (`starts_on`, `ends_on`); each edition belongs to one `Product`. Deal lines link via `deal_products.edition_id` (edition must match line's product).
 - Feature flag `:alerts` in `CreamFeatures`; menu **Alertas**; `AlertRulesController` + `RequiresFeature`.
 - User channel prefs: **Settings → Profile → Alertas** (`Settings::ProfileController` permits `alert_in_app`, `alert_email`). If both off, no delivery and no `AlertDelivery` row.
 
