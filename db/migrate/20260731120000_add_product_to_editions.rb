@@ -10,11 +10,13 @@ class AddProductToEditions < ActiveRecord::Migration[8.1]
   def up
     add_reference :editions, :product, foreign_key: true, null: true
 
+    # Drop workspace-scoped uniqueness before duplicating editions per product;
+    # the new model scopes name uniqueness to product_id instead.
+    remove_index :editions, name: "index_editions_on_workspace_id_and_name"
+
     say_with_time "Assign editions to products based on deal line usage" do
       migrate_editions_to_products
     end
-
-    remove_index :editions, name: "index_editions_on_workspace_id_and_name"
     MigrationEdition.where(product_id: nil).delete_all
     change_column_null :editions, :product_id, false
     add_index :editions, [ :product_id, :name ], unique: true
