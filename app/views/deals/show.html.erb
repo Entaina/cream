@@ -1,4 +1,5 @@
-<% page_title @deal.name %>
+<% deal_title = [@deal.name, @deal.company&.name].compact_blank.join(" - ") %>
+<% page_title deal_title %>
 <% actions = capture do %>
   <%= link_to deal_versions_path(@deal), class: "btn-secondary" do %>
     <%= icon :activity, classes: "size-3.5" %> Version history
@@ -13,7 +14,7 @@
     <%= icon :trash, classes: "size-3.5" %> Delete
   <% end %>
 <% end %>
-<%= render "shared/page_header", title: @deal.name, icon_name: :banknote, count: nil, actions: actions %>
+<%= render "shared/page_header", title: deal_title, icon_name: :banknote, count: nil, actions: actions %>
 
 <div class="flex-1 flex min-h-0 overflow-x-auto snap-x snap-mandatory md:overflow-x-visible md:snap-none">
   <aside class="w-80 shrink-0 snap-start border-r border-line overflow-y-auto scrollbar-subtle p-4">
