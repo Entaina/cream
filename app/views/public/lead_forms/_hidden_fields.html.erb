@@ -9,3 +9,6 @@
 <%= hidden_field_tag "lead[utm_campaign]", params[:utm_campaign], data: { lead_form_target: "utmCampaign" } %>
 <%= hidden_field_tag "lead[utm_term]", params[:utm_term], data: { lead_form_target: "utmTerm" } %>
 <%= hidden_field_tag "lead[utm_content]", params[:utm_content], data: { lead_form_target: "utmContent" } %>
+<% lead_form.hidden_field_keys.each do |key| %>
+  <%= hidden_field_tag "lead[#{key}]", params[key], data: { lead_form_param: key } %>
+<% end %>

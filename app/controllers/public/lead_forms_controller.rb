@@ -13,7 +13,7 @@ module Public
 
     # Anti-DoS: per-IP throttling backed by Rails.cache (Solid Cache in production).
     rate_limit to: 10, within: 1.minute, only: :create, name: "lead_form_create",
-      with: -> { redirect_to public_lead_form_success_path(params[:slug]), notice: "Gracias. Hemos recibido tu solicitud." }
+      with: -> { redirect_after_submission }
     rate_limit to: 60, within: 1.minute, only: %i[show success], name: "lead_form_show"
 
     def show
@@ -21,7 +21,7 @@ module Public
 
     def create
       if bot_suspected?
-        redirect_to public_lead_form_success_path(@lead_form.slug), notice: "Gracias. Hemos recibido tu solicitud."
+        redirect_after_submission
         return
       end
 
@@ -42,7 +42,7 @@ module Public
         params: lead_params,
         request: request
       )
-      redirect_to public_lead_form_success_path(@lead_form.slug), notice: "Gracias. Hemos recibido tu solicitud."
+      redirect_after_submission
     rescue ActiveRecord::RecordInvalid => e
       flash.now[:alert] = e.record.errors.full_messages.to_sentence.presence || "No se pudo enviar el formulario."
       render :show, status: :unprocessable_entity
@@ -73,7 +73,8 @@ module Public
         :newsletter_opt_in, :gdpr_consent,
         :lead_form_slug, :lead_form_name,
         :source_page, :referrer, :utm_source, :utm_medium, :utm_campaign, :utm_term, :utm_content,
-        LeadForm::HONEYPOT_FIELD, LeadForm::TIMESTAMP_FIELD
+        LeadForm::HONEYPOT_FIELD, LeadForm::TIMESTAMP_FIELD,
+        *@lead_form.hidden_field_keys
       ).to_h
     end
 
@@ -93,6 +94,15 @@ module Public
       return true unless TurnstileVerifier.enabled?
 
       TurnstileVerifier.valid?(token: params["cf-turnstile-response"], ip: request.remote_ip)
+    end
+
+    def redirect_after_submission
+      notice = "Gracias. Hemos recibido tu solicitud."
+      if (location = @lead_form.success_redirect_location)
+        redirect_to location, notice: notice, allow_other_host: true
+      else
+        redirect_to public_lead_form_success_path(@lead_form.slug), notice: notice
+      end
     end
 
     def allow_iframe_embedding

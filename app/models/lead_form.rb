@@ -11,6 +11,15 @@ class LeadForm < ApplicationRecord
     lead_form_slug lead_form_name source_page referrer
     utm_source utm_medium utm_campaign utm_term utm_content
   ].freeze
+  SUBMISSION_FIELD_KEYS = %w[
+    email first_name last_name phone how_heard help_type message
+    company_name company_cif employee_range qualifying_answer job_title audience tech_profile
+    ia_work_task ia_build_automation organization_ia_stage newsletter_opt_in
+  ].freeze
+  RESERVED_FIELD_KEYS = (
+    SUBMISSION_FIELD_KEYS + METADATA_FIELDS + [ HONEYPOT_FIELD, TIMESTAMP_FIELD, "gdpr_consent" ]
+  ).freeze
+  HIDDEN_FIELD_KEY_FORMAT = /\A[a-z][a-z0-9_]{0,39}\z/
   HOW_HEARD_OPTIONS = [
     [ "Redes sociales", "redes_sociales" ],
     [ "Recomendación de alguien", "recomendacion" ],
@@ -48,10 +57,14 @@ class LeadForm < ApplicationRecord
   validates :name, :slug, :template_key, presence: true
   validates :slug, uniqueness: true, format: { with: /\A[a-z0-9-]+\z/ }
   validates :template_key, inclusion: { in: ->(form) { form.class.available_template_keys } }
+  validates :success_redirect_url, format: { with: URI::DEFAULT_PARSER.make_regexp(%w[http https]) }, allow_blank: true
   validate :associations_belong_to_workspace
   validate :pipeline_routes_belong_to_workspace
+  validate :hidden_field_keys_are_valid
 
   before_validation :normalize_slug
+  before_validation :normalize_success_redirect_url
+  before_validation :normalize_hidden_field_keys
   before_validation :normalize_pipeline_routes
 
   scope :active, -> { where(active: true) }
@@ -137,6 +150,18 @@ class LeadForm < ApplicationRecord
   end
   private_class_method :timestamp_verifier
 
+  def success_redirect_location
+    success_redirect_url.presence
+  end
+
+  def hidden_field_keys_text
+    hidden_field_keys.join("\n")
+  end
+
+  def hidden_field_keys_text=(value)
+    self.hidden_field_keys = value.to_s.split(/\r?\n/).map(&:strip).reject(&:blank?)
+  end
+
   def public_url
     Rails.application.routes.url_helpers.public_lead_form_url(slug, host: default_url_host)
   end
@@ -149,6 +174,27 @@ class LeadForm < ApplicationRecord
 
   def normalize_slug
     self.slug = slug.to_s.parameterize if slug.present?
+  end
+
+  def normalize_success_redirect_url
+    self.success_redirect_url = success_redirect_url.to_s.strip.presence
+  end
+
+  def normalize_hidden_field_keys
+    self.hidden_field_keys = Array(hidden_field_keys).map { |key| key.to_s.strip.downcase }.compact_blank.uniq
+  end
+
+  def hidden_field_keys_are_valid
+    hidden_field_keys.each do |key|
+      unless key.match?(HIDDEN_FIELD_KEY_FORMAT)
+        errors.add(:hidden_field_keys, "invalid key: #{key}")
+        next
+      end
+
+      if RESERVED_FIELD_KEYS.include?(key)
+        errors.add(:hidden_field_keys, "reserved key: #{key}")
+      end
+    end
   end
 
   def normalize_pipeline_routes

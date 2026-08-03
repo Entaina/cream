@@ -63,7 +63,8 @@ class LeadFormsController < ApplicationController
   def lead_form_params
     params.require(:lead_form).permit(
       :name, :slug, :template_key, :pipeline_id, :responsible_id,
-      :email_template_id, :collects_company, :active,
+      :email_template_id, :collects_company, :active, :success_redirect_url,
+      :hidden_field_keys_text,
       pipeline_routes: LeadForm::CONTACTO_HELP_TYPE_KEYS
     )
   end

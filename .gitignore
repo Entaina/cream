@@ -50,3 +50,6 @@ __pycache__/
 *.pyc
 
 calendar_features
+# Ignore key files for decrypting credentials and more.
+/config/credentials/*.key
+

@@ -21,6 +21,14 @@ export default class extends Controller {
     this.setIfEmpty("utmCampaignTarget", params.get("utm_campaign"))
     this.setIfEmpty("utmTermTarget", params.get("utm_term"))
     this.setIfEmpty("utmContentTarget", params.get("utm_content"))
+
+    this.element.querySelectorAll("[data-lead-form-param]").forEach((input) => {
+      const param = input.dataset.leadFormParam
+      if (!param || input.value) return
+
+      const value = params.get(param)
+      if (value) input.value = value
+    })
   }
 
   setIfEmpty(targetKey, value) {

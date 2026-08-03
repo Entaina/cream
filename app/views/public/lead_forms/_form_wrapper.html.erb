@@ -1,5 +1,7 @@
-<%= form_with url: public_lead_form_path(lead_form.slug), scope: :lead, method: :post,
-      class: "space-y-4", data: { controller: "lead-form" } do |f| %>
+<% form_options = { url: public_lead_form_path(lead_form.slug), scope: :lead, method: :post,
+      class: "space-y-4", data: { controller: "lead-form" } } %>
+<% form_options[:html] = { target: "_top" } if lead_form.success_redirect_url.present? %>
+<%= form_with **form_options do |f| %>
   <%= render "public/lead_forms/hidden_fields", lead_form: lead_form %>
 
   <div class="hidden" aria-hidden="true">

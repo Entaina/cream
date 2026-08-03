@@ -4,7 +4,7 @@
 
 Cream es un CRM por **workspaces** para gestionar **personas**, **empresas** y **deals** (oportunidades), con notas, tareas, listas y un historial de actividad compartido en el equipo.
 
-> **Última revisión:** 2026-07-31 (ediciones por producto, picker filtrado)
+> **Última revisión:** 2026-08-03 (campos ocultos configurables en formularios de captación)
 > Este documento describe la funcionalidad **visible para el usuario**. Las funcionalidades desactivadas aparecen al final en «Próximamente».
 
 ---
@@ -1005,8 +1005,10 @@ En el menú lateral, abre **Formularios**.
 
 1. Pulsa **Nuevo formulario**.
 2. Indica el **nombre**, el **slug** (aparecerá en la URL pública `/f/slug`), la **plantilla** del formulario, el **pipeline** donde se creará el deal, el **responsable** (recibe la notificación y la tarea de seguimiento), y la **plantilla de email** que se enviará al lead.
-3. Marca **Recoger datos de empresa** si el formulario debe pedir nombre y CIF de la empresa.
-4. Guarda. En el listado verás la **URL pública** y el **código iframe** listos para copiar.
+3. Opcional: indica la **URL de redirección tras envío** (p. ej. `https://entaina.com/gracias`) para llevar al visitante a una página de tu web. Si se deja vacía, se muestra la página de gracias de Cream (`/f/slug/success`).
+4. Opcional: define **campos ocultos adicionales** (uno por línea, p. ej. `producto`, `landing`). Sus valores se pasan como query params en la URL pública o del iframe, p. ej. `/f/slug?producto=curso-ia`. Se guardan con el envío y aparecen en **Formulario de origen** del deal.
+5. Marca **Recoger datos de empresa** si el formulario debe pedir nombre y CIF de la empresa.
+6. Guarda. En el listado verás la **URL pública** y el **código iframe** listos para copiar.
 
 ### Qué ocurre al enviar un formulario
 

@@ -42,6 +42,16 @@
     <%= f.label :email_template_id, "Plantilla de email al lead", class: "label" %>
     <%= f.collection_select :email_template_id, @email_templates, :id, :name, {}, class: "input w-full" %>
   </div>
+  <div>
+    <%= f.label :success_redirect_url, "URL de redirección tras envío", class: "label" %>
+    <%= f.url_field :success_redirect_url, class: "input w-full", placeholder: "https://entaina.com/gracias" %>
+    <p class="text-xs text-ink-faint mt-1">Opcional. Si se deja vacío, se muestra la página de gracias de Cream (/f/slug/success).</p>
+  </div>
+  <div>
+    <%= f.label :hidden_field_keys_text, "Campos ocultos adicionales", class: "label" %>
+    <%= f.text_area :hidden_field_keys_text, class: "input w-full font-mono text-sm", rows: 4, placeholder: "producto\nlanding" %>
+    <p class="text-xs text-ink-faint mt-1">Uno por línea. Se leen de la URL pública, p. ej. /f/slug?producto=curso-ia</p>
+  </div>
   <label class="flex items-center gap-2 text-base">
     <%= f.check_box :collects_company %> Recoger datos de empresa (nombre y CIF)
   </label>

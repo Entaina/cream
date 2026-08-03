@@ -30,6 +30,18 @@ RSpec.describe "Public lead forms", type: :request do
 
       expect(response).to have_http_status(:not_found)
     end
+
+    it "renders configured hidden fields from query params" do
+      lead_form.update!(hidden_field_keys: %w[producto landing])
+
+      get public_lead_form_path(lead_form.slug, producto: "curso-ia", landing: "home")
+
+      expect(response.body).to include('name="lead[producto]"')
+      expect(response.body).to include('value="curso-ia"')
+      expect(response.body).to include('name="lead[landing]"')
+      expect(response.body).to include('value="home"')
+      expect(response.body).to include('data-lead-form-param="producto"')
+    end
   end
 
   describe "POST /f/:slug" do
@@ -56,6 +68,38 @@ RSpec.describe "Public lead forms", type: :request do
       expect(submission.data["how_heard"]).to eq("evento")
       expect(submission.data["help_type"]).to eq("entrenamiento")
       expect(submission.data["message"]).to eq("Quiero saber más")
+    end
+
+    it "redirects to configured success URL when present" do
+      lead_form.update!(success_redirect_url: "https://example.com/gracias")
+
+      post public_lead_form_path(lead_form.slug), params: {
+        lead: contacto_lead_params
+      }
+
+      expect(response).to redirect_to("https://example.com/gracias")
+    end
+
+    it "uses target _top when success redirect URL is configured" do
+      lead_form.update!(success_redirect_url: "https://example.com/gracias")
+
+      get public_lead_form_path(lead_form.slug)
+
+      expect(response.body).to include('target="_top"')
+    end
+
+    it "stores configured hidden field values in submission data" do
+      lead_form.update!(hidden_field_keys: %w[producto])
+
+      expect {
+        post public_lead_form_path(lead_form.slug), params: {
+          lead: contacto_lead_params(producto: "curso-ia", extra_field: "ignored")
+        }
+      }.to change(Deal, :count).by(1)
+
+      submission = LeadSubmission.order(:id).last
+      expect(submission.data["producto"]).to eq("curso-ia")
+      expect(submission.data).not_to have_key("extra_field")
     end
 
     it "rejects submissions without GDPR consent" do

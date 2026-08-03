@@ -4,7 +4,7 @@
 
 Cream is a **workspace**-based CRM for managing **people**, **companies** and **deals** (opportunities), with notes, tasks, lists and an activity history shared across the team.
 
-> **Last revision:** 2026-07-31 (editions per product, scoped picker)
+> **Last revision:** 2026-08-03 (configurable hidden fields in lead forms)
 > This document describes the functionality **visible to the user**. Disabled features are listed at the end under "Coming soon".
 
 ---
@@ -1005,8 +1005,10 @@ In the sidebar menu, open **Formularios** (Forms).
 
 1. Click **Nuevo formulario** (New form).
 2. Provide the **name**, the **slug** (it will appear in the public URL `/f/slug`), the form **template**, the **pipeline** where the deal will be created, the **owner** (receives the notification and the follow-up task), and the **email template** that will be sent to the lead.
-3. Check **Recoger datos de empresa** (Collect company data) if the form should ask for the company name and tax ID (CIF).
-4. Save. In the list you will see the **public URL** and the **iframe code** ready to copy.
+3. Optional: set a **redirect URL after submission** (e.g. `https://example.com/thanks`) to send the visitor to a page on your site. If left blank, Cream's thank-you page is shown (`/f/slug/success`).
+4. Optional: define **additional hidden fields** (one per line, e.g. `producto`, `landing`). Their values are passed as query params in the public or iframe URL, e.g. `/f/slug?producto=curso-ia`. They are saved with the submission and shown on the deal under **Formulario de origen** (Source form).
+5. Check **Recoger datos de empresa** (Collect company data) if the form should ask for the company name and tax ID (CIF).
+6. Save. In the list you will see the **public URL** and the **iframe code** ready to copy.
 
 ### What happens when a form is submitted
 
