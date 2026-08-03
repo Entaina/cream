@@ -28,6 +28,10 @@ RSpec.describe "Api::V1::Deals", type: :request do
       }.not_to change { deal.activities.where(action: "stage_changed").count }
 
       expect(deal.reload.name).to eq("Via API")
+      expect(response.parsed_body).to include(
+        "created_at" => deal.created_at.iso8601,
+        "updated_at" => deal.updated_at.iso8601
+      )
     end
   end
 end

@@ -103,7 +103,8 @@ module CreamMcp
     { id: p.id, type: "person", name: p.display_name, email: p.email, phone: p.phone,
      job_title: p.job_title, location: p.location, company_id: p.company_id,
      company: p.company&.name, owner: p.owner&.name, url: record_url(p),
-     custom_fields: custom_fields_json(p) }.compact
+     custom_fields: custom_fields_json(p),
+     created_at: p.created_at.iso8601, updated_at: p.updated_at.iso8601 }.compact
   end
 
   def self.company_json(c)
@@ -111,7 +112,8 @@ module CreamMcp
      employees: c.employee_range, location: c.location, annual_revenue: c.annual_revenue,
      fiscal_information: c.fiscal_information,
      owner: c.owner&.name, people_count: c.people.size, url: record_url(c),
-     custom_fields: custom_fields_json(c) }.compact
+     custom_fields: custom_fields_json(c),
+     created_at: c.created_at.iso8601, updated_at: c.updated_at.iso8601 }.compact
   end
 
   def self.deal_json(d)
@@ -122,7 +124,8 @@ module CreamMcp
      expected_close_date: d.expected_close_date&.iso8601,
      company_id: d.company_id, company: d.company&.name, company_url: record_url(d.company),
      contacts: d.contacts.map { |p| record_ref_json(p) }.presence, owner: d.owner&.name, url: record_url(d),
-     custom_fields: custom_fields_json(d) }.compact
+     custom_fields: custom_fields_json(d),
+     created_at: d.created_at.iso8601, updated_at: d.updated_at.iso8601 }.compact
   end
 
   def self.custom_fields_json(record)
@@ -136,8 +139,10 @@ module CreamMcp
 
   def self.task_json(t)
     { id: t.id, title: t.title, due_on: t.due_on&.iso8601, completed: t.completed?,
+     completed_at: t.completed_at&.iso8601,
      overdue: t.overdue?, assignee: t.assignee&.name, url: task_url(t),
-     record: t.taskable && record_ref_json(t.taskable) }.compact
+     record: t.taskable && record_ref_json(t.taskable),
+     created_at: t.created_at.iso8601, updated_at: t.updated_at.iso8601 }.compact
   end
 
   def self.product_json(p)

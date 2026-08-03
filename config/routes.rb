@@ -186,6 +186,7 @@ Rails.application.routes.draw do
       resources :people
       resources :companies
       resources :deals
+      resources :tasks
       get "gmail/context", to: "gmail_contexts#show"
       post "gmail/threads/status", to: "gmail_threads#status"
       post "gmail/threads/link", to: "gmail_threads#link"

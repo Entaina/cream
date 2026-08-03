@@ -57,7 +57,9 @@ module Api
           email: person.email,
           emails: person.person_emails.ordered.map { |record| { address: record.address, primary: record.primary? } },
           company_id: person.company_id,
-          company: person.company&.name
+          company: person.company&.name,
+          created_at: person.created_at.iso8601,
+          updated_at: person.updated_at.iso8601
         }
       end
     end

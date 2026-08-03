@@ -49,7 +49,14 @@ module Api
       end
 
       def company_json(company)
-        { id: company.id, name: company.name, domain: company.domain, industry: company.industry }
+        {
+          id: company.id,
+          name: company.name,
+          domain: company.domain,
+          industry: company.industry,
+          created_at: company.created_at.iso8601,
+          updated_at: company.updated_at.iso8601
+        }
       end
     end
   end

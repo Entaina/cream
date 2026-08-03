@@ -69,7 +69,9 @@ module Api
           stage: deal.stage_label,
           value: deal.value.to_f,
           currency: deal.currency,
-          company_id: deal.company_id
+          company_id: deal.company_id,
+          created_at: deal.created_at.iso8601,
+          updated_at: deal.updated_at.iso8601
         }
       end
     end

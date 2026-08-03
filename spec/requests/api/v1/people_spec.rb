@@ -7,11 +7,16 @@ RSpec.describe "Api::V1::People", type: :request do
     user = users(:one)
     workspace = workspaces(:one)
     token = user.api_tokens.create!(name: "Test", workspace: workspace)
-    create_person!(workspace)
+    person = create_person!(workspace)
 
     get "/api/v1/people", headers: { "Authorization" => "Bearer #{token.plaintext_token}" }
 
     expect(response).to have_http_status(:success)
-    expect(response.parsed_body).to be_an(Array)
+    body = response.parsed_body
+    expect(body).to be_an(Array)
+    expect(body.first).to include(
+      "created_at" => person.created_at.iso8601,
+      "updated_at" => person.updated_at.iso8601
+    )
   end
 end
