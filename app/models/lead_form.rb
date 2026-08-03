@@ -151,7 +151,15 @@ class LeadForm < ApplicationRecord
   private_class_method :timestamp_verifier
 
   def success_redirect_location
-    success_redirect_url.presence
+    url = success_redirect_url.to_s.strip.presence
+    return if url.blank?
+
+    uri = URI.parse(url)
+    return unless uri.is_a?(URI::HTTP) && uri.host.present?
+
+    uri.to_s
+  rescue URI::InvalidURIError
+    nil
   end
 
   def hidden_field_keys_text

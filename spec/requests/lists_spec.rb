@@ -27,7 +27,7 @@ RSpec.describe "Lists", type: :request do
       expect(response).to have_http_status(:ok)
       expect(response.body).to include("Own list deal")
       expect(response.body).not_to include("Hidden list deal")
-      expect(response.body).not_to include("value=\"#{hidden_deal.id}\"")
+      expect(response.body).not_to include(%(<option value="#{hidden_deal.id}">Hidden list deal</option>))
     end
 
     it "shows all deal entries and candidates when view-all is enabled" do
@@ -41,8 +41,8 @@ RSpec.describe "Lists", type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include("Visible list deal")
-      expect(response.body).to include("value=\"#{candidate_deal.id}\"")
-      expect(response.body).not_to include("value=\"#{listed_deal.id}\"")
+      expect(response.body).to include(%(<option value="#{candidate_deal.id}">Visible candidate deal</option>))
+      expect(response.body).not_to include(%(<option value="#{listed_deal.id}">Visible list deal</option>))
     end
   end
 

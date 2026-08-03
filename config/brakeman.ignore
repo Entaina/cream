@@ -1,0 +1,26 @@
+{
+  "ignored_warnings": [
+    {
+      "warning_type": "Redirect",
+      "warning_code": 18,
+      "fingerprint": "2c21dc37cd3f5034024d4004d3d0b52cd3a9b146c66fd4afef05ab70c3ce9597",
+      "check_name": "Redirect",
+      "message": "Possible unprotected redirect",
+      "file": "app/controllers/public/lead_forms_controller.rb",
+      "line": 102,
+      "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
+      "code": "redirect_to(LeadForm.active.find_by!(:slug => params[:slug]).success_redirect_location, :notice => \"Gracias. Hemos recibido tu solicitud.\", :allow_other_host => true)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Public::LeadFormsController",
+        "method": "redirect_after_submission"
+      },
+      "user_input": "LeadForm.active.find_by!(:slug => params[:slug]).success_redirect_location",
+      "confidence": "Weak",
+      "note": "Intentional external redirect after lead form submit. URL is admin-configured (success_redirect_url), validated as http(s) on save, and re-validated at runtime in LeadForm#success_redirect_location before allow_other_host: true."
+    }
+  ],
+  "updated": "2026-08-03 18:01:00 +0200",
+  "brakeman_version": "8.0.5"
+}
