@@ -1,6 +1,6 @@
 ---
 name: cream-architecture
-description: Domain model, workspaces, API tokens, conventions, design system and production deployment of the Cream CRM (Attio clone). Use when adding features, models, views, auth, multi-tenancy, UI components, or working on production deploy/infra so everything stays consistent.
+description: Domain model, workspaces, API tokens, conventions, design system and production deployment of the Cream CRM (Attio clone). Use when adding features, models, views, auth, multi-tenancy, UI components, or working on production deploy/infra so everything stays consistent. For REST API v1 use skill `cream-api`; for MCP use skill `cream-mcp`.
 ---
 
 # Cream — Architecture & conventions
@@ -57,14 +57,15 @@ When adding features: ALWAYS scope queries through `current_workspace`. If imple
 
 ## API tokens
 
-Per-user, per-workspace bearer tokens for programmatic access (MCP, etc.).
+Per-user, per-workspace bearer tokens for programmatic access (MCP, REST API, etc.).
 
 - Model: `ApiToken` — `belongs_to :user`, `belongs_to :workspace`
 - Prefix: `cream_`; stored as SHA256 digest; plaintext shown once on create (`flash[:api_token]`)
 - Created via `ApiTokensController` on `current_user` + `current_workspace`
 - Policy: users list/revoke only their own tokens (`ApiTokenPolicy#destroy?` checks `record.user_id == user.id`; scope filters `user` + `workspace`)
-- Auth: `ApiToken.authenticate(plaintext)` → sets `@mcp_user` and `@mcp_workspace` in `McpController`
 - Routes: `resources :api_tokens, only: %i[index create destroy]`
+- **REST API v1** (endpoints, OpenAPI): skill **`cream-api`**
+- **MCP server** (tools, OAuth scope `mcp`, `/mcp`): skill **`cream-mcp`**
 
 ## UI conventions
 
@@ -127,7 +128,9 @@ When adding a new alert trigger or condition, extend constants + `AlertRuleEngin
 Before considering a task done:
 
 1. If the change affects **user-visible** behaviour (screens, menus, flows, permissions in the UI), update [`USER_MANUAL.md`](../../../USER_MANUAL.md) and [`MANUAL_USUARIO.md`](../../../MANUAL_USUARIO.md) — see skill `cream-user-manual`.
-2. Run `bin/rubocop` (or `bin/rubocop -a`) and fix style issues, then run the relevant specs. Lint is enforced locally via skills, not in CI — see `cream-dev` for commands.
+2. If the change adds or modifies **REST API v1** endpoints, follow skill **`cream-api`** (incl. `docs/openapi.yaml` in the same PR).
+3. If the change adds or modifies **MCP tools or OAuth MCP**, follow skill **`cream-mcp`**.
+4. Run `bin/rubocop` (or `bin/rubocop -a`) and fix style issues, then run the relevant specs. Lint is enforced locally via skills, not in CI — see `cream-dev` for commands.
 
 ## Production deployment
 

@@ -17,11 +17,14 @@ module Api
         deal = current_workspace.deals.new(deal_params.merge(owner: current_user))
         authorize deal
 
-        if deal.save
-          render json: deal_json(deal), status: :created
-        else
-          render json: { errors: deal.errors.full_messages }, status: :unprocessable_entity
+        notes = []
+        ActiveRecord::Base.transaction do
+          deal.save!
+          notes = create_notes_for!(deal)
         end
+        render json: deal_json(deal, notes: notes), status: :created
+      rescue ActiveRecord::RecordInvalid => e
+        render json: { errors: e.record.errors.full_messages }, status: :unprocessable_entity
       end
 
       def update
@@ -48,7 +51,35 @@ module Api
       private
 
       def deal_params
-        params.require(:deal).permit(:name, :company_id, :pipeline_id, :pipeline_stage_id, :value, :currency, :probability, :expected_close_date)
+        params.require(:deal).permit(
+          :name, :company_id, :pipeline_id, :pipeline_stage_id, :value, :currency, :probability, :expected_close_date,
+          tasks_attributes: %i[title due_on]
+        )
+      end
+
+      def nested_notes_params
+        Array(params[:notes]).filter_map do |entry|
+          next unless entry.is_a?(ActionController::Parameters) || entry.is_a?(Hash)
+
+          entry = ActionController::Parameters.new(entry) unless entry.is_a?(ActionController::Parameters)
+          entry.permit(:title, :body).to_h.symbolize_keys.presence
+        end
+      end
+
+      def create_notes_for!(deal)
+        nested_notes_params.map do |attrs|
+          deal.notes.create!(attrs.merge(workspace: current_workspace, user: current_user))
+        end
+      end
+
+      def note_json(note)
+        {
+          id: note.id,
+          title: note.title,
+          body: note.body,
+          created_at: note.created_at.iso8601,
+          updated_at: note.updated_at.iso8601
+        }
       end
 
       # Stage changes must go through move_to_stage! so the stage_changed
@@ -62,8 +93,8 @@ module Api
         current_workspace.pipeline_stages.find(stage_id)
       end
 
-      def deal_json(deal)
-        {
+      def deal_json(deal, notes: nil)
+        json = {
           id: deal.id,
           name: deal.name,
           stage: deal.stage_label,
@@ -73,6 +104,8 @@ module Api
           created_at: deal.created_at.iso8601,
           updated_at: deal.updated_at.iso8601
         }
+        json[:notes] = notes.map { |note| note_json(note) } unless notes.nil?
+        json
       end
     end
   end

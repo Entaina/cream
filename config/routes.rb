@@ -182,10 +182,15 @@ Rails.application.routes.draw do
   end
 
   namespace :api do
+    get "docs", to: "docs#show"
+    get "openapi.yaml", to: "docs#openapi", as: :openapi
     namespace :v1 do
       resources :people
       resources :companies
-      resources :deals
+      resources :deals do
+        resources :notes, only: :create, controller: "deal_notes"
+        resources :emails, only: :create, controller: "deal_emails"
+      end
       resources :tasks
       get "gmail/context", to: "gmail_contexts#show"
       post "gmail/threads/status", to: "gmail_threads#status"

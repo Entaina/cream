@@ -1,0 +1,1222 @@
+openapi: 3.1.0
+info:
+  title: Cream CRM API
+  version: 1.0.0
+  description: |
+    REST API for the Cream CRM workspace data model.
+
+    Authentication uses a Bearer token in the `Authorization` header:
+
+    - **API token** — created in the Cream web app (`Settings → API tokens`). Prefix: `cream_`.
+    - **OAuth access token** — obtained via Doorkeeper with scope `api` (same flow as MCP, different scope).
+
+    Workspace context:
+
+    - API tokens are bound to one workspace.
+    - OAuth tokens may access any workspace the user belongs to; pass `X-Cream-Workspace-Id` to select one, or the user's default workspace is used.
+
+    JSON request bodies use the `application/json` content type unless noted otherwise.
+
+servers:
+  - url: /
+    description: Current host
+
+tags:
+  - name: People
+  - name: Companies
+  - name: Deals
+  - name: Deal notes
+  - name: Deal emails
+  - name: Tasks
+  - name: Gmail add-on
+
+security:
+  - BearerAuth: []
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: API token (`cream_…`) or OAuth access token (Doorkeeper scope `api`).
+
+  parameters:
+    WorkspaceId:
+      name: X-Cream-Workspace-Id
+      in: header
+      required: false
+      schema:
+        type: integer
+      description: Target workspace when using an OAuth access token. Ignored for API tokens (workspace is fixed on the token).
+
+    SearchQuery:
+      name: q
+      in: query
+      required: false
+      schema:
+        type: string
+      description: Case-insensitive search term (supported on list endpoints).
+
+    PersonId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+
+    CompanyId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+
+    DealId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+
+    DealIdNested:
+      name: deal_id
+      in: path
+      required: true
+      schema:
+        type: integer
+
+    TaskId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+
+  responses:
+    Unauthorized:
+      description: Missing or invalid Bearer token.
+    Forbidden:
+      description: Token valid but not allowed for the requested workspace or resource.
+    NotFound:
+      description: Record not found in the current workspace, or feature disabled.
+    ValidationError:
+      description: Validation failed.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ValidationError"
+    FeatureDisabled:
+      description: Feature not enabled for this deployment.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/FeatureDisabledError"
+
+  schemas:
+    ValidationError:
+      type: object
+      required: [errors]
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+
+    FeatureDisabledError:
+      type: object
+      properties:
+        error:
+          type: string
+
+    Timestamps:
+      type: object
+      properties:
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    PersonEmail:
+      type: object
+      properties:
+        address:
+          type: string
+          format: email
+        primary:
+          type: boolean
+
+    Person:
+      allOf:
+        - type: object
+          required: [id, first_name, last_name]
+          properties:
+            id:
+              type: integer
+            first_name:
+              type: string
+            last_name:
+              type: string
+            email:
+              type: string
+              format: email
+              nullable: true
+            emails:
+              type: array
+              items:
+                $ref: "#/components/schemas/PersonEmail"
+            company_id:
+              type: integer
+              nullable: true
+            company:
+              type: string
+              nullable: true
+              description: Company name (read-only).
+        - $ref: "#/components/schemas/Timestamps"
+
+    PersonInput:
+      type: object
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        job_title:
+          type: string
+        location:
+          type: string
+        company_id:
+          type: integer
+        person_emails_attributes:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              address:
+                type: string
+                format: email
+              primary:
+                type: boolean
+              _destroy:
+                type: boolean
+
+    Company:
+      allOf:
+        - type: object
+          required: [id, name]
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+            domain:
+              type: string
+              nullable: true
+            industry:
+              type: string
+              nullable: true
+        - $ref: "#/components/schemas/Timestamps"
+
+    CompanyInput:
+      type: object
+      properties:
+        name:
+          type: string
+        domain:
+          type: string
+        industry:
+          type: string
+        employee_range:
+          type: string
+        location:
+          type: string
+        annual_revenue:
+          type: number
+
+    DealTaskInput:
+      type: object
+      required: [title, due_on]
+      properties:
+        title:
+          type: string
+          description: Next action title.
+        due_on:
+          type: string
+          format: date
+          description: Due date (today or later). Required when creating a deal.
+
+    Note:
+      allOf:
+        - type: object
+          required: [id, body]
+          properties:
+            id:
+              type: integer
+            title:
+              type: string
+              nullable: true
+            body:
+              type: string
+        - $ref: "#/components/schemas/Timestamps"
+
+    NoteInput:
+      type: object
+      required: [body]
+      properties:
+        title:
+          type: string
+        body:
+          type: string
+
+    Deal:
+      allOf:
+        - type: object
+          required: [id, name, stage, value, currency, company_id]
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+            stage:
+              type: string
+              description: Current pipeline stage label.
+            value:
+              type: number
+            currency:
+              type: string
+            company_id:
+              type: integer
+            notes:
+              type: array
+              description: Present only in create responses when notes were sent in the request.
+              items:
+                $ref: "#/components/schemas/Note"
+        - $ref: "#/components/schemas/Timestamps"
+
+    DealInput:
+      type: object
+      required: [name, company_id]
+      properties:
+        name:
+          type: string
+        company_id:
+          type: integer
+        pipeline_id:
+          type: integer
+        pipeline_stage_id:
+          type: integer
+          description: On update, stage changes run through the stage machine (activities, automations, triggers).
+        value:
+          type: number
+        currency:
+          type: string
+        probability:
+          type: integer
+          minimum: 0
+          maximum: 100
+        expected_close_date:
+          type: string
+          format: date
+        tasks_attributes:
+          type: array
+          description: At least one task with a future due date is required when creating a deal.
+          items:
+            $ref: "#/components/schemas/DealTaskInput"
+
+    DealCreateRequest:
+      type: object
+      required: [deal]
+      properties:
+        deal:
+          $ref: "#/components/schemas/DealInput"
+        notes:
+          type: array
+          description: Optional notes created atomically with the deal (rolled back if any note is invalid).
+          items:
+            $ref: "#/components/schemas/NoteInput"
+
+    DealEmail:
+      type: object
+      required: [id, to_address, subject, status, via_gmail]
+      properties:
+        id:
+          type: integer
+        to_address:
+          type: string
+          format: email
+        subject:
+          type: string
+        status:
+          type: string
+          enum: [sent, scheduled, failed, opened, received]
+        via_gmail:
+          type: boolean
+          description: True when delivery is queued through the sender's connected Gmail account.
+
+    DealEmailInput:
+      type: object
+      required: [subject, body]
+      properties:
+        to_address:
+          type: string
+          format: email
+          description: Defaults to the first contact's email on the deal when omitted.
+        subject:
+          type: string
+        body:
+          type: string
+
+    Task:
+      allOf:
+        - type: object
+          required: [id, title, completed]
+          properties:
+            id:
+              type: integer
+            title:
+              type: string
+            due_on:
+              type: string
+              format: date
+              nullable: true
+            completed:
+              type: boolean
+            completed_at:
+              type: string
+              format: date-time
+              nullable: true
+            assignee_id:
+              type: integer
+              nullable: true
+            taskable_type:
+              type: string
+              enum: [Company, Person, Deal]
+              nullable: true
+            taskable_id:
+              type: integer
+              nullable: true
+        - $ref: "#/components/schemas/Timestamps"
+
+    TaskInput:
+      type: object
+      properties:
+        title:
+          type: string
+        due_on:
+          type: string
+          format: date
+        assignee_id:
+          type: integer
+        taskable_type:
+          type: string
+          enum: [Company, Person, Deal]
+        taskable_id:
+          type: integer
+        completed:
+          type: boolean
+
+    GmailContext:
+      type: object
+      required: [selected_workspace_id, workspaces]
+      properties:
+        selected_workspace_id:
+          type: integer
+        workspaces:
+          type: array
+          items:
+            $ref: "#/components/schemas/GmailWorkspace"
+
+    GmailWorkspace:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        default_pipeline_id:
+          type: integer
+          nullable: true
+        pipelines:
+          type: array
+          items:
+            $ref: "#/components/schemas/GmailPipeline"
+
+    GmailPipeline:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        default:
+          type: boolean
+        stages:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              name:
+                type: string
+              closed:
+                type: boolean
+
+    GmailThreadStatusRequest:
+      type: object
+      properties:
+        gmail_thread_id:
+          type: string
+        rfc822_message_ids:
+          type: array
+          items:
+            type: string
+        participant_emails:
+          type: array
+          items:
+            type: string
+            format: email
+
+    GmailDealSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        stage:
+          type: string
+        company_id:
+          type: integer
+        url:
+          type: string
+          format: uri
+          nullable: true
+
+    GmailThreadStatus:
+      type: object
+      properties:
+        linked:
+          type: array
+          items:
+            $ref: "#/components/schemas/GmailDealSummary"
+        suggestions:
+          type: array
+          items:
+            $ref: "#/components/schemas/GmailDealSummary"
+
+    GmailThreadMessage:
+      type: object
+      properties:
+        gmail_message_id:
+          type: string
+        rfc822_message_id:
+          type: string
+        from:
+          type: string
+        to:
+          type: string
+        subject:
+          type: string
+        body:
+          type: string
+        sent_at:
+          type: string
+          format: date-time
+
+    GmailThread:
+      type: object
+      required: [gmail_thread_id, messages]
+      properties:
+        gmail_thread_id:
+          type: string
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/GmailThreadMessage"
+
+    GmailThreadLinkRequest:
+      type: object
+      required: [thread]
+      properties:
+        deal_id:
+          type: integer
+          description: Link to an existing deal. Omit when creating a new deal.
+        new_deal:
+          type: object
+          properties:
+            name:
+              type: string
+            pipeline_stage_id:
+              type: integer
+        thread:
+          $ref: "#/components/schemas/GmailThread"
+
+    GmailThreadLinkResponse:
+      type: object
+      properties:
+        deal:
+          $ref: "#/components/schemas/GmailDealSummary"
+        imported_count:
+          type: integer
+        messages:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              direction:
+                type: string
+                enum: [outbound, inbound]
+              subject:
+                type: string
+              from:
+                type: string
+              to:
+                type: string
+
+paths:
+  /api/v1/people:
+    get:
+      tags: [People]
+      summary: List people
+      parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
+        - $ref: "#/components/parameters/SearchQuery"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Person"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/FeatureDisabled"
+    post:
+      tags: [People]
+      summary: Create a person
+      parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [person]
+              properties:
+                person:
+                  $ref: "#/components/schemas/PersonInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Person"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/FeatureDisabled"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /api/v1/people/{id}:
+    get:
+      tags: [People]
+      summary: Show a person
+      parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
+        - $ref: "#/components/parameters/PersonId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Person"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags: [People]
+      summary: Update a person
+      parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
+        - $ref: "#/components/parameters/PersonId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [person]
+              properties:
+                person:
+                  $ref: "#/components/schemas/PersonInput"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Person"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+    delete:
+      tags: [People]
+      summary: Delete a person
+      parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
+        - $ref: "#/components/parameters/PersonId"
+      responses:
+        "204":
+          description: Deleted
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/v1/companies:
+    get:
+      tags: [Companies]
+      summary: List companies
+      parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
+        - $ref: "#/components/parameters/SearchQuery"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Company"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/FeatureDisabled"
+    post:
+      tags: [Companies]
+      summary: Create a company
+      parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [company]
+              properties:
+                company:
+                  $ref: "#/components/schemas/CompanyInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Company"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/FeatureDisabled"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /api/v1/companies/{id}:
+    get:
+      tags: [Companies]
+      summary: Show a company
+      parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
+        - $ref: "#/components/parameters/CompanyId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Company"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags: [Companies]
+      summary: Update a company
+      parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
+        - $ref: "#/components/parameters/CompanyId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [company]
+              properties:
+                company:
+                  $ref: "#/components/schemas/CompanyInput"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Company"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+    delete:
+      tags: [Companies]
+      summary: Delete a company
+      parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
+        - $ref: "#/components/parameters/CompanyId"
+      responses:
+        "204":
+          description: Deleted
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/v1/deals:
+    get:
+      tags: [Deals]
+      summary: List deals
+      parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
+        - $ref: "#/components/parameters/SearchQuery"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Deal"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/FeatureDisabled"
+    post:
+      tags: [Deals]
+      summary: Create a deal
+      description: |
+        A deal requires at least one next-action task with a due date today or later.
+        Optional `notes` are created in the same transaction as the deal.
+      parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DealCreateRequest"
+            example:
+              deal:
+                name: Enterprise license
+                company_id: 1
+                tasks_attributes:
+                  - title: Send proposal
+                    due_on: "2026-08-15"
+              notes:
+                - title: Discovery call
+                  body: Interested in annual plan.
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Deal"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/FeatureDisabled"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /api/v1/deals/{id}:
+    get:
+      tags: [Deals]
+      summary: Show a deal
+      parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
+        - $ref: "#/components/parameters/DealId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Deal"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags: [Deals]
+      summary: Update a deal
+      description: Changing `pipeline_stage_id` routes through the stage machine (activities, webhooks, automations, stage triggers).
+      parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
+        - $ref: "#/components/parameters/DealId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [deal]
+              properties:
+                deal:
+                  $ref: "#/components/schemas/DealInput"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Deal"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+    delete:
+      tags: [Deals]
+      summary: Delete a deal
+      parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
+        - $ref: "#/components/parameters/DealId"
+      responses:
+        "204":
+          description: Deleted
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/v1/deals/{deal_id}/notes:
+    post:
+      tags: [Deal notes]
+      summary: Add a note to a deal
+      parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
+        - $ref: "#/components/parameters/DealIdNested"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [note]
+              properties:
+                note:
+                  $ref: "#/components/schemas/NoteInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Note"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /api/v1/deals/{deal_id}/emails:
+    post:
+      tags: [Deal emails]
+      summary: Send an email from a deal
+      description: |
+        Queues delivery through the sender's Gmail account when connected and enabled;
+        otherwise sends via SMTP. Requires the `record_email` feature.
+      parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
+        - $ref: "#/components/parameters/DealIdNested"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email:
+                  $ref: "#/components/schemas/DealEmailInput"
+      responses:
+        "201":
+          description: Queued for delivery
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DealEmail"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /api/v1/tasks:
+    get:
+      tags: [Tasks]
+      summary: List tasks
+      parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Task"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/FeatureDisabled"
+    post:
+      tags: [Tasks]
+      summary: Create a task
+      parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [task]
+              properties:
+                task:
+                  $ref: "#/components/schemas/TaskInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/FeatureDisabled"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /api/v1/tasks/{id}:
+    get:
+      tags: [Tasks]
+      summary: Show a task
+      parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
+        - $ref: "#/components/parameters/TaskId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags: [Tasks]
+      summary: Update a task
+      description: Setting `completed` to true runs completion side effects (activity log).
+      parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
+        - $ref: "#/components/parameters/TaskId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [task]
+              properties:
+                task:
+                  $ref: "#/components/schemas/TaskInput"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+    delete:
+      tags: [Tasks]
+      summary: Delete a task
+      parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
+        - $ref: "#/components/parameters/TaskId"
+      responses:
+        "204":
+          description: Deleted
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/v1/gmail/context:
+    get:
+      tags: [Gmail add-on]
+      summary: Gmail add-on workspace context
+      description: Returns workspaces, pipelines and stages for the authenticated user. Requires the `gmail_addon` feature.
+      parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GmailContext"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/FeatureDisabled"
+
+  /api/v1/gmail/threads/status:
+    post:
+      tags: [Gmail add-on]
+      summary: Gmail thread link status
+      description: Returns deals already linked to a thread and suggestions based on participant emails.
+      parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GmailThreadStatusRequest"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GmailThreadStatus"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/FeatureDisabled"
+
+  /api/v1/gmail/threads/link:
+    post:
+      tags: [Gmail add-on]
+      summary: Link a Gmail thread to a deal
+      description: Links to an existing deal or creates a new one and imports thread messages.
+      parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GmailThreadLinkRequest"
+      responses:
+        "201":
+          description: Linked
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GmailThreadLinkResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"

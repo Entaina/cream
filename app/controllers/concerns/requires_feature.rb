@@ -11,10 +11,14 @@ module RequiresFeature
 
         label = CreamFeatures.entry(feature_key).label
         message = "#{label} is not available yet."
-        respond_to do |format|
-          format.html { redirect_to root_path, alert: message }
-          format.json { render json: { error: message }, status: :not_found }
-          format.any { head :not_found }
+        if is_a?(ActionController::API)
+          render json: { error: message }, status: :not_found
+        else
+          respond_to do |format|
+            format.html { redirect_to root_path, alert: message }
+            format.json { render json: { error: message }, status: :not_found }
+            format.any { head :not_found }
+          end
         end
       end
     end
