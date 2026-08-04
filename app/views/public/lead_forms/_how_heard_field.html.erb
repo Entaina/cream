@@ -1,7 +1,8 @@
+<%# locals: f, options: LeadForm::HOW_HEARD_OPTIONS %>
 <div>
   <%= render "public/lead_forms/field_label", f: f, field: :how_heard, text: "¿Cómo nos has conocido?", required: true %>
   <%= f.select :how_heard,
-        options_for_select(LeadForm::HOW_HEARD_OPTIONS),
+        options_for_select(local_assigns.fetch(:options, LeadForm::HOW_HEARD_OPTIONS)),
         { include_blank: "Selecciona una opción" },
         class: "input w-full",
         required: true %>

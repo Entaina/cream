@@ -11,7 +11,7 @@
   <div>
     <%= render "public/lead_forms/field_label", f: f, field: :audience, text: "Para ti o para tu equipo", required: true %>
     <%= f.select :audience,
-          options_for_select(LeadForm::LIDERANDO_IA_AUDIENCE_OPTIONS),
+          options_for_select(LeadForm::DESARROLLANDO_IA_AUDIENCE_OPTIONS),
           { include_blank: "Selecciona una opción" },
           class: "input w-full",
           required: true %>

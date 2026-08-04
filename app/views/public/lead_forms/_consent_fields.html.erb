@@ -1,16 +1,29 @@
+<%# locals: f, lead_form: nil %>
 <div class="space-y-3 border-t border-line pt-4">
-  <label class="flex items-start gap-2.5 text-sm text-ink-soft cursor-pointer">
-    <%= f.check_box :newsletter_opt_in, { class: "mt-0.5 rounded border-line" }, "1", "0" %>
-    <span>Quiero recibir la newsletter de <%= cream_operator_name %></span>
-  </label>
+  <% if local_assigns[:lead_form].nil? || lead_form.show_newsletter_opt_in? %>
+    <label class="flex items-start gap-2.5 text-sm text-ink-soft cursor-pointer">
+      <%= f.check_box :newsletter_opt_in, { class: "mt-0.5 rounded border-line" }, "1", "0" %>
+      <span>Quiero recibir la newsletter de <%= cream_operator_name %></span>
+    </label>
+  <% end %>
 
   <label class="flex items-start gap-2.5 text-sm text-ink-soft cursor-pointer">
     <%= f.check_box :gdpr_consent, { required: true, class: "mt-0.5 rounded border-line" }, "1", "0" %>
     <span>
-      He leído y acepto la
-      <%= link_to "política de privacidad", privacy_path, target: "_blank", rel: "noopener", class: "text-accent hover:underline" %>.
-      Consiento el tratamiento de mis datos personales para gestionar mi solicitud en el CRM de <%= cream_operator_name %>
-      y, en su caso, el envío de comunicaciones a través de la plataforma beehiiv.
+      <% if local_assigns[:lead_form]&.entaina_privacy_consent? %>
+        He leído y acepto la
+        <%= link_to "política de privacidad", "https://entaina.ai/privacy-policy", target: "_blank", rel: "noopener", class: "text-accent hover:underline" %>.
+        <% if local_assigns[:lead_form]&.liderando_ia_reserva_template? %>
+          Mis datos se guardan en CReaM, el CRM de entaina, para atender esta solicitud.
+        <% else %>
+          Mis datos se guardan en CReaM, el CRM de entaina, para atender esta solicitud. Si marco la casilla de la newsletter, además se darán de alta en beehiiv, la plataforma con la que entaina envía sus correos.
+        <% end %>
+      <% else %>
+        He leído y acepto la
+        <%= link_to "política de privacidad", privacy_path, target: "_blank", rel: "noopener", class: "text-accent hover:underline" %>.
+        Consiento el tratamiento de mis datos personales para gestionar mi solicitud en el CRM de <%= cream_operator_name %>
+        y, en su caso, el envío de comunicaciones a través de la plataforma beehiiv.
+      <% end %>
       <%= render "public/lead_forms/required_marker" %>
     </span>
   </label>

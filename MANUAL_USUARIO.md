@@ -4,7 +4,7 @@
 
 Cream es un CRM por **workspaces** para gestionar **personas**, **empresas** y **deals** (oportunidades), con notas, tareas, listas y un historial de actividad compartido en el equipo.
 
-> **Última revisión:** 2026-08-03 (campos ocultos configurables en formularios de captación)
+> **Última revisión:** 2026-08-04 (etapa destino configurable en formularios)
 > Este documento describe la funcionalidad **visible para el usuario**. Las funcionalidades desactivadas aparecen al final en «Próximamente».
 
 ---
@@ -1004,7 +1004,7 @@ En el menú lateral, abre **Formularios**.
 ### Configurar un formulario
 
 1. Pulsa **Nuevo formulario**.
-2. Indica el **nombre**, el **slug** (aparecerá en la URL pública `/f/slug`), la **plantilla** del formulario, el **pipeline** donde se creará el deal, el **responsable** (recibe la notificación y la tarea de seguimiento), y la **plantilla de email** que se enviará al lead.
+2. Indica el **nombre**, el **slug** (aparecerá en la URL pública `/f/slug`), la **plantilla** del formulario, el **pipeline** donde se creará el deal, la **etapa** opcional (tras elegir el pipeline), el **responsable** (recibe la notificación y la tarea de seguimiento), y la **plantilla de email** que se enviará al lead.
 3. Opcional: indica la **URL de redirección tras envío** (p. ej. `https://entaina.com/gracias`) para llevar al visitante a una página de tu web. Si se deja vacía, se muestra la página de gracias de Cream (`/f/slug/success`).
 4. Opcional: define **campos ocultos adicionales** (uno por línea, p. ej. `producto`, `landing`). Sus valores se pasan como query params en la URL pública o del iframe, p. ej. `/f/slug?producto=curso-ia`. Se guardan con el envío y aparecen en **Formulario de origen** del deal.
 5. Marca **Recoger datos de empresa** si el formulario debe pedir nombre y CIF de la empresa.
@@ -1012,16 +1012,18 @@ En el menú lateral, abre **Formularios**.
 
 ### Qué ocurre al enviar un formulario
 
-- Se crea o reutiliza una **persona** por email (origen «Formulario web»).
-- Se crea un **deal** en la **primera etapa** del pipeline configurado, con una tarea **Contactar lead** para el responsable.
+- Se crea o reutiliza una **persona** por email (origen «Formulario web»). Si la persona ya existía, solo se rellenan los campos que estuvieran vacíos (nombre, apellidos, teléfono, cargo…).
+- Si esa persona ya tiene un **deal abierto** en el pipeline del formulario, se **reutiliza** ese deal: se añaden al envío los datos nuevos del formulario (sin crear otro deal ni otra tarea **Contactar lead**). Si has configurado una **etapa**, el deal avanza hasta ella solo si está en una etapa anterior (nunca retrocede). Si no hay deal abierto en ese pipeline (por ejemplo, solo deals ganados o perdidos, o deals en otro pipeline), se crea un deal nuevo en la etapa configurada o, si no hay etapa, en la **primera etapa** del pipeline (salvo plantillas con reglas propias, p. ej. **Demo** en Adoption), con la tarea **Contactar lead** para el responsable.
 - Los datos del envío (campos del formulario, página de origen, UTM, navegador, IP…) quedan guardados y visibles en la ficha del deal, en **Formulario de origen**.
 - El lead recibe el email configurado; el responsable recibe una notificación con los datos y un enlace al deal.
 
 ### Notas
 
 - Los formularios inactivos no aceptan envíos.
+- Si la etapa configurada tiene **condiciones de entrada** y el deal no las cumple, se queda en su etapa actual y el envío se guarda igualmente.
 - Si el formulario no pide empresa, la persona se asocia a la empresa genérica **Particulares** del workspace (salvo que ya existiera con otra empresa).
-- El formulario **Liderando con IA** (`/f/liderando-ia`) pide nombre, email, teléfono, empresa, cargo, audiencia (individual o equipo) y cómo nos has conocido; crea deals en el pipeline **Formación B2C**.
+- El formulario **Liderando con IA** (`/f/liderando-ia`) pide nombre, email, teléfono, empresa, si es para ti o para tu equipo, cómo nos has conocido, newsletter (opcional, desmarcada) y consentimiento de protección de datos; crea deals en el pipeline **Formación B2C**.
+- El formulario **Liderando con IA — Reserva** (`/f/liderando-ia-reserva`) pide edición, nombre, apellidos, email, teléfono, un mensaje libre (opcional) y consentimiento de protección de datos; crea deals en el pipeline **Formación B2C**.
 - El formulario **Trabajando con IA** (`/f/trabajando-ia`) pide nombre, email, teléfono, una pregunta opcional sobre qué tarea del trabajo resolver con IA, cómo nos has conocido, newsletter y consentimiento RGPD; crea deals en el pipeline **Formación B2C**.
 - El formulario **Desarrollando con IA** (`/f/desarrollando-ia`) pide nombre, email, teléfono, perfil técnico, audiencia (individual o equipo), una pregunta opcional sobre qué construir o automatizar con IA, cómo nos has conocido, newsletter y consentimiento RGPD; crea deals en el pipeline **Formación B2C**.
 - El formulario **Demo Adoption** (`/f/adoption`) pide nombre, email, teléfono, una pregunta opcional sobre el grado de adopción de IA en la organización, cómo nos has conocido, newsletter y consentimiento RGPD; crea deals marcados como **Demo** en el pipeline **Proyectos** (etapa **Demo** si existe).

@@ -10,13 +10,15 @@
   </div>
 
   <div class="space-y-4">
-    <%= render "public/lead_forms/base_fields",
-          f: f,
-          show_how_heard: lead_form.show_how_heard_in_base? %>
+    <% if lead_form.render_base_fields? %>
+      <%= render "public/lead_forms/base_fields",
+            f: f,
+            show_how_heard: lead_form.show_how_heard_in_base? %>
+    <% end %>
 
     <%= render "public/lead_forms/templates/#{lead_form.template_key}", f: f, lead_form: lead_form %>
 
-    <%= render "public/lead_forms/consent_fields", f: f %>
+    <%= render "public/lead_forms/consent_fields", f: f, lead_form: lead_form %>
   </div>
 
   <% if TurnstileVerifier.enabled? %>

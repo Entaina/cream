@@ -1,6 +1,8 @@
 class LeadFormSubmissionProcessor
   Result = Data.define(:submission, :deal, :person)
 
+  PERSON_FILLABLE_FIELDS = %w[first_name last_name phone job_title].freeze
+
   def self.call(lead_form:, params:, request:)
     new(lead_form:, params:, request:).call
   end
@@ -18,17 +20,12 @@ class LeadFormSubmissionProcessor
 
     ActiveRecord::Base.transaction do
       person, created = find_or_create_person!
+      fill_person_blanks!(person) unless created
       company = resolve_company!(person:, created:)
+      fill_company_blanks!(company)
       person.update!(company: company) if person.company_id != company.id
-      deal = create_deal!(person:, company:)
-      submission = LeadSubmission.create!(
-        workspace: workspace,
-        lead_form: lead_form,
-        deal: deal,
-        person: person,
-        data: submission_data,
-        metadata: submission_metadata
-      )
+      deal, deal_created = find_or_create_deal!(person:, company:)
+      submission = persist_submission!(deal:, person:, deal_created:)
       enqueue_emails(submission:, deal:, person:)
       Result.new(submission:, deal:, person:)
     end
@@ -43,7 +40,9 @@ class LeadFormSubmissionProcessor
   end
 
   def form_throttled?
-    lead_form.lead_submissions.where(created_at: 1.hour.ago..).count >= LeadForm::MAX_SUBMISSIONS_PER_FORM_PER_HOUR
+    cutoff = 1.hour.ago
+    submissions = LeadSubmission.where(lead_form: lead_form).to_a
+    submission_times_in_window(submissions, cutoff).count >= LeadForm::MAX_SUBMISSIONS_PER_FORM_PER_HOUR
   end
 
   def email_throttled?
@@ -53,7 +52,23 @@ class LeadFormSubmissionProcessor
     person = workspace.people.with_email(email).first
     return false unless person
 
-    LeadSubmission.where(person: person, created_at: 24.hours.ago..).count >= LeadForm::MAX_SUBMISSIONS_PER_EMAIL_PER_DAY
+    cutoff = 24.hours.ago
+    submission_times_in_window(LeadSubmission.where(person: person).to_a, cutoff).count >= LeadForm::MAX_SUBMISSIONS_PER_EMAIL_PER_DAY
+  end
+
+  def submission_times_in_window(submissions, cutoff)
+    submissions.flat_map { |submission| submission_effective_times(submission) }.select { |time| time >= cutoff }
+  end
+
+  def submission_effective_times(submission)
+    tracked = Array(submission.metadata["submissions_at"]).filter_map do |timestamp|
+      Time.zone.parse(timestamp)
+    rescue ArgumentError, TypeError
+      nil
+    end
+    return tracked if tracked.any?
+
+    [ submission.created_at ]
   end
 
   def find_or_create_person!
@@ -77,11 +92,37 @@ class LeadFormSubmissionProcessor
     [ person, true ]
   end
 
+  def fill_person_blanks!(person)
+    updates = PERSON_FILLABLE_FIELDS.each_with_object({}) do |field, attrs|
+      next if person.public_send(field).present?
+
+      value = params[field].presence
+      attrs[field] = value if value.present?
+    end
+    person.update!(updates) if updates.any?
+  end
+
   def resolve_company!(person:, created:)
-    return resolve_submitted_company! if lead_form.collects_company?
+    return resolve_submitted_company! if requires_company_name?
     return LeadForm.placeholder_company_for(workspace) if created
 
     person.company
+  end
+
+  def requires_company_name?
+    lead_form.collects_company? || lead_form.liderando_ia_template?
+  end
+
+  def fill_company_blanks!(company)
+    updates = {}
+    if company.fiscal_information.blank? && params["company_cif"].present?
+      updates[:fiscal_information] = params["company_cif"].to_s.strip
+    end
+    if company.employee_range.blank?
+      range = params["employee_range"].to_s.strip
+      updates[:employee_range] = range if range.present? && Company::EMPLOYEE_RANGES.include?(range)
+    end
+    company.update!(updates) if updates.any?
   end
 
   def resolve_submitted_company!
@@ -111,8 +152,31 @@ class LeadFormSubmissionProcessor
     workspace.companies.create!(attrs)
   end
 
-  def create_deal!(person:, company:)
+  def find_or_create_deal!(person:, company:)
     pipeline = lead_form.resolve_pipeline(help_type: params["help_type"])
+    existing = person.deals.open_deals.where(pipeline_id: pipeline.id).order(created_at: :desc).first
+
+    if existing
+      existing.update!(company: company) if existing.company_id != company.id
+      advance_stage!(existing, pipeline)
+      return [ existing, false ]
+    end
+
+    [ create_deal!(person:, company:, pipeline:), true ]
+  end
+
+  def advance_stage!(deal, pipeline)
+    target = lead_form.configured_stage_for(pipeline)
+    return if target.nil? || deal.pipeline_stage_id == target.id
+    return if deal.pipeline_stage.position >= target.position
+
+    deal.move_to_stage!(target)
+  rescue ActiveRecord::RecordInvalid
+    deal.reload
+  end
+
+  def create_deal!(person:, company:, pipeline: nil)
+    pipeline ||= lead_form.resolve_pipeline(help_type: params["help_type"])
     stage = lead_form.resolve_stage(for_pipeline: pipeline)
     deal_name = [ person.display_name, lead_form.name ].compact.join(" — ")
     deal_name = "#{deal_name} (#{lead_form.help_type_label(params['help_type'])})" if lead_form.contacto_template? && params["help_type"].present?
@@ -134,6 +198,58 @@ class LeadFormSubmissionProcessor
         )
       ]
     )
+  end
+
+  def persist_submission!(deal:, person:, deal_created:)
+    now = Time.current.iso8601
+    new_data = submission_data
+    new_metadata = submission_metadata.merge(
+      "last_submitted_at" => now,
+      "submissions_at" => [ now ]
+    )
+
+    if deal_created
+      return LeadSubmission.create!(
+        workspace: workspace,
+        lead_form: lead_form,
+        deal: deal,
+        person: person,
+        data: new_data,
+        metadata: new_metadata
+      )
+    end
+
+    existing = deal.lead_submission
+    if existing
+      existing.update!(
+        data: merge_submission_hashes(existing.data, new_data),
+        metadata: merge_submission_hashes(existing.metadata, new_metadata).merge(
+          "last_submitted_at" => now,
+          "submissions_at" => Array(existing.metadata["submissions_at"]) + [ now ]
+        )
+      )
+      return existing
+    end
+
+    LeadSubmission.create!(
+      workspace: workspace,
+      lead_form: lead_form,
+      deal: deal,
+      person: person,
+      data: new_data,
+      metadata: new_metadata
+    )
+  end
+
+  def merge_submission_hashes(existing, incoming)
+    merged = existing.stringify_keys.dup
+    incoming.stringify_keys.each do |key, value|
+      next if value.blank? && !value.is_a?(FalseClass)
+
+      existing_value = merged[key]
+      merged[key] = value if existing_value.blank? && !existing_value.is_a?(FalseClass)
+    end
+    merged
   end
 
   def submission_data
@@ -167,8 +283,9 @@ class LeadFormSubmissionProcessor
     person.errors.add(:first_name, "can't be blank") if params["first_name"].blank?
     person.errors.add(:email, "can't be blank") if normalized_email.blank?
     person.errors.add(:phone, "can't be blank") if params["phone"].blank?
-    person.errors.add(:base, "company name is required") if lead_form.collects_company? && params["company_name"].blank?
+    person.errors.add(:base, "company name is required") if requires_company_name? && params["company_name"].blank?
     person.errors.add(:job_title, "can't be blank") if lead_form.requires_job_title? && params["job_title"].blank?
+    person.errors.add(:email, "is invalid") if normalized_email.present? && !normalized_email.match?(URI::MailTo::EMAIL_REGEXP)
 
     if lead_form.contacto_template?
       person.errors.add(:base, "help type is required") if params["help_type"].blank?
@@ -176,6 +293,11 @@ class LeadFormSubmissionProcessor
 
     if lead_form.liderando_ia_template? || lead_form.desarrollando_ia_template?
       person.errors.add(:base, "audience is required") if params["audience"].blank?
+    end
+
+    if lead_form.liderando_ia_reserva_template?
+      person.errors.add(:last_name, "can't be blank") if params["last_name"].blank?
+      person.errors.add(:base, "edition is required") if params["edition"].blank?
     end
 
     if lead_form.desarrollando_ia_template?

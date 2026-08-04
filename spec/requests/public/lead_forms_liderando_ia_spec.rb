@@ -24,10 +24,20 @@ RSpec.describe "Public lead form Liderando con IA", type: :request do
       expect(response).to have_http_status(:ok)
       expect(response.body).to include("Liderando con IA")
       expect(response.body).to include('name="lead[company_name]"')
-      expect(response.body).to include('name="lead[job_title]"')
-      expect(response.body).to include("¿Para ti o para tu equipo?")
+      expect(response.body).not_to include('name="lead[job_title]"')
+      expect(response.body).to include("¿Es para ti o para tu equipo?")
+      expect(response.body).to include("Para mí")
+      expect(response.body).to include("Para mi equipo")
+      expect(response.body).not_to include("Solo para mí")
       expect(response.body).not_to include("¿Qué decisión sobre IA tenéis encima de la mesa ahora mismo?")
       expect(response.body).to include("¿Cómo nos has conocido?")
+      expect(response.body).to include("LinkedIn")
+      expect(response.body).to include("Google")
+      expect(response.body).to include('name="lead[newsletter_opt_in]"')
+      expect(response.body).not_to match(/name="lead\[newsletter_opt_in\]"[^>]*checked/)
+      expect(response.body).to include("https://entaina.ai/privacy-policy")
+      expect(response.body).to include("Mis datos se guardan en CReaM, el CRM de entaina")
+      expect(response.body).to include('name="lead[gdpr_consent]"')
     end
   end
 
@@ -50,7 +60,9 @@ RSpec.describe "Public lead form Liderando con IA", type: :request do
       person = Person.order(:id).last
       expect(submission.data["audience"]).to eq("para_equipo")
       expect(submission.data["company_name"]).to eq("Acme SL")
-      expect(person.job_title).to eq("Directora de innovación")
+      expect(submission.data["how_heard"]).to eq("linkedin")
+      expect(submission.data["newsletter_opt_in"]).to be(true)
+      expect(person.job_title).to be_blank
       expect(person.company.name).to eq("Acme SL")
     end
   end

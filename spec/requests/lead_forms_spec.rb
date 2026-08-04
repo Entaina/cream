@@ -154,6 +154,59 @@ RSpec.describe "Lead forms", type: :request do
       expect(form.pipeline_routes).to eq({ "curso" => cursos.id, "entrenamiento" => pipeline.id })
     end
 
+    it "creates a lead form with a pipeline stage" do
+      qualified = pipeline.pipeline_stages.find_by!(name: "Qualified")
+
+      post lead_forms_path, params: {
+        lead_form: {
+          name: "Landing etapa",
+          slug: "landing-etapa",
+          template_key: "contacto",
+          pipeline_id: pipeline.id,
+          pipeline_stage_id: qualified.id,
+          responsible_id: member.id,
+          email_template_id: template.id,
+          active: "1"
+        }
+      }
+
+      expect(response).to redirect_to(lead_forms_path)
+      expect(LeadForm.find_by!(slug: "landing-etapa").pipeline_stage).to eq(qualified)
+    end
+
+    it "rejects a pipeline stage from another pipeline" do
+      other = pipeline.duplicate(name: "Other")
+      other.save!
+      foreign_stage = other.pipeline_stages.second
+
+      expect {
+        post lead_forms_path, params: {
+          lead_form: {
+            name: "Landing etapa invalida",
+            slug: "landing-etapa-invalida",
+            template_key: "contacto",
+            pipeline_id: pipeline.id,
+            pipeline_stage_id: foreign_stage.id,
+            responsible_id: member.id,
+            email_template_id: template.id,
+            active: "1"
+          }
+        }
+      }.not_to change(LeadForm, :count)
+
+      expect(response).to have_http_status(:unprocessable_entity)
+    end
+
+    it "updates the pipeline stage" do
+      form = create_lead_form!(workspace, user: member, slug: "stage-form")
+      qualified = pipeline.pipeline_stages.find_by!(name: "Qualified")
+
+      patch lead_form_path(form), params: { lead_form: { pipeline_stage_id: qualified.id } }
+
+      expect(response).to redirect_to(lead_forms_path)
+      expect(form.reload.pipeline_stage).to eq(qualified)
+    end
+
     it "updates and deletes a lead form" do
       form = create_lead_form!(workspace, user: member, slug: "editable")
 

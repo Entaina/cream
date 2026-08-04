@@ -1,18 +1,11 @@
 <div class="space-y-3">
-  <% if lead_form.collects_company? %>
-    <div>
-      <%= render "public/lead_forms/field_label", f: f, field: :company_name, text: "Empresa", required: true %>
-      <%= f.text_field :company_name, required: true, class: "input w-full", autocomplete: "organization" %>
-    </div>
-  <% end %>
-
   <div>
-    <%= render "public/lead_forms/field_label", f: f, field: :job_title, text: "Cargo", required: true %>
-    <%= f.text_field :job_title, required: true, class: "input w-full", autocomplete: "organization-title" %>
+    <%= render "public/lead_forms/field_label", f: f, field: :company_name, text: "Empresa", required: true %>
+    <%= f.text_field :company_name, required: true, class: "input w-full", autocomplete: "organization" %>
   </div>
 
   <div>
-    <%= render "public/lead_forms/field_label", f: f, field: :audience, text: "¿Para ti o para tu equipo?", required: true %>
+    <%= render "public/lead_forms/field_label", f: f, field: :audience, text: "¿Es para ti o para tu equipo?", required: true %>
     <%= f.select :audience,
           options_for_select(LeadForm::LIDERANDO_IA_AUDIENCE_OPTIONS),
           { include_blank: "Selecciona una opción" },
@@ -20,5 +13,5 @@
           required: true %>
   </div>
 
-  <%= render "public/lead_forms/how_heard_field", f: f %>
+  <%= render "public/lead_forms/how_heard_field", f: f, options: LeadForm::LIDERANDO_IA_HOW_HEARD_OPTIONS %>
 </div>

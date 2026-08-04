@@ -67,7 +67,7 @@ module Public
 
     def lead_params
       params.fetch(:lead, {}).permit(
-        :email, :first_name, :last_name, :phone, :how_heard, :help_type, :message,
+        :email, :first_name, :last_name, :phone, :how_heard, :help_type, :message, :edition,
         :company_name, :company_cif, :employee_range, :qualifying_answer, :job_title, :audience, :tech_profile, :ia_work_task, :ia_build_automation,
         :organization_ia_stage,
         :newsletter_opt_in, :gdpr_consent,

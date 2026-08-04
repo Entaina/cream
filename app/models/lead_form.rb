@@ -12,7 +12,7 @@ class LeadForm < ApplicationRecord
     utm_source utm_medium utm_campaign utm_term utm_content
   ].freeze
   SUBMISSION_FIELD_KEYS = %w[
-    email first_name last_name phone how_heard help_type message
+    email first_name last_name phone how_heard help_type message edition
     company_name company_cif employee_range qualifying_answer job_title audience tech_profile
     ia_work_task ia_build_automation organization_ia_stage newsletter_opt_in
   ].freeze
@@ -36,9 +36,25 @@ class LeadForm < ApplicationRecord
   ].freeze
   CONTACTO_HELP_TYPE_KEYS = CONTACTO_HELP_OPTIONS.map(&:last).freeze
   LIDERANDO_IA_AUDIENCE_OPTIONS = [
+    [ "Para mí", "para_mi" ],
+    [ "Para mi equipo", "para_equipo" ]
+  ].freeze
+  DESARROLLANDO_IA_AUDIENCE_OPTIONS = [
     [ "Solo para mí", "para_mi" ],
     [ "Para mi equipo", "para_equipo" ],
     [ "Para mí y mi equipo", "para_mi_y_equipo" ]
+  ].freeze
+  LIDERANDO_IA_HOW_HEARD_OPTIONS = [
+    [ "LinkedIn", "linkedin" ],
+    [ "Newsletter", "newsletter" ],
+    [ "Recomendación", "recomendacion" ],
+    [ "Google", "google" ],
+    [ "Evento", "evento" ],
+    [ "Otro", "otro" ]
+  ].freeze
+  LIDERANDO_IA_RESERVA_EDITION_OPTIONS = [
+    [ "Marzo 2026", "marzo_2026" ],
+    [ "Junio 2026", "junio_2026" ]
   ].freeze
   DESARROLLANDO_IA_TECH_PROFILE_OPTIONS = [
     [ "Desarrollo/programo a diario", "desarrollo" ],
@@ -49,6 +65,7 @@ class LeadForm < ApplicationRecord
 
   belongs_to :workspace
   belongs_to :pipeline
+  belongs_to :pipeline_stage, optional: true
   belongs_to :responsible, class_name: "User"
   belongs_to :email_template
 
@@ -78,6 +95,10 @@ class LeadForm < ApplicationRecord
     template_key == "liderando_ia"
   end
 
+  def liderando_ia_reserva_template?
+    template_key == "liderando_ia_reserva"
+  end
+
   def trabajando_ia_template?
     template_key == "trabajando_ia"
   end
@@ -97,14 +118,35 @@ class LeadForm < ApplicationRecord
   ADOPTION_STAGE_NAME = "Demo".freeze
 
   def requires_job_title?
-    liderando_ia_template? || indice_adopcion_ia_template?
+    indice_adopcion_ia_template?
+  end
+
+  def render_base_fields?
+    !liderando_ia_reserva_template?
   end
 
   def show_how_heard_in_base?
-    !contacto_template? && !liderando_ia_template? && !trabajando_ia_template? && !desarrollando_ia_template? && !adoption_template? && !indice_adopcion_ia_template?
+    !contacto_template? && !liderando_ia_template? && !liderando_ia_reserva_template? && !trabajando_ia_template? && !desarrollando_ia_template? && !adoption_template? && !indice_adopcion_ia_template?
+  end
+
+  def show_newsletter_opt_in?
+    !liderando_ia_reserva_template?
+  end
+
+  def entaina_privacy_consent?
+    liderando_ia_template? || liderando_ia_reserva_template?
+  end
+
+  def configured_stage_for(for_pipeline)
+    return if pipeline_stage.nil? || for_pipeline.nil?
+    return unless pipeline_stage.pipeline_id == for_pipeline.id
+
+    pipeline_stage
   end
 
   def resolve_stage(for_pipeline: pipeline)
+    configured = configured_stage_for(for_pipeline)
+    return configured if configured
     return for_pipeline.first_stage unless adoption_template?
 
     for_pipeline.pipeline_stages.find_by("name ILIKE ?", ADOPTION_STAGE_NAME) || for_pipeline.first_stage
@@ -225,6 +267,9 @@ class LeadForm < ApplicationRecord
     return if workspace.nil?
 
     errors.add(:pipeline, "must belong to the workspace") if pipeline && pipeline.workspace_id != workspace_id
+    if pipeline_stage && pipeline && pipeline_stage.pipeline_id != pipeline_id
+      errors.add(:pipeline_stage, "must belong to the selected pipeline")
+    end
     errors.add(:email_template, "must belong to the workspace") if email_template && email_template.workspace_id != workspace_id
     errors.add(:responsible, "must be a workspace member") if responsible && !workspace.users.exists?(id: responsible_id)
   end

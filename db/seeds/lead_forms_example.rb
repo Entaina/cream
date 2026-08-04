@@ -5,6 +5,7 @@
 module LeadFormsExample
   PIPELINE_NAMES = {
     "formacion" => "Formación",
+    "formacion_b2c" => "Formación B2C",
     "consultoria" => "Consultoría",
     "proyectos" => "Proyectos"
   }.freeze
@@ -70,6 +71,27 @@ module LeadFormsExample
           Hola {first_name}:
 
           Gracias por suscribirte a la newsletter de Example. Pronto recibirás novedades en tu correo.
+
+          Un cordial saludo,
+        BODY
+      }
+    },
+    {
+      slug: "liderando-ia-reserva",
+      name: "Liderando con IA — Reserva",
+      template_key: "liderando_ia_reserva",
+      active: true,
+      collects_company: false,
+      default_pipeline: "Formación B2C",
+      pipeline_routes: {},
+      email_template: {
+        key: "liderando_ia_reserva_lead",
+        name: "Liderando con IA — Reserva — acuse de recibo",
+        subject: "Example | Hemos recibido tu reserva — Liderando con IA",
+        body: <<~BODY.strip
+          Hola {first_name}:
+
+          Gracias por tu interés en Liderando con IA. Hemos recibido tu solicitud de reserva y alguien del equipo se pondrá en contacto contigo en breve.
 
           Un cordial saludo,
         BODY

@@ -90,9 +90,21 @@ module LeadFormHelper
       "first_name" => "Ana",
       "phone" => "600111222",
       "company_name" => "Acme SL",
-      "job_title" => "Directora de innovación",
       "audience" => "para_equipo",
-      "how_heard" => "evento",
+      "how_heard" => "linkedin",
+      "gdpr_consent" => "1",
+      LeadForm::TIMESTAMP_FIELD => valid_lead_form_timestamp
+    }.merge(overrides.stringify_keys)
+  end
+
+  def liderando_ia_reserva_lead_params(overrides = {})
+    {
+      "email" => "lead@example.com",
+      "first_name" => "Ana",
+      "last_name" => "García",
+      "phone" => "600111222",
+      "edition" => "marzo_2026",
+      "message" => "Quiero reservar plaza",
       "gdpr_consent" => "1",
       LeadForm::TIMESTAMP_FIELD => valid_lead_form_timestamp
     }.merge(overrides.stringify_keys)

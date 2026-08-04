@@ -14,15 +14,20 @@ export default class extends Controller {
     let firstVisible = null
 
     Array.from(stageSelect.options).forEach(option => {
-      const belongs = option.dataset.pipelineId === pipelineId
+      const optionPipelineId = option.dataset.pipelineId
+      const belongs = optionPipelineId === undefined || optionPipelineId === pipelineId
       option.hidden = !belongs
       option.disabled = !belongs
-      if (belongs && !firstVisible) firstVisible = option
+      if (belongs && optionPipelineId && !firstVisible) firstVisible = option
     })
 
     const selected = stageSelect.selectedOptions[0]
     if (!selected || selected.hidden) {
-      if (firstVisible) stageSelect.value = firstVisible.value
+      if (firstVisible) {
+        stageSelect.value = firstVisible.value
+      } else {
+        stageSelect.value = ""
+      }
     }
   }
 }

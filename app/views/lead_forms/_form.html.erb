@@ -12,12 +12,32 @@
     <%= f.label :template_key, "Plantilla del formulario", class: "label" %>
     <%= f.select :template_key, options_for_select(@template_keys, lead_form.template_key), {}, class: "input w-full" %>
   </div>
-  <div>
-    <%= f.label :pipeline_id, "Pipeline por defecto", class: "label" %>
-    <%= f.collection_select :pipeline_id, @pipelines, :id, :name, {}, class: "input w-full" %>
-    <% if lead_form.contacto_template? %>
-      <p class="text-xs text-ink-faint mt-1">Se usa cuando no hay ruta específica o el lead elige «Otro».</p>
-    <% end %>
+  <div data-controller="pipeline-stage-select" class="space-y-3">
+    <div>
+      <%= f.label :pipeline_id, "Pipeline por defecto", class: "label" %>
+      <%= f.collection_select :pipeline_id, @pipelines, :id, :name, {},
+            class: "input w-full",
+            data: { pipeline_stage_select_target: "pipeline", action: "change->pipeline-stage-select#pipelineChanged" } %>
+      <% if lead_form.contacto_template? %>
+        <p class="text-xs text-ink-faint mt-1">Se usa cuando no hay ruta específica o el lead elige «Otro».</p>
+      <% end %>
+    </div>
+    <div>
+      <%= f.label :pipeline_stage_id, "Etapa", class: "label" %>
+      <%= f.select :pipeline_stage_id,
+            options_for_select(
+              @pipelines.flat_map { |p|
+                p.pipeline_stages.ordered.map { |s|
+                  [ s.name, s.id, { data: { pipeline_id: p.id } } ]
+                }
+              },
+              lead_form.pipeline_stage_id
+            ),
+            { include_blank: "Primera etapa del pipeline" },
+            class: "input w-full",
+            data: { pipeline_stage_select_target: "stage" } %>
+      <p class="text-xs text-ink-faint mt-1">Opcional. Los deals nuevos se crean en esta etapa; los deals abiertos existentes avanzan hasta ella (nunca retroceden).</p>
+    </div>
   </div>
   <% if lead_form.contacto_template? %>
     <div class="space-y-3">
