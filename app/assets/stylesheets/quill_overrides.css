@@ -1,0 +1,71 @@
+.rich-text-editor .ql-toolbar.ql-snow {
+  border: none;
+  border-bottom: 1px solid var(--color-line);
+  background: var(--color-canvas-raised);
+}
+
+.rich-text-editor .ql-container.ql-snow {
+  border: none;
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+.rich-text-editor .ql-editor {
+  min-height: 12rem;
+  color: var(--color-ink);
+}
+
+.rich-text-editor .ql-editor.ql-blank::before {
+  color: var(--color-ink-faint);
+  font-style: normal;
+}
+
+.rich-text-editor--compact .ql-editor {
+  min-height: 8rem;
+}
+
+/* Custom pixel size labels (Quill snow defaults only know small/large/huge). */
+.rich-text-editor .ql-picker.ql-size .ql-picker-label[data-value="12px"]::before,
+.rich-text-editor .ql-picker.ql-size .ql-picker-item[data-value="12px"]::before {
+  content: "12px";
+}
+
+.rich-text-editor .ql-picker.ql-size .ql-picker-label[data-value="14px"]::before,
+.rich-text-editor .ql-picker.ql-size .ql-picker-item[data-value="14px"]::before {
+  content: "14px";
+}
+
+.rich-text-editor .ql-picker.ql-size .ql-picker-label[data-value="16px"]::before,
+.rich-text-editor .ql-picker.ql-size .ql-picker-item[data-value="16px"]::before {
+  content: "16px";
+}
+
+.rich-text-editor .ql-picker.ql-size .ql-picker-label[data-value="18px"]::before,
+.rich-text-editor .ql-picker.ql-size .ql-picker-item[data-value="18px"]::before {
+  content: "18px";
+}
+
+.rich-text-editor .ql-picker.ql-size .ql-picker-label[data-value="24px"]::before,
+.rich-text-editor .ql-picker.ql-size .ql-picker-item[data-value="24px"]::before {
+  content: "24px";
+}
+
+.rich-text-editor .ql-picker.ql-size .ql-picker-item[data-value="12px"]::before {
+  font-size: 12px;
+}
+
+.rich-text-editor .ql-picker.ql-size .ql-picker-item[data-value="14px"]::before {
+  font-size: 14px;
+}
+
+.rich-text-editor .ql-picker.ql-size .ql-picker-item[data-value="16px"]::before {
+  font-size: 16px;
+}
+
+.rich-text-editor .ql-picker.ql-size .ql-picker-item[data-value="18px"]::before {
+  font-size: 18px;
+}
+
+.rich-text-editor .ql-picker.ql-size .ql-picker-item[data-value="24px"]::before {
+  font-size: 24px;
+}

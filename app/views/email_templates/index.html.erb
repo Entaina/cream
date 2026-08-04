@@ -18,7 +18,7 @@
         </div>
       </div>
       <p class="text-sm text-ink-faint"><%= template.subject %></p>
-      <p class="text-base text-ink-soft mt-1 whitespace-pre-wrap"><%= template.body.truncate(200) %></p>
+      <p class="text-base text-ink-soft mt-1"><%= email_body_preview(template.body, length: 200) %></p>
       <% if template.attachments.attached? %>
         <ul class="mt-2 space-y-1">
           <% template.attachments.each do |file| %>

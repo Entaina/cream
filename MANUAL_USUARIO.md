@@ -4,7 +4,7 @@
 
 Cream es un CRM por **workspaces** para gestionar **personas**, **empresas** y **deals** (oportunidades), con notas, tareas, listas y un historial de actividad compartido en el equipo.
 
-> **Última revisión:** 2026-08-04 (etapa destino configurable en formularios)
+> **Última revisión:** 2026-08-04 (editor enriquecido en plantillas y correos)
 > Este documento describe la funcionalidad **visible para el usuario**. Las funcionalidades desactivadas aparecen al final en «Próximamente».
 
 ---
@@ -619,10 +619,10 @@ cuenta; no compartas enlaces de autorización ni tokens.
 
 Las **plantillas** te ahorran reescribir correos frecuentes (presentación, seguimiento, etc.).
 
-- **Crear y gestionar:** entra en **Plantillas** desde el menú lateral. Cada plantilla tiene **nombre**, **asunto** y **cuerpo**, y puedes marcarla como **compartida** con todo el workspace o dejarla personal.
+- **Crear y gestionar:** entra en **Plantillas** desde el menú lateral. Cada plantilla tiene **nombre**, **asunto** y **cuerpo**, y puedes marcarla como **compartida** con todo el workspace o dejarla personal. El **cuerpo** se edita con un editor enriquecido (negrita, cursiva, color, listas, enlaces, etc.); los estilos se guardan de forma compatible con clientes de email.
 - **Plantillas predefinidas (Example):** el workspace de organización incluye ocho plantillas del ciclo de curso (primer contacto, reserva confirmada, recordatorios de pago, cierre, etc.). Puedes editarlas desde **Plantillas** si eres administrador.
 - **Variables:** usa `{first_name}`, `{last_name}`, `{name}`, `{company}` y `{email}` en el asunto o el cuerpo; al insertarlas se sustituyen por los datos del registro. Los textos entre corchetes como `[Nombre del curso]` o `[fechas]` son marcadores que debes completar manualmente tras cargar la plantilla.
-- **Usar en un email:** en la sección **Send email** de una ficha (Person, Company o Deal), despliega **Insertar plantilla…** y elige una. El asunto y el cuerpo se rellenan automáticamente con las variables ya sustituidas para ese contacto. Puedes editar el texto antes de enviar. Si aún no hay plantillas, verás un enlace para crearlas.
+- **Usar en un email:** en la sección **Send email** de una ficha (Person, Company o Deal), despliega **Insertar plantilla…** y elige una. El asunto y el cuerpo se rellenan automáticamente con las variables ya sustituidas para ese contacto. Puedes editar el texto con el mismo editor enriquecido antes de enviar. Si aún no hay plantillas, verás un enlace para crearlas.
 
 ### Envío masivo (Mail merge)
 
@@ -639,7 +639,7 @@ Entrada **Mail merge** en el menú lateral.
    - una **lista**, o
    - **Enter record IDs manually** para indicar IDs separados por comas.
    El texto bajo el selector muestra **cuántos destinatarios** recibirán el correo.
-2. Opcional: elige una **plantilla**; si la usas, se envía su cuerpo (personalizado por destinatario). Si no, se usa el **Subject** y **Body** del formulario.
+2. Opcional: elige una **plantilla**; si la usas, se envía su cuerpo (personalizado por destinatario). Si no, redacta el **Subject** y el **Body** con el editor enriquecido del formulario.
 3. Usa variables como `{name}` o `{first_name}` en asunto y cuerpo para personalizar cada envío.
 4. Pulsa **Send mail merge**. Cada correo se registra en la ficha del registro correspondiente, con seguimiento de apertura igual que un envío individual.
 

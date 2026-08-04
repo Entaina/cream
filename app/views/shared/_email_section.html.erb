@@ -34,7 +34,9 @@
     <% end %>
     <%= f.email_field :to_address, placeholder: "To", class: "input w-full mb-2" %>
     <%= f.text_field :subject, placeholder: "Subject", class: "input w-full mb-2", data: { "template-picker-target" => "subject" } %>
-    <%= f.text_area :body, rows: 4, placeholder: "Message body...", class: "input w-full mb-2 resize-y", data: { "template-picker-target" => "body" } %>
+    <div class="mb-2">
+      <%= render "shared/rich_text_editor", form: f, field: :body, placeholder: "Message body...", compact: true, input_data: { data: { "template-picker-target" => "body" } } %>
+    </div>
     <div class="mb-2">
       <label class="label">Attachments</label>
       <p class="text-xs text-ink-faint mb-1">Desmarca los que no quieras enviar.</p>
@@ -103,13 +105,13 @@
                 <% else %>
                   <div class="text-xs text-ink-faint truncate mt-0.5">To: <%= message.to_address %></div>
                 <% end %>
-                <p class="text-sm text-ink-soft truncate mt-0.5 group-open:hidden"><%= truncate(message.body.to_s, length: 90) %></p>
+                <p class="text-sm text-ink-soft truncate mt-0.5 group-open:hidden"><%= email_body_preview(message.body) %></p>
               </div>
               <time class="text-xs text-ink-faint whitespace-nowrap shrink-0" datetime="<%= timestamp&.iso8601 %>">
                 <%= timestamp&.strftime("%-d %b %Y, %H:%M") %>
               </time>
             </summary>
-            <div class="mt-2 pt-2 border-t border-line text-sm text-ink-soft whitespace-pre-wrap break-words"><%= message.body %></div>
+            <div class="mt-2 pt-2 border-t border-line text-sm text-ink-soft break-words email-body"><%= email_body_html(message.body) %></div>
             <% if message.attachments.attached? %>
               <ul class="mt-2 space-y-1">
                 <% message.attachments.each do |file| %>

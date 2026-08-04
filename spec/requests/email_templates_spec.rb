@@ -19,6 +19,19 @@ RSpec.describe "Email templates", type: :request do
       expect(response).to redirect_to(email_templates_path)
     end
 
+    it "creates a template with HTML body" do
+      post email_templates_path, params: {
+        email_template: {
+          name: "Styled",
+          subject: "Hi",
+          body: '<p><strong>Hello</strong> {first_name}</p>'
+        }
+      }
+
+      template = EmailTemplate.order(:id).last
+      expect(template.body).to include("<strong>Hello</strong>")
+    end
+
     it "creates a template with attachments" do
       file = fixture_file_upload("spec/fixtures/files/sample.txt", "text/plain")
 
@@ -55,6 +68,7 @@ RSpec.describe "Email templates", type: :request do
       get person_path(person)
 
       expect(response.body).to include('data-controller="template-picker"')
+      expect(response.body).to include('data-controller="rich-text-editor"')
       expect(response.body).to include("Insertar plantilla")
       expect(response.body).to include("Hi {first_name}")
     end

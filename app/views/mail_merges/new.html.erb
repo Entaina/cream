@@ -50,7 +50,7 @@
       </div>
       <div>
         <label class="label">Body</label>
-        <%= text_area_tag :body, "Hi {first_name},", rows: 6, class: "input w-full resize-y" %>
+        <%= render "shared/rich_text_editor", field: :body, value: "Hi {first_name}," %>
       </div>
       <%= submit_tag "Send mail merge", class: "btn-primary" %>
     <% end %>

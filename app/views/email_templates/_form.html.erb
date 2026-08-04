@@ -9,7 +9,7 @@
   </div>
   <div>
     <%= f.label :body, class: "label" %>
-    <%= f.text_area :body, rows: 8, class: "input w-full resize-y", placeholder: "Hi {first_name}, ..." %>
+    <%= render "shared/rich_text_editor", form: f, field: :body, placeholder: "Hi {first_name}, ..." %>
   </div>
   <% if template.attachments.attached? %>
     <div>

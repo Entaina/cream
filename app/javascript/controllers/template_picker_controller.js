@@ -21,7 +21,7 @@ export default class extends Controller {
     const body = this.interpolate(option.dataset.body || "")
 
     if (subject && this.hasSubjectTarget) this.writeFieldValue(this.subjectTarget, subject)
-    if (this.hasBodyTarget) this.writeFieldValue(this.bodyTarget, body)
+    if (this.hasBodyTarget) this.writeBodyValue(body)
 
     if (this.hasTemplateIdTarget) this.templateIdTarget.value = option.value
     this.showTemplateAttachments(option.dataset.attachments)
@@ -84,6 +84,18 @@ export default class extends Controller {
     field.focus()
     field.setSelectionRange(0, field.value.length)
     document.execCommand("insertText", false, value)
+  }
+
+  writeBodyValue(value) {
+    const editorWrapper = this.bodyTarget.closest('[data-controller~="rich-text-editor"]')
+    if (editorWrapper) {
+      editorWrapper.dispatchEvent(new CustomEvent("rich-text-editor:set", {
+        detail: { html: value }
+      }))
+      return
+    }
+
+    this.writeFieldValue(this.bodyTarget, value)
   }
 
   interpolate(text) {

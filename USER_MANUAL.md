@@ -4,7 +4,7 @@
 
 Cream is a **workspace**-based CRM for managing **people**, **companies** and **deals** (opportunities), with notes, tasks, lists and an activity history shared across the team.
 
-> **Last revision:** 2026-08-04 (configurable target stage on lead forms)
+> **Last revision:** 2026-08-04 (rich text editor for templates and emails)
 > This document describes the functionality **visible to the user**. Disabled features are listed at the end under "Coming soon".
 
 ---
@@ -619,10 +619,10 @@ account; do not share authorization links or tokens.
 
 **Templates** save you from rewriting frequent emails (introduction, follow-up, etc.).
 
-- **Create and manage:** go to **Plantillas** (Templates) from the sidebar menu. Each template has a **name**, **subject** and **body**, and you can mark it as **shared** with the whole workspace or keep it personal.
+- **Create and manage:** go to **Plantillas** (Templates) from the sidebar menu. Each template has a **name**, **subject** and **body**, and you can mark it as **shared** with the whole workspace or keep it personal. The **body** uses a rich text editor (bold, italic, color, lists, links, etc.); formatting is stored in an email-client-friendly way.
 - **Predefined templates (Example):** the organization workspace includes eight templates for the course cycle (first contact, confirmed booking, payment reminders, closing, etc.). You can edit them from **Plantillas** if you are an administrator.
 - **Variables:** use `{first_name}`, `{last_name}`, `{name}`, `{company}` and `{email}` in the subject or body; when inserted they are replaced with the record's data. Texts in square brackets such as `[Nombre del curso]` or `[fechas]` are placeholders you must fill in manually after loading the template.
-- **Use in an email:** in the **Send email** section of a record (Person, Company or Deal), open **Insertar plantilla…** (Insert template…) and pick one. The subject and body are filled in automatically with the variables already substituted for that contact. You can edit the text before sending. If there are no templates yet, you will see a link to create them.
+- **Use in an email:** in the **Send email** section of a record (Person, Company or Deal), open **Insertar plantilla…** (Insert template…) and pick one. The subject and body are filled in automatically with the variables already substituted for that contact. You can edit the message with the same rich text editor before sending. If there are no templates yet, you will see a link to create them.
 
 ### Bulk sending (Mail merge)
 
@@ -639,7 +639,7 @@ account; do not share authorization links or tokens.
    - a **list**, or
    - **Enter record IDs manually** to provide comma-separated IDs.
    The text below the selector shows **how many recipients** will receive the email.
-2. Optional: choose a **template**; if you use one, its body is sent (personalized per recipient). If not, the form's **Subject** and **Body** are used.
+2. Optional: choose a **template**; if you use one, its body is sent (personalized per recipient). If not, compose the form's **Subject** and **Body** with the rich text editor.
 3. Use variables such as `{name}` or `{first_name}` in the subject and body to personalize each send.
 4. Click **Send mail merge**. Each email is recorded on the corresponding record's page, with open tracking just like an individual send.
 
