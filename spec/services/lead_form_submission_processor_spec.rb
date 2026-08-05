@@ -1,6 +1,8 @@
 require "rails_helper"
 
 RSpec.describe LeadFormSubmissionProcessor do
+  include ActiveSupport::Testing::TimeHelpers
+
   fixtures :users, :workspaces, :memberships
 
   let(:member) { users(:one) }
@@ -286,6 +288,16 @@ RSpec.describe LeadFormSubmissionProcessor do
     result = submit(contacto_lead_params("how_heard" => "otro"))
 
     expect(result.deal.tasks.sole.due_on).to eq(Date.current)
+  end
+
+  it "creates the first task with due date relative to deal creation, not form configuration date" do
+    lead_form.update!(first_task_due_days: 2)
+    submission_day = Date.new(2026, 8, 10)
+
+    travel_to submission_day.noon do
+      result = submit(contacto_lead_params("how_heard" => "otro"))
+      expect(result.deal.tasks.sole.due_on).to eq(Date.new(2026, 8, 12))
+    end
   end
 
   it "uses the first stage of a routed pipeline when the configured stage belongs to the default pipeline" do

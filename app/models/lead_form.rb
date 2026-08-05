@@ -120,8 +120,8 @@ class LeadForm < ApplicationRecord
     template_key == "entrenadores"
   end
 
-  def first_task_due_on
-    Date.current + first_task_due_days.days
+  def first_task_due_on(on: Date.current)
+    on + first_task_due_days.days
   end
 
   ADOPTION_STAGE_NAME = "Demo".freeze

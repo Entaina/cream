@@ -1004,7 +1004,7 @@ En el menú lateral, abre **Formularios**.
 ### Configurar un formulario
 
 1. Pulsa **Nuevo formulario**.
-2. Indica el **nombre**, el **slug** (aparecerá en la URL pública `/f/slug`), la **plantilla** del formulario, el **pipeline** donde se creará el deal, la **etapa** opcional (tras elegir el pipeline), el **responsable** (recibe la notificación y la tarea de seguimiento), el **texto de la primera tarea** y los **días hasta el vencimiento** (fecha = día del envío + N días; 0 = hoy), y la **plantilla de email** que se enviará al lead.
+2. Indica el **nombre**, el **slug** (aparecerá en la URL pública `/f/slug`), la **plantilla** del formulario, el **pipeline** donde se creará el deal, la **etapa** opcional (tras elegir el pipeline), el **responsable** (recibe la notificación y la tarea de seguimiento), el **texto de la primera tarea** y los **días hasta el vencimiento** (desde la creación del deal al enviar el formulario; 0 = el mismo día), y la **plantilla de email** que se enviará al lead.
 3. Opcional: indica la **URL de redirección tras envío** (p. ej. `https://entaina.com/gracias`) para llevar al visitante a una página de tu web. Si se deja vacía, se muestra la página de gracias de Cream (`/f/slug/success`).
 4. Opcional: define **campos ocultos adicionales** (uno por línea, p. ej. `producto`, `landing`). Sus valores se pasan como query params en la URL pública o del iframe, p. ej. `/f/slug?producto=curso-ia`. Se guardan con el envío y aparecen en **Formulario de origen** del deal.
 5. Marca **Recoger datos de empresa** si el formulario debe pedir nombre y CIF de la empresa.

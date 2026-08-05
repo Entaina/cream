@@ -30,9 +30,10 @@ RSpec.describe LeadForm, type: :model do
     expect(form.errors[:first_task_due_days]).to be_present
   end
 
-  it "computes first task due date from configured days" do
+  it "computes first task due date from configured days relative to a given date" do
     form = create_lead_form!(workspace, user: member, first_task_due_days: 4)
+    submission_day = Date.new(2026, 8, 10)
 
-    expect(form.first_task_due_on).to eq(Date.current + 4.days)
+    expect(form.first_task_due_on(on: submission_day)).to eq(Date.new(2026, 8, 14))
   end
 end

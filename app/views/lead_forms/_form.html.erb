@@ -101,9 +101,9 @@
         <%= f.text_field :first_task_title, class: "input mt-1 w-full", required: true %>
       </div>
       <div class="max-w-xs">
-        <%= f.label :first_task_due_days, "Vence en (días desde hoy)", class: "label" %>
+        <%= f.label :first_task_due_days, "Vence en (días desde la creación del deal)", class: "label" %>
         <%= f.number_field :first_task_due_days, class: "input mt-1 w-full", min: 0, required: true %>
-        <p class="mt-1 text-xs text-ink-faint">0 = el mismo día del envío.</p>
+        <p class="mt-1 text-xs text-ink-faint">Al enviar el formulario y crear el deal, la tarea vence N días después (0 = el mismo día).</p>
       </div>
     </div>
 

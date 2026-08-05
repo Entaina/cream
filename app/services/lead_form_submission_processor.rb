@@ -191,7 +191,7 @@ class LeadFormSubmissionProcessor
       tasks: [
         Task.new(
           title: lead_form.first_task_title,
-          due_on: lead_form.first_task_due_on,
+          due_on: Date.current + lead_form.first_task_due_days.days,
           workspace: workspace,
           user: lead_form.responsible,
           assignee: lead_form.responsible
