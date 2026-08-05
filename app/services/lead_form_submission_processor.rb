@@ -282,7 +282,7 @@ class LeadFormSubmissionProcessor
     person = Person.new
     person.errors.add(:first_name, "can't be blank") if params["first_name"].blank?
     person.errors.add(:email, "can't be blank") if normalized_email.blank?
-    person.errors.add(:phone, "can't be blank") if params["phone"].blank?
+    person.errors.add(:phone, "can't be blank") if lead_form.require_phone? && params["phone"].blank?
     person.errors.add(:base, "company name is required") if requires_company_name? && params["company_name"].blank?
     person.errors.add(:job_title, "can't be blank") if lead_form.requires_job_title? && params["job_title"].blank?
     person.errors.add(:email, "is invalid") if normalized_email.present? && !normalized_email.match?(URI::MailTo::EMAIL_REGEXP)

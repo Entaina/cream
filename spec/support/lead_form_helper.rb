@@ -110,6 +110,15 @@ module LeadFormHelper
     }.merge(overrides.stringify_keys)
   end
 
+  def entrenadores_lead_params(overrides = {})
+    {
+      "email" => "lead@example.com",
+      "first_name" => "Ana",
+      "gdpr_consent" => "1",
+      LeadForm::TIMESTAMP_FIELD => valid_lead_form_timestamp
+    }.merge(overrides.stringify_keys)
+  end
+
   def valid_lead_form_timestamp
     LeadForm.signed_timestamp(at: 10.seconds.ago)
   end

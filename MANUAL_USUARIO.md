@@ -4,7 +4,7 @@
 
 Cream es un CRM por **workspaces** para gestionar **personas**, **empresas** y **deals** (oportunidades), con notas, tareas, listas y un historial de actividad compartido en el equipo.
 
-> **Última revisión:** 2026-08-04 (editor enriquecido en plantillas y correos)
+> **Última revisión:** 2026-08-05 (formulario público Entrenadores)
 > Este documento describe la funcionalidad **visible para el usuario**. Las funcionalidades desactivadas aparecen al final en «Próximamente».
 
 ---
@@ -1028,6 +1028,7 @@ En el menú lateral, abre **Formularios**.
 - El formulario **Desarrollando con IA** (`/f/desarrollando-ia`) pide nombre, email, teléfono, perfil técnico, audiencia (individual o equipo), una pregunta opcional sobre qué construir o automatizar con IA, cómo nos has conocido, newsletter y consentimiento RGPD; crea deals en el pipeline **Formación B2C**.
 - El formulario **Demo Adoption** (`/f/adoption`) pide nombre, email, teléfono, una pregunta opcional sobre el grado de adopción de IA en la organización, cómo nos has conocido, newsletter y consentimiento RGPD; crea deals marcados como **Demo** en el pipeline **Proyectos** (etapa **Demo** si existe).
 - El formulario **Assessment · Índice de adopción** (`/f/indice-adopcion-ia`) pide nombre, email, teléfono, empresa, cargo, tamaño (nº de empleados), cómo nos has conocido, newsletter y consentimiento RGPD; crea deals en el pipeline **Proyectos**.
+- El formulario **Entrenadores** (`/f/entrenadores`) pide nombre, email, una pregunta opcional sobre el principal reto con la IA, newsletter (opcional, desmarcada) y consentimiento de protección de datos; no pide teléfono ni cómo nos has conocido; crea deals en el pipeline **Entrenadores**.
 - Cualquier miembro del workspace puede gestionar los formularios.
 
 ---

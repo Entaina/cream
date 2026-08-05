@@ -115,6 +115,10 @@ class LeadForm < ApplicationRecord
     template_key == "indice_adopcion_ia"
   end
 
+  def entrenadores_template?
+    template_key == "entrenadores"
+  end
+
   ADOPTION_STAGE_NAME = "Demo".freeze
 
   def requires_job_title?
@@ -126,7 +130,15 @@ class LeadForm < ApplicationRecord
   end
 
   def show_how_heard_in_base?
-    !contacto_template? && !liderando_ia_template? && !liderando_ia_reserva_template? && !trabajando_ia_template? && !desarrollando_ia_template? && !adoption_template? && !indice_adopcion_ia_template?
+    !contacto_template? && !liderando_ia_template? && !liderando_ia_reserva_template? && !trabajando_ia_template? && !desarrollando_ia_template? && !adoption_template? && !indice_adopcion_ia_template? && !entrenadores_template?
+  end
+
+  def show_phone_in_base?
+    !entrenadores_template?
+  end
+
+  def require_phone?
+    show_phone_in_base?
   end
 
   def show_newsletter_opt_in?
@@ -134,7 +146,7 @@ class LeadForm < ApplicationRecord
   end
 
   def entaina_privacy_consent?
-    liderando_ia_template? || liderando_ia_reserva_template?
+    liderando_ia_template? || liderando_ia_reserva_template? || entrenadores_template?
   end
 
   def configured_stage_for(for_pipeline)

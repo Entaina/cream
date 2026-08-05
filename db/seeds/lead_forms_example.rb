@@ -7,7 +7,8 @@ module LeadFormsExample
     "formacion" => "Formación",
     "formacion_b2c" => "Formación B2C",
     "consultoria" => "Consultoría",
-    "proyectos" => "Proyectos"
+    "proyectos" => "Proyectos",
+    "entrenadores" => "Entrenadores"
   }.freeze
 
   FORMS = [
@@ -92,6 +93,27 @@ module LeadFormsExample
           Hola {first_name}:
 
           Gracias por tu interés en Liderando con IA. Hemos recibido tu solicitud de reserva y alguien del equipo se pondrá en contacto contigo en breve.
+
+          Un cordial saludo,
+        BODY
+      }
+    },
+    {
+      slug: "entrenadores",
+      name: "Entrenadores",
+      template_key: "entrenadores",
+      active: true,
+      collects_company: false,
+      default_pipeline: "Entrenadores",
+      pipeline_routes: {},
+      email_template: {
+        key: "entrenadores_lead",
+        name: "Entrenadores — acuse de recibo",
+        subject: "Example | Hemos recibido tu solicitud — Entrenadores",
+        body: <<~BODY.strip
+          Hola {first_name}:
+
+          Gracias por contactar con Example. Hemos recibido tu solicitud y alguien del equipo se pondrá en contacto contigo en breve.
 
           Un cordial saludo,
         BODY

@@ -4,7 +4,7 @@
 
 Cream is a **workspace**-based CRM for managing **people**, **companies** and **deals** (opportunities), with notes, tasks, lists and an activity history shared across the team.
 
-> **Last revision:** 2026-08-04 (rich text editor for templates and emails)
+> **Last revision:** 2026-08-05 (Entrenadores public lead form)
 > This document describes the functionality **visible to the user**. Disabled features are listed at the end under "Coming soon".
 
 ---
@@ -1028,6 +1028,7 @@ In the sidebar menu, open **Formularios** (Forms).
 - The **Desarrollando con IA** form (`/f/desarrollando-ia`) asks for name, email, phone, technical profile, audience (individual or team), an optional question about what to build or automate with AI, how you heard about us, newsletter and GDPR consent; it creates deals in the **Formación B2C** pipeline.
 - The **Demo Adoption** form (`/f/adoption`) asks for name, email, phone, an optional question about the organization's degree of AI adoption, how you heard about us, newsletter and GDPR consent; it creates deals marked as **Demo** in the **Proyectos** pipeline (**Demo** stage if it exists).
 - The **Assessment · Índice de adopción** form (`/f/indice-adopcion-ia`) asks for name, email, phone, company, job title, size (number of employees), how you heard about us, newsletter and GDPR consent; it creates deals in the **Proyectos** pipeline.
+- The **Entrenadores** form (`/f/entrenadores`) asks for name, email, an optional question about your main challenge with AI, newsletter (optional, unchecked) and data-protection consent; it does not ask for phone or how you heard about us; it creates deals in the **Entrenadores** pipeline.
 - Any workspace member can manage the forms.
 
 ---
