@@ -22,7 +22,7 @@ Implementación:
 
 - Controlador: [`McpController`](../../../app/controllers/mcp_controller.rb) — `MCP::Server::Transports::StreamableHTTPTransport`
 - Servidor y tools: [`CreamMcp`](../../../app/mcp/cream_mcp.rb) — `CreamMcp.server_for(user:, workspace:)`
-- Gema: `mcp` (~> 0.25)
+- Gema: `mcp` (~> 1.1)
 
 Hosts permitidos en el transport: `CREAM_APP_URL` y `CREAM_DOMAIN` (evita host header injection).
 
