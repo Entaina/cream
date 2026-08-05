@@ -28,7 +28,7 @@ RSpec.describe "Public lead form Desarrollando con IA", type: :request do
       expect(response.body).to include('name="lead[phone]"')
       expect(response.body).to include("Tu perfil técnico")
       expect(response.body).to include("Para ti o para tu equipo")
-      expect(response.body).to include("¿Qué querrías construir o automatizar con IA en tu trabajo?")
+      expect(response.body).not_to include("¿Qué querrías construir o automatizar con IA en tu trabajo?")
       expect(response.body).to include("¿Cómo nos has conocido?")
       expect(response.body).to include('name="lead[newsletter_opt_in]"')
       expect(response.body).to include('name="lead[gdpr_consent]"')
@@ -41,10 +41,7 @@ RSpec.describe "Public lead form Desarrollando con IA", type: :request do
 
       expect {
         post public_lead_form_path(lead_form.slug), params: {
-          lead: desarrollando_ia_lead_params(
-            ia_build_automation: "Un asistente para revisar pull requests con IA",
-            newsletter_opt_in: "1"
-          )
+          lead: desarrollando_ia_lead_params(newsletter_opt_in: "1")
         }
       }.to change(Deal, :count).by(1)
         .and change(EmailMessage, :count).by(1)
@@ -57,7 +54,7 @@ RSpec.describe "Public lead form Desarrollando con IA", type: :request do
       person = Person.order(:id).last
       expect(submission.data["tech_profile"]).to eq("desarrollo")
       expect(submission.data["audience"]).to eq("para_mi")
-      expect(submission.data["ia_build_automation"]).to eq("Un asistente para revisar pull requests con IA")
+      expect(submission.data).not_to have_key("ia_build_automation")
       expect(submission.data["how_heard"]).to eq("evento")
       expect(submission.data["newsletter_opt_in"]).to be(true)
       expect(person.company.name).to eq(LeadForm::PLACEHOLDER_COMPANY_NAME)
