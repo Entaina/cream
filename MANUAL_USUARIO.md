@@ -4,7 +4,7 @@
 
 Cream es un CRM por **workspaces** para gestionar **personas**, **empresas** y **deals** (oportunidades), con notas, tareas, listas y un historial de actividad compartido en el equipo.
 
-> **Última revisión:** 2026-08-05 (formulario público Entrenadores)
+> **Última revisión:** 2026-08-05 (primera tarea configurable en formularios)
 > Este documento describe la funcionalidad **visible para el usuario**. Las funcionalidades desactivadas aparecen al final en «Próximamente».
 
 ---
@@ -1004,7 +1004,7 @@ En el menú lateral, abre **Formularios**.
 ### Configurar un formulario
 
 1. Pulsa **Nuevo formulario**.
-2. Indica el **nombre**, el **slug** (aparecerá en la URL pública `/f/slug`), la **plantilla** del formulario, el **pipeline** donde se creará el deal, la **etapa** opcional (tras elegir el pipeline), el **responsable** (recibe la notificación y la tarea de seguimiento), y la **plantilla de email** que se enviará al lead.
+2. Indica el **nombre**, el **slug** (aparecerá en la URL pública `/f/slug`), la **plantilla** del formulario, el **pipeline** donde se creará el deal, la **etapa** opcional (tras elegir el pipeline), el **responsable** (recibe la notificación y la tarea de seguimiento), el **texto de la primera tarea** y los **días hasta el vencimiento** (fecha = día del envío + N días; 0 = hoy), y la **plantilla de email** que se enviará al lead.
 3. Opcional: indica la **URL de redirección tras envío** (p. ej. `https://entaina.com/gracias`) para llevar al visitante a una página de tu web. Si se deja vacía, se muestra la página de gracias de Cream (`/f/slug/success`).
 4. Opcional: define **campos ocultos adicionales** (uno por línea, p. ej. `producto`, `landing`). Sus valores se pasan como query params en la URL pública o del iframe, p. ej. `/f/slug?producto=curso-ia`. Se guardan con el envío y aparecen en **Formulario de origen** del deal.
 5. Marca **Recoger datos de empresa** si el formulario debe pedir nombre y CIF de la empresa.
@@ -1013,7 +1013,7 @@ En el menú lateral, abre **Formularios**.
 ### Qué ocurre al enviar un formulario
 
 - Se crea o reutiliza una **persona** por email (origen «Formulario web»). Si la persona ya existía, solo se rellenan los campos que estuvieran vacíos (nombre, apellidos, teléfono, cargo…).
-- Si esa persona ya tiene un **deal abierto** en el pipeline del formulario, se **reutiliza** ese deal: se añaden al envío los datos nuevos del formulario (sin crear otro deal ni otra tarea **Contactar lead**). Si has configurado una **etapa**, el deal avanza hasta ella solo si está en una etapa anterior (nunca retrocede). Si no hay deal abierto en ese pipeline (por ejemplo, solo deals ganados o perdidos, o deals en otro pipeline), se crea un deal nuevo en la etapa configurada o, si no hay etapa, en la **primera etapa** del pipeline (salvo plantillas con reglas propias, p. ej. **Demo** en Adoption), con la tarea **Contactar lead** para el responsable.
+- Si esa persona ya tiene un **deal abierto** en el pipeline del formulario, se **reutiliza** ese deal: se añaden al envío los datos nuevos del formulario (sin crear otro deal ni otra tarea de seguimiento). Si has configurado una **etapa**, el deal avanza hasta ella solo si está en una etapa anterior (nunca retrocede). Si no hay deal abierto en ese pipeline (por ejemplo, solo deals ganados o perdidos, o deals en otro pipeline), se crea un deal nuevo en la etapa configurada o, si no hay etapa, en la **primera etapa** del pipeline (salvo plantillas con reglas propias, p. ej. **Demo** en Adoption), con la **primera tarea** configurada en el formulario (por defecto «Contactar lead» al día siguiente) asignada al responsable.
 - Los datos del envío (campos del formulario, página de origen, UTM, navegador, IP…) quedan guardados y visibles en la ficha del deal, en **Formulario de origen**.
 - El lead recibe el email configurado; el responsable recibe una notificación con los datos y un enlace al deal.
 

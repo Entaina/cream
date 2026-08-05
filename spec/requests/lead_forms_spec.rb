@@ -207,6 +207,58 @@ RSpec.describe "Lead forms", type: :request do
       expect(form.reload.pipeline_stage).to eq(qualified)
     end
 
+    it "stores first task configuration" do
+      post lead_forms_path, params: {
+        lead_form: {
+          name: "Landing tarea",
+          slug: "landing-tarea",
+          template_key: "contacto",
+          pipeline_id: pipeline.id,
+          responsible_id: member.id,
+          email_template_id: template.id,
+          active: "1",
+          first_task_title: "Seguimiento inicial",
+          first_task_due_days: "5"
+        }
+      }
+
+      form = LeadForm.find_by!(slug: "landing-tarea")
+      expect(form.first_task_title).to eq("Seguimiento inicial")
+      expect(form.first_task_due_days).to eq(5)
+    end
+
+    it "rejects negative first task due days" do
+      expect {
+        post lead_forms_path, params: {
+          lead_form: {
+            name: "Landing tarea invalida",
+            slug: "landing-tarea-invalida",
+            template_key: "contacto",
+            pipeline_id: pipeline.id,
+            responsible_id: member.id,
+            email_template_id: template.id,
+            active: "1",
+            first_task_title: "Seguimiento",
+            first_task_due_days: "-1"
+          }
+        }
+      }.not_to change(LeadForm, :count)
+
+      expect(response).to have_http_status(:unprocessable_entity)
+    end
+
+    it "updates first task configuration" do
+      form = create_lead_form!(workspace, user: member, slug: "task-form")
+
+      patch lead_form_path(form), params: {
+        lead_form: { first_task_title: "Contactar en 48h", first_task_due_days: "2" }
+      }
+
+      expect(response).to redirect_to(lead_forms_path)
+      expect(form.reload.first_task_title).to eq("Contactar en 48h")
+      expect(form.first_task_due_days).to eq(2)
+    end
+
     it "updates and deletes a lead form" do
       form = create_lead_form!(workspace, user: member, slug: "editable")
 

@@ -190,8 +190,8 @@ class LeadFormSubmissionProcessor
       contacts: [ person ],
       tasks: [
         Task.new(
-          title: "Contactar lead",
-          due_on: Task.default_due_on,
+          title: lead_form.first_task_title,
+          due_on: lead_form.first_task_due_on,
           workspace: workspace,
           user: lead_form.responsible,
           assignee: lead_form.responsible

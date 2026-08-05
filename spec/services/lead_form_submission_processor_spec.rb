@@ -30,6 +30,7 @@ RSpec.describe LeadFormSubmissionProcessor do
       expect(result.person.source).to eq("web_form")
       expect(result.person.company.name).to eq(LeadForm::PLACEHOLDER_COMPANY_NAME)
       expect(result.deal.tasks.map(&:title)).to include("Contactar lead")
+      expect(result.deal.tasks.map(&:due_on)).to include(Date.current + 1.day)
       expect(result.submission.data).to include("email" => "lead@example.com", "how_heard" => "recomendacion", "help_type" => "curso")
       expect(result.submission.data["newsletter_opt_in"]).to be(false)
       expect(result.submission.metadata).to include(
@@ -266,6 +267,25 @@ RSpec.describe LeadFormSubmissionProcessor do
     expect(result.deal).to eq(existing_deal)
     expect(result.deal.reload.pipeline_stage).to eq(pipeline.first_stage)
     expect(result.submission).to be_present
+  end
+
+  it "creates the first task with the configured title and due days" do
+    lead_form.update!(first_task_title: "Llamar al lead", first_task_due_days: 3)
+
+    result = submit(contacto_lead_params("how_heard" => "otro"))
+
+    task = result.deal.tasks.sole
+    expect(task.title).to eq("Llamar al lead")
+    expect(task.due_on).to eq(Date.current + 3.days)
+    expect(task.assignee).to eq(lead_form.responsible)
+  end
+
+  it "creates the first task due today when configured with zero days" do
+    lead_form.update!(first_task_due_days: 0)
+
+    result = submit(contacto_lead_params("how_heard" => "otro"))
+
+    expect(result.deal.tasks.sole.due_on).to eq(Date.current)
   end
 
   it "uses the first stage of a routed pipeline when the configured stage belongs to the default pipeline" do

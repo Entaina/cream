@@ -71,9 +71,10 @@ class LeadForm < ApplicationRecord
 
   has_many :lead_submissions, dependent: :destroy
 
-  validates :name, :slug, :template_key, presence: true
+  validates :name, :slug, :template_key, :first_task_title, presence: true
   validates :slug, uniqueness: true, format: { with: /\A[a-z0-9-]+\z/ }
   validates :template_key, inclusion: { in: ->(form) { form.class.available_template_keys } }
+  validates :first_task_due_days, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   validates :success_redirect_url, format: { with: URI::DEFAULT_PARSER.make_regexp(%w[http https]) }, allow_blank: true
   validate :associations_belong_to_workspace
   validate :pipeline_routes_belong_to_workspace
@@ -117,6 +118,10 @@ class LeadForm < ApplicationRecord
 
   def entrenadores_template?
     template_key == "entrenadores"
+  end
+
+  def first_task_due_on
+    Date.current + first_task_due_days.days
   end
 
   ADOPTION_STAGE_NAME = "Demo".freeze

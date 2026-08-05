@@ -64,7 +64,7 @@ class LeadFormsController < ApplicationController
     params.require(:lead_form).permit(
       :name, :slug, :template_key, :pipeline_id, :pipeline_stage_id, :responsible_id,
       :email_template_id, :collects_company, :active, :success_redirect_url,
-      :hidden_field_keys_text,
+      :hidden_field_keys_text, :first_task_title, :first_task_due_days,
       pipeline_routes: LeadForm::CONTACTO_HELP_TYPE_KEYS
     )
   end

@@ -4,7 +4,7 @@
 
 Cream is a **workspace**-based CRM for managing **people**, **companies** and **deals** (opportunities), with notes, tasks, lists and an activity history shared across the team.
 
-> **Last revision:** 2026-08-05 (Entrenadores public lead form)
+> **Last revision:** 2026-08-05 (configurable first task on lead forms)
 > This document describes the functionality **visible to the user**. Disabled features are listed at the end under "Coming soon".
 
 ---
@@ -1004,7 +1004,7 @@ In the sidebar menu, open **Formularios** (Forms).
 ### Setting up a form
 
 1. Click **Nuevo formulario** (New form).
-2. Provide the **name**, the **slug** (it will appear in the public URL `/f/slug`), the form **template**, the **pipeline** where the deal will be created, the optional **stage** (after choosing the pipeline), the **owner** (receives the notification and the follow-up task), and the **email template** that will be sent to the lead.
+2. Provide the **name**, the **slug** (it will appear in the public URL `/f/slug`), the form **template**, the **pipeline** where the deal will be created, the optional **stage** (after choosing the pipeline), the **owner** (receives the notification and the follow-up task), the **first task text** and **days until due** (due date = submission day + N days; 0 = today), and the **email template** that will be sent to the lead.
 3. Optional: set a **redirect URL after submission** (e.g. `https://example.com/thanks`) to send the visitor to a page on your site. If left blank, Cream's thank-you page is shown (`/f/slug/success`).
 4. Optional: define **additional hidden fields** (one per line, e.g. `producto`, `landing`). Their values are passed as query params in the public or iframe URL, e.g. `/f/slug?producto=curso-ia`. They are saved with the submission and shown on the deal under **Formulario de origen** (Source form).
 5. Check **Recoger datos de empresa** (Collect company data) if the form should ask for the company name and tax ID (CIF).
@@ -1013,7 +1013,7 @@ In the sidebar menu, open **Formularios** (Forms).
 ### What happens when a form is submitted
 
 - A **person** is created or reused by email (source "Formulario web"). If the person already existed, only blank fields are filled in (name, last name, phone, job title…).
-- If that person already has an **open deal** in the form's pipeline, that deal is **reused**: new form data is added to the submission (without creating another deal or another **Contactar lead** task). If you configured a **stage**, the deal advances to it only when it is in an earlier stage (it never moves backwards). If there is no open deal in that pipeline (for example, only won or lost deals, or deals in another pipeline), a new deal is created in the configured stage or, if none is set, in the pipeline's **first stage** (except templates with their own rules, e.g. **Demo** for Adoption), with a **Contactar lead** (Contact lead) task for the owner.
+- If that person already has an **open deal** in the form's pipeline, that deal is **reused**: new form data is added to the submission (without creating another deal or another follow-up task). If you configured a **stage**, the deal advances to it only when it is in an earlier stage (it never moves backwards). If there is no open deal in that pipeline (for example, only won or lost deals, or deals in another pipeline), a new deal is created in the configured stage or, if none is set, in the pipeline's **first stage** (except templates with their own rules, e.g. **Demo** for Adoption), with the form's configured **first task** (default: **Contactar lead** / Contact lead, due the next day) assigned to the owner.
 - The submission data (form fields, source page, UTM, browser, IP…) is saved and visible on the deal's page, under **Formulario de origen** (Source form).
 - The lead receives the configured email; the owner receives a notification with the data and a link to the deal.
 

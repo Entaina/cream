@@ -59,6 +59,16 @@
     <%= f.collection_select :responsible_id, @responsibles, :id, :name, {}, class: "input w-full" %>
   </div>
   <div>
+    <%= f.label :first_task_title, "Texto de la primera tarea", class: "label" %>
+    <%= f.text_field :first_task_title, class: "input w-full", required: true %>
+    <p class="text-xs text-ink-faint mt-1">Se crea al generar un deal nuevo desde el formulario (no al reutilizar uno abierto).</p>
+  </div>
+  <div>
+    <%= f.label :first_task_due_days, "Vence en (días desde hoy)", class: "label" %>
+    <%= f.number_field :first_task_due_days, class: "input w-full", min: 0, required: true %>
+    <p class="text-xs text-ink-faint mt-1">La fecha de la tarea será el día del envío más este número de días (0 = hoy).</p>
+  </div>
+  <div>
     <%= f.label :email_template_id, "Plantilla de email al lead", class: "label" %>
     <%= f.collection_select :email_template_id, @email_templates, :id, :name, {}, class: "input w-full" %>
   </div>
