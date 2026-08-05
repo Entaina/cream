@@ -1,7 +1,10 @@
-<%# locals: lead_form — tracking oculto común a todos los formularios %>
+<%# locals: lead_form, product: nil %>
 <%= hidden_field_tag "lead[#{LeadForm::TIMESTAMP_FIELD}]", LeadForm.signed_timestamp %>
 <%= hidden_field_tag "lead[lead_form_slug]", lead_form.slug %>
 <%= hidden_field_tag "lead[lead_form_name]", lead_form.name %>
+<% if local_assigns[:product]&.persisted? %>
+  <%= hidden_field_tag "lead[product_id]", product.id %>
+<% end %>
 <%= hidden_field_tag "lead[source_page]", params[:source_page], data: { lead_form_target: "sourcePage" } %>
 <%= hidden_field_tag "lead[referrer]", nil, data: { lead_form_target: "referrer" } %>
 <%= hidden_field_tag "lead[utm_source]", params[:utm_source], data: { lead_form_target: "utmSource" } %>

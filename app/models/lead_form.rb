@@ -12,7 +12,8 @@ class LeadForm < ApplicationRecord
     utm_source utm_medium utm_campaign utm_term utm_content
   ].freeze
   SUBMISSION_FIELD_KEYS = %w[
-    email first_name last_name phone how_heard help_type message edition
+    email first_name last_name phone how_heard help_type message
+    product_id edition_id
     company_name company_cif employee_range qualifying_answer job_title audience tech_profile
     ia_work_task organization_ia_stage newsletter_opt_in
   ].freeze
@@ -52,10 +53,6 @@ class LeadForm < ApplicationRecord
     [ "Evento", "evento" ],
     [ "Otro", "otro" ]
   ].freeze
-  LIDERANDO_IA_RESERVA_EDITION_OPTIONS = [
-    [ "Marzo 2026", "marzo_2026" ],
-    [ "Junio 2026", "junio_2026" ]
-  ].freeze
   DESARROLLANDO_IA_TECH_PROFILE_OPTIONS = [
     [ "Desarrollo/programo a diario", "desarrollo" ],
     [ "Perfil técnico no-dev", "perfil_tecnico" ],
@@ -66,6 +63,7 @@ class LeadForm < ApplicationRecord
   belongs_to :workspace
   belongs_to :pipeline
   belongs_to :pipeline_stage, optional: true
+  belongs_to :product, optional: true
   belongs_to :responsible, class_name: "User"
   belongs_to :email_template
 
@@ -182,6 +180,19 @@ class LeadForm < ApplicationRecord
     CONTACTO_HELP_OPTIONS.to_h.invert.fetch(help_type.to_s, help_type.to_s.humanize)
   end
 
+  def resolved_product(product_id_param: nil)
+    id = product_id_param.presence || product_id
+    return if id.blank?
+
+    workspace.products.find_by(id: id)
+  end
+
+  def open_editions_for(product)
+    return Edition.none unless product
+
+    product.editions.not_finished.order(Arel.sql("starts_on NULLS LAST"), :name)
+  end
+
   def self.available_template_keys
     Dir.glob(Rails.root.join("app/views/public/lead_forms/templates/_*.html.erb")).map do |path|
       File.basename(path).delete_prefix("_").delete_suffix(".html.erb")
@@ -284,6 +295,7 @@ class LeadForm < ApplicationRecord
     return if workspace.nil?
 
     errors.add(:pipeline, "must belong to the workspace") if pipeline && pipeline.workspace_id != workspace_id
+    errors.add(:product, "must belong to the workspace") if product && product.workspace_id != workspace_id
     if pipeline_stage && pipeline && pipeline_stage.pipeline_id != pipeline_id
       errors.add(:pipeline_stage, "must belong to the selected pipeline")
     end

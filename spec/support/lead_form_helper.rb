@@ -98,16 +98,20 @@ module LeadFormHelper
   end
 
   def liderando_ia_reserva_lead_params(overrides = {})
-    {
+    product = overrides.delete(:product) || overrides.delete("product")
+    edition = overrides.delete(:edition) || overrides.delete("edition")
+    params = {
       "email" => "lead@example.com",
       "first_name" => "Ana",
       "last_name" => "García",
       "phone" => "600111222",
-      "edition" => "marzo_2026",
       "message" => "Quiero reservar plaza",
       "gdpr_consent" => "1",
       LeadForm::TIMESTAMP_FIELD => valid_lead_form_timestamp
-    }.merge(overrides.stringify_keys)
+    }
+    params["product_id"] = product.id.to_s if product
+    params["edition_id"] = edition.id.to_s if edition
+    params.merge(overrides.stringify_keys)
   end
 
   def entrenadores_lead_params(overrides = {})

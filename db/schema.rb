@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_05_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_05_130000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -450,6 +450,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_05_120000) do
     t.bigint "pipeline_id", null: false
     t.jsonb "pipeline_routes", default: {}, null: false
     t.bigint "pipeline_stage_id"
+    t.bigint "product_id"
     t.bigint "responsible_id", null: false
     t.string "slug", null: false
     t.string "success_redirect_url"
@@ -459,6 +460,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_05_120000) do
     t.index ["email_template_id"], name: "index_lead_forms_on_email_template_id"
     t.index ["pipeline_id"], name: "index_lead_forms_on_pipeline_id"
     t.index ["pipeline_stage_id"], name: "index_lead_forms_on_pipeline_stage_id"
+    t.index ["product_id"], name: "index_lead_forms_on_product_id"
     t.index ["responsible_id"], name: "index_lead_forms_on_responsible_id"
     t.index ["slug"], name: "index_lead_forms_on_slug", unique: true
     t.index ["workspace_id"], name: "index_lead_forms_on_workspace_id"
@@ -1264,6 +1266,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_05_120000) do
   add_foreign_key "lead_forms", "email_templates"
   add_foreign_key "lead_forms", "pipeline_stages"
   add_foreign_key "lead_forms", "pipelines"
+  add_foreign_key "lead_forms", "products"
   add_foreign_key "lead_forms", "users", column: "responsible_id"
   add_foreign_key "lead_forms", "workspaces"
   add_foreign_key "lead_submissions", "deals"

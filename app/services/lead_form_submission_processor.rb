@@ -25,6 +25,7 @@ class LeadFormSubmissionProcessor
       fill_company_blanks!(company)
       person.update!(company: company) if person.company_id != company.id
       deal, deal_created = find_or_create_deal!(person:, company:)
+      attach_deal_product!(deal)
       submission = persist_submission!(deal:, person:, deal_created:)
       enqueue_emails(submission:, deal:, person:)
       Result.new(submission:, deal:, person:)
@@ -200,6 +201,27 @@ class LeadFormSubmissionProcessor
     )
   end
 
+  def attach_deal_product!(deal)
+    product = resolved_product
+    return unless product
+
+    edition = resolved_edition(product)
+    return if deal.deal_products.exists?(product_id: product.id, edition_id: edition&.id)
+
+    deal.deal_products.create!(product: product, edition: edition, quantity: 1)
+  end
+
+  def resolved_product
+    lead_form.resolved_product(product_id_param: params["product_id"])
+  end
+
+  def resolved_edition(product)
+    edition_id = params["edition_id"].presence
+    return if edition_id.blank?
+
+    product.editions.not_finished.find_by(id: edition_id)
+  end
+
   def persist_submission!(deal:, person:, deal_created:)
     now = Time.current.iso8601
     new_data = submission_data
@@ -297,7 +319,14 @@ class LeadFormSubmissionProcessor
 
     if lead_form.liderando_ia_reserva_template?
       person.errors.add(:last_name, "can't be blank") if params["last_name"].blank?
-      person.errors.add(:base, "edition is required") if params["edition"].blank?
+      person.errors.add(:base, "edition is required") if params["edition_id"].blank?
+
+      product = resolved_product
+      if product.nil?
+        person.errors.add(:base, "product is required")
+      elsif params["edition_id"].present? && resolved_edition(product).nil?
+        person.errors.add(:base, "edition is invalid")
+      end
     end
 
     if lead_form.desarrollando_ia_template?

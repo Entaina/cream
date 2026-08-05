@@ -57,13 +57,14 @@ class LeadFormsController < ApplicationController
     @pipelines = current_workspace.pipelines.ordered.includes(:pipeline_stages)
     @responsibles = current_workspace.users.order(:name)
     @email_templates = current_workspace.email_templates.visible_to(current_user).ordered
+    @products = current_workspace.products.ordered
     @template_keys = LeadForm.available_template_keys
   end
 
   def lead_form_params
     params.require(:lead_form).permit(
       :name, :slug, :template_key, :pipeline_id, :pipeline_stage_id, :responsible_id,
-      :email_template_id, :collects_company, :active, :success_redirect_url,
+      :email_template_id, :product_id, :collects_company, :active, :success_redirect_url,
       :hidden_field_keys_text, :first_task_title, :first_task_due_days,
       pipeline_routes: LeadForm::CONTACTO_HELP_TYPE_KEYS
     )

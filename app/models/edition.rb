@@ -12,6 +12,7 @@ class Edition < ApplicationRecord
   validate :ends_on_not_before_starts_on
 
   scope :ordered, -> { order(:name) }
+  scope :not_finished, -> { where("ends_on IS NULL OR ends_on >= ?", Date.current) }
   scope :search, ->(q) {
     where("editions.name ILIKE :q", q: "%#{sanitize_sql_like(q)}%") if q.present?
   }

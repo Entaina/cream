@@ -9,6 +9,7 @@ module Public
 
     before_action :ensure_feature_enabled
     before_action :set_lead_form
+    before_action :set_resolved_product
     after_action :allow_iframe_embedding
 
     # Anti-DoS: per-IP throttling backed by Rails.cache (Solid Cache in production).
@@ -65,9 +66,16 @@ module Public
       head :not_found
     end
 
+    def set_resolved_product
+      product_id_param = params[:product_id].presence || params.dig(:lead, :product_id)
+      @product = @lead_form.resolved_product(product_id_param:)
+      @open_editions = @lead_form.open_editions_for(@product) if @lead_form.liderando_ia_reserva_template?
+    end
+
     def lead_params
       params.fetch(:lead, {}).permit(
-        :email, :first_name, :last_name, :phone, :how_heard, :help_type, :message, :edition,
+        :email, :first_name, :last_name, :phone, :how_heard, :help_type, :message,
+        :product_id, :edition_id,
         :company_name, :company_cif, :employee_range, :qualifying_answer, :job_title, :audience, :tech_profile, :ia_work_task,
         :organization_ia_stage,
         :newsletter_opt_in, :gdpr_consent,

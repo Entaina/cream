@@ -18,7 +18,7 @@ RSpec.describe "Public lead forms", type: :request do
       expect(response.body).to include("¿Cómo nos has conocido?")
       expect(response.body).to include("¿En qué te ayudamos?")
       expect(response.body).to include("Cuéntanos un poco más")
-      expect(response.body).to include("newsletter de Example")
+      expect(response.body).to include("newsletter de Entaina")
       expect(response.body).to include("beehiiv")
       expect(response.headers["Content-Security-Policy"]).to include("frame-ancestors *")
     end

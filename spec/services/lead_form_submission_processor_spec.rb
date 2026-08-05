@@ -310,4 +310,91 @@ RSpec.describe LeadFormSubmissionProcessor do
     expect(result.deal.pipeline).to eq(cursos)
     expect(result.deal.pipeline_stage).to eq(cursos.first_stage)
   end
+
+  describe "product and edition attachment" do
+    let(:product) { workspace.products.create!(name: "Liderando con IA", price: 990) }
+    let(:edition) { product.editions.create!(name: "Marzo 2026", ends_on: Date.current + 30.days) }
+
+    it "creates a deal product line when the form has a configured product and edition" do
+      lead_form.update!(product: product)
+
+      result = submit(contacto_lead_params(
+        "how_heard" => "evento",
+        "product_id" => product.id.to_s,
+        "edition_id" => edition.id.to_s
+      ))
+
+      line = result.deal.deal_products.sole
+      expect(line.product).to eq(product)
+      expect(line.edition).to eq(edition)
+      expect(line.quantity).to eq(1)
+      expect(result.submission.data).to include(
+        "product_id" => product.id.to_s,
+        "edition_id" => edition.id.to_s
+      )
+    end
+
+    it "overrides the configured product with the submitted product_id param" do
+      configured = workspace.products.create!(name: "Configured", price: 100)
+      override = workspace.products.create!(name: "Override", price: 200)
+      override_edition = override.editions.create!(name: "Override edition")
+      lead_form.update!(product: configured)
+
+      result = submit(contacto_lead_params(
+        "how_heard" => "evento",
+        "product_id" => override.id.to_s,
+        "edition_id" => override_edition.id.to_s
+      ))
+
+      expect(result.deal.deal_products.sole.product).to eq(override)
+    end
+
+    it "does not duplicate the same product and edition when reusing an open deal" do
+      lead_form.update!(product: product)
+      company = create_company!(workspace)
+      person = create_person!(workspace, company: company, email: "lead@example.com")
+      existing_deal = create_deal!(workspace, pipeline: pipeline, company: company, contacts: [ person ])
+      existing_deal.deal_products.create!(product: product, edition: edition, quantity: 1)
+
+      expect {
+        result = submit(contacto_lead_params(
+          "how_heard" => "evento",
+          "product_id" => product.id.to_s,
+          "edition_id" => edition.id.to_s
+        ))
+        expect(result.deal).to eq(existing_deal)
+      }.not_to change(DealProduct, :count)
+    end
+
+    it "ignores an edition that belongs to another product" do
+      other_product = workspace.products.create!(name: "Other", price: 50)
+      foreign_edition = other_product.editions.create!(name: "Foreign")
+      lead_form.update!(product: product)
+
+      result = submit(contacto_lead_params(
+        "how_heard" => "evento",
+        "product_id" => product.id.to_s,
+        "edition_id" => foreign_edition.id.to_s
+      ))
+
+      line = result.deal.deal_products.sole
+      expect(line.product).to eq(product)
+      expect(line.edition).to be_nil
+    end
+
+    it "ignores a finished edition" do
+      finished = product.editions.create!(name: "Past", ends_on: Date.current - 1.day)
+      lead_form.update!(product: product)
+
+      result = submit(contacto_lead_params(
+        "how_heard" => "evento",
+        "product_id" => product.id.to_s,
+        "edition_id" => finished.id.to_s
+      ))
+
+      line = result.deal.deal_products.sole
+      expect(line.product).to eq(product)
+      expect(line.edition).to be_nil
+    end
+  end
 end

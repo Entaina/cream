@@ -67,6 +67,13 @@
       <%= f.label :responsible_id, "Responsable", class: "label" %>
       <%= f.collection_select :responsible_id, @responsibles, :id, :name, {}, class: "input mt-1 w-full" %>
     </div>
+    <div class="max-w-md">
+      <%= f.label :product_id, "Producto (opcional)", class: "label" %>
+      <%= f.collection_select :product_id, @products, :id, :name,
+            { include_blank: "Ninguno" },
+            class: "input mt-1 w-full" %>
+      <p class="mt-1 text-xs text-ink-faint">Si se configura, se envía oculto en el formulario público y se asocia al deal. Puede sobrescribirse con <code class="text-2xs">?product_id=</code> en la URL.</p>
+    </div>
 
     <% if lead_form.contacto_template? %>
       <div class="space-y-3 border-t border-line pt-4">

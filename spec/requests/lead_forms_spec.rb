@@ -174,6 +174,26 @@ RSpec.describe "Lead forms", type: :request do
       expect(LeadForm.find_by!(slug: "landing-etapa").pipeline_stage).to eq(qualified)
     end
 
+    it "stores an optional product" do
+      product = workspace.products.create!(name: "Liderando con IA", price: 990)
+
+      post lead_forms_path, params: {
+        lead_form: {
+          name: "Reserva Liderando",
+          slug: "reserva-liderando",
+          template_key: "liderando_ia_reserva",
+          pipeline_id: pipeline.id,
+          responsible_id: member.id,
+          email_template_id: template.id,
+          product_id: product.id,
+          active: "1"
+        }
+      }
+
+      expect(response).to redirect_to(lead_forms_path)
+      expect(LeadForm.find_by!(slug: "reserva-liderando").product).to eq(product)
+    end
+
     it "rejects a pipeline stage from another pipeline" do
       other = pipeline.duplicate(name: "Other")
       other.save!

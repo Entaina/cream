@@ -2,7 +2,7 @@
       class: "space-y-4", data: { controller: "lead-form" } } %>
 <% form_options[:html] = { target: "_top" } if lead_form.success_redirect_url.present? %>
 <%= form_with **form_options do |f| %>
-  <%= render "public/lead_forms/hidden_fields", lead_form: lead_form %>
+  <%= render "public/lead_forms/hidden_fields", lead_form: lead_form, product: @product %>
 
   <div class="hidden" aria-hidden="true">
     <%= label_tag "lead_#{LeadForm::HONEYPOT_FIELD}", "No rellenar" %>
@@ -18,7 +18,7 @@
             require_phone: lead_form.require_phone? %>
     <% end %>
 
-    <%= render "public/lead_forms/templates/#{lead_form.template_key}", f: f, lead_form: lead_form %>
+    <%= render "public/lead_forms/templates/#{lead_form.template_key}", f: f, lead_form: lead_form, product: @product, open_editions: @open_editions %>
 
     <%= render "public/lead_forms/consent_fields", f: f, lead_form: lead_form %>
   </div>
