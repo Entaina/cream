@@ -1,93 +1,141 @@
-<%= form_with model: lead_form, class: "card p-4 space-y-3" do |f| %>
-  <div>
-    <%= f.label :name, class: "label" %>
-    <%= f.text_field :name, class: "input w-full", required: true %>
-  </div>
-  <div>
-    <%= f.label :slug, "Slug (URL pública)", class: "label" %>
-    <%= f.text_field :slug, class: "input w-full", placeholder: "contacto-curso-ia" %>
-    <p class="text-xs text-ink-faint mt-1">Se usará en /f/slug. Solo letras minúsculas, números y guiones.</p>
-  </div>
-  <div>
-    <%= f.label :template_key, "Plantilla del formulario", class: "label" %>
-    <%= f.select :template_key, options_for_select(@template_keys, lead_form.template_key), {}, class: "input w-full" %>
-  </div>
-  <div data-controller="pipeline-stage-select" class="space-y-3">
+<%= form_with model: lead_form, class: "mx-auto max-w-5xl space-y-6" do |f| %>
+  <div class="card space-y-4 p-6">
     <div>
-      <%= f.label :pipeline_id, "Pipeline por defecto", class: "label" %>
-      <%= f.collection_select :pipeline_id, @pipelines, :id, :name, {},
-            class: "input w-full",
-            data: { pipeline_stage_select_target: "pipeline", action: "change->pipeline-stage-select#pipelineChanged" } %>
-      <% if lead_form.contacto_template? %>
-        <p class="text-xs text-ink-faint mt-1">Se usa cuando no hay ruta específica o el lead elige «Otro».</p>
-      <% end %>
+      <h2 class="font-display text-lg font-semibold">Identidad</h2>
+      <p class="mt-1 text-xs text-ink-faint">Nombre público, URL y plantilla del formulario de captación.</p>
     </div>
-    <div>
-      <%= f.label :pipeline_stage_id, "Etapa", class: "label" %>
-      <%= f.select :pipeline_stage_id,
-            options_for_select(
-              @pipelines.flat_map { |p|
-                p.pipeline_stages.ordered.map { |s|
-                  [ s.name, s.id, { data: { pipeline_id: p.id } } ]
-                }
-              },
-              lead_form.pipeline_stage_id
-            ),
-            { include_blank: "Primera etapa del pipeline" },
-            class: "input w-full",
-            data: { pipeline_stage_select_target: "stage" } %>
-      <p class="text-xs text-ink-faint mt-1">Opcional. Los deals nuevos se crean en esta etapa; los deals abiertos existentes avanzan hasta ella (nunca retroceden).</p>
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <div>
+        <%= f.label :name, class: "label" %>
+        <%= f.text_field :name, class: "input mt-1 w-full", required: true %>
+      </div>
+      <div>
+        <%= f.label :slug, "Slug (URL pública)", class: "label" %>
+        <%= f.text_field :slug, class: "input mt-1 w-full", placeholder: "contacto-curso-ia" %>
+        <p class="mt-1 text-xs text-ink-faint">Se usará en /f/slug. Solo letras minúsculas, números y guiones.</p>
+      </div>
+    </div>
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <div>
+        <%= f.label :template_key, "Plantilla del formulario", class: "label" %>
+        <%= f.select :template_key, options_for_select(@template_keys, lead_form.template_key), {}, class: "input mt-1 w-full" %>
+      </div>
+      <div class="flex flex-col justify-end gap-3 pb-1">
+        <label class="flex items-center gap-2 text-sm">
+          <%= f.check_box :collects_company %> Recoger datos de empresa (nombre y CIF)
+        </label>
+        <label class="flex items-center gap-2 text-sm">
+          <%= f.check_box :active %> Activo
+        </label>
+      </div>
     </div>
   </div>
-  <% if lead_form.contacto_template? %>
-    <div class="space-y-3">
-      <p class="label">Pipeline según «¿En qué te ayudamos?»</p>
-      <% LeadForm::CONTACTO_HELP_OPTIONS.each do |label, key| %>
+
+  <div class="card space-y-4 p-6" data-controller="pipeline-stage-select">
+    <div>
+      <h2 class="font-display text-lg font-semibold">CRM y asignación</h2>
+      <p class="mt-1 text-xs text-ink-faint">Pipeline, etapa y responsable de los deals creados desde este formulario.</p>
+    </div>
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <div>
+        <%= f.label :pipeline_id, "Pipeline por defecto", class: "label" %>
+        <%= f.collection_select :pipeline_id, @pipelines, :id, :name, {},
+              class: "input mt-1 w-full",
+              data: { pipeline_stage_select_target: "pipeline", action: "change->pipeline-stage-select#pipelineChanged" } %>
+        <% if lead_form.contacto_template? %>
+          <p class="mt-1 text-xs text-ink-faint">Se usa cuando no hay ruta específica o el lead elige «Otro».</p>
+        <% end %>
+      </div>
+      <div>
+        <%= f.label :pipeline_stage_id, "Etapa", class: "label" %>
+        <%= f.select :pipeline_stage_id,
+              options_for_select(
+                @pipelines.flat_map { |p|
+                  p.pipeline_stages.ordered.map { |s|
+                    [ s.name, s.id, { data: { pipeline_id: p.id } } ]
+                  }
+                },
+                lead_form.pipeline_stage_id
+              ),
+              { include_blank: "Primera etapa del pipeline" },
+              class: "input mt-1 w-full",
+              data: { pipeline_stage_select_target: "stage" } %>
+        <p class="mt-1 text-xs text-ink-faint">Opcional. Los deals nuevos se crean en esta etapa; los deals abiertos existentes avanzan hasta ella (nunca retroceden).</p>
+      </div>
+    </div>
+    <div class="max-w-md">
+      <%= f.label :responsible_id, "Responsable", class: "label" %>
+      <%= f.collection_select :responsible_id, @responsibles, :id, :name, {}, class: "input mt-1 w-full" %>
+    </div>
+
+    <% if lead_form.contacto_template? %>
+      <div class="space-y-3 border-t border-line pt-4">
         <div>
-          <%= label_tag "lead_form_pipeline_routes_#{key}", label, class: "label" %>
-          <%= select_tag "lead_form[pipeline_routes][#{key}]",
-                options_from_collection_for_select(@pipelines, :id, :name, lead_form.pipeline_routes[key]),
-                include_blank: "Usar pipeline por defecto",
-                class: "input w-full",
-                id: "lead_form_pipeline_routes_#{key}" %>
+          <p class="text-sm font-medium text-ink">Pipeline según «¿En qué te ayudamos?»</p>
+          <p class="mt-1 text-xs text-ink-faint">Asigna un pipeline distinto según la opción elegida en el formulario de contacto.</p>
         </div>
-      <% end %>
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <% LeadForm::CONTACTO_HELP_OPTIONS.each do |label, key| %>
+            <div>
+              <%= label_tag "lead_form_pipeline_routes_#{key}", label, class: "label" %>
+              <%= select_tag "lead_form[pipeline_routes][#{key}]",
+                    options_from_collection_for_select(@pipelines, :id, :name, lead_form.pipeline_routes[key]),
+                    include_blank: "Usar pipeline por defecto",
+                    class: "input mt-1 w-full",
+                    id: "lead_form_pipeline_routes_#{key}" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-start">
+    <div class="card space-y-4 p-6 min-w-0">
+      <div>
+        <h2 class="font-display text-lg font-semibold">Primera tarea</h2>
+        <p class="mt-1 text-xs text-ink-faint">Se crea al generar un deal nuevo (no al reutilizar uno abierto).</p>
+      </div>
+      <div>
+        <%= f.label :first_task_title, "Texto de la primera tarea", class: "label" %>
+        <%= f.text_field :first_task_title, class: "input mt-1 w-full", required: true %>
+      </div>
+      <div class="max-w-xs">
+        <%= f.label :first_task_due_days, "Vence en (días desde hoy)", class: "label" %>
+        <%= f.number_field :first_task_due_days, class: "input mt-1 w-full", min: 0, required: true %>
+        <p class="mt-1 text-xs text-ink-faint">0 = el mismo día del envío.</p>
+      </div>
     </div>
-  <% end %>
-  <div>
-    <%= f.label :responsible_id, "Responsable", class: "label" %>
-    <%= f.collection_select :responsible_id, @responsibles, :id, :name, {}, class: "input w-full" %>
+
+    <div class="card space-y-4 p-6 min-w-0">
+      <div>
+        <h2 class="font-display text-lg font-semibold">Email y redirección</h2>
+        <p class="mt-1 text-xs text-ink-faint">Comunicación automática al lead y destino tras el envío.</p>
+      </div>
+      <div>
+        <%= f.label :email_template_id, "Plantilla de email al lead", class: "label" %>
+        <%= f.collection_select :email_template_id, @email_templates, :id, :name, {}, class: "input mt-1 w-full" %>
+      </div>
+      <div>
+        <%= f.label :success_redirect_url, "URL de redirección tras envío", class: "label" %>
+        <%= f.url_field :success_redirect_url, class: "input mt-1 w-full", placeholder: "https://entaina.com/gracias" %>
+        <p class="mt-1 text-xs text-ink-faint">Opcional. Si se deja vacío, se muestra la página de gracias de Cream (/f/slug/success).</p>
+      </div>
+    </div>
   </div>
-  <div>
-    <%= f.label :first_task_title, "Texto de la primera tarea", class: "label" %>
-    <%= f.text_field :first_task_title, class: "input w-full", required: true %>
-    <p class="text-xs text-ink-faint mt-1">Se crea al generar un deal nuevo desde el formulario (no al reutilizar uno abierto).</p>
+
+  <div class="card space-y-4 p-6">
+    <div>
+      <h2 class="font-display text-lg font-semibold">Campos ocultos</h2>
+      <p class="mt-1 text-xs text-ink-faint">Parámetros adicionales leídos de la URL pública (p. ej. /f/slug?producto=curso-ia).</p>
+    </div>
+    <div class="max-w-xl">
+      <%= f.label :hidden_field_keys_text, "Claves adicionales", class: "label" %>
+      <%= f.text_area :hidden_field_keys_text, class: "input mt-1 w-full font-mono text-sm", rows: 4, placeholder: "producto\nlanding" %>
+      <p class="mt-1 text-xs text-ink-faint">Una clave por línea.</p>
+    </div>
   </div>
-  <div>
-    <%= f.label :first_task_due_days, "Vence en (días desde hoy)", class: "label" %>
-    <%= f.number_field :first_task_due_days, class: "input w-full", min: 0, required: true %>
-    <p class="text-xs text-ink-faint mt-1">La fecha de la tarea será el día del envío más este número de días (0 = hoy).</p>
-  </div>
-  <div>
-    <%= f.label :email_template_id, "Plantilla de email al lead", class: "label" %>
-    <%= f.collection_select :email_template_id, @email_templates, :id, :name, {}, class: "input w-full" %>
-  </div>
-  <div>
-    <%= f.label :success_redirect_url, "URL de redirección tras envío", class: "label" %>
-    <%= f.url_field :success_redirect_url, class: "input w-full", placeholder: "https://entaina.com/gracias" %>
-    <p class="text-xs text-ink-faint mt-1">Opcional. Si se deja vacío, se muestra la página de gracias de Cream (/f/slug/success).</p>
-  </div>
-  <div>
-    <%= f.label :hidden_field_keys_text, "Campos ocultos adicionales", class: "label" %>
-    <%= f.text_area :hidden_field_keys_text, class: "input w-full font-mono text-sm", rows: 4, placeholder: "producto\nlanding" %>
-    <p class="text-xs text-ink-faint mt-1">Uno por línea. Se leen de la URL pública, p. ej. /f/slug?producto=curso-ia</p>
-  </div>
-  <label class="flex items-center gap-2 text-base">
-    <%= f.check_box :collects_company %> Recoger datos de empresa (nombre y CIF)
-  </label>
-  <label class="flex items-center gap-2 text-base">
-    <%= f.check_box :active %> Activo
-  </label>
+
   <div class="flex gap-2">
     <%= f.submit class: "btn-primary" %>
     <%= link_to "Cancelar", lead_forms_path, class: "btn-secondary" %>
