@@ -67,6 +67,20 @@ RSpec.describe LeadFormSubmissionProcessor do
     expect(notification.url).to eq(Rails.application.routes.url_helpers.deal_path(deal))
   end
 
+  it "does not enqueue lead email when the form has no email template" do
+    lead_form.update!(email_template: nil)
+
+    expect {
+      submit(contacto_lead_params("how_heard" => "otro"))
+    }.to change(Person, :count).by(1)
+      .and change(Deal, :count).by(1)
+      .and change(LeadSubmission, :count).by(1)
+      .and change(EmailMessage, :count).by(0)
+      .and change(Notification, :count).by(1)
+      .and have_enqueued_job(SendViaGmailJob).exactly(0).times
+      .and have_enqueued_mail(LeadFormMailer, :responsible_notification)
+  end
+
   it "silently discards submissions beyond the per-email daily cap" do
     stub_const("LeadForm::MAX_SUBMISSIONS_PER_EMAIL_PER_DAY", 1)
     submit(contacto_lead_params)

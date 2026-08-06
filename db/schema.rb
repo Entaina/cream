@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_06_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_06_130000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -443,7 +443,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_06_120000) do
     t.boolean "active", default: true, null: false
     t.boolean "collects_company", default: false, null: false
     t.datetime "created_at", null: false
-    t.bigint "email_template_id", null: false
+    t.bigint "email_template_id"
     t.integer "first_task_due_days", default: 1, null: false
     t.string "first_task_title", default: "Contactar lead", null: false
     t.jsonb "hidden_field_keys", default: [], null: false

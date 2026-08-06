@@ -356,18 +356,20 @@ class LeadFormSubmissionProcessor
   end
 
   def enqueue_emails(submission:, deal:, person:)
-    template = lead_form.email_template
-    rendered_body = template.render_for(person)
-    rendered_subject = render_template_subject(template, person)
+    if lead_form.email_template
+      template = lead_form.email_template
+      rendered_body = template.render_for(person)
+      rendered_subject = render_template_subject(template, person)
 
-    message = workspace.email_messages.create!(
-      user: lead_form.responsible,
-      record: deal,
-      to_address: person.email,
-      subject: rendered_subject,
-      body: rendered_body
-    )
-    SendViaGmailJob.perform_later(message.id)
+      message = workspace.email_messages.create!(
+        user: lead_form.responsible,
+        record: deal,
+        to_address: person.email,
+        subject: rendered_subject,
+        body: rendered_body
+      )
+      SendViaGmailJob.perform_later(message.id)
+    end
 
     if CreamFeatures.enabled?(:notifications)
       NotificationService.notify_lead_submission(

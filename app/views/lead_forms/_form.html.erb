@@ -121,7 +121,8 @@
       </div>
       <div>
         <%= f.label :email_template_id, "Plantilla de email al lead", class: "label" %>
-        <%= f.collection_select :email_template_id, @email_templates, :id, :name, {}, class: "input mt-1 w-full" %>
+        <%= f.collection_select :email_template_id, @email_templates, :id, :name, { include_blank: "Sin email" }, class: "input mt-1 w-full" %>
+        <p class="mt-1 text-xs text-ink-faint">Si eliges «Sin email», no se envía correo automático al lead tras el envío.</p>
       </div>
       <div>
         <%= f.label :success_redirect_url, "URL de redirección tras envío", class: "label" %>

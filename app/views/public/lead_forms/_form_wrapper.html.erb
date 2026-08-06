@@ -13,7 +13,6 @@
     <% if lead_form.render_base_fields? %>
       <%= render "public/lead_forms/base_fields",
             f: f,
-            paired_contact_rows: lead_form.liderando_ia_template?,
             show_how_heard: lead_form.show_how_heard_in_base?,
             show_phone: lead_form.show_phone_in_base?,
             require_phone: lead_form.require_phone? %>

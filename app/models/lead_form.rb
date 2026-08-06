@@ -78,7 +78,7 @@ class LeadForm < ApplicationRecord
   belongs_to :pipeline_stage, optional: true
   belongs_to :product, optional: true
   belongs_to :responsible, class_name: "User"
-  belongs_to :email_template
+  belongs_to :email_template, optional: true
 
   has_many :lead_submissions, dependent: :destroy
 

@@ -1,49 +1,9 @@
-<%# locals: f, show_how_heard: true, show_phone: true, require_phone: true, paired_contact_rows: false %>
-<% paired_contact_rows = local_assigns.fetch(:paired_contact_rows, false) %>
+<%# locals: f, show_how_heard: true, show_phone: true, require_phone: true %>
 <div class="space-y-3">
-  <% if paired_contact_rows %>
-    <div class="grid grid-cols-2 gap-3">
-      <div>
-        <%= render "public/lead_forms/field_label", f: f, field: :first_name, text: "Nombre", required: true %>
-        <%= f.text_field :first_name, required: true, class: "input w-full", autocomplete: "given-name" %>
-      </div>
-      <div>
-        <%= render "public/lead_forms/field_label", f: f, field: :last_name, text: "Apellidos", required: true %>
-        <%= f.text_field :last_name, required: true, class: "input w-full", autocomplete: "family-name" %>
-      </div>
-    </div>
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-      <div>
-        <%= render "public/lead_forms/field_label", f: f, field: :email, text: "Email", required: true %>
-        <%= f.email_field :email, required: true, class: "input w-full", autocomplete: "email" %>
-      </div>
-      <% if local_assigns.fetch(:show_phone, true) %>
-        <div>
-          <%= render "public/lead_forms/field_label", f: f, field: :phone, text: "Teléfono", required: local_assigns.fetch(:require_phone, true) %>
-          <%= f.telephone_field :phone, required: local_assigns.fetch(:require_phone, true), class: "input w-full", autocomplete: "tel" %>
-        </div>
-      <% end %>
-    </div>
-  <% else %>
-    <div>
-      <%= render "public/lead_forms/field_label", f: f, field: :first_name, text: "Nombre", required: true %>
-      <%= f.text_field :first_name, required: true, class: "input w-full", autocomplete: "given-name" %>
-    </div>
-    <div>
-      <%= render "public/lead_forms/field_label", f: f, field: :last_name, text: "Apellidos", required: true %>
-      <%= f.text_field :last_name, required: true, class: "input w-full", autocomplete: "family-name" %>
-    </div>
-    <div>
-      <%= render "public/lead_forms/field_label", f: f, field: :email, text: "Email", required: true %>
-      <%= f.email_field :email, required: true, class: "input w-full", autocomplete: "email" %>
-    </div>
-    <% if local_assigns.fetch(:show_phone, true) %>
-      <div>
-        <%= render "public/lead_forms/field_label", f: f, field: :phone, text: "Teléfono", required: local_assigns.fetch(:require_phone, true) %>
-        <%= f.telephone_field :phone, required: local_assigns.fetch(:require_phone, true), class: "input w-full", autocomplete: "tel" %>
-      </div>
-    <% end %>
-  <% end %>
+  <%= render "public/lead_forms/contact_fields",
+        f: f,
+        show_phone: local_assigns.fetch(:show_phone, true),
+        require_phone: local_assigns.fetch(:require_phone, true) %>
   <% if local_assigns.fetch(:show_how_heard, true) %>
     <%= render "public/lead_forms/how_heard_field", f: f %>
   <% end %>

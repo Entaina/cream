@@ -47,6 +47,34 @@ RSpec.describe "Lead forms", type: :request do
       expect(LeadForm.last.success_redirect_url).to eq("https://example.com/gracias")
     end
 
+    it "creates a lead form without lead email template" do
+      expect {
+        post lead_forms_path, params: {
+          lead_form: {
+            name: "Landing sin email",
+            slug: "landing-sin-email",
+            template_key: "contacto",
+            pipeline_id: pipeline.id,
+            responsible_id: member.id,
+            email_template_id: "",
+            active: "1"
+          }
+        }
+      }.to change(LeadForm, :count).by(1)
+
+      expect(response).to redirect_to(lead_forms_path)
+      expect(LeadForm.find_by!(slug: "landing-sin-email").email_template).to be_nil
+    end
+
+    it "updates lead form to remove email template" do
+      form = create_lead_form!(workspace, user: member, slug: "with-email")
+
+      patch lead_form_path(form), params: { lead_form: { email_template_id: "" } }
+
+      expect(response).to redirect_to(lead_forms_path)
+      expect(form.reload.email_template).to be_nil
+    end
+
     it "rejects an invalid success redirect URL" do
       expect {
         post lead_forms_path, params: {

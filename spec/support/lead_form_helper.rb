@@ -10,7 +10,11 @@ module LeadFormHelper
 
   def create_lead_form!(workspace, user:, pipeline: nil, **attrs)
     pipeline ||= Pipeline.default_for(workspace) || Pipeline.create_default!(workspace)
-    template = attrs.delete(:email_template) || create_email_template!(workspace, user: user)
+    template = if attrs.key?(:email_template)
+      attrs.delete(:email_template)
+    else
+      create_email_template!(workspace, user: user)
+    end
     workspace.lead_forms.create!({
       name: "Contacto web",
       slug: "contacto-#{SecureRandom.hex(3)}",

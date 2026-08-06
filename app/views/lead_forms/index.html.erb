@@ -29,7 +29,7 @@
         <div><dt class="text-ink-faint">Plantilla</dt><dd><%= form.template_key %></dd></div>
         <div><dt class="text-ink-faint">Pipeline</dt><dd><%= form.pipeline.name %></dd></div>
         <div><dt class="text-ink-faint">Responsable</dt><dd><%= form.responsible.name %></dd></div>
-        <div><dt class="text-ink-faint">Email al lead</dt><dd><%= link_to form.email_template.name, edit_email_template_path(form.email_template), class: "text-accent hover:underline" %></dd></div>
+        <div><dt class="text-ink-faint">Email al lead</dt><dd><% if form.email_template %><%= link_to form.email_template.name, edit_email_template_path(form.email_template), class: "text-accent hover:underline" %><% else %><span class="text-ink-faint">Sin email</span><% end %></dd></div>
       </dl>
 
       <div>
