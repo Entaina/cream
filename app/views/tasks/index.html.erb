@@ -3,9 +3,30 @@
 
 <div class="flex items-center gap-1 border-b border-line px-5 py-2 shrink-0">
   <% { "pending" => "Open", "completed" => "Completed", "all" => "All" }.each do |key, label| %>
-    <%= link_to label, tasks_path(filter: key),
+    <% tab_params = { filter: key } %>
+    <% if @can_filter_by_assignee %>
+      <% if @assignee_filter == :all %>
+        <% tab_params[:assignee_id] = "all" %>
+      <% elsif @assignee_filter != current_user.id %>
+        <% tab_params[:assignee_id] = @assignee_filter %>
+      <% end %>
+    <% end %>
+    <%= link_to label, tasks_path(tab_params),
           class: [ "rounded-md px-2.5 py-1 text-sm font-medium",
                    @filter == key ? "bg-canvas-sunken text-ink" : "text-ink-faint hover:text-ink" ] %>
+  <% end %>
+
+  <% if @can_filter_by_assignee %>
+    <%= form_with url: tasks_path, method: :get, class: "ml-auto" do %>
+      <%= hidden_field_tag :filter, @filter %>
+      <%= select_tag :assignee_id,
+            options_for_select(
+              [ [ "My tasks", "" ], [ "All assignees", "all" ] ] + @assignees.map { |user| [ user.name, user.id ] },
+              @assignee_filter == :all ? "all" : (@assignee_filter == current_user.id ? "" : @assignee_filter)
+            ),
+            class: "input w-44",
+            onchange: "this.form.requestSubmit()" %>
+    <% end %>
   <% end %>
 </div>
 

@@ -163,6 +163,15 @@ RSpec.describe "List filter persistence", type: :request do
 
       expect(response).to redirect_to(tasks_path(filter: "completed"))
     end
+
+    it "restores the selected assignee filter" do
+      sign_in_as(member)
+
+      get tasks_path(filter: "pending", assignee_id: "all")
+      get tasks_path
+
+      expect(response).to redirect_to(tasks_path(filter: "pending", assignee_id: "all"))
+    end
   end
 
   describe "GET /products" do

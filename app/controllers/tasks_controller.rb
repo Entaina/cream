@@ -7,6 +7,10 @@ class TasksController < ApplicationController
   def index
     scope = policy_scope(current_workspace.tasks).includes(:assignee, :taskable)
     @filter = params[:filter].presence_in(%w[pending completed all]) || "pending"
+    @can_filter_by_assignee = pundit_user.can_view_others_tasks?
+    @assignee_filter = resolve_assignee_filter
+    scope = apply_assignee_filter(scope, @assignee_filter)
+    @assignees = current_workspace.users.order(:name) if @can_filter_by_assignee
     @tasks = case @filter
     when "completed" then scope.completed.order(completed_at: :desc)
     when "all" then scope.due_order
@@ -71,5 +75,24 @@ class TasksController < ApplicationController
 
     scope = current_workspace.public_send(params[:taskable_type].tableize)
     @task.taskable = policy_scope(scope).find(params[:taskable_id])
+  end
+
+  def resolve_assignee_filter
+    return current_user.id unless @can_filter_by_assignee
+
+    param = params[:assignee_id]
+    return current_user.id if param.blank?
+    return :all if param == "all"
+
+    user_id = param.to_i
+    return user_id if current_workspace.users.exists?(id: user_id)
+
+    current_user.id
+  end
+
+  def apply_assignee_filter(scope, assignee_filter)
+    return scope if assignee_filter == :all
+
+    scope.where(assignee_id: assignee_filter)
   end
 end

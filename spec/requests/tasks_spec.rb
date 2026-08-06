@@ -4,9 +4,112 @@ RSpec.describe "Tasks", type: :request do
   fixtures :users, :workspaces, :memberships
 
   let(:member) { users(:one) }
+  let(:salesperson) { users(:two) }
+  let(:sales_director) { users(:three) }
   let(:workspace) { workspaces(:one) }
   let!(:pipeline) { Pipeline.create_default!(workspace) }
   let(:deal) { create_deal!(workspace, pipeline: pipeline) }
+
+  def create_workspace_task!(assignee:, title:)
+    deal.tasks.create!(
+      title: title,
+      due_on: Date.current,
+      workspace: workspace,
+      user: assignee,
+      assignee: assignee
+    )
+  end
+
+  def sign_in_to_workspace!(user)
+    sign_in_as(user)
+    patch switch_workspace_path, params: { workspace_id: workspace.id }
+  end
+
+  describe "GET /tasks" do
+    let!(:admin_task) { create_workspace_task!(assignee: member, title: "Admin task") }
+    let!(:salesperson_task) { create_workspace_task!(assignee: salesperson, title: "Salesperson task") }
+
+    it "shows only the current user's tasks by default" do
+      sign_in_as(member)
+
+      get tasks_path
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("Admin task")
+      expect(response.body).not_to include("Salesperson task")
+    end
+
+    context "as admin" do
+      it "shows the assignee filter and all tasks when assignee_id=all" do
+        sign_in_as(member)
+
+        get tasks_path(assignee_id: "all")
+
+        expect(response.body).to include("Admin task")
+        expect(response.body).to include("Salesperson task")
+        expect(response.body).to include('name="assignee_id"')
+      end
+
+      it "filters by a specific assignee" do
+        sign_in_as(member)
+
+        get tasks_path(assignee_id: salesperson.id)
+
+        expect(response.body).not_to include("Admin task")
+        expect(response.body).to include("Salesperson task")
+      end
+    end
+
+    context "as sales director" do
+      it "shows the assignee filter and all tasks when assignee_id=all" do
+        sign_in_to_workspace!(sales_director)
+
+        get tasks_path(assignee_id: "all")
+
+        expect(response.body).to include("Admin task")
+        expect(response.body).to include("Salesperson task")
+        expect(response.body).to include('name="assignee_id"')
+      end
+    end
+
+    context "as salesperson without view-all flag" do
+      it "shows only own tasks even when assignee_id=all is requested" do
+        sign_in_to_workspace!(salesperson)
+
+        get tasks_path(assignee_id: "all")
+
+        expect(response.body).to include("Salesperson task")
+        expect(response.body).not_to include("Admin task")
+        expect(response.body).not_to include('name="assignee_id"')
+      end
+    end
+
+    context "when salespeople_can_view_all_deals is enabled" do
+      before { workspace.update!(salespeople_can_view_all_deals: true) }
+
+      it "allows a salesperson to use the assignee filter and view all tasks" do
+        sign_in_to_workspace!(salesperson)
+
+        get tasks_path(assignee_id: "all")
+
+        expect(response.body).to include("Admin task")
+        expect(response.body).to include("Salesperson task")
+        expect(response.body).to include('name="assignee_id"')
+      end
+    end
+
+    context "when salespeople_can_edit_all_deals is enabled" do
+      before { workspace.update!(salespeople_can_edit_all_deals: true) }
+
+      it "allows a salesperson to use the assignee filter" do
+        sign_in_to_workspace!(salesperson)
+
+        get tasks_path
+
+        expect(response.body).to include('name="assignee_id"')
+      end
+    end
+  end
 
   describe "POST /tasks from deal" do
     it "creates a task linked to the deal" do
