@@ -1,0 +1,29 @@
+<div class="mx-auto max-w-xl">
+  <h1 class="font-display text-2xl font-semibold mb-4">{{ lead_form.name }}</h1>
+  {% form_open %}
+  {% hidden_fields %}
+  {% honeypot %}
+
+  <div class="space-y-4">
+  <div class="space-y-3">
+    <div>
+      {% field type: "label", name: "edition_id", label: "Edición", required: true %}
+      {% if product.blank %}
+        <p class="text-sm text-ink-soft">No hay producto configurado para este formulario.</p>
+      {% elsif open_editions.size == 0 %}
+        <p class="text-sm text-ink-soft">No hay ediciones abiertas en este momento.</p>
+      {% else %}
+        {% field type: "select", name: "edition_id", collection: "open_editions", blank: "Elige una edición", required: true %}
+      {% endif %}
+    </div>
+
+    {% partial 'contact_fields' %}
+    {% field type: "textarea", name: "message", label: "Mensaje", placeholder: "Opcional" %}
+  </div>
+    {% partial 'consent_fields' %}
+  </div>
+
+  {% turnstile %}
+  {% submit 'Enviar' %}
+  {% form_close %}
+</div>

@@ -386,35 +386,31 @@ RSpec.describe LeadFormSubmissionProcessor do
       }.not_to change(DealProduct, :count)
     end
 
-    it "ignores an edition that belongs to another product" do
+    it "rejects an edition that belongs to another product" do
       other_product = workspace.products.create!(name: "Other", price: 50)
       foreign_edition = other_product.editions.create!(name: "Foreign")
       lead_form.update!(product: product)
 
-      result = submit(contacto_lead_params(
-        "how_heard" => "evento",
-        "product_id" => product.id.to_s,
-        "edition_id" => foreign_edition.id.to_s
-      ))
-
-      line = result.deal.deal_products.sole
-      expect(line.product).to eq(product)
-      expect(line.edition).to be_nil
+      expect {
+        submit(contacto_lead_params(
+          "how_heard" => "evento",
+          "product_id" => product.id.to_s,
+          "edition_id" => foreign_edition.id.to_s
+        ))
+      }.to raise_error(ActiveRecord::RecordInvalid, /edition is invalid/)
     end
 
-    it "ignores a finished edition" do
+    it "rejects a finished edition" do
       finished = product.editions.create!(name: "Past", ends_on: Date.current - 1.day)
       lead_form.update!(product: product)
 
-      result = submit(contacto_lead_params(
-        "how_heard" => "evento",
-        "product_id" => product.id.to_s,
-        "edition_id" => finished.id.to_s
-      ))
-
-      line = result.deal.deal_products.sole
-      expect(line.product).to eq(product)
-      expect(line.edition).to be_nil
+      expect {
+        submit(contacto_lead_params(
+          "how_heard" => "evento",
+          "product_id" => product.id.to_s,
+          "edition_id" => finished.id.to_s
+        ))
+      }.to raise_error(ActiveRecord::RecordInvalid, /edition is invalid/)
     end
   end
 end

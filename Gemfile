@@ -85,3 +85,5 @@ gem "google-apis-drive_v3"
 gem "llmemory"
 
 gem "rspec-rails", "~> 8.0", groups: [ :development, :test ]
+
+gem "liquid", "~> 5.13"

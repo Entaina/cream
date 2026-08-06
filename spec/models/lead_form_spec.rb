@@ -36,4 +36,14 @@ RSpec.describe LeadForm, type: :model do
 
     expect(form.first_task_due_on(on: submission_day)).to eq(Date.new(2026, 8, 14))
   end
+
+  it "includes workspace-specific template keys" do
+    workspace.lead_form_templates.create!(
+      path: "public/lead_forms/custom_workspace",
+      partial: false,
+      body: "<div class=\"mx-auto max-w-xl\"><p>custom</p></div>"
+    )
+
+    expect(described_class.available_template_keys(workspace: workspace)).to include("custom_workspace")
+  end
 end

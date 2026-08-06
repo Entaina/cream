@@ -163,6 +163,7 @@ Rails.application.routes.draw do
   resources :alert_rules, except: %i[show]
   resources :slack_integrations, except: %i[show]
   resources :lead_forms, except: %i[show]
+  resources :lead_form_templates, except: %i[show]
   resources :booking_pages, except: %i[show] do
     collection do
       get :calendars

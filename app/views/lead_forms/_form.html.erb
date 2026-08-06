@@ -42,9 +42,7 @@
         <%= f.collection_select :pipeline_id, @pipelines, :id, :name, {},
               class: "input mt-1 w-full",
               data: { pipeline_stage_select_target: "pipeline", action: "change->pipeline-stage-select#pipelineChanged" } %>
-        <% if lead_form.contacto_template? %>
-          <p class="mt-1 text-xs text-ink-faint">Se usa cuando no hay ruta específica o el lead elige «Otro».</p>
-        <% end %>
+        <p class="mt-1 text-xs text-ink-faint">Pipeline por defecto para deals nuevos. Si el formulario envía <code class="text-2xs">help_type</code>, puede enrutarse según la tabla inferior.</p>
       </div>
       <div>
         <%= f.label :pipeline_stage_id, "Etapa", class: "label" %>
@@ -75,12 +73,11 @@
       <p class="mt-1 text-xs text-ink-faint">Si se configura, se envía oculto en el formulario público y se asocia al deal. Puede sobrescribirse con <code class="text-2xs">?product_id=</code> en la URL.</p>
     </div>
 
-    <% if lead_form.contacto_template? %>
-      <div class="space-y-3 border-t border-line pt-4">
-        <div>
-          <p class="text-sm font-medium text-ink">Pipeline según «¿En qué te ayudamos?»</p>
-          <p class="mt-1 text-xs text-ink-faint">Asigna un pipeline distinto según la opción elegida en el formulario de contacto.</p>
-        </div>
+    <div class="space-y-3 border-t border-line pt-4">
+      <div>
+        <p class="text-sm font-medium text-ink">Pipeline según campo del formulario</p>
+        <p class="mt-1 text-xs text-ink-faint">Opcional. Si la plantilla envía <code class="text-2xs">help_type</code>, asigna un pipeline distinto por valor (p. ej. opciones de «¿En qué te ayudamos?»).</p>
+      </div>
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <% LeadForm::CONTACTO_HELP_OPTIONS.each do |label, key| %>
             <div>
@@ -93,8 +90,7 @@
             </div>
           <% end %>
         </div>
-      </div>
-    <% end %>
+    </div>
   </div>
 
   <div class="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-start">

@@ -18,6 +18,9 @@ module Public
     rate_limit to: 60, within: 1.minute, only: %i[show success], name: "lead_form_show"
 
     def show
+      prepare_show_page
+    rescue Liquid::FileSystemError
+      head :not_found
     end
 
     def create
@@ -28,14 +31,12 @@ module Public
 
       unless gdpr_consent_given?
         flash.now[:alert] = "Debes aceptar la política de privacidad para enviar el formulario."
-        render :show, status: :unprocessable_entity
-        return
+        return render_show_or_not_found(status: :unprocessable_entity)
       end
 
       unless turnstile_passed?
         flash.now[:alert] = "No hemos podido verificar que eres una persona. Vuelve a intentarlo."
-        render :show, status: :unprocessable_entity
-        return
+        return render_show_or_not_found(status: :unprocessable_entity)
       end
 
       LeadFormSubmissionProcessor.call(
@@ -46,10 +47,13 @@ module Public
       redirect_after_submission
     rescue ActiveRecord::RecordInvalid => e
       flash.now[:alert] = e.record.errors.full_messages.to_sentence.presence || "No se pudo enviar el formulario."
-      render :show, status: :unprocessable_entity
+      render_show_or_not_found(status: :unprocessable_entity)
     end
 
     def success
+      @lead_form_page_html = template_renderer.render("public/lead_forms/success")
+    rescue Liquid::FileSystemError
+      head :not_found
     end
 
     private
@@ -58,6 +62,29 @@ module Public
       return if CreamFeatures.enabled?(:lead_forms)
 
       head :not_found
+    end
+
+    def prepare_show_page
+      path = LeadFormTemplate.form_page_path_for(@lead_form.template_key)
+      @lead_form_page_html = template_renderer.render(path)
+    end
+
+    def render_show_or_not_found(status: :ok)
+      prepare_show_page
+      render :show, status: status
+    rescue Liquid::FileSystemError
+      head :not_found
+    end
+
+    def template_renderer
+      @template_renderer ||= LeadFormTemplates::Renderer.new(
+        workspace: @lead_form.workspace,
+        lead_form: @lead_form,
+        view_context: view_context,
+        params: params,
+        product: @product,
+        open_editions: @open_editions || []
+      )
     end
 
     def set_lead_form
@@ -69,7 +96,7 @@ module Public
     def set_resolved_product
       product_id_param = params[:product_id].presence || params.dig(:lead, :product_id)
       @product = @lead_form.resolved_product(product_id_param:)
-      @open_editions = @lead_form.open_editions_for(@product) if @lead_form.reserva_template?
+      @open_editions = @lead_form.open_editions_for(@product) if @product.present?
     end
 
     def lead_params

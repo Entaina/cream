@@ -1,5 +1,10 @@
 <% page_title "Formularios de captación" %>
 <% actions = capture do %>
+  <% if current_membership&.admin? %>
+    <%= link_to lead_form_templates_path, class: "btn-secondary" do %>
+      Plantillas de formulario
+    <% end %>
+  <% end %>
   <%= link_to new_lead_form_path, class: "btn-primary" do %>
     <%= icon :plus, classes: "size-3.5" %> Nuevo formulario
   <% end %>

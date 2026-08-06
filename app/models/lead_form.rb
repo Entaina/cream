@@ -84,7 +84,7 @@ class LeadForm < ApplicationRecord
 
   validates :name, :slug, :template_key, :first_task_title, presence: true
   validates :slug, uniqueness: true, format: { with: /\A[a-z0-9-]+\z/ }
-  validates :template_key, inclusion: { in: ->(form) { form.class.available_template_keys } }
+  validates :template_key, inclusion: { in: ->(form) { form.class.available_template_keys(workspace: form.workspace) } }
   validates :first_task_due_days, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   validates :success_redirect_url, format: { with: URI::DEFAULT_PARSER.make_regexp(%w[http https]) }, allow_blank: true
   validate :associations_belong_to_workspace
@@ -99,78 +99,8 @@ class LeadForm < ApplicationRecord
   scope :active, -> { where(active: true) }
   scope :ordered, -> { order(:name, :id) }
 
-  def contacto_template?
-    template_key == "contacto"
-  end
-
-  def liderando_ia_template?
-    template_key == "liderando_ia"
-  end
-
-  def liderando_ia_reserva_template?
-    template_key == "liderando_ia_reserva"
-  end
-
-  def desarrollando_ia_reserva_template?
-    template_key == "desarrollando_ia_reserva"
-  end
-
-  def reserva_template?
-    liderando_ia_reserva_template? || desarrollando_ia_reserva_template?
-  end
-
-  def trabajando_ia_template?
-    template_key == "trabajando_ia"
-  end
-
-  def desarrollando_ia_template?
-    template_key == "desarrollando_ia"
-  end
-
-  def adoption_template?
-    template_key == "adoption"
-  end
-
-  def indice_adopcion_ia_template?
-    template_key == "indice_adopcion_ia"
-  end
-
-  def entrenadores_template?
-    template_key == "entrenadores"
-  end
-
   def first_task_due_on(on: Date.current)
     on + first_task_due_days.days
-  end
-
-  ADOPTION_STAGE_NAME = "Demo".freeze
-
-  def requires_job_title?
-    indice_adopcion_ia_template?
-  end
-
-  def render_base_fields?
-    !reserva_template?
-  end
-
-  def show_how_heard_in_base?
-    !contacto_template? && !liderando_ia_template? && !reserva_template? && !trabajando_ia_template? && !desarrollando_ia_template? && !adoption_template? && !indice_adopcion_ia_template? && !entrenadores_template?
-  end
-
-  def show_phone_in_base?
-    !entrenadores_template?
-  end
-
-  def require_phone?
-    show_phone_in_base?
-  end
-
-  def show_newsletter_opt_in?
-    !reserva_template?
-  end
-
-  def entaina_privacy_consent?
-    liderando_ia_template? || reserva_template? || entrenadores_template?
   end
 
   def configured_stage_for(for_pipeline)
@@ -183,15 +113,12 @@ class LeadForm < ApplicationRecord
   def resolve_stage(for_pipeline: pipeline)
     configured = configured_stage_for(for_pipeline)
     return configured if configured
-    return for_pipeline.first_stage unless adoption_template?
 
-    for_pipeline.pipeline_stages.find_by("name ILIKE ?", ADOPTION_STAGE_NAME) || for_pipeline.first_stage
+    for_pipeline.first_stage
   end
 
   def resolve_pipeline(help_type: nil)
-    return pipeline unless contacto_template?
-
-    route_id = pipeline_routes[help_type.to_s].presence
+    route_id = pipeline_routes[help_type.to_s].presence if help_type.present?
     return workspace.pipelines.find(route_id) if route_id.present?
 
     pipeline
@@ -214,9 +141,22 @@ class LeadForm < ApplicationRecord
     product.editions.not_finished.order(Arel.sql("starts_on NULLS LAST"), :name)
   end
 
-  def self.available_template_keys
-    Dir.glob(Rails.root.join("app/views/public/lead_forms/templates/_*.html.erb")).map do |path|
-      File.basename(path).delete_prefix("_").delete_suffix(".html.erb")
+  def self.available_template_keys(workspace: nil)
+    keys = filesystem_template_keys
+    return keys if workspace.nil?
+
+    db_keys = workspace.lead_form_templates
+      .form_pages
+      .pluck(:path)
+      .filter_map { |path| LeadFormTemplate.template_key_for(path) }
+
+    (keys + db_keys).uniq.sort
+  end
+
+  def self.filesystem_template_keys
+    Dir.glob(Rails.root.join("lib/lead_form_templates/public/lead_forms/*.liquid")).filter_map do |path|
+      key = File.basename(path, ".liquid")
+      key unless key.in?(%w[show success])
     end.sort
   end
 

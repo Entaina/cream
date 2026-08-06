@@ -8,6 +8,10 @@ module LeadFormHelper
     }.merge(attrs))
   end
 
+  def import_lead_form_templates!(workspace)
+    LeadFormTemplates::Importer.import!(workspace)
+  end
+
   def create_lead_form!(workspace, user:, pipeline: nil, **attrs)
     pipeline ||= Pipeline.default_for(workspace) || Pipeline.create_default!(workspace)
     template = if attrs.key?(:email_template)

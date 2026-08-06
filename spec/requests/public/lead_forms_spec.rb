@@ -42,6 +42,39 @@ RSpec.describe "Public lead forms", type: :request do
       expect(response.body).to include('value="home"')
       expect(response.body).to include('data-lead-form-param="producto"')
     end
+
+    it "returns not found when workspace templates are not imported" do
+      LeadFormTemplate.delete_all
+
+      get public_lead_form_path(lead_form.slug)
+
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it "renders workspace templates from the database" do
+      workspace.lead_form_templates.find_by!(path: "public/lead_forms/contacto").update!(
+        body: '<div class="mx-auto max-w-xl"><p id="db-template-marker">DB template override</p></div>'
+      )
+
+      get public_lead_form_path(lead_form.slug)
+
+      expect(response.body).to include("DB template override")
+      expect(response.body).not_to include("¿En qué te ayudamos?")
+    end
+
+    it "reflects template edits without restarting the app" do
+      template = workspace.lead_form_templates.find_by!(path: "public/lead_forms/contacto")
+      template.update!(body: '<div class="mx-auto max-w-xl"><p id="db-template-marker">Version one</p></div>')
+
+      get public_lead_form_path(lead_form.slug)
+      expect(response.body).to include("Version one")
+
+      template.update!(body: '<p id="db-template-marker">Version two</p>')
+
+      get public_lead_form_path(lead_form.slug)
+      expect(response.body).to include("Version two")
+      expect(response.body).not_to include("Version one")
+    end
   end
 
   describe "POST /f/:slug" do

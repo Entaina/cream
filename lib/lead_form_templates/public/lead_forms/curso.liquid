@@ -1,0 +1,20 @@
+<div class="mx-auto max-w-xl">
+  <h1 class="font-display text-2xl font-semibold mb-4">{{ lead_form.name }}</h1>
+  {% form_open %}
+  {% hidden_fields %}
+  {% honeypot %}
+
+  <div class="space-y-4">
+    {% partial 'contact_fields' %}
+    {% partial 'how_heard_field' %}
+  <div>
+    {% field type: "text", name: "qualifying_answer", label: "¿Qué curso te interesa?", required: true %}
+  </div>
+    {% partial 'newsletter_opt_in' %}
+    {% partial 'consent_fields' %}
+  </div>
+
+  {% turnstile %}
+  {% submit 'Enviar' %}
+  {% form_close %}
+</div>

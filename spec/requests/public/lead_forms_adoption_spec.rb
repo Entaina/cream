@@ -61,14 +61,15 @@ RSpec.describe "Public lead form Demo Adoption", type: :request do
       submission = LeadSubmission.order(:id).last
       person = Person.order(:id).last
       expect(deal.pipeline).to eq(proyectos)
-      expect(deal.name).to include("(Demo)")
+      expect(deal.name).to include("Demo Adoption")
+      expect(deal.name).not_to include("(Demo)")
       expect(submission.data["organization_ia_stage"]).to eq("Estamos probando con un equipo piloto")
       expect(submission.data["how_heard"]).to eq("evento")
       expect(submission.data["newsletter_opt_in"]).to be(true)
       expect(person.company.name).to eq(LeadForm::PLACEHOLDER_COMPANY_NAME)
     end
 
-    it "places the deal in the Demo stage when it exists" do
+    it "places the deal in the configured stage" do
       allow(TurnstileVerifier).to receive_messages(enabled?: false)
       demo_stage = proyectos.pipeline_stages.create!(
         name: "Demo",
@@ -77,6 +78,7 @@ RSpec.describe "Public lead form Demo Adoption", type: :request do
         position: proyectos.pipeline_stages.count,
         workspace: workspace
       )
+      lead_form.update!(pipeline_stage: demo_stage)
 
       post public_lead_form_path(lead_form.slug), params: { lead: adoption_lead_params }
 

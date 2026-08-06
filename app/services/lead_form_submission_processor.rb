@@ -111,7 +111,7 @@ class LeadFormSubmissionProcessor
   end
 
   def requires_company_name?
-    lead_form.collects_company? || lead_form.liderando_ia_template?
+    lead_form.collects_company?
   end
 
   def fill_company_blanks!(company)
@@ -180,8 +180,7 @@ class LeadFormSubmissionProcessor
     pipeline ||= lead_form.resolve_pipeline(help_type: params["help_type"])
     stage = lead_form.resolve_stage(for_pipeline: pipeline)
     deal_name = [ person.display_name, lead_form.name ].compact.join(" — ")
-    deal_name = "#{deal_name} (#{lead_form.help_type_label(params['help_type'])})" if lead_form.contacto_template? && params["help_type"].present?
-    deal_name = "#{deal_name} (Demo)" if lead_form.adoption_template?
+    deal_name = "#{deal_name} (#{lead_form.help_type_label(params['help_type'])})" if params["help_type"].present?
     workspace.deals.create!(
       name: deal_name,
       company: company,
@@ -309,10 +308,11 @@ class LeadFormSubmissionProcessor
   def resolved_phone
     number = params["phone"].to_s.strip
     return if number.blank?
-    return number unless lead_form.desarrollando_ia_reserva_template?
 
-    prefix = params["phone_prefix"].presence || "+34"
-    "#{prefix} #{number}"
+    prefix = params["phone_prefix"].presence
+    return "#{prefix} #{number}" if prefix.present?
+
+    number
   end
 
   def validate_submission!
@@ -320,36 +320,16 @@ class LeadFormSubmissionProcessor
     person.errors.add(:first_name, "can't be blank") if params["first_name"].blank?
     person.errors.add(:last_name, "can't be blank") if params["last_name"].blank?
     person.errors.add(:email, "can't be blank") if normalized_email.blank?
-    person.errors.add(:phone, "can't be blank") if lead_form.require_phone? && resolved_phone.blank?
-    person.errors.add(:base, "company name is required") if requires_company_name? && params["company_name"].blank?
-    person.errors.add(:job_title, "can't be blank") if lead_form.requires_job_title? && params["job_title"].blank?
     person.errors.add(:email, "is invalid") if normalized_email.present? && !normalized_email.match?(URI::MailTo::EMAIL_REGEXP)
+    person.errors.add(:phone, "can't be blank") if params.key?("phone") && resolved_phone.blank?
+    person.errors.add(:base, "company name is required") if requires_company_name? && params["company_name"].blank?
 
-    if lead_form.contacto_template?
-      person.errors.add(:base, "help type is required") if params["help_type"].blank?
-    end
-
-    if lead_form.liderando_ia_template? || lead_form.desarrollando_ia_template?
-      person.errors.add(:base, "audience is required") if params["audience"].blank?
-    end
-
-    if lead_form.reserva_template?
-      person.errors.add(:base, "edition is required") if params["edition_id"].blank?
-
+    if lead_form.product_id.present?
       product = resolved_product
-      if product.nil?
-        person.errors.add(:base, "product is required")
-      elsif params["edition_id"].present? && resolved_edition(product).nil?
+      person.errors.add(:base, "product is required") if product.nil?
+      if params["edition_id"].present? && product && resolved_edition(product).nil?
         person.errors.add(:base, "edition is invalid")
       end
-    end
-
-    if lead_form.desarrollando_ia_template?
-      person.errors.add(:base, "tech profile is required") if params["tech_profile"].blank?
-    end
-
-    if lead_form.indice_adopcion_ia_template?
-      person.errors.add(:base, "employee range is required") if params["employee_range"].blank?
     end
 
     raise ActiveRecord::RecordInvalid.new(person) if person.errors.any?

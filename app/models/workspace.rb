@@ -36,6 +36,7 @@ class Workspace < ApplicationRecord
   has_many :stripe_connections, dependent: :destroy
   has_many :stripe_payments, dependent: :destroy
   has_many :lead_forms, dependent: :destroy
+  has_many :lead_form_templates, dependent: :destroy
   has_many :lead_submissions, dependent: :destroy
   has_many :calendar_connections, dependent: :destroy
   has_many :booking_pages, dependent: :destroy

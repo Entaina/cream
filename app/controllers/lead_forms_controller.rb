@@ -58,7 +58,7 @@ class LeadFormsController < ApplicationController
     @responsibles = current_workspace.users.order(:name)
     @email_templates = current_workspace.email_templates.visible_to(current_user).ordered
     @products = current_workspace.products.ordered
-    @template_keys = LeadForm.available_template_keys
+    @template_keys = LeadForm.available_template_keys(workspace: current_workspace)
   end
 
   def lead_form_params

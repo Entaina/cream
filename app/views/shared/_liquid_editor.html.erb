@@ -1,0 +1,8 @@
+<%# locals: (form:, field:, rows: 24, required: false, input_data: {}) %>
+<% input_options = { rows: rows, spellcheck: false, class: "sr-only", data: { liquid_editor_target: "input" }.merge(input_data[:data] || {}) } %>
+<% input_options[:required] = true if required %>
+<div class="liquid-editor border border-line rounded-md overflow-hidden bg-canvas"
+     data-controller="liquid-editor">
+  <%= form.text_area field, **input_options %>
+  <div data-liquid-editor-target="editor" class="liquid-editor__surface" style="min-height: <%= rows * 1.4 %>rem;"></div>
+</div>

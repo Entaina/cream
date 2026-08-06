@@ -1,0 +1,12 @@
+<div class="space-y-3 border-t border-line pt-4">
+  <label class="flex items-start gap-2.5 text-sm text-ink-soft cursor-pointer">
+    <input type="hidden" name="lead[gdpr_consent]" value="0" autocomplete="off" />
+    <input type="checkbox" name="lead[gdpr_consent]" value="1" required="required" class="mt-0.5 rounded border-line" />
+    <span>
+      He leído y acepto la {% privacy_link text: "política de privacidad" %}.
+      Consiento el tratamiento de mis datos personales para gestionar mi solicitud en el CRM de Entaina
+      y, en su caso, el envío de comunicaciones a través de la plataforma beehiiv.
+      {% required_marker %}
+    </span>
+  </label>
+</div>

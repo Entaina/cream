@@ -1,0 +1,17 @@
+<div class="grid grid-cols-2 gap-3">
+  <div>
+    {% field type: "text", name: "first_name", label: "Nombre", required: true, autocomplete: "given-name" %}
+  </div>
+  <div>
+    {% field type: "text", name: "last_name", label: "Apellidos", required: true, autocomplete: "family-name" %}
+  </div>
+</div>
+
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+  <div>
+    {% field type: "email", name: "email", label: "Email", required: true, autocomplete: "email" %}
+  </div>
+  <div>
+    {% field type: "tel", name: "phone", label: "Teléfono", required: true, autocomplete: "tel" %}
+  </div>
+</div>

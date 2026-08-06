@@ -46,8 +46,8 @@ RSpec.describe "Public lead form Desarrollando con IA — Reservas", type: :requ
       expect(response.body).to include("¿En qué te podemos ayudar?")
       expect(response.body).not_to include('name="lead[how_heard]"')
       expect(response.body).not_to include('name="lead[newsletter_opt_in]"')
-      expect(response.body).to include("https://entaina.ai/privacy-policy")
-      expect(response.body).to include("Mis datos se guardan en CReaM, el CRM de Entaina")
+      expect(response.body).to include('href="/privacy"')
+      expect(response.body).to include("CRM de Entaina")
       expect(response.body).to include('name="lead[gdpr_consent]"')
     end
   end
