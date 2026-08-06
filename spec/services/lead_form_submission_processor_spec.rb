@@ -17,6 +17,12 @@ RSpec.describe LeadFormSubmissionProcessor do
     described_class.call(lead_form:, params:, request:)
   end
 
+  it "rejects submissions without last_name" do
+    expect {
+      submit(contacto_lead_params("last_name" => ""))
+    }.to raise_error(ActiveRecord::RecordInvalid, /Last name can't be blank/)
+  end
+
   it "creates person, deal, submission and enqueues emails" do
     params = contacto_lead_params(
       "last_name" => "López",

@@ -12,7 +12,7 @@ class LeadForm < ApplicationRecord
     utm_source utm_medium utm_campaign utm_term utm_content
   ].freeze
   SUBMISSION_FIELD_KEYS = %w[
-    email first_name last_name phone how_heard help_type message
+    email first_name last_name phone phone_prefix how_heard help_type message
     product_id edition_id
     company_name company_cif employee_range qualifying_answer job_title audience tech_profile
     ia_work_task organization_ia_stage newsletter_opt_in
@@ -59,6 +59,19 @@ class LeadForm < ApplicationRecord
     [ "No técnico", "no_tecnico" ]
   ].freeze
   COMPANY_EMPLOYEE_RANGE_OPTIONS = Company::EMPLOYEE_RANGES.map { |range| [ "#{range} empleados", range ] }.freeze
+  PHONE_PREFIX_OPTIONS = [
+    [ "+34", "+34" ],
+    [ "+351", "+351" ],
+    [ "+33", "+33" ],
+    [ "+39", "+39" ],
+    [ "+44", "+44" ],
+    [ "+49", "+49" ],
+    [ "+1", "+1" ],
+    [ "+52", "+52" ],
+    [ "+54", "+54" ],
+    [ "+56", "+56" ],
+    [ "+57", "+57" ]
+  ].freeze
 
   belongs_to :workspace
   belongs_to :pipeline
@@ -98,6 +111,14 @@ class LeadForm < ApplicationRecord
     template_key == "liderando_ia_reserva"
   end
 
+  def desarrollando_ia_reserva_template?
+    template_key == "desarrollando_ia_reserva"
+  end
+
+  def reserva_template?
+    liderando_ia_reserva_template? || desarrollando_ia_reserva_template?
+  end
+
   def trabajando_ia_template?
     template_key == "trabajando_ia"
   end
@@ -129,11 +150,11 @@ class LeadForm < ApplicationRecord
   end
 
   def render_base_fields?
-    !liderando_ia_reserva_template?
+    !reserva_template?
   end
 
   def show_how_heard_in_base?
-    !contacto_template? && !liderando_ia_template? && !liderando_ia_reserva_template? && !trabajando_ia_template? && !desarrollando_ia_template? && !adoption_template? && !indice_adopcion_ia_template? && !entrenadores_template?
+    !contacto_template? && !liderando_ia_template? && !reserva_template? && !trabajando_ia_template? && !desarrollando_ia_template? && !adoption_template? && !indice_adopcion_ia_template? && !entrenadores_template?
   end
 
   def show_phone_in_base?
@@ -145,11 +166,11 @@ class LeadForm < ApplicationRecord
   end
 
   def show_newsletter_opt_in?
-    !liderando_ia_reserva_template?
+    !reserva_template?
   end
 
   def entaina_privacy_consent?
-    liderando_ia_template? || liderando_ia_reserva_template? || entrenadores_template?
+    liderando_ia_template? || reserva_template? || entrenadores_template?
   end
 
   def configured_stage_for(for_pipeline)

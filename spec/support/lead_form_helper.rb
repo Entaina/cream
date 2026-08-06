@@ -27,6 +27,7 @@ module LeadFormHelper
     {
       "email" => "lead@example.com",
       "first_name" => "Ana",
+      "last_name" => "García",
       "phone" => "600111222",
       "help_type" => "curso",
       "how_heard" => "evento",
@@ -39,6 +40,7 @@ module LeadFormHelper
     {
       "email" => "lead@example.com",
       "first_name" => "Ana",
+      "last_name" => "García",
       "phone" => "600111222",
       "how_heard" => "evento",
       "gdpr_consent" => "1",
@@ -50,6 +52,7 @@ module LeadFormHelper
     {
       "email" => "lead@example.com",
       "first_name" => "Ana",
+      "last_name" => "García",
       "phone" => "600111222",
       "tech_profile" => "desarrollo",
       "audience" => "para_mi",
@@ -63,6 +66,7 @@ module LeadFormHelper
     {
       "email" => "lead@example.com",
       "first_name" => "Ana",
+      "last_name" => "García",
       "phone" => "600111222",
       "how_heard" => "evento",
       "gdpr_consent" => "1",
@@ -74,6 +78,7 @@ module LeadFormHelper
     {
       "email" => "lead@example.com",
       "first_name" => "Ana",
+      "last_name" => "García",
       "phone" => "600111222",
       "company_name" => "Acme SL",
       "job_title" => "Directora de innovación",
@@ -88,6 +93,7 @@ module LeadFormHelper
     {
       "email" => "lead@example.com",
       "first_name" => "Ana",
+      "last_name" => "García",
       "phone" => "600111222",
       "company_name" => "Acme SL",
       "audience" => "para_equipo",
@@ -114,10 +120,29 @@ module LeadFormHelper
     params.merge(overrides.stringify_keys)
   end
 
+  def desarrollando_ia_reserva_lead_params(overrides = {})
+    product = overrides.delete(:product) || overrides.delete("product")
+    edition = overrides.delete(:edition) || overrides.delete("edition")
+    params = {
+      "email" => "lead@example.com",
+      "first_name" => "Ana",
+      "last_name" => "García",
+      "phone_prefix" => "+34",
+      "phone" => "600111222",
+      "message" => "Quiero reservar plaza",
+      "gdpr_consent" => "1",
+      LeadForm::TIMESTAMP_FIELD => valid_lead_form_timestamp
+    }
+    params["product_id"] = product.id.to_s if product
+    params["edition_id"] = edition.id.to_s if edition
+    params.merge(overrides.stringify_keys)
+  end
+
   def entrenadores_lead_params(overrides = {})
     {
       "email" => "lead@example.com",
       "first_name" => "Ana",
+      "last_name" => "García",
       "gdpr_consent" => "1",
       LeadForm::TIMESTAMP_FIELD => valid_lead_form_timestamp
     }.merge(overrides.stringify_keys)

@@ -99,6 +99,27 @@ module LeadFormsExample
       }
     },
     {
+      slug: "desarrollando-con-ia-reservas",
+      name: "Desarrollando con IA — Reservas",
+      template_key: "desarrollando_ia_reserva",
+      active: true,
+      collects_company: false,
+      default_pipeline: "Formación B2C",
+      pipeline_routes: {},
+      email_template: {
+        key: "desarrollando_ia_reserva_lead",
+        name: "Desarrollando con IA — Reservas — acuse de recibo",
+        subject: "Example | Hemos recibido tu reserva — Desarrollando con IA",
+        body: <<~BODY.strip
+          Hola {first_name}:
+
+          Gracias por tu interés en Desarrollando con IA. Hemos recibido tu solicitud de reserva y alguien del equipo se pondrá en contacto contigo en breve.
+
+          Un cordial saludo,
+        BODY
+      }
+    },
+    {
       slug: "entrenadores",
       name: "Entrenadores",
       template_key: "entrenadores",

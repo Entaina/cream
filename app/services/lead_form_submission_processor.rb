@@ -84,7 +84,7 @@ class LeadFormSubmissionProcessor
       email: params["email"].to_s.strip,
       first_name: params["first_name"].to_s,
       last_name: params["last_name"].to_s,
-      phone: params["phone"].presence,
+      phone: resolved_phone,
       job_title: params["job_title"].presence,
       company: LeadForm.placeholder_company_for(workspace),
       source: "web_form",
@@ -97,7 +97,7 @@ class LeadFormSubmissionProcessor
     updates = PERSON_FILLABLE_FIELDS.each_with_object({}) do |field, attrs|
       next if person.public_send(field).present?
 
-      value = params[field].presence
+      value = person_field_value(field)
       attrs[field] = value if value.present?
     end
     person.update!(updates) if updates.any?
@@ -300,11 +300,27 @@ class LeadFormSubmissionProcessor
     params["email"].to_s.strip.downcase.presence
   end
 
+  def person_field_value(field)
+    return resolved_phone if field == "phone"
+
+    params[field].presence
+  end
+
+  def resolved_phone
+    number = params["phone"].to_s.strip
+    return if number.blank?
+    return number unless lead_form.desarrollando_ia_reserva_template?
+
+    prefix = params["phone_prefix"].presence || "+34"
+    "#{prefix} #{number}"
+  end
+
   def validate_submission!
     person = Person.new
     person.errors.add(:first_name, "can't be blank") if params["first_name"].blank?
+    person.errors.add(:last_name, "can't be blank") if params["last_name"].blank?
     person.errors.add(:email, "can't be blank") if normalized_email.blank?
-    person.errors.add(:phone, "can't be blank") if lead_form.require_phone? && params["phone"].blank?
+    person.errors.add(:phone, "can't be blank") if lead_form.require_phone? && resolved_phone.blank?
     person.errors.add(:base, "company name is required") if requires_company_name? && params["company_name"].blank?
     person.errors.add(:job_title, "can't be blank") if lead_form.requires_job_title? && params["job_title"].blank?
     person.errors.add(:email, "is invalid") if normalized_email.present? && !normalized_email.match?(URI::MailTo::EMAIL_REGEXP)
@@ -317,8 +333,7 @@ class LeadFormSubmissionProcessor
       person.errors.add(:base, "audience is required") if params["audience"].blank?
     end
 
-    if lead_form.liderando_ia_reserva_template?
-      person.errors.add(:last_name, "can't be blank") if params["last_name"].blank?
+    if lead_form.reserva_template?
       person.errors.add(:base, "edition is required") if params["edition_id"].blank?
 
       product = resolved_product

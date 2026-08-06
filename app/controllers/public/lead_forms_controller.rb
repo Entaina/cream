@@ -69,12 +69,12 @@ module Public
     def set_resolved_product
       product_id_param = params[:product_id].presence || params.dig(:lead, :product_id)
       @product = @lead_form.resolved_product(product_id_param:)
-      @open_editions = @lead_form.open_editions_for(@product) if @lead_form.liderando_ia_reserva_template?
+      @open_editions = @lead_form.open_editions_for(@product) if @lead_form.reserva_template?
     end
 
     def lead_params
       params.fetch(:lead, {}).permit(
-        :email, :first_name, :last_name, :phone, :how_heard, :help_type, :message,
+        :email, :first_name, :last_name, :phone, :phone_prefix, :how_heard, :help_type, :message,
         :product_id, :edition_id,
         :company_name, :company_cif, :employee_range, :qualifying_answer, :job_title, :audience, :tech_profile, :ia_work_task,
         :organization_ia_stage,

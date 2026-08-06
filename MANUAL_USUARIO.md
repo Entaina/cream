@@ -4,7 +4,7 @@
 
 Cream es un CRM por **workspaces** para gestionar **personas**, **empresas** y **deals** (oportunidades), con notas, tareas, listas y un historial de actividad compartido en el equipo.
 
-> **Última revisión:** 2026-08-05 (formulario Desarrollando con IA sin pregunta de automatización)
+> **Última revisión:** 2026-08-06 (formulario Desarrollando con IA — Reservas)
 > Este documento describe la funcionalidad **visible para el usuario**. Las funcionalidades desactivadas aparecen al final en «Próximamente».
 
 ---
@@ -1024,6 +1024,7 @@ En el menú lateral, abre **Formularios**.
 - Si el formulario no pide empresa, la persona se asocia a la empresa genérica **Particulares** del workspace (salvo que ya existiera con otra empresa).
 - El formulario **Liderando con IA** (`/f/liderando-ia`) pide nombre, email, teléfono, empresa, si es para ti o para tu equipo, cómo nos has conocido, newsletter (opcional, desmarcada) y consentimiento de protección de datos; crea deals en el pipeline **Formación B2C**.
 - El formulario **Liderando con IA — Reserva** (`/f/liderando-ia-reserva`) pide edición, nombre, apellidos, email, teléfono, un mensaje libre (opcional) y consentimiento de protección de datos; crea deals en el pipeline **Formación B2C**.
+- El formulario **Desarrollando con IA — Reservas** (`/f/desarrollando-con-ia-reservas`) pide edición (botones), nombre, apellidos, email, teléfono con prefijo de país, una pregunta libre opcional («¿En qué te podemos ayudar?») y consentimiento de protección de datos; crea deals en el pipeline **Formación B2C**.
 - El formulario **Trabajando con IA** (`/f/trabajando-ia`) pide nombre, email, teléfono, una pregunta opcional sobre qué tarea del trabajo resolver con IA, cómo nos has conocido, newsletter y consentimiento RGPD; crea deals en el pipeline **Formación B2C**.
 - El formulario **Desarrollando con IA** (`/f/desarrollando-ia`) pide nombre, email, teléfono, perfil técnico, audiencia (individual o equipo), cómo nos has conocido, newsletter y consentimiento RGPD; crea deals en el pipeline **Formación B2C**.
 - El formulario **Demo Adoption** (`/f/adoption`) pide nombre, email, teléfono, una pregunta opcional sobre el grado de adopción de IA en la organización, cómo nos has conocido, newsletter y consentimiento RGPD; crea deals marcados como **Demo** en el pipeline **Proyectos** (etapa **Demo** si existe).

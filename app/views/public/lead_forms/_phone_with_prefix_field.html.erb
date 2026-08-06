@@ -1,0 +1,13 @@
+<%# locals: f, required: true, selected_prefix: "+34" %>
+<div class="flex gap-2">
+  <%= f.select :phone_prefix,
+        options_for_select(LeadForm::PHONE_PREFIX_OPTIONS, local_assigns.fetch(:selected_prefix, "+34")),
+        {},
+        class: "input w-auto shrink-0",
+        aria: { label: "Prefijo de país" } %>
+  <%= f.telephone_field :phone,
+        required: local_assigns.fetch(:required, true),
+        class: "input w-full min-w-0",
+        autocomplete: "tel-national",
+        inputmode: "tel" %>
+</div>

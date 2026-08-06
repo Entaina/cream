@@ -1,0 +1,38 @@
+<%# locals: f, lead_form:, product: nil, open_editions: [] %>
+<div class="space-y-3">
+  <div>
+    <%= render "public/lead_forms/field_label", f: f, field: :edition_id, text: "Elige tu edición", required: true %>
+    <% if product.blank? %>
+      <p class="text-sm text-ink-soft">No hay producto configurado para este formulario.</p>
+    <% elsif open_editions.blank? %>
+      <p class="text-sm text-ink-soft">No hay ediciones abiertas en este momento.</p>
+    <% else %>
+      <%= render "public/lead_forms/edition_button_group", f: f, open_editions: open_editions %>
+    <% end %>
+  </div>
+
+  <div>
+    <%= render "public/lead_forms/field_label", f: f, field: :first_name, text: "Nombre", required: true %>
+    <%= f.text_field :first_name, required: true, class: "input w-full", autocomplete: "given-name" %>
+  </div>
+
+  <div>
+    <%= render "public/lead_forms/field_label", f: f, field: :last_name, text: "Apellidos", required: true %>
+    <%= f.text_field :last_name, required: true, class: "input w-full", autocomplete: "family-name" %>
+  </div>
+
+  <div>
+    <%= render "public/lead_forms/field_label", f: f, field: :email, text: "Email", required: true %>
+    <%= f.email_field :email, required: true, class: "input w-full", autocomplete: "email" %>
+  </div>
+
+  <div>
+    <%= render "public/lead_forms/field_label", f: f, field: :phone, text: "Teléfono", required: true %>
+    <%= render "public/lead_forms/phone_with_prefix_field", f: f, required: true %>
+  </div>
+
+  <div>
+    <%= f.label :message, "¿En qué te podemos ayudar?", class: "label" %>
+    <%= f.text_area :message, rows: 4, class: "input w-full resize-y", placeholder: "Opcional" %>
+  </div>
+</div>

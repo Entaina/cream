@@ -1,0 +1,12 @@
+<%# locals: f, open_editions: [] %>
+<div class="flex flex-wrap gap-2" role="radiogroup" aria-label="Elige tu edición">
+  <% open_editions.each do |edition| %>
+    <% checked = params.dig(:lead, :edition_id).to_s == edition.id.to_s %>
+    <label class="cursor-pointer">
+      <%= f.radio_button :edition_id, edition.id, required: true, checked: checked, class: "peer sr-only" %>
+      <span class="inline-flex items-center rounded-lg px-4 py-2 text-sm font-medium ring-1 ring-line-strong bg-canvas-raised text-ink-soft transition-colors peer-checked:bg-accent peer-checked:text-on-dark peer-checked:ring-accent hover:bg-canvas-soft peer-checked:hover:bg-accent-dark">
+        <%= edition.display_name %>
+      </span>
+    </label>
+  <% end %>
+</div>

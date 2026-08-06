@@ -4,7 +4,7 @@
 
 Cream is a **workspace**-based CRM for managing **people**, **companies** and **deals** (opportunities), with notes, tasks, lists and an activity history shared across the team.
 
-> **Last revision:** 2026-08-05 (Desarrollando con IA form without automation question)
+> **Last revision:** 2026-08-06 (Desarrollando con IA — Reservas form)
 > This document describes the functionality **visible to the user**. Disabled features are listed at the end under "Coming soon".
 
 ---
@@ -1024,6 +1024,7 @@ In the sidebar menu, open **Formularios** (Forms).
 - If the form does not ask for a company, the person is associated with the workspace's generic **Particulares** (Individuals) company (unless the person already existed with another company).
 - The **Liderando con IA** form (`/f/liderando-ia`) asks for name, email, phone, company, whether it is for you or your team, how you heard about us, newsletter (optional, unchecked) and data-protection consent; it creates deals in the **Formación B2C** pipeline.
 - The **Liderando con IA — Reserva** form (`/f/liderando-ia-reserva`) asks for edition, name, last name, email, phone, an optional free-text message and data-protection consent; it creates deals in the **Formación B2C** pipeline.
+- The **Desarrollando con IA — Reservas** form (`/f/desarrollando-con-ia-reservas`) asks for edition (buttons), name, last name, email, phone with country prefix, an optional free-text question (“How can we help you?”) and data-protection consent; it creates deals in the **Formación B2C** pipeline.
 - The **Trabajando con IA** form (`/f/trabajando-ia`) asks for name, email, phone, an optional question about which work task to solve with AI, how you heard about us, newsletter and GDPR consent; it creates deals in the **Formación B2C** pipeline.
 - The **Desarrollando con IA** form (`/f/desarrollando-ia`) asks for name, email, phone, technical profile, audience (individual or team), how you heard about us, newsletter and GDPR consent; it creates deals in the **Formación B2C** pipeline.
 - The **Demo Adoption** form (`/f/adoption`) asks for name, email, phone, an optional question about the organization's degree of AI adoption, how you heard about us, newsletter and GDPR consent; it creates deals marked as **Demo** in the **Proyectos** pipeline (**Demo** stage if it exists).

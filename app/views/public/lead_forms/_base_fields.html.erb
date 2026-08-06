@@ -2,7 +2,11 @@
 <div class="space-y-3">
   <div>
     <%= render "public/lead_forms/field_label", f: f, field: :first_name, text: "Nombre", required: true %>
-    <%= f.text_field :first_name, required: true, class: "input w-full", autocomplete: "name" %>
+    <%= f.text_field :first_name, required: true, class: "input w-full", autocomplete: "given-name" %>
+  </div>
+  <div>
+    <%= render "public/lead_forms/field_label", f: f, field: :last_name, text: "Apellidos", required: true %>
+    <%= f.text_field :last_name, required: true, class: "input w-full", autocomplete: "family-name" %>
   </div>
   <div>
     <%= render "public/lead_forms/field_label", f: f, field: :email, text: "Email", required: true %>
