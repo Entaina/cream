@@ -11,6 +11,24 @@ module Settings
     def update
       authorize [ :settings, :profile ]
 
+      if params[:user].present?
+        update_name
+      else
+        update_membership_preferences
+      end
+    end
+
+    private
+
+    def update_name
+      if current_user.update(user_params)
+        redirect_to settings_profile_path, notice: "Nombre actualizado."
+      else
+        redirect_to settings_profile_path, alert: current_user.errors.full_messages.to_sentence
+      end
+    end
+
+    def update_membership_preferences
       if current_membership.update(membership_params)
         redirect_to settings_profile_path, notice: "Preferencias actualizadas."
       else
@@ -18,7 +36,9 @@ module Settings
       end
     end
 
-    private
+    def user_params
+      params.require(:user).permit(:name)
+    end
 
     def membership_params
       params.require(:membership).permit(:current_pipeline_id, :sales_director_briefing_enabled,

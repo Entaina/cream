@@ -17,13 +17,16 @@ RSpec.describe "Settings::Profile", type: :request do
   end
 
   describe "GET /settings/profile" do
-    it "shows the sales director preference for admins" do
+    it "shows personal data and the sales director preference for admins" do
       sign_in_as(admin)
       patch switch_workspace_path, params: { workspace_id: workspace.id }
 
       get settings_profile_path
 
       expect(response).to have_http_status(:success)
+      expect(response.body).to include("Datos personales")
+      expect(response.body).to include(admin.name)
+      expect(response.body).to include(admin.email_address)
       expect(response.body).to include("Mostrar briefing del director de ventas en el dashboard")
     end
 
@@ -52,6 +55,29 @@ RSpec.describe "Settings::Profile", type: :request do
   end
 
   describe "PATCH /settings/profile" do
+    it "allows users to update their name" do
+      sign_in_as(member)
+      patch switch_workspace_path, params: { workspace_id: workspace.id }
+
+      patch settings_profile_path, params: { user: { name: "Nuevo Nombre" } }
+
+      expect(response).to redirect_to(settings_profile_path)
+      expect(flash[:notice]).to eq("Nombre actualizado.")
+      expect(member.reload.name).to eq("Nuevo Nombre")
+    end
+
+    it "rejects a blank name" do
+      sign_in_as(member)
+      patch switch_workspace_path, params: { workspace_id: workspace.id }
+      original_name = member.name
+
+      patch settings_profile_path, params: { user: { name: "" } }
+
+      expect(response).to redirect_to(settings_profile_path)
+      expect(flash[:alert]).to be_present
+      expect(member.reload.name).to eq(original_name)
+    end
+
     it "allows members to disable the sales director briefing" do
       sign_in_as(member)
       patch switch_workspace_path, params: { workspace_id: workspace.id }

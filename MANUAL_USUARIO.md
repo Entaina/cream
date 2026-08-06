@@ -4,7 +4,7 @@
 
 Cream es un CRM por **workspaces** para gestionar **personas**, **empresas** y **deals** (oportunidades), con notas, tareas, listas y un historial de actividad compartido en el equipo.
 
-> **Última revisión:** 2026-08-06 (formulario Desarrollando con IA — Reservas)
+> **Última revisión:** 2026-08-06 (cambiar nombre en Profile)
 > Este documento describe la funcionalidad **visible para el usuario**. Las funcionalidades desactivadas aparecen al final en «Próximamente».
 
 ---
@@ -62,6 +62,14 @@ En **Create account** introduces tu nombre, email, contraseña y el nombre del w
 - Se crea un workspace nuevo con el nombre indicado (o «Nombre's Workspace» si no indicas uno).
 - Eres **admin** de ese workspace.
 
+### Cambiar tu nombre
+
+1. Abre **Settings → Profile** (también desde tu nombre en la parte inferior del menú lateral).
+2. En **Datos personales**, edita el campo **Nombre**.
+3. Pulsa **Guardar**.
+
+El nombre se actualiza en el menú lateral, en las menciones y en la actividad del equipo. El email se muestra en esa misma sección, pero no se puede cambiar desde ahí.
+
 ### Cerrar sesión
 
 En la parte inferior del menú lateral, pulsa el icono de salida junto a tu nombre.
@@ -109,7 +117,7 @@ El menú lateral izquierdo concentra el acceso principal. En **pantallas pequeñ
 | **Stripe**       | Pagos importados de Stripe y su conciliación con deals |
 | **Pipelines**    | Configuración de pipelines de venta |
 | **API tokens**   | Tokens para clientes MCP / API |
-| **Profile**      | Preferencias personales en el workspace (pipeline, briefing, canales de alerta) |
+| **Profile**      | Nombre de usuario y preferencias personales en el workspace (pipeline, briefing, canales de alerta) |
 | **Settings**     | Configuración del workspace (solo admins): nombre, visibilidad de deals, director de ventas, OKM |
 | **Team**         | Miembros e invitaciones |
 | **Custom fields**| Campos extra por tipo de registro |

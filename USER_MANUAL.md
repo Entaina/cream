@@ -4,7 +4,7 @@
 
 Cream is a **workspace**-based CRM for managing **people**, **companies** and **deals** (opportunities), with notes, tasks, lists and an activity history shared across the team.
 
-> **Last revision:** 2026-08-06 (Desarrollando con IA — Reservas form)
+> **Last revision:** 2026-08-06 (change name in Profile)
 > This document describes the functionality **visible to the user**. Disabled features are listed at the end under "Coming soon".
 
 ---
@@ -62,6 +62,14 @@ In **Create account** you enter your name, email, password and the workspace nam
 - A new workspace is created with the given name (or «Name's Workspace» if you don't provide one).
 - You are the **admin** of that workspace.
 
+### Change your name
+
+1. Open **Settings → Profile** (also from your name at the bottom of the sidebar).
+2. In **Datos personales**, edit the **Nombre** field.
+3. Click **Guardar**.
+
+Your name updates in the sidebar, mentions and team activity. The email is shown in the same section, but it cannot be changed from there.
+
 ### Sign out
 
 At the bottom of the sidebar, click the exit icon next to your name.
@@ -109,7 +117,7 @@ The left sidebar concentrates the main navigation. On **small screens (mobile)**
 | **Stripe**       | Payments imported from Stripe and their reconciliation with deals |
 | **Pipelines**    | Sales pipeline configuration |
 | **API tokens**   | Tokens for MCP / API clients |
-| **Profile**      | Personal preferences in the workspace (pipeline, briefing, alert channels) |
+| **Profile**      | User name and personal preferences in the workspace (pipeline, briefing, alert channels) |
 | **Settings**     | Workspace configuration (admins only): name, deal visibility, sales director, OKM |
 | **Team**         | Members and invitations |
 | **Custom fields**| Extra fields per record type |

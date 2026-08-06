@@ -8,6 +8,24 @@
     </p>
 
     <section class="card p-4 space-y-3">
+      <h2 class="text-base font-semibold text-ink">Datos personales</h2>
+      <%= form_with model: current_user, url: settings_profile_path, method: :patch, class: "space-y-3" do |f| %>
+        <div>
+          <%= f.label :name, "Nombre", class: "label" %>
+          <%= f.text_field :name, required: true, class: "input mt-1 w-full", autocomplete: "name" %>
+          <p class="mt-1 text-sm text-ink-faint">
+            Se muestra en el menú lateral, menciones y actividad del equipo.
+          </p>
+        </div>
+        <div>
+          <span class="label">Email</span>
+          <p class="mt-1 text-base text-ink"><%= current_user.email_address %></p>
+        </div>
+        <%= f.submit "Guardar", class: "btn-secondary" %>
+      <% end %>
+    </section>
+
+    <section class="card p-4 space-y-3">
       <h2 class="text-base font-semibold text-ink">Preferencias</h2>
       <%= form_with model: current_membership, url: settings_profile_path, method: :patch, class: "space-y-3" do |f| %>
         <div>
