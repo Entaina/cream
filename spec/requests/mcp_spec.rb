@@ -40,6 +40,16 @@ RSpec.describe "Mcp", type: :request do
       expect(body.dig("result", "serverInfo", "name")).to eq("cream")
     end
 
+    it "returns compact server instructions under the client truncation budget" do
+      post mcp_url, params: initialize_payload, as: :json, headers: mcp_headers(plaintext)
+
+      instructions = JSON.parse(response.body).dig("result", "instructions")
+      expect(instructions).to be_present
+      expect(instructions.length).to be <= CreamMcp::MAX_INSTRUCTIONS_LENGTH
+      expect(instructions).to include("list_my_tasks", "natural_language_search", "list_pipelines")
+      expect(instructions).not_to match(/configurable stages \(/)
+    end
+
     it "lists tools with api token" do
       post mcp_url, params: tools_list_payload, as: :json, headers: mcp_headers(plaintext)
 

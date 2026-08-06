@@ -9,41 +9,38 @@ module CreamMcp
     stage_changed pipeline_changed contacts_changed products_changed
     note_added comment_added task_completed email_replied
   ].freeze
+  MAX_INSTRUCTIONS_LENGTH = 1800
 
   def self.server_for(user:, workspace:)
     MCP::Server.new(
       name: "cream",
       title: "Cream CRM",
       version: "1.0.0",
-      instructions: "CRM with people, companies and deals organised in pipelines with " \
-                    "configurable stages (#{workspace.pipeline_stages.ordered.pluck(:name).uniq.join(", ")}). " \
-                    "There may be several pipelines — use list_pipelines to discover them and the valid stage names. " \
-                    "Deals carry product line items; manage the catalogue with list_products/create_product and " \
-                    "add lines with add_deal_product (the deal value is the sum of its line subtotals). " \
-                    "Records can be edited with update_person/update_company/update_deal (update_deal also " \
-                    "replaces contacts and moves the deal to another pipeline). " \
-                    "Duplicate cleanup: list_person_duplicates/list_company_duplicates to find candidates, " \
-                    "then merge_person/merge_company (secondaries are deleted after reassignment). " \
-                    "delete_record permanently removes a person, company or deal (deleting a company also " \
-                    "deletes its people and deals). " \
-                    "There are also notes, comments (add_comment for the internal discussion thread), " \
-                    "tasks, emails (list_emails; get_email for the full body), " \
-                    "Stripe payments (list_payments for imported charges and reconciliation status) and " \
-                    "an activity timeline (list_activity). Use recent_changes for a consolidated feed of what " \
-                    "happened recently (new records, inbound emails, significant changes) and sales_forecast for " \
-                    "weighted pipeline projections by expected close month. Records can have workspace-defined " \
-                    "custom fields — use list_custom_fields to discover their keys/types and set_custom_fields " \
-                    "to update them. Tool routing: for your own tasks due today or overdue (title + url), use " \
-                    "list_my_tasks only — do not use natural_language_search or get_record for that. Tasks on a " \
-                    "specific record → list_tasks with record_type and record_id or record_query (name). Tasks " \
-                    "assigned to a workspace member → list_tasks with assignee_id or assignee_query. Phrase searches (stalled deals, " \
-                    "follow-ups) → natural_language_search. Record detail → get_record. Pipeline overview → " \
-                    "pipeline_summary or sales_forecast. People, companies and deals include a url field " \
-                    "pointing to the record in the Cream web app (requires CREAM_APP_URL). " \
-                    "All data belongs to the workspace «#{workspace.name}».",
+      instructions: server_instructions(workspace),
       tools: tools,
       server_context: { user: user, workspace: workspace }
     )
+  end
+
+  def self.server_instructions(workspace)
+    text = <<~TEXT.squish
+      Cream CRM workspace «#{workspace.name}». Routing: own due/overdue tasks → list_my_tasks only
+      (not natural_language_search or get_record). Tasks on a record → list_tasks with record_type,
+      record_id or record_query. Member tasks → list_tasks with assignee_id or assignee_query.
+      Phrase search → natural_language_search. Record detail → get_record. Pipeline →
+      pipeline_summary or sales_forecast. Stages via list_pipelines. People, companies and deals
+      in pipelines; deal value = sum of line subtotals (list_products/create_product,
+      add_deal_product). Edit with update_person/update_company/update_deal (update_deal can
+      move pipeline/replace contacts). Duplicates: list_person_duplicates/list_company_duplicates
+      then merge_*; delete_record removes records (deleting a company also deletes its people and
+      deals). Notes, comments (add_comment), emails (list_emails/get_email), Stripe payments
+      (list_payments), activity (list_activity), recent_changes. Custom fields:
+      list_custom_fields/set_custom_fields. Records include url (needs CREAM_APP_URL).
+    TEXT
+    if text.length > MAX_INSTRUCTIONS_LENGTH
+      raise "MCP instructions exceed #{MAX_INSTRUCTIONS_LENGTH} chars (#{text.length})"
+    end
+    text
   end
 
   def self.tools
