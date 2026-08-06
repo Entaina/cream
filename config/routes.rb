@@ -168,6 +168,11 @@ Rails.application.routes.draw do
       get :calendars
     end
   end
+  resources :bookings, only: %i[index] do
+    member do
+      patch :cancel
+    end
+  end
   resource :calendar_connection, only: %i[show destroy]
 
   get "f/:slug", to: "public/lead_forms#show", as: :public_lead_form

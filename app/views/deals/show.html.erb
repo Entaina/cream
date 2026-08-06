@@ -75,7 +75,7 @@
     <%= render "trigger_panel", deal: @deal, run: StageTriggerRun.latest_panel_for(@deal) if feature_enabled?(:stage_triggers) %>
     <%= render "shared/tasks_section", record: @deal, task: @task %>
     <%= render "lead_submission_section", deal: @deal if @deal.lead_submission.present? %>
-    <%= render "booking_submission_section", deal: @deal if @deal.booking.present? %>
+    <%= render "booking_submission_section", deal: @deal if @deal.bookings.any? %>
     <%= render "shared/ai_assistant_section", record: @deal if feature_enabled?(:ai_assistant) %>
     <%= render "products_section", deal: @deal, line_items: @line_items, products: @products %>
     <%= render "collaborators_section", deal: @deal %>

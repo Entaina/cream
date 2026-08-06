@@ -111,6 +111,10 @@
           <%= form.number_field :min_notice_hours, min: 0, class: "input mt-1 w-full" %>
         </div>
         <div>
+          <%= form.label :reminder_minutes_before, "Recordatorio (min antes)", class: "label" %>
+          <%= form.number_field :reminder_minutes_before, min: 0, class: "input mt-1 w-full", placeholder: "60 (0 = desactivado)" %>
+        </div>
+        <div>
           <%= form.label :buffer_before_minutes, "Buffer antes (min)", class: "label" %>
           <%= form.number_field :buffer_before_minutes, min: 0, class: "input mt-1 w-full" %>
         </div>

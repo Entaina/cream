@@ -52,6 +52,12 @@ module GoogleOauthTokenRefresh
     execute(uri, request)
   end
 
+  def delete_json(uri, bearer:)
+    request = Net::HTTP::Delete.new(uri)
+    request["Authorization"] = "Bearer #{bearer}"
+    execute(uri, request)
+  end
+
   def execute(uri, request)
     Net::HTTP.start(uri.host, uri.port, use_ssl: true, open_timeout: TIMEOUT, read_timeout: TIMEOUT, write_timeout: TIMEOUT) do |http|
       http.request(request)

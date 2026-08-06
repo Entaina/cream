@@ -52,31 +52,37 @@
     <button type="button" data-action="booking#backToSchedule" class="btn-ghost mb-4" data-booking-target="backToScheduleLabel"></button>
     <div class="grid gap-6 lg:grid-cols-[1fr_280px]">
       <form data-booking-target="form" data-action="submit->booking#submitBooking" class="space-y-4">
-        <div class="grid gap-4 sm:grid-cols-2">
-          <div>
-            <label class="label" data-booking-target="firstNameLabel"></label>
-            <input type="text" name="first_name" required minlength="2" class="input mt-1 w-full" data-booking-target="firstNameInput">
+        <div data-booking-target="formFields" class="space-y-4">
+          <div class="grid gap-4 sm:grid-cols-2">
+            <div data-booking-target="firstNameField">
+              <label class="label" data-booking-target="firstNameLabel"></label>
+              <input type="text" name="first_name" required minlength="2" class="input mt-1 w-full" data-booking-target="firstNameInput">
+            </div>
+            <div data-booking-target="lastNameField">
+              <label class="label" data-booking-target="lastNameLabel"></label>
+              <input type="text" name="last_name" required minlength="2" class="input mt-1 w-full" data-booking-target="lastNameInput">
+            </div>
           </div>
-          <div>
-            <label class="label" data-booking-target="lastNameLabel"></label>
-            <input type="text" name="last_name" required minlength="2" class="input mt-1 w-full" data-booking-target="lastNameInput">
+          <div data-booking-target="emailField">
+            <label class="label" data-booking-target="emailLabel"></label>
+            <input type="email" name="email" required class="input mt-1 w-full" data-booking-target="emailInput">
+          </div>
+          <div data-booking-target="phoneField">
+            <label class="label" data-booking-target="phoneLabel"></label>
+            <input type="tel" name="phone" class="input mt-1 w-full" data-booking-target="phoneInput">
+          </div>
+          <div data-booking-target="messageField">
+            <label class="label" data-booking-target="messageLabel"></label>
+            <textarea name="message" maxlength="500" rows="3" class="input mt-1 w-full" data-booking-target="messageInput"></textarea>
+          </div>
+          <div data-booking-target="guestsSection">
+            <button type="button" data-action="booking#toggleGuests" class="btn-secondary" data-booking-target="addGuestsLabel"></button>
+            <div data-booking-target="guestsFields" class="hidden mt-3 space-y-2"></div>
           </div>
         </div>
-        <div>
-          <label class="label" data-booking-target="emailLabel"></label>
-          <input type="email" name="email" required class="input mt-1 w-full" data-booking-target="emailInput">
-        </div>
-        <div>
-          <label class="label" data-booking-target="phoneLabel"></label>
-          <input type="tel" name="phone" class="input mt-1 w-full" data-booking-target="phoneInput">
-        </div>
-        <div>
-          <label class="label" data-booking-target="messageLabel"></label>
-          <textarea name="message" maxlength="500" rows="3" class="input mt-1 w-full" data-booking-target="messageInput"></textarea>
-        </div>
-        <div>
-          <button type="button" data-action="booking#toggleGuests" class="btn-secondary" data-booking-target="addGuestsLabel"></button>
-          <div data-booking-target="guestsFields" class="hidden mt-3 space-y-2"></div>
+        <div data-booking-target="confirmPanel" class="hidden space-y-4">
+          <h3 class="text-sm font-semibold uppercase tracking-wider text-ink-faint" data-booking-target="confirmHeading"></h3>
+          <div data-booking-target="confirmSummary" class="card p-4 text-sm space-y-2"></div>
         </div>
         <div class="hidden" aria-hidden="true">
           <label for="booking_honeypot">No rellenar</label>

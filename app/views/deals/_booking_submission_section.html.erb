@@ -1,6 +1,6 @@
 <div class="mt-4 card p-4">
   <h3 class="text-sm font-semibold uppercase tracking-wider text-ink-faint mb-3">Origen de la reserva</h3>
-  <% booking = deal.booking %>
+  <% booking = deal.bookings.order(created_at: :desc).first %>
   <p class="text-sm text-ink-faint mb-3">
     Reservado el <%= l(booking.created_at, format: :short) %> en
     <strong><%= booking.booking_page.name %></strong>

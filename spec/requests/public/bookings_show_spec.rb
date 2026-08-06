@@ -1,0 +1,54 @@
+require "rails_helper"
+
+RSpec.describe "Public booking page", type: :request do
+  fixtures :users, :workspaces, :memberships
+
+  let(:workspace) { workspaces(:one) }
+  let(:user) { users(:one) }
+  let(:pipeline) { Pipeline.default_for(workspace) || Pipeline.create_default!(workspace) }
+  let!(:booking_page) do
+    page = workspace.booking_pages.new(
+      name: "Agenda",
+      slug: "agenda-show",
+      host: user,
+      pipeline: pipeline,
+      timezone: "Europe/Madrid",
+      calendar_ids: [ "primary" ],
+      active: true
+    )
+    page.event_types.build(
+      slug: "video",
+      name_i18n: { "es" => "Online" },
+      duration_minutes: 30,
+      location_type: "google_meet",
+      weekly_hours: BookingEventType::DEFAULT_WEEKLY_HOURS,
+      slot_increment_minutes: 15,
+      min_notice_hours: 0,
+      visible: true
+    )
+    page.save!
+    page
+  end
+
+  before do
+    allow(CreamFeatures).to receive(:enabled?).and_call_original
+    allow(CreamFeatures).to receive(:enabled?).with(:calendar_booking).and_return(true)
+  end
+
+  it "renders the booking page with prefill and confirmation targets" do
+    get public_booking_page_path(
+      booking_page.slug,
+      first_name: "Ana",
+      last_name: "Lopez",
+      email: "ana@example.com",
+      hide_known: "true"
+    )
+
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include('data-booking-target="confirmPanel"')
+    expect(response.body).to include('data-booking-target="firstNameField"')
+    expect(response.body).to include('name="first_name"')
+    expect(response.body).to include('name="last_name"')
+    expect(response.body).to include('name="email"')
+  end
+end

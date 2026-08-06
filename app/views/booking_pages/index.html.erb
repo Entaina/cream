@@ -1,5 +1,6 @@
 <% page_title "Reservas" %>
 <% actions = capture do %>
+  <%= link_to "Reservas recibidas", bookings_path, class: "btn-secondary" %>
   <%= link_to(
         @calendar_connection&.connected? ? "Google Calendar" : "Conectar Google Calendar",
         calendar_connection_path,

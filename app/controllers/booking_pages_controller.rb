@@ -137,7 +137,7 @@ class BookingPagesController < ApplicationController
       event_types_attributes: [
         :id, :slug, :color, :duration_minutes, :location_type, :location_address,
         :buffer_before_minutes, :buffer_after_minutes, :slot_increment_minutes,
-        :min_notice_hours, :visible, :position, :weekly_hours, :_destroy,
+        :min_notice_hours, :reminder_minutes_before, :visible, :position, :weekly_hours, :_destroy,
         { name_i18n: {}, description_i18n: {} }
       ]
     ).tap do |permitted|

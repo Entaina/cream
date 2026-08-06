@@ -38,4 +38,31 @@ RSpec.describe GoogleCalendar::Client do
       expect(calendars.last).to include(id: "team@group.calendar.google.com", writable: false)
     end
   end
+
+  describe "#delete_event" do
+    it "deletes the event from Google Calendar" do
+      response = instance_double(Net::HTTPSuccess, is_a?: true)
+      allow(response).to receive(:is_a?).with(Net::HTTPSuccess).and_return(true)
+      http = instance_double(Net::HTTP)
+      allow(Net::HTTP).to receive(:start).and_yield(http)
+      allow(http).to receive(:request).and_return(response)
+
+      expect {
+        client.delete_event(calendar_id: "primary@gmail.com", event_id: "evt1")
+      }.not_to raise_error
+    end
+
+    it "treats a missing event as success" do
+      response = instance_double(Net::HTTPNotFound, is_a?: false)
+      allow(response).to receive(:is_a?).with(Net::HTTPSuccess).and_return(false)
+      allow(response).to receive(:is_a?).with(Net::HTTPNotFound).and_return(true)
+      http = instance_double(Net::HTTP)
+      allow(Net::HTTP).to receive(:start).and_yield(http)
+      allow(http).to receive(:request).and_return(response)
+
+      expect {
+        client.delete_event(calendar_id: "primary@gmail.com", event_id: "missing")
+      }.not_to raise_error
+    end
+  end
 end

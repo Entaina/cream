@@ -60,6 +60,17 @@ module GoogleCalendar
       JSON.parse(response.body)
     end
 
+    def delete_event(calendar_id:, event_id:)
+      bearer = ensure_access_token!(@connection)
+      uri = URI("#{BASE_URI}/calendars/#{CGI.escape(calendar_id)}/events/#{CGI.escape(event_id)}")
+      uri.query = URI.encode_www_form(sendUpdates: "all")
+      response = delete_json(uri, bearer: bearer)
+      return if response.is_a?(Net::HTTPSuccess)
+      return if response.is_a?(Net::HTTPNotFound) || response.is_a?(Net::HTTPGone)
+
+      raise Error.from_response("eliminar eventos", response)
+    end
+
     def list_calendars
       bearer = ensure_access_token!(@connection)
       uri = URI("#{BASE_URI}/users/me/calendarList")

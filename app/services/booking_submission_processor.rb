@@ -18,7 +18,7 @@ class BookingSubmissionProcessor
       person, created = find_or_create_person!
       company = created ? LeadForm.placeholder_company_for(@workspace) : person.company
       person.update!(company:) if person.company_id != company.id
-      deal = create_deal!(person:, company:)
+      deal = find_or_create_deal!(person:, company:)
       Result.new(person:, deal:)
     end
   end
@@ -42,9 +42,25 @@ class BookingSubmissionProcessor
     [ person, true ]
   end
 
-  def create_deal!(person:, company:)
+  def find_or_create_deal!(person:, company:)
     pipeline = @booking_page.pipeline
     stage = pipeline.first_stage
+    existing = person.deals
+      .where(pipeline_id: pipeline.id, pipeline_stage_id: stage.id)
+      .order(created_at: :desc)
+      .first
+
+    if existing
+      existing.update!(company: company) if existing.company_id != company.id
+      return existing
+    end
+
+    create_deal!(person:, company:, pipeline:, stage:)
+  end
+
+  def create_deal!(person:, company:, pipeline: nil, stage: nil)
+    pipeline ||= @booking_page.pipeline
+    stage ||= pipeline.first_stage
     deal_name = [ person.display_name, @event_type.localized_name, @booking_page.name ].compact.join(" — ")
     @workspace.deals.create!(
       name: deal_name,

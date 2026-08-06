@@ -4,6 +4,21 @@ es:
       slot_unavailable: "Ese horario ya no está disponible."
       invalid_datetime: "La fecha u hora seleccionada no es válida."
       rate_limited: "Demasiadas peticiones. Inténtalo de nuevo en un minuto."
+    mailer:
+      reminder:
+        subject: "Recordatorio: %{event_name} · %{date}"
+        greeting: "Hola %{name},"
+        intro: "Te recordamos que tu reserva «%{event_name}» empieza pronto."
+        date: "Fecha"
+        time: "Hora"
+        duration: "Duración"
+        duration_minutes:
+          one: "1 minuto"
+          other: "%{count} minutos"
+        location: "Ubicación"
+        address: "Dirección"
+        join_meet: "Unirse a Google Meet"
+        footer: "Reserva gestionada por %{host_name}."
 
 en:
   booking:
@@ -11,3 +26,18 @@ en:
       slot_unavailable: "That time slot is no longer available."
       invalid_datetime: "The selected date or time is invalid."
       rate_limited: "Too many requests. Please try again in a minute."
+    mailer:
+      reminder:
+        subject: "Reminder: %{event_name} · %{date}"
+        greeting: "Hi %{name},"
+        intro: "This is a reminder that your booking «%{event_name}» is starting soon."
+        date: "Date"
+        time: "Time"
+        duration: "Duration"
+        duration_minutes:
+          one: "1 minute"
+          other: "%{count} minutes"
+        location: "Location"
+        address: "Address"
+        join_meet: "Join Google Meet"
+        footer: "Booking managed by %{host_name}."

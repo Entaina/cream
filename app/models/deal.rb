@@ -23,7 +23,7 @@ class Deal < ApplicationRecord
   has_many :suggested_stripe_payments, class_name: "StripePayment",
     foreign_key: :suggested_deal_id, dependent: :nullify, inverse_of: :suggested_deal
   has_one :lead_submission, dependent: :destroy
-  has_one :booking, dependent: :nullify
+  has_many :bookings, dependent: :nullify
   accepts_nested_attributes_for :deal_products, allow_destroy: true,
     reject_if: ->(attrs) { attrs[:product_id].blank? }
   accepts_nested_attributes_for :tasks,

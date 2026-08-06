@@ -29,16 +29,19 @@ class BookingEventType < ApplicationRecord
 
   belongs_to :booking_page, inverse_of: :event_types
 
+  attribute :reminder_minutes_before, :integer, default: 60
+
   validates :slug, presence: true, format: { with: /\A[a-z0-9-]+\z/ }
   validates :slug, uniqueness: { scope: :booking_page_id }
   validates :duration_minutes, numericality: { greater_than: 0 }
   validates :slot_increment_minutes, numericality: { greater_than: 0 }
   validates :min_notice_hours, numericality: { greater_than_or_equal_to: 0 }
+  validates :reminder_minutes_before, numericality: { greater_than_or_equal_to: 0, allow_nil: true }
   validates :location_type, inclusion: { in: LOCATION_TYPES }
   validates :color, inclusion: { in: COLORS }
   validate :name_i18n_present
 
-  before_validation :normalize_weekly_hours, :normalize_slug
+  before_validation :normalize_weekly_hours, :normalize_slug, :normalize_reminder_minutes_before
 
   scope :visible, -> { where(visible: true) }
   scope :ordered, -> { order(:position, :id) }
@@ -55,6 +58,7 @@ class BookingEventType < ApplicationRecord
       weekly_hours: empty_weekly_hours,
       slot_increment_minutes: 15,
       min_notice_hours: 4,
+      reminder_minutes_before: 60,
       buffer_before_minutes: 0,
       buffer_after_minutes: 0,
       visible: true,
@@ -80,6 +84,10 @@ class BookingEventType < ApplicationRecord
 
   def google_meet?
     location_type == "google_meet"
+  end
+
+  def reminder_enabled?
+    reminder_minutes_before.to_i.positive?
   end
 
   def payload(locale: I18n.locale)
@@ -130,6 +138,10 @@ class BookingEventType < ApplicationRecord
 
   def normalize_slug
     self.slug = slug.to_s.parameterize if slug.present?
+  end
+
+  def normalize_reminder_minutes_before
+    self.reminder_minutes_before = nil if reminder_minutes_before.blank?
   end
 
   def name_i18n_present

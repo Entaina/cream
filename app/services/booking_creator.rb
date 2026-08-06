@@ -66,10 +66,21 @@ class BookingCreator
       )
     )
 
+    enqueue_reminder!(booking)
+
     Result.new(booking:)
   end
 
   private
+
+  def enqueue_reminder!(booking)
+    return unless @event_type.reminder_enabled?
+
+    remind_at = booking.starts_at - @event_type.reminder_minutes_before.minutes
+    return if remind_at <= Time.current
+
+    BookingReminderJob.set(wait_until: remind_at).perform_later(booking.id)
+  end
 
   def validate!
     booking = Booking.new(

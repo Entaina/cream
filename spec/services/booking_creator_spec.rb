@@ -78,4 +78,115 @@ RSpec.describe BookingCreator, type: :service do
     expect(workspace.deals.where("name ILIKE ?", "%Ana Lopez%")).to exist
     expect(client).to have_received(:create_event)
   end
+
+  it "enqueues a reminder job one hour before the booking starts" do
+    remind_at = ActiveSupport::TimeZone["Europe/Madrid"].parse("2026-07-28T11:00:00")
+
+    expect {
+      described_class.call(
+        booking_page: booking_page,
+        event_type: event_type,
+        params: {
+          datetime: "2026-07-28T12:00:00",
+          timezone: "Europe/Madrid",
+          first_name: "Ana",
+          last_name: "Lopez",
+          email: "ana@example.com"
+        },
+        request: request,
+        client: client
+      )
+    }.to have_enqueued_job(BookingReminderJob).at(remind_at)
+  end
+
+  it "respects a custom reminder_minutes_before value" do
+    event_type.update!(reminder_minutes_before: 30)
+    remind_at = ActiveSupport::TimeZone["Europe/Madrid"].parse("2026-07-28T11:30:00")
+
+    expect {
+      described_class.call(
+        booking_page: booking_page,
+        event_type: event_type,
+        params: {
+          datetime: "2026-07-28T12:00:00",
+          timezone: "Europe/Madrid",
+          first_name: "Ana",
+          last_name: "Lopez",
+          email: "ana@example.com"
+        },
+        request: request,
+        client: client
+      )
+    }.to have_enqueued_job(BookingReminderJob).at(remind_at)
+  end
+
+  it "does not enqueue a reminder when disabled on the event type" do
+    event_type.update!(reminder_minutes_before: 0)
+
+    expect {
+      described_class.call(
+        booking_page: booking_page,
+        event_type: event_type,
+        params: {
+          datetime: "2026-07-28T10:00:00",
+          timezone: "Europe/Madrid",
+          first_name: "Ana",
+          last_name: "Lopez",
+          email: "ana@example.com"
+        },
+        request: request,
+        client: client
+      )
+    }.not_to have_enqueued_job(BookingReminderJob)
+  end
+
+  it "does not enqueue a reminder when the remind time is in the past" do
+    event_type.update!(reminder_minutes_before: 120)
+
+    expect {
+      described_class.call(
+        booking_page: booking_page,
+        event_type: event_type,
+        params: {
+          datetime: "2026-07-28T09:30:00",
+          timezone: "Europe/Madrid",
+          first_name: "Ana",
+          last_name: "Lopez",
+          email: "ana@example.com"
+        },
+        request: request,
+        client: client
+      )
+    }.not_to have_enqueued_job(BookingReminderJob)
+  end
+
+  it "reuses an existing deal in the target pipeline and stage" do
+    company = create_company!(workspace)
+    person = create_person!(workspace, company: company, email: "ana@example.com", first_name: "Ana", last_name: "Lopez")
+    existing_deal = create_deal!(
+      workspace,
+      pipeline: pipeline,
+      stage: pipeline.first_stage,
+      company: company,
+      contacts: [ person ],
+      name: "Existing deal"
+    )
+
+    result = described_class.call(
+      booking_page: booking_page,
+      event_type: event_type,
+      params: {
+        datetime: "2026-07-28T11:00:00",
+        timezone: "Europe/Madrid",
+        first_name: "Ana",
+        last_name: "Lopez",
+        email: "ana@example.com"
+      },
+      request: request,
+      client: client
+    )
+
+    expect(result.booking.deal).to eq(existing_deal)
+    expect(workspace.deals.where(pipeline: pipeline, pipeline_stage: pipeline.first_stage).count).to eq(1)
+  end
 end

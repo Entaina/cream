@@ -23,6 +23,8 @@ const COPY = {
     location: "Ubicación",
     downloadIcs: "Descargar .ics",
     bookAnother: "Agendar otra reunión",
+    attendeeDetails: "Datos del asistente",
+    guestsLabel: "Invitados",
     minutes: "min",
     slotTaken: "Ese horario ya no está disponible. Elige otro.",
     calendarUnavailable: "No se pudo consultar la disponibilidad del calendario.",
@@ -54,6 +56,8 @@ const COPY = {
     location: "Location",
     downloadIcs: "Download .ics",
     bookAnother: "Schedule another meeting",
+    attendeeDetails: "Attendee details",
+    guestsLabel: "Guests",
     minutes: "min",
     slotTaken: "That time is no longer available. Please choose another.",
     calendarUnavailable: "Could not load calendar availability.",
@@ -69,7 +73,9 @@ export default class extends Controller {
   static targets = [
     "profile", "headingChoose", "eventTypeGrid", "stepEventTypes", "stepSchedule", "stepForm", "stepConfirmation",
     "backToTypesLabel", "backToScheduleLabel", "monthLabel", "calendarGrid", "scheduleError", "timezoneLabel", "timezoneSelect",
-    "eventSummary", "slotsHeading", "slotsList", "nextButton", "form", "formSummary", "formError",
+    "eventSummary", "slotsHeading", "slotsList", "nextButton", "form", "formFields", "formSummary", "formError",
+    "firstNameField", "lastNameField", "emailField", "phoneField", "messageField", "guestsSection",
+    "confirmPanel", "confirmHeading", "confirmSummary",
     "firstNameLabel", "lastNameLabel", "emailLabel", "phoneLabel", "messageLabel", "addGuestsLabel", "guestsFields",
     "submitLabel", "confirmedHeading", "confirmationDetails", "icsDownload", "bookAnotherLabel",
     "firstNameInput", "lastNameInput", "emailInput", "phoneInput", "messageInput", "honeypotInput"
@@ -98,9 +104,50 @@ export default class extends Controller {
     this.availabilityRequestId = 0
     this.availabilityAbortController = null
     this.tracking = this.captureTracking()
+    this.parseUrlParams()
     this.detectTimezone()
     this.applyCopy()
+    this.applyPrefill()
     this.loadEventTypes()
+  }
+
+  parseUrlParams() {
+    const params = new URLSearchParams(window.location.search)
+    this.prefill = {}
+    this.knownFields = new Set()
+
+    for (const key of [ "first_name", "last_name", "email", "phone", "message" ]) {
+      const value = params.get(key)
+      if (value === null || value === "") continue
+
+      this.prefill[key] = value
+      this.knownFields.add(key)
+    }
+
+    const guests = params.get("guests")
+    if (guests !== null && guests !== "") {
+      this.prefill.guests = guests.split(",").map((email) => email.trim()).filter(Boolean)
+      if (this.prefill.guests.length) this.knownFields.add("guests")
+    }
+
+    this.hideKnown = [ "true", "1" ].includes(params.get("hide_known")?.toLowerCase())
+  }
+
+  applyPrefill() {
+    if (this.prefill.first_name) this.firstNameInputTarget.value = this.prefill.first_name
+    if (this.prefill.last_name) this.lastNameInputTarget.value = this.prefill.last_name
+    if (this.prefill.email) this.emailInputTarget.value = this.prefill.email
+    if (this.prefill.phone) this.phoneInputTarget.value = this.prefill.phone
+    if (this.prefill.message) this.messageInputTarget.value = this.prefill.message
+    if (this.prefill.guests?.length) this.renderGuestInputs(this.prefill.guests)
+  }
+
+  requiredFieldsComplete() {
+    const firstName = this.prefill.first_name?.trim()
+    const lastName = this.prefill.last_name?.trim()
+    const email = this.prefill.email?.trim()
+
+    return firstName?.length >= 2 && lastName?.length >= 2 && email?.includes("@")
   }
 
   captureTracking() {
@@ -142,6 +189,7 @@ export default class extends Controller {
     this.confirmedHeadingTarget.textContent = this.copy.confirmed
     this.icsDownloadTarget.textContent = this.copy.downloadIcs
     this.bookAnotherLabelTarget.textContent = this.copy.bookAnother
+    if (this.hasConfirmHeadingTarget) this.confirmHeadingTarget.textContent = this.copy.attendeeDetails
   }
 
   async loadEventTypes() {
@@ -341,6 +389,63 @@ export default class extends Controller {
   goToForm() {
     this.showStep("form")
     this.renderFormSummary()
+    this.formErrorTarget.classList.add("hidden")
+
+    if (this.hideKnown && this.requiredFieldsComplete()) {
+      this.showConfirmOnly()
+    } else {
+      this.showFormStep()
+    }
+  }
+
+  showConfirmOnly() {
+    this.formFieldsTarget.classList.add("hidden")
+    this.confirmPanelTarget.classList.remove("hidden")
+    this.renderConfirmSummary()
+  }
+
+  showFormStep() {
+    this.formFieldsTarget.classList.remove("hidden")
+    this.confirmPanelTarget.classList.add("hidden")
+    this.applyFieldVisibility()
+  }
+
+  applyFieldVisibility() {
+    const fieldTargets = {
+      first_name: "firstNameFieldTarget",
+      last_name: "lastNameFieldTarget",
+      email: "emailFieldTarget",
+      phone: "phoneFieldTarget",
+      message: "messageFieldTarget",
+      guests: "guestsSectionTarget"
+    }
+
+    for (const [ key, targetName ] of Object.entries(fieldTargets)) {
+      const target = this[targetName]
+      if (!target) continue
+
+      target.classList.toggle("hidden", this.hideKnown && this.knownFields.has(key))
+    }
+  }
+
+  renderConfirmSummary() {
+    const lines = [
+      `<p><strong>${this.escape(this.firstNameInputTarget.value)} ${this.escape(this.lastNameInputTarget.value)}</strong></p>`,
+      `<p>${this.escape(this.emailInputTarget.value)}</p>`
+    ]
+
+    const phone = this.phoneInputTarget.value.trim()
+    if (phone) lines.push(`<p>${this.escape(phone)}</p>`)
+
+    const message = this.messageInputTarget.value.trim()
+    if (message) lines.push(`<p class="text-ink-soft">${this.escape(message)}</p>`)
+
+    const guests = this.collectGuestEmails()
+    if (guests.length) {
+      lines.push(`<p class="text-ink-faint">${this.copy.guestsLabel}: ${guests.map((email) => this.escape(email)).join(", ")}</p>`)
+    }
+
+    this.confirmSummaryTarget.innerHTML = lines.join("")
   }
 
   renderEventSummary() {
@@ -363,13 +468,42 @@ export default class extends Controller {
   toggleGuests() {
     this.guestsVisible = !this.guestsVisible
     if (this.guestsVisible) {
-      this.guestsFieldsTarget.classList.remove("hidden")
-      this.guestsFieldsTarget.innerHTML = Array.from({ length: 5 }, (_, index) => `
-        <input type="email" name="guest_${index}" placeholder="${this.copy.guest} ${index + 1}" class="input w-full guest-email">
-      `).join("")
+      this.renderGuestInputs()
     } else {
       this.guestsFieldsTarget.classList.add("hidden")
       this.guestsFieldsTarget.innerHTML = ""
+    }
+  }
+
+  renderGuestInputs(prefilledEmails = []) {
+    this.guestsVisible = true
+    this.guestsFieldsTarget.classList.remove("hidden")
+    this.guestsFieldsTarget.innerHTML = Array.from({ length: 5 }, (_, index) => {
+      const value = prefilledEmails[index] ? ` value="${this.escape(prefilledEmails[index])}"` : ""
+      return `<input type="email" name="guest_${index}" placeholder="${this.copy.guest} ${index + 1}" class="input w-full guest-email"${value}>`
+    }).join("")
+  }
+
+  collectGuestEmails() {
+    return Array.from(this.element.querySelectorAll(".guest-email"))
+      .map((input) => input.value.trim())
+      .filter(Boolean)
+  }
+
+  buildPayload() {
+    return {
+      event_type: this.selectedEventType.slug,
+      datetime: `${this.selectedDate}T${this.selectedSlot}:00`,
+      timezone: this.timezoneValue,
+      first_name: this.firstNameInputTarget.value.trim(),
+      last_name: this.lastNameInputTarget.value.trim(),
+      email: this.emailInputTarget.value.trim(),
+      phone: this.phoneInputTarget.value.trim(),
+      message: this.messageInputTarget.value.trim(),
+      guests: this.collectGuestEmails(),
+      _ts: this.timestampValue,
+      _honeypot: this.hasHoneypotInputTarget ? this.honeypotInputTarget.value : "",
+      ...this.tracking
     }
   }
 
@@ -379,25 +513,7 @@ export default class extends Controller {
     this.submitLabelTarget.textContent = this.copy.scheduling
     this.submitLabelTarget.disabled = true
 
-    const datetime = `${this.selectedDate}T${this.selectedSlot}:00`
-    const guests = Array.from(this.element.querySelectorAll(".guest-email"))
-      .map((input) => input.value.trim())
-      .filter(Boolean)
-
-    const payload = {
-      event_type: this.selectedEventType.slug,
-      datetime,
-      timezone: this.timezoneValue,
-      first_name: this.firstNameInputTarget.value.trim(),
-      last_name: this.lastNameInputTarget.value.trim(),
-      email: this.emailInputTarget.value.trim(),
-      phone: this.phoneInputTarget.value.trim(),
-      message: this.messageInputTarget.value.trim(),
-      guests,
-      _ts: this.timestampValue,
-      _honeypot: this.hasHoneypotInputTarget ? this.honeypotInputTarget.value : "",
-      ...this.tracking
-    }
+    const payload = this.buildPayload()
 
     const response = await fetch(this.bookUrlValue, {
       method: "POST",
@@ -465,6 +581,10 @@ export default class extends Controller {
     this.selectedDate = null
     this.selectedSlot = null
     this.formTarget.reset()
+    this.applyPrefill()
+    this.formFieldsTarget.classList.remove("hidden")
+    this.confirmPanelTarget.classList.add("hidden")
+    this.applyFieldVisibility()
     this.showStep("eventTypes")
     this.loadEventTypes()
   }
