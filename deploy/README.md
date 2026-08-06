@@ -14,7 +14,7 @@ Internet → Traefik (:443, separate stack — infra repo)
 
 Traefik is not part of this stack: it lives in `~/infra` on the server and serves all the apps on the machine (cream, academia…). This compose file only requires the external Docker network `proxy` to exist, and connects the `web` service to it with routing labels.
 
-The image is built in GitHub Actions (`.github/workflows/docker.yml`) on every push to `main`, published to GHCR and **deployed automatically** to the server (`/home/deploy/cream`).
+The image is built in GitHub Actions (`.github/workflows/docker.yml`) on every push to `main`, published to GHCR and **deployed automatically** to the server (`/home/deploy/cream`)
 
 ## Automatic deployment (push to `main`)
 
