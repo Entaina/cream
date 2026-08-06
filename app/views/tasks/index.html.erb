@@ -17,7 +17,7 @@
   <% end %>
 
   <% if @can_filter_by_assignee %>
-    <%= form_with url: tasks_path, method: :get, class: "ml-auto" do %>
+    <%= form_with url: tasks_path, method: :get, class: "ml-2" do %>
       <%= hidden_field_tag :filter, @filter %>
       <%= select_tag :assignee_id,
             options_for_select(
