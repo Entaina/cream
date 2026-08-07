@@ -5,6 +5,26 @@ RSpec.describe LeadFormTemplate, type: :model do
 
   let(:workspace) { workspaces(:one) }
 
+  describe "submission schema" do
+    it "compiles and stores the schema when saving a form page" do
+      import_lead_form_templates!(workspace)
+      template = workspace.lead_form_templates.find_by!(path: "public/lead_forms/contacto")
+
+      expect(template.submission_schema).to include("fields")
+      expect(template.submission_schema["fields"].map { |field| field["name"] }).to include("email", "help_type", "gdpr_consent")
+    end
+
+    it "does not compile submission schema for partials" do
+      template = workspace.lead_form_templates.create!(
+        path: "public/lead_forms/partials/custom_fields",
+        partial: true,
+        body: "{% field type: \"text\", name: \"custom\", label: \"Custom\" %}"
+      )
+
+      expect(template.submission_schema).to eq({})
+    end
+  end
+
   describe "validations" do
     it "is valid with allowed path and Liquid body" do
       template = workspace.lead_form_templates.build(

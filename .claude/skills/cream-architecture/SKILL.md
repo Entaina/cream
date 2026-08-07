@@ -148,12 +148,13 @@ Select options: inline in Liquid via `choices: "Label|value; Label2|value2"` on 
 2. **`LeadFormSubmissionProcessor`**: generic validation + CRM side effects. **No `template_key` branches.**
 3. **`lead_params`**: accepts any `lead[…]` key matching `LeadForm::FIELD_KEY_FORMAT` (`[a-z][a-z0-9_]{0,39}`). No fixed field whitelist. Hidden field keys in admin cannot collide with **system** keys only (`SYSTEM_FIELD_KEYS`: UTM, honeypot, timestamp, GDPR, form metadata).
 
-**Server validation** (`validate_submission!`) — minimal CRM rules only (not per-field template rules):
+**Server validation** — schema stored on each form-page `LeadFormTemplate` (`submission_schema` jsonb), recompiled on save:
 
-- `email` — required; format via `URI::MailTo::EMAIL_REGEXP` (needed to create/link the person)
-- `product` / `edition_id` — only if form has configured `product_id` (edition validated when present)
+1. **At template save** (`LeadFormTemplate#refresh_submission_schema!`): `SchemaCompiler` renders the page in maximal/minimal contexts, parses HTML → JSON field definitions (required, types, allowed values, conditional flags like `requires_collects_company`, `requires_open_editions`).
+2. **At submit** (`SubmissionSchema.build`): loads stored schema, applies runtime context (`collects_company?`, product, `open_editions`), validates params. Fallback: live render if schema empty (legacy rows).
+3. `Public::LeadFormsController#lead_params` whitelists to `schema.allowed_param_keys`.
 
-Fields marked `required: true` in Liquid are **HTML5-only** on the client. Optional fields are stored when non-blank (`submission_data` strips blanks). `collects_company?` still controls whether a real company is resolved vs placeholder, but empty `company_name` is allowed server-side.
+Implication: a field only persists if it appears in the stored schema **and** passes contextual filters for that submit. Re-import or re-save templates after Liquid changes to refresh the schema.
 
 **URL prefill**: `hidden_field_keys` + `?key=value`; Stimulus `lead_form_controller.js` fills `[data-lead-form-param]`. Also `?product_id=` overrides configured product. **`open_editions`**: `LeadForm#open_editions_for(product)` → `product.editions.not_finished`, exposed to Liquid and `{% field collection: "open_editions" %}`.
 

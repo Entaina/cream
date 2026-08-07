@@ -42,7 +42,9 @@ module Public
       LeadFormSubmissionProcessor.call(
         lead_form: @lead_form,
         params: lead_params,
-        request: request
+        request: request,
+        product: @product,
+        open_editions: @open_editions
       )
       redirect_after_submission
     rescue ActiveRecord::RecordInvalid => e
@@ -100,7 +102,17 @@ module Public
     end
 
     def lead_params
-      LeadForm.filter_submission_params(params.fetch(:lead, {}))
+      raw = LeadForm.filter_submission_params(params.fetch(:lead, {}))
+      raw.slice(*submission_schema.allowed_param_keys)
+    end
+
+    def submission_schema
+      @submission_schema ||= LeadFormTemplates::SubmissionSchema.build(
+        lead_form: @lead_form,
+        product: @product,
+        open_editions: @open_editions,
+        params: LeadForm.filter_submission_params(params.fetch(:lead, {}))
+      )
     end
 
     def gdpr_consent_given?

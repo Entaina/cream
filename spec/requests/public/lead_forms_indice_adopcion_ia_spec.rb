@@ -62,30 +62,28 @@ RSpec.describe "Public lead form Assessment · Índice de adopción", type: :req
       expect(company.employee_range).to eq("51-200")
     end
 
-    it "accepts submission without phone when the client bypasses HTML validation" do
+    it "rejects submission without phone" do
       allow(TurnstileVerifier).to receive_messages(enabled?: false)
 
       expect {
         post public_lead_form_path(lead_form.slug), params: {
           lead: indice_adopcion_ia_lead_params("phone" => "")
         }
-      }.to change(Deal, :count).by(1)
+      }.not_to change(Deal, :count)
 
-      expect(response).to redirect_to(public_lead_form_success_path(lead_form.slug))
-      expect(Person.order(:id).last.phone).to be_blank
+      expect(response).to have_http_status(:unprocessable_entity)
     end
 
-    it "accepts submission without company name when the client bypasses HTML validation" do
+    it "rejects submission without company name" do
       allow(TurnstileVerifier).to receive_messages(enabled?: false)
 
       expect {
         post public_lead_form_path(lead_form.slug), params: {
           lead: indice_adopcion_ia_lead_params("company_name" => "")
         }
-      }.to change(Deal, :count).by(1)
+      }.not_to change(Deal, :count)
 
-      expect(response).to redirect_to(public_lead_form_success_path(lead_form.slug))
-      expect(Company.order(:id).last.name).to eq("Empresa sin nombre")
+      expect(response).to have_http_status(:unprocessable_entity)
     end
   end
 end

@@ -48,6 +48,16 @@ class LeadFormTemplate < ApplicationRecord
   end
 
   before_validation :assign_path_from_slug
+  after_save :refresh_submission_schema!, if: :form_page?
+
+  def form_page?
+    !partial? && template_key.present?
+  end
+
+  def refresh_submission_schema!
+    compiled = LeadFormTemplates::SchemaCompiler.compile(template: self)
+    update_column(:submission_schema, compiled)
+  end
 
   private
 

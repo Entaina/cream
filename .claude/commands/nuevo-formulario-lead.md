@@ -106,16 +106,14 @@ Campos ocultos adicionales del admin no pueden usar claves de **sistema** (UTM, 
 
 ### 4. Validación servidor
 
-[`LeadFormSubmissionProcessor#validate_submission!`](app/services/lead_form_submission_processor.rb) es **genérica** — no ramificar por `template_key`.
+El esquema se **persiste** en `LeadFormTemplate#submission_schema` (solo páginas de formulario, no partials) y se **recompila al guardar** la plantilla (`SchemaCompiler`).
 
-Reglas actuales (no duplicar salvo requisito explícito):
+En cada submit:
+1. Cargar `submission_schema` de la plantilla del formulario
+2. Aplicar contexto runtime (`collects_company?`, producto, ediciones abiertas)
+3. Whitelist + validación de params
 
-| Campo | Servidor |
-|-------|----------|
-| `email` | Siempre obligatorio; formato con `URI::MailTo::EMAIL_REGEXP` |
-| `product` / `edition_id` | Si el formulario tiene `product_id` configurado |
-
-Todo lo demás (`first_name`, `last_name`, `phone`, `company_name`, campos custom…) depende de `required: true` en Liquid (HTML5). El servidor no rechaza envíos por campos vacíos salvo email y coherencia producto/edición.
+Tras editar Liquid en admin, guardar la plantilla (o `lead_form_templates:import`) para actualizar el esquema. Si el esquema está vacío, hay fallback a render en vivo.
 
 ### 5. Configuración del LeadForm (admin / seed)
 

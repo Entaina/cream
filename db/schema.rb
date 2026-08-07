@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_06_140000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_07_100000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -444,6 +444,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_06_140000) do
     t.datetime "created_at", null: false
     t.boolean "partial", default: false, null: false
     t.string "path", null: false
+    t.jsonb "submission_schema", default: {}, null: false
     t.datetime "updated_at", null: false
     t.bigint "workspace_id", null: false
     t.index ["workspace_id", "path"], name: "index_lead_form_templates_on_workspace_id_and_path", unique: true
@@ -557,6 +558,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_06_140000) do
     t.index ["subject_id"], name: "index_llmemory_edges_on_subject_id"
     t.index ["user_id", "subject_id", "predicate"], name: "index_llmemory_edges_on_user_id_and_subject_id_and_predicate"
   end
+
+# Could not dump table "llmemory_embeddings" because of following StandardError
+#   Unknown type 'vector(1536)' for column 'embedding'
+
 
   create_table "llmemory_episodes", id: :string, force: :cascade do |t|
     t.datetime "archived_at"

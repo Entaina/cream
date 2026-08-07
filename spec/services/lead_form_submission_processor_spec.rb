@@ -8,19 +8,21 @@ RSpec.describe LeadFormSubmissionProcessor do
   let(:member) { users(:one) }
   let(:workspace) { workspaces(:one) }
   let!(:pipeline) { Pipeline.create_default!(workspace) }
-  let(:lead_form) { create_lead_form!(workspace, user: member) }
+  let(:lead_form) { create_lead_form!(workspace, user: member, pipeline: pipeline) }
   let(:request) { instance_double(ActionDispatch::Request, user_agent: "Mozilla/5.0", remote_ip: "203.0.113.1") }
   let(:qualified_stage) { pipeline.pipeline_stages.find_by!(name: "Qualified") }
   let(:proposal_stage) { pipeline.pipeline_stages.find_by!(name: "Proposal") }
+
+  before { import_lead_form_templates!(workspace) }
 
   def submit(params)
     described_class.call(lead_form:, params:, request:)
   end
 
-  it "accepts submissions without last_name when the template omits it" do
-    result = submit(contacto_lead_params("last_name" => ""))
-
-    expect(result.person.last_name).to eq("")
+  it "rejects submissions without required fields from the rendered template" do
+    expect {
+      submit(contacto_lead_params("last_name" => ""))
+    }.to raise_error(ActiveRecord::RecordInvalid, /Last name can't be blank/)
   end
 
   it "creates person, deal, submission and enqueues emails" do
@@ -203,40 +205,27 @@ RSpec.describe LeadFormSubmissionProcessor do
   end
 
   it "finds company by name when collecting company data" do
-    lead_form.update!(template_key: "curso", collects_company: true)
+    lead_form.update!(template_key: "liderando_ia", collects_company: true)
     company = create_company!(workspace, name: "Acme SL")
 
     submit(
-      contacto_lead_params(
+      liderando_ia_lead_params(
         "email" => "ceo@acme.com",
         "first_name" => "CEO",
-        "how_heard" => "busqueda",
         "company_name" => "Acme SL"
-      ).except("help_type")
-        .merge("qualifying_answer" => "IA")
+      )
     )
 
     deal = Deal.order(:id).last
     expect(deal.company).to eq(company)
   end
 
-  it "finds company by CIF in fiscal information" do
-    lead_form.update!(template_key: "curso", collects_company: true)
-    company = workspace.companies.create!(name: "Fiscal Corp", fiscal_information: "B12345678")
+  it "rejects company_cif when the rendered form does not include that field" do
+    lead_form.update!(template_key: "liderando_ia", collects_company: true)
 
-    submit(
-      contacto_lead_params(
-        "email" => "fiscal@example.com",
-        "first_name" => "Fiscal",
-        "how_heard" => "evento",
-        "company_name" => "Otro nombre",
-        "company_cif" => "B12345678"
-      ).except("help_type")
-        .merge("qualifying_answer" => "IA")
-    )
-
-    deal = Deal.order(:id).last
-    expect(deal.company).to eq(company)
+    expect {
+      submit(liderando_ia_lead_params("company_cif" => "B12345678"))
+    }.to raise_error(ActiveRecord::RecordInvalid, /Unknown field company_cif/)
   end
 
   it "creates a new deal in the configured pipeline stage" do
@@ -334,15 +323,23 @@ RSpec.describe LeadFormSubmissionProcessor do
   describe "product and edition attachment" do
     let(:product) { workspace.products.create!(name: "Liderando con IA", price: 990) }
     let(:edition) { product.editions.create!(name: "Marzo 2026", ends_on: Date.current + 30.days) }
+    let(:lead_form) do
+      create_lead_form!(
+        workspace,
+        user: member,
+        pipeline: pipeline,
+        template_key: "liderando_ia_reserva",
+        product: product,
+        slug: "reserva-#{SecureRandom.hex(3)}"
+      )
+    end
+
+    def reserva_params(overrides = {})
+      liderando_ia_reserva_lead_params(product: product, edition: edition, **overrides)
+    end
 
     it "creates a deal product line when the form has a configured product and edition" do
-      lead_form.update!(product: product)
-
-      result = submit(contacto_lead_params(
-        "how_heard" => "evento",
-        "product_id" => product.id.to_s,
-        "edition_id" => edition.id.to_s
-      ))
+      result = submit(reserva_params)
 
       line = result.deal.deal_products.sole
       expect(line.product).to eq(product)
@@ -357,60 +354,44 @@ RSpec.describe LeadFormSubmissionProcessor do
     it "overrides the configured product with the submitted product_id param" do
       configured = workspace.products.create!(name: "Configured", price: 100)
       override = workspace.products.create!(name: "Override", price: 200)
-      override_edition = override.editions.create!(name: "Override edition")
+      override_edition = override.editions.create!(name: "Override edition", ends_on: Date.current + 30.days)
       lead_form.update!(product: configured)
 
-      result = submit(contacto_lead_params(
-        "how_heard" => "evento",
-        "product_id" => override.id.to_s,
-        "edition_id" => override_edition.id.to_s
+      result = submit(liderando_ia_reserva_lead_params(
+        product: override,
+        edition: override_edition
       ))
 
       expect(result.deal.deal_products.sole.product).to eq(override)
     end
 
     it "does not duplicate the same product and edition when reusing an open deal" do
-      lead_form.update!(product: product)
       company = create_company!(workspace)
       person = create_person!(workspace, company: company, email: "lead@example.com")
       existing_deal = create_deal!(workspace, pipeline: pipeline, company: company, contacts: [ person ])
       existing_deal.deal_products.create!(product: product, edition: edition, quantity: 1)
 
       expect {
-        result = submit(contacto_lead_params(
-          "how_heard" => "evento",
-          "product_id" => product.id.to_s,
-          "edition_id" => edition.id.to_s
-        ))
+        result = submit(reserva_params)
         expect(result.deal).to eq(existing_deal)
       }.not_to change(DealProduct, :count)
     end
 
     it "rejects an edition that belongs to another product" do
       other_product = workspace.products.create!(name: "Other", price: 50)
-      foreign_edition = other_product.editions.create!(name: "Foreign")
-      lead_form.update!(product: product)
+      foreign_edition = other_product.editions.create!(name: "Foreign", ends_on: Date.current + 30.days)
 
       expect {
-        submit(contacto_lead_params(
-          "how_heard" => "evento",
-          "product_id" => product.id.to_s,
-          "edition_id" => foreign_edition.id.to_s
-        ))
-      }.to raise_error(ActiveRecord::RecordInvalid, /edition is invalid/)
+        submit(reserva_params("edition_id" => foreign_edition.id.to_s))
+      }.to raise_error(ActiveRecord::RecordInvalid, /edition id is invalid/)
     end
 
     it "rejects a finished edition" do
       finished = product.editions.create!(name: "Past", ends_on: Date.current - 1.day)
-      lead_form.update!(product: product)
 
       expect {
-        submit(contacto_lead_params(
-          "how_heard" => "evento",
-          "product_id" => product.id.to_s,
-          "edition_id" => finished.id.to_s
-        ))
-      }.to raise_error(ActiveRecord::RecordInvalid, /edition is invalid/)
+        submit(reserva_params("edition_id" => finished.id.to_s))
+      }.to raise_error(ActiveRecord::RecordInvalid, /edition id is invalid/)
     end
   end
 end

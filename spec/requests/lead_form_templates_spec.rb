@@ -59,6 +59,18 @@ RSpec.describe "Lead form templates", type: :request do
       expect(LeadFormTemplate.last.path).to eq("public/lead_forms/partials/custom")
     end
 
+    it "shows the submission schema on the edit page" do
+      import_lead_form_templates!(workspace)
+      template = workspace.lead_form_templates.find_by!(path: "public/lead_forms/contacto")
+
+      get edit_lead_form_template_path(template)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("Esquema de validación")
+      expect(response.body).to include("lead[email]")
+      expect(response.body).to include("lead[help_type]")
+    end
+
     it "updates a template" do
       template = workspace.lead_form_templates.create!(
         path: "public/lead_forms/demo",

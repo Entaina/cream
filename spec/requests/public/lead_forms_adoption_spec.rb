@@ -86,17 +86,16 @@ RSpec.describe "Public lead form Demo Adoption", type: :request do
       expect(deal.pipeline_stage).to eq(demo_stage)
     end
 
-    it "accepts submission without phone when the client bypasses HTML validation" do
+    it "rejects submission without phone" do
       allow(TurnstileVerifier).to receive_messages(enabled?: false)
 
       expect {
         post public_lead_form_path(lead_form.slug), params: {
           lead: adoption_lead_params("phone" => "")
         }
-      }.to change(Deal, :count).by(1)
+      }.not_to change(Deal, :count)
 
-      expect(response).to redirect_to(public_lead_form_success_path(lead_form.slug))
-      expect(Person.order(:id).last.phone).to be_blank
+      expect(response).to have_http_status(:unprocessable_entity)
     end
   end
 end

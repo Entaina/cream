@@ -3,15 +3,17 @@ class LeadFormSubmissionProcessor
 
   PERSON_FILLABLE_FIELDS = %w[first_name last_name phone job_title].freeze
 
-  def self.call(lead_form:, params:, request:)
-    new(lead_form:, params:, request:).call
+  def self.call(lead_form:, params:, request:, product: nil, open_editions: nil)
+    new(lead_form:, params:, request:, product:, open_editions:).call
   end
 
-  def initialize(lead_form:, params:, request:)
+  def initialize(lead_form:, params:, request:, product: nil, open_editions: nil)
     @lead_form = lead_form
     @workspace = lead_form.workspace
     @params = params.to_h.stringify_keys
     @request = request
+    @product = product || lead_form.resolved_product(product_id_param: @params["product_id"])
+    @open_editions = open_editions.nil? ? lead_form.open_editions_for(@product) : open_editions
   end
 
   # Returns nil (silent discard) when containment caps are exceeded.
@@ -34,7 +36,7 @@ class LeadFormSubmissionProcessor
 
   private
 
-  attr_reader :lead_form, :workspace, :params, :request
+  attr_reader :lead_form, :workspace, :params, :request, :product, :open_editions
 
   def throttled?
     form_throttled? || email_throttled?
@@ -316,19 +318,16 @@ class LeadFormSubmissionProcessor
   end
 
   def validate_submission!
-    person = Person.new
-    person.errors.add(:email, "can't be blank") if normalized_email.blank?
-    person.errors.add(:email, "is invalid") if normalized_email.present? && !normalized_email.match?(URI::MailTo::EMAIL_REGEXP)
+    submission_schema.validate!(params)
+  end
 
-    if lead_form.product_id.present?
-      product = resolved_product
-      person.errors.add(:base, "product is required") if product.nil?
-      if params["edition_id"].present? && product && resolved_edition(product).nil?
-        person.errors.add(:base, "edition is invalid")
-      end
-    end
-
-    raise ActiveRecord::RecordInvalid.new(person) if person.errors.any?
+  def submission_schema
+    @submission_schema ||= LeadFormTemplates::SubmissionSchema.build(
+      lead_form: lead_form,
+      product: product,
+      open_editions: open_editions,
+      params: params
+    )
   end
 
   def enqueue_emails(submission:, deal:, person:)
