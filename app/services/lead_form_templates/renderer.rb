@@ -1,13 +1,13 @@
 module LeadFormTemplates
   class Renderer
-    def initialize(workspace:, lead_form:, view_context:, params:, product: nil, open_editions: [])
+    def initialize(workspace:, lead_form:, view_context:, params:, product: nil, open_editions: [], source: nil)
       @workspace = workspace
       @lead_form = lead_form
       @view_context = view_context
       @params = params
       @product = product
       @open_editions = open_editions
-      @source = Source.new(workspace: workspace)
+      @source = source || Source.new(workspace: workspace)
       @field_renderer = FieldRenderer.new(view_context: view_context, params: params, open_editions: open_editions)
       @environment = self.class.build_environment
     end

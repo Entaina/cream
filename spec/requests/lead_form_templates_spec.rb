@@ -69,6 +69,59 @@ RSpec.describe "Lead form templates", type: :request do
       expect(response.body).to include("Esquema de validación")
       expect(response.body).to include("lead[email]")
       expect(response.body).to include("lead[help_type]")
+      expect(response.body).to include("Vista previa")
+    end
+
+    it "previews a saved page template" do
+      import_lead_form_templates!(workspace)
+      template = workspace.lead_form_templates.find_by!(path: "public/lead_forms/contacto")
+
+      get preview_lead_form_template_path(template)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("Vista previa de plantilla")
+      expect(response.body).to include("lead[email]")
+      expect(response.body).to include('action="#"')
+    end
+
+    it "previews a page template with a selected product" do
+      import_lead_form_templates!(workspace)
+      template = workspace.lead_form_templates.find_by!(path: "public/lead_forms/liderando_ia_reserva")
+      product = workspace.products.create!(name: "Liderando con IA", price: 990)
+      product.editions.create!(name: "Marzo 2026", ends_on: Date.current + 30.days)
+
+      get preview_lead_form_template_path(template, preview_product_id: product.id)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('value="' + product.id.to_s + '"')
+      expect(response.body).to include("Marzo 2026")
+      expect(response.body).to include("Producto para vista previa")
+    end
+
+    it "previews draft body from the editor" do
+      import_lead_form_templates!(workspace)
+      template = workspace.lead_form_templates.find_by!(path: "public/lead_forms/contacto")
+
+      post preview_lead_form_template_path(template), params: {
+        lead_form_template: { body: "<div class=\"mx-auto max-w-xl\"><h1>Borrador</h1>{% form_open %}{% form_close %}</div>" }
+      }
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("Incluye cambios sin guardar")
+      expect(response.body).to include("Borrador")
+    end
+
+    it "shows preview link on index for pages only" do
+      import_lead_form_templates!(workspace)
+
+      get lead_form_templates_path
+
+      expect(response.body).to include(preview_lead_form_template_path(
+        workspace.lead_form_templates.find_by!(path: "public/lead_forms/contacto")
+      ))
+      expect(response.body).not_to include(preview_lead_form_template_path(
+        workspace.lead_form_templates.find_by!(path: "public/lead_forms/partials/contact_fields")
+      ))
     end
 
     it "updates a template" do
@@ -131,6 +184,19 @@ RSpec.describe "Lead form templates", type: :request do
 
       expect(response).to redirect_to(root_path)
       expect(LeadFormTemplate.count).to eq(0)
+    end
+
+    it "forbids previewing templates" do
+      template = workspace.lead_form_templates.create!(
+        path: "public/lead_forms/demo",
+        partial: false,
+        body: "<p>demo</p>"
+      )
+      product = workspace.products.create!(name: "Ajeno", price: 1)
+
+      get preview_lead_form_template_path(template, preview_product_id: product.id)
+
+      expect(response).to redirect_to(root_path)
     end
 
     it "does not show Plantillas de formulario link on lead forms index" do

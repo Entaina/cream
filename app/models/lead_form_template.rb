@@ -54,6 +54,10 @@ class LeadFormTemplate < ApplicationRecord
     !partial? && template_key.present?
   end
 
+  def previewable?
+    !partial?
+  end
+
   def refresh_submission_schema!
     compiled = LeadFormTemplates::SchemaCompiler.compile(template: self)
     update_column(:submission_schema, compiled)

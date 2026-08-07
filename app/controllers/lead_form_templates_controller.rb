@@ -1,7 +1,7 @@
 class LeadFormTemplatesController < ApplicationController
   include RequiresFeature
   requires_feature :lead_forms
-  before_action :set_template, only: %i[edit update destroy]
+  before_action :set_template, only: %i[edit update destroy preview]
 
   def index
     @kind = params[:kind].presence_in(%w[partial view]) || "all"
@@ -30,6 +30,7 @@ class LeadFormTemplatesController < ApplicationController
 
   def edit
     authorize @template
+    load_preview_products
   end
 
   def update
@@ -47,6 +48,28 @@ class LeadFormTemplatesController < ApplicationController
     redirect_to lead_form_templates_path, notice: "Plantilla eliminada.", status: :see_other
   end
 
+  def preview
+    authorize @template, :preview?
+
+    unless @template.previewable?
+      redirect_to lead_form_templates_path, alert: "Solo las páginas completas admiten vista previa."
+      return
+    end
+
+    @preview_draft = preview_body_param.present?
+    @preview_product = resolved_preview_product
+    load_preview_products
+    @lead_form_page_html = LeadFormTemplates::PagePreview.render(
+      template: @template,
+      view_context: LeadFormTemplates::PreviewViewContext.new(view_context),
+      body: preview_body_param,
+      product_id: @preview_product&.id
+    )
+    render :preview, layout: "public_lead_form"
+  rescue Liquid::SyntaxError, Liquid::FileSystemError => e
+    render plain: "No se pudo renderizar la plantilla: #{e.message}", status: :unprocessable_entity
+  end
+
   private
 
   def set_template
@@ -55,5 +78,20 @@ class LeadFormTemplatesController < ApplicationController
 
   def template_params
     params.require(:lead_form_template).permit(:slug, :partial, :body)
+  end
+
+  def preview_body_param
+    params.dig(:lead_form_template, :body).presence
+  end
+
+  def load_preview_products
+    @preview_products = current_workspace.products.ordered
+  end
+
+  def resolved_preview_product
+    id = params[:preview_product_id].presence
+    return if id.blank?
+
+    current_workspace.products.find_by(id: id)
   end
 end

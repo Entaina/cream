@@ -3,4 +3,5 @@ class LeadFormTemplatePolicy < WorkspaceRecordPolicy
   def create? = admin?
   def update? = admin?
   def destroy? = admin?
+  def preview? = admin?
 end

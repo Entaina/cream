@@ -34,6 +34,10 @@
         <h2 class="font-semibold text-base font-mono"><%= template.display_name %></h2>
         <%= badge template.partial? ? "Parcial" : "Página", color: template.partial? ? "hoki" : "green" %>
         <div class="ml-auto flex gap-2">
+          <% if template.previewable? %>
+            <%= link_to "Vista previa", preview_lead_form_template_path(template),
+                  class: "btn-secondary", target: "_blank", rel: "noopener noreferrer" %>
+          <% end %>
           <%= link_to "Editar", edit_lead_form_template_path(template), class: "btn-secondary" %>
           <%= button_to "Eliminar", lead_form_template_path(template), method: :delete, class: "btn-danger" %>
         </div>

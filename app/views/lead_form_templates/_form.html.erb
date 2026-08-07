@@ -22,8 +22,15 @@
     <p class="mt-1 text-xs text-ink-faint">Usa etiquetas como {% raw %}{% field type: "select", name: "help_type", label: "…", choices: "Curso|curso; Otro|otro", blank: "Elige", required: true %}{% endraw %}, {% raw %}{% partial 'nombre' %}{% endraw %}, {% raw %}{% form_open %}{% endraw %} y variables {{ lead_form.name }}.</p>
   </div>
 
+  <% if template.previewable? && defined?(@preview_products) && @preview_products.any? %>
+    <%= render "preview_product_field",
+          products: @preview_products,
+          selected_id: params[:preview_product_id] %>
+  <% end %>
+
   <div class="flex gap-2">
     <%= f.submit class: "btn-primary" %>
+    <%= lead_form_template_preview_button(template) if template.previewable? %>
     <%= link_to "Cancelar", lead_form_templates_path, class: "btn-secondary" %>
   </div>
   </div>
