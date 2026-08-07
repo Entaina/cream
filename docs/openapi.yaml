@@ -25,6 +25,7 @@ tags:
   - name: People
   - name: Companies
   - name: Pipelines
+  - name: Products
   - name: Deals
   - name: Deal notes
   - name: Deal emails
@@ -58,6 +59,15 @@ components:
         type: string
       description: Case-insensitive search term (supported on list endpoints).
 
+    ProductSegmentQuery:
+      name: segment
+      in: query
+      required: false
+      schema:
+        type: string
+        enum: [b2b, b2c]
+      description: Filter products by segment.
+
     PersonId:
       name: id
       in: path
@@ -73,6 +83,13 @@ components:
         type: integer
 
     PipelineId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+
+    ProductId:
       name: id
       in: path
       required: true
@@ -290,6 +307,47 @@ components:
                 $ref: "#/components/schemas/PipelineStage"
         - $ref: "#/components/schemas/Timestamps"
 
+    Edition:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        starts_on:
+          type: string
+          format: date
+          nullable: true
+        ends_on:
+          type: string
+          format: date
+          nullable: true
+
+    Product:
+      allOf:
+        - type: object
+          required: [id, name, price, editions]
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+            price:
+              type: number
+            description:
+              type: string
+              nullable: true
+            segment:
+              type: string
+              enum: [b2b, b2c]
+              nullable: true
+            editions:
+              type: array
+              items:
+                $ref: "#/components/schemas/Edition"
+        - $ref: "#/components/schemas/Timestamps"
+
     DealTaskInput:
       type: object
       required: [title, due_on]
@@ -301,6 +359,54 @@ components:
           type: string
           format: date
           description: Due date (today or later). Required when creating a deal.
+
+    DealProductLine:
+      type: object
+      required: [id, product_id, product_name, quantity, unit_price, subtotal]
+      properties:
+        id:
+          type: integer
+        product_id:
+          type: integer
+        product_name:
+          type: string
+        edition_id:
+          type: integer
+          nullable: true
+        edition_name:
+          type: string
+          nullable: true
+        quantity:
+          type: integer
+        unit_price:
+          type: number
+        subtotal:
+          type: number
+
+    DealProductInput:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Line item id. Required when updating or removing an existing line.
+        product_id:
+          type: integer
+          description: Required when adding a new line.
+        edition_id:
+          type: integer
+          description: Edition id (must belong to the product). Alternative to edition_name.
+        edition_name:
+          type: string
+          description: Edition name; created on the product if it does not exist yet. Pass an empty string to clear the edition on update.
+        quantity:
+          type: integer
+          minimum: 1
+        unit_price:
+          type: number
+          description: Optional override; defaults to the catalogue price when creating a line.
+        _destroy:
+          type: boolean
+          description: Set to true to remove an existing line (requires id).
 
     Note:
       allOf:
@@ -348,6 +454,10 @@ components:
               items:
                 type: integer
               description: Person IDs linked to the deal as contacts.
+            deal_products:
+              type: array
+              items:
+                $ref: "#/components/schemas/DealProductLine"
             notes:
               type: array
               description: Present only in create responses when notes were sent in the request.
@@ -384,6 +494,11 @@ components:
           items:
             type: integer
           description: Person IDs to link as deal contacts. Each person must belong to the deal company (or partner, if set).
+        deal_products_attributes:
+          type: array
+          description: Product line items on the deal. Deal value is recalculated from line subtotals.
+          items:
+            $ref: "#/components/schemas/DealProductInput"
         tasks_attributes:
           type: array
           description: At least one task with a future due date is required when creating a deal.
@@ -928,6 +1043,52 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
 
+  /api/v1/products:
+    get:
+      tags: [Products]
+      summary: List products
+      description: Returns workspace products with their editions (variants).
+      parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
+        - $ref: "#/components/parameters/SearchQuery"
+        - $ref: "#/components/parameters/ProductSegmentQuery"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/FeatureDisabled"
+
+  /api/v1/products/{id}:
+    get:
+      tags: [Products]
+      summary: Show a product
+      parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
+        - $ref: "#/components/parameters/ProductId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
   /api/v1/deals:
     get:
       tags: [Deals]
@@ -969,6 +1130,10 @@ paths:
                 name: Enterprise license
                 company_id: 1
                 contact_ids: [42]
+                deal_products_attributes:
+                  - product_id: 7
+                    edition_name: "2026"
+                    quantity: 2
                 tasks_attributes:
                   - title: Send proposal
                     due_on: "2026-08-15"

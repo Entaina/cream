@@ -10,6 +10,7 @@ RSpec.describe "Api::V1::Deals", type: :request do
   let(:deal) { create_deal!(workspace, pipeline: pipeline) }
   let(:token) { user.api_tokens.create!(name: "Test", workspace: workspace) }
   let(:headers) { { "Authorization" => "Bearer #{token.plaintext_token}" } }
+  let(:json_headers) { headers.merge("CONTENT_TYPE" => "application/json", "ACCEPT" => "application/json") }
 
   def valid_create_params(**extra)
     {
@@ -24,6 +25,92 @@ RSpec.describe "Api::V1::Deals", type: :request do
   end
 
   describe "POST /api/v1/deals" do
+    it "creates a deal with product lines and edition" do
+      product = workspace.products.create!(name: "Premium", price: 1200)
+      edition = product.editions.create!(name: "2026")
+
+      expect {
+        post "/api/v1/deals",
+          params: valid_create_params(
+            deal: {
+              deal_products_attributes: [
+                { product_id: product.id, edition_id: edition.id, quantity: 2 }
+              ]
+            }
+          ),
+          headers: json_headers,
+          as: :json
+      }.to change(DealProduct, :count).by(1)
+
+      expect(response).to have_http_status(:created)
+      created_deal = workspace.deals.find(response.parsed_body["id"])
+      line = created_deal.deal_products.sole
+      expect(line.product).to eq(product)
+      expect(line.edition).to eq(edition)
+      expect(created_deal.value).to eq(2400)
+      expect(response.parsed_body["deal_products"]).to contain_exactly(
+        include(
+          "product_id" => product.id,
+          "edition_id" => edition.id,
+          "edition_name" => "2026",
+          "quantity" => 2,
+          "unit_price" => 1200.0,
+          "subtotal" => 2400.0
+        )
+      )
+    end
+
+    it "creates a product edition from edition_name" do
+      product = workspace.products.create!(name: "Premium", price: 500)
+
+      post "/api/v1/deals",
+        params: valid_create_params(
+          deal: {
+            deal_products_attributes: [
+              { product_id: product.id, edition_name: "Madrid 2026", quantity: 1 }
+            ]
+          }
+        ),
+        headers: json_headers,
+        as: :json
+
+      expect(response).to have_http_status(:created)
+      line = workspace.deals.find(response.parsed_body["id"]).deal_products.sole
+      expect(line.edition.name).to eq("Madrid 2026")
+    end
+
+    it "returns not found when a product id is outside the workspace" do
+      outsider = workspaces(:two).products.create!(name: "Other", price: 1)
+
+      post "/api/v1/deals",
+        params: valid_create_params(
+          deal: { deal_products_attributes: [ { product_id: outsider.id, quantity: 1 } ] }
+        ),
+        headers: json_headers,
+        as: :json
+
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it "returns not found when an edition does not belong to the product" do
+      product = workspace.products.create!(name: "Premium", price: 1200)
+      other = workspace.products.create!(name: "Other", price: 100)
+      edition = other.editions.create!(name: "2026")
+
+      post "/api/v1/deals",
+        params: valid_create_params(
+          deal: {
+            deal_products_attributes: [
+              { product_id: product.id, edition_id: edition.id, quantity: 1 }
+            ]
+          }
+        ),
+        headers: json_headers,
+        as: :json
+
+      expect(response).to have_http_status(:not_found)
+    end
+
     it "creates a deal with contacts" do
       contact = create_person!(workspace, company: company, first_name: "Jane", last_name: "Doe")
 
@@ -106,6 +193,45 @@ RSpec.describe "Api::V1::Deals", type: :request do
 
       expect(response).to have_http_status(:success)
       expect(deal.reload.stage_label).to eq("Won")
+    end
+
+    it "updates product lines" do
+      product = workspace.products.create!(name: "Premium", price: 1000)
+      edition = product.editions.create!(name: "2026")
+      line = deal.deal_products.create!(product: product, edition: edition, quantity: 1)
+      addon = workspace.products.create!(name: "Support", price: 200)
+
+      patch "/api/v1/deals/#{deal.id}", params: {
+        deal: {
+          deal_products_attributes: [
+            { id: line.id, quantity: 3 },
+            { product_id: addon.id, quantity: 1 }
+          ]
+        }
+      }, headers: json_headers, as: :json
+
+      expect(response).to have_http_status(:success)
+      deal.reload
+      expect(deal.deal_products.count).to eq(2)
+      expect(line.reload.quantity).to eq(3)
+      expect(deal.value).to eq(3200)
+      expect(response.parsed_body["deal_products"]).to contain_exactly(
+        include("product_name" => "Premium", "quantity" => 3, "subtotal" => 3000.0),
+        include("product_name" => "Support", "quantity" => 1, "subtotal" => 200.0)
+      )
+    end
+
+    it "removes a product line" do
+      product = workspace.products.create!(name: "Premium", price: 1000)
+      line = deal.deal_products.create!(product: product, quantity: 1)
+
+      patch "/api/v1/deals/#{deal.id}", params: {
+        deal: { deal_products_attributes: [ { id: line.id, _destroy: true } ] }
+      }, headers: json_headers, as: :json
+
+      expect(response).to have_http_status(:success)
+      expect(deal.reload.deal_products).to be_empty
+      expect(response.parsed_body["deal_products"]).to eq([])
     end
 
     it "updates contacts" do
