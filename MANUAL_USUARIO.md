@@ -4,7 +4,7 @@
 
 Cream es un CRM por **workspaces** para gestionar **personas**, **empresas** y **deals** (oportunidades), con notas, tareas, listas y un historial de actividad compartido en el equipo.
 
-> **Última revisión:** 2026-08-06 (cambiar nombre en Profile)
+> **Última revisión:** 2026-08-06 (plantillas Liquid de formularios públicos)
 > Este documento describe la funcionalidad **visible para el usuario**. Las funcionalidades desactivadas aparecen al final en «Próximamente».
 
 ---
@@ -1015,13 +1015,26 @@ En el menú lateral, abre **Formularios**.
 2. Indica el **nombre**, el **slug** (aparecerá en la URL pública `/f/slug`), la **plantilla** del formulario, el **pipeline** donde se creará el deal, la **etapa** opcional (tras elegir el pipeline), el **responsable** (recibe la notificación y la tarea de seguimiento), el **texto de la primera tarea** y los **días hasta el vencimiento** (desde la creación del deal al enviar el formulario; 0 = el mismo día), y la **plantilla de email** que se enviará al lead.
 3. Opcional: indica la **URL de redirección tras envío** (p. ej. `https://entaina.com/gracias`) para llevar al visitante a una página de tu web. Si se deja vacía, se muestra la página de gracias de Cream (`/f/slug/success`).
 4. Opcional: define **campos ocultos adicionales** (uno por línea, p. ej. `producto`, `landing`). Sus valores se pasan como query params en la URL pública o del iframe, p. ej. `/f/slug?producto=curso-ia`. Se guardan con el envío y aparecen en **Formulario de origen** del deal.
-5. Marca **Recoger datos de empresa** si el formulario debe pedir nombre y CIF de la empresa.
-6. Guarda. En el listado verás la **URL pública** y el **código iframe** listos para copiar.
+5. Opcional: elige un **producto** del catálogo si el formulario debe asociar una línea de producto al deal (p. ej. reservas de curso). El visitante puede sobrescribirlo con `?product_id=` en la URL. Las plantillas de reserva muestran las **ediciones abiertas** de ese producto.
+6. Marca **Recoger datos de empresa** si el formulario debe pedir nombre y CIF de la empresa (la validación en servidor exige el nombre de empresa solo con esta opción activada).
+7. Guarda. En el listado verás la **URL pública** y el **código iframe** listos para copiar.
+
+### Plantillas de formulario (administradores)
+
+La **apariencia y los campos** de cada página pública se definen en plantillas **Liquid** guardadas en el workspace, no en el propio registro del formulario.
+
+1. Desde **Formularios**, pulsa **Plantillas de formulario** (solo administradores).
+2. Filtra por **Páginas** (formularios completos, p. ej. `contacto`, `liderando_ia_reserva`) o **Parciales** (bloques reutilizables: datos de contacto, consentimiento RGPD, etc.).
+3. **Editar** abre un editor con resaltado Liquid. Las páginas usan etiquetas como `{% field %}`, `{% partial 'contact_fields' %}`, `{% form_open %}` y variables como `{{ lead_form.name }}`.
+4. **Nueva plantilla**: indica un **nombre** corto (p. ej. `mi_formulario` para una página, o `mi_bloque` para un parcial) y marca **Es un parcial** si no es una página completa.
+5. Tras crear o cambiar una plantilla de **página**, elige ese nombre en el campo **Plantilla del formulario** al configurar un formulario de captación.
+
+Si la plantilla de una página no existe en el workspace, la URL pública `/f/slug` responderá con error.
 
 ### Qué ocurre al enviar un formulario
 
 - Se crea o reutiliza una **persona** por email (origen «Formulario web»). Si la persona ya existía, solo se rellenan los campos que estuvieran vacíos (nombre, apellidos, teléfono, cargo…).
-- Si esa persona ya tiene un **deal abierto** en el pipeline del formulario, se **reutiliza** ese deal: se añaden al envío los datos nuevos del formulario (sin crear otro deal ni otra tarea de seguimiento). Si has configurado una **etapa**, el deal avanza hasta ella solo si está en una etapa anterior (nunca retrocede). Si no hay deal abierto en ese pipeline (por ejemplo, solo deals ganados o perdidos, o deals en otro pipeline), se crea un deal nuevo en la etapa configurada o, si no hay etapa, en la **primera etapa** del pipeline (salvo plantillas con reglas propias, p. ej. **Demo** en Adoption), con la **primera tarea** configurada en el formulario (por defecto «Contactar lead» al día siguiente) asignada al responsable.
+- Si esa persona ya tiene un **deal abierto** en el pipeline del formulario, se **reutiliza** ese deal: se añaden al envío los datos nuevos del formulario (sin crear otro deal ni otra tarea de seguimiento). Si has configurado una **etapa**, el deal avanza hasta ella solo si está en una etapa anterior (nunca retrocede). Si no hay deal abierto en ese pipeline (por ejemplo, solo deals ganados o perdidos, o deals en otro pipeline), se crea un deal nuevo en la etapa configurada o, si no hay etapa, en la **primera etapa** del pipeline, con la **primera tarea** configurada en el formulario (por defecto «Contactar lead» al día siguiente) asignada al responsable.
 - Los datos del envío (campos del formulario, página de origen, UTM, navegador, IP…) quedan guardados y visibles en la ficha del deal, en **Formulario de origen**.
 - El lead recibe el email configurado; el responsable recibe una notificación con los datos y un enlace al deal.
 
@@ -1035,10 +1048,10 @@ En el menú lateral, abre **Formularios**.
 - El formulario **Desarrollando con IA — Reservas** (`/f/desarrollando-con-ia-reservas`) pide edición (botones), nombre, apellidos, email, teléfono con prefijo de país, una pregunta libre opcional («¿En qué te podemos ayudar?») y consentimiento de protección de datos; crea deals en el pipeline **Formación B2C**.
 - El formulario **Trabajando con IA** (`/f/trabajando-ia`) pide nombre, email, teléfono, una pregunta opcional sobre qué tarea del trabajo resolver con IA, cómo nos has conocido, newsletter y consentimiento RGPD; crea deals en el pipeline **Formación B2C**.
 - El formulario **Desarrollando con IA** (`/f/desarrollando-ia`) pide nombre, email, teléfono, perfil técnico, audiencia (individual o equipo), cómo nos has conocido, newsletter y consentimiento RGPD; crea deals en el pipeline **Formación B2C**.
-- El formulario **Demo Adoption** (`/f/adoption`) pide nombre, email, teléfono, una pregunta opcional sobre el grado de adopción de IA en la organización, cómo nos has conocido, newsletter y consentimiento RGPD; crea deals marcados como **Demo** en el pipeline **Proyectos** (etapa **Demo** si existe).
+- El formulario **Demo Adoption** (`/f/adoption`) pide nombre, email, teléfono, una pregunta opcional sobre el grado de adopción de IA en la organización, cómo nos has conocido, newsletter y consentimiento RGPD; crea deals en el pipeline **Proyectos**.
 - El formulario **Assessment · Índice de adopción** (`/f/indice-adopcion-ia`) pide nombre, email, teléfono, empresa, cargo, tamaño (nº de empleados), cómo nos has conocido, newsletter y consentimiento RGPD; crea deals en el pipeline **Proyectos**.
 - El formulario **Entrenadores** (`/f/entrenadores`) pide nombre, email, una pregunta opcional sobre el principal reto con la IA, newsletter (opcional, desmarcada) y consentimiento de protección de datos; no pide teléfono ni cómo nos has conocido; crea deals en el pipeline **Entrenadores**.
-- Cualquier miembro del workspace puede gestionar los formularios.
+- Cualquier miembro del workspace puede gestionar los formularios; **editar plantillas Liquid** es solo para administradores.
 
 ---
 

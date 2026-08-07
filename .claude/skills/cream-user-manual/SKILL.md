@@ -149,6 +149,25 @@ Al cambiar catálogo, picker o rutas de ediciones, actualizar **MANUAL_USUARIO.m
 
 Modelo: `Edition` `belongs_to :product`; unicidad de nombre por producto. No documentar rutas ni Stimulus en el manual.
 
+## Formularios de captación (referencia para §27)
+
+Al cambiar formularios públicos, plantillas Liquid o admin de formularios, actualizar **MANUAL_USUARIO.md** §27 y **USER_MANUAL.md** §27 (Lead capture forms).
+
+| Pieza | Ubicación en código | Manual (usuario) |
+|-------|---------------------|------------------|
+| Listado / CRUD formularios | `/lead_forms`, menú **Formularios** | §27 «Cómo acceder», «Configurar un formulario» |
+| Plantillas Liquid (admin) | `/lead_form_templates`, enlace **Plantillas de formulario** | §27 «Plantillas de formulario» — solo admins |
+| Página pública | `/f/:slug` | §27 URL, iframe, campos ocultos por query param |
+| Producto en formulario reserva | `LeadForm#product_id`, `?product_id=` | §27 nota producto / ediciones abiertas |
+| Página de gracias | `/f/:slug/success` | §27 redirección vs success de Cream |
+| Datos en deal | `LeadSubmission`, ficha deal **Formulario de origen** | §27 «Qué ocurre al enviar» |
+
+**No documentar** en el manual: tags Liquid, `LeadFormSubmissionProcessor`, importer rake, `FieldRenderer`, Stimulus, whitelist de `lead_params`.
+
+**Formularios de ejemplo** (slugs en seeds `db/seeds/lead_forms_example.rb`): mantener la lista de bullets al final de §27 sincronizada con plantillas reales (`contacto`, `demo`, `liderando_ia`, reservas, etc.). Si se elimina un formulario de ejemplo, quitar su bullet.
+
+**Validación visible**: el manual puede mencionar que nombre, apellidos, email y consentimiento RGPD son obligatorios; teléfono/empresa según la plantilla y la casilla «Recoger datos de empresa». No detallar validación HTML5 vs servidor.
+
 - [ ] ¿Cambió algo que un usuario vería o haría distinto? → manual actualizado
 - [ ] ¿Se movió una feature entre activa / próximamente? → ambas secciones coherentes
 - [ ] ¿Fecha `Última revisión` actualizada?

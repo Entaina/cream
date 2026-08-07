@@ -1,4 +1,0 @@
-<%# locals: (f:, field:, text:, required: false) %>
-<%= f.label field, class: "label" do %>
-  <%= text %><% if local_assigns.fetch(:required, false) %> <%= render "public/lead_forms/required_marker" %><% end %>
-<% end %>

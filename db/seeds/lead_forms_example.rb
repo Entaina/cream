@@ -143,6 +143,7 @@ module LeadFormsExample
   ].freeze
 
   def self.seed!(workspace:, user:)
+    LeadFormTemplates::Importer.import!(workspace)
     pipelines = ensure_pipelines!(workspace)
     responsible = workspace.briefing_actor || user
 

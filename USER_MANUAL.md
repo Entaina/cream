@@ -4,7 +4,7 @@
 
 Cream is a **workspace**-based CRM for managing **people**, **companies** and **deals** (opportunities), with notes, tasks, lists and an activity history shared across the team.
 
-> **Last revision:** 2026-08-06 (change name in Profile)
+> **Last revision:** 2026-08-06 (public form Liquid templates)
 > This document describes the functionality **visible to the user**. Disabled features are listed at the end under "Coming soon".
 
 ---
@@ -1015,13 +1015,26 @@ In the sidebar menu, open **Formularios** (Forms).
 2. Provide the **name**, the **slug** (it will appear in the public URL `/f/slug`), the form **template**, the **pipeline** where the deal will be created, the optional **stage** (after choosing the pipeline), the **owner** (receives the notification and the follow-up task), the **first task text** and **days until due** (from deal creation when the form is submitted; 0 = same day), and the **email template** that will be sent to the lead.
 3. Optional: set a **redirect URL after submission** (e.g. `https://example.com/thanks`) to send the visitor to a page on your site. If left blank, Cream's thank-you page is shown (`/f/slug/success`).
 4. Optional: define **additional hidden fields** (one per line, e.g. `producto`, `landing`). Their values are passed as query params in the public or iframe URL, e.g. `/f/slug?producto=curso-ia`. They are saved with the submission and shown on the deal under **Formulario de origen** (Source form).
-5. Check **Recoger datos de empresa** (Collect company data) if the form should ask for the company name and tax ID (CIF).
-6. Save. In the list you will see the **public URL** and the **iframe code** ready to copy.
+5. Optional: select a **product** from the catalog if the form should attach a product line to the deal (e.g. course reservations). Visitors can override it with `?product_id=` in the URL. Reservation templates show that product's **open editions**.
+6. Check **Recoger datos de empresa** (Collect company data) if the form should ask for the company name and tax ID (CIF). Server-side validation requires the company name only when this option is enabled.
+7. Save. In the list you will see the **public URL** and the **iframe code** ready to copy.
+
+### Form templates (administrators)
+
+The **layout and fields** of each public page are defined in **Liquid** templates stored in the workspace, not in the form record itself.
+
+1. From **Formularios** (Forms), click **Plantillas de formulario** (Form templates) — administrators only.
+2. Filter by **Páginas** (Pages — full forms, e.g. `contacto`, `liderando_ia_reserva`) or **Parciales** (Partials — reusable blocks: contact fields, GDPR consent, etc.).
+3. **Edit** opens a syntax-highlighted Liquid editor. Pages use tags such as `{% field %}`, `{% partial 'contact_fields' %}`, `{% form_open %}`, and variables like `{{ lead_form.name }}`.
+4. **New template**: enter a short **name** (e.g. `my_form` for a page, or `my_block` for a partial) and check **Es un parcial** (Is a partial) if it is not a full page.
+5. After creating or changing a **page** template, select that name in **Plantilla del formulario** (Form template) when configuring a capture form.
+
+If a page template does not exist in the workspace, the public URL `/f/slug` will return an error.
 
 ### What happens when a form is submitted
 
 - A **person** is created or reused by email (source "Formulario web"). If the person already existed, only blank fields are filled in (name, last name, phone, job title…).
-- If that person already has an **open deal** in the form's pipeline, that deal is **reused**: new form data is added to the submission (without creating another deal or another follow-up task). If you configured a **stage**, the deal advances to it only when it is in an earlier stage (it never moves backwards). If there is no open deal in that pipeline (for example, only won or lost deals, or deals in another pipeline), a new deal is created in the configured stage or, if none is set, in the pipeline's **first stage** (except templates with their own rules, e.g. **Demo** for Adoption), with the form's configured **first task** (default: **Contactar lead** / Contact lead, due the next day) assigned to the owner.
+- If that person already has an **open deal** in the form's pipeline, that deal is **reused**: new form data is added to the submission (without creating another deal or another follow-up task). If you configured a **stage**, the deal advances to it only when it is in an earlier stage (it never moves backwards). If there is no open deal in that pipeline (for example, only won or lost deals, or deals in another pipeline), a new deal is created in the configured stage or, if none is set, in the pipeline's **first stage**, with the form's configured **first task** (default: **Contactar lead** / Contact lead, due the next day) assigned to the owner.
 - The submission data (form fields, source page, UTM, browser, IP…) is saved and visible on the deal's page, under **Formulario de origen** (Source form).
 - The lead receives the configured email; the owner receives a notification with the data and a link to the deal.
 
@@ -1035,10 +1048,10 @@ In the sidebar menu, open **Formularios** (Forms).
 - The **Desarrollando con IA — Reservas** form (`/f/desarrollando-con-ia-reservas`) asks for edition (buttons), name, last name, email, phone with country prefix, an optional free-text question (“How can we help you?”) and data-protection consent; it creates deals in the **Formación B2C** pipeline.
 - The **Trabajando con IA** form (`/f/trabajando-ia`) asks for name, email, phone, an optional question about which work task to solve with AI, how you heard about us, newsletter and GDPR consent; it creates deals in the **Formación B2C** pipeline.
 - The **Desarrollando con IA** form (`/f/desarrollando-ia`) asks for name, email, phone, technical profile, audience (individual or team), how you heard about us, newsletter and GDPR consent; it creates deals in the **Formación B2C** pipeline.
-- The **Demo Adoption** form (`/f/adoption`) asks for name, email, phone, an optional question about the organization's degree of AI adoption, how you heard about us, newsletter and GDPR consent; it creates deals marked as **Demo** in the **Proyectos** pipeline (**Demo** stage if it exists).
+- The **Demo Adoption** form (`/f/adoption`) asks for name, email, phone, an optional question about the organization's degree of AI adoption, how you heard about us, newsletter and GDPR consent; it creates deals in the **Proyectos** pipeline.
 - The **Assessment · Índice de adopción** form (`/f/indice-adopcion-ia`) asks for name, email, phone, company, job title, size (number of employees), how you heard about us, newsletter and GDPR consent; it creates deals in the **Proyectos** pipeline.
 - The **Entrenadores** form (`/f/entrenadores`) asks for name, email, an optional question about your main challenge with AI, newsletter (optional, unchecked) and data-protection consent; it does not ask for phone or how you heard about us; it creates deals in the **Entrenadores** pipeline.
-- Any workspace member can manage the forms.
+- Any workspace member can manage forms; **editing Liquid templates** is administrators only.
 
 ---
 

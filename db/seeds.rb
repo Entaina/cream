@@ -182,9 +182,10 @@ ActiveRecord::Base.transaction do
   if organization_workspace
     org_members = organization_workspace.users.pluck(:email_address).join(", ")
     template_count = organization_workspace.email_templates.where.not(key: nil).count
+    lead_form_template_count = organization_workspace.lead_form_templates.count
     lead_form_count = organization_workspace.lead_forms.count
     booking_page_count = organization_workspace.booking_pages.count
-    puts "Organization workspace '#{organization_workspace.name}': #{org_members.presence || "no members"} (#{template_count} email templates, #{lead_form_count} lead forms, #{booking_page_count} booking pages)"
+    puts "Organization workspace '#{organization_workspace.name}': #{org_members.presence || "no members"} (#{template_count} email templates, #{lead_form_template_count} lead form templates, #{lead_form_count} lead forms, #{booking_page_count} booking pages)"
   end
   puts "Login: #{ENV.fetch("CREAM_SEED_ADMIN_EMAIL")} / #{ENV.fetch("CREAM_SEED_ADMIN_PASSWORD")}"
 end

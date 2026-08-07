@@ -69,6 +69,21 @@ Conventions:
 - Mock external HTTP calls and background jobs (Solid Queue / `deliver_later`) — do not hit real services in specs.
 - `SessionHelper` (`spec/support/session_helper.rb`) provides `sign_in_as` / `sign_out` for authenticated request specs.
 - `DealHelper` (`spec/support/deal_helper.rb`) provides `create_deal!`, `create_company!`, `create_person!` for deal-related specs.
+- Public lead form request specs auto-import Liquid templates via `spec/support/public_lead_form_templates.rb` (mirrors `lib/lead_form_templates/` into the workspace DB).
+
+### Lead form templates (dev)
+
+Public forms render Liquid from **`lead_form_templates`** in the workspace DB (not from `app/views/public/lead_forms/` at runtime).
+
+```bash
+# Import/update all repo templates into a workspace (idempotent)
+bin/rails 'lead_form_templates:import[WORKSPACE_ID]'
+
+# Example workspace after db:seed
+bin/rails runner "w=Workspace.find_by(slug: ENV.fetch('CREAM_ORGANIZATION_WORKSPACE_NAME', 'Example').parameterize); LeadFormTemplates::Importer.import!(w)"
+```
+
+Source files to edit before re-import: `lib/lead_form_templates/public/lead_forms/*.liquid` and `partials/`. Admins can also edit templates in the UI (**Formularios → Plantillas de formulario**). `db:seed` (organization workspace) runs `LeadFormTemplates::Importer` via `LeadFormsExample.seed!` before creating example forms. Production: see `deploy/README.md` § Lead capture form templates. Architecture details: skill `cream-architecture` § Lead capture forms.
 
 ### Recurring jobs (Solid Queue)
 

@@ -117,6 +117,52 @@ AlertRulesJob (daily, recurring.yml) → AlertRuleEngine → matching deals
 
 When adding a new alert trigger or condition, extend constants + `AlertRuleEngine#apply_trigger` / `#apply_conditions` and the form checkboxes in `alert_rules/_form.html.erb`.
 
+## Lead capture forms (public)
+
+Feature flag `:lead_forms`. Public URLs `/f/:slug` (POST creates lead) and `/f/:slug/success` (thank-you page). Admin CRUD: `LeadFormsController`, `LeadFormTemplatesController` (templates admin-only).
+
+### Runtime rendering (Liquid, DB-only)
+
+- **`LeadForm`** (`template_key`) picks which **page template** to render from `lead_form_templates` in DB. Public views: only `app/views/public/lead_forms/show.html.erb` and `success.html.erb` wrap rendered Liquid HTML.
+- **`LeadFormTemplate`**: workspace-scoped Liquid body in DB. Paths like `public/lead_forms/contacto` (pages) or `public/lead_forms/partials/contact_fields` (partials). System view: `public/lead_forms/success`.
+- **`LeadFormTemplates::Source#find_body`**: reads **only from DB**; no filesystem fallback at runtime. Missing template → 404.
+- **`LeadFormTemplates::Renderer`**: Liquid env + custom tags in `app/services/lead_form_templates/tags.rb`. Assigns: `lead_form`, `product`, `open_editions`. Registers: `field_renderer`, `form_action`, CSRF, etc.
+- **Repo seed files** (import only): `lib/lead_form_templates/public/lead_forms/*.liquid` + `partials/`. Import: `rake lead_form_templates:import[WORKSPACE_ID]` → `LeadFormTemplates::Importer`.
+
+### Liquid tags (form pages)
+
+| Tag | Role |
+|-----|------|
+| `{% form_open %}` / `{% form_close %}` | `<form>` + Stimulus `lead-form` |
+| `{% hidden_fields %}` | Honeypot metadata, UTM, `product_id`, `hidden_field_keys` from URL |
+| `{% field type: "…", name: "…", required: true %}` | Inputs via `FieldRenderer` |
+| `{% partial 'name' %}` | Renders `public/lead_forms/partials/name` |
+| `{% phone_with_prefix %}` | Phone + country prefix select |
+| `{% honeypot %}`, `{% turnstile %}`, `{% submit '…' %}` | Anti-spam / submit |
+
+Select options: `options: "contacto_help"` etc. → `FieldRenderer::OPTION_SETS` backed by constants on **`LeadForm`** (not per-template Ruby branches).
+
+### Submission pipeline
+
+1. **`Public::LeadFormsController#create`**: GDPR consent, Turnstile, honeypot + signed timestamp (`LeadForm::MIN_SECONDS_TO_SUBMIT`), rate limits.
+2. **`LeadFormSubmissionProcessor`**: generic validation + CRM side effects. **No `template_key` branches.**
+3. **`lead_params`**: whitelist in controller; extra keys via `LeadForm#hidden_field_keys`.
+
+**Server validation** (`validate_submission!`) — always enforced:
+
+- `first_name`, `last_name`, `email` (format via `URI::MailTo::EMAIL_REGEXP`)
+- `phone` — only if `params.key?("phone")` (form included the field)
+- `company_name` — only if `lead_form.collects_company?`
+- `product` / `edition_id` — only if form has configured `product_id` (edition validated when present)
+
+Fields marked `required: true` in Liquid are **HTML5-only** unless covered above. Optional fields are stored when non-blank (`submission_data` strips blanks).
+
+**URL prefill**: `hidden_field_keys` + `?key=value`; Stimulus `lead_form_controller.js` fills `[data-lead-form-param]`. Also `?product_id=` overrides configured product. **`open_editions`**: `LeadForm#open_editions_for(product)` → `product.editions.not_finished`, exposed to Liquid and `{% field collection: "open_editions" %}`.
+
+**Deal behaviour**: reuse open deal in form pipeline; optional `pipeline_stage_id` advances without regressing; `resolve_pipeline(help_type:)` uses `pipeline_routes` JSON on the form (not template-specific code).
+
+When adding a new public form: Liquid page + optional partials in DB, new `LeadForm` row, extend `lead_params` / `SUBMISSION_FIELD_KEYS` if new field names, option constant + `OPTION_SETS` entry if new select catalog. See command `.claude/commands/nuevo-formulario-lead.md`.
+
 ## Testing
 
 - Backend tests use **RSpec** (`bundle exec rspec`). Place request specs in `spec/requests/`, model specs in `spec/models/`.
