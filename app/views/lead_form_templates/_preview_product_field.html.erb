@@ -1,0 +1,26 @@
+<%# locals: (products:, selected_id: nil, auto_submit: false, form_url: nil, form_method: :get) %>
+<% if products.any? %>
+  <% if auto_submit && form_url.present? %>
+    <%= form_with url: form_url, method: form_method, class: "space-y-1" do %>
+      <%= label_tag :preview_product_id, "Producto para vista previa", class: "label" %>
+      <%= select_tag :preview_product_id,
+            options_for_select(
+              [ [ "Automático (formulario o ejemplo)", "" ] ] + products.map { |product| [ product.name, product.id ] },
+              selected_id
+            ),
+            class: "input w-full",
+            onchange: "this.form.requestSubmit()" %>
+    <% end %>
+  <% else %>
+    <div>
+      <%= label_tag :preview_product_id, "Producto para vista previa", class: "label" %>
+      <%= select_tag :preview_product_id,
+            options_for_select(
+              [ [ "Automático (formulario o ejemplo)", "" ] ] + products.map { |product| [ product.name, product.id ] },
+              selected_id
+            ),
+            class: "input w-full" %>
+      <p class="mt-1 text-xs text-ink-faint">Opcional. Se usa al abrir la vista previa para probar campos de producto y ediciones.</p>
+    </div>
+  <% end %>
+<% end %>
