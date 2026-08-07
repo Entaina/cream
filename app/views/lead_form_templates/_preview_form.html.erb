@@ -1,17 +1,9 @@
-<%# locals: (template:, preview_products: [], selected_product_id: nil) %>
+<%# locals: (template:) %>
 <%= form_with url: preview_lead_form_template_path(template),
       method: :post,
       target: "_blank",
       id: "lead-form-template-preview-form",
-      class: "inline-flex flex-wrap items-end gap-2",
+      class: "hidden",
       data: { turbo: false } do %>
   <%= hidden_field_tag "lead_form_template[body]", template.body %>
-  <% if preview_products.any? %>
-    <div class="min-w-[16rem]">
-      <%= render "preview_product_field",
-            products: preview_products,
-            selected_id: selected_product_id %>
-    </div>
-  <% end %>
-  <%= submit_tag "Vista previa", class: "btn-secondary" %>
 <% end %>

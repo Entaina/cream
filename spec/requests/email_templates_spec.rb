@@ -58,6 +58,34 @@ RSpec.describe "Email templates", type: :request do
       filenames = template.reload.attachments.map { |f| f.filename.to_s }
       expect(filenames).to eq([ "keep.txt" ])
     end
+
+    it "keeps existing attachments when updating without new files" do
+      template = workspace.email_templates.create!(user: member, name: "Intro", subject: "Hi", body: "Hello")
+      template.attachments.attach(io: StringIO.new("keep"), filename: "keep.txt", content_type: "text/plain")
+
+      # Browsers submit an empty string for an untouched multiple file input.
+      patch email_template_path(template), params: {
+        email_template: { name: "Intro updated", subject: "Hi", body: "Hello", attachments: [ "" ] }
+      }
+
+      expect(response).to redirect_to(email_templates_path)
+      template.reload
+      expect(template.name).to eq("Intro updated")
+      expect(template.attachments.map { |f| f.filename.to_s }).to eq([ "keep.txt" ])
+    end
+
+    it "appends new attachments on update without replacing existing ones" do
+      template = workspace.email_templates.create!(user: member, name: "Intro", subject: "Hi", body: "Hello")
+      template.attachments.attach(io: StringIO.new("keep"), filename: "keep.txt", content_type: "text/plain")
+      new_file = fixture_file_upload("spec/fixtures/files/sample.txt", "text/plain")
+
+      patch email_template_path(template), params: {
+        email_template: { name: "Intro", subject: "Hi", body: "Hello", attachments: [ new_file ] }
+      }
+
+      filenames = template.reload.attachments.map { |f| f.filename.to_s }
+      expect(filenames).to contain_exactly("keep.txt", "sample.txt")
+    end
   end
 
   describe "composer integration" do

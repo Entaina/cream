@@ -31,7 +31,16 @@ class EmailTemplatesController < ApplicationController
   def update
     authorize @template
     purge_attachments
-    if @template.update(template_params)
+
+    attrs = template_params
+    new_files = Array(attrs[:attachments]).compact_blank
+
+    # Don't mass-assign attachments: empty file inputs delete existing ones in Rails 8,
+    # and assigning new files replaces instead of appending.
+    @template.assign_attributes(attrs.except(:attachments))
+    @template.attachments.attach(new_files) if new_files.any?
+
+    if @template.save
       redirect_to email_templates_path, notice: "Plantilla actualizada."
     else
       render :edit, status: :unprocessable_entity

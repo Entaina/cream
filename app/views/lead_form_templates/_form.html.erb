@@ -30,13 +30,22 @@
       </div>
     <% end %>
 
-    <div class="flex flex-wrap items-end gap-2">
+    <% if template.persisted? && template.previewable? %>
+      <% preview_products = defined?(@preview_products) ? @preview_products : [] %>
+      <%= render "preview_form", template: template %>
+      <% if preview_products.any? %>
+        <%= render "preview_product_field",
+              products: preview_products,
+              selected_id: params[:preview_product_id],
+              form_id: "lead-form-template-preview-form" %>
+      <% end %>
+    <% end %>
+
+    <div class="flex flex-wrap gap-2">
       <%= button_tag "Guardar", type: "submit", form: edit_form_id, class: "btn-primary" %>
       <% if template.persisted? && template.previewable? %>
-        <%= render "preview_form",
-              template: template,
-              preview_products: (defined?(@preview_products) ? @preview_products : []),
-              selected_product_id: params[:preview_product_id] %>
+        <%= button_tag "Vista previa", type: "submit", form: "lead-form-template-preview-form",
+              class: "btn-secondary" %>
       <% end %>
       <%= link_to "Cancelar", lead_form_templates_path, class: "btn-secondary" %>
     </div>
