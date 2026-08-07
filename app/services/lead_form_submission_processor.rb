@@ -27,8 +27,9 @@ class LeadFormSubmissionProcessor
       fill_company_blanks!(company)
       person.update!(company: company) if person.company_id != company.id
       deal, deal_created = find_or_create_deal!(person:, company:)
+      create_first_task!(deal) unless deal_created
       attach_deal_product!(deal)
-      submission = persist_submission!(deal:, person:, deal_created:)
+      submission = persist_submission!(deal:, person:)
       enqueue_emails(submission:, deal:, person:)
       Result.new(submission:, deal:, person:)
     end
@@ -183,23 +184,30 @@ class LeadFormSubmissionProcessor
     stage = lead_form.resolve_stage(for_pipeline: pipeline)
     deal_name = [ person.display_name, lead_form.name ].compact.join(" — ")
     deal_name = "#{deal_name} (#{lead_form.help_type_label(params['help_type'])})" if params["help_type"].present?
-    workspace.deals.create!(
+    deal = workspace.deals.create!(
       name: deal_name,
       company: company,
       pipeline: pipeline,
       pipeline_stage: stage,
       owner: lead_form.responsible,
       contacts: [ person ],
-      tasks: [
-        Task.new(
-          title: lead_form.first_task_title,
-          due_on: Date.current + lead_form.first_task_due_days.days,
-          workspace: workspace,
-          user: lead_form.responsible,
-          assignee: lead_form.responsible
-        )
-      ]
+      tasks: [ Task.new(first_task_attributes) ]
     )
+    deal
+  end
+
+  def create_first_task!(deal)
+    deal.tasks.create!(first_task_attributes)
+  end
+
+  def first_task_attributes
+    {
+      title: lead_form.first_task_title,
+      due_on: Date.current + lead_form.first_task_due_days.days,
+      workspace: workspace,
+      user: lead_form.responsible,
+      assignee: lead_form.responsible
+    }
   end
 
   def attach_deal_product!(deal)
@@ -207,7 +215,11 @@ class LeadFormSubmissionProcessor
     return unless product
 
     edition = resolved_edition(product)
-    return if deal.deal_products.exists?(product_id: product.id, edition_id: edition&.id)
+    existing = deal.deal_products.find_by(product_id: product.id)
+    if existing
+      existing.update!(edition: edition) if existing.edition_id != edition&.id
+      return
+    end
 
     deal.deal_products.create!(product: product, edition: edition, quantity: 1)
   end
@@ -223,56 +235,20 @@ class LeadFormSubmissionProcessor
     product.editions.not_started.find_by(id: edition_id)
   end
 
-  def persist_submission!(deal:, person:, deal_created:)
+  def persist_submission!(deal:, person:)
     now = Time.current.iso8601
-    new_data = submission_data
-    new_metadata = submission_metadata.merge(
-      "last_submitted_at" => now,
-      "submissions_at" => [ now ]
-    )
-
-    if deal_created
-      return LeadSubmission.create!(
-        workspace: workspace,
-        lead_form: lead_form,
-        deal: deal,
-        person: person,
-        data: new_data,
-        metadata: new_metadata
-      )
-    end
-
-    existing = deal.lead_submission
-    if existing
-      existing.update!(
-        data: merge_submission_hashes(existing.data, new_data),
-        metadata: merge_submission_hashes(existing.metadata, new_metadata).merge(
-          "last_submitted_at" => now,
-          "submissions_at" => Array(existing.metadata["submissions_at"]) + [ now ]
-        )
-      )
-      return existing
-    end
 
     LeadSubmission.create!(
       workspace: workspace,
       lead_form: lead_form,
       deal: deal,
       person: person,
-      data: new_data,
-      metadata: new_metadata
+      data: submission_data,
+      metadata: submission_metadata.merge(
+        "last_submitted_at" => now,
+        "submissions_at" => [ now ]
+      )
     )
-  end
-
-  def merge_submission_hashes(existing, incoming)
-    merged = existing.stringify_keys.dup
-    incoming.stringify_keys.each do |key, value|
-      next if value.blank? && !value.is_a?(FalseClass)
-
-      existing_value = merged[key]
-      merged[key] = value if existing_value.blank? && !existing_value.is_a?(FalseClass)
-    end
-    merged
   end
 
   def submission_data

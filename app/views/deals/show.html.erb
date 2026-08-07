@@ -74,7 +74,7 @@
   <div class="w-full shrink-0 snap-start md:flex-1 md:w-auto overflow-y-auto scrollbar-subtle p-5 space-y-6 bg-canvas-soft/50">
     <%= render "trigger_panel", deal: @deal, run: StageTriggerRun.latest_panel_for(@deal) if feature_enabled?(:stage_triggers) %>
     <%= render "shared/tasks_section", record: @deal, task: @task %>
-    <%= render "lead_submission_section", deal: @deal if @deal.lead_submission.present? %>
+    <%= render "lead_submission_section", deal: @deal if @deal.lead_submissions.any? %>
     <%= render "booking_submission_section", deal: @deal if @deal.bookings.any? %>
     <%= render "shared/ai_assistant_section", record: @deal if feature_enabled?(:ai_assistant) %>
     <%= render "products_section", deal: @deal, line_items: @line_items, products: @products %>

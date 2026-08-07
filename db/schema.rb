@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_07_100001) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_07_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -490,7 +490,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_07_100001) do
     t.bigint "person_id", null: false
     t.datetime "updated_at", null: false
     t.bigint "workspace_id", null: false
-    t.index ["deal_id"], name: "index_lead_submissions_on_deal_id", unique: true
+    t.index ["deal_id"], name: "index_lead_submissions_on_deal_id"
     t.index ["lead_form_id"], name: "index_lead_submissions_on_lead_form_id"
     t.index ["person_id"], name: "index_lead_submissions_on_person_id"
     t.index ["workspace_id"], name: "index_lead_submissions_on_workspace_id"

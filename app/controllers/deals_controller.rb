@@ -243,7 +243,9 @@ class DealsController < ApplicationController
   end
 
   def set_deal
-    @deal = policy_scope(current_workspace.deals).find(params[:id])
+    @deal = policy_scope(current_workspace.deals)
+      .includes(lead_submissions: :lead_form)
+      .find(params[:id])
   end
 
   def deal_params

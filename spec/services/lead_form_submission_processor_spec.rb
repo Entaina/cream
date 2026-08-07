@@ -168,10 +168,17 @@ RSpec.describe LeadFormSubmissionProcessor do
     expect(existing.reload.first_name).to eq("Existente")
   end
 
-  it "reuses an open deal in the target pipeline and merges submission data" do
+  it "reuses an open deal in the target pipeline and creates a new submission and task" do
     company = create_company!(workspace, name: "Acme SL")
     person = create_person!(workspace, company: company, email: "lead@example.com", first_name: "Existente", last_name: "")
     existing_deal = create_deal!(workspace, pipeline: pipeline, company: company, contacts: [ person ], name: "Existing deal")
+    existing_deal.tasks.create!(
+      title: "Tarea previa",
+      due_on: Date.current,
+      workspace: workspace,
+      user: member,
+      assignee: member
+    )
     submission = LeadSubmission.create!(
       workspace: workspace,
       lead_form: lead_form,
@@ -184,14 +191,16 @@ RSpec.describe LeadFormSubmissionProcessor do
     expect {
       result = submit(contacto_lead_params("first_name" => "Otro", "last_name" => "Nuevo", "how_heard" => "otro", "message" => "Hola"))
       expect(result.deal).to eq(existing_deal)
-      expect(result.submission.id).to eq(submission.id)
+      expect(result.submission.id).not_to eq(submission.id)
       expect(result.person.first_name).to eq("Existente")
       expect(result.person.last_name).to eq("Nuevo")
-      expect(result.submission.data).to include("how_heard" => "evento", "message" => "Hola", "last_name" => "Nuevo")
+      expect(result.submission.data).to include("how_heard" => "otro", "message" => "Hola", "last_name" => "Nuevo")
+      expect(submission.reload.data).to include("how_heard" => "evento")
       expect(result.deal.pipeline_stage).to eq(existing_deal.pipeline_stage)
+      expect(result.deal.tasks.map(&:title)).to include("Contactar lead")
     }.to change(Deal, :count).by(0)
-      .and change(LeadSubmission, :count).by(0)
-      .and change { submission.reload.metadata["submissions_at"].size }.by(1)
+      .and change(LeadSubmission, :count).by(1)
+      .and change(Task, :count).by(1)
   end
 
   it "creates a new deal when the person only has closed deals in the target pipeline" do
@@ -431,6 +440,37 @@ RSpec.describe LeadFormSubmissionProcessor do
         result = submit(reserva_params)
         expect(result.deal).to eq(existing_deal)
       }.not_to change(DealProduct, :count)
+    end
+
+    it "updates the edition when reusing an open deal with the same product and a different edition" do
+      other_edition = product.editions.create!(name: "Abril 2026", starts_on: Date.current + 90.days, ends_on: Date.current + 120.days)
+      company = create_company!(workspace)
+      person = create_person!(workspace, company: company, email: "lead@example.com")
+      existing_deal = create_deal!(workspace, pipeline: pipeline, company: company, contacts: [ person ])
+      line = existing_deal.deal_products.create!(product: product, edition: edition, quantity: 1)
+
+      expect {
+        result = submit(liderando_ia_reserva_lead_params(product: product, edition: other_edition))
+        expect(result.deal).to eq(existing_deal)
+      }.not_to change(DealProduct, :count)
+
+      expect(line.reload.edition).to eq(other_edition)
+    end
+
+    it "adds a new line when reusing an open deal with a different product" do
+      other_product = workspace.products.create!(name: "Otro producto", price: 500)
+      other_edition = other_product.editions.create!(name: "Junio 2026", starts_on: Date.current + 30.days, ends_on: Date.current + 60.days)
+      company = create_company!(workspace)
+      person = create_person!(workspace, company: company, email: "lead@example.com")
+      existing_deal = create_deal!(workspace, pipeline: pipeline, company: company, contacts: [ person ])
+      existing_deal.deal_products.create!(product: product, edition: edition, quantity: 1)
+
+      expect {
+        result = submit(liderando_ia_reserva_lead_params(product: other_product, edition: other_edition))
+        expect(result.deal).to eq(existing_deal)
+      }.to change(DealProduct, :count).by(1)
+
+      expect(existing_deal.deal_products.pluck(:product_id)).to contain_exactly(product.id, other_product.id)
     end
 
     it "rejects an edition that belongs to another product" do
