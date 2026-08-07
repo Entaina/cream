@@ -197,6 +197,7 @@ Rails.application.routes.draw do
     namespace :v1 do
       resources :people
       resources :companies
+      resources :pipelines, only: %i[index show]
       resources :deals do
         resources :notes, only: :create, controller: "deal_notes"
         resources :emails, only: :create, controller: "deal_emails"

@@ -24,6 +24,7 @@ servers:
 tags:
   - name: People
   - name: Companies
+  - name: Pipelines
   - name: Deals
   - name: Deal notes
   - name: Deal emails
@@ -65,6 +66,13 @@ components:
         type: integer
 
     CompanyId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+
+    PipelineId:
       name: id
       in: path
       required: true
@@ -241,6 +249,47 @@ components:
         annual_revenue:
           type: number
 
+    PipelineStage:
+      type: object
+      required: [id, name, position, probability, won, closed, color]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        position:
+          type: integer
+        probability:
+          type: integer
+          minimum: 0
+          maximum: 100
+        won:
+          type: boolean
+        closed:
+          type: boolean
+        color:
+          type: string
+
+    Pipeline:
+      allOf:
+        - type: object
+          required: [id, name, default, position, stages]
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+            default:
+              type: boolean
+              description: Whether this is the workspace default pipeline for new deals.
+            position:
+              type: integer
+            stages:
+              type: array
+              items:
+                $ref: "#/components/schemas/PipelineStage"
+        - $ref: "#/components/schemas/Timestamps"
+
     DealTaskInput:
       type: object
       required: [title, due_on]
@@ -294,6 +343,11 @@ components:
               type: string
             company_id:
               type: integer
+            contact_ids:
+              type: array
+              items:
+                type: integer
+              description: Person IDs linked to the deal as contacts.
             notes:
               type: array
               description: Present only in create responses when notes were sent in the request.
@@ -325,6 +379,11 @@ components:
         expected_close_date:
           type: string
           format: date
+        contact_ids:
+          type: array
+          items:
+            type: integer
+          description: Person IDs to link as deal contacts. Each person must belong to the deal company (or partner, if set).
         tasks_attributes:
           type: array
           description: At least one task with a future due date is required when creating a deal.
@@ -825,6 +884,50 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
 
+  /api/v1/pipelines:
+    get:
+      tags: [Pipelines]
+      summary: List pipelines
+      description: Returns the workspace pipelines with their ordered stages (use stage IDs when creating or moving deals).
+      parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Pipeline"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/FeatureDisabled"
+
+  /api/v1/pipelines/{id}:
+    get:
+      tags: [Pipelines]
+      summary: Show a pipeline
+      parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
+        - $ref: "#/components/parameters/PipelineId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pipeline"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
   /api/v1/deals:
     get:
       tags: [Deals]
@@ -865,6 +968,7 @@ paths:
               deal:
                 name: Enterprise license
                 company_id: 1
+                contact_ids: [42]
                 tasks_attributes:
                   - title: Send proposal
                     due_on: "2026-08-15"

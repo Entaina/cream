@@ -24,6 +24,42 @@ RSpec.describe "Api::V1::Deals", type: :request do
   end
 
   describe "POST /api/v1/deals" do
+    it "creates a deal with contacts" do
+      contact = create_person!(workspace, company: company, first_name: "Jane", last_name: "Doe")
+
+      post "/api/v1/deals",
+        params: valid_create_params(deal: { contact_ids: [ contact.id ] }),
+        headers: headers
+
+      expect(response).to have_http_status(:created)
+      created_deal = workspace.deals.find(response.parsed_body["id"])
+      expect(created_deal.contacts).to contain_exactly(contact)
+      expect(response.parsed_body["contact_ids"]).to eq([ contact.id ])
+    end
+
+    it "returns not found when a contact id is outside the workspace" do
+      other_workspace = workspaces(:two)
+      outsider = create_person!(other_workspace, first_name: "Other")
+
+      post "/api/v1/deals",
+        params: valid_create_params(deal: { contact_ids: [ outsider.id ] }),
+        headers: headers
+
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it "returns unprocessable entity when a contact does not belong to the deal company" do
+      other_company = create_company!(workspace)
+      outsider = create_person!(workspace, company: other_company)
+
+      post "/api/v1/deals",
+        params: valid_create_params(deal: { contact_ids: [ outsider.id ] }),
+        headers: headers
+
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response.parsed_body["errors"]).to include(/Every contact must belong/)
+    end
+
     it "creates a deal with nested notes" do
       expect {
         post "/api/v1/deals",
@@ -70,6 +106,16 @@ RSpec.describe "Api::V1::Deals", type: :request do
 
       expect(response).to have_http_status(:success)
       expect(deal.reload.stage_label).to eq("Won")
+    end
+
+    it "updates contacts" do
+      contact = create_person!(workspace, company: deal.company)
+
+      patch "/api/v1/deals/#{deal.id}", params: { deal: { contact_ids: [ contact.id ] } }, headers: headers
+
+      expect(response).to have_http_status(:success)
+      expect(deal.reload.contacts).to contain_exactly(contact)
+      expect(response.parsed_body["contact_ids"]).to eq([ contact.id ])
     end
 
     it "updates plain fields without logging a stage change" do
