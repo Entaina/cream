@@ -56,7 +56,7 @@ module LeadFormTemplates
           type: type,
           name: name.to_sym,
           text: @attributes["label"],
-          options: @attributes["options"],
+          choices: @attributes["choices"],
           collection: @attributes["collection"],
           blank: @attributes["blank"],
           required: @attributes["required"] == true,
@@ -90,7 +90,8 @@ module LeadFormTemplates
       def render(context)
         renderer(context).phone_with_prefix(
           required: @attributes.fetch("required", true),
-          selected_prefix: @attributes.fetch("prefix", "+34")
+          selected_prefix: @attributes.fetch("prefix", "+34"),
+          prefixes: @attributes["prefixes"]
         )
       end
     end

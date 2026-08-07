@@ -21,14 +21,6 @@ class LeadForm < ApplicationRecord
     SUBMISSION_FIELD_KEYS + METADATA_FIELDS + [ HONEYPOT_FIELD, TIMESTAMP_FIELD, "gdpr_consent" ]
   ).freeze
   HIDDEN_FIELD_KEY_FORMAT = /\A[a-z][a-z0-9_]{0,39}\z/
-  HOW_HEARD_OPTIONS = [
-    [ "Redes sociales", "redes_sociales" ],
-    [ "Recomendación de alguien", "recomendacion" ],
-    [ "Búsqueda en internet", "busqueda" ],
-    [ "Evento o webinar", "evento" ],
-    [ "Newsletter o email", "newsletter" ],
-    [ "Otro", "otro" ]
-  ].freeze
   CONTACTO_HELP_OPTIONS = [
     [ "Curso", "curso" ],
     [ "Entrenamiento", "entrenamiento" ],
@@ -36,42 +28,6 @@ class LeadForm < ApplicationRecord
     [ "Otro", "otro" ]
   ].freeze
   CONTACTO_HELP_TYPE_KEYS = CONTACTO_HELP_OPTIONS.map(&:last).freeze
-  LIDERANDO_IA_AUDIENCE_OPTIONS = [
-    [ "Para mí", "para_mi" ],
-    [ "Para mi equipo", "para_equipo" ]
-  ].freeze
-  DESARROLLANDO_IA_AUDIENCE_OPTIONS = [
-    [ "Solo para mí", "para_mi" ],
-    [ "Para mi equipo", "para_equipo" ],
-    [ "Para mí y mi equipo", "para_mi_y_equipo" ]
-  ].freeze
-  LIDERANDO_IA_HOW_HEARD_OPTIONS = [
-    [ "LinkedIn", "linkedin" ],
-    [ "Newsletter", "newsletter" ],
-    [ "Recomendación", "recomendacion" ],
-    [ "Google", "google" ],
-    [ "Evento", "evento" ],
-    [ "Otro", "otro" ]
-  ].freeze
-  DESARROLLANDO_IA_TECH_PROFILE_OPTIONS = [
-    [ "Desarrollo/programo a diario", "desarrollo" ],
-    [ "Perfil técnico no-dev", "perfil_tecnico" ],
-    [ "No técnico", "no_tecnico" ]
-  ].freeze
-  COMPANY_EMPLOYEE_RANGE_OPTIONS = Company::EMPLOYEE_RANGES.map { |range| [ "#{range} empleados", range ] }.freeze
-  PHONE_PREFIX_OPTIONS = [
-    [ "+34", "+34" ],
-    [ "+351", "+351" ],
-    [ "+33", "+33" ],
-    [ "+39", "+39" ],
-    [ "+44", "+44" ],
-    [ "+49", "+49" ],
-    [ "+1", "+1" ],
-    [ "+52", "+52" ],
-    [ "+54", "+54" ],
-    [ "+56", "+56" ],
-    [ "+57", "+57" ]
-  ].freeze
 
   belongs_to :workspace
   belongs_to :pipeline

@@ -7,8 +7,8 @@
   <div class="space-y-4">
     {% partial 'contact_fields' %}
   <div class="space-y-3">
-    {% field type: "select", name: "tech_profile", label: "Tu perfil técnico", options: "tech_profile", blank: "Selecciona una opción", required: true %}
-    {% field type: "select", name: "audience", label: "Para ti o para tu equipo", options: "desarrollando_ia_audience", blank: "Selecciona una opción", required: true %}
+    {% field type: "select", name: "tech_profile", label: "Tu perfil técnico", choices: "Desarrollo/programo a diario|desarrollo; Perfil técnico no-dev|perfil_tecnico; No técnico|no_tecnico", blank: "Selecciona una opción", required: true %}
+    {% field type: "select", name: "audience", label: "Para ti o para tu equipo", choices: "Solo para mí|para_mi; Para mi equipo|para_equipo; Para mí y mi equipo|para_mi_y_equipo", blank: "Selecciona una opción", required: true %}
     {% partial 'how_heard_field' %}
   </div>
     {% partial 'newsletter_opt_in' %}

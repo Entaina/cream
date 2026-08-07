@@ -140,7 +140,7 @@ Feature flag `:lead_forms`. Public URLs `/f/:slug` (POST creates lead) and `/f/:
 | `{% phone_with_prefix %}` | Phone + country prefix select |
 | `{% honeypot %}`, `{% turnstile %}`, `{% submit '…' %}` | Anti-spam / submit |
 
-Select options: `options: "contacto_help"` etc. → `FieldRenderer::OPTION_SETS` backed by constants on **`LeadForm`** (not per-template Ruby branches).
+Select options: inline in Liquid via `choices: "Label|value; Label2|value2"` on `{% field type: "select" %}`. Phone prefix lists use the same format on `{% phone_with_prefix prefixes: "…" %}`. Dynamic collections (e.g. `open_editions`) still use `collection: "open_editions"`. Admin pipeline routing for `help_type` still uses `LeadForm::CONTACTO_HELP_OPTIONS` in the CRM form editor only.
 
 ### Submission pipeline
 
@@ -161,7 +161,7 @@ Fields marked `required: true` in Liquid are **HTML5-only** unless covered above
 
 **Deal behaviour**: reuse open deal in form pipeline; optional `pipeline_stage_id` advances without regressing; `resolve_pipeline(help_type:)` uses `pipeline_routes` JSON on the form (not template-specific code).
 
-When adding a new public form: Liquid page + optional partials in DB, new `LeadForm` row, extend `lead_params` / `SUBMISSION_FIELD_KEYS` if new field names, option constant + `OPTION_SETS` entry if new select catalog. See command `.claude/commands/nuevo-formulario-lead.md`.
+When adding a new public form: Liquid page + optional partials in DB, new `LeadForm` row, extend `lead_params` / `SUBMISSION_FIELD_KEYS` if new field names. Define select options inline with `choices:` in the template. See command `.claude/commands/nuevo-formulario-lead.md`.
 
 ## Testing
 

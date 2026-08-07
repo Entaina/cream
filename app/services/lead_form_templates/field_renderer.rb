@@ -1,16 +1,5 @@
 module LeadFormTemplates
   class FieldRenderer
-    OPTION_SETS = {
-      "how_heard" => LeadForm::HOW_HEARD_OPTIONS,
-      "contacto_help" => LeadForm::CONTACTO_HELP_OPTIONS,
-      "liderando_ia_audience" => LeadForm::LIDERANDO_IA_AUDIENCE_OPTIONS,
-      "desarrollando_ia_audience" => LeadForm::DESARROLLANDO_IA_AUDIENCE_OPTIONS,
-      "liderando_ia_how_heard" => LeadForm::LIDERANDO_IA_HOW_HEARD_OPTIONS,
-      "tech_profile" => LeadForm::DESARROLLANDO_IA_TECH_PROFILE_OPTIONS,
-      "employee_range" => LeadForm::COMPANY_EMPLOYEE_RANGE_OPTIONS,
-      "phone_prefix" => LeadForm::PHONE_PREFIX_OPTIONS
-    }.freeze
-
     def initialize(view_context:, params:, open_editions: [])
       @view_context = view_context
       @params = params
@@ -74,11 +63,12 @@ module LeadFormTemplates
       %(<textarea #{attrs.join(" ")}></textarea>)
     end
 
-    def select_field(name, options: nil, collection: nil, blank: nil, required: false, class_name: "input w-full", selected: nil, **)
+    def select_field(name, choices: nil, collection: nil, blank: nil, required: false, class_name: "input w-full", selected: nil, **)
+      selected ||= @params.dig(:lead, name) || @params.dig("lead", name.to_s)
       option_tags = if collection.present?
-        collection_options(collection, selected: selected || @params.dig(:lead, name) || @params.dig("lead", name.to_s))
+        collection_options(collection, selected: selected)
       else
-        static_options(options, blank: blank)
+        option_tags_for(self.class.parse_choice_pairs(choices), blank: blank, selected: selected)
       end
       attrs = input_attrs(name, required: required, class_name: class_name, id: "lead_#{name}", type: nil)
       %(<select #{attrs}>#{option_tags}</select>)
@@ -116,8 +106,12 @@ module LeadFormTemplates
       %(<div class="flex flex-wrap gap-2" role="radiogroup"#{aria}>#{buttons}</div>)
     end
 
-    def phone_with_prefix(required: true, selected_prefix: "+34")
-      prefix_options = static_options("phone_prefix", blank: nil, selected: selected_prefix)
+    def phone_with_prefix(required: true, selected_prefix: "+34", prefixes: nil)
+      prefix_options = option_tags_for(
+        self.class.parse_choice_pairs(prefixes),
+        blank: nil,
+        selected: selected_prefix
+      )
       prefix_attrs = input_attrs(:phone_prefix, required: false, class_name: "input w-auto shrink-0", aria_label: "Prefijo de país")
       phone_attrs = input_attrs(:phone, required: required, class_name: "input w-full min-w-0", autocomplete: "tel-national", inputmode: "tel")
       <<~HTML
@@ -172,6 +166,24 @@ module LeadFormTemplates
       %(<a href="#{ERB::Util.html_escape(url)}" target="_blank" rel="noopener" class="#{css}">#{ERB::Util.html_escape(text)}</a>)
     end
 
+    def self.parse_choice_pairs(raw)
+      return [] if raw.blank?
+
+      raw.to_s.split(";").filter_map do |entry|
+        entry = entry.strip
+        next if entry.blank?
+
+        if entry.include?("|")
+          label, value = entry.split("|", 2).map(&:strip)
+          next if label.blank? || value.blank?
+
+          [ label, value ]
+        else
+          [ entry, entry ]
+        end
+      end
+    end
+
     private
 
     def input_attrs(name, required: false, class_name: nil, autocomplete: nil, rows: nil, placeholder: nil, inputmode: nil, id: nil, type: "text", aria_label: nil)
@@ -194,8 +206,7 @@ module LeadFormTemplates
       %(<input type="hidden" name="lead[#{name}]" id="lead_#{name}" value="#{ERB::Util.html_escape(value)}" autocomplete="off" #{data_attrs} />)
     end
 
-    def static_options(options_key, blank:, selected: nil)
-      pairs = OPTION_SETS.fetch(options_key.to_s)
+    def option_tags_for(pairs, blank:, selected: nil)
       html = ""
       html << %(<option value="">#{ERB::Util.html_escape(blank)}</option>) if blank.present?
       pairs.each do |label, value|

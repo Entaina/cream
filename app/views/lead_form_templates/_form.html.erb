@@ -18,7 +18,7 @@
   <div>
     <%= f.label :body, "Contenido Liquid", class: "label" %>
     <%= render "shared/liquid_editor", form: f, field: :body, rows: 24, required: true %>
-    <p class="mt-1 text-xs text-ink-faint">Usa etiquetas como {% field %}, {% partial 'nombre' %}, {% form_open %} y variables {{ lead_form.name }}.</p>
+    <p class="mt-1 text-xs text-ink-faint">Usa etiquetas como {% raw %}{% field type: "select", name: "help_type", label: "…", choices: "Curso|curso; Otro|otro", blank: "Elige", required: true %}{% endraw %}, {% raw %}{% partial 'nombre' %}{% endraw %}, {% raw %}{% form_open %}{% endraw %} y variables {{ lead_form.name }}.</p>
   </div>
 
   <div class="flex gap-2">

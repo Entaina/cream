@@ -11,7 +11,7 @@
       {% field type: "text", name: "company_name", label: "Empresa", required: true, autocomplete: "organization" %}
     {% endif %}
     {% field type: "text", name: "job_title", label: "Cargo", required: true, autocomplete: "organization-title" %}
-    {% field type: "select", name: "employee_range", label: "Tamaño (nº de empleados)", options: "employee_range", blank: "Selecciona una opción", required: true %}
+    {% field type: "select", name: "employee_range", label: "Tamaño (nº de empleados)", choices: "1-10 empleados|1-10; 11-50 empleados|11-50; 51-200 empleados|51-200; 201-500 empleados|201-500; 501-1000 empleados|501-1000; 1000+ empleados|1000+", blank: "Selecciona una opción", required: true %}
     {% partial 'how_heard_field' %}
   </div>
     {% partial 'newsletter_opt_in' %}

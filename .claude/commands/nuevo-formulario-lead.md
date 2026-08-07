@@ -78,9 +78,13 @@ Ejemplo mínimo:
 </div>
 ```
 
-Select con catálogo existente: `{% field type: "select", name: "help_type", options: "contacto_help", blank: "Selecciona", required: true %}`.
+Select con opciones inline:
 
-Select con catálogo nuevo: añade constante en [`LeadForm`](app/models/lead_form.rb) + entrada en [`FieldRenderer::OPTION_SETS`](app/services/lead_form_templates/field_renderer.rb).
+```liquid
+{% field type: "select", name: "help_type", label: "¿En qué te ayudamos?", choices: "Curso|curso; Entrenamiento|entrenamiento", blank: "Selecciona", required: true %}
+```
+
+Formato `choices`: pares `Etiqueta|valor` separados por `;`. Prefijos telefónicos: `{% phone_with_prefix prefixes: "+34|+34; +351|+351" %}`.
 
 ### 2. Importar plantillas al workspace
 
@@ -161,7 +165,7 @@ Actualizar [`MANUAL_USUARIO.md`](MANUAL_USUARIO.md) y [`USER_MANUAL.md`](USER_MA
 
 ## Pipeline routes (formulario tipo contacto)
 
-1. `LeadForm::CONTACTO_HELP_OPTIONS` en la plantilla (`options: "contacto_help"`).
+1. Define las opciones de `help_type` con `choices:` en la plantilla Liquid.
 2. Seed/admin: `pipeline_routes: { "curso" => pipeline_id, ... }` (nombres de pipeline del workspace).
 3. `LeadForm#resolve_pipeline(help_type:)` enruta; el nombre del deal incluye la etiqueta del help type si viene en el POST.
 

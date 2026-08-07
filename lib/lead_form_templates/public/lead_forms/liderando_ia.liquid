@@ -8,8 +8,8 @@
     {% partial 'contact_fields' %}
   <div class="space-y-3">
     {% field type: "text", name: "company_name", label: "Empresa", required: true, autocomplete: "organization" %}
-    {% field type: "select", name: "audience", label: "¿Es para ti o para tu equipo?", options: "liderando_ia_audience", blank: "Selecciona una opción", required: true %}
-    {% field type: "select", name: "how_heard", label: "¿Cómo nos has conocido?", options: "liderando_ia_how_heard", blank: "Selecciona una opción", required: true %}
+    {% field type: "select", name: "audience", label: "¿Es para ti o para tu equipo?", choices: "Para mí|para_mi; Para mi equipo|para_equipo", blank: "Selecciona una opción", required: true %}
+    {% field type: "select", name: "how_heard", label: "¿Cómo nos has conocido?", choices: "LinkedIn|linkedin; Newsletter|newsletter; Recomendación|recomendacion; Google|google; Evento|evento; Otro|otro", blank: "Selecciona una opción", required: true %}
   </div>
     {% partial 'newsletter_opt_in' %}
     {% partial 'consent_fields' %}
