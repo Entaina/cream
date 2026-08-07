@@ -70,6 +70,21 @@ RSpec.describe "Lead form templates", type: :request do
       expect(response.body).to include("lead[email]")
       expect(response.body).to include("lead[help_type]")
       expect(response.body).to include("Vista previa")
+      expect(response.body).to include('id="lead-form-template-preview-form"')
+      expect(response.body).to include(preview_lead_form_template_path(template))
+      expect(response.body).not_to include('formmethod="post"')
+    end
+
+    it "does not route preview through PATCH (edit form _method)" do
+      import_lead_form_templates!(workspace)
+      template = workspace.lead_form_templates.find_by!(path: "public/lead_forms/contacto")
+
+      post preview_lead_form_template_path(template), params: {
+        _method: "patch",
+        lead_form_template: { body: template.body }
+      }
+
+      expect(response).to have_http_status(:not_found)
     end
 
     it "previews a saved page template" do

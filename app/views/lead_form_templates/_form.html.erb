@@ -1,41 +1,48 @@
-<%= form_with model: template, class: "max-w-6xl grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] xl:items-start" do |f| %>
+<% edit_form_id = dom_id(template, :edit) %>
+<div class="max-w-6xl grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] xl:items-start">
   <div class="card space-y-4 p-4 min-w-0">
-  <% if template.errors.any? %>
-    <div class="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-950 dark:text-red-200">
-      <%= template.errors.full_messages.to_sentence %>
+    <%= form_with model: template, html: { id: edit_form_id } do |f| %>
+      <% if template.errors.any? %>
+        <div class="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-950 dark:text-red-200">
+          <%= template.errors.full_messages.to_sentence %>
+        </div>
+      <% end %>
+
+      <div>
+        <%= f.label :slug, "Nombre", class: "label" %>
+        <%= f.text_field :slug, class: "input w-full font-mono", placeholder: "contacto", required: true %>
+        <p class="mt-1 text-xs text-ink-faint">Identificador de la plantilla (p. ej. <code class="font-mono">contacto</code>, <code class="font-mono">contact_fields</code>). Se usa en el selector de formularios y en <code class="font-mono">{% partial 'nombre' %}</code>.</p>
+      </div>
+
+      <label class="flex items-center gap-2 text-sm">
+        <%= f.check_box :partial %> Es un parcial (partial)
+      </label>
+
+      <div>
+        <%= f.label :body, "Contenido Liquid", class: "label" %>
+        <%= render "shared/liquid_editor",
+              form: f,
+              field: :body,
+              rows: 24,
+              required: true,
+              preview_form_id: (template.persisted? && template.previewable? ? "lead-form-template-preview-form" : nil) %>
+        <p class="mt-1 text-xs text-ink-faint">Usa etiquetas como {% raw %}{% field type: "select", name: "help_type", label: "…", choices: "Curso|curso; Otro|otro", blank: "Elige", required: true %}{% endraw %}, {% raw %}{% partial 'nombre' %}{% endraw %}, {% raw %}{% form_open %}{% endraw %} y variables {{ lead_form.name }}.</p>
+      </div>
+    <% end %>
+
+    <div class="flex flex-wrap items-end gap-2">
+      <%= button_tag "Guardar", type: "submit", form: edit_form_id, class: "btn-primary" %>
+      <% if template.persisted? && template.previewable? %>
+        <%= render "preview_form",
+              template: template,
+              preview_products: (defined?(@preview_products) ? @preview_products : []),
+              selected_product_id: params[:preview_product_id] %>
+      <% end %>
+      <%= link_to "Cancelar", lead_form_templates_path, class: "btn-secondary" %>
     </div>
-  <% end %>
-
-  <div>
-    <%= f.label :slug, "Nombre", class: "label" %>
-    <%= f.text_field :slug, class: "input w-full font-mono", placeholder: "contacto", required: true %>
-    <p class="mt-1 text-xs text-ink-faint">Identificador de la plantilla (p. ej. <code class="font-mono">contacto</code>, <code class="font-mono">contact_fields</code>). Se usa en el selector de formularios y en <code class="font-mono">{% partial 'nombre' %}</code>.</p>
-  </div>
-
-  <label class="flex items-center gap-2 text-sm">
-    <%= f.check_box :partial %> Es un parcial (partial)
-  </label>
-
-  <div>
-    <%= f.label :body, "Contenido Liquid", class: "label" %>
-    <%= render "shared/liquid_editor", form: f, field: :body, rows: 24, required: true %>
-    <p class="mt-1 text-xs text-ink-faint">Usa etiquetas como {% raw %}{% field type: "select", name: "help_type", label: "…", choices: "Curso|curso; Otro|otro", blank: "Elige", required: true %}{% endraw %}, {% raw %}{% partial 'nombre' %}{% endraw %}, {% raw %}{% form_open %}{% endraw %} y variables {{ lead_form.name }}.</p>
-  </div>
-
-  <% if template.previewable? && defined?(@preview_products) && @preview_products.any? %>
-    <%= render "preview_product_field",
-          products: @preview_products,
-          selected_id: params[:preview_product_id] %>
-  <% end %>
-
-  <div class="flex gap-2">
-    <%= f.submit class: "btn-primary" %>
-    <%= lead_form_template_preview_button(template) if template.previewable? %>
-    <%= link_to "Cancelar", lead_form_templates_path, class: "btn-secondary" %>
-  </div>
   </div>
 
   <aside class="min-w-0 xl:sticky xl:top-5">
     <%= render "submission_schema", template: template %>
   </aside>
-<% end %>
+</div>

@@ -17,15 +17,25 @@ export default class extends Controller {
     }
 
     this.form = this.element.closest("form")
+    this.previewFormId = this.element.dataset.liquidEditorPreviewFormId
+    this.previewForm = this.previewFormId ? document.getElementById(this.previewFormId) : null
+
+    this.submitHandler = () => this.sync()
     if (this.form) {
-      this.submitHandler = () => this.sync()
       this.form.addEventListener("submit", this.submitHandler)
+    }
+    if (this.previewForm) {
+      this.previewSubmitHandler = () => this.syncPreviewBody()
+      this.previewForm.addEventListener("submit", this.previewSubmitHandler)
     }
   }
 
   disconnect() {
     if (this.form && this.submitHandler) {
       this.form.removeEventListener("submit", this.submitHandler)
+    }
+    if (this.previewForm && this.previewSubmitHandler) {
+      this.previewForm.removeEventListener("submit", this.previewSubmitHandler)
     }
     if (this.view) {
       this.view.destroy()
@@ -36,6 +46,14 @@ export default class extends Controller {
   sync() {
     if (this.view) {
       this.inputTarget.value = this.view.state.doc.toString()
+    }
+  }
+
+  syncPreviewBody() {
+    this.sync()
+    const previewBody = this.previewForm?.querySelector('[name="lead_form_template[body]"]')
+    if (previewBody) {
+      previewBody.value = this.inputTarget.value
     }
   }
 

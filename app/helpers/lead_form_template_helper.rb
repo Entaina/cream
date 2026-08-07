@@ -66,16 +66,4 @@ module LeadFormTemplateHelper
     end
   end
 
-  def lead_form_template_preview_button(template, **html_options)
-    return unless template.previewable?
-
-    defaults = {
-      class: "btn-secondary",
-      formmethod: :post,
-      formaction: preview_lead_form_template_path(template),
-      formtarget: "_blank",
-      rel: "noopener noreferrer"
-    }
-    button_tag("Vista previa", **defaults.merge(html_options))
-  end
 end

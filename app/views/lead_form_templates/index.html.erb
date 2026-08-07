@@ -39,7 +39,8 @@
                   class: "btn-secondary", target: "_blank", rel: "noopener noreferrer" %>
           <% end %>
           <%= link_to "Editar", edit_lead_form_template_path(template), class: "btn-secondary" %>
-          <%= button_to "Eliminar", lead_form_template_path(template), method: :delete, class: "btn-danger" %>
+          <%= button_to "Eliminar", lead_form_template_path(template), method: :delete, class: "btn-danger",
+                data: { turbo_confirm: "¿Eliminar la plantilla «#{template.display_name}»?" } %>
         </div>
       </div>
       <div class="mt-2">
