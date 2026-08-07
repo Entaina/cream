@@ -20,89 +20,92 @@
     <% end if feature_enabled?(:notifications) %>
   </div>
 
-  <%# Navigation %>
-  <div class="mt-1 px-2"
-       data-controller="sidebar-edit"
-       data-sidebar-edit-url-value="<%= sidebar_preferences_path %>">
-    <div class="flex items-center justify-between px-2.5 mb-1">
-      <span class="text-xs font-semibold uppercase tracking-wider text-ink-faint">Menu</span>
-      <button type="button"
-              title="Customize menu"
-              aria-label="Customize menu"
-              aria-pressed="false"
-              data-sidebar-edit-target="toggleBtn"
-              data-action="sidebar-edit#toggleEdit"
-              class="text-ink-faint hover:text-ink p-1 rounded-md hover:bg-accent-soft/70 transition-colors">
-        <%= icon :settings, classes: "size-3.5" %>
-      </button>
-    </div>
+  <%# Scrollable nav: Menu + Lists (fits short viewports / mobile drawer) %>
+  <div class="flex-1 min-h-0 overflow-y-auto scrollbar-subtle">
+    <%# Navigation %>
+    <div class="mt-1 px-2"
+         data-controller="sidebar-edit"
+         data-sidebar-edit-url-value="<%= sidebar_preferences_path %>">
+      <div class="flex items-center justify-between px-2.5 mb-1">
+        <span class="text-xs font-semibold uppercase tracking-wider text-ink-faint">Menu</span>
+        <button type="button"
+                title="Customize menu"
+                aria-label="Customize menu"
+                aria-pressed="false"
+                data-sidebar-edit-target="toggleBtn"
+                data-action="sidebar-edit#toggleEdit"
+                class="text-ink-faint hover:text-ink p-1 rounded-md hover:bg-accent-soft/70 transition-colors">
+          <%= icon :settings, classes: "size-3.5" %>
+        </button>
+      </div>
 
-    <nav class="space-y-0.5" data-sidebar-edit-target="list">
-      <% sidebar_nav_items.each do |item| %>
-        <div data-sidebar-edit-target="item"
-             data-key="<%= item[:key] %>"
-             data-hidden="<%= item[:hidden] %>"
-             class="<%= 'hidden' if item[:hidden] %>">
-          <div class="flex items-center gap-0.5">
-            <button type="button"
-                    title="Drag to reorder"
-                    aria-label="Drag to reorder"
-                    data-sidebar-edit-target="handle"
-                    data-action="pointerdown->sidebar-edit#pointerDown"
-                    class="hidden shrink-0 cursor-grab active:cursor-grabbing text-ink-faint hover:text-ink p-1 rounded-md hover:bg-accent-soft/70 touch-none">
-              <%= icon :grip, classes: "size-3.5" %>
-            </button>
-            <%= link_to item[:path],
-                  data: { sidebar_edit_target: "link", action: "click->sidebar-edit#preventNav" },
-                  class: [ "flex flex-1 min-w-0 items-center gap-2.5 rounded-md px-2.5 py-1.5 text-base font-medium transition-colors",
-                           item[:active] ? "bg-accent-soft text-ink" : "text-ink-soft hover:bg-accent-soft/70 hover:text-ink" ] do %>
-              <%= icon item[:icon], classes: "size-4 shrink-0 #{item[:active] ? 'text-ink' : 'text-ink-faint'}" %>
-              <span class="truncate"><%= item[:label] %></span>
-            <% end %>
-            <button type="button"
-                    title="<%= item[:hidden] ? 'Show in menu' : 'Hide from menu' %>"
-                    aria-label="<%= item[:hidden] ? 'Show in menu' : 'Hide from menu' %>"
-                    data-sidebar-edit-target="visibilityBtn"
-                    data-action="click->sidebar-edit#toggleVisibility"
-                    class="hidden shrink-0 text-ink-faint hover:text-ink p-1 rounded-md hover:bg-accent-soft/70">
-              <span data-sidebar-edit-target="eyeIcon" class="<%= 'hidden' if item[:hidden] %>"><%= icon :eye, classes: "size-3.5" %></span>
-              <span data-sidebar-edit-target="eyeOffIcon" class="<%= 'hidden' unless item[:hidden] %>"><%= icon :eye_off, classes: "size-3.5" %></span>
-            </button>
-          </div>
-          <% if item[:saved_views]&.any? %>
-            <div class="ml-6 space-y-0.5 mb-1">
-              <% item[:saved_views].each do |view| %>
-                <%= link_to saved_views_index_path(view.record_type, view: view.id),
-                      data: { action: "click->sidebar-edit#preventNav" },
-                      class: [ "flex items-center gap-2 rounded-md px-2.5 py-1 text-sm transition-colors truncate",
-                               params[:view].to_s == view.id.to_s ? "bg-accent-soft text-ink font-medium" : "text-ink-faint hover:bg-accent-soft/70 hover:text-ink-soft" ] do %>
-                  <%= icon :list, classes: "size-3 shrink-0" %>
-                  <span class="truncate"><%= view.name %></span>
-                <% end %>
+      <nav class="space-y-0.5" data-sidebar-edit-target="list">
+        <% sidebar_nav_items.each do |item| %>
+          <div data-sidebar-edit-target="item"
+               data-key="<%= item[:key] %>"
+               data-hidden="<%= item[:hidden] %>"
+               class="<%= 'hidden' if item[:hidden] %>">
+            <div class="flex items-center gap-0.5">
+              <button type="button"
+                      title="Drag to reorder"
+                      aria-label="Drag to reorder"
+                      data-sidebar-edit-target="handle"
+                      data-action="pointerdown->sidebar-edit#pointerDown"
+                      class="hidden shrink-0 cursor-grab active:cursor-grabbing text-ink-faint hover:text-ink p-1 rounded-md hover:bg-accent-soft/70 touch-none">
+                <%= icon :grip, classes: "size-3.5" %>
+              </button>
+              <%= link_to item[:path],
+                    data: { sidebar_edit_target: "link", action: "click->sidebar-edit#preventNav" },
+                    class: [ "flex flex-1 min-w-0 items-center gap-2.5 rounded-md px-2.5 py-1.5 text-base font-medium transition-colors",
+                             item[:active] ? "bg-accent-soft text-ink" : "text-ink-soft hover:bg-accent-soft/70 hover:text-ink" ] do %>
+                <%= icon item[:icon], classes: "size-4 shrink-0 #{item[:active] ? 'text-ink' : 'text-ink-faint'}" %>
+                <span class="truncate"><%= item[:label] %></span>
               <% end %>
+              <button type="button"
+                      title="<%= item[:hidden] ? 'Show in menu' : 'Hide from menu' %>"
+                      aria-label="<%= item[:hidden] ? 'Show in menu' : 'Hide from menu' %>"
+                      data-sidebar-edit-target="visibilityBtn"
+                      data-action="click->sidebar-edit#toggleVisibility"
+                      class="hidden shrink-0 text-ink-faint hover:text-ink p-1 rounded-md hover:bg-accent-soft/70">
+                <span data-sidebar-edit-target="eyeIcon" class="<%= 'hidden' if item[:hidden] %>"><%= icon :eye, classes: "size-3.5" %></span>
+                <span data-sidebar-edit-target="eyeOffIcon" class="<%= 'hidden' unless item[:hidden] %>"><%= icon :eye_off, classes: "size-3.5" %></span>
+              </button>
             </div>
-          <% end %>
-        </div>
-      <% end %>
-    </nav>
-  </div>
+            <% if item[:saved_views]&.any? %>
+              <div class="ml-6 space-y-0.5 mb-1">
+                <% item[:saved_views].each do |view| %>
+                  <%= link_to saved_views_index_path(view.record_type, view: view.id),
+                        data: { action: "click->sidebar-edit#preventNav" },
+                        class: [ "flex items-center gap-2 rounded-md px-2.5 py-1 text-sm transition-colors truncate",
+                                 params[:view].to_s == view.id.to_s ? "bg-accent-soft text-ink font-medium" : "text-ink-faint hover:bg-accent-soft/70 hover:text-ink-soft" ] do %>
+                    <%= icon :list, classes: "size-3 shrink-0" %>
+                    <span class="truncate"><%= view.name %></span>
+                  <% end %>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </nav>
+    </div>
 
-  <%# Lists %>
-  <div class="mt-5 px-2 flex-1 overflow-y-auto scrollbar-subtle">
-    <div class="flex items-center justify-between px-2.5 mb-1">
-      <span class="text-xs font-semibold uppercase tracking-wider text-ink-faint">Lists</span>
-      <%= link_to new_list_path, class: "text-ink-faint hover:text-ink", title: "New list" do %>
-        <%= icon :plus, classes: "size-3.5" %>
+    <%# Lists %>
+    <div class="mt-5 px-2 pb-2">
+      <div class="flex items-center justify-between px-2.5 mb-1">
+        <span class="text-xs font-semibold uppercase tracking-wider text-ink-faint">Lists</span>
+        <%= link_to new_list_path, class: "text-ink-faint hover:text-ink", title: "New list" do %>
+          <%= icon :plus, classes: "size-3.5" %>
+        <% end %>
+      </div>
+      <% current_workspace&.lists&.order(:name)&.each do |list| %>
+        <%= link_to list_path(list),
+              class: [ "flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-base font-medium transition-colors",
+                       current_page?(list_path(list)) ? "bg-accent-soft text-ink" : "text-ink-soft hover:bg-accent-soft/70 hover:text-ink" ] do %>
+          <span class="size-2 rounded-full bg-<%= list.color %>-500 shrink-0"></span>
+          <span class="truncate"><%= list.name %></span>
+        <% end %>
       <% end %>
     </div>
-    <% current_workspace&.lists&.order(:name)&.each do |list| %>
-      <%= link_to list_path(list),
-            class: [ "flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-base font-medium transition-colors",
-                     current_page?(list_path(list)) ? "bg-accent-soft text-ink" : "text-ink-soft hover:bg-accent-soft/70 hover:text-ink" ] do %>
-        <span class="size-2 rounded-full bg-<%= list.color %>-500 shrink-0"></span>
-        <span class="truncate"><%= list.name %></span>
-      <% end %>
-    <% end %>
   </div>
 
   <%# User footer %>
