@@ -99,9 +99,16 @@ class BookingCreator
       subject: rendered_subject,
       body: rendered_body
     )
+    attach_template_files(message, template)
     SendViaGmailJob.perform_later(message.id)
   rescue StandardError => e
     Rails.logger.error("Booking confirmation email failed for Booking##{booking.id}: #{e.class}: #{e.message}")
+  end
+
+  def attach_template_files(message, template)
+    return unless template.attachments.attached?
+
+    template.attachments.each { |file| message.attachments.attach(file.blob) }
   end
 
   def booking_confirmation_tokens(booking)

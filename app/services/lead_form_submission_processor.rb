@@ -320,6 +320,7 @@ class LeadFormSubmissionProcessor
         subject: rendered_subject,
         body: rendered_body
       )
+      attach_template_files(message, template)
       SendViaGmailJob.perform_later(message.id)
     end
 
@@ -338,6 +339,12 @@ class LeadFormSubmissionProcessor
       submission: submission,
       deal: deal
     ).deliver_later
+  end
+
+  def attach_template_files(message, template)
+    return unless template.attachments.attached?
+
+    template.attachments.each { |file| message.attachments.attach(file.blob) }
   end
 
   def lead_email_tokens(submission:)

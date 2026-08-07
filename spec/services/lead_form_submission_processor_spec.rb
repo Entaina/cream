@@ -91,6 +91,27 @@ RSpec.describe LeadFormSubmissionProcessor do
     expect(message.body).to eq("Hola Ana, tu consulta sobre curso: Quiero más info.")
   end
 
+  it "attaches email template files to the lead confirmation message" do
+    template = create_email_template!(
+      workspace,
+      user: member,
+      subject: "Gracias",
+      body: "Hola {first_name}"
+    )
+    template.attachments.attach(
+      io: StringIO.new("brochure content"),
+      filename: "brochure.pdf",
+      content_type: "application/pdf"
+    )
+    lead_form.update!(email_template: template)
+
+    submit(contacto_lead_params)
+
+    message = EmailMessage.order(:id).last
+    expect(message.attachments.count).to eq(1)
+    expect(message.attachments.first.filename.to_s).to eq("brochure.pdf")
+  end
+
   it "interpolates empty form fields as blank strings in the lead email template" do
     template = create_email_template!(
       workspace,

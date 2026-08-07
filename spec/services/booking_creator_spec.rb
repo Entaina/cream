@@ -199,6 +199,39 @@ RSpec.describe BookingCreator, type: :service do
     end
   end
 
+  it "attaches email template files to the booking confirmation message" do
+    template = workspace.email_templates.create!(
+      user: user,
+      name: "Confirmación reserva",
+      subject: "Reserva confirmada",
+      body: "Hola {first_name}"
+    )
+    template.attachments.attach(
+      io: StringIO.new("ics content"),
+      filename: "agenda.pdf",
+      content_type: "application/pdf"
+    )
+    event_type.update!(email_template: template)
+
+    described_class.call(
+      booking_page: booking_page,
+      event_type: event_type,
+      params: {
+        datetime: "2026-07-28T10:00:00",
+        timezone: "Europe/Madrid",
+        first_name: "Ana",
+        last_name: "Lopez",
+        email: "ana@example.com"
+      },
+      request: request,
+      client: client
+    )
+
+    message = workspace.email_messages.order(:id).last
+    expect(message.attachments.count).to eq(1)
+    expect(message.attachments.first.filename.to_s).to eq("agenda.pdf")
+  end
+
   it "does not send a confirmation email without a template" do
     expect {
       described_class.call(
