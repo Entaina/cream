@@ -21,7 +21,7 @@ module LeadFormTemplates
       raise Liquid::FileSystemError, "Template not found: #{path}" if body.blank?
 
       template = Liquid::Template.parse(body, environment: @environment)
-      template.render!(build_assigns, registers: build_registers)
+      template.render!(build_assigns, registers: build_registers).html_safe
     end
 
     private
