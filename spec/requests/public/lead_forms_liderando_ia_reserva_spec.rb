@@ -7,8 +7,8 @@ RSpec.describe "Public lead form Liderando con IA — Reserva", type: :request d
   let(:workspace) { workspaces(:one) }
   let!(:pipeline) { Pipeline.create_default!(workspace) }
   let(:product) { workspace.products.create!(name: "Liderando con IA", price: 990) }
-  let!(:open_edition) { product.editions.create!(name: "Marzo 2026", ends_on: Date.current + 30.days) }
-  let!(:finished_edition) { product.editions.create!(name: "Enero 2026", ends_on: Date.current - 1.day) }
+  let!(:open_edition) { product.editions.create!(name: "Marzo 2026", starts_on: Date.current + 30.days, ends_on: Date.current + 60.days) }
+  let!(:finished_edition) { product.editions.create!(name: "Enero 2026", starts_on: Date.current - 30.days, ends_on: Date.current - 1.day) }
   let(:lead_form) do
     create_lead_form!(
       workspace,
@@ -48,7 +48,7 @@ RSpec.describe "Public lead form Liderando con IA — Reserva", type: :request d
 
     it "allows overriding the product via query param" do
       other_product = workspace.products.create!(name: "Otro curso", price: 500)
-      other_edition = other_product.editions.create!(name: "Septiembre 2026")
+      other_edition = other_product.editions.create!(name: "Septiembre 2026", starts_on: Date.current + 60.days)
 
       get public_lead_form_path(lead_form.slug, product_id: other_product.id)
 

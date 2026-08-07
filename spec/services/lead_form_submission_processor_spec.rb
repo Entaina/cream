@@ -359,7 +359,7 @@ RSpec.describe LeadFormSubmissionProcessor do
 
   describe "product and edition attachment" do
     let(:product) { workspace.products.create!(name: "Liderando con IA", price: 990) }
-    let(:edition) { product.editions.create!(name: "Marzo 2026", ends_on: Date.current + 30.days) }
+    let(:edition) { product.editions.create!(name: "Marzo 2026", starts_on: Date.current + 30.days, ends_on: Date.current + 60.days) }
     let(:lead_form) do
       create_lead_form!(
         workspace,
@@ -410,7 +410,7 @@ RSpec.describe LeadFormSubmissionProcessor do
     it "overrides the configured product with the submitted product_id param" do
       configured = workspace.products.create!(name: "Configured", price: 100)
       override = workspace.products.create!(name: "Override", price: 200)
-      override_edition = override.editions.create!(name: "Override edition", ends_on: Date.current + 30.days)
+      override_edition = override.editions.create!(name: "Override edition", starts_on: Date.current + 30.days, ends_on: Date.current + 60.days)
       lead_form.update!(product: configured)
 
       result = submit(liderando_ia_reserva_lead_params(
@@ -435,18 +435,26 @@ RSpec.describe LeadFormSubmissionProcessor do
 
     it "rejects an edition that belongs to another product" do
       other_product = workspace.products.create!(name: "Other", price: 50)
-      foreign_edition = other_product.editions.create!(name: "Foreign", ends_on: Date.current + 30.days)
+      foreign_edition = other_product.editions.create!(name: "Foreign", starts_on: Date.current + 30.days)
 
       expect {
         submit(reserva_params("edition_id" => foreign_edition.id.to_s))
       }.to raise_error(ActiveRecord::RecordInvalid, /edition id is invalid/)
     end
 
-    it "rejects a finished edition" do
-      finished = product.editions.create!(name: "Past", ends_on: Date.current - 1.day)
+    it "rejects a started edition" do
+      started = product.editions.create!(name: "Started", starts_on: Date.current - 1.day, ends_on: Date.current + 30.days)
 
       expect {
-        submit(reserva_params("edition_id" => finished.id.to_s))
+        submit(reserva_params("edition_id" => started.id.to_s))
+      }.to raise_error(ActiveRecord::RecordInvalid, /edition id is invalid/)
+    end
+
+    it "rejects an edition without dates" do
+      undated = product.editions.create!(name: "No dates")
+
+      expect {
+        submit(reserva_params("edition_id" => undated.id.to_s))
       }.to raise_error(ActiveRecord::RecordInvalid, /edition id is invalid/)
     end
   end

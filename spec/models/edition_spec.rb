@@ -79,21 +79,22 @@ RSpec.describe Edition, type: :model do
     end
   end
 
-  describe ".not_finished" do
-    it "includes editions without an end date" do
-      open_edition = product.editions.create!(name: "Open-ended")
-      expect(product.editions.not_finished).to include(open_edition)
+  describe ".not_started" do
+    it "includes editions with a future start date" do
+      upcoming = product.editions.create!(name: "Upcoming", starts_on: Date.current + 10.days)
+      expect(product.editions.not_started).to include(upcoming)
     end
 
-    it "includes editions ending today or later" do
-      current = product.editions.create!(name: "Current", ends_on: Date.current)
-      future = product.editions.create!(name: "Future", ends_on: Date.current + 10.days)
-      expect(product.editions.not_finished).to include(current, future)
+    it "excludes editions without a start date" do
+      undated = product.editions.create!(name: "No dates")
+      end_only = product.editions.create!(name: "End only", ends_on: Date.current + 30.days)
+      expect(product.editions.not_started).not_to include(undated, end_only)
     end
 
-    it "excludes editions that already ended" do
-      finished = product.editions.create!(name: "Past", ends_on: Date.current - 1.day)
-      expect(product.editions.not_finished).not_to include(finished)
+    it "excludes editions that already started" do
+      started = product.editions.create!(name: "Started", starts_on: Date.current)
+      past = product.editions.create!(name: "Past", starts_on: Date.current - 1.day)
+      expect(product.editions.not_started).not_to include(started, past)
     end
   end
 end

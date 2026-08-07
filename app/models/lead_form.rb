@@ -91,7 +91,7 @@ class LeadForm < ApplicationRecord
   def open_editions_for(product)
     return Edition.none unless product
 
-    product.editions.not_finished.order(Arel.sql("starts_on NULLS LAST"), :name)
+    product.editions.not_started.order(:starts_on, :name)
   end
 
   def self.available_template_keys(workspace: nil)

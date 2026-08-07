@@ -74,7 +74,7 @@ module LeadFormTemplates
     def sample_product
       @workspace.products
         .joins(:editions)
-        .merge(Edition.not_finished)
+        .merge(Edition.not_started)
         .distinct
         .first || @workspace.products.first
     end

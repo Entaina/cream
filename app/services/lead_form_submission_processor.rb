@@ -220,7 +220,7 @@ class LeadFormSubmissionProcessor
     edition_id = params["edition_id"].presence
     return if edition_id.blank?
 
-    product.editions.not_finished.find_by(id: edition_id)
+    product.editions.not_started.find_by(id: edition_id)
   end
 
   def persist_submission!(deal:, person:, deal_created:)
