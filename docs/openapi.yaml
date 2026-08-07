@@ -68,6 +68,15 @@ components:
         enum: [b2b, b2c]
       description: Filter products by segment.
 
+    PersonEmailQuery:
+      name: email
+      in: query
+      required: false
+      schema:
+        type: string
+        format: email
+      description: Exact email match (case-insensitive) against primary or any secondary person email.
+
     PersonId:
       name: id
       in: path
@@ -766,6 +775,7 @@ paths:
       parameters:
         - $ref: "#/components/parameters/WorkspaceId"
         - $ref: "#/components/parameters/SearchQuery"
+        - $ref: "#/components/parameters/PersonEmailQuery"
       responses:
         "200":
           description: OK
