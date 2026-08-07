@@ -61,23 +61,25 @@ module Public
     end
 
     def book
-      event_type = find_event_type!
-      result = BookingCreator.call(
-        booking_page: @booking_page,
-        event_type:,
-        params: booking_params,
-        request:,
-        client: @calendar_client
-      )
-      render json: result.booking.confirmation_payload(locale: resolved_locale), status: :created
-    rescue BookingCreator::Conflict => e
-      render json: { error: e.message }, status: :conflict
-    rescue BookingCreator::ValidationError => e
-      render json: { error: e.message }, status: :bad_request
-    rescue GoogleCalendar::Error => e
-      render json: { error: e.message }, status: :service_unavailable
-    rescue ActiveRecord::RecordNotFound
-      render json: { error: "event type not found" }, status: :not_found
+      I18n.with_locale(resolved_locale) do
+        event_type = find_event_type!
+        result = BookingCreator.call(
+          booking_page: @booking_page,
+          event_type:,
+          params: booking_params,
+          request:,
+          client: @calendar_client
+        )
+        render json: result.booking.confirmation_payload(locale: resolved_locale), status: :created
+      rescue BookingCreator::Conflict => e
+        render json: { error: e.message }, status: :conflict
+      rescue BookingCreator::ValidationError => e
+        render json: { error: e.message }, status: :bad_request
+      rescue GoogleCalendar::Error => e
+        render json: { error: e.message }, status: :service_unavailable
+      rescue ActiveRecord::RecordNotFound
+        render json: { error: I18n.t("booking.errors.event_type_not_found") }, status: :not_found
+      end
     end
 
     private
@@ -114,13 +116,14 @@ module Public
     end
 
     def resolved_locale
-      locale = params[:lang].presence || request.env["HTTP_ACCEPT_LANGUAGE"].to_s[/\A[a-z]{2}/]
+      locale = params[:lang].presence || booking_params["lang"].presence ||
+        request.env["HTTP_ACCEPT_LANGUAGE"].to_s[/\A[a-z]{2}/]
       locale.in?(%w[es en]) ? locale : "es"
     end
 
     def booking_params
       params.permit(
-        :event_type, :datetime, :first_name, :last_name, :email, :phone, :message, :timezone,
+        :event_type, :datetime, :first_name, :last_name, :email, :phone, :message, :timezone, :lang,
         :source_page, :referrer, :utm_source, :utm_medium, :utm_campaign, :utm_term, :utm_content,
         BookingPage::HONEYPOT_FIELD, BookingPage::TIMESTAMP_FIELD,
         guests: []
@@ -155,7 +158,7 @@ module Public
       starts_at = zone.parse(booking_params["datetime"].to_s) || Time.current
       ends_at = starts_at + event_type.duration_minutes.minutes
 
-      {
+      payload = {
         id: 0,
         event_type: event_type.payload(locale: resolved_locale),
         starts_at: starts_at.iso8601,
@@ -169,11 +172,18 @@ module Public
         meet_link: nil,
         google_event_link: nil
       }
+      if event_type.reminder_will_send_at?(starts_at)
+        payload[:reminder_minutes_before] = event_type.reminder_minutes_before
+      end
+      payload[:confirmation_email] = true if event_type.confirmation_email_enabled?
+      payload
     end
 
     def render_rate_limited
       response.set_header("Retry-After", "60")
-      render json: { error: I18n.t("booking.errors.rate_limited") }, status: :too_many_requests
+      I18n.with_locale(resolved_locale) do
+        render json: { error: I18n.t("booking.errors.rate_limited") }, status: :too_many_requests
+      end
     end
 
     def calendar_error_json(error)

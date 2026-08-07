@@ -333,8 +333,9 @@ class LeadFormSubmissionProcessor
   def enqueue_emails(submission:, deal:, person:)
     if lead_form.email_template
       template = lead_form.email_template
-      rendered_body = template.render_for(person)
-      rendered_subject = render_template_subject(template, person)
+      extra_tokens = lead_email_tokens(submission:)
+      rendered_body = template.render_for(person, extra_tokens:)
+      rendered_subject = template.render_subject_for(person, extra_tokens:)
 
       message = workspace.email_messages.create!(
         user: lead_form.responsible,
@@ -363,17 +364,52 @@ class LeadFormSubmissionProcessor
     ).deliver_later
   end
 
-  def render_template_subject(template, person)
-    template.subject.to_s.gsub(/\{(\w+)\}/) do
-      token = Regexp.last_match(1)
-      case token
-      when "first_name" then person.first_name
-      when "last_name" then person.last_name
-      when "name" then person.display_name
-      when "company" then person.company&.name
-      when "email" then person.email
-      else "{#{token}}"
-      end.to_s
+  def lead_email_tokens(submission:)
+    tokens = {
+      "form_name" => lead_form.name,
+      "form_slug" => lead_form.slug,
+      "product" => resolved_product&.name.to_s,
+      "edition" => resolved_edition_for_email(submission)&.display_name.to_s
+    }
+
+    submission_schema.fields.each do |field|
+      tokens[field.name] = stringify_field_token(field.name)
+    end
+
+    tokens
+  end
+
+  def stringify_field_token(name)
+    value = case name
+    when "newsletter_opt_in"
+      params.key?("newsletter_opt_in") ? params["newsletter_opt_in"] == "1" : nil
+    else
+      params[name]
+    end
+
+    stringify_token_value(value)
+  end
+
+  def resolved_edition_for_email(submission)
+    edition_id = submission.data["edition_id"].presence || params["edition_id"].presence
+    return if edition_id.blank?
+
+    product = resolved_product
+    return unless product
+
+    product.editions.find_by(id: edition_id)
+  end
+
+  def stringify_token_value(value)
+    case value
+    when Array
+      value.map(&:to_s).join(", ")
+    when TrueClass, FalseClass
+      value.to_s
+    when nil
+      ""
+    else
+      value.to_s
     end
   end
 end

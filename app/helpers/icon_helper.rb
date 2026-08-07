@@ -53,7 +53,8 @@ module IconHelper
     monitor: "M2 3h20v14H2zM8 21h8M12 17v4",
     expand: "M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3",
     shrink: "M8 3v3a2 2 0 01-2 2H3m18 0h-3a2 2 0 01-2-2V3m0 18v-3a2 2 0 012-2h3M3 16h3a2 2 0 012 2v3",
-    lock: "M7 11V7a5 5 0 0110 0v4M5 11h14v10H5z"
+    lock: "M7 11V7a5 5 0 0110 0v4M5 11h14v10H5z",
+    info: "M12 16v-4M12 8h.01M22 12c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2s10 4.477 10 10z"
   }.freeze
 
   def icon(name, classes: "size-4", stroke: 1.75)

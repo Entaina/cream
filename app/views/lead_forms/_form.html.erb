@@ -151,7 +151,23 @@
       </div>
       <div>
         <%= f.label :email_template_id, "Plantilla de email al lead", class: "label" %>
-        <%= f.collection_select :email_template_id, @email_templates, :id, :name, { include_blank: "Sin email" }, class: "input mt-1 w-full" %>
+        <div
+          class="mt-1 flex items-center gap-2"
+          data-controller="email-template-select"
+          data-email-template-select-url-template-value="<%= edit_email_template_path("__ID__") %>"
+        >
+          <%= f.collection_select :email_template_id, @email_templates, :id, :name, { include_blank: "Sin email" }, class: "input w-full min-w-0", data: { email_template_select_target: "select", action: "change->email-template-select#update" } %>
+          <% selected_template = lead_form.email_template %>
+          <%= link_to(
+                selected_template ? edit_email_template_path(selected_template) : "#",
+                target: "_blank",
+                rel: "noopener noreferrer",
+                class: "inline-flex shrink-0 text-ink-faint hover:text-ink focus:outline-none focus-visible:text-ink #{'invisible pointer-events-none' unless selected_template}",
+                data: { email_template_select_target: "link" },
+                aria: { label: "Abrir plantilla de email en otra pestaña" }
+              ) { icon(:external, classes: "size-4") } %>
+          <%= info_tooltip(lead_form_email_template_tokens_hint, label: "Tokens disponibles en la plantilla de email") %>
+        </div>
         <p class="mt-1 text-xs text-ink-faint">Si eliges «Sin email», no se envía correo automático al lead tras el envío.</p>
       </div>
       <div>

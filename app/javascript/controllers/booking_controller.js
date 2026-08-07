@@ -3,6 +3,9 @@ import { Controller } from "@hotwired/stimulus"
 const COPY = {
   es: {
     chooseEvent: "Elige un tipo de reunión",
+    stepEvent: "Tipo",
+    stepSchedule: "Fecha",
+    stepDetails: "Datos",
     backToTypes: "← Volver a tipos de evento",
     backToSchedule: "← Volver al calendario",
     timezone: "Zona horaria",
@@ -18,7 +21,8 @@ const COPY = {
     schedule: "Programar evento",
     scheduling: "Programando…",
     confirmed: "¡Reunión programada!",
-    emailNotice: "Recibirás una invitación por email.",
+    reminderNotice: "Te enviaremos un recordatorio por email %{minutes} minutos antes de la reunión.",
+    confirmationEmailNotice: "Te hemos enviado un email de confirmación a %{email}.",
     meetLink: "Enlace de Google Meet",
     location: "Ubicación",
     downloadIcs: "Descargar .ics",
@@ -31,11 +35,16 @@ const COPY = {
     calendarEstimated: "Mostrando horarios según la agenda configurada. Google Calendar no respondió; algunos huecos pueden estar ocupados.",
     loadingAvailability: "Consultando disponibilidad…",
     noSlots: "No hay horarios disponibles este día.",
-    weekdays: [ "L", "M", "X", "J", "V", "S", "D" ],
-    locationIcons: { google_meet: "📹", physical: "📍", to_be_decided: "📞" }
+    doNotFill: "No rellenar",
+    enableCalendarApi: "Activar Google Calendar API",
+    genericError: "Ha ocurrido un error. Inténtalo de nuevo.",
+    weekdays: [ "L", "M", "X", "J", "V", "S", "D" ]
   },
   en: {
     chooseEvent: "Choose an event type",
+    stepEvent: "Type",
+    stepSchedule: "Date",
+    stepDetails: "Details",
     backToTypes: "← Back to event types",
     backToSchedule: "← Back to calendar",
     timezone: "Timezone",
@@ -51,7 +60,8 @@ const COPY = {
     schedule: "Schedule event",
     scheduling: "Scheduling…",
     confirmed: "Event scheduled!",
-    emailNotice: "You will receive an email invitation.",
+    reminderNotice: "We will send you an email reminder %{minutes} minutes before the meeting.",
+    confirmationEmailNotice: "We have sent a confirmation email to %{email}.",
     meetLink: "Google Meet link",
     location: "Location",
     downloadIcs: "Download .ics",
@@ -64,9 +74,17 @@ const COPY = {
     calendarEstimated: "Showing times from the configured schedule. Google Calendar did not respond; some slots may already be booked.",
     loadingAvailability: "Loading availability…",
     noSlots: "No available times on this day.",
-    weekdays: [ "M", "T", "W", "T", "F", "S", "S" ],
-    locationIcons: { google_meet: "📹", physical: "📍", to_be_decided: "📞" }
+    doNotFill: "Do not fill",
+    enableCalendarApi: "Enable Google Calendar API",
+    genericError: "Something went wrong. Please try again.",
+    weekdays: [ "M", "T", "W", "T", "F", "S", "S" ]
   }
+}
+
+const LOCATION_ICONS = {
+  google_meet: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg>`,
+  physical: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>`,
+  to_be_decided: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"/></svg>`
 }
 
 export default class extends Controller {
@@ -78,7 +96,9 @@ export default class extends Controller {
     "confirmPanel", "confirmHeading", "confirmSummary",
     "firstNameLabel", "lastNameLabel", "emailLabel", "phoneLabel", "messageLabel", "addGuestsLabel", "guestsFields",
     "submitLabel", "confirmedHeading", "confirmationDetails", "icsDownload", "bookAnotherLabel",
-    "firstNameInput", "lastNameInput", "emailInput", "phoneInput", "messageInput", "honeypotInput"
+    "firstNameInput", "lastNameInput", "emailInput", "phoneInput", "messageInput", "honeypotInput", "honeypotLabel",
+    "localeEs", "localeEn", "progress", "progressEvent", "progressSchedule", "progressDetails",
+    "progressEventLabel", "progressScheduleLabel", "progressDetailsLabel"
   ]
 
   static values = {
@@ -103,10 +123,13 @@ export default class extends Controller {
     this.syncingTimezoneSelect = false
     this.availabilityRequestId = 0
     this.availabilityAbortController = null
+    this.currentStep = "eventTypes"
     this.tracking = this.captureTracking()
     this.parseUrlParams()
     this.detectTimezone()
     this.applyCopy()
+    this.updateLocaleButtons()
+    this.updateProgress("eventTypes")
     this.applyPrefill()
     this.loadEventTypes()
   }
@@ -115,6 +138,11 @@ export default class extends Controller {
     const params = new URLSearchParams(window.location.search)
     this.prefill = {}
     this.knownFields = new Set()
+
+    const lang = params.get("lang")
+    if (lang && [ "es", "en" ].includes(lang)) {
+      this.localeValue = lang
+    }
 
     for (const key of [ "first_name", "last_name", "email", "phone", "message" ]) {
       const value = params.get(key)
@@ -167,8 +195,17 @@ export default class extends Controller {
 
   setLocale(event) {
     this.localeValue = event.currentTarget.dataset.locale
+    const url = new URL(window.location.href)
+    url.searchParams.set("lang", this.localeValue)
+    history.replaceState({}, "", url)
+    document.documentElement.lang = this.localeValue
     this.applyCopy()
+    this.updateLocaleButtons()
     this.loadEventTypes()
+    if (this.selectedEventType) {
+      this.renderEventSummary()
+      if (this.selectedDate && this.selectedSlot) this.renderFormSummary()
+    }
   }
 
   applyCopy() {
@@ -190,6 +227,40 @@ export default class extends Controller {
     this.icsDownloadTarget.textContent = this.copy.downloadIcs
     this.bookAnotherLabelTarget.textContent = this.copy.bookAnother
     if (this.hasConfirmHeadingTarget) this.confirmHeadingTarget.textContent = this.copy.attendeeDetails
+    if (this.hasHoneypotLabelTarget) this.honeypotLabelTarget.textContent = this.copy.doNotFill
+    if (this.hasProgressEventLabelTarget) this.progressEventLabelTarget.textContent = this.copy.stepEvent
+    if (this.hasProgressScheduleLabelTarget) this.progressScheduleLabelTarget.textContent = this.copy.stepSchedule
+    if (this.hasProgressDetailsLabelTarget) this.progressDetailsLabelTarget.textContent = this.copy.stepDetails
+  }
+
+  updateLocaleButtons() {
+    if (!this.hasLocaleEsTarget || !this.hasLocaleEnTarget) return
+
+    this.localeEsTarget.classList.toggle("is-active", this.localeValue === "es")
+    this.localeEnTarget.classList.toggle("is-active", this.localeValue === "en")
+  }
+
+  updateProgress(step) {
+    if (!this.hasProgressTarget) return
+
+    const steps = [
+      { name: "eventTypes", target: "progressEventTarget" },
+      { name: "schedule", target: "progressScheduleTarget" },
+      { name: "form", target: "progressDetailsTarget" }
+    ]
+    const order = [ "eventTypes", "schedule", "form", "confirmation" ]
+    const currentIndex = order.indexOf(step)
+
+    for (const { name, target } of steps) {
+      const element = this[target]
+      if (!element) continue
+
+      const stepIndex = order.indexOf(name)
+      element.classList.toggle("is-active", step === name)
+      element.classList.toggle("is-complete", currentIndex > stepIndex)
+    }
+
+    this.progressTarget.classList.toggle("hidden", step === "confirmation")
   }
 
   async loadEventTypes() {
@@ -205,27 +276,27 @@ export default class extends Controller {
   renderProfile() {
     if (!this.profile) return
     this.profileTarget.innerHTML = `
-      ${this.profile.avatar_url ? `<img src="${this.profile.avatar_url}" alt="" class="size-14 rounded-full object-cover">` : ""}
-      <div class="min-w-0">
-        <p class="font-display text-xl font-semibold truncate">${this.escape(this.profile.name)}</p>
-        ${this.profile.welcome_message ? `<p class="text-sm text-ink-soft">${this.escape(this.profile.welcome_message)}</p>` : ""}
+      ${this.profile.avatar_url ? `<img src="${this.escape(this.profile.avatar_url)}" alt="" class="public-booking-avatar">` : ""}
+      <div class="min-w-0 flex-1">
+        <p class="public-booking-host-name">${this.escape(this.profile.name)}</p>
+        ${this.profile.welcome_message ? `<p class="public-booking-welcome">${this.escape(this.profile.welcome_message)}</p>` : ""}
       </div>
-      ${this.profile.logo_url ? `<img src="${this.profile.logo_url}" alt="" class="h-8 ml-auto">` : ""}
+      ${this.profile.logo_url ? `<img src="${this.escape(this.profile.logo_url)}" alt="" class="public-booking-logo">` : ""}
     `
   }
 
   renderEventTypes() {
     this.eventTypeGridTarget.innerHTML = this.eventTypes.map((eventType) => `
-      <button type="button" class="card p-4 text-left hover:border-accent transition-colors border-l-4 ${this.borderClass(eventType.color)}"
+      <button type="button" class="public-booking-event-card border-l-4 ${this.borderClass(eventType.color)}"
               data-action="booking#selectEventType" data-slug="${eventType.slug}">
-        <div class="flex items-start gap-2">
-          <span>${this.copy.locationIcons[eventType.location_type] || ""}</span>
-          <div>
-            <p class="font-semibold">${this.escape(eventType.name)}</p>
-            <p class="text-sm text-ink-faint">${eventType.duration_minutes} ${this.copy.minutes}</p>
-            <p class="text-sm text-ink-soft mt-1">${this.escape(eventType.description || "")}</p>
+        <div class="public-booking-event-card-header">
+          <span class="public-booking-event-icon">${this.locationIcon(eventType.location_type)}</span>
+          <div class="min-w-0">
+            <p class="public-booking-event-name">${this.escape(eventType.name)}</p>
+            <p class="public-booking-event-meta">${eventType.duration_minutes} ${this.copy.minutes}</p>
           </div>
         </div>
+        ${eventType.description ? `<p class="public-booking-event-desc">${this.escape(eventType.description)}</p>` : ""}
       </button>
     `).join("")
   }
@@ -302,7 +373,7 @@ export default class extends Controller {
     const startOffset = (firstDay.getDay() + 6) % 7
     const daysInMonth = new Date(year, month + 1, 0).getDate()
 
-    let html = this.copy.weekdays.map((label) => `<div class="text-ink-faint font-medium py-1">${label}</div>`).join("")
+    let html = this.copy.weekdays.map((label) => `<div class="public-booking-calendar-weekday">${label}</div>`).join("")
     for (let i = 0; i < startOffset; i++) html += `<div></div>`
 
     for (let day = 1; day <= daysInMonth; day++) {
@@ -310,9 +381,10 @@ export default class extends Controller {
       const available = this.availableDays[iso]
       const selected = this.selectedDate === iso
       const disabled = !available
+      const stateClass = selected ? "is-selected" : available ? "is-available" : "is-unavailable"
       html += `
         <button type="button"
-                class="rounded-md py-2 ${selected ? "bg-accent text-on-dark" : available ? "bg-accent-soft hover:bg-accent/20" : "text-ink-faint opacity-40 cursor-not-allowed"}"
+                class="public-booking-day ${stateClass}"
                 ${disabled ? "disabled" : `data-action="booking#selectDate" data-date="${iso}"`}>
           ${day}
         </button>
@@ -341,7 +413,7 @@ export default class extends Controller {
 
   async loadSlots() {
     const requestId = ++this.availabilityRequestId
-    this.slotsListTarget.innerHTML = `<p class="text-sm text-ink-faint">${this.copy.loadingAvailability}</p>`
+    this.slotsListTarget.innerHTML = `<p class="public-booking-slot-loading">${this.copy.loadingAvailability}</p>`
     try {
       const params = new URLSearchParams({
         event_type: this.selectedEventType.slug,
@@ -364,12 +436,12 @@ export default class extends Controller {
 
       const slots = data.slots || []
       if (!slots.length) {
-        this.slotsListTarget.innerHTML = `<p class="text-sm text-ink-faint">${this.copy.noSlots}</p>`
+        this.slotsListTarget.innerHTML = `<p class="public-booking-slot-empty">${this.copy.noSlots}</p>`
         return
       }
 
       this.slotsListTarget.innerHTML = slots.map((slot) => `
-        <button type="button" class="btn-secondary ${this.selectedSlot === slot ? "!bg-accent !text-on-dark" : ""}"
+        <button type="button" class="public-booking-slot ${this.selectedSlot === slot ? "is-selected" : ""}"
                 data-action="booking#selectSlot" data-slot="${slot}">${slot}</button>
       `).join("")
     } catch (error) {
@@ -451,17 +523,17 @@ export default class extends Controller {
   renderEventSummary() {
     if (!this.selectedEventType) return
     this.eventSummaryTarget.innerHTML = `
-      <p class="font-semibold">${this.escape(this.selectedEventType.name)}</p>
-      <p class="text-sm text-ink-faint">${this.selectedEventType.duration_minutes} ${this.copy.minutes}</p>
-      <p class="text-sm text-ink-soft">${this.escape(this.selectedEventType.description || "")}</p>
+      <p class="public-booking-summary-name">${this.escape(this.selectedEventType.name)}</p>
+      <p class="public-booking-summary-meta">${this.selectedEventType.duration_minutes} ${this.copy.minutes}</p>
+      ${this.selectedEventType.description ? `<p class="public-booking-summary-desc">${this.escape(this.selectedEventType.description)}</p>` : ""}
     `
   }
 
   renderFormSummary() {
     this.formSummaryTarget.innerHTML = `
-      <p class="font-semibold">${this.escape(this.selectedEventType.name)}</p>
-      <p class="text-sm">${this.selectedDate} ${this.selectedSlot}</p>
-      <p class="text-sm text-ink-faint">${this.timezoneValue}</p>
+      <p class="public-booking-summary-name">${this.escape(this.selectedEventType.name)}</p>
+      <p class="public-booking-summary-meta">${this.formatDateTime(this.selectedDate, this.selectedSlot)}</p>
+      <p class="public-booking-summary-desc">${this.escape(this.timezoneValue)}</p>
     `
   }
 
@@ -495,6 +567,7 @@ export default class extends Controller {
       event_type: this.selectedEventType.slug,
       datetime: `${this.selectedDate}T${this.selectedSlot}:00`,
       timezone: this.timezoneValue,
+      lang: this.localeValue,
       first_name: this.firstNameInputTarget.value.trim(),
       last_name: this.lastNameInputTarget.value.trim(),
       email: this.emailInputTarget.value.trim(),
@@ -535,7 +608,7 @@ export default class extends Controller {
 
     if (!response.ok) {
       const data = await response.json()
-      this.formErrorTarget.textContent = data.error || "Error"
+      this.formErrorTarget.textContent = data.error || this.copy.genericError
       this.formErrorTarget.classList.remove("hidden")
       return
     }
@@ -546,14 +619,31 @@ export default class extends Controller {
 
   showConfirmation(data) {
     this.showStep("confirmation")
+    const formattedDate = new Date(data.starts_at).toLocaleString(this.localeValue, {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit"
+    })
     const lines = [
-      `<p><strong>${this.escape(data.event_type.name)}</strong></p>`,
-      `<p>${new Date(data.starts_at).toLocaleString(this.localeValue)} (${data.timezone})</p>`,
-      `<p>${data.event_type.duration_minutes} ${this.copy.minutes}</p>`
+      `<p class="public-booking-summary-name">${this.escape(data.event_type.name)}</p>`,
+      `<p class="public-booking-summary-meta">${formattedDate}</p>`,
+      `<p class="public-booking-summary-desc">${this.escape(data.timezone)} · ${data.event_type.duration_minutes} ${this.copy.minutes}</p>`
     ]
-    if (data.meet_link) lines.push(`<p><a href="${data.meet_link}" class="text-accent underline" target="_blank" rel="noopener">${this.copy.meetLink}</a></p>`)
-    if (data.location_address) lines.push(`<p>${this.copy.location}: ${this.escape(data.location_address)}</p>`)
-    lines.push(`<p class="text-sm text-ink-faint">${this.copy.emailNotice}</p>`)
+    if (data.meet_link) {
+      lines.push(`<p><a href="${this.escape(data.meet_link)}" class="text-accent underline" target="_blank" rel="noopener">${this.copy.meetLink}</a></p>`)
+    }
+    if (data.location_address) {
+      lines.push(`<p>${this.copy.location}: ${this.escape(data.location_address)}</p>`)
+    }
+    if (data.reminder_minutes_before) {
+      lines.push(`<p class="text-sm text-ink-faint">${this.reminderNotice(data.reminder_minutes_before)}</p>`)
+    }
+    if (data.confirmation_email) {
+      lines.push(`<p class="text-sm text-ink-faint">${this.confirmationEmailNotice(data.attendee_email)}</p>`)
+    }
     this.confirmationDetailsTarget.innerHTML = lines.join("")
     this.icsDownloadTarget.href = this.buildIcs(data)
   }
@@ -620,9 +710,9 @@ export default class extends Controller {
     if (!this.hasScheduleErrorTarget) return
 
     const helpLink = helpUrl
-      ? ` <a href="${this.escape(helpUrl)}" class="text-accent underline" target="_blank" rel="noopener">Activar Google Calendar API</a>`
+      ? ` <a href="${this.escape(helpUrl)}" class="text-accent underline" target="_blank" rel="noopener">${this.copy.enableCalendarApi}</a>`
       : ""
-    this.scheduleErrorTarget.className = "text-sm text-red-600 mt-3"
+    this.scheduleErrorTarget.className = "public-booking-alert is-error"
     this.scheduleErrorTarget.innerHTML = `${this.escape(message)}${helpLink}`
     this.scheduleErrorTarget.classList.remove("hidden")
   }
@@ -630,7 +720,7 @@ export default class extends Controller {
   showScheduleWarning(message) {
     if (!this.hasScheduleErrorTarget) return
 
-    this.scheduleErrorTarget.className = "text-sm text-golden-800 bg-golden-100 rounded-md px-3 py-2 mt-3"
+    this.scheduleErrorTarget.className = "public-booking-alert is-warning"
     this.scheduleErrorTarget.textContent = `${this.copy.calendarEstimated} ${message}`
     this.scheduleErrorTarget.classList.remove("hidden")
   }
@@ -667,10 +757,41 @@ export default class extends Controller {
   }
 
   showStep(step) {
+    this.currentStep = step
     this.stepEventTypesTarget.classList.toggle("hidden", step !== "eventTypes")
     this.stepScheduleTarget.classList.toggle("hidden", step !== "schedule")
     this.stepFormTarget.classList.toggle("hidden", step !== "form")
     this.stepConfirmationTarget.classList.toggle("hidden", step !== "confirmation")
+    this.updateProgress(step)
+  }
+
+  formatDateTime(dateStr, timeStr) {
+    if (!dateStr || !timeStr) return ""
+
+    const [ year, month, day ] = dateStr.split("-").map(Number)
+    const [ hours, minutes ] = timeStr.split(":").map(Number)
+    const date = new Date(year, month - 1, day, hours, minutes)
+
+    return date.toLocaleString(this.localeValue, {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit"
+    })
+  }
+
+  reminderNotice(minutes) {
+    return this.copy.reminderNotice.replace("%{minutes}", minutes)
+  }
+
+  confirmationEmailNotice(email) {
+    return this.copy.confirmationEmailNotice.replace("%{email}", this.escape(email))
+  }
+
+  locationIcon(type) {
+    return LOCATION_ICONS[type] || LOCATION_ICONS.to_be_decided
   }
 
   escape(text) {

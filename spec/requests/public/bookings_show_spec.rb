@@ -35,7 +35,19 @@ RSpec.describe "Public booking page", type: :request do
     allow(CreamFeatures).to receive(:enabled?).with(:calendar_booking).and_return(true)
   end
 
-  it "renders the booking page with prefill and confirmation targets" do
+  it "renders the booking page shell with progress and i18n targets" do
+    get public_booking_page_path(booking_page.slug, lang: "es")
+
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include('class="public-booking-shell"')
+    expect(response.body).to include('data-booking-target="progress"')
+    expect(response.body).to include('data-booking-target="progressEventLabel"')
+    expect(response.body).to include('data-booking-target="localeEs"')
+    expect(response.body).to include('data-booking-target="honeypotLabel"')
+    expect(response.body).to include('lang="es"')
+  end
+
+  it "renders prefill and confirmation targets" do
     get public_booking_page_path(
       booking_page.slug,
       first_name: "Ana",

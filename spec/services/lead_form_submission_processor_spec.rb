@@ -69,6 +69,43 @@ RSpec.describe LeadFormSubmissionProcessor do
     expect(notification.url).to eq(Rails.application.routes.url_helpers.deal_path(deal))
   end
 
+  it "interpolates form config and submission data into the lead email template" do
+    template = create_email_template!(
+      workspace,
+      user: member,
+      subject: "Gracias por contactar con {form_name}",
+      body: "Hola {first_name}, tu consulta sobre {help_type}: {message}."
+    )
+    lead_form.update!(email_template: template, name: "Formulario contacto")
+
+    expect {
+      submit(contacto_lead_params(
+        "help_type" => "curso",
+        "message" => "Quiero más info"
+      ))
+    }.to change(EmailMessage, :count).by(1)
+      .and have_enqueued_job(SendViaGmailJob)
+
+    message = EmailMessage.order(:id).last
+    expect(message.subject).to eq("Gracias por contactar con Formulario contacto")
+    expect(message.body).to eq("Hola Ana, tu consulta sobre curso: Quiero más info.")
+  end
+
+  it "interpolates empty form fields as blank strings in the lead email template" do
+    template = create_email_template!(
+      workspace,
+      user: member,
+      subject: "Gracias {first_name}",
+      body: "Mensaje: «{message}»"
+    )
+    lead_form.update!(email_template: template)
+
+    submit(contacto_lead_params("message" => ""))
+
+    message = EmailMessage.order(:id).last
+    expect(message.body).to eq("Mensaje: «»")
+  end
+
   it "does not enqueue lead email when the form has no email template" do
     lead_form.update!(email_template: nil)
 
@@ -349,6 +386,25 @@ RSpec.describe LeadFormSubmissionProcessor do
         "product_id" => product.id.to_s,
         "edition_id" => edition.id.to_s
       )
+    end
+
+    it "interpolates product and edition into the lead email template" do
+      template = create_email_template!(
+        workspace,
+        user: member,
+        subject: "Reserva {product}",
+        body: "Edición: {edition}"
+      )
+      lead_form.update!(email_template: template)
+
+      expect {
+        submit(reserva_params)
+      }.to change(EmailMessage, :count).by(1)
+        .and have_enqueued_job(SendViaGmailJob)
+
+      message = EmailMessage.order(:id).last
+      expect(message.subject).to eq("Reserva Liderando con IA")
+      expect(message.body).to eq("Edición: Marzo 2026")
     end
 
     it "overrides the configured product with the submitted product_id param" do

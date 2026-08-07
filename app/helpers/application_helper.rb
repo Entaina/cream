@@ -137,6 +137,28 @@ module ApplicationHelper
     end
   end
 
+  def lead_form_email_template_tokens_hint
+    "Tokens disponibles: {first_name}, {last_name}, {name}, {email}, {company}, " \
+      "{form_name}, {form_slug}, {product}, {edition} y cualquier campo del envío " \
+      "(p. ej. {help_type}, {message})."
+  end
+
+  def info_tooltip(content, label: "Más información", width: "w-72")
+    tag.span(class: "relative group shrink-0 inline-flex") do
+      safe_join([
+        tag.button(
+          type: "button",
+          class: "inline-flex text-ink-faint hover:text-ink-soft focus:outline-none focus-visible:text-ink",
+          aria: { label: label }
+        ) { icon(:info, classes: "size-4") },
+        tag.span(
+          class: "pointer-events-none absolute z-10 right-0 top-full mt-1 #{width} invisible opacity-0 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100 transition-opacity rounded-lg border border-line bg-canvas-raised shadow-md p-2.5 text-left text-xs text-ink-faint font-normal leading-relaxed",
+          role: "tooltip"
+        ) { content }
+      ])
+    end
+  end
+
   def stage_filter_options(pipelines, include_closed: false)
     pipelines.map do |pipeline|
       stages = pipeline.pipeline_stages.select { |s| include_closed || !s.closed? }

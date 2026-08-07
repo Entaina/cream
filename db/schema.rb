@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_07_100000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_07_100001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -130,6 +130,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_07_100000) do
     t.datetime "created_at", null: false
     t.jsonb "description_i18n", default: {}, null: false
     t.integer "duration_minutes", null: false
+    t.bigint "email_template_id"
     t.string "location_address"
     t.string "location_type", default: "google_meet", null: false
     t.integer "min_notice_hours", default: 4, null: false
@@ -143,6 +144,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_07_100000) do
     t.jsonb "weekly_hours", default: {}, null: false
     t.index ["booking_page_id", "slug"], name: "index_booking_event_types_on_booking_page_id_and_slug", unique: true
     t.index ["booking_page_id"], name: "index_booking_event_types_on_booking_page_id"
+    t.index ["email_template_id"], name: "index_booking_event_types_on_email_template_id"
   end
 
   create_table "booking_pages", force: :cascade do |t|
@@ -1234,6 +1236,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_07_100000) do
   add_foreign_key "api_tokens", "workspaces"
   add_foreign_key "automations", "workspaces"
   add_foreign_key "booking_event_types", "booking_pages"
+  add_foreign_key "booking_event_types", "email_templates", on_delete: :nullify
   add_foreign_key "booking_pages", "pipelines"
   add_foreign_key "booking_pages", "users", column: "host_id"
   add_foreign_key "booking_pages", "workspaces"

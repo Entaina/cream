@@ -273,6 +273,312 @@
   }
 }
 
+/* Public booking page */
+.public-booking-page {
+  background:
+    radial-gradient(ellipse 80% 60% at 50% -10%, color-mix(in srgb, var(--color-hoki-100) 70%, transparent), transparent),
+    linear-gradient(to bottom, var(--color-hoki-50), var(--color-canvas));
+  color: var(--color-ink);
+}
+
+.public-booking-main {
+  @apply flex min-h-full w-full items-start justify-center px-4 py-6 sm:px-6 sm:py-10 lg:px-8;
+}
+
+.public-booking-shell {
+  @apply w-full overflow-hidden rounded-2xl border border-line bg-canvas-raised shadow-lg shadow-hoki-900/5;
+}
+
+.public-booking-hero {
+  @apply flex items-start justify-between gap-4 border-b border-line bg-gradient-to-br from-hoki-50/80 to-canvas-raised px-6 py-6 sm:px-8 sm:py-7;
+}
+
+.public-booking-profile {
+  @apply flex items-center gap-4;
+}
+
+.public-booking-profile .public-booking-avatar {
+  @apply size-16 shrink-0 rounded-full object-cover ring-2 ring-white shadow-sm sm:size-[4.5rem];
+}
+
+.public-booking-profile .public-booking-host-name {
+  @apply font-display text-xl font-semibold text-ink sm:text-2xl;
+}
+
+.public-booking-profile .public-booking-welcome {
+  @apply mt-1 text-sm leading-relaxed text-ink-soft sm:text-base;
+}
+
+.public-booking-profile .public-booking-logo {
+  @apply ml-auto h-9 max-w-[7rem] object-contain sm:h-10;
+}
+
+.public-booking-locale {
+  @apply inline-flex rounded-lg bg-canvas-soft p-0.5 ring-1 ring-line;
+}
+
+.public-booking-locale-btn {
+  @apply rounded-md px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-ink-soft transition-colors cursor-pointer;
+}
+
+.public-booking-locale-btn.is-active {
+  @apply bg-canvas-raised text-ink shadow-sm;
+}
+
+.public-booking-progress {
+  @apply border-b border-line px-6 py-4 sm:px-8;
+}
+
+.public-booking-progress-list {
+  @apply flex items-center justify-center gap-2 sm:gap-3;
+}
+
+.public-booking-progress-step {
+  @apply flex items-center gap-2 text-xs text-ink-faint transition-colors sm:text-sm;
+}
+
+.public-booking-progress-step.is-active {
+  @apply font-medium text-ink;
+}
+
+.public-booking-progress-step.is-complete {
+  @apply text-ink-soft;
+}
+
+.public-booking-progress-number {
+  @apply flex size-6 shrink-0 items-center justify-center rounded-full bg-canvas-soft text-xs font-semibold ring-1 ring-line transition-colors;
+}
+
+.public-booking-progress-step.is-active .public-booking-progress-number {
+  @apply bg-accent text-on-dark ring-accent;
+}
+
+.public-booking-progress-step.is-complete .public-booking-progress-number {
+  @apply bg-hoki-100 text-hoki-700 ring-hoki-200;
+}
+
+.public-booking-progress-separator {
+  @apply hidden h-px w-6 bg-line sm:block sm:w-10;
+}
+
+.public-booking-content {
+  @apply px-6 py-6 sm:px-8 sm:py-8 lg:px-10 lg:py-10;
+}
+
+.public-booking-step {
+  animation: public-booking-fade-in 0.25s ease-out;
+}
+
+.public-booking-heading {
+  @apply mb-5 font-display text-xl font-semibold text-ink sm:mb-6 sm:text-2xl;
+}
+
+.public-booking-heading--center {
+  @apply text-center;
+}
+
+.public-booking-back {
+  @apply mb-5 inline-flex items-center text-sm font-medium text-ink-soft transition-colors hover:text-ink cursor-pointer;
+}
+
+.public-booking-event-grid {
+  @apply grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 lg:gap-5;
+}
+
+.public-booking-event-card {
+  @apply flex w-full cursor-pointer flex-col gap-3 rounded-xl border border-line bg-canvas-raised p-4 text-left transition-all
+         hover:border-accent/40 hover:shadow-md hover:shadow-hoki-900/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 sm:p-5;
+}
+
+.public-booking-event-card:hover {
+  transform: translateY(-1px);
+}
+
+.public-booking-event-card-header {
+  @apply flex items-start gap-3;
+}
+
+.public-booking-event-icon {
+  @apply mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg bg-accent-soft text-accent;
+}
+
+.public-booking-event-icon svg {
+  @apply size-4;
+}
+
+.public-booking-event-name {
+  @apply font-semibold text-ink;
+}
+
+.public-booking-event-meta {
+  @apply mt-0.5 text-sm text-ink-faint;
+}
+
+.public-booking-event-desc {
+  @apply line-clamp-2 text-sm leading-relaxed text-ink-soft;
+}
+
+.public-booking-two-col {
+  @apply grid gap-6 lg:gap-10 xl:gap-12;
+}
+
+.public-booking-two-col--schedule {
+  @apply lg:grid-cols-[minmax(18rem,22rem)_minmax(0,1fr)];
+}
+
+.public-booking-two-col:not(.public-booking-two-col--schedule) {
+  @apply lg:grid-cols-[minmax(0,1fr)_minmax(16rem,22rem)];
+}
+
+.public-booking-calendar-panel {
+  @apply min-w-0 lg:max-w-[22rem];
+}
+
+.public-booking-month-nav {
+  @apply mb-4 flex items-center justify-between;
+}
+
+.public-booking-month-btn {
+  @apply flex size-9 items-center justify-center rounded-lg text-ink-soft transition-colors hover:bg-canvas-soft hover:text-ink cursor-pointer;
+}
+
+.public-booking-month-label {
+  @apply font-display text-lg font-semibold capitalize text-ink;
+}
+
+.public-booking-calendar {
+  @apply grid grid-cols-7 gap-1 text-center text-sm transition-opacity;
+}
+
+.public-booking-calendar-weekday {
+  @apply py-2 text-xs font-semibold uppercase tracking-wide text-ink-faint;
+}
+
+.public-booking-day {
+  @apply rounded-lg py-2.5 text-sm font-medium transition-all cursor-pointer sm:py-3;
+}
+
+.public-booking-day.is-available {
+  @apply bg-accent-soft text-ink hover:bg-accent/20;
+}
+
+.public-booking-day.is-selected {
+  @apply bg-accent text-on-dark shadow-sm;
+}
+
+.public-booking-day.is-unavailable {
+  @apply cursor-not-allowed text-ink-faint opacity-35;
+}
+
+.public-booking-timezone {
+  @apply mt-6;
+}
+
+.public-booking-aside {
+  @apply min-w-0 space-y-5 rounded-xl border border-line bg-canvas-soft/60 p-4 lg:sticky lg:top-4 lg:self-start lg:p-5 xl:p-6;
+}
+
+.public-booking-two-col--schedule .public-booking-aside {
+  @apply lg:p-6 xl:p-7;
+}
+
+.public-booking-summary {
+  @apply space-y-1 border-b border-line pb-4;
+}
+
+.public-booking-summary-name {
+  @apply font-semibold text-ink;
+}
+
+.public-booking-summary-meta {
+  @apply text-sm text-ink-faint;
+}
+
+.public-booking-summary-desc {
+  @apply text-sm leading-relaxed text-ink-soft;
+}
+
+.public-booking-slots-heading {
+  @apply mb-3 text-sm font-semibold text-ink;
+}
+
+.public-booking-slots-list {
+  @apply grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6;
+}
+
+.public-booking-slot {
+  @apply w-full rounded-lg border border-line bg-canvas-raised px-2 py-2 text-center text-sm font-medium text-ink transition-all cursor-pointer
+         hover:border-accent/40 hover:bg-accent-soft/50 sm:px-3 sm:py-2.5;
+}
+
+.public-booking-slot.is-selected {
+  @apply border-accent bg-accent text-on-dark shadow-sm;
+}
+
+.public-booking-slot-loading,
+.public-booking-slot-empty {
+  @apply col-span-full py-2 text-sm text-ink-faint;
+}
+
+.public-booking-next {
+  @apply mt-2;
+}
+
+.public-booking-form {
+  @apply space-y-5;
+}
+
+.public-booking-form-error {
+  @apply rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700;
+}
+
+.public-booking-submit {
+  @apply w-full sm:w-auto;
+}
+
+.public-booking-summary-card {
+  @apply rounded-xl border border-line bg-canvas-soft/60 p-4 text-sm leading-relaxed space-y-2 sm:p-5;
+}
+
+.public-booking-summary-card--center {
+  @apply mx-auto max-w-md text-left;
+}
+
+.public-booking-confirmation {
+  @apply mx-auto max-w-lg space-y-5 text-center;
+}
+
+.public-booking-success-icon {
+  @apply mx-auto flex size-14 items-center justify-center rounded-full bg-green-100 text-green-600;
+}
+
+.public-booking-confirmation-actions {
+  @apply flex flex-col items-center justify-center gap-3 sm:flex-row;
+}
+
+.public-booking-alert {
+  @apply mt-3 rounded-lg px-3 py-2 text-sm;
+}
+
+.public-booking-alert.is-error {
+  @apply bg-red-50 text-red-700;
+}
+
+.public-booking-alert.is-warning {
+  @apply bg-golden-100 text-golden-800;
+}
+
+@keyframes public-booking-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @keyframes confetti-fall {
   0% {
     transform: translateY(-10vh) rotate(0deg);

@@ -4,6 +4,7 @@ es:
       slot_unavailable: "Ese horario ya no está disponible."
       invalid_datetime: "La fecha u hora seleccionada no es válida."
       rate_limited: "Demasiadas peticiones. Inténtalo de nuevo en un minuto."
+      event_type_not_found: "Tipo de evento no encontrado."
     mailer:
       reminder:
         subject: "Recordatorio: %{event_name} · %{date}"
@@ -26,6 +27,7 @@ en:
       slot_unavailable: "That time slot is no longer available."
       invalid_datetime: "The selected date or time is invalid."
       rate_limited: "Too many requests. Please try again in a minute."
+      event_type_not_found: "Event type not found."
     mailer:
       reminder:
         subject: "Reminder: %{event_name} · %{date}"

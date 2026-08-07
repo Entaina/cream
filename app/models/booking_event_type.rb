@@ -28,6 +28,7 @@ class BookingEventType < ApplicationRecord
   }.freeze
 
   belongs_to :booking_page, inverse_of: :event_types
+  belongs_to :email_template, optional: true
 
   attribute :reminder_minutes_before, :integer, default: 60
 
@@ -88,6 +89,17 @@ class BookingEventType < ApplicationRecord
 
   def reminder_enabled?
     reminder_minutes_before.to_i.positive?
+  end
+
+  def confirmation_email_enabled?
+    email_template.present?
+  end
+
+  def reminder_will_send_at?(starts_at)
+    return false unless reminder_enabled?
+
+    remind_at = starts_at - reminder_minutes_before.minutes
+    remind_at > Time.current
   end
 
   def payload(locale: I18n.locale)

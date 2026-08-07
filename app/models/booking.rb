@@ -43,7 +43,7 @@ class Booking < ApplicationRecord
   end
 
   def confirmation_payload(locale: I18n.locale)
-    {
+    payload = {
       id: id,
       event_type: booking_event_type.payload(locale:),
       starts_at: starts_at.iso8601,
@@ -57,6 +57,11 @@ class Booking < ApplicationRecord
       meet_link: meet_link,
       google_event_link: google_event_link
     }
+    if booking_event_type.reminder_will_send_at?(starts_at)
+      payload[:reminder_minutes_before] = booking_event_type.reminder_minutes_before
+    end
+    payload[:confirmation_email] = true if booking_event_type.confirmation_email_enabled?
+    payload
   end
 
   private

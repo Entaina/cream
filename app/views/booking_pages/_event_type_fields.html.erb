@@ -126,6 +126,18 @@
     </div>
 
     <div class="space-y-3">
+      <p class="text-xs font-medium text-ink-soft uppercase tracking-wide">Email de confirmación</p>
+      <div>
+        <%= form.label :email_template_id, "Plantilla de email al invitado", class: "label" %>
+        <%= form.collection_select :email_template_id, @email_templates, :id, :name, { include_blank: "Sin email" }, class: "input mt-1 w-full" %>
+        <p class="mt-1 text-xs text-ink-faint">
+          Se envía al confirmar la reserva. Tokens disponibles:
+          {first_name}, {last_name}, {name}, {email}, {company}, {event_name}, {date}, {time}, {duration}, {timezone}, {location}, {meet_link}.
+        </p>
+      </div>
+    </div>
+
+    <div class="space-y-3">
       <p class="text-xs font-medium text-ink-soft uppercase tracking-wide">Ubicación y apariencia</p>
       <div class="grid gap-3 sm:grid-cols-2">
         <div>

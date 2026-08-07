@@ -84,6 +84,7 @@ class BookingPagesController < ApplicationController
   def load_form_options
     @hosts = current_workspace.users.order(:name)
     @pipelines = current_workspace.pipelines.ordered
+    @email_templates = current_workspace.email_templates.visible_to(current_user).ordered
     host = @booking_page.host || current_user
     @host_calendar_connection = current_workspace.calendar_connections.find_by(user: host)
     calendar_result = load_host_calendars(@host_calendar_connection)
@@ -137,7 +138,7 @@ class BookingPagesController < ApplicationController
       event_types_attributes: [
         :id, :slug, :color, :duration_minutes, :location_type, :location_address,
         :buffer_before_minutes, :buffer_after_minutes, :slot_increment_minutes,
-        :min_notice_hours, :reminder_minutes_before, :visible, :position, :weekly_hours, :_destroy,
+        :min_notice_hours, :reminder_minutes_before, :email_template_id, :visible, :position, :weekly_hours, :_destroy,
         { name_i18n: {}, description_i18n: {} }
       ]
     ).tap do |permitted|

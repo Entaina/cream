@@ -12,21 +12,32 @@ class EmailTemplate < ApplicationRecord
   }
   scope :ordered, -> { order(:name, :id) }
 
-  def render_for(record)
-    body.gsub(/\{(\w+)\}/) do
-      token = Regexp.last_match(1)
-      template_value(record, token)
-    end
+  def render_for(record, extra_tokens: {})
+    interpolate(body, record, extra_tokens)
+  end
+
+  def render_subject_for(record, extra_tokens: {})
+    interpolate(subject.to_s, record, extra_tokens)
   end
 
   private
+
+  def interpolate(text, record, extra_tokens)
+    text.to_s.gsub(/\{(\w+)\}/) do
+      token = Regexp.last_match(1)
+      value = extra_tokens[token] || extra_tokens[token.to_sym]
+      next value.to_s unless value.nil?
+
+      template_value(record, token)
+    end
+  end
 
   def template_value(record, token)
     case token
     when "first_name" then record.try(:first_name)
     when "last_name" then record.try(:last_name)
     when "name" then record.try(:display_name) || record.try(:name)
-    when "company" then record.try(:company)&.name
+    when "company" then record.try(:company)&.name || record.try(:person)&.company&.name
     when "email" then record.try(:email)
     else "{#{token}}"
     end.to_s

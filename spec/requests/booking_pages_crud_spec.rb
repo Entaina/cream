@@ -166,5 +166,49 @@ RSpec.describe "Booking pages CRUD", type: :request do
       expect(video_type.reload.weekly_hours["monday"]).to eq([ [ "09:00", "12:00" ] ])
       expect(video_type.weekly_hours["tuesday"]).to eq([])
     end
+
+    it "persists email_template_id on event types" do
+      template = workspace.email_templates.create!(
+        user: user,
+        name: "Confirmación reserva",
+        subject: "Reserva confirmada",
+        body: "Hola {first_name}"
+      )
+
+      patch booking_page_path(booking_page), params: {
+        booking_page: {
+          name: booking_page.name,
+          slug: booking_page.slug,
+          host_id: user.id,
+          pipeline_id: pipeline.id,
+          timezone: "Europe/Madrid",
+          booking_window_days: 60,
+          active: true,
+          calendar_ids: [ "primary" ],
+          event_types_attributes: {
+            "0" => {
+              id: video_type.id,
+              slug: "video",
+              duration_minutes: 30,
+              location_type: "google_meet",
+              color: "hoki",
+              slot_increment_minutes: 15,
+              buffer_before_minutes: 0,
+              buffer_after_minutes: 0,
+              min_notice_hours: 0,
+              email_template_id: template.id,
+              visible: "1",
+              position: 0,
+              weekly_hours: BookingEventType::DEFAULT_WEEKLY_HOURS.to_json,
+              name_i18n: { es: "Video", en: "Video" },
+              description_i18n: { es: "", en: "" }
+            }
+          }
+        }
+      }
+
+      expect(response).to redirect_to(booking_pages_path)
+      expect(video_type.reload.email_template_id).to eq(template.id)
+    end
   end
 end

@@ -1,5 +1,5 @@
 <% content_for :title, @booking_page.name %>
-<div class="mx-auto max-w-5xl"
+<div class="public-booking mx-auto w-full max-w-7xl"
      data-controller="booking"
      data-booking-slug-value="<%= @booking_page.slug %>"
      data-booking-locale-value="<%= @locale %>"
@@ -8,97 +8,127 @@
      data-booking-availability-url-value="<%= public_booking_api_availability_path(@booking_page.slug) %>"
      data-booking-book-url-value="<%= public_booking_api_book_path(@booking_page.slug) %>"
      data-booking-timestamp-value="<%= BookingPage.signed_timestamp %>">
-  <div class="flex items-center justify-between gap-4 mb-6">
-    <div data-booking-target="profile" class="flex items-center gap-4 min-w-0"></div>
-    <div class="flex items-center gap-2 shrink-0">
-      <button type="button" data-action="booking#setLocale" data-locale="es" class="btn-ghost text-sm">ES</button>
-      <button type="button" data-action="booking#setLocale" data-locale="en" class="btn-ghost text-sm">EN</button>
-    </div>
-  </div>
+  <div class="public-booking-shell">
+    <header class="public-booking-hero">
+      <div data-booking-target="profile" class="public-booking-profile min-w-0 flex-1"></div>
+      <div class="public-booking-locale shrink-0" role="group" aria-label="Language">
+        <button type="button" data-action="booking#setLocale" data-locale="es" data-booking-target="localeEs" class="public-booking-locale-btn">ES</button>
+        <button type="button" data-action="booking#setLocale" data-locale="en" data-booking-target="localeEn" class="public-booking-locale-btn">EN</button>
+      </div>
+    </header>
 
-  <div data-booking-target="stepEventTypes">
-    <h1 class="font-display text-2xl font-semibold mb-4" data-booking-target="headingChoose"></h1>
-    <div data-booking-target="eventTypeGrid" class="grid gap-4 sm:grid-cols-2"></div>
-  </div>
+    <nav data-booking-target="progress" class="public-booking-progress" aria-label="Booking steps">
+      <ol class="public-booking-progress-list">
+        <li data-booking-target="progressEvent" class="public-booking-progress-step" data-step="eventTypes">
+          <span class="public-booking-progress-number">1</span>
+          <span data-booking-target="progressEventLabel" class="public-booking-progress-label"></span>
+        </li>
+        <li class="public-booking-progress-separator" aria-hidden="true"></li>
+        <li data-booking-target="progressSchedule" class="public-booking-progress-step" data-step="schedule">
+          <span class="public-booking-progress-number">2</span>
+          <span data-booking-target="progressScheduleLabel" class="public-booking-progress-label"></span>
+        </li>
+        <li class="public-booking-progress-separator" aria-hidden="true"></li>
+        <li data-booking-target="progressDetails" class="public-booking-progress-step" data-step="form">
+          <span class="public-booking-progress-number">3</span>
+          <span data-booking-target="progressDetailsLabel" class="public-booking-progress-label"></span>
+        </li>
+      </ol>
+    </nav>
 
-  <div data-booking-target="stepSchedule" class="hidden">
-    <button type="button" data-action="booking#backToEventTypes" class="btn-ghost mb-4" data-booking-target="backToTypesLabel"></button>
-    <div class="grid gap-6 lg:grid-cols-[1fr_280px]">
-      <div>
-        <div class="flex items-center justify-between mb-4">
-          <button type="button" data-action="booking#prevMonth" class="btn-ghost">&larr;</button>
-          <h2 class="font-display text-lg font-semibold" data-booking-target="monthLabel"></h2>
-          <button type="button" data-action="booking#nextMonth" class="btn-ghost">&rarr;</button>
-        </div>
-        <div data-booking-target="calendarGrid" class="grid grid-cols-7 gap-1 text-center text-sm"></div>
-        <p data-booking-target="scheduleError" class="hidden text-sm text-red-600 mt-3"></p>
-        <div class="mt-6">
-          <label class="label" data-booking-target="timezoneLabel"></label>
-          <select data-booking-target="timezoneSelect" data-action="change->booking#timezoneChanged" class="input mt-1"></select>
+    <div class="public-booking-content">
+      <div data-booking-target="stepEventTypes" class="public-booking-step">
+        <h1 class="public-booking-heading" data-booking-target="headingChoose"></h1>
+        <div data-booking-target="eventTypeGrid" class="public-booking-event-grid"></div>
+      </div>
+
+      <div data-booking-target="stepSchedule" class="public-booking-step hidden">
+        <button type="button" data-action="booking#backToEventTypes" class="public-booking-back" data-booking-target="backToTypesLabel"></button>
+        <div class="public-booking-two-col public-booking-two-col--schedule">
+          <div class="public-booking-calendar-panel">
+            <div class="public-booking-month-nav">
+              <button type="button" data-action="booking#prevMonth" class="public-booking-month-btn" aria-label="Previous month">&larr;</button>
+              <h2 class="public-booking-month-label" data-booking-target="monthLabel"></h2>
+              <button type="button" data-action="booking#nextMonth" class="public-booking-month-btn" aria-label="Next month">&rarr;</button>
+            </div>
+            <div data-booking-target="calendarGrid" class="public-booking-calendar"></div>
+            <p data-booking-target="scheduleError" class="public-booking-alert hidden"></p>
+            <div class="public-booking-timezone">
+              <label class="label" data-booking-target="timezoneLabel"></label>
+              <select data-booking-target="timezoneSelect" data-action="change->booking#timezoneChanged" class="input mt-1"></select>
+            </div>
+          </div>
+          <aside class="public-booking-aside">
+            <div data-booking-target="eventSummary" class="public-booking-summary"></div>
+            <div class="public-booking-slots">
+              <h3 class="public-booking-slots-heading" data-booking-target="slotsHeading"></h3>
+              <div data-booking-target="slotsList" class="public-booking-slots-list"></div>
+            </div>
+            <button type="button" data-action="booking#goToForm" data-booking-target="nextButton" class="btn-primary public-booking-next hidden w-full"></button>
+          </aside>
         </div>
       </div>
-      <aside class="card p-4 space-y-4">
-        <div data-booking-target="eventSummary"></div>
-        <div>
-          <h3 class="text-sm font-semibold mb-2" data-booking-target="slotsHeading"></h3>
-          <div data-booking-target="slotsList" class="flex flex-wrap gap-2"></div>
-        </div>
-        <button type="button" data-action="booking#goToForm" data-booking-target="nextButton" class="btn-primary w-full hidden"></button>
-      </aside>
-    </div>
-  </div>
 
-  <div data-booking-target="stepForm" class="hidden">
-    <button type="button" data-action="booking#backToSchedule" class="btn-ghost mb-4" data-booking-target="backToScheduleLabel"></button>
-    <div class="grid gap-6 lg:grid-cols-[1fr_280px]">
-      <form data-booking-target="form" data-action="submit->booking#submitBooking" class="space-y-4">
-        <div data-booking-target="formFields" class="space-y-4">
-          <div class="grid gap-4 sm:grid-cols-2">
-            <div data-booking-target="firstNameField">
-              <label class="label" data-booking-target="firstNameLabel"></label>
-              <input type="text" name="first_name" required minlength="2" class="input mt-1 w-full" data-booking-target="firstNameInput">
+      <div data-booking-target="stepForm" class="public-booking-step hidden">
+        <button type="button" data-action="booking#backToSchedule" class="public-booking-back" data-booking-target="backToScheduleLabel"></button>
+        <div class="public-booking-two-col">
+          <form data-booking-target="form" data-action="submit->booking#submitBooking" class="public-booking-form">
+            <div data-booking-target="formFields" class="space-y-5">
+              <div class="grid gap-4 sm:grid-cols-2">
+                <div data-booking-target="firstNameField">
+                  <label class="label" data-booking-target="firstNameLabel"></label>
+                  <input type="text" name="first_name" required minlength="2" class="input mt-1 w-full" data-booking-target="firstNameInput">
+                </div>
+                <div data-booking-target="lastNameField">
+                  <label class="label" data-booking-target="lastNameLabel"></label>
+                  <input type="text" name="last_name" required minlength="2" class="input mt-1 w-full" data-booking-target="lastNameInput">
+                </div>
+              </div>
+              <div data-booking-target="emailField">
+                <label class="label" data-booking-target="emailLabel"></label>
+                <input type="email" name="email" required class="input mt-1 w-full" data-booking-target="emailInput">
+              </div>
+              <div data-booking-target="phoneField">
+                <label class="label" data-booking-target="phoneLabel"></label>
+                <input type="tel" name="phone" class="input mt-1 w-full" data-booking-target="phoneInput">
+              </div>
+              <div data-booking-target="messageField">
+                <label class="label" data-booking-target="messageLabel"></label>
+                <textarea name="message" maxlength="500" rows="3" class="input mt-1 w-full" data-booking-target="messageInput"></textarea>
+              </div>
+              <div data-booking-target="guestsSection">
+                <button type="button" data-action="booking#toggleGuests" class="btn-secondary" data-booking-target="addGuestsLabel"></button>
+                <div data-booking-target="guestsFields" class="hidden mt-3 space-y-2"></div>
+              </div>
             </div>
-            <div data-booking-target="lastNameField">
-              <label class="label" data-booking-target="lastNameLabel"></label>
-              <input type="text" name="last_name" required minlength="2" class="input mt-1 w-full" data-booking-target="lastNameInput">
+            <div data-booking-target="confirmPanel" class="hidden space-y-4">
+              <h3 class="text-xs font-semibold uppercase tracking-wider text-ink-faint" data-booking-target="confirmHeading"></h3>
+              <div data-booking-target="confirmSummary" class="public-booking-summary-card"></div>
             </div>
-          </div>
-          <div data-booking-target="emailField">
-            <label class="label" data-booking-target="emailLabel"></label>
-            <input type="email" name="email" required class="input mt-1 w-full" data-booking-target="emailInput">
-          </div>
-          <div data-booking-target="phoneField">
-            <label class="label" data-booking-target="phoneLabel"></label>
-            <input type="tel" name="phone" class="input mt-1 w-full" data-booking-target="phoneInput">
-          </div>
-          <div data-booking-target="messageField">
-            <label class="label" data-booking-target="messageLabel"></label>
-            <textarea name="message" maxlength="500" rows="3" class="input mt-1 w-full" data-booking-target="messageInput"></textarea>
-          </div>
-          <div data-booking-target="guestsSection">
-            <button type="button" data-action="booking#toggleGuests" class="btn-secondary" data-booking-target="addGuestsLabel"></button>
-            <div data-booking-target="guestsFields" class="hidden mt-3 space-y-2"></div>
-          </div>
+            <div class="hidden" aria-hidden="true">
+              <label for="booking_honeypot" data-booking-target="honeypotLabel"></label>
+              <input type="text" id="booking_honeypot" name="_honeypot" tabindex="-1" autocomplete="off" data-booking-target="honeypotInput">
+            </div>
+            <p data-booking-target="formError" class="public-booking-form-error hidden"></p>
+            <button type="submit" class="btn-primary public-booking-submit" data-booking-target="submitLabel"></button>
+          </form>
+          <aside class="public-booking-aside" data-booking-target="formSummary"></aside>
         </div>
-        <div data-booking-target="confirmPanel" class="hidden space-y-4">
-          <h3 class="text-sm font-semibold uppercase tracking-wider text-ink-faint" data-booking-target="confirmHeading"></h3>
-          <div data-booking-target="confirmSummary" class="card p-4 text-sm space-y-2"></div>
-        </div>
-        <div class="hidden" aria-hidden="true">
-          <label for="booking_honeypot">No rellenar</label>
-          <input type="text" id="booking_honeypot" name="_honeypot" tabindex="-1" autocomplete="off" data-booking-target="honeypotInput">
-        </div>
-        <p data-booking-target="formError" class="text-red-600 text-sm hidden"></p>
-        <button type="submit" class="btn-primary" data-booking-target="submitLabel"></button>
-      </form>
-      <aside class="card p-4" data-booking-target="formSummary"></aside>
-    </div>
-  </div>
+      </div>
 
-  <div data-booking-target="stepConfirmation" class="hidden max-w-xl mx-auto text-center space-y-4">
-    <h2 class="font-display text-2xl font-semibold" data-booking-target="confirmedHeading"></h2>
-    <div data-booking-target="confirmationDetails" class="card p-6 text-left space-y-3"></div>
-    <a href="#" data-booking-target="icsDownload" class="btn-secondary" download="event.ics"></a>
-    <button type="button" data-action="booking#restart" class="btn-primary" data-booking-target="bookAnotherLabel"></button>
+      <div data-booking-target="stepConfirmation" class="public-booking-step public-booking-confirmation hidden">
+        <div class="public-booking-success-icon" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-8">
+            <path d="M20 6 9 17l-5-5"/>
+          </svg>
+        </div>
+        <h2 class="public-booking-heading public-booking-heading--center" data-booking-target="confirmedHeading"></h2>
+        <div data-booking-target="confirmationDetails" class="public-booking-summary-card public-booking-summary-card--center"></div>
+        <div class="public-booking-confirmation-actions">
+          <a href="#" data-booking-target="icsDownload" class="btn-secondary" download="event.ics"></a>
+          <button type="button" data-action="booking#restart" class="btn-primary" data-booking-target="bookAnotherLabel"></button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

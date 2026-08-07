@@ -160,6 +160,63 @@ RSpec.describe BookingCreator, type: :service do
     }.not_to have_enqueued_job(BookingReminderJob)
   end
 
+  it "sends a confirmation email when an email template is configured" do
+    template = workspace.email_templates.create!(
+      user: user,
+      name: "Confirmación reserva",
+      subject: "Reserva: {event_name} — {date}",
+      body: "Hola {first_name}, tu reunión {event_name} es el {date} a las {time} ({timezone}). Meet: {meet_link}"
+    )
+    event_type.update!(email_template: template)
+
+    I18n.with_locale(:es) do
+      expect {
+        result = described_class.call(
+          booking_page: booking_page,
+          event_type: event_type,
+          params: {
+            datetime: "2026-07-28T10:00:00",
+            timezone: "Europe/Madrid",
+            lang: "es",
+            first_name: "Ana",
+            last_name: "Lopez",
+            email: "ana@example.com"
+          },
+          request: request,
+          client: client
+        )
+
+        message = workspace.email_messages.order(:id).last
+        expect(message).to be_present
+        expect(message.to_address).to eq("ana@example.com")
+        expect(message.subject).to include("Online")
+        expect(message.body).to include("Ana")
+        expect(message.body).to include("https://meet.google.com/abc")
+        expect(message.body).to match(/julio|Julio|martes|Martes/)
+        expect(message.record).to eq(result.booking.deal)
+        expect(message.user).to eq(user)
+      }.to have_enqueued_job(SendViaGmailJob)
+    end
+  end
+
+  it "does not send a confirmation email without a template" do
+    expect {
+      described_class.call(
+        booking_page: booking_page,
+        event_type: event_type,
+        params: {
+          datetime: "2026-07-28T10:00:00",
+          timezone: "Europe/Madrid",
+          first_name: "Ana",
+          last_name: "Lopez",
+          email: "ana@example.com"
+        },
+        request: request,
+        client: client
+      )
+    }.not_to have_enqueued_job(SendViaGmailJob)
+  end
+
   it "reuses an existing deal in the target pipeline and stage" do
     company = create_company!(workspace)
     person = create_person!(workspace, company: company, email: "ana@example.com", first_name: "Ana", last_name: "Lopez")

@@ -47,6 +47,9 @@ class EmailMessage < ApplicationRecord
   # account instead of SMTP. Single source of truth so immediate and scheduled
   # (deferred) sends pick the same channel, evaluated at send time.
   def route_via_gmail?
+    # Development captures mail via Mailbin (SMTP); skip Gmail so emails are visible locally.
+    return false if Rails.env.development?
+
     return false unless CreamFeatures.enabled?(:gmail_sync)
 
     connection = workspace.gmail_connections.find_by(user_id: user_id)

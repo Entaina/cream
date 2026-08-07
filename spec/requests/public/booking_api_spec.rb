@@ -105,13 +105,14 @@ RSpec.describe Public::BookingApiController, type: :request do
 
   describe "POST /b/:slug/api/book" do
     let(:booking) do
+      starts = 2.days.from_now.change(hour: 10, min: 0)
       Booking.new(
         id: 1,
         first_name: "Ana",
         last_name: "Lopez",
         email: "ana@example.com",
-        starts_at: Time.zone.parse("2026-07-28 10:00"),
-        ends_at: Time.zone.parse("2026-07-28 10:30"),
+        starts_at: starts,
+        ends_at: starts + 30.minutes,
         timezone: "Europe/Madrid",
         guest_emails: [],
         booking_page: booking_page,
@@ -130,6 +131,54 @@ RSpec.describe Public::BookingApiController, type: :request do
       expect(response).to have_http_status(:created)
       expect(response.parsed_body["attendee_email"]).to eq("ana@example.com")
       expect(BookingCreator).to have_received(:call)
+    end
+
+    it "includes reminder_minutes_before when a reminder is scheduled" do
+      allow(BookingCreator).to receive(:call).and_return(BookingCreator::Result.new(booking: booking))
+
+      post public_booking_api_book_path(booking_page.slug),
+        params: valid_booking_params,
+        as: :json
+
+      expect(response.parsed_body["reminder_minutes_before"]).to eq(60)
+    end
+
+    it "omits reminder_minutes_before when reminders are disabled" do
+      event_type.update!(reminder_minutes_before: 0)
+      allow(BookingCreator).to receive(:call).and_return(BookingCreator::Result.new(booking: booking))
+
+      post public_booking_api_book_path(booking_page.slug),
+        params: valid_booking_params,
+        as: :json
+
+      expect(response.parsed_body).not_to have_key("reminder_minutes_before")
+    end
+
+    it "includes confirmation_email when an email template is configured" do
+      template = workspace.email_templates.create!(
+        user: user,
+        name: "Confirmación",
+        subject: "Reserva confirmada",
+        body: "Hola {first_name}"
+      )
+      event_type.update!(email_template: template)
+      allow(BookingCreator).to receive(:call).and_return(BookingCreator::Result.new(booking: booking))
+
+      post public_booking_api_book_path(booking_page.slug),
+        params: valid_booking_params,
+        as: :json
+
+      expect(response.parsed_body["confirmation_email"]).to eq(true)
+    end
+
+    it "omits confirmation_email without a template" do
+      allow(BookingCreator).to receive(:call).and_return(BookingCreator::Result.new(booking: booking))
+
+      post public_booking_api_book_path(booking_page.slug),
+        params: valid_booking_params,
+        as: :json
+
+      expect(response.parsed_body).not_to have_key("confirmation_email")
     end
 
     it "silently accepts honeypot submissions" do
@@ -224,6 +273,25 @@ RSpec.describe Public::BookingApiController, type: :request do
         as: :json
 
       expect(response).to have_http_status(:conflict)
+    end
+
+    it "returns conflict message in the requested locale" do
+      allow(BookingCreator).to receive(:call) do
+        raise BookingCreator::Conflict, I18n.t("booking.errors.slot_unavailable")
+      end
+
+      post public_booking_api_book_path(booking_page.slug),
+        params: valid_booking_params(lang: "es"),
+        as: :json
+
+      expect(response).to have_http_status(:conflict)
+      expect(response.parsed_body["error"]).to eq(I18n.t("booking.errors.slot_unavailable", locale: :es))
+
+      post public_booking_api_book_path(booking_page.slug),
+        params: valid_booking_params(lang: "en"),
+        as: :json
+
+      expect(response.parsed_body["error"]).to eq(I18n.t("booking.errors.slot_unavailable", locale: :en))
     end
   end
 end
