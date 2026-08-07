@@ -35,7 +35,7 @@ RSpec.describe "Public lead form Liderando con IA", type: :request do
       expect(response.body).to include("Google")
       expect(response.body).to include('name="lead[newsletter_opt_in]"')
       expect(response.body).not_to match(/name="lead\[newsletter_opt_in\]"[^>]*checked/)
-      expect(response.body).to include('href="/privacy"')
+      expect(response.body).to include(public_lead_form_privacy_path(lead_form.slug))
       expect(response.body).to include("CRM de Entaina")
       expect(response.body).to include('name="lead[gdpr_consent]"')
     end

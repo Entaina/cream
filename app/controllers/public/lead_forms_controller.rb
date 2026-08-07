@@ -2,7 +2,7 @@ module Public
   class LeadFormsController < ApplicationController
     layout "public_lead_form"
 
-    allow_unauthenticated_access only: %i[show create success]
+    allow_unauthenticated_access only: %i[show create success privacy]
     skip_before_action :set_current_workspace, :ensure_workspace_membership
     skip_after_action :verify_authorized
     skip_after_action :verify_policy_scoped
@@ -15,7 +15,7 @@ module Public
     # Anti-DoS: per-IP throttling backed by Rails.cache (Solid Cache in production).
     rate_limit to: 10, within: 1.minute, only: :create, name: "lead_form_create",
       with: -> { redirect_after_submission }
-    rate_limit to: 60, within: 1.minute, only: %i[show success], name: "lead_form_show"
+    rate_limit to: 60, within: 1.minute, only: %i[show success privacy], name: "lead_form_show"
 
     def show
       prepare_show_page
@@ -54,6 +54,12 @@ module Public
 
     def success
       @lead_form_page_html = template_renderer.render("public/lead_forms/success")
+    rescue Liquid::FileSystemError
+      head :not_found
+    end
+
+    def privacy
+      @lead_form_page_html = template_renderer.render("public/lead_forms/privacy")
     rescue Liquid::FileSystemError
       head :not_found
     end

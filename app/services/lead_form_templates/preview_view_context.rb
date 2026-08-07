@@ -12,8 +12,8 @@ module LeadFormTemplates
       @view_context.form_authenticity_token
     end
 
-    def privacy_path
-      @view_context.privacy_path
+    def public_lead_form_privacy_path(_slug)
+      "#"
     end
 
     def method_missing(name, ...)

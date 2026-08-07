@@ -9,8 +9,8 @@ module LeadFormTemplates
       "schema-render-token"
     end
 
-    def privacy_path
-      "/privacy"
+    def public_lead_form_privacy_path(slug)
+      "/f/#{slug}/privacy"
     end
   end
 end

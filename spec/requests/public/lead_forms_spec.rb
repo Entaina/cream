@@ -20,6 +20,7 @@ RSpec.describe "Public lead forms", type: :request do
       expect(response.body).to include("Cuéntanos un poco más")
       expect(response.body).to include("newsletter de Entaina")
       expect(response.body).to include("beehiiv")
+      expect(response.body).to include(public_lead_form_privacy_path(lead_form.slug))
       expect(response.headers["Content-Security-Policy"]).to include("frame-ancestors *")
     end
 
@@ -74,6 +75,43 @@ RSpec.describe "Public lead forms", type: :request do
       get public_lead_form_path(lead_form.slug)
       expect(response.body).to include("Version two")
       expect(response.body).not_to include("Version one")
+    end
+  end
+
+  describe "GET /f/:slug/privacy" do
+    it "renders the workspace privacy template" do
+      get public_lead_form_privacy_path(lead_form.slug)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("Política de privacidad")
+      expect(response.body).to include("Responsable del tratamiento")
+      expect(response.headers["Content-Security-Policy"]).to include("frame-ancestors *")
+    end
+
+    it "reflects workspace template edits" do
+      workspace.lead_form_templates.find_by!(path: "public/lead_forms/privacy").update!(
+        body: '<div class="mx-auto max-w-xl"><p id="privacy-marker">Política personalizada</p></div>'
+      )
+
+      get public_lead_form_privacy_path(lead_form.slug)
+
+      expect(response.body).to include("Política personalizada")
+    end
+
+    it "returns not found when workspace templates are not imported" do
+      LeadFormTemplate.delete_all
+
+      get public_lead_form_privacy_path(lead_form.slug)
+
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it "returns not found for inactive forms" do
+      lead_form.update!(active: false)
+
+      get public_lead_form_privacy_path(lead_form.slug)
+
+      expect(response).to have_http_status(:not_found)
     end
   end
 

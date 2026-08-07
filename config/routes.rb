@@ -183,6 +183,7 @@ Rails.application.routes.draw do
   get "f/:slug", to: "public/lead_forms#show", as: :public_lead_form
   post "f/:slug", to: "public/lead_forms#create"
   get "f/:slug/success", to: "public/lead_forms#success", as: :public_lead_form_success
+  get "f/:slug/privacy", to: "public/lead_forms#privacy", as: :public_lead_form_privacy
 
   get "b/:slug", to: "public/bookings#show", as: :public_booking_page
   scope "b/:slug", as: :public_booking do

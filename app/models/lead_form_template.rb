@@ -2,7 +2,7 @@ class LeadFormTemplate < ApplicationRecord
   PATH_FORMAT = /\Apublic\/lead_forms(?:\/[a-z0-9_]+)+\z/
   ROOT_PREFIX = "public/lead_forms/".freeze
   PARTIALS_PREFIX = "public/lead_forms/partials/".freeze
-  SYSTEM_VIEW_PATHS = %w[public/lead_forms/success].freeze
+  SYSTEM_VIEW_PATHS = %w[public/lead_forms/success public/lead_forms/privacy].freeze
 
   belongs_to :workspace
 

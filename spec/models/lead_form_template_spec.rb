@@ -106,6 +106,7 @@ RSpec.describe LeadFormTemplate, type: :model do
 
     it "returns nil for non-template paths" do
       expect(described_class.template_key_for("public/lead_forms/success")).to be_nil
+      expect(described_class.template_key_for("public/lead_forms/privacy")).to be_nil
       expect(described_class.template_key_for("public/lead_forms/partials/contact_fields")).to be_nil
     end
   end
