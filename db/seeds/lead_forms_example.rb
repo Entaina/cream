@@ -11,6 +11,13 @@ module LeadFormsExample
     "entrenadores" => "Entrenadores"
   }.freeze
 
+  CONTACTO_PIPELINE_ROUTES = {
+    "curso" => "Formación B2C",
+    "entrenamiento" => "Entrenadores",
+    "proyecto_consultoria" => "Consultoría",
+    "otro" => "Proyectos"
+  }.freeze
+
   FORMS = [
     {
       slug: "contacto",
@@ -19,7 +26,7 @@ module LeadFormsExample
       active: true,
       collects_company: false,
       default_pipeline: "Proyectos",
-      pipeline_routes: PIPELINE_NAMES,
+      pipeline_routes: CONTACTO_PIPELINE_ROUTES,
       email_template: {
         key: "contacto_lead",
         name: "Contacto — acuse de recibo",

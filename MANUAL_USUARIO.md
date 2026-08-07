@@ -1016,7 +1016,7 @@ En el menú lateral, abre **Formularios**.
 3. Opcional: indica la **URL de redirección tras envío** (p. ej. `https://entaina.com/gracias`) para llevar al visitante a una página de tu web. Si se deja vacía, se muestra la página de gracias de Cream (`/f/slug/success`).
 4. Opcional: define **campos ocultos adicionales** (uno por línea, p. ej. `producto`, `landing`). Sus valores se pasan como query params en la URL pública o del iframe, p. ej. `/f/slug?producto=curso-ia`. Se guardan con el envío y aparecen en **Formulario de origen** del deal.
 5. Opcional: elige un **producto** del catálogo si el formulario debe asociar una línea de producto al deal (p. ej. reservas de curso). El visitante puede sobrescribirlo con `?product_id=` en la URL. Las plantillas de reserva muestran las **ediciones abiertas** de ese producto.
-6. Marca **Recoger datos de empresa** si el formulario debe pedir nombre y CIF de la empresa (la validación en servidor exige el nombre de empresa solo con esta opción activada).
+6. Marca **Recoger datos de empresa** si el formulario debe pedir nombre y CIF de la empresa. Con esta opción, un envío sin nombre de empresa sigue aceptándose en servidor (se usa una empresa placeholder); marca el campo `required: true` en la plantilla si quieres exigirlo en el navegador.
 7. Guarda. En el listado verás la **URL pública** y el **código iframe** listos para copiar.
 
 ### Plantillas de formulario (administradores)

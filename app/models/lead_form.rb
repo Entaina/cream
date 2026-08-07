@@ -11,23 +11,10 @@ class LeadForm < ApplicationRecord
     lead_form_slug lead_form_name source_page referrer
     utm_source utm_medium utm_campaign utm_term utm_content
   ].freeze
-  SUBMISSION_FIELD_KEYS = %w[
-    email first_name last_name phone phone_prefix how_heard help_type message
-    product_id edition_id
-    company_name company_cif employee_range qualifying_answer job_title audience tech_profile
-    ia_work_task organization_ia_stage newsletter_opt_in
-  ].freeze
-  RESERVED_FIELD_KEYS = (
-    SUBMISSION_FIELD_KEYS + METADATA_FIELDS + [ HONEYPOT_FIELD, TIMESTAMP_FIELD, "gdpr_consent" ]
+  SYSTEM_FIELD_KEYS = (
+    METADATA_FIELDS + [ HONEYPOT_FIELD, TIMESTAMP_FIELD, "gdpr_consent" ]
   ).freeze
-  HIDDEN_FIELD_KEY_FORMAT = /\A[a-z][a-z0-9_]{0,39}\z/
-  CONTACTO_HELP_OPTIONS = [
-    [ "Curso", "curso" ],
-    [ "Entrenamiento", "entrenamiento" ],
-    [ "Proyecto / consultoría", "proyecto_consultoria" ],
-    [ "Otro", "otro" ]
-  ].freeze
-  CONTACTO_HELP_TYPE_KEYS = CONTACTO_HELP_OPTIONS.map(&:last).freeze
+  FIELD_KEY_FORMAT = /\A[a-z][a-z0-9_]{0,39}\z/
 
   belongs_to :workspace
   belongs_to :pipeline
@@ -45,6 +32,7 @@ class LeadForm < ApplicationRecord
   validates :success_redirect_url, format: { with: URI::DEFAULT_PARSER.make_regexp(%w[http https]) }, allow_blank: true
   validate :associations_belong_to_workspace
   validate :pipeline_routes_belong_to_workspace
+  validate :pipeline_route_keys_are_valid
   validate :hidden_field_keys_are_valid
 
   before_validation :normalize_slug
@@ -81,7 +69,16 @@ class LeadForm < ApplicationRecord
   end
 
   def help_type_label(help_type)
-    CONTACTO_HELP_OPTIONS.to_h.invert.fetch(help_type.to_s, help_type.to_s.humanize)
+    help_type.to_s.tr("_", " ").humanize
+  end
+
+  def self.build_pipeline_routes_from_form(keys, pipeline_ids)
+    Array(keys).zip(Array(pipeline_ids)).each_with_object({}) do |(key, pipeline_id), routes|
+      key = key.to_s.strip
+      next if key.blank? || pipeline_id.blank?
+
+      routes[key] = pipeline_id
+    end
   end
 
   def resolved_product(product_id_param: nil)
@@ -114,6 +111,18 @@ class LeadForm < ApplicationRecord
       key = File.basename(path, ".liquid")
       key unless key.in?(%w[show success])
     end.sort
+  end
+
+  def self.filter_submission_params(raw)
+    hash = raw.respond_to?(:to_unsafe_h) ? raw.to_unsafe_h : raw.to_h
+    hash.stringify_keys.select { |key, _| field_key?(key) }
+  end
+
+  def self.field_key?(key)
+    key = key.to_s
+    return true if key.in?([ HONEYPOT_FIELD, TIMESTAMP_FIELD ])
+
+    key.match?(FIELD_KEY_FORMAT)
   end
 
   def self.placeholder_company_for(workspace)
@@ -181,12 +190,12 @@ class LeadForm < ApplicationRecord
 
   def hidden_field_keys_are_valid
     hidden_field_keys.each do |key|
-      unless key.match?(HIDDEN_FIELD_KEY_FORMAT)
+      unless key.match?(FIELD_KEY_FORMAT)
         errors.add(:hidden_field_keys, "invalid key: #{key}")
         next
       end
 
-      if RESERVED_FIELD_KEYS.include?(key)
+      if SYSTEM_FIELD_KEYS.include?(key)
         errors.add(:hidden_field_keys, "reserved key: #{key}")
       end
     end
@@ -196,6 +205,16 @@ class LeadForm < ApplicationRecord
     return if pipeline_routes.blank?
 
     self.pipeline_routes = pipeline_routes.to_h.transform_keys(&:to_s).transform_values { |value| value.presence&.to_i }.compact
+  end
+
+  def pipeline_route_keys_are_valid
+    return if pipeline_routes.blank?
+
+    pipeline_routes.each_key do |key|
+      next if key.match?(FIELD_KEY_FORMAT)
+
+      errors.add(:pipeline_routes, "invalid key: #{key}")
+    end
   end
 
   def pipeline_routes_belong_to_workspace

@@ -162,7 +162,7 @@ Al cambiar formularios públicos, plantillas Liquid o admin de formularios, actu
 | Página de gracias | `/f/:slug/success` | §27 redirección vs success de Cream |
 | Datos en deal | `LeadSubmission`, ficha deal **Formulario de origen** | §27 «Qué ocurre al enviar» |
 
-**No documentar** en el manual: tags Liquid, `LeadFormSubmissionProcessor`, importer rake, `FieldRenderer`, Stimulus, whitelist de `lead_params`.
+**No documentar** en el manual: tags Liquid, `LeadFormSubmissionProcessor`, importer rake, `FieldRenderer`, Stimulus.
 
 **Formularios de ejemplo** (slugs en seeds `db/seeds/lead_forms_example.rb`): mantener la lista de bullets al final de §27 sincronizada con plantillas reales (`contacto`, `demo`, `liderando_ia`, reservas, etc.). Si se elimina un formulario de ejemplo, quitar su bullet.
 

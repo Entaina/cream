@@ -98,14 +98,11 @@ En dev (workspace Example): usar el id del workspace tras seed. Los specs usan `
 
 **No** añadir fallback filesystem en runtime — solo BD.
 
-### 3. Strong params y campos reservados
+### 3. Nombres de campo
 
-Si el formulario usa campos **nuevos** (no en la whitelist):
+Los campos del POST deben llamarse `lead[nombre_campo]` con `nombre_campo` en minúsculas, empezando por letra (`FIELD_KEY_FORMAT`: `[a-z][a-z0-9_]{0,39}`). No hace falta registrar el nombre en Ruby.
 
-1. Añadir a `LeadForm::SUBMISSION_FIELD_KEYS` en [`app/models/lead_form.rb`](app/models/lead_form.rb)
-2. Añadir a [`Public::LeadFormsController#lead_params`](app/controllers/public/lead_forms_controller.rb)
-
-`help_type` y rutas de pipeline ya están soportados (`pipeline_routes` en admin del formulario).
+Campos ocultos adicionales del admin no pueden usar claves de **sistema** (UTM, `_honeypot`, `_ts`, `gdpr_consent`, `lead_form_slug`, etc.).
 
 ### 4. Validación servidor
 
@@ -115,12 +112,10 @@ Reglas actuales (no duplicar salvo requisito explícito):
 
 | Campo | Servidor |
 |-------|----------|
-| `first_name`, `last_name`, `email` | Siempre obligatorios; email con `URI::MailTo::EMAIL_REGEXP` |
-| `phone` | Obligatorio solo si el POST incluye clave `phone` |
-| `company_name` | Obligatorio si `collects_company?` |
+| `email` | Siempre obligatorio; formato con `URI::MailTo::EMAIL_REGEXP` |
 | `product` / `edition_id` | Si el formulario tiene `product_id` configurado |
 
-`required: true` en Liquid = HTML5 únicamente para el resto de campos.
+Todo lo demás (`first_name`, `last_name`, `phone`, `company_name`, campos custom…) depende de `required: true` en Liquid (HTML5). El servidor no rechaza envíos por campos vacíos salvo email y coherencia producto/edición.
 
 ### 5. Configuración del LeadForm (admin / seed)
 
@@ -165,9 +160,9 @@ Actualizar [`MANUAL_USUARIO.md`](MANUAL_USUARIO.md) y [`USER_MANUAL.md`](USER_MA
 
 ## Pipeline routes (formulario tipo contacto)
 
-1. Define las opciones de `help_type` con `choices:` en la plantilla Liquid.
-2. Seed/admin: `pipeline_routes: { "curso" => pipeline_id, ... }` (nombres de pipeline del workspace).
-3. `LeadForm#resolve_pipeline(help_type:)` enruta; el nombre del deal incluye la etiqueta del help type si viene en el POST.
+1. Define las opciones del campo (p. ej. `help_type`) con `choices:` en la plantilla Liquid.
+2. En admin del **LeadForm**, añade filas «valor → pipeline». La clave debe ser el **value** de `choices:` (`curso`, no «Curso»). En seeds: `pipeline_routes: { "curso" => "Formación B2C", ... }` (nombres de pipeline del workspace).
+3. `LeadForm#resolve_pipeline(help_type:)` enruta; el nombre del deal incluye `help_type.humanize` si viene en el POST.
 
 ## Checklist final (obligatorio)
 

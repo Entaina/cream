@@ -73,23 +73,57 @@
       <p class="mt-1 text-xs text-ink-faint">Si se configura, se envía oculto en el formulario público y se asocia al deal. Puede sobrescribirse con <code class="text-2xs">?product_id=</code> en la URL.</p>
     </div>
 
-    <div class="space-y-3 border-t border-line pt-4">
+    <div class="space-y-3 border-t border-line pt-4" data-controller="nested-form">
+      <%= hidden_field_tag "lead_form[pipeline_routes_submitted]", "1" %>
       <div>
         <p class="text-sm font-medium text-ink">Pipeline según campo del formulario</p>
-        <p class="mt-1 text-xs text-ink-faint">Opcional. Si la plantilla envía <code class="text-2xs">help_type</code>, asigna un pipeline distinto por valor (p. ej. opciones de «¿En qué te ayudamos?»).</p>
+        <p class="mt-1 text-xs text-ink-faint">Opcional. Si la plantilla envía un campo (p. ej. <code class="text-2xs">help_type</code>), asigna un pipeline distinto por <strong>valor</strong> del POST. Las claves deben coincidir con los <code class="text-2xs">value</code> del atributo <code class="text-2xs">choices:</code> en Liquid.</p>
       </div>
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <% LeadForm::CONTACTO_HELP_OPTIONS.each do |label, key| %>
-            <div>
-              <%= label_tag "lead_form_pipeline_routes_#{key}", label, class: "label" %>
-              <%= select_tag "lead_form[pipeline_routes][#{key}]",
-                    options_from_collection_for_select(@pipelines, :id, :name, lead_form.pipeline_routes[key]),
-                    include_blank: "Usar pipeline por defecto",
-                    class: "input mt-1 w-full",
-                    id: "lead_form_pipeline_routes_#{key}" %>
+      <div class="space-y-2" data-nested-form-target="list">
+        <% lead_form.pipeline_routes.each do |key, pipeline_id| %>
+          <div class="flex flex-col gap-2 sm:flex-row sm:items-end" data-nested-form-target="row">
+            <div class="flex-1">
+              <%= label_tag nil, "Valor del campo", class: "label" %>
+              <%= text_field_tag "lead_form[pipeline_route_keys][]", key,
+                    class: "input mt-1 w-full font-mono text-sm",
+                    placeholder: "curso",
+                    pattern: LeadForm::FIELD_KEY_FORMAT.source,
+                    title: "Letras minúsculas, números y guiones bajos" %>
             </div>
-          <% end %>
+            <div class="flex-1">
+              <%= label_tag nil, "Pipeline", class: "label" %>
+              <%= select_tag "lead_form[pipeline_route_pipeline_ids][]",
+                    options_from_collection_for_select(@pipelines, :id, :name, pipeline_id),
+                    include_blank: "Usar pipeline por defecto",
+                    class: "input mt-1 w-full" %>
+            </div>
+            <button type="button" class="btn-ghost shrink-0" data-action="nested-form#remove" aria-label="Quitar ruta">✕</button>
+          </div>
+        <% end %>
+      </div>
+      <template data-nested-form-target="template">
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-end" data-nested-form-target="row">
+          <div class="flex-1">
+            <%= label_tag nil, "Valor del campo", class: "label" %>
+            <%= text_field_tag "lead_form[pipeline_route_keys][]", nil,
+                  class: "input mt-1 w-full font-mono text-sm",
+                  placeholder: "curso",
+                  pattern: LeadForm::FIELD_KEY_FORMAT.source,
+                  title: "Letras minúsculas, números y guiones bajos" %>
+          </div>
+          <div class="flex-1">
+            <%= label_tag nil, "Pipeline", class: "label" %>
+            <%= select_tag "lead_form[pipeline_route_pipeline_ids][]",
+                  options_from_collection_for_select(@pipelines, :id, :name, nil),
+                  include_blank: "Usar pipeline por defecto",
+                  class: "input mt-1 w-full" %>
+          </div>
+          <button type="button" class="btn-ghost shrink-0" data-action="nested-form#remove" aria-label="Quitar ruta">✕</button>
         </div>
+      </template>
+      <button type="button" class="btn-secondary" data-action="nested-form#add">
+        <%= icon :plus, classes: "size-3.5" %> Añadir ruta
+      </button>
     </div>
   </div>
 

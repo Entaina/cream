@@ -59,16 +59,17 @@ RSpec.describe "Public lead form Trabajando con IA", type: :request do
       expect(person.company.name).to eq(LeadForm::PLACEHOLDER_COMPANY_NAME)
     end
 
-    it "rejects submission without phone" do
+    it "accepts submission without phone when the client bypasses HTML validation" do
       allow(TurnstileVerifier).to receive_messages(enabled?: false)
 
       expect {
         post public_lead_form_path(lead_form.slug), params: {
           lead: trabajando_ia_lead_params("phone" => "")
         }
-      }.not_to change(Deal, :count)
+      }.to change(Deal, :count).by(1)
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to redirect_to(public_lead_form_success_path(lead_form.slug))
+      expect(Person.order(:id).last.phone).to be_blank
     end
   end
 end

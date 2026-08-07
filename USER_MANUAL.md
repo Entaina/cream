@@ -1016,7 +1016,7 @@ In the sidebar menu, open **Formularios** (Forms).
 3. Optional: set a **redirect URL after submission** (e.g. `https://example.com/thanks`) to send the visitor to a page on your site. If left blank, Cream's thank-you page is shown (`/f/slug/success`).
 4. Optional: define **additional hidden fields** (one per line, e.g. `producto`, `landing`). Their values are passed as query params in the public or iframe URL, e.g. `/f/slug?producto=curso-ia`. They are saved with the submission and shown on the deal under **Formulario de origen** (Source form).
 5. Optional: select a **product** from the catalog if the form should attach a product line to the deal (e.g. course reservations). Visitors can override it with `?product_id=` in the URL. Reservation templates show that product's **open editions**.
-6. Check **Recoger datos de empresa** (Collect company data) if the form should ask for the company name and tax ID (CIF). Server-side validation requires the company name only when this option is enabled.
+6. Check **Recoger datos de empresa** (Collect company data) if the form should ask for the company name and tax ID (CIF). When enabled, submissions with an empty company name still succeed server-side (a placeholder company is used); mark the field `required: true` in the template if you want to enforce it in the browser.
 7. Save. In the list you will see the **public URL** and the **iframe code** ready to copy.
 
 ### Form templates (administrators)

@@ -46,4 +46,51 @@ RSpec.describe LeadForm, type: :model do
 
     expect(described_class.available_template_keys(workspace: workspace)).to include("custom_workspace")
   end
+
+  describe ".build_pipeline_routes_from_form" do
+    it "zips keys and pipeline ids into a hash" do
+      routes = described_class.build_pipeline_routes_from_form(
+        %w[curso otro],
+        [ 10, 20 ]
+      )
+
+      expect(routes).to eq({ "curso" => 10, "otro" => 20 })
+    end
+
+    it "skips blank keys or pipeline ids" do
+      routes = described_class.build_pipeline_routes_from_form(
+        [ "curso", "", "otro" ],
+        [ 10, 20, "" ]
+      )
+
+      expect(routes).to eq({ "curso" => 10 })
+    end
+  end
+
+  describe "pipeline_routes validation" do
+    it "rejects invalid route keys" do
+      form = create_lead_form!(workspace, user: member)
+      form.pipeline_routes = { "Invalid-Key" => form.pipeline_id }
+
+      expect(form).not_to be_valid
+      expect(form.errors[:pipeline_routes]).to include("invalid key: Invalid-Key")
+    end
+  end
+
+  describe ".filter_submission_params" do
+    it "keeps any field key matching FIELD_KEY_FORMAT" do
+      filtered = described_class.filter_submission_params(
+        "email" => "a@b.com",
+        "custom_field" => "value",
+        "Invalid-Key" => "drop",
+        "gdpr_consent" => "1"
+      )
+
+      expect(filtered).to eq(
+        "email" => "a@b.com",
+        "custom_field" => "value",
+        "gdpr_consent" => "1"
+      )
+    end
+  end
 end

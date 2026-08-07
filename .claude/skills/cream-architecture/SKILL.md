@@ -140,28 +140,26 @@ Feature flag `:lead_forms`. Public URLs `/f/:slug` (POST creates lead) and `/f/:
 | `{% phone_with_prefix %}` | Phone + country prefix select |
 | `{% honeypot %}`, `{% turnstile %}`, `{% submit '…' %}` | Anti-spam / submit |
 
-Select options: inline in Liquid via `choices: "Label|value; Label2|value2"` on `{% field type: "select" %}`. Phone prefix lists use the same format on `{% phone_with_prefix prefixes: "…" %}`. Dynamic collections (e.g. `open_editions`) still use `collection: "open_editions"`. Admin pipeline routing for `help_type` still uses `LeadForm::CONTACTO_HELP_OPTIONS` in the CRM form editor only.
+Select options: inline in Liquid via `choices: "Label|value; Label2|value2"` on `{% field type: "select" %}`. Phone prefix lists use the same format on `{% phone_with_prefix prefixes: "…" %}`. Dynamic collections (e.g. `open_editions`) still use `collection: "open_editions"`. Admin **pipeline routes** are free-form rows (field value → pipeline); keys must match Liquid `choices` values (e.g. `curso`, not the label).
 
 ### Submission pipeline
 
 1. **`Public::LeadFormsController#create`**: GDPR consent, Turnstile, honeypot + signed timestamp (`LeadForm::MIN_SECONDS_TO_SUBMIT`), rate limits.
 2. **`LeadFormSubmissionProcessor`**: generic validation + CRM side effects. **No `template_key` branches.**
-3. **`lead_params`**: whitelist in controller; extra keys via `LeadForm#hidden_field_keys`.
+3. **`lead_params`**: accepts any `lead[…]` key matching `LeadForm::FIELD_KEY_FORMAT` (`[a-z][a-z0-9_]{0,39}`). No fixed field whitelist. Hidden field keys in admin cannot collide with **system** keys only (`SYSTEM_FIELD_KEYS`: UTM, honeypot, timestamp, GDPR, form metadata).
 
-**Server validation** (`validate_submission!`) — always enforced:
+**Server validation** (`validate_submission!`) — minimal CRM rules only (not per-field template rules):
 
-- `first_name`, `last_name`, `email` (format via `URI::MailTo::EMAIL_REGEXP`)
-- `phone` — only if `params.key?("phone")` (form included the field)
-- `company_name` — only if `lead_form.collects_company?`
+- `email` — required; format via `URI::MailTo::EMAIL_REGEXP` (needed to create/link the person)
 - `product` / `edition_id` — only if form has configured `product_id` (edition validated when present)
 
-Fields marked `required: true` in Liquid are **HTML5-only** unless covered above. Optional fields are stored when non-blank (`submission_data` strips blanks).
+Fields marked `required: true` in Liquid are **HTML5-only** on the client. Optional fields are stored when non-blank (`submission_data` strips blanks). `collects_company?` still controls whether a real company is resolved vs placeholder, but empty `company_name` is allowed server-side.
 
 **URL prefill**: `hidden_field_keys` + `?key=value`; Stimulus `lead_form_controller.js` fills `[data-lead-form-param]`. Also `?product_id=` overrides configured product. **`open_editions`**: `LeadForm#open_editions_for(product)` → `product.editions.not_finished`, exposed to Liquid and `{% field collection: "open_editions" %}`.
 
 **Deal behaviour**: reuse open deal in form pipeline; optional `pipeline_stage_id` advances without regressing; `resolve_pipeline(help_type:)` uses `pipeline_routes` JSON on the form (not template-specific code).
 
-When adding a new public form: Liquid page + optional partials in DB, new `LeadForm` row, extend `lead_params` / `SUBMISSION_FIELD_KEYS` if new field names. Define select options inline with `choices:` in the template. See command `.claude/commands/nuevo-formulario-lead.md`.
+When adding a new public form: Liquid page + optional partials in DB, new `LeadForm` row. Field names only need to match `FIELD_KEY_FORMAT`; no Ruby whitelist to update. Define select options inline with `choices:` in the template. See command `.claude/commands/nuevo-formulario-lead.md`.
 
 ## Testing
 

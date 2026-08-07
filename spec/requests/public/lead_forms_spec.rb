@@ -121,18 +121,18 @@ RSpec.describe "Public lead forms", type: :request do
       expect(response.body).to include('target="_top"')
     end
 
-    it "stores configured hidden field values in submission data" do
+    it "stores custom field values in submission data" do
       lead_form.update!(hidden_field_keys: %w[producto])
 
       expect {
         post public_lead_form_path(lead_form.slug), params: {
-          lead: contacto_lead_params(producto: "curso-ia", extra_field: "ignored")
+          lead: contacto_lead_params(producto: "curso-ia", extra_field: "custom-value")
         }
       }.to change(Deal, :count).by(1)
 
       submission = LeadSubmission.order(:id).last
       expect(submission.data["producto"]).to eq("curso-ia")
-      expect(submission.data).not_to have_key("extra_field")
+      expect(submission.data["extra_field"]).to eq("custom-value")
     end
 
     it "rejects submissions without GDPR consent" do

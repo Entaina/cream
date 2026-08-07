@@ -100,17 +100,7 @@ module Public
     end
 
     def lead_params
-      params.fetch(:lead, {}).permit(
-        :email, :first_name, :last_name, :phone, :phone_prefix, :how_heard, :help_type, :message,
-        :product_id, :edition_id,
-        :company_name, :company_cif, :employee_range, :qualifying_answer, :job_title, :audience, :tech_profile, :ia_work_task,
-        :organization_ia_stage,
-        :newsletter_opt_in, :gdpr_consent,
-        :lead_form_slug, :lead_form_name,
-        :source_page, :referrer, :utm_source, :utm_medium, :utm_campaign, :utm_term, :utm_content,
-        LeadForm::HONEYPOT_FIELD, LeadForm::TIMESTAMP_FIELD,
-        *@lead_form.hidden_field_keys
-      ).to_h
+      LeadForm.filter_submission_params(params.fetch(:lead, {}))
     end
 
     def gdpr_consent_given?

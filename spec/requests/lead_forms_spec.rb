@@ -134,7 +134,7 @@ RSpec.describe "Lead forms", type: :request do
             responsible_id: member.id,
             email_template_id: template.id,
             active: "1",
-            hidden_field_keys_text: "email"
+            hidden_field_keys_text: "utm_source"
           }
         }
       }.not_to change(LeadForm, :count)
@@ -161,7 +161,7 @@ RSpec.describe "Lead forms", type: :request do
       expect(response).to have_http_status(:unprocessable_entity)
     end
 
-    it "stores pipeline routes for contacto forms" do
+    it "stores pipeline routes from parallel form fields" do
       cursos = pipeline.duplicate(name: "Cursos")
       cursos.save!
 
@@ -174,12 +174,53 @@ RSpec.describe "Lead forms", type: :request do
           responsible_id: member.id,
           email_template_id: template.id,
           active: "1",
-          pipeline_routes: { curso: cursos.id, entrenamiento: pipeline.id }
+          pipeline_routes_submitted: "1",
+          pipeline_route_keys: %w[curso entrenamiento],
+          pipeline_route_pipeline_ids: [ cursos.id, pipeline.id ]
         }
       }
 
       form = LeadForm.find_by!(slug: "contacto")
       expect(form.pipeline_routes).to eq({ "curso" => cursos.id, "entrenamiento" => pipeline.id })
+    end
+
+    it "clears pipeline routes when all rows are removed" do
+      form = create_lead_form!(workspace, user: member, slug: "routed-form")
+      other = pipeline.duplicate(name: "Other")
+      other.save!
+      form.update!(pipeline_routes: { "curso" => other.id })
+
+      patch lead_form_path(form), params: {
+        lead_form: {
+          pipeline_routes_submitted: "1",
+          pipeline_route_keys: [],
+          pipeline_route_pipeline_ids: []
+        }
+      }
+
+      expect(response).to redirect_to(lead_forms_path)
+      expect(form.reload.pipeline_routes).to eq({})
+    end
+
+    it "rejects invalid pipeline route keys" do
+      expect {
+        post lead_forms_path, params: {
+          lead_form: {
+            name: "Contacto",
+            slug: "contacto-invalid-route",
+            template_key: "contacto",
+            pipeline_id: pipeline.id,
+            responsible_id: member.id,
+            email_template_id: template.id,
+            active: "1",
+            pipeline_routes_submitted: "1",
+            pipeline_route_keys: [ "Invalid-Key" ],
+            pipeline_route_pipeline_ids: [ pipeline.id ]
+          }
+        }
+      }.not_to change(LeadForm, :count)
+
+      expect(response).to have_http_status(:unprocessable_entity)
     end
 
     it "creates a lead form with a pipeline stage" do

@@ -62,11 +62,24 @@ class LeadFormsController < ApplicationController
   end
 
   def lead_form_params
-    params.require(:lead_form).permit(
+    permitted = params.require(:lead_form).permit(
       :name, :slug, :template_key, :pipeline_id, :pipeline_stage_id, :responsible_id,
       :email_template_id, :product_id, :collects_company, :active, :success_redirect_url,
       :hidden_field_keys_text, :first_task_title, :first_task_due_days,
-      pipeline_routes: LeadForm::CONTACTO_HELP_TYPE_KEYS
+      :pipeline_routes_submitted,
+      pipeline_routes: {},
+      pipeline_route_keys: [],
+      pipeline_route_pipeline_ids: []
     )
+
+    route_keys = permitted.delete(:pipeline_route_keys)
+    route_pipeline_ids = permitted.delete(:pipeline_route_pipeline_ids)
+    submitted = permitted.delete(:pipeline_routes_submitted)
+
+    if submitted.present?
+      permitted[:pipeline_routes] = LeadForm.build_pipeline_routes_from_form(route_keys, route_pipeline_ids)
+    end
+
+    permitted
   end
 end
