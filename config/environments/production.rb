@@ -68,9 +68,11 @@ Rails.application.configure do
   # SMTP settings are resolved at runtime so the production assets:precompile
   # during `docker build` (run with SECRET_KEY_BASE_DUMMY=1) does not require
   # the real mailer credentials, which only exist on the deploy machine.
+  # Assign to ActionMailer::Base as well: updating only config.action_mailer after
+  # initialize leaves Base on the defaults (localhost:25) and deliveries fail.
   config.after_initialize do
     unless ENV["SECRET_KEY_BASE_DUMMY"]
-      config.action_mailer.smtp_settings = {
+      settings = {
         address: ENV.fetch("SMTP_ADDRESS"),
         port: ENV.fetch("SMTP_PORT", "587").to_i,
         user_name: ENV.fetch("SMTP_USERNAME"),
@@ -79,6 +81,8 @@ Rails.application.configure do
         authentication: ENV.fetch("SMTP_AUTHENTICATION", "plain").to_sym,
         enable_starttls_auto: true
       }
+      config.action_mailer.smtp_settings = settings
+      ActionMailer::Base.smtp_settings = settings
     end
   end
 
