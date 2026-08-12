@@ -99,7 +99,12 @@ module LeadFormTemplates
     class FormOpenTag < BaseTag
       def render(context)
         lead_form = context.registers[:lead_form]
-        target = lead_form.success_redirect_url.present? ? ' target="_top"' : ""
+        # Con redirección tras envío, el formulario tiene que poder sacar al visitante del
+        # iframe cuando está empotrado en otra web. target="_top" solo no basta: Turbo
+        # intercepta el submit y lo manda por fetch, ignorando el target, así que el lead
+        # se crea pero nadie llega al destino. data-turbo="false" devuelve el envío al
+        # navegador, que sí respeta el target.
+        target = lead_form.success_redirect_url.present? ? ' target="_top" data-turbo="false"' : ""
         <<~HTML
           <form action="#{context.registers[:form_action]}" method="post" class="space-y-4" data-controller="lead-form"#{target}>
             <input type="hidden" name="authenticity_token" value="#{ERB::Util.html_escape(context.registers[:csrf_token])}" autocomplete="off" />

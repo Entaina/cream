@@ -159,6 +159,22 @@ RSpec.describe "Public lead forms", type: :request do
       expect(response.body).to include('target="_top"')
     end
 
+    it "opts out of Turbo when success redirect URL is configured, so target _top applies" do
+      lead_form.update!(success_redirect_url: "https://example.com/gracias")
+
+      get public_lead_form_path(lead_form.slug)
+
+      # Turbo intercepta el submit y lo manda por fetch, ignorando el target: embebido en
+      # otra web el lead se crea pero el visitante nunca llega al destino de la redirección.
+      expect(response.body).to include('data-turbo="false"')
+    end
+
+    it "keeps Turbo enabled when there is no success redirect URL" do
+      get public_lead_form_path(lead_form.slug)
+
+      expect(response.body).not_to include('data-turbo="false"')
+    end
+
     it "stores configured hidden URL fields and ignores undeclared params" do
       lead_form.update!(hidden_field_keys: %w[producto])
 
