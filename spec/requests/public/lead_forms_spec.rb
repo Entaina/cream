@@ -225,6 +225,8 @@ RSpec.describe "Public lead forms", type: :request do
 
       expect(response).to have_http_status(:unprocessable_entity)
       expect(response.body).to include("verificar que eres una persona")
+      expect(response.body).to include('role="alert"')
+      expect(response.body).to include('value="Ana"')
       expect(TurnstileVerifier).to have_received(:valid?).with(token: "bad-token", ip: anything)
     end
 

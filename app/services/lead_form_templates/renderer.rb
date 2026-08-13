@@ -43,7 +43,8 @@ module LeadFormTemplates
         open_editions: @open_editions,
         form_action: @view_context.public_lead_form_path(@lead_form.slug),
         csrf_token: @view_context.form_authenticity_token,
-        privacy_url: @view_context.public_lead_form_privacy_path(@lead_form.slug)
+        privacy_url: @view_context.public_lead_form_privacy_path(@lead_form.slug),
+        flash_alert: (@view_context.flash[:alert] if @view_context.respond_to?(:flash))
       }
     end
   end

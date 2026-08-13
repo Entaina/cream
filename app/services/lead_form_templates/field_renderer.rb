@@ -38,17 +38,17 @@ module LeadFormTemplates
     end
 
     def text_field(name, required: false, autocomplete: nil, class_name: "input w-full", **)
-      attrs = input_attrs(name, required: required, autocomplete: autocomplete, class_name: class_name)
+      attrs = input_attrs(name, required: required, autocomplete: autocomplete, class_name: class_name, value: submitted_value(name))
       %(<input type="text" #{attrs} />)
     end
 
     def email_field(name, required: false, autocomplete: nil, class_name: "input w-full", **)
-      attrs = input_attrs(name, required: required, autocomplete: autocomplete, class_name: class_name)
+      attrs = input_attrs(name, required: required, autocomplete: autocomplete, class_name: class_name, value: submitted_value(name))
       %(<input type="email" #{attrs} />)
     end
 
     def telephone_field(name, required: false, autocomplete: nil, class_name: "input w-full", inputmode: nil, **)
-      attrs = input_attrs(name, required: required, autocomplete: autocomplete, class_name: class_name, inputmode: inputmode)
+      attrs = input_attrs(name, required: required, autocomplete: autocomplete, class_name: class_name, inputmode: inputmode, value: submitted_value(name))
       %(<input type="tel" #{attrs} />)
     end
 
@@ -60,11 +60,11 @@ module LeadFormTemplates
       attrs << %(required="required") if required
       attrs << %(rows="#{rows}")
       attrs << %(placeholder="#{ERB::Util.html_escape(placeholder)}") if placeholder
-      %(<textarea #{attrs.join(" ")}></textarea>)
+      %(<textarea #{attrs.join(" ")}>#{ERB::Util.html_escape(submitted_value(name))}</textarea>)
     end
 
     def select_field(name, choices: nil, collection: nil, blank: nil, required: false, class_name: "input w-full", selected: nil, **)
-      selected ||= @params.dig(:lead, name) || @params.dig("lead", name.to_s)
+      selected ||= submitted_value(name)
       option_tags = if collection.present?
         collection_options(collection, selected: selected)
       else
@@ -77,10 +77,11 @@ module LeadFormTemplates
     def checkbox_field(name, label:, value: "1", unchecked_value: "0", class_name: "mt-0.5 rounded border-line", required: false, **)
       checkbox_id = "lead_#{name}"
       required_attr = required ? ' required="required"' : ""
+      checked_attr = submitted_value(name).to_s == value.to_s ? ' checked="checked"' : ""
       <<~HTML.squish
         <label class="flex items-start gap-2.5 text-sm text-ink-soft cursor-pointer">
           <input type="hidden" name="lead[#{name}]" value="#{unchecked_value}" autocomplete="off" />
-          <input type="checkbox" name="lead[#{name}]" id="#{checkbox_id}" value="#{value}" class="#{class_name}"#{required_attr} />
+          <input type="checkbox" name="lead[#{name}]" id="#{checkbox_id}" value="#{value}" class="#{class_name}"#{required_attr}#{checked_attr} />
           <span>#{ERB::Util.html_escape(label)}</span>
         </label>
       HTML
@@ -88,7 +89,7 @@ module LeadFormTemplates
 
     def radio_group_field(name, collection:, required: false, aria_label: nil, **)
       editions = resolve_collection(collection)
-      selected = @params.dig(:lead, name) || @params.dig("lead", name.to_s)
+      selected = submitted_value(name)
       buttons = editions.map do |edition|
         checked = selected.to_s == edition.id.to_s
         checked_attr = checked ? ' checked="checked"' : ""
@@ -110,10 +111,10 @@ module LeadFormTemplates
       prefix_options = option_tags_for(
         self.class.parse_choice_pairs(prefixes),
         blank: nil,
-        selected: selected_prefix
+        selected: submitted_value(:phone_prefix).presence || selected_prefix
       )
       prefix_attrs = input_attrs(:phone_prefix, required: false, class_name: "input w-auto shrink-0", aria_label: "Prefijo de país")
-      phone_attrs = input_attrs(:phone, required: required, class_name: "input w-full min-w-0", autocomplete: "tel-national", inputmode: "tel")
+      phone_attrs = input_attrs(:phone, required: required, class_name: "input w-full min-w-0", autocomplete: "tel-national", inputmode: "tel", value: submitted_value(:phone))
       <<~HTML
         <div class="flex gap-2">
           <select #{prefix_attrs}>#{prefix_options}</select>
@@ -186,11 +187,12 @@ module LeadFormTemplates
 
     private
 
-    def input_attrs(name, required: false, class_name: nil, autocomplete: nil, rows: nil, placeholder: nil, inputmode: nil, id: nil, type: "text", aria_label: nil)
+    def input_attrs(name, required: false, class_name: nil, autocomplete: nil, rows: nil, placeholder: nil, inputmode: nil, id: nil, type: "text", aria_label: nil, value: nil)
       attrs = []
       attrs << %(id="#{id || "lead_#{name}"}")
       attrs << %(name="lead[#{name}]")
       attrs << %(type="#{type}") if type
+      attrs << %(value="#{ERB::Util.html_escape(value)}") if value.present?
       attrs << %(class="#{class_name}") if class_name
       attrs << %(required="required") if required
       attrs << %(autocomplete="#{autocomplete}") if autocomplete
@@ -199,6 +201,11 @@ module LeadFormTemplates
       attrs << %(inputmode="#{inputmode}") if inputmode
       attrs << %(aria-label="#{ERB::Util.html_escape(aria_label)}") if aria_label
       attrs.join(" ")
+    end
+
+    # What the visitor already typed, so a re-render (e.g. 422) keeps their input.
+    def submitted_value(name)
+      @params.dig(:lead, name) || @params.dig("lead", name.to_s)
     end
 
     def hidden_input(name, value, data: {})
