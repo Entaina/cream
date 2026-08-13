@@ -141,13 +141,48 @@ RSpec.describe "Public lead forms", type: :request do
       expect(submission.data["message"]).to eq("Quiero saber más")
     end
 
-    it "redirects to configured success URL when present" do
+    it "redirects to configured success URL with lead data as query params" do
       lead_form.update!(success_redirect_url: "https://example.com/gracias")
 
       post public_lead_form_path(lead_form.slug), params: {
         lead: contacto_lead_params
       }
 
+      location = URI.parse(response.headers["Location"])
+      expect("#{location.scheme}://#{location.host}#{location.path}").to eq("https://example.com/gracias")
+      expect(Rack::Utils.parse_query(location.query)).to eq(
+        "first_name" => "Ana",
+        "last_name" => "García",
+        "email" => "lead@example.com",
+        "phone" => "600111222"
+      )
+    end
+
+    it "keeps query params already present in the configured success URL" do
+      lead_form.update!(success_redirect_url: "https://example.com/gracias?utm_source=crm&first_name=Fijado")
+
+      post public_lead_form_path(lead_form.slug), params: {
+        lead: contacto_lead_params
+      }
+
+      location = URI.parse(response.headers["Location"])
+      query = Rack::Utils.parse_query(location.query)
+      expect(query["utm_source"]).to eq("crm")
+      # Ante colisión gana lo configurado a mano en la URL, no el dato del lead.
+      expect(query["first_name"]).to eq("Fijado")
+      expect(query["email"]).to eq("lead@example.com")
+    end
+
+    it "does not append lead data when the submission is suspected to be a bot" do
+      lead_form.update!(success_redirect_url: "https://example.com/gracias")
+
+      expect {
+        post public_lead_form_path(lead_form.slug), params: {
+          lead: contacto_lead_params(LeadForm::HONEYPOT_FIELD => "spam")
+        }
+      }.not_to change(Deal, :count)
+
+      # El camino de bots redirige sin crear lead: la URL debe ir limpia, sin datos.
       expect(response).to redirect_to("https://example.com/gracias")
     end
 
@@ -157,6 +192,22 @@ RSpec.describe "Public lead forms", type: :request do
       get public_lead_form_path(lead_form.slug)
 
       expect(response.body).to include('target="_top"')
+    end
+
+    it "opts out of Turbo when success redirect URL is configured, so target _top applies" do
+      lead_form.update!(success_redirect_url: "https://example.com/gracias")
+
+      get public_lead_form_path(lead_form.slug)
+
+      # Turbo intercepta el submit y lo manda por fetch, ignorando el target: embebido en
+      # otra web el lead se crea pero el visitante nunca llega al destino de la redirección.
+      expect(response.body).to include('data-turbo="false"')
+    end
+
+    it "keeps Turbo enabled when there is no success redirect URL" do
+      get public_lead_form_path(lead_form.slug)
+
+      expect(response.body).not_to include('data-turbo="false"')
     end
 
     it "stores configured hidden URL fields and ignores undeclared params" do

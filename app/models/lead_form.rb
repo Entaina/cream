@@ -15,6 +15,11 @@ class LeadForm < ApplicationRecord
     METADATA_FIELDS + [ HONEYPOT_FIELD, TIMESTAMP_FIELD, "gdpr_consent" ]
   ).freeze
   FIELD_KEY_FORMAT = /\A[a-z][a-z0-9_]{0,39}\z/
+  # Datos del envío que viajan como query params a la URL de redirección tras envío,
+  # para que el destino (p. ej. una página de reservas) pueda autorrellenarse.
+  # Siempre lo que tecleó el visitante, nunca la ficha del CRM: si no, cualquiera
+  # que conozca un email podría pescar el nombre y teléfono almacenados de esa persona.
+  REDIRECT_PREFILL_KEYS = %w[first_name last_name email phone].freeze
 
   belongs_to :workspace
   belongs_to :pipeline
@@ -146,13 +151,14 @@ class LeadForm < ApplicationRecord
   end
   private_class_method :timestamp_verifier
 
-  def success_redirect_location
+  def success_redirect_location(prefill: nil)
     url = success_redirect_url.to_s.strip.presence
     return if url.blank?
 
     uri = URI.parse(url)
     return unless uri.is_a?(URI::HTTP) && uri.host.present?
 
+    append_redirect_prefill(uri, prefill) if prefill.present?
     uri.to_s
   rescue URI::InvalidURIError
     nil
@@ -182,6 +188,17 @@ class LeadForm < ApplicationRecord
 
   def normalize_success_redirect_url
     self.success_redirect_url = success_redirect_url.to_s.strip.presence
+  end
+
+  # Cuelga los datos del envío como query params de la URL de redirección,
+  # conservando los que la URL configurada ya trae (ante colisión, gana lo configurado).
+  def append_redirect_prefill(uri, prefill)
+    configured = Rack::Utils.parse_query(uri.query.to_s)
+    extra = prefill.slice(*REDIRECT_PREFILL_KEYS)
+      .transform_values { |value| value.to_s.strip }
+      .reject { |_, value| value.blank? }
+    merged = extra.merge(configured)
+    uri.query = Rack::Utils.build_query(merged) if merged.present?
   end
 
   def normalize_hidden_field_keys

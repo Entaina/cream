@@ -61,5 +61,45 @@ RSpec.describe "Public lead form Entrenadores", type: :request do
       expect(submission.data).not_to have_key("phone")
       expect(deal.pipeline).to eq(pipeline)
     end
+
+    it "redirects to the configured success URL with lead data, omitting fields the form does not collect" do
+      allow(TurnstileVerifier).to receive_messages(enabled?: false)
+      lead_form.update!(success_redirect_url: "https://crm.example.com/b/reserva-jp")
+
+      post public_lead_form_path(lead_form.slug), params: {
+        lead: entrenadores_lead_params
+      }
+
+      location = URI.parse(response.headers["Location"])
+      expect("#{location.scheme}://#{location.host}#{location.path}").to eq("https://crm.example.com/b/reserva-jp")
+      query = Rack::Utils.parse_query(location.query)
+      expect(query).to eq(
+        "first_name" => "Ana",
+        "last_name" => "García",
+        "email" => "lead@example.com"
+      )
+      expect(query).not_to have_key("phone")
+    end
+
+    it "prefills from the submitted data, never from the stored CRM person" do
+      allow(TurnstileVerifier).to receive_messages(enabled?: false)
+      lead_form.update!(success_redirect_url: "https://crm.example.com/b/reserva-jp")
+      company = workspace.companies.create!(name: "Particulares")
+      workspace.people.create!(
+        first_name: "Nombre", last_name: "Guardado", email: "lead@example.com",
+        phone: "699999999", company: company
+      )
+
+      post public_lead_form_path(lead_form.slug), params: {
+        lead: entrenadores_lead_params
+      }
+
+      # Si esto devolviera la ficha del CRM, cualquiera que conozca un email
+      # podría pescar el nombre y teléfono almacenados de esa persona.
+      query = Rack::Utils.parse_query(URI.parse(response.headers["Location"]).query)
+      expect(query["first_name"]).to eq("Ana")
+      expect(query["last_name"]).to eq("García")
+      expect(query).not_to have_key("phone")
+    end
   end
 end
