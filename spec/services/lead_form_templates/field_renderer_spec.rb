@@ -59,6 +59,12 @@ RSpec.describe LeadFormTemplates::FieldRenderer do
       expect(html).not_to include('checked="checked"')
     end
 
+    it "does not check a checkbox with a blank value on a first render" do
+      html = empty_renderer.render(type: "checkbox", name: :newsletter_opt_in, label: "Newsletter", value: "")
+
+      expect(html).not_to include('checked="checked"')
+    end
+
     it "keeps the submitted phone and prefix" do
       html = renderer.phone_with_prefix(prefixes: "+34; +351")
 

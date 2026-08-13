@@ -77,7 +77,8 @@ module LeadFormTemplates
     def checkbox_field(name, label:, value: "1", unchecked_value: "0", class_name: "mt-0.5 rounded border-line", required: false, **)
       checkbox_id = "lead_#{name}"
       required_attr = required ? ' required="required"' : ""
-      checked_attr = submitted_value(name).to_s == value.to_s ? ' checked="checked"' : ""
+      submitted = submitted_value(name)
+      checked_attr = submitted.present? && submitted.to_s == value.to_s ? ' checked="checked"' : ""
       <<~HTML.squish
         <label class="flex items-start gap-2.5 text-sm text-ink-soft cursor-pointer">
           <input type="hidden" name="lead[#{name}]" value="#{unchecked_value}" autocomplete="off" />
