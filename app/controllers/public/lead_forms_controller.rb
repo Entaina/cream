@@ -39,14 +39,14 @@ module Public
         return render_show_or_not_found(status: :unprocessable_entity)
       end
 
-      LeadFormSubmissionProcessor.call(
+      result = LeadFormSubmissionProcessor.call(
         lead_form: @lead_form,
         params: lead_params,
         request: request,
         product: @product,
         open_editions: @open_editions
       )
-      redirect_after_submission
+      redirect_after_submission(prefill: (redirect_prefill if result))
     rescue ActiveRecord::RecordInvalid => e
       flash.now[:alert] = e.record.errors.full_messages.to_sentence.presence || "No se pudo enviar el formulario."
       render_show_or_not_found(status: :unprocessable_entity)
@@ -112,6 +112,12 @@ module Public
       raw.slice(*submission_schema.allowed_param_keys)
     end
 
+    # Siempre lo que tecleó el visitante, nunca la ficha del CRM (ver
+    # LeadForm::REDIRECT_PREFILL_KEYS).
+    def redirect_prefill
+      lead_params.slice(*LeadForm::REDIRECT_PREFILL_KEYS)
+    end
+
     def submission_schema
       @submission_schema ||= LeadFormTemplates::SubmissionSchema.build(
         lead_form: @lead_form,
@@ -139,9 +145,11 @@ module Public
       TurnstileVerifier.valid?(token: params["cf-turnstile-response"], ip: request.remote_ip)
     end
 
-    def redirect_after_submission
+    # Sin prefill (bots, rate limit, descarte silencioso) la redirección va limpia:
+    # los datos del envío solo viajan cuando el lead se ha creado de verdad.
+    def redirect_after_submission(prefill: nil)
       notice = "Gracias. Hemos recibido tu solicitud."
-      if (location = @lead_form.success_redirect_location)
+      if (location = @lead_form.success_redirect_location(prefill: prefill))
         redirect_to location, notice: notice, allow_other_host: true
       else
         redirect_to public_lead_form_success_path(@lead_form.slug), notice: notice
