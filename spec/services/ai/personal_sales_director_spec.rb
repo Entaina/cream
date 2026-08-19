@@ -78,7 +78,7 @@ RSpec.describe Ai::PersonalSalesDirector do
   end
 
   describe "next-action aware briefing" do
-    let(:briefing_date) { Date.new(2026, 7, 28) }
+    let(:briefing_date) { Date.current }
     let!(:deal) do
       create_deal!(
         workspace,
