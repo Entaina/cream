@@ -119,6 +119,106 @@ RSpec.describe "Api::V1::DealEmails", type: :request do
       expect(response).to have_http_status(:not_found)
     end
 
+    context "with Base64 attachments" do
+      let(:pdf_content) { Base64.strict_encode64("%PDF-1.4 fake report") }
+
+      before do
+        allow(CreamFeatures).to receive(:enabled?).with(:gmail_sync).and_return(false)
+      end
+
+      it "attaches the decoded file to the message and lists it in the response" do
+        params = {
+          email: {
+            to_address: "lead@example.com",
+            subject: "Tu informe",
+            body: "Adjuntamos tu informe.",
+            attachments: [
+              { filename: "informe.pdf", content_type: "application/pdf", content: pdf_content }
+            ]
+          }
+        }
+
+        expect {
+          post "/api/v1/deals/#{deal.id}/emails", params: params, headers: headers, as: :json
+        }.to change(EmailMessage, :count).by(1)
+          .and have_enqueued_mail(RecordMailer, :tracked_email)
+
+        message = EmailMessage.order(:id).last
+        expect(response).to have_http_status(:created)
+        expect(message.attachments.count).to eq(1)
+        expect(message.attachments.first.filename.to_s).to eq("informe.pdf")
+        expect(message.attachments.first.download).to eq("%PDF-1.4 fake report")
+        expect(response.parsed_body["attachments"]).to eq([ "informe.pdf" ])
+      end
+
+      it "rejects invalid Base64 content with 422" do
+        params = {
+          email: {
+            to_address: "lead@example.com",
+            subject: "Hi",
+            body: "Hello",
+            attachments: [ { filename: "informe.pdf", content: "not-base64!!!" } ]
+          }
+        }
+
+        expect {
+          post "/api/v1/deals/#{deal.id}/emails", params: params, headers: headers, as: :json
+        }.not_to change(EmailMessage, :count)
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response.parsed_body["errors"]).to be_present
+      end
+
+      it "rejects more attachments than the allowed maximum with 422" do
+        too_many = Array.new(EmailMessage::MAX_ATTACHMENTS + 1) do |i|
+          { filename: "f#{i}.txt", content: Base64.strict_encode64("x") }
+        end
+        params = {
+          email: { to_address: "lead@example.com", subject: "Hi", body: "Hello", attachments: too_many }
+        }
+
+        expect {
+          post "/api/v1/deals/#{deal.id}/emails", params: params, headers: headers, as: :json
+        }.not_to change(EmailMessage, :count)
+
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+
+      it "rejects a non-object attachment entry with 422" do
+        params = {
+          email: {
+            to_address: "lead@example.com",
+            subject: "Hi",
+            body: "Hello",
+            attachments: [ "just-a-string" ]
+          }
+        }
+
+        expect {
+          post "/api/v1/deals/#{deal.id}/emails", params: params, headers: headers, as: :json
+        }.not_to change(EmailMessage, :count)
+
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+
+      it "rejects an attachment without content with 422" do
+        params = {
+          email: {
+            to_address: "lead@example.com",
+            subject: "Hi",
+            body: "Hello",
+            attachments: [ { filename: "informe.pdf" } ]
+          }
+        }
+
+        expect {
+          post "/api/v1/deals/#{deal.id}/emails", params: params, headers: headers, as: :json
+        }.not_to change(EmailMessage, :count)
+
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+    end
+
     context "when record_email is disabled" do
       before do
         allow(CreamFeatures).to receive(:enabled?).with(:record_email).and_return(false)
