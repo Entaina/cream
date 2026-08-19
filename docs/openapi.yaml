@@ -543,6 +543,11 @@ components:
         via_gmail:
           type: boolean
           description: True when delivery is queued through the sender's connected Gmail account.
+        attachments:
+          type: array
+          description: Filenames of the files attached to the message.
+          items:
+            type: string
 
     DealEmailInput:
       type: object
@@ -556,6 +561,29 @@ components:
           type: string
         body:
           type: string
+        attachments:
+          type: array
+          description: >-
+            Files to attach to the email, sent as Base64 in the JSON body.
+            Limits: up to 10 files, 10 MB per file and 25 MB in total.
+          items:
+            $ref: "#/components/schemas/DealEmailAttachmentInput"
+
+    DealEmailAttachmentInput:
+      type: object
+      required: [filename, content]
+      properties:
+        filename:
+          type: string
+          example: informe.pdf
+        content_type:
+          type: string
+          description: Optional; inferred from the filename when omitted.
+          example: application/pdf
+        content:
+          type: string
+          format: byte
+          description: Base64-encoded file content.
 
     Task:
       allOf:
@@ -1273,7 +1301,8 @@ paths:
       summary: Send an email from a deal
       description: |
         Queues delivery through the sender's Gmail account when connected and enabled;
-        otherwise sends via SMTP. Requires the `record_email` feature.
+        otherwise sends via SMTP. Files can be attached as Base64 payloads in the
+        `attachments` array. Requires the `record_email` feature.
       parameters:
         - $ref: "#/components/parameters/WorkspaceId"
         - $ref: "#/components/parameters/DealIdNested"
