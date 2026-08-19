@@ -29,7 +29,19 @@ jobs:
 
     steps:
       - name: Install packages
-        run: sudo apt-get update && sudo apt-get install --no-install-recommends -y libvips
+        # See the note in the `test` job: bound apt with a timeout + retry so a
+        # stuck hosted-runner mirror fails fast instead of hanging the job.
+        run: |
+          for i in 1 2 3; do
+            if sudo timeout -k 30 240 apt-get update -o Acquire::Retries=3 -o Acquire::http::Timeout=30 \
+               && sudo timeout -k 30 240 apt-get install --no-install-recommends -y \
+                    -o Acquire::Retries=3 -o Acquire::http::Timeout=30 libvips; then
+              exit 0
+            fi
+            echo "::warning::apt attempt $i failed or timed out; retrying in 15s"
+            sleep 15
+          done
+          echo "::error::apt install failed after 3 attempts"; exit 1
 
       - name: Checkout code
         uses: actions/checkout@v7
@@ -63,7 +75,20 @@ jobs:
 
     steps:
       - name: Install packages
-        run: sudo apt-get update && sudo apt-get install --no-install-recommends -y libpq-dev libvips
+        # Hosted-runner apt mirrors/dpkg locks occasionally hang indefinitely,
+        # stalling the whole job. Bound each apt call with a timeout and retry so
+        # a stuck mirror fails fast and hits another one instead of hanging.
+        run: |
+          for i in 1 2 3; do
+            if sudo timeout -k 30 240 apt-get update -o Acquire::Retries=3 -o Acquire::http::Timeout=30 \
+               && sudo timeout -k 30 240 apt-get install --no-install-recommends -y \
+                    -o Acquire::Retries=3 -o Acquire::http::Timeout=30 libpq-dev libvips; then
+              exit 0
+            fi
+            echo "::warning::apt attempt $i failed or timed out; retrying in 15s"
+            sleep 15
+          done
+          echo "::error::apt install failed after 3 attempts"; exit 1
 
       - name: Checkout code
         uses: actions/checkout@v7
