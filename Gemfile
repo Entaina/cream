@@ -71,7 +71,7 @@ end
 
 gem "herb", "~> 0.10.2", group: :development
 
-gem "mcp", "~> 1.1"
+gem "mcp", "~> 1.2"
 gem "doorkeeper", "~> 5.9"
 gem "pundit", "~> 2.4"
 gem "pagy", "~> 43.6"
