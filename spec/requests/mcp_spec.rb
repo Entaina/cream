@@ -570,6 +570,44 @@ RSpec.describe "Mcp", type: :request do
       expect(actions).to include("pipeline_changed", "stage_changed")
     end
 
+    it "moves a deal by stage name case-insensitively via update_deal_stage" do
+      pipeline = Pipeline.default_for(workspace) || Pipeline.create_default!(workspace)
+      cobro = pipeline.pipeline_stages.create!(name: "Pendiente de Cobro", color: "golden",
+        probability: 95, position: 90, workspace: workspace)
+      deal = create_deal!(workspace, pipeline: pipeline, stage: cobro)
+      won = pipeline.pipeline_stages.find_by!(name: "Won")
+
+      result = call_tool("update_deal_stage", { deal_id: deal.id, stage: "won" })
+
+      expect(result.dig("updated", "stage")).to eq("Won")
+      expect(deal.reload.pipeline_stage).to eq(won)
+    end
+
+    it "returns a validation error when stage conditions block an MCP move" do
+      pipeline = Pipeline.default_for(workspace) || Pipeline.create_default!(workspace)
+      cobro = pipeline.pipeline_stages.create!(name: "Pendiente de Cobro", color: "golden",
+        probability: 95, position: 90, workspace: workspace)
+      won = pipeline.pipeline_stages.find_by!(name: "Won")
+      workspace.stage_conditions.create!(pipeline_stage: won, field: "invoice_number",
+        operator: "present", compare_value: nil)
+      deal = create_deal!(workspace, pipeline: pipeline, stage: cobro)
+
+      result = call_tool("update_deal_stage", { deal_id: deal.id, stage: "Won" })
+
+      expect(result["error"]).to eq("validation_error")
+      expect(result["message"]).to include("No se puede pasar a «Won»")
+      expect(deal.reload.pipeline_stage).to eq(cobro)
+    end
+
+    it "returns not_found when the target stage name is unknown" do
+      deal = create_deal!(workspace)
+
+      result = call_tool("update_deal_stage", { deal_id: deal.id, stage: "No Existe" })
+
+      expect(result["error"]).to eq("not_found")
+      expect(result["message"]).to include("Unknown pipeline stage: No Existe")
+    end
+
     it "adds a comment and exposes comments through get_record" do
       deal = create_deal!(workspace)
 

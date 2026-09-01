@@ -8,10 +8,14 @@
   border: none;
   font-family: inherit;
   font-size: 1rem;
+  height: auto;
 }
 
 .rich-text-editor .ql-editor {
   min-height: 12rem;
+  max-height: min(32rem, calc(100vh - 16rem));
+  height: auto;
+  overflow-y: auto;
   color: var(--color-ink);
 }
 
@@ -22,6 +26,7 @@
 
 .rich-text-editor--compact .ql-editor {
   min-height: 8rem;
+  max-height: min(20rem, calc(100vh - 20rem));
 }
 
 /* Custom pixel size labels (Quill snow defaults only know small/large/huge). */

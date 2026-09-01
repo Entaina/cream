@@ -248,7 +248,11 @@ module CreamMcp
     started_at = Process.clock_gettime(Process::CLOCK_MONOTONIC) if tool
     block.call
   rescue Pundit::NotAuthorizedError => e
-    MCP::Tool::Response.new([ { type: "text", text: JSON.generate({ error: "forbidden", message: e.message }) } ])
+    respond_with(error: "forbidden", message: e.message)
+  rescue ActiveRecord::RecordInvalid => e
+    respond_with(error: "validation_error", message: e.record.errors.full_messages.to_sentence)
+  rescue ActiveRecord::RecordNotFound => e
+    respond_with(error: "not_found", message: e.message)
   ensure
     if tool
       duration_ms = ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - started_at) * 1000).round

@@ -30,6 +30,11 @@ RSpec.describe Deal, type: :model do
     expect(deal.reload.stage_label).to eq("Qualified")
   end
 
+  it "moves to a stage by name case-insensitively" do
+    deal.move_to_stage!("qualified")
+    expect(deal.reload.stage_label).to eq("Qualified")
+  end
+
   describe "stage triggers" do
     include ActiveJob::TestHelper
 

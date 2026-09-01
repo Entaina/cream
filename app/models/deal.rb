@@ -199,8 +199,9 @@ class Deal < ApplicationRecord
     return stage if stage.is_a?(PipelineStage)
 
     scope = pipeline&.pipeline_stages || PipelineStage.where(workspace_id: workspace_id)
-    scope.find_by(id: stage) || scope.find_by(name: stage) ||
-      raise(ActiveRecord::RecordNotFound, "Unknown pipeline stage: #{stage}")
+    found = scope.find_by(id: stage) if stage.to_s.match?(/\A\d+\z/)
+    found ||= scope.where("name ILIKE ?", stage.to_s).first
+    found || raise(ActiveRecord::RecordNotFound, "Unknown pipeline stage: #{stage}")
   end
 
   def set_default_pipeline_stage
