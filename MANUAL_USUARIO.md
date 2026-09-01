@@ -4,7 +4,7 @@
 
 Cream es un CRM por **workspaces** para gestionar **personas**, **empresas** y **deals** (oportunidades), con notas, tareas, listas y un historial de actividad compartido en el equipo.
 
-> **Última revisión:** 2026-08-06 (plantillas Liquid de formularios públicos)
+> **Última revisión:** 2026-09-01 (importe del deal con céntimos)
 > Este documento describe la funcionalidad **visible para el usuario**. Las funcionalidades desactivadas aparecen al final en «Próximamente».
 
 ---
@@ -251,7 +251,7 @@ Al fusionar, los contactos, deals, notas, tareas, emails y actividad del timelin
 
 ### Deals
 
-- Representan oportunidades de venta con **valor**, **moneda**, **etapa**, **probabilidad**, **fecha de cierre prevista** y, opcionalmente, **número de factura** (*Nº factura*).
+- Representan oportunidades de venta con **valor**, **moneda**, **etapa**, **probabilidad**, **fecha de cierre prevista** y, opcionalmente, **número de factura** (*Nº factura*). El valor se escribe con la cifra exacta (incluido céntimos) y se muestra igual en la **ficha**, la **tabla** y el **tablero**; si no hay céntimos, no se añaden ceros.
 - Se asocian a una **empresa** y un **propietario**; los **contactos** son opcionales.
 - Pueden incluir **líneas de producto** (productos del catálogo con cantidad y precio).
 - Al **crear un deal** (`New deal`):

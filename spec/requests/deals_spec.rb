@@ -647,6 +647,16 @@ RSpec.describe "Deals", type: :request do
       expect(card).to include("×2")
     end
 
+    it "shows cents on the card when the value is not a whole number" do
+      sign_in_as(member)
+      deal = create_deal!(workspace, pipeline: pipeline, name: "Exact amount", value: 590.50)
+
+      get board_deals_path
+
+      card = board_card_html(deal.id)
+      expect(card).to include("590,50 €")
+    end
+
     it "hides company on cards when company is not selected" do
       sign_in_as(member)
       pipeline.update!(card_fields: %w[value owner])
@@ -763,6 +773,15 @@ RSpec.describe "Deals", type: :request do
       expect(deal.reload.invoice_number).to eq("FAC-2026-099")
     end
 
+    it "accepts an exact value with cents" do
+      sign_in_as(member)
+
+      patch deal_path(deal), params: { deal: { value: "590.50" } }
+
+      expect(response).to redirect_to(deal_path(deal))
+      expect(deal.reload.value).to eq(590.50)
+    end
+
     it "routes stage changes through move_to_stage! so activity and hooks fire" do
       sign_in_as(member)
       target = pipeline.pipeline_stages.find_by(name: "Won")
@@ -842,6 +861,18 @@ RSpec.describe "Deals", type: :request do
     end
   end
 
+  describe "GET /deals/:id (value display)" do
+    it "shows cents on the deal page when the value is not a whole number" do
+      sign_in_as(member)
+      deal.update_column(:value, 590.50)
+
+      get deal_path(deal)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("590,50 €")
+    end
+  end
+
   describe "GET /deals/:id/edit" do
     it "renders stage data attributes and celebration controller on the form" do
       sign_in_as(member)
@@ -858,6 +889,7 @@ RSpec.describe "Deals", type: :request do
       expect(response.body).to include(
         "data-stage-won=\"false\" data-stage-closed=\"true\" value=\"#{lost_stage.id}\""
       )
+      expect(Nokogiri::HTML(response.body).at_css("#deal_value")["step"]).to eq("0.01")
     end
   end
 

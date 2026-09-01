@@ -167,7 +167,13 @@ module ApplicationHelper
   end
 
   def money(amount, currency = "EUR")
-    number_to_currency(amount, unit: (currency == "EUR") ? "€" : "$", precision: 0, delimiter: ".", format: "%n %u")
+    number = amount.to_d
+    number_to_currency(number,
+      unit: (currency == "EUR") ? "€" : "$",
+      precision: number.frac.zero? ? 0 : 2,
+      delimiter: ".",
+      separator: ",",
+      format: "%n %u")
   end
 
   # Formatted deal field for display, honouring the per-stage display rules

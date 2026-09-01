@@ -4,7 +4,7 @@
 
 Cream is a **workspace**-based CRM for managing **people**, **companies** and **deals** (opportunities), with notes, tasks, lists and an activity history shared across the team.
 
-> **Last revision:** 2026-08-06 (public form Liquid templates)
+> **Last revision:** 2026-09-01 (deal value with cents)
 > This document describes the functionality **visible to the user**. Disabled features are listed at the end under "Coming soon".
 
 ---
@@ -251,7 +251,7 @@ When merging, the contacts, deals, notes, tasks, emails and timeline activity of
 
 ### Deals
 
-- They represent sales opportunities with **value**, **currency**, **stage**, **probability**, **expected close date** and optional **invoice number** (*Nº factura*).
+- They represent sales opportunities with **value**, **currency**, **stage**, **probability**, **expected close date** and optional **invoice number** (*Nº factura*). You enter the exact amount (including cents) and it is shown the same way on the **record page**, **table** and **board**; whole euros are shown without trailing zeros.
 - They are linked to a **company** and an **owner**; **contacts** are optional.
 - They can include **product lines** (catalog products with quantity and price).
 - When **creating a deal** (`New deal`):
