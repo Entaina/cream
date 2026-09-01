@@ -205,6 +205,7 @@ The list shows **50 records per page**. When there are more, a pagination bar ap
 - When creating or editing a person, next to the **LinkedIn URL** field there is a **Buscar en LinkedIn** (search on LinkedIn) button: it opens LinkedIn profile search in another tab with the name and company already filled in. When you find the right profile, copy its URL and paste it into **LinkedIn URL**.
 - **Relationships between contacts:** in the left panel of the record, the **Relationships** section lets you link this person with another one in the workspace. Choose the other person, the relationship type (**Invitó a**, **Referido por**, **Trabajó con**, **Colega de** — invited, referred by, worked with, colleague of) and click **Add**. The relationship is stored with a direction: what you declare from the current record is the origin (for example, «Ana invitó a Bruno» — Ana invited Bruno). On Bruno's record you will see the consistent inverse label («invitado por Ana» — invited by Ana). You can delete the relationship from either of the two records; it disappears from both.
 - **Create a deal from the record:** click **Add deal** in the top bar. A dialog opens where you choose the **pipeline** (by default yours from *Settings → Profile*, or the workspace's if you don't have one), the **product** and the **first action** (title and date). The deal is created in the **first stage** of the chosen pipeline, with the person's company and contact; the name is generated as «Empresa — Producto» (Company — Product). After creating it you go to the deal page. If there are validation errors, they are shown inside the same dialog without leaving the record. If there are no products in the catalog, the dialog tells you that you must create one first.
+- **Person's deals:** in the left panel, the **Deals** section lists deals where the person is an active contact, sorted by creation date (newest first). Each row shows the name (link to the deal page), the current **stage**, the date and the deal line **products**. If there are deals with more than one distinct product, an **All products** dropdown appears to filter the list by product.
 
 **Possible duplicates**
 
@@ -295,6 +296,8 @@ On the board, a saved view with a **stage** filter does not restrict the columns
 The **Products** catalog stores reusable products for creating lines in a deal. From a deal page — or when **creating a new deal** — you can add products with quantity, edition and unit price; the deal value can reflect those lines.
 
 Each product can be tagged with a **B2B** or **B2C** **segment** when creating or editing it. In the product list you can filter and sort by segment.
+
+On a product's edit page, the **View deals** button opens the **Deals** list (table view) filtered to that product and including closed deals. From there you can refine with the usual filters: edition, owner, stage, etc.
 
 ### Editions
 

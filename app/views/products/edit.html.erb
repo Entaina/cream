@@ -1,5 +1,10 @@
 <% page_title "Edit #{@product.name}" %>
-<%= render "shared/page_header", title: "Edit #{@product.name}", icon_name: :briefcase, count: nil, actions: nil %>
+<% actions = capture do %>
+  <%= link_to deals_path(product_id: @product.id, closed: 1), class: "btn-secondary" do %>
+    <%= icon :banknote, classes: "size-3.5" %> View deals
+  <% end %>
+<% end %>
+<%= render "shared/page_header", title: "Edit #{@product.name}", icon_name: :briefcase, count: nil, actions: actions %>
 <div class="flex-1 overflow-y-auto p-5">
   <div class="max-w-xl">
     <%= render "form", product: @product %>

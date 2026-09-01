@@ -240,6 +240,46 @@ RSpec.describe "People", type: :request do
         end
       end
     end
+
+    describe "deals section" do
+      let(:pipeline) { Pipeline.create_default!(workspace) }
+      let(:company) { create_company!(workspace) }
+      let(:person) { create_person!(workspace, company: company) }
+      let(:product_a) { workspace.products.create!(name: "Plan Alpha", price: 100) }
+      let(:product_b) { workspace.products.create!(name: "Plan Beta", price: 200) }
+
+      before { sign_in_as(member) }
+
+      it "lists deals ordered by created_at descending with stage and products" do
+        older = create_deal!(workspace, pipeline: pipeline, company: company, contacts: [ person ], name: "Older deal")
+        newer = create_deal!(workspace, pipeline: pipeline, company: company, contacts: [ person ], name: "Newer deal")
+        older.update_column(:created_at, Time.zone.local(2025, 1, 10, 12))
+        newer.update_column(:created_at, Time.zone.local(2025, 6, 10, 12))
+        newer.deal_products.create!(product: product_a, quantity: 1)
+
+        get person_path(person)
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include("Newer deal")
+        expect(response.body).to include("Older deal")
+        expect(response.body).to include("Plan Alpha")
+        expect(response.body.index("Newer deal")).to be < response.body.index("Older deal")
+      end
+
+      it "filters deals by product when product_id is given" do
+        deal_a = create_deal!(workspace, pipeline: pipeline, company: company, contacts: [ person ], name: "Alpha deal")
+        deal_b = create_deal!(workspace, pipeline: pipeline, company: company, contacts: [ person ], name: "Beta deal")
+        deal_a.deal_products.create!(product: product_a, quantity: 1)
+        deal_b.deal_products.create!(product: product_b, quantity: 1)
+
+        get person_path(person), params: { product_id: product_a.id }
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include("Alpha deal")
+        expect(response.body).not_to include("Beta deal")
+        expect(response.body).to include('name="product_id"')
+      end
+    end
   end
 
   describe "POST /people.json (inline contact creation)" do

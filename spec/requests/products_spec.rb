@@ -37,6 +37,20 @@ RSpec.describe "Products", type: :request do
     end
   end
 
+  describe "GET /products/:id/edit" do
+    it "includes a link to view deals filtered by product" do
+      sign_in_as(member)
+      product = workspaces(:one).products.create!(name: "Plan Pro", price: 1200)
+
+      get edit_product_path(product)
+
+      expect(response).to have_http_status(:success)
+      expect(response.body).to include("View deals")
+      expect(response.body).to include("product_id=#{product.id}")
+      expect(response.body).to include("closed=1")
+    end
+  end
+
   describe "GET /products with segment filter" do
     it "filters products by segment" do
       sign_in_as(member)

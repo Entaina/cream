@@ -205,6 +205,7 @@ El listado muestra **50 registros por página**. Cuando hay más, aparece una ba
 - Al crear o editar una persona, junto al campo **LinkedIn URL** aparece el botón **Buscar en LinkedIn**: abre la búsqueda de perfiles en LinkedIn en otra pestaña con el nombre y la empresa ya rellenados. Cuando encuentres el perfil correcto, copia su URL y pégala en **LinkedIn URL**.
 - **Relaciones entre contactos:** en el panel izquierdo de la ficha, la sección **Relationships** permite vincular esta persona con otra del workspace. Elige la otra persona, el tipo de relación (**Invitó a**, **Referido por**, **Trabajó con**, **Colega de**) y pulsa **Add**. La relación se guarda con dirección: lo que declares desde la ficha actual es el origen (por ejemplo, «Ana invitó a Bruno»). En la ficha de Bruno verás la etiqueta inversa coherente («invitado por Ana»). Puedes eliminar la relación desde cualquiera de las dos fichas; desaparece en ambas.
 - **Crear deal desde la ficha:** pulsa **Add deal** en la barra superior. Se abre un cuadro donde eliges el **pipeline** (por defecto el tuyo en *Settings → Profile*, o el del workspace si no tienes uno), el **producto** y la **primera acción** (título y fecha). El deal se crea en la **primera etapa** del pipeline elegido, con la empresa y el contacto de la persona; el nombre se genera como «Empresa — Producto». Tras crearlo irás a la ficha del deal. Si hay errores de validación, se muestran dentro del mismo cuadro sin salir de la ficha. Si no hay productos en el catálogo, el cuadro te indica que debes crear uno antes.
+- **Deals de la persona:** en el panel izquierdo, la sección **Deals** lista los deals en los que la persona es contacto activo, ordenados por fecha de creación (más recientes primero). Cada fila muestra el nombre (enlace a la ficha del deal), la **etapa** actual, la fecha y los **productos** de las líneas del deal. Si hay deals con más de un producto distinto, aparece un desplegable **All products** para filtrar la lista por producto.
 
 **Posibles duplicados**
 
@@ -295,6 +296,8 @@ En el tablero, una vista guardada con filtro de **etapa** no restringe las colum
 El catálogo de **Products** guarda productos reutilizables al crear líneas en un deal. Desde la ficha de un deal — o al **crear un deal nuevo** — puedes añadir productos con cantidad, edición y precio unitario; el valor del deal puede reflejar esas líneas.
 
 Cada producto puede marcarse con un **segmento** **B2B** o **B2C** al crearlo o editarlo. En el listado de productos puedes filtrar y ordenar por segmento.
+
+En la página de edición de un producto, el botón **View deals** abre el listado de **Deals** (vista tabla) filtrado por ese producto e incluyendo deals cerrados. Desde ahí puedes refinar con los filtros habituales: edición, propietario, etapa, etc.
 
 ### Ediciones
 

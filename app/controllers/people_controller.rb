@@ -31,12 +31,20 @@ class PeopleController < ApplicationController
 
   def show
     authorize @person
-    @deals = policy_scope(current_workspace.deals)
+    deals_scope = policy_scope(current_workspace.deals)
       .joins(:contacts)
       .where(people: { id: @person.id })
       .distinct
-      .includes(:pipeline_stage)
+    @deal_product_options = current_workspace.products
+      .where(id: DealProduct.where(deal_id: deals_scope.select(:id)).select(:product_id))
       .order(:name)
+    @deal_product_id = params[:product_id].presence
+    deals = if @deal_product_id
+      deals_scope.joins(:deal_products).where(deal_products: { product_id: @deal_product_id }).distinct
+    else
+      deals_scope
+    end
+    @deals = deals.includes(:pipeline_stage, :products).order(created_at: :desc)
     @okm_chat_record = @person
     @activities = @person.activities.includes(:user, :subject).recent_first.limit(50)
     @note = Note.new
