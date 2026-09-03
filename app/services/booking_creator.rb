@@ -68,11 +68,20 @@ class BookingCreator
 
     enqueue_reminder!(booking)
     enqueue_confirmation!(booking)
+    notify_host!(booking)
 
     Result.new(booking:)
   end
 
   private
+
+  def notify_host!(booking)
+    host = @booking_page.host
+    AlertChannelDelivery.for(user: host, workspace: @booking_page.workspace).deliver do |channels|
+      NotificationService.notify_booking(booking:) if channels.in_app?
+      BookingMailer.host_notification(booking:, host:).deliver_later if channels.email?
+    end
+  end
 
   def enqueue_reminder!(booking)
     return unless @event_type.reminder_enabled?

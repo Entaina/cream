@@ -98,7 +98,7 @@ Task title fields with mentions: `shared/_tasks_section`, `tasks/index`, `deals/
 
 ## Notifications & alerts
 
-**In-app notifications** — model `Notification` (`kind`, `title`, `body`, `url`, `read_at`), scoped per user + workspace. Kinds include `mention`, `task_overdue`, `email_*`, `lead_submission`, `automation`, **`alert`**. Created via `NotificationService`; inbox at `/notifications`.
+**In-app notifications** — model `Notification` (`kind`, `title`, `body`, `url`, `read_at`), scoped per user + workspace. Kinds include `mention`, `task_overdue`, `email_*`, `lead_submission`, `booking`, `automation`, **`alert`**. Created via `NotificationService`; inbox at `/notifications`.
 
 **Configurable alerts** (time-based, separate from event-driven **Automations**):
 
@@ -113,7 +113,7 @@ AlertRulesJob (daily, recurring.yml) → AlertRuleEngine → matching deals
 - **`AlertRule`**: `TRIGGER_FIELDS` = `edition_ends_on` | `edition_starts_on` | `deal_expected_close_date` (fires when `date + offset_days <= Date.current`; negative offset = advance warning). `CONDITIONS` = `company_without_fiscal_info` (`companies.fiscal_information` blank), `deal_open` (stage not closed). `RECIPIENTS` = `deal_owner` | `admins`.
 - Edition dates live on `Edition` (`starts_on`, `ends_on`); each edition belongs to one `Product`. Deal lines link via `deal_products.edition_id` (edition must match line's product).
 - Feature flag `:alerts` in `CreamFeatures`; menu **Alertas**; `AlertRulesController` + `RequiresFeature`.
-- User channel prefs: **Settings → Profile → Alertas** (`Settings::ProfileController` permits `alert_in_app`, `alert_email`). If both off, no delivery and no `AlertDelivery` row.
+- User channel prefs: **Settings → Profile → Alertas** (`Settings::ProfileController` permits `alert_in_app`, `alert_email`). Used by **AlertRuleEngine**, lead-form responsible notify, and booking host notify. If both off, no delivery (and no `AlertDelivery` row for rules).
 
 When adding a new alert trigger or condition, extend constants + `AlertRuleEngine#apply_trigger` / `#apply_conditions` and the form checkboxes in `alert_rules/_form.html.erb`.
 

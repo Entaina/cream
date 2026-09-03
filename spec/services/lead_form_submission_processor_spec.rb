@@ -55,7 +55,6 @@ RSpec.describe LeadFormSubmissionProcessor do
       .and change(EmailMessage, :count).by(1)
       .and change(Notification, :count).by(1)
       .and have_enqueued_job(SendViaGmailJob)
-      .and have_enqueued_mail(LeadFormMailer, :responsible_notification)
 
     message = EmailMessage.order(:id).last
     expect(message.record).to eq(Deal.order(:id).last)
@@ -67,6 +66,24 @@ RSpec.describe LeadFormSubmissionProcessor do
     expect(notification.user).to eq(lead_form.responsible)
     expect(notification.kind).to eq("lead_submission")
     expect(notification.url).to eq(Rails.application.routes.url_helpers.deal_path(deal))
+  end
+
+  it "emails the responsible when they enabled the email channel" do
+    memberships(:one_one).update!(alert_in_app: false, alert_email: true)
+
+    expect {
+      submit(contacto_lead_params)
+    }.to have_enqueued_mail(LeadFormMailer, :responsible_notification)
+      .and change(Notification, :count).by(0)
+  end
+
+  it "skips responsible notification when they disabled all channels" do
+    memberships(:one_one).update!(alert_in_app: false, alert_email: false)
+
+    expect {
+      submit(contacto_lead_params)
+    }.to change(Notification, :count).by(0)
+      .and have_enqueued_mail(LeadFormMailer, :responsible_notification).exactly(0).times
   end
 
   it "interpolates form config and submission data into the lead email template" do
@@ -138,7 +155,6 @@ RSpec.describe LeadFormSubmissionProcessor do
       .and change(EmailMessage, :count).by(0)
       .and change(Notification, :count).by(1)
       .and have_enqueued_job(SendViaGmailJob).exactly(0).times
-      .and have_enqueued_mail(LeadFormMailer, :responsible_notification)
   end
 
   it "silently discards submissions beyond the per-email daily cap" do

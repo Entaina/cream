@@ -66,6 +66,21 @@ class NotificationService
     )
   end
 
+  def self.notify_booking(booking:)
+    host = booking.booking_page.host
+    zone = ActiveSupport::TimeZone[booking.timezone] || Time.zone
+    starts_at = booking.starts_at.in_time_zone(zone)
+    event_name = booking.booking_event_type.localized_name
+
+    host.notifications.create!(
+      workspace: booking.workspace,
+      kind: "booking",
+      title: "New booking",
+      body: "#{event_name}: #{booking.display_name} (#{booking.email}) — #{starts_at.strftime('%Y-%m-%d %H:%M')}",
+      url: record_path_for(booking.deal) || Rails.application.routes.url_helpers.bookings_path
+    )
+  end
+
   def self.notify_alert(recipient:, rule:, deal:)
     recipient.notifications.create!(
       workspace: rule.workspace,

@@ -64,7 +64,6 @@ RSpec.describe "Public lead form Desarrollando con IA — Reservas", type: :requ
         .and change(DealProduct, :count).by(1)
         .and change(EmailMessage, :count).by(1)
         .and have_enqueued_job(SendViaGmailJob)
-        .and have_enqueued_mail(LeadFormMailer, :responsible_notification)
 
       expect(response).to redirect_to(public_lead_form_success_path(lead_form.slug))
 

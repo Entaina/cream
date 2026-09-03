@@ -73,11 +73,10 @@ class AlertRuleEngine
   end
 
   def deliver(deal, user, membership)
-    return false unless membership.alert_in_app? || membership.alert_email?
-
-    NotificationService.notify_alert(recipient: user, rule: rule, deal: deal) if membership.alert_in_app?
-    AlertMailer.alert_email(user: user, rule: rule, deal: deal).deliver_later if membership.alert_email?
-    true
+    AlertChannelDelivery.new(membership).deliver do |channels|
+      NotificationService.notify_alert(recipient: user, rule: rule, deal: deal) if channels.in_app?
+      AlertMailer.alert_email(user: user, rule: rule, deal: deal).deliver_later if channels.email?
+    end
   end
 
   def already_delivered?(deal, user)

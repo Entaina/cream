@@ -58,7 +58,7 @@
       <section class="card p-4 space-y-3">
         <h2 class="text-base font-semibold text-ink">Alertas</h2>
         <p class="text-sm text-ink-faint">
-          Elige cómo quieres recibir las alertas configuradas por el administrador en este workspace.
+          Elige cómo quieres recibir las alertas, los envíos de formularios y las reservas de calendario en este workspace.
         </p>
         <%= form_with model: current_membership, url: settings_profile_path, method: :patch, class: "space-y-3" do |f| %>
           <label class="flex items-center gap-2 text-base">
@@ -70,7 +70,7 @@
             Email
           </label>
           <p class="text-sm text-ink-faint">
-            Si desactivas ambos canales, no recibirás alertas aunque una regla te incluya como destinatario.
+            Si desactivas ambos canales, no recibirás alertas, avisos de formularios ni de reservas.
           </p>
           <%= f.submit "Guardar", class: "btn-secondary" %>
         <% end %>

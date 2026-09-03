@@ -77,6 +77,56 @@ RSpec.describe BookingCreator, type: :service do
     expect(workspace.people.with_email("ana@example.com")).to exist
     expect(workspace.deals.where("name ILIKE ?", "%Ana Lopez%")).to exist
     expect(client).to have_received(:create_event)
+
+    notification = user.notifications.order(:id).last
+    expect(notification).to be_present
+    expect(notification.kind).to eq("booking")
+    expect(notification.title).to eq("New booking")
+    expect(notification.body).to include("Ana Lopez")
+    expect(notification.body).to include("ana@example.com")
+    expect(notification.url).to eq(Rails.application.routes.url_helpers.deal_path(result.booking.deal))
+  end
+
+  it "emails the host when they enabled the email channel" do
+    memberships(:one_one).update!(alert_in_app: false, alert_email: true)
+
+    expect {
+      described_class.call(
+        booking_page: booking_page,
+        event_type: event_type,
+        params: {
+          datetime: "2026-07-28T10:00:00",
+          timezone: "Europe/Madrid",
+          first_name: "Ana",
+          last_name: "Lopez",
+          email: "ana@example.com"
+        },
+        request: request,
+        client: client
+      )
+    }.to have_enqueued_mail(BookingMailer, :host_notification)
+      .and change(Notification, :count).by(0)
+  end
+
+  it "skips host notification when they disabled all channels" do
+    memberships(:one_one).update!(alert_in_app: false, alert_email: false)
+
+    expect {
+      described_class.call(
+        booking_page: booking_page,
+        event_type: event_type,
+        params: {
+          datetime: "2026-07-28T10:00:00",
+          timezone: "Europe/Madrid",
+          first_name: "Ana",
+          last_name: "Lopez",
+          email: "ana@example.com"
+        },
+        request: request,
+        client: client
+      )
+    }.to change(Notification, :count).by(0)
+      .and have_enqueued_mail(BookingMailer, :host_notification).exactly(0).times
   end
 
   it "enqueues a reminder job one hour before the booking starts" do

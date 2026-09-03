@@ -4,7 +4,7 @@
 
 Cream es un CRM por **workspaces** para gestionar **personas**, **empresas** y **deals** (oportunidades), con notas, tareas, listas y un historial de actividad compartido en el equipo.
 
-> **Última revisión:** 2026-09-01 (importe del deal con céntimos)
+> **Última revisión:** 2026-09-03 (avisos de reserva y leads según canales del perfil)
 > Este documento describe la funcionalidad **visible para el usuario**. Las funcionalidades desactivadas aparecen al final en «Próximamente».
 
 ---
@@ -733,7 +733,7 @@ En **Settings → Profile**, sección **Alertas**, cada miembro elige:
 - **Notificación in-app (campana)** — activada por defecto.
 - **Email** — desactivado por defecto.
 
-Si desactivas ambos canales, no recibirás alertas aunque una regla te incluya como destinatario.
+Estos canales se usan para las **alertas** configuradas por el administrador, los **envíos de formularios** (el responsable) y las **reservas de calendario** (el anfitrión). Si desactivas ambos, no recibirás ninguno de esos avisos.
 
 ### Notas
 
@@ -756,7 +756,7 @@ En **Webhooks** configuras URLs que Cream llamará cuando ocurran eventos (p. ej
 
 ## 19. Notificaciones
 
-**Notifications** en el menú lateral muestra avisos del workspace: menciones en **comentarios**, **alertas** configuradas por el administrador, leads de formularios, etc. Las menciones en el título de una **tarea** asignan la tarea pero no generan aviso por ahora.
+**Notifications** en el menú lateral muestra avisos del workspace: menciones en **comentarios**, **alertas** configuradas por el administrador, leads de formularios, **reservas de calendario** (el anfitrión), etc. Las menciones en el título de una **tarea** asignan la tarea pero no generan aviso por ahora. Los avisos de **alertas**, **formularios** y **reservas** respetan tus canales en **Settings → Profile → Alertas** (campana y/o email).
 
 - El contador en el menú indica notificaciones sin leer.
 - **Mark read** en cada aviso o **Mark all read** para limpiar la bandeja.
@@ -1039,7 +1039,7 @@ Si la plantilla de una página no existe en el workspace, la URL pública `/f/sl
 - Se crea o reutiliza una **persona** por email (origen «Formulario web»). Si la persona ya existía, solo se rellenan los campos que estuvieran vacíos (nombre, apellidos, teléfono, cargo…).
 - Si esa persona ya tiene un **deal abierto** en el pipeline del formulario, se **reutiliza** ese deal: se añaden al envío los datos nuevos del formulario (sin crear otro deal ni otra tarea de seguimiento). Si has configurado una **etapa**, el deal avanza hasta ella solo si está en una etapa anterior (nunca retrocede). Si no hay deal abierto en ese pipeline (por ejemplo, solo deals ganados o perdidos, o deals en otro pipeline), se crea un deal nuevo en la etapa configurada o, si no hay etapa, en la **primera etapa** del pipeline, con la **primera tarea** configurada en el formulario (por defecto «Contactar lead» al día siguiente) asignada al responsable.
 - Los datos del envío (campos del formulario, página de origen, UTM, navegador, IP…) quedan guardados y visibles en la ficha del deal, en **Formulario de origen**.
-- El lead recibe el email configurado; el responsable recibe una notificación con los datos y un enlace al deal.
+- El lead recibe el email configurado; el responsable recibe aviso según sus canales en **Settings → Profile → Alertas** (campana y/o email), con los datos y un enlace al deal.
 
 ### Notas
 
@@ -1114,6 +1114,7 @@ Copia la **URL pública** y compártela con clientes.
 - Se consulta la **disponibilidad real** contra los calendarios configurados (por defecto `primary`).
 - Al confirmar, se crea el **evento en Google Calendar** con invitaciones a asistentes e invitados opcionales (hasta 5).
 - En Cream se crean **persona** y **deal** en el pipeline indicado, con tarea de seguimiento para el anfitrión.
+- El anfitrión recibe aviso según sus canales en **Settings → Profile → Alertas** (campana y/o email), con los datos de la reserva y un enlace al deal.
 
 ### Página pública (visitante)
 

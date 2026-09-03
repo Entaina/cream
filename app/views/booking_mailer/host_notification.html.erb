@@ -1,0 +1,18 @@
+<p>Hola <%= @host.name %>,</p>
+<p>
+  Se ha hecho una reserva de <strong><%= @event_type.localized_name %></strong>
+  con <strong><%= @booking.display_name %></strong> (<%= @booking.email %>)
+  en <strong><%= @booking_page.workspace.name %></strong>.
+</p>
+<ul>
+  <li><strong>Fecha:</strong> <%= l(@starts_at_in_zone.to_date, format: :long) %></li>
+  <li><strong>Hora:</strong> <%= @starts_at_time %> (<%= @booking.timezone %>)</li>
+</ul>
+<% if @deal_url %>
+  <p>
+    <%= link_to "Ver deal", @deal_url %>
+  </p>
+<% end %>
+<p style="color:#999;font-size:12px;margin-top:16px;">
+  Recibes este email porque tienes activadas las alertas por correo en tu perfil de Cream.
+</p>

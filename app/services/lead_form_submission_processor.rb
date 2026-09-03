@@ -324,21 +324,29 @@ class LeadFormSubmissionProcessor
       SendViaGmailJob.perform_later(message.id)
     end
 
-    if CreamFeatures.enabled?(:notifications)
-      NotificationService.notify_lead_submission(
-        responsible: lead_form.responsible,
-        lead_form: lead_form,
-        deal: deal,
-        person: person
-      )
-    end
+    notify_responsible!(submission:, deal:, person:)
+  end
 
-    LeadFormMailer.responsible_notification(
-      responsible: lead_form.responsible,
-      lead_form: lead_form,
-      submission: submission,
-      deal: deal
-    ).deliver_later
+  def notify_responsible!(submission:, deal:, person:)
+    responsible = lead_form.responsible
+    AlertChannelDelivery.for(user: responsible, workspace: workspace).deliver do |channels|
+      if channels.in_app?
+        NotificationService.notify_lead_submission(
+          responsible: responsible,
+          lead_form: lead_form,
+          deal: deal,
+          person: person
+        )
+      end
+      if channels.email?
+        LeadFormMailer.responsible_notification(
+          responsible: responsible,
+          lead_form: lead_form,
+          submission: submission,
+          deal: deal
+        ).deliver_later
+      end
+    end
   end
 
   def attach_template_files(message, template)

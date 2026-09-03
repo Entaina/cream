@@ -4,7 +4,7 @@
 
 Cream is a **workspace**-based CRM for managing **people**, **companies** and **deals** (opportunities), with notes, tasks, lists and an activity history shared across the team.
 
-> **Last revision:** 2026-09-01 (deal value with cents)
+> **Last revision:** 2026-09-03 (booking and lead notices follow profile channels)
 > This document describes the functionality **visible to the user**. Disabled features are listed at the end under "Coming soon".
 
 ---
@@ -733,7 +733,7 @@ In **Settings → Profile**, **Alertas** section, each member chooses:
 - **Notificación in-app (campana)** (In-app notification) — enabled by default.
 - **Email** — disabled by default.
 
-If you disable both channels, you will not receive alerts even when a rule lists you as a recipient.
+These channels are used for **alerts** configured by the administrator, **lead form submissions** (the owner) and **calendar bookings** (the host). If you disable both, you will not receive any of those notices.
 
 ### Notes
 
@@ -756,7 +756,7 @@ Useful for integrating Cream with other systems (Zapier, your own scripts, etc.)
 
 ## 19. Notifications
 
-**Notifications** in the sidebar menu shows workspace alerts: **comment** mentions, **alerts** configured by the administrator, lead form submissions, etc. Mentions in a **task** title assign the task but do not generate an alert for now.
+**Notifications** in the sidebar menu shows workspace alerts: **comment** mentions, **alerts** configured by the administrator, lead form submissions, **calendar bookings** (the host), etc. Mentions in a **task** title assign the task but do not generate an alert for now. **Alerts**, **form submissions** and **bookings** follow your channels in **Settings → Profile → Alertas** (bell and/or email).
 
 - The counter in the menu indicates unread notifications.
 - **Mark read** on each alert or **Mark all read** to clear the inbox.
@@ -1039,7 +1039,7 @@ If a page template does not exist in the workspace, the public URL `/f/slug` wil
 - A **person** is created or reused by email (source "Formulario web"). If the person already existed, only blank fields are filled in (name, last name, phone, job title…).
 - If that person already has an **open deal** in the form's pipeline, that deal is **reused**: new form data is added to the submission (without creating another deal or another follow-up task). If you configured a **stage**, the deal advances to it only when it is in an earlier stage (it never moves backwards). If there is no open deal in that pipeline (for example, only won or lost deals, or deals in another pipeline), a new deal is created in the configured stage or, if none is set, in the pipeline's **first stage**, with the form's configured **first task** (default: **Contactar lead** / Contact lead, due the next day) assigned to the owner.
 - The submission data (form fields, source page, UTM, browser, IP…) is saved and visible on the deal's page, under **Formulario de origen** (Source form).
-- The lead receives the configured email; the owner receives a notification with the data and a link to the deal.
+- The lead receives the configured email; the owner is notified according to their channels in **Settings → Profile → Alertas** (bell and/or email), with the data and a link to the deal.
 
 ### Notes
 
@@ -1114,6 +1114,7 @@ Copy the **public URL** and share it with clients.
 - **Real availability** is checked against the configured calendars (`primary` by default).
 - Upon confirmation, the **event is created in Google Calendar** with invitations to attendees and optional guests (up to 5).
 - In Cream, a **person** and a **deal** are created in the specified pipeline, with a follow-up task for the host.
+- The host is notified according to their channels in **Settings → Profile → Alertas** (bell and/or email), with the booking details and a link to the deal.
 
 ### Public page (visitor)
 
