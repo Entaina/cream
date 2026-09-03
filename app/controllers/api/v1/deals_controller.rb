@@ -19,13 +19,22 @@ module Api
         authorize deal
 
         notes = []
+        email_message = nil
         ActiveRecord::Base.transaction do
           deal.save!
           notes = create_notes_for!(deal)
+          email_message = create_email_for!(deal) if nested_email_requested?
         end
-        render json: deal_json(deal.reload, notes: notes), status: :created
+        deliver_email!(email_message) if email_message
+        json_opts = { notes: notes }
+        json_opts[:email_message] = email_message if nested_email_requested?
+        render json: deal_json(deal.reload, **json_opts), status: :created
       rescue ActiveRecord::RecordInvalid => e
         render json: { errors: e.record.errors.full_messages }, status: :unprocessable_entity
+      rescue Api::DealEmailCreator::InvalidAttachment => e
+        render json: { errors: [ e.message ] }, status: :unprocessable_entity
+      rescue Api::DealEmailCreator::RecordEmailDisabled => e
+        render json: { errors: [ e.message ] }, status: :unprocessable_entity
       end
 
       def update
@@ -128,6 +137,43 @@ module Api
         end
       end
 
+      def nested_email_requested?
+        params.key?(:email) && params[:email].present?
+      end
+
+      def nested_email_params
+        entry = params[:email]
+        entry = ActionController::Parameters.new(entry) unless entry.is_a?(ActionController::Parameters)
+        {
+          attrs: entry.permit(:to_address, :subject, :body).to_h,
+          attachments: Api::DealEmailCreator.parse_attachments(entry[:attachments])
+        }
+      end
+
+      def create_email_for!(deal)
+        unless CreamFeatures.enabled?(:record_email)
+          raise Api::DealEmailCreator::RecordEmailDisabled, "#{CreamFeatures.entry(:record_email).label} is not available yet."
+        end
+
+        email_data = nested_email_params
+        creator = Api::DealEmailCreator.new(
+          workspace: current_workspace,
+          user: current_user,
+          deal: deal,
+          email_attrs: email_data[:attrs],
+          attachments: email_data[:attachments]
+        )
+        message = creator.build
+        authorize message
+        message.save!
+        @email_creator = creator
+        message
+      end
+
+      def deliver_email!(message)
+        @email_creator.deliver(message)
+      end
+
       def note_json(note)
         {
           id: note.id,
@@ -149,7 +195,7 @@ module Api
         current_workspace.pipeline_stages.find(stage_id)
       end
 
-      def deal_json(deal, notes: nil)
+      def deal_json(deal, notes: nil, email_message: :omit)
         json = {
           id: deal.id,
           name: deal.name,
@@ -163,6 +209,7 @@ module Api
           updated_at: deal.updated_at.iso8601
         }
         json[:notes] = notes.map { |note| note_json(note) } unless notes.nil?
+        json[:email] = Api::DealEmailCreator.json(email_message) unless email_message == :omit
         json
       end
 

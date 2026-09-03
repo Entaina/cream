@@ -49,9 +49,9 @@ Namespace `config/routes.rb` → `namespace :api > :v1`:
 |---------|-------|-------|
 | People | CRUD | `?q=` búsqueda; nested `person_emails_attributes` |
 | Companies | CRUD | `?q=` búsqueda |
-| Deals | CRUD | `?q=`; stage change vía `move_to_stage!`; create acepta `notes[]` y `tasks_attributes` |
+| Deals | CRUD | `?q=`; stage change vía `move_to_stage!`; create acepta `notes[]`, `email` (Base64 o multipart) y `tasks_attributes` |
 | Deal notes | `POST /deals/:deal_id/notes` | `{ note: { title, body } }` |
-| Deal emails | `POST /deals/:deal_id/emails` | `{ email: { to_address?, subject, body } }`; Gmail si hay conexión, si no SMTP |
+| Deal emails | `POST /deals/:deal_id/emails` | `{ email: { to_address?, subject, body, attachments[] } }` — JSON (Base64) o `multipart/form-data` (`email[attachments][]`); Gmail si hay conexión, si no SMTP |
 | Tasks | CRUD | `taskable_type`/`taskable_id`; `completed` dispara side effects |
 | Gmail add-on | `GET gmail/context`, `POST gmail/threads/status`, `POST gmail/threads/link` | Requiere `:gmail_addon` |
 
@@ -59,7 +59,7 @@ Fuera de este API (ver skill **`cream-mcp`** para `/mcp` y OAuth scope `mcp`): b
 
 ## Crear deals por API
 
-Validación de dominio: al crear un deal hace falta al menos una tarea con `due_on` hoy o posterior (`tasks_attributes` en el payload del deal). Notas opcionales en el mismo request (`notes` a nivel raíz) — transaccional con el deal.
+Validación de dominio: al crear un deal hace falta al menos una tarea con `due_on` hoy o posterior (`tasks_attributes` en el payload del deal). Notas opcionales en el mismo request (`notes` a nivel raíz) — transaccional con el deal. Email opcional (`email` a nivel raíz, misma forma que `POST /deals/:id/emails`, adjuntos Base64 en JSON o ficheros binarios en `multipart/form-data`) — transaccional; la entrega se encola tras el commit. Requiere `:record_email` si se envía `email`.
 
 ## Emails desde deals
 

@@ -219,6 +219,43 @@ RSpec.describe "Api::V1::DealEmails", type: :request do
       end
     end
 
+    context "with multipart attachments" do
+      let(:uploaded_file) do
+        Rack::Test::UploadedFile.new(
+          StringIO.new("%PDF-1.4 fake report"),
+          "application/pdf",
+          original_filename: "informe.pdf"
+        )
+      end
+
+      before do
+        allow(CreamFeatures).to receive(:enabled?).with(:gmail_sync).and_return(false)
+      end
+
+      it "attaches uploaded files to the message" do
+        params = {
+          email: {
+            to_address: "lead@example.com",
+            subject: "Tu informe",
+            body: "Adjuntamos tu informe.",
+            attachments: [ uploaded_file ]
+          }
+        }
+
+        expect {
+          post "/api/v1/deals/#{deal.id}/emails", params: params, headers: headers
+        }.to change(EmailMessage, :count).by(1)
+          .and have_enqueued_mail(RecordMailer, :tracked_email)
+
+        message = EmailMessage.order(:id).last
+        expect(response).to have_http_status(:created)
+        expect(message.attachments.count).to eq(1)
+        expect(message.attachments.first.filename.to_s).to eq("informe.pdf")
+        expect(message.attachments.first.download).to eq("%PDF-1.4 fake report")
+        expect(response.parsed_body["attachments"]).to eq([ "informe.pdf" ])
+      end
+    end
+
     context "when record_email is disabled" do
       before do
         allow(CreamFeatures).to receive(:enabled?).with(:record_email).and_return(false)

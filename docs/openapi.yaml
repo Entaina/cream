@@ -472,6 +472,9 @@ components:
               description: Present only in create responses when notes were sent in the request.
               items:
                 $ref: "#/components/schemas/Note"
+            email:
+              $ref: "#/components/schemas/DealEmail"
+              description: Present only in create responses when an email was sent in the request.
         - $ref: "#/components/schemas/Timestamps"
 
     DealInput:
@@ -525,6 +528,40 @@ components:
           description: Optional notes created atomically with the deal (rolled back if any note is invalid).
           items:
             $ref: "#/components/schemas/NoteInput"
+        email:
+          $ref: "#/components/schemas/DealEmailInput"
+          description: >-
+            Optional outbound email queued atomically with the deal (rolled back if the
+            email or any attachment is invalid). Requires the `record_email` feature.
+            Attachments use the same Base64 format as POST /deals/{deal_id}/emails,
+            or upload binary files via multipart/form-data.
+
+    DealCreateMultipartRequest:
+      type: object
+      required: [deal]
+      description: >-
+        Multipart variant of deal creation. Use nested field names such as
+        `deal[name]`, `deal[company_id]`, `deal[tasks_attributes][0][title]`,
+        `email[subject]`, `email[body]` and upload files as `email[attachments][]`.
+      properties:
+        deal:
+          $ref: "#/components/schemas/DealInput"
+        notes:
+          type: array
+          items:
+            $ref: "#/components/schemas/NoteInput"
+        email:
+          $ref: "#/components/schemas/DealEmailInput"
+
+    DealEmailMultipartRequest:
+      type: object
+      required: [email]
+      description: >-
+        Multipart variant of deal email creation. Send `email[to_address]`,
+        `email[subject]`, `email[body]` and upload files as `email[attachments][]`.
+      properties:
+        email:
+          $ref: "#/components/schemas/DealEmailInput"
 
     DealEmail:
       type: object
@@ -564,10 +601,16 @@ components:
         attachments:
           type: array
           description: >-
-            Files to attach to the email, sent as Base64 in the JSON body.
-            Limits: up to 10 files, 10 MB per file and 25 MB in total.
+            Files to attach to the email. With `application/json`, send Base64
+            objects in this array. With `multipart/form-data`, upload binary files
+            as `email[attachments][]`. Limits: up to 10 files, 10 MB per file and
+            25 MB in total.
           items:
-            $ref: "#/components/schemas/DealEmailAttachmentInput"
+            oneOf:
+              - $ref: "#/components/schemas/DealEmailAttachmentInput"
+              - type: string
+                format: binary
+                description: Uploaded file when using multipart/form-data.
 
     DealEmailAttachmentInput:
       type: object
@@ -1154,7 +1197,10 @@ paths:
       summary: Create a deal
       description: |
         A deal requires at least one next-action task with a due date today or later.
-        Optional `notes` are created in the same transaction as the deal.
+        Optional `notes` and an optional `email` (with Base64 or multipart file
+        `attachments`) are created in the same transaction as the deal. Email delivery
+        is queued after the transaction commits. Requires the `record_email` feature
+        when `email` is present.
       parameters:
         - $ref: "#/components/parameters/WorkspaceId"
       requestBody:
@@ -1178,6 +1224,17 @@ paths:
               notes:
                 - title: Discovery call
                   body: Interested in annual plan.
+              email:
+                to_address: lead@example.com
+                subject: Welcome aboard
+                body: "<p>Thanks for your interest.</p>"
+                attachments:
+                  - filename: brochure.pdf
+                    content_type: application/pdf
+                    content: JVBERi0xLjQK
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/DealCreateMultipartRequest"
       responses:
         "201":
           description: Created
@@ -1301,8 +1358,9 @@ paths:
       summary: Send an email from a deal
       description: |
         Queues delivery through the sender's Gmail account when connected and enabled;
-        otherwise sends via SMTP. Files can be attached as Base64 payloads in the
-        `attachments` array. Requires the `record_email` feature.
+        otherwise sends via SMTP. Attach files as Base64 in JSON or upload binary
+        files with `multipart/form-data` (`email[attachments][]`). Requires the
+        `record_email` feature.
       parameters:
         - $ref: "#/components/parameters/WorkspaceId"
         - $ref: "#/components/parameters/DealIdNested"
@@ -1316,6 +1374,9 @@ paths:
               properties:
                 email:
                   $ref: "#/components/schemas/DealEmailInput"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/DealEmailMultipartRequest"
       responses:
         "201":
           description: Queued for delivery

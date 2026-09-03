@@ -181,6 +181,158 @@ RSpec.describe "Api::V1::Deals", type: :request do
       expect(response).to have_http_status(:unprocessable_entity)
       expect(response.parsed_body["errors"]).to include("Body can't be blank")
     end
+
+    context "with nested email" do
+      let(:contact) { create_person!(workspace, company: company, email: "contact@example.com") }
+      let(:pdf_content) { Base64.strict_encode64("%PDF-1.4 fake report") }
+
+      before do
+        allow(CreamFeatures).to receive(:enabled?).and_call_original
+        allow(CreamFeatures).to receive(:enabled?).with(:record_email).and_return(true)
+        allow(CreamFeatures).to receive(:enabled?).with(:gmail_sync).and_return(false)
+      end
+
+      it "creates the deal and queues SMTP delivery for the nested email" do
+        expect {
+          post "/api/v1/deals",
+            params: valid_create_params(
+              deal: { contact_ids: [ contact.id ] },
+              email: {
+                subject: "Welcome",
+                body: "Thanks for joining.",
+                attachments: [
+                  { filename: "informe.pdf", content_type: "application/pdf", content: pdf_content }
+                ]
+              }
+            ),
+            headers: json_headers,
+            as: :json
+        }.to change(Deal, :count).by(1)
+          .and change(EmailMessage, :count).by(1)
+          .and have_enqueued_mail(RecordMailer, :tracked_email)
+
+        created_deal = workspace.deals.find(response.parsed_body["id"])
+        message = created_deal.email_messages.sole
+
+        expect(response).to have_http_status(:created)
+        expect(response.parsed_body["email"]).to include(
+          "id" => message.id,
+          "to_address" => "contact@example.com",
+          "subject" => "Welcome",
+          "via_gmail" => false,
+          "attachments" => [ "informe.pdf" ]
+        )
+        expect(message.attachments.count).to eq(1)
+        expect(message.attachments.first.download).to eq("%PDF-1.4 fake report")
+        expect(created_deal.activities.where(action: "email_sent").count).to eq(1)
+      end
+
+      it "queues Gmail delivery when the sender has Gmail enabled" do
+        allow(CreamFeatures).to receive(:enabled?).with(:gmail_sync).and_return(true)
+        workspace.gmail_connections.create!(
+          user: user,
+          email: "me@gmail.com",
+          access_token: "at",
+          refresh_token: "rt",
+          expires_at: 1.hour.from_now,
+          send_enabled: true,
+          granted_scopes: GmailConnection::SEND_SCOPE
+        )
+
+        expect {
+          post "/api/v1/deals",
+            params: valid_create_params(
+              deal: { contact_ids: [ contact.id ] },
+              email: { to_address: "lead@example.com", subject: "Hi", body: "Hello" }
+            ),
+            headers: json_headers,
+            as: :json
+        }.to change(EmailMessage, :count).by(1)
+          .and have_enqueued_job(SendViaGmailJob)
+
+        expect(response).to have_http_status(:created)
+        expect(response.parsed_body["email"]).to include("via_gmail" => true)
+      end
+
+      it "rolls back the deal when the nested email is invalid" do
+        expect {
+          post "/api/v1/deals",
+            params: valid_create_params(
+              email: { to_address: "bad", subject: "Hi", body: "Hello" }
+            ),
+            headers: json_headers,
+            as: :json
+        }.not_to change(Deal, :count)
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response.parsed_body["errors"]).to be_present
+      end
+
+      it "rolls back the deal when an attachment has invalid Base64" do
+        expect {
+          post "/api/v1/deals",
+            params: valid_create_params(
+              email: {
+                to_address: "lead@example.com",
+                subject: "Hi",
+                body: "Hello",
+                attachments: [ { filename: "informe.pdf", content: "not-base64!!!" } ]
+              }
+            ),
+            headers: json_headers,
+            as: :json
+        }.not_to change(Deal, :count)
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response.parsed_body["errors"]).to be_present
+      end
+
+      it "creates the deal with multipart file attachments on the nested email" do
+        uploaded_file = Rack::Test::UploadedFile.new(
+          StringIO.new("%PDF-1.4 fake report"),
+          "application/pdf",
+          original_filename: "informe.pdf"
+        )
+
+        expect {
+          post "/api/v1/deals",
+            params: valid_create_params(
+              deal: { contact_ids: [ contact.id ] },
+              email: {
+                subject: "Welcome",
+                body: "Thanks for joining.",
+                attachments: [ uploaded_file ]
+              }
+            ),
+            headers: headers
+        }.to change(Deal, :count).by(1)
+          .and change(EmailMessage, :count).by(1)
+          .and have_enqueued_mail(RecordMailer, :tracked_email)
+
+        created_deal = workspace.deals.find(response.parsed_body["id"])
+        message = created_deal.email_messages.sole
+
+        expect(response).to have_http_status(:created)
+        expect(response.parsed_body["email"]["attachments"]).to eq([ "informe.pdf" ])
+        expect(message.attachments.first.download).to eq("%PDF-1.4 fake report")
+      end
+
+      it "returns unprocessable entity when record_email is disabled" do
+        allow(CreamFeatures).to receive(:enabled?).with(:record_email).and_return(false)
+
+        expect {
+          post "/api/v1/deals",
+            params: valid_create_params(
+              email: { to_address: "lead@example.com", subject: "Hi", body: "Hello" }
+            ),
+            headers: json_headers,
+            as: :json
+        }.not_to change(Deal, :count)
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response.parsed_body["errors"]).to be_present
+      end
+    end
   end
 
   describe "PATCH /api/v1/deals/:id" do
