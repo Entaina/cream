@@ -30,9 +30,10 @@ module Marketing
         scope = ListFilters.apply_owner(scope, @filters["owner_id"]) if @filters["owner_id"].present?
         scope = ListFilters.apply_created_at(scope, @filters.symbolize_keys)
         scope = scope.where(lifecycle_stage: @filters["lifecycle_stage"]) if @filters["lifecycle_stage"].present?
-        scope = apply_contains(scope, "people.email", @filters["email_contains"]) if @filters["email_contains"].present?
-        scope = apply_contains(scope, "people.job_title", @filters["job_title_contains"]) if @filters["job_title_contains"].present?
-        scope = apply_numeric_range(scope, "people.lead_score", @filters["lead_score_min"], @filters["lead_score_max"])
+        people = Person.arel_table
+        scope = apply_contains(scope, people[:email], @filters["email_contains"]) if @filters["email_contains"].present?
+        scope = apply_contains(scope, people[:job_title], @filters["job_title_contains"]) if @filters["job_title_contains"].present?
+        scope = apply_numeric_range(scope, people[:lead_score], @filters["lead_score_min"], @filters["lead_score_max"])
       when "Company"
         scope = ListFilters.apply_industry(scope, @filters["industry"]) if @filters["industry"].present?
         scope = ListFilters.apply_owner(scope, @filters["owner_id"]) if @filters["owner_id"].present?
@@ -44,12 +45,12 @@ module Marketing
     end
 
     def apply_contains(scope, column, value)
-      scope.where("#{column} ILIKE ?", "%#{ActiveRecord::Base.sanitize_sql_like(value)}%")
+      scope.where(column.matches("%#{ActiveRecord::Base.sanitize_sql_like(value)}%"))
     end
 
     def apply_numeric_range(scope, column, min, max)
-      scope = scope.where("#{column} >= ?", min.to_i) if min.present?
-      scope = scope.where("#{column} <= ?", max.to_i) if max.present?
+      scope = scope.where(column.gteq(min.to_i)) if min.present?
+      scope = scope.where(column.lteq(max.to_i)) if max.present?
       scope
     end
 

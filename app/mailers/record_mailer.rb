@@ -14,6 +14,12 @@ class RecordMailer < ApplicationMailer
     mail(to: message.to_address, subject: message.subject, headers: headers || {})
   end
 
+  def record_email(to:, subject:, body:, record:, user:)
+    @body = body
+    @record = record
+    mail(to: to, subject: subject, from: user.email_address)
+  end
+
   private
 
   def marketing_headers(message)
@@ -21,11 +27,5 @@ class RecordMailer < ApplicationMailer
     client.send(:headers)
   rescue StandardError
     {}
-  end
-
-  def record_email(to:, subject:, body:, record:, user:)
-    @body = body
-    @record = record
-    mail(to: to, subject: subject, from: user.email_address)
   end
 end

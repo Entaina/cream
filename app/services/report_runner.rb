@@ -5,6 +5,24 @@ class ReportRunner
     "avg_value" => "Average value"
   }.freeze
 
+  UTM_COLUMNS = {
+    "utm_source" => :utm_source,
+    "utm_medium" => :utm_medium,
+    "utm_campaign" => :utm_campaign
+  }.freeze
+
+  LEAD_SUBMISSION_UTM_SQL = {
+    "utm_source" => Arel.sql("lead_submissions.metadata->>'utm_source'"),
+    "utm_medium" => Arel.sql("lead_submissions.metadata->>'utm_medium'"),
+    "utm_campaign" => Arel.sql("lead_submissions.metadata->>'utm_campaign'")
+  }.freeze
+
+  PERSON_UTM_SQL = {
+    "utm_source" => Arel.sql("(SELECT lead_submissions.metadata->>'utm_source' FROM lead_submissions WHERE lead_submissions.person_id = people.id ORDER BY lead_submissions.created_at ASC LIMIT 1)"),
+    "utm_medium" => Arel.sql("(SELECT lead_submissions.metadata->>'utm_medium' FROM lead_submissions WHERE lead_submissions.person_id = people.id ORDER BY lead_submissions.created_at ASC LIMIT 1)"),
+    "utm_campaign" => Arel.sql("(SELECT lead_submissions.metadata->>'utm_campaign' FROM lead_submissions WHERE lead_submissions.person_id = people.id ORDER BY lead_submissions.created_at ASC LIMIT 1)")
+  }.freeze
+
   Row = Data.define(:key, :label, :value, :color)
   Result = Data.define(:rows, :metric, :metric_label, :total, :max)
 
@@ -73,13 +91,13 @@ class ReportRunner
   def utm_grouped_scope(scope, field)
     case @record_type
     when "Deal"
-      scope.left_joins(:campaign).group("campaigns.#{field}")
+      scope.left_joins(:campaign).group(Campaign.arel_table[UTM_COLUMNS.fetch(field)])
     when "LeadSubmission"
-      scope.group(Arel.sql("lead_submissions.metadata->>'#{field}'"))
+      scope.group(LEAD_SUBMISSION_UTM_SQL.fetch(field))
     when "Person"
-      scope.group(Arel.sql("(SELECT lead_submissions.metadata->>'#{field}' FROM lead_submissions WHERE lead_submissions.person_id = people.id ORDER BY lead_submissions.created_at ASC LIMIT 1)"))
+      scope.group(PERSON_UTM_SQL.fetch(field))
     when "Campaign"
-      scope.group(field.to_sym)
+      scope.group(UTM_COLUMNS.fetch(field))
     else
       scope.group(:owner_id)
     end
