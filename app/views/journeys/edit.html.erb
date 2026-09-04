@@ -1,0 +1,4 @@
+<% page_title "Editar recorrido" %>
+<%= render "shared/page_header", title: "Editar recorrido", icon_name: :zap,
+           actions: capture { link_to("Ver recorrido", @journey, class: "btn-secondary") } %>
+<div class="flex-1 overflow-y-auto scrollbar-subtle p-5"><%= render "form", journey: @journey %></div>

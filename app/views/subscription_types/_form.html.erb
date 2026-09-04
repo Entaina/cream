@@ -1,0 +1,37 @@
+<%= form_with model: subscription_type, class: "card p-4 space-y-4 max-w-xl" do |f| %>
+  <% if subscription_type.errors.any? %>
+    <div class="rounded-lg bg-danger-soft text-danger-strong ring-1 ring-danger-line px-3 py-2 text-sm">
+      <%= subscription_type.errors.full_messages.to_sentence %>
+    </div>
+  <% end %>
+
+  <div>
+    <%= f.label :name, "Nombre", class: "label" %>
+    <%= f.text_field :name, class: "input w-full", placeholder: "Newsletter" %>
+  </div>
+
+  <div>
+    <%= f.label :slug, "Identificador (slug)", class: "label" %>
+    <%= f.text_field :slug, class: "input w-full font-mono", placeholder: "newsletter" %>
+    <p class="text-sm text-ink-faint mt-1">Solo letras minúsculas, números y guiones. No cambiar en producción.</p>
+  </div>
+
+  <div>
+    <%= f.label :description, "Descripción", class: "label" %>
+    <%= f.text_area :description, class: "input w-full resize-y", rows: 3,
+          placeholder: "Novedades mensuales sobre producto y empresa" %>
+    <p class="text-sm text-ink-faint mt-1">Visible para contactos en el centro de preferencias.</p>
+  </div>
+
+  <div>
+    <%= f.label :position, "Orden", class: "label" %>
+    <%= f.number_field :position, class: "input w-full", min: 0 %>
+  </div>
+
+  <label class="flex items-center gap-2 text-base">
+    <%= f.check_box :active %> Activo
+  </label>
+
+  <%= f.submit subscription_type.persisted? ? "Guardar" : "Crear tipo", class: "btn-primary" %>
+  <%= link_to "Cancelar", subscription_types_path, class: "btn-secondary ml-2" %>
+<% end %>

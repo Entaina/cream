@@ -1,0 +1,2 @@
+class SubscriptionTypePolicy < MarketingAdminPolicy
+end

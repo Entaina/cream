@@ -19,6 +19,15 @@ production:
   evaluate_alert_rules:
     class: AlertRulesJob
     schedule: every day at 7am
+  run_journey_runner:
+    class: JourneyRunnerJob
+    schedule: every 10 minutes
+  recalculate_lead_scores:
+    class: ScoringRecalculateJob
+    schedule: every day at 3am
+  purge_marketing_events:
+    class: MarketingDataRetentionJob
+    schedule: every day at 4am
   sync_gmail_inboxes:
     class: GmailSyncSchedulerJob
     schedule: every 10 minutes
@@ -36,5 +45,14 @@ development:
   sync_stripe_payments:
     class: StripeSyncSchedulerJob
     schedule: every 15 minutes
+  run_journey_runner:
+    class: JourneyRunnerJob
+    schedule: every 10 minutes
+  recalculate_lead_scores:
+    class: ScoringRecalculateJob
+    schedule: every day at 3am
+  purge_marketing_events:
+    class: MarketingDataRetentionJob
+    schedule: every day at 4am
 
 # Recurring tasks are loaded per environment. database_backup is production-only.

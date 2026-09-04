@@ -1,0 +1,2 @@
+class SegmentPolicy < MarketingAdminPolicy
+end

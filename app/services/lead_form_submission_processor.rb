@@ -30,6 +30,21 @@ class LeadFormSubmissionProcessor
       create_first_task!(deal) unless deal_created
       attach_deal_product!(deal)
       submission = persist_submission!(deal:, person:)
+      Marketing::ConsentService.propagate_from_lead_form!(
+        person: person,
+        workspace: workspace,
+        params: params,
+        request: request,
+        lead_form: lead_form
+      )
+      person.update!(lifecycle_stage: "lead") if person.lifecycle_stage == "subscriber"
+      assign_campaign_from_utm!(submission)
+      link_anonymous_page_views!(person)
+      Marketing::ScoringEngine.apply_event!(person: person, event: "lead_submission", metadata: submission.metadata)
+      Marketing::ScoringEngine.apply_event!(person: person, event: "form_field", metadata: submission.data)
+      Marketing::JourneyTrigger.enqueue_lead_form_submitted!(person: person, lead_form: lead_form)
+      Marketing::SegmentWatcher.sync_person!(person)
+      Ai::AutomationHooks.score_deal(deal: deal)
       enqueue_emails(submission:, deal:, person:)
       Result.new(submission:, deal:, person:)
     end
@@ -245,10 +260,21 @@ class LeadFormSubmissionProcessor
       person: person,
       data: submission_data,
       metadata: submission_metadata.merge(
+        Marketing::ConsentService.gdpr_audit_metadata(params:, request:, lead_form:)
+      ).merge(
         "last_submitted_at" => now,
         "submissions_at" => [ now ]
       )
     )
+  end
+
+  def link_anonymous_page_views!(person)
+    return unless CreamFeatures.enabled?(:web_tracking)
+
+    anonymous_id = params["cream_aid"].presence || request.cookie_jar[:cream_aid]
+    return if anonymous_id.blank?
+
+    workspace.page_views.where(anonymous_id: anonymous_id, person_id: nil).update_all(person_id: person.id, updated_at: Time.current)
   end
 
   def submission_data
@@ -325,6 +351,20 @@ class LeadFormSubmissionProcessor
     end
 
     notify_responsible!(submission:, deal:, person:)
+  end
+
+  def assign_campaign_from_utm!(submission)
+    return unless CreamFeatures.enabled?(:marketing_campaigns)
+
+    utm_campaign = submission.metadata["utm_campaign"]
+    return if utm_campaign.blank?
+
+    campaign = workspace.campaigns.find_or_create_by!(utm_campaign: utm_campaign) do |record|
+      record.name = utm_campaign
+      record.status = "sent"
+    end
+    submission.update!(campaign: campaign)
+    submission.deal&.update!(campaign: campaign)
   end
 
   def notify_responsible!(submission:, deal:, person:)

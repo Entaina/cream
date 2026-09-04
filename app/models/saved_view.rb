@@ -31,29 +31,11 @@ class SavedView < ApplicationRecord
   # filtering in PeopleController/CompaniesController/DealsController so a saved
   # view resolves to the same set of records the user sees in the list.
   def resolve(scope)
-    scope = scope.search(filters["q"]) if filters["q"].present?
-
-    native = filters[native_filter_key]
-    if native.present?
-      scope = apply_native_filter(scope, record_type, native)
-    end
-
-    if filters["cf"].present?
-      scope = scope.merge(record_type.constantize.apply_custom_field_filters(workspace, filters["cf"]))
-    end
-
-    case record_type
-    when "Person"
-      scope = ListFilters.apply_owner(scope, filters["owner_id"]) if filters["owner_id"].present?
-      scope = ListFilters.apply_created_at(scope, filters.symbolize_keys)
-    when "Company"
-      scope = ListFilters.apply_owner(scope, filters["owner_id"]) if filters["owner_id"].present?
-      scope = ListFilters.apply_created_at(scope, filters.symbolize_keys)
-    when "Deal"
-      scope = Deal.apply_extra_filters(scope, filters.symbolize_keys)
-    end
-
-    scope
+    Marketing::FilterResolver.new(
+      workspace: workspace,
+      record_type: record_type,
+      filters: filters.merge("sort" => sort, "dir" => direction).compact
+    ).resolve(scope)
   end
 
   def apply_native_filter(scope, record_type, value)

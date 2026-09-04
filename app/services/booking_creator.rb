@@ -70,10 +70,31 @@ class BookingCreator
     enqueue_confirmation!(booking)
     notify_host!(booking)
 
+    if booking.person
+      assign_campaign_from_utm!(booking)
+      Marketing::ScoringEngine.apply_event!(person: booking.person, event: "booking_created", metadata: booking.metadata)
+      Marketing::JourneyTrigger.enqueue_booking_created!(person: booking.person, booking: booking)
+      Marketing::SegmentWatcher.sync_person!(booking.person)
+    end
+
     Result.new(booking:)
   end
 
   private
+
+  def assign_campaign_from_utm!(booking)
+    return unless CreamFeatures.enabled?(:marketing_campaigns)
+
+    utm_campaign = booking.metadata["utm_campaign"]
+    return if utm_campaign.blank?
+
+    campaign = @booking_page.workspace.campaigns.find_or_create_by!(utm_campaign: utm_campaign) do |record|
+      record.name = utm_campaign
+      record.status = "sent"
+    end
+    booking.update!(campaign: campaign)
+    booking.deal&.update!(campaign: campaign)
+  end
 
   def notify_host!(booking)
     host = @booking_page.host

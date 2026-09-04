@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_07_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_04_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -171,6 +171,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_07_120000) do
   create_table "bookings", force: :cascade do |t|
     t.bigint "booking_event_type_id", null: false
     t.bigint "booking_page_id", null: false
+    t.bigint "campaign_id"
     t.datetime "created_at", null: false
     t.bigint "deal_id"
     t.string "email", null: false
@@ -193,6 +194,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_07_120000) do
     t.index ["booking_event_type_id"], name: "index_bookings_on_booking_event_type_id"
     t.index ["booking_page_id", "starts_at"], name: "index_bookings_on_booking_page_id_and_starts_at"
     t.index ["booking_page_id"], name: "index_bookings_on_booking_page_id"
+    t.index ["campaign_id"], name: "index_bookings_on_campaign_id"
     t.index ["deal_id"], name: "index_bookings_on_deal_id"
     t.index ["email"], name: "index_bookings_on_email"
     t.index ["person_id"], name: "index_bookings_on_person_id"
@@ -212,6 +214,56 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_07_120000) do
     t.index ["user_id"], name: "index_calendar_connections_on_user_id"
     t.index ["workspace_id", "user_id"], name: "index_calendar_connections_on_workspace_id_and_user_id", unique: true
     t.index ["workspace_id"], name: "index_calendar_connections_on_workspace_id"
+  end
+
+  create_table "campaign_sends", force: :cascade do |t|
+    t.bigint "campaign_id", null: false
+    t.datetime "completed_at"
+    t.datetime "created_at", null: false
+    t.bigint "email_template_id", null: false
+    t.datetime "scheduled_at"
+    t.bigint "segment_id", null: false
+    t.datetime "started_at"
+    t.jsonb "stats", default: {}, null: false
+    t.string "status", default: "pending", null: false
+    t.bigint "subscription_type_id"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.bigint "workspace_id", null: false
+    t.index ["campaign_id"], name: "index_campaign_sends_on_campaign_id"
+    t.index ["email_template_id"], name: "index_campaign_sends_on_email_template_id"
+    t.index ["segment_id"], name: "index_campaign_sends_on_segment_id"
+    t.index ["subscription_type_id"], name: "index_campaign_sends_on_subscription_type_id"
+    t.index ["user_id"], name: "index_campaign_sends_on_user_id"
+    t.index ["workspace_id"], name: "index_campaign_sends_on_workspace_id"
+  end
+
+  create_table "campaign_variants", force: :cascade do |t|
+    t.text "body", null: false
+    t.bigint "campaign_send_id", null: false
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.string "subject", null: false
+    t.datetime "updated_at", null: false
+    t.integer "weight", default: 50, null: false
+    t.boolean "winner", default: false, null: false
+    t.index ["campaign_send_id"], name: "index_campaign_variants_on_campaign_send_id"
+  end
+
+  create_table "campaigns", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "goal"
+    t.string "name", null: false
+    t.date "starts_on"
+    t.string "status", default: "draft", null: false
+    t.datetime "updated_at", null: false
+    t.string "utm_campaign"
+    t.string "utm_content"
+    t.string "utm_medium"
+    t.string "utm_source"
+    t.string "utm_term"
+    t.bigint "workspace_id", null: false
+    t.index ["workspace_id"], name: "index_campaigns_on_workspace_id"
   end
 
   create_table "comments", force: :cascade do |t|
@@ -317,6 +369,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_07_120000) do
   end
 
   create_table "deals", force: :cascade do |t|
+    t.bigint "campaign_id"
     t.bigint "company_id", null: false
     t.datetime "created_at", null: false
     t.string "currency", default: "EUR", null: false
@@ -332,6 +385,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_07_120000) do
     t.datetime "updated_at", null: false
     t.decimal "value", precision: 14, scale: 2, default: "0.0"
     t.bigint "workspace_id", null: false
+    t.index ["campaign_id"], name: "index_deals_on_campaign_id"
     t.index ["company_id"], name: "index_deals_on_company_id"
     t.index ["owner_id"], name: "index_deals_on_owner_id"
     t.index ["partner_id"], name: "index_deals_on_partner_id"
@@ -355,17 +409,34 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_07_120000) do
     t.index ["workspace_id"], name: "index_editions_on_workspace_id"
   end
 
+  create_table "email_events", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "email_message_id", null: false
+    t.string "event_type", null: false
+    t.datetime "occurred_at", null: false
+    t.jsonb "payload", default: {}, null: false
+    t.datetime "updated_at", null: false
+    t.string "url"
+    t.index ["email_message_id", "event_type", "occurred_at"], name: "idx_email_events_message_type_at"
+    t.index ["email_message_id"], name: "index_email_events_on_email_message_id"
+    t.index ["occurred_at"], name: "index_email_events_on_occurred_at"
+  end
+
   create_table "email_messages", force: :cascade do |t|
     t.text "body", null: false
+    t.bigint "campaign_id"
+    t.bigint "campaign_variant_id"
     t.integer "clicks_count", default: 0, null: false
     t.datetime "created_at", null: false
     t.string "direction", default: "outbound", null: false
+    t.string "esp_message_id"
     t.datetime "follow_up_at"
     t.string "from_address"
     t.string "gmail_message_id"
     t.string "gmail_thread_id"
     t.bigint "in_reply_to_id"
     t.string "mail_merge_batch_id"
+    t.boolean "marketing_send", default: false, null: false
     t.datetime "opened_at"
     t.bigint "record_id", null: false
     t.string "record_type", null: false
@@ -379,7 +450,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_07_120000) do
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.bigint "workspace_id", null: false
+    t.index ["campaign_id"], name: "index_email_messages_on_campaign_id"
+    t.index ["campaign_variant_id"], name: "index_email_messages_on_campaign_variant_id"
     t.index ["direction"], name: "index_email_messages_on_direction"
+    t.index ["esp_message_id"], name: "index_email_messages_on_esp_message_id"
     t.index ["follow_up_at"], name: "index_email_messages_on_follow_up_at"
     t.index ["gmail_message_id"], name: "index_email_messages_on_gmail_message_id"
     t.index ["gmail_thread_id"], name: "index_email_messages_on_gmail_thread_id"
@@ -390,6 +464,35 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_07_120000) do
     t.index ["tracking_token"], name: "index_email_messages_on_tracking_token", unique: true
     t.index ["user_id"], name: "index_email_messages_on_user_id"
     t.index ["workspace_id"], name: "index_email_messages_on_workspace_id"
+  end
+
+  create_table "email_subscriptions", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "legal_basis"
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "opted_in_at"
+    t.datetime "opted_out_at"
+    t.bigint "person_id", null: false
+    t.string "source"
+    t.string "status", default: "subscribed", null: false
+    t.bigint "subscription_type_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "workspace_id", null: false
+    t.index ["person_id", "subscription_type_id"], name: "idx_email_subscriptions_person_type", unique: true
+    t.index ["person_id"], name: "index_email_subscriptions_on_person_id"
+    t.index ["subscription_type_id"], name: "index_email_subscriptions_on_subscription_type_id"
+    t.index ["workspace_id"], name: "index_email_subscriptions_on_workspace_id"
+  end
+
+  create_table "email_suppressions", force: :cascade do |t|
+    t.string "address", null: false
+    t.datetime "created_at", null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.string "reason", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "workspace_id", null: false
+    t.index ["workspace_id", "address"], name: "index_email_suppressions_on_workspace_id_and_address", unique: true
+    t.index ["workspace_id"], name: "index_email_suppressions_on_workspace_id"
   end
 
   create_table "email_templates", force: :cascade do |t|
@@ -441,14 +544,61 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_07_120000) do
     t.index ["workspace_id"], name: "index_invitations_on_workspace_id"
   end
 
+  create_table "journey_enrollments", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "current_step_id"
+    t.datetime "enrolled_at", null: false
+    t.bigint "journey_id", null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "next_run_at"
+    t.bigint "person_id", null: false
+    t.string "state", default: "active", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "workspace_id", null: false
+    t.index ["current_step_id"], name: "index_journey_enrollments_on_current_step_id"
+    t.index ["journey_id", "person_id", "state"], name: "idx_journey_enrollments_journey_person_state"
+    t.index ["journey_id"], name: "index_journey_enrollments_on_journey_id"
+    t.index ["person_id"], name: "index_journey_enrollments_on_person_id"
+    t.index ["state", "next_run_at"], name: "idx_journey_enrollments_due"
+    t.index ["workspace_id"], name: "index_journey_enrollments_on_workspace_id"
+  end
+
+  create_table "journey_steps", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.jsonb "config", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.bigint "journey_id", null: false
+    t.integer "position", default: 0, null: false
+    t.string "step_type", null: false
+    t.datetime "updated_at", null: false
+    t.index ["journey_id", "position"], name: "index_journey_steps_on_journey_id_and_position"
+    t.index ["journey_id"], name: "index_journey_steps_on_journey_id"
+  end
+
+  create_table "journeys", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.jsonb "entry_config", default: {}, null: false
+    t.string "entry_trigger", null: false
+    t.integer "max_reenrollments", default: 0, null: false
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "workspace_id", null: false
+    t.index ["workspace_id"], name: "index_journeys_on_workspace_id"
+  end
+
   create_table "lead_form_templates", force: :cascade do |t|
     t.text "body", null: false
     t.datetime "created_at", null: false
+    t.string "kind", default: "form", null: false
+    t.string "page_slug"
     t.boolean "partial", default: false, null: false
     t.string "path", null: false
     t.jsonb "submission_schema", default: {}, null: false
     t.datetime "updated_at", null: false
     t.bigint "workspace_id", null: false
+    t.index ["kind"], name: "index_lead_form_templates_on_kind"
+    t.index ["workspace_id", "page_slug"], name: "index_lead_form_templates_on_workspace_id_and_page_slug", unique: true, where: "(page_slug IS NOT NULL)"
     t.index ["workspace_id", "path"], name: "index_lead_form_templates_on_workspace_id_and_path", unique: true
     t.index ["workspace_id"], name: "index_lead_form_templates_on_workspace_id"
   end
@@ -482,6 +632,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_07_120000) do
   end
 
   create_table "lead_submissions", force: :cascade do |t|
+    t.bigint "campaign_id"
     t.datetime "created_at", null: false
     t.jsonb "data", default: {}, null: false
     t.bigint "deal_id", null: false
@@ -490,6 +641,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_07_120000) do
     t.bigint "person_id", null: false
     t.datetime "updated_at", null: false
     t.bigint "workspace_id", null: false
+    t.index ["campaign_id"], name: "index_lead_submissions_on_campaign_id"
     t.index ["deal_id"], name: "index_lead_submissions_on_deal_id"
     t.index ["lead_form_id"], name: "index_lead_submissions_on_lead_form_id"
     t.index ["person_id"], name: "index_lead_submissions_on_person_id"
@@ -713,6 +865,28 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_07_120000) do
     t.index ["uid"], name: "index_oauth_applications_on_uid", unique: true
   end
 
+  create_table "page_views", force: :cascade do |t|
+    t.string "anonymous_id", null: false
+    t.datetime "created_at", null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "occurred_at", null: false
+    t.bigint "person_id"
+    t.string "referrer"
+    t.string "session_id"
+    t.datetime "updated_at", null: false
+    t.string "url", null: false
+    t.string "utm_campaign"
+    t.string "utm_content"
+    t.string "utm_medium"
+    t.string "utm_source"
+    t.string "utm_term"
+    t.bigint "workspace_id", null: false
+    t.index ["person_id"], name: "index_page_views_on_person_id"
+    t.index ["workspace_id", "anonymous_id", "occurred_at"], name: "idx_page_views_workspace_anon_at"
+    t.index ["workspace_id", "person_id", "occurred_at"], name: "idx_page_views_workspace_person_at"
+    t.index ["workspace_id"], name: "index_page_views_on_workspace_id"
+  end
+
   create_table "people", force: :cascade do |t|
     t.bigint "brought_by_id"
     t.bigint "company_id", null: false
@@ -723,6 +897,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_07_120000) do
     t.string "first_name", default: "", null: false
     t.string "job_title"
     t.string "last_name", default: "", null: false
+    t.integer "lead_score", default: 0, null: false
+    t.datetime "lead_score_decayed_at"
+    t.string "lifecycle_stage", default: "subscriber", null: false
     t.string "linkedin_url"
     t.string "location"
     t.bigint "owner_id"
@@ -736,6 +913,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_07_120000) do
     t.index ["owner_id"], name: "index_people_on_owner_id"
     t.index ["workspace_id", "email"], name: "index_people_on_workspace_id_and_email"
     t.index ["workspace_id", "last_name", "first_name"], name: "index_people_on_workspace_id_and_last_name_and_first_name"
+    t.index ["workspace_id", "lifecycle_stage"], name: "index_people_on_workspace_id_and_lifecycle_stage"
     t.index ["workspace_id"], name: "index_people_on_workspace_id"
   end
 
@@ -866,6 +1044,46 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_07_120000) do
     t.index ["user_id"], name: "index_saved_views_on_user_id"
     t.index ["workspace_id", "record_type"], name: "index_saved_views_on_workspace_id_and_record_type"
     t.index ["workspace_id"], name: "index_saved_views_on_workspace_id"
+  end
+
+  create_table "scoring_rules", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.jsonb "conditions", default: [], null: false
+    t.datetime "created_at", null: false
+    t.integer "decay_days"
+    t.string "event_type"
+    t.string "name", null: false
+    t.integer "points", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.bigint "workspace_id", null: false
+    t.index ["workspace_id"], name: "index_scoring_rules_on_workspace_id"
+  end
+
+  create_table "segment_memberships", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "entered_at", null: false
+    t.bigint "person_id", null: false
+    t.bigint "segment_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "workspace_id", null: false
+    t.index ["person_id"], name: "index_segment_memberships_on_person_id"
+    t.index ["segment_id", "person_id"], name: "index_segment_memberships_on_segment_id_and_person_id", unique: true
+    t.index ["segment_id"], name: "index_segment_memberships_on_segment_id"
+    t.index ["workspace_id"], name: "index_segment_memberships_on_workspace_id"
+  end
+
+  create_table "segments", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.jsonb "filters", default: {}, null: false
+    t.string "name", null: false
+    t.string "record_type", default: "Person", null: false
+    t.boolean "shared", default: false, null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.bigint "workspace_id", null: false
+    t.index ["user_id"], name: "index_segments_on_user_id"
+    t.index ["workspace_id"], name: "index_segments_on_workspace_id"
   end
 
   create_table "sessions", force: :cascade do |t|
@@ -1137,6 +1355,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_07_120000) do
     t.index ["workspace_id"], name: "index_stripe_payments_on_workspace_id"
   end
 
+  create_table "subscription_types", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.string "name", null: false
+    t.integer "position", default: 0, null: false
+    t.string "slug", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "workspace_id", null: false
+    t.index ["workspace_id", "slug"], name: "index_subscription_types_on_workspace_id_and_slug", unique: true
+    t.index ["workspace_id"], name: "index_subscription_types_on_workspace_id"
+  end
+
   create_table "tasks", force: :cascade do |t|
     t.bigint "assignee_id"
     t.datetime "completed_at"
@@ -1242,11 +1473,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_07_120000) do
   add_foreign_key "booking_pages", "workspaces"
   add_foreign_key "bookings", "booking_event_types"
   add_foreign_key "bookings", "booking_pages"
+  add_foreign_key "bookings", "campaigns"
   add_foreign_key "bookings", "deals"
   add_foreign_key "bookings", "people"
   add_foreign_key "bookings", "workspaces"
   add_foreign_key "calendar_connections", "users"
   add_foreign_key "calendar_connections", "workspaces"
+  add_foreign_key "campaign_sends", "campaigns"
+  add_foreign_key "campaign_sends", "email_templates"
+  add_foreign_key "campaign_sends", "segments"
+  add_foreign_key "campaign_sends", "subscription_types"
+  add_foreign_key "campaign_sends", "users"
+  add_foreign_key "campaign_sends", "workspaces"
+  add_foreign_key "campaign_variants", "campaign_sends"
+  add_foreign_key "campaigns", "workspaces"
   add_foreign_key "comments", "comments", column: "parent_id"
   add_foreign_key "comments", "users"
   add_foreign_key "comments", "workspaces"
@@ -1262,6 +1502,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_07_120000) do
   add_foreign_key "deal_products", "deals"
   add_foreign_key "deal_products", "editions"
   add_foreign_key "deal_products", "products"
+  add_foreign_key "deals", "campaigns"
   add_foreign_key "deals", "companies"
   add_foreign_key "deals", "companies", column: "partner_id"
   add_foreign_key "deals", "pipeline_stages"
@@ -1270,15 +1511,28 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_07_120000) do
   add_foreign_key "deals", "workspaces"
   add_foreign_key "editions", "products"
   add_foreign_key "editions", "workspaces"
+  add_foreign_key "email_events", "email_messages"
+  add_foreign_key "email_messages", "campaign_variants"
+  add_foreign_key "email_messages", "campaigns"
   add_foreign_key "email_messages", "email_messages", column: "in_reply_to_id"
   add_foreign_key "email_messages", "users"
   add_foreign_key "email_messages", "workspaces"
+  add_foreign_key "email_subscriptions", "people"
+  add_foreign_key "email_subscriptions", "subscription_types"
+  add_foreign_key "email_subscriptions", "workspaces"
+  add_foreign_key "email_suppressions", "workspaces"
   add_foreign_key "email_templates", "users"
   add_foreign_key "email_templates", "workspaces"
   add_foreign_key "gmail_connections", "users"
   add_foreign_key "gmail_connections", "workspaces"
   add_foreign_key "invitations", "users", column: "invited_by_id"
   add_foreign_key "invitations", "workspaces"
+  add_foreign_key "journey_enrollments", "journey_steps", column: "current_step_id"
+  add_foreign_key "journey_enrollments", "journeys"
+  add_foreign_key "journey_enrollments", "people"
+  add_foreign_key "journey_enrollments", "workspaces"
+  add_foreign_key "journey_steps", "journeys"
+  add_foreign_key "journeys", "workspaces"
   add_foreign_key "lead_form_templates", "workspaces"
   add_foreign_key "lead_forms", "email_templates"
   add_foreign_key "lead_forms", "pipeline_stages"
@@ -1286,6 +1540,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_07_120000) do
   add_foreign_key "lead_forms", "products"
   add_foreign_key "lead_forms", "users", column: "responsible_id"
   add_foreign_key "lead_forms", "workspaces"
+  add_foreign_key "lead_submissions", "campaigns"
   add_foreign_key "lead_submissions", "deals"
   add_foreign_key "lead_submissions", "lead_forms"
   add_foreign_key "lead_submissions", "people"
@@ -1306,6 +1561,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_07_120000) do
   add_foreign_key "notifications", "workspaces"
   add_foreign_key "oauth_access_grants", "oauth_applications", column: "application_id"
   add_foreign_key "oauth_access_tokens", "oauth_applications", column: "application_id"
+  add_foreign_key "page_views", "people"
+  add_foreign_key "page_views", "workspaces"
   add_foreign_key "people", "companies"
   add_foreign_key "people", "users", column: "brought_by_id"
   add_foreign_key "people", "users", column: "owner_id"
@@ -1327,6 +1584,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_07_120000) do
   add_foreign_key "sales_briefings", "workspaces"
   add_foreign_key "saved_views", "users"
   add_foreign_key "saved_views", "workspaces"
+  add_foreign_key "scoring_rules", "workspaces"
+  add_foreign_key "segment_memberships", "people"
+  add_foreign_key "segment_memberships", "segments"
+  add_foreign_key "segment_memberships", "workspaces"
+  add_foreign_key "segments", "users"
+  add_foreign_key "segments", "workspaces"
   add_foreign_key "sessions", "users"
   add_foreign_key "slack_integrations", "workspaces"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
@@ -1353,6 +1616,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_07_120000) do
   add_foreign_key "stripe_payments", "stripe_connections"
   add_foreign_key "stripe_payments", "users", column: "matched_by_id"
   add_foreign_key "stripe_payments", "workspaces"
+  add_foreign_key "subscription_types", "workspaces"
   add_foreign_key "tasks", "users"
   add_foreign_key "tasks", "users", column: "assignee_id"
   add_foreign_key "tasks", "workspaces"

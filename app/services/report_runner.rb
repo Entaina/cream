@@ -56,14 +56,32 @@ class ReportRunner
 
   def grouped_scope
     scope = base_scope
-    scope = scope.open_deals if @group_by == "stage" && !@include_closed
+    scope = scope.open_deals if @group_by == "stage" && !@include_closed && @record_type == "Deal"
     case @group_by
     when "owner" then scope.group(:owner_id)
     when "stage" then scope.group(:pipeline_stage_id)
     when "industry" then scope.group(:industry)
     when "company" then scope.group(:company_id)
     when "month" then scope.group(Arel.sql("date_trunc('month', #{model.table_name}.created_at)"))
+    when "lifecycle_stage" then scope.group(:lifecycle_stage)
+    when "status" then scope.group(:status)
+    when "utm_source", "utm_medium", "utm_campaign" then utm_grouped_scope(scope, @group_by)
     else scope.group(:owner_id)
+    end
+  end
+
+  def utm_grouped_scope(scope, field)
+    case @record_type
+    when "Deal"
+      scope.left_joins(:campaign).group("campaigns.#{field}")
+    when "LeadSubmission"
+      scope.group(Arel.sql("lead_submissions.metadata->>'#{field}'"))
+    when "Person"
+      scope.group(Arel.sql("(SELECT lead_submissions.metadata->>'#{field}' FROM lead_submissions WHERE lead_submissions.person_id = people.id ORDER BY lead_submissions.created_at ASC LIMIT 1)"))
+    when "Campaign"
+      scope.group(field.to_sym)
+    else
+      scope.group(:owner_id)
     end
   end
 
@@ -87,6 +105,9 @@ class ReportRunner
     when "company" then company_names[key] || "—"
     when "industry" then key.presence || "—"
     when "month" then key ? key.to_date.strftime("%b %Y") : "—"
+    when "lifecycle_stage" then key.presence || "—"
+    when "status" then key.to_s.humanize
+    when "utm_source", "utm_medium", "utm_campaign" then key.presence || "—"
     else key.to_s
     end
   end

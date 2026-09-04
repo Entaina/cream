@@ -13,14 +13,45 @@ class EmailTemplate < ApplicationRecord
   scope :ordered, -> { order(:name, :id) }
 
   def render_for(record, extra_tokens: {})
-    interpolate(body, record, extra_tokens)
+    interpolate(render_body(record, extra_tokens), record, extra_tokens)
   end
 
   def render_subject_for(record, extra_tokens: {})
-    interpolate(subject.to_s, record, extra_tokens)
+    interpolate(render_subject(record, extra_tokens), record, extra_tokens)
+  end
+
+  def render_custom_for(record, subject: nil, body: nil, extra_tokens: {})
+    rendered_subject = subject.present? ? render_string(subject, record, extra_tokens) : render_subject_for(record, extra_tokens:)
+    rendered_body = body.present? ? render_string(body, record, extra_tokens) : render_for(record, extra_tokens:)
+    [ rendered_subject, rendered_body ]
+  end
+
+  def render_string(text, record, extra_tokens = {})
+    result = text.to_s
+    if result.include?("{%") || result.include?("{{")
+      result = Marketing::LiquidRenderer.render(result, record: record, extra_tokens: extra_tokens)
+    end
+    interpolate(result, record, extra_tokens)
+  end
+
+  def liquid?
+    body.to_s.include?("{%") || body.to_s.include?("{{")
   end
 
   private
+
+  def render_body(record, extra_tokens)
+    return body unless liquid?
+
+    Marketing::LiquidRenderer.render(body, record: record, extra_tokens: extra_tokens)
+  end
+
+  def render_subject(record, extra_tokens)
+    text = subject.to_s
+    return text unless text.include?("{%") || text.include?("{{")
+
+    Marketing::LiquidRenderer.render(text, record: record, extra_tokens: extra_tokens)
+  end
 
   def interpolate(text, record, extra_tokens)
     text.to_s.gsub(/\{(\w+)\}/) do

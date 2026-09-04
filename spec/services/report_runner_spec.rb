@@ -96,4 +96,29 @@ RSpec.describe ReportRunner do
 
     expect(result.rows.sum(&:value)).to eq(2)
   end
+
+  it "counts lead submissions grouped by utm source" do
+    lead_form = create_lead_form!(workspace, user: users(:one))
+    person = create_person!(workspace)
+    workspace.lead_submissions.create!(
+      lead_form: lead_form,
+      person: person,
+      deal: create_deal!(workspace, pipeline: pipeline),
+      data: { "email" => person.email },
+      metadata: { "utm_source" => "google" }
+    )
+
+    result = run(metric: "count", group_by: "utm_source", record_type: "LeadSubmission")
+
+    expect(result.rows.find { |row| row.label == "google" }.value).to eq(1)
+  end
+
+  it "counts people grouped by lifecycle stage" do
+    create_person!(workspace, lifecycle_stage: "lead")
+    create_person!(workspace, lifecycle_stage: "mql")
+
+    result = run(metric: "count", group_by: "lifecycle_stage", record_type: "Person")
+
+    expect(result.rows.sum(&:value)).to eq(2)
+  end
 end

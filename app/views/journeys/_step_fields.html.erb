@@ -1,0 +1,124 @@
+<div class="rounded-lg ring-1 ring-line p-3 space-y-3"
+     data-nested-form-target="row"
+     data-journey-form-target="stepRow">
+  <%= f.hidden_field :id %>
+  <%= f.hidden_field :_destroy %>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+    <div>
+      <%= f.label :step_type, "Tipo de paso", class: "label" %>
+      <%= f.select :step_type,
+            JourneyStep::STEP_TYPES.map { |t| [ step_type_label(t), t ] },
+            {}, class: "input w-full",
+            data: { "journey-form-target" => "stepType", action: "journey-form#stepTypeChanged" } %>
+    </div>
+    <div>
+      <%= f.label :position, "Posición", class: "label" %>
+      <%= f.number_field :position, class: "input w-full", min: 0 %>
+    </div>
+  </div>
+
+  <% config = f.object.config.to_h.stringify_keys %>
+  <% prefix = "#{f.object_name}[config]" %>
+
+  <div data-journey-form-target="stepField" data-step-type="send_email" class="space-y-2">
+    <div>
+      <label class="label">Plantilla de email</label>
+      <%= select_tag "#{prefix}[email_template_id]",
+            options_from_collection_for_select(@email_templates, :id, :name, config["email_template_id"]),
+            include_blank: "Selecciona plantilla", class: "input w-full" %>
+    </div>
+    <div>
+      <label class="label">Tipo de suscripción</label>
+      <%= select_tag "#{prefix}[subscription_type_id]",
+            options_from_collection_for_select(@subscription_types, :id, :name, config["subscription_type_id"]),
+            include_blank: "Por defecto", class: "input w-full" %>
+    </div>
+  </div>
+
+  <div data-journey-form-target="stepField" data-step-type="wait" hidden>
+    <label class="label">Esperar (minutos)</label>
+    <%= number_field_tag "#{prefix}[minutes]", config["minutes"], class: "input w-full", min: 1 %>
+  </div>
+
+  <div data-journey-form-target="stepField" data-step-type="create_task" hidden class="space-y-2">
+    <div>
+      <label class="label">Título de la tarea</label>
+      <%= text_field_tag "#{prefix}[title]", config["title"], class: "input w-full", placeholder: "Seguimiento comercial" %>
+    </div>
+    <div>
+      <label class="label">Vence en (días)</label>
+      <%= number_field_tag "#{prefix}[due_days]", config["due_days"] || 1, class: "input w-full", min: 0 %>
+    </div>
+  </div>
+
+  <div data-journey-form-target="stepField" data-step-type="adjust_score" hidden>
+    <label class="label">Puntos de puntuación</label>
+    <%= number_field_tag "#{prefix}[points]", config["points"], class: "input w-full", placeholder: "10 o -5" %>
+  </div>
+
+  <div data-journey-form-target="stepField" data-step-type="add_to_segment" hidden>
+    <label class="label">Lista de personas</label>
+    <%= select_tag "#{prefix}[list_id]",
+          options_from_collection_for_select(@lists, :id, :name, config["list_id"]),
+          include_blank: "Selecciona lista", class: "input w-full" %>
+  </div>
+
+  <div data-journey-form-target="stepField" data-step-type="notify" hidden class="space-y-2">
+    <div>
+      <label class="label">Usuario a notificar</label>
+      <%= select_tag "#{prefix}[user_id]",
+            options_from_collection_for_select(@users, :id, :name, config["user_id"]),
+            include_blank: "Propietario del contacto", class: "input w-full" %>
+    </div>
+    <div>
+      <label class="label">Mensaje</label>
+      <%= text_field_tag "#{prefix}[message]", config["message"], class: "input w-full", placeholder: "Paso completado para {nombre}" %>
+    </div>
+  </div>
+
+  <div data-journey-form-target="stepField" data-step-type="set_field" hidden class="space-y-2">
+    <div>
+      <label class="label">Campo</label>
+      <%= select_tag "#{prefix}[field]",
+            options_for_select([ [ "Ciclo de vida", "lifecycle_stage" ] ], config["field"]),
+            class: "input w-full" %>
+    </div>
+    <div>
+      <label class="label">Valor</label>
+      <%= select_tag "#{prefix}[value]",
+            options_for_select(Person::LIFECYCLE_STAGES.map { |s| [ s.humanize, s ] }, config["value"]),
+            include_blank: "Selecciona valor", class: "input w-full" %>
+    </div>
+  </div>
+
+  <div data-journey-form-target="stepField" data-step-type="branch" hidden class="space-y-3">
+    <p class="text-sm text-ink-faint">Evalúa una condición sobre el contacto y salta al paso indicado.</p>
+    <% condition = (config["condition"] || {}).to_h.stringify_keys %>
+    <% condition_prefix = "#{prefix}[condition]" %>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+      <%= text_field_tag "#{condition_prefix}[field]", condition["field"], placeholder: "person.lead_score", class: "input w-full" %>
+      <%= select_tag "#{condition_prefix}[operator]",
+            options_for_select(Marketing::ConditionEvaluator::OPERATORS.map { |k, v| [ v, k ] }, condition["operator"]),
+            class: "input w-full" %>
+      <%= text_field_tag "#{condition_prefix}[compare_value]", condition["compare_value"], class: "input w-full" %>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div>
+        <label class="label">Si cumple → paso (ID)</label>
+        <%= number_field_tag "#{prefix}[true_step_id]", config["true_step_id"], class: "input w-full" %>
+      </div>
+      <div>
+        <label class="label">Si no cumple → paso (ID)</label>
+        <%= number_field_tag "#{prefix}[false_step_id]", config["false_step_id"], class: "input w-full" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex items-center justify-between gap-2">
+    <label class="flex items-center gap-2 text-base"><%= f.check_box :active %> Activo</label>
+    <button type="button" data-action="nested-form#remove" class="btn-ghost text-danger">
+      <%= icon :trash, classes: "size-3.5" %> Eliminar paso
+    </button>
+  </div>
+</div>

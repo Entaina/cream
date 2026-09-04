@@ -4,25 +4,25 @@ overview: Análisis de qué funcionalidades de HubSpot Marketing Hub encajan en 
 todos:
   - id: phase0-consent
     content: "Fase 0: modelos SubscriptionType, EmailSubscription y EmailSuppression; centro de preferencias público con token firmado y baja en un clic; propagar consentimiento y newsletter_opt_in desde LeadFormSubmissionProcessor a Person; flag :marketing_consent"
-    status: pending
+    status: completed
   - id: phase1-esp
     content: "Fase 1: capa Marketing::Esp::Client con adaptador Mailjet, modelo EmailEvent, receptor de webhooks con firma, supresión automática por rebote/spam, reescritura de enlaces para click tracking con UTM, cabeceras List-Unsubscribe y throttling por lotes"
-    status: pending
+    status: completed
   - id: phase2-campaigns
     content: "Fase 2: modelo Campaign con UTM por defecto y campaign_id en email_messages, lead_submissions, bookings y deals; modelo Segment sobre un Marketing::FilterResolver extraído de SavedView; CampaignSend/CampaignSendJob con exclusiones y dedupe; Liquid en EmailTemplate"
-    status: pending
+    status: completed
   - id: phase3-journeys
     content: "Fase 3: Journey, JourneyStep (incluye wait y branch) y JourneyEnrollment; JourneyRunnerJob recurrente; triggers de entrada por formulario, segmento, lifecycle, click y reserva"
-    status: pending
+    status: completed
   - id: phase4-scoring
     content: "Fase 4: lead_score y lifecycle_stage en Person, ScoringRule sobre FieldCondition más eventos de engagement, decaimiento temporal y transiciones automáticas registradas en el timeline"
-    status: pending
+    status: completed
   - id: phase5-tracking
     content: "Fase 5: snippet cream.js y Public::TrackingController con modelo PageView e identificación por cookie; landing pages como tipo page de LeadFormTemplate en /p/:slug; A/B testing con CampaignVariant"
-    status: pending
+    status: completed
   - id: phase6-analytics
     content: "Fase 6: extender Report con Campaign y LeadSubmission y dimensiones UTM; dashboard de atribución visita-lead-MQL-deal-ingresos con drill-down"
-    status: pending
+    status: completed
 isProject: false
 ---
 

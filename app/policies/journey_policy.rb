@@ -1,0 +1,2 @@
+class JourneyPolicy < MarketingAdminPolicy
+end

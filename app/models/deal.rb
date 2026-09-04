@@ -9,6 +9,7 @@ class Deal < ApplicationRecord
   belongs_to :partner, class_name: "Company", optional: true
   belongs_to :pipeline
   belongs_to :pipeline_stage
+  belongs_to :campaign, optional: true
 
   has_many :deal_contacts, dependent: :destroy, inverse_of: :deal
   has_many :contacts, through: :deal_contacts, source: :person

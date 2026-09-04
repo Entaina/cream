@@ -1,0 +1,59 @@
+<%= form_with model: scoring_rule, class: "card p-4 space-y-4 max-w-2xl" do |f| %>
+  <% if scoring_rule.errors.any? %>
+    <div class="rounded-lg bg-danger-soft text-danger-strong ring-1 ring-danger-line px-3 py-2 text-sm">
+      <%= scoring_rule.errors.full_messages.to_sentence %>
+    </div>
+  <% end %>
+
+  <div>
+    <%= f.label :name, "Nombre", class: "label" %>
+    <%= f.text_field :name, class: "input w-full", placeholder: "Email abierto" %>
+  </div>
+
+  <div>
+    <%= f.label :event_type, "Tipo de evento", class: "label" %>
+    <%= f.select :event_type,
+          ScoringRule::EVENT_TYPES.map { |e| [ scoring_event_label(e), e ] },
+          { include_blank: "Cualquier evento" }, class: "input w-full" %>
+    <p class="text-sm text-ink-faint mt-1">Deja vacío para aplicar la regla a cualquier evento que cumpla las condiciones.</p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+    <div>
+      <%= f.label :points, "Puntos", class: "label" %>
+      <%= f.number_field :points, class: "input w-full" %>
+    </div>
+    <div>
+      <%= f.label :decay_days, "Decaimiento (días)", class: "label" %>
+      <%= f.number_field :decay_days, class: "input w-full", min: 0 %>
+      <p class="text-sm text-ink-faint mt-1">0 = sin decaimiento.</p>
+    </div>
+  </div>
+
+  <label class="flex items-center gap-2 text-base"><%= f.check_box :active %> Activa</label>
+
+  <div data-controller="nested-form">
+    <div class="flex items-center justify-between gap-2 mb-2">
+      <div>
+        <p class="label">Condiciones adicionales</p>
+        <p class="text-sm text-ink-faint">Todas deben cumplirse además del tipo de evento.</p>
+      </div>
+      <button type="button" data-action="nested-form#add" class="btn-secondary shrink-0">
+        <%= icon :plus, classes: "size-3.5" %> Añadir condición
+      </button>
+    </div>
+
+    <div data-nested-form-target="list" class="space-y-3">
+      <% Array(scoring_rule.conditions).each do |condition| %>
+        <%= render "condition_fields", condition: condition.to_h.stringify_keys %>
+      <% end %>
+    </div>
+
+    <template data-nested-form-target="template">
+      <%= render "condition_fields", condition: {} %>
+    </template>
+  </div>
+
+  <%= f.submit scoring_rule.persisted? ? "Guardar" : "Crear regla", class: "btn-primary" %>
+  <%= link_to "Cancelar", scoring_rules_path, class: "btn-secondary ml-2" %>
+<% end %>

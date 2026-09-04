@@ -77,7 +77,7 @@ class LeadFormTemplatesController < ApplicationController
   end
 
   def template_params
-    params.require(:lead_form_template).permit(:slug, :partial, :body)
+    params.require(:lead_form_template).permit(:slug, :partial, :body, :kind, :page_slug)
   end
 
   def preview_body_param

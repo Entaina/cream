@@ -1,5 +1,5 @@
 class Report < ApplicationRecord
-  RECORD_TYPES = %w[Deal Person Company].freeze
+  RECORD_TYPES = %w[Deal Person Company Campaign LeadSubmission].freeze
   METRICS = %w[count sum_value avg_value].freeze
   VALUE_METRICS = %w[sum_value avg_value].freeze
   RANGES = %w[all month quarter year].freeze
@@ -8,9 +8,11 @@ class Report < ApplicationRecord
 
   # Group-by dimensions available per record type.
   DIMENSIONS = {
-    "Deal" => %w[stage owner month],
-    "Person" => %w[owner company month],
-    "Company" => %w[owner industry month]
+    "Deal" => %w[stage owner month utm_source utm_medium utm_campaign],
+    "Person" => %w[owner company month lifecycle_stage utm_source],
+    "Company" => %w[owner industry month],
+    "Campaign" => %w[status month utm_source utm_medium utm_campaign],
+    "LeadSubmission" => %w[month utm_source utm_medium utm_campaign]
   }.freeze
 
   belongs_to :workspace

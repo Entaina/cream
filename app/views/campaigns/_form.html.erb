@@ -1,0 +1,62 @@
+<%= form_with model: campaign, class: "card p-4 space-y-4 max-w-2xl" do |f| %>
+  <% if campaign.errors.any? %>
+    <div class="rounded-lg bg-danger-soft text-danger-strong ring-1 ring-danger-line px-3 py-2 text-sm">
+      <%= campaign.errors.full_messages.to_sentence %>
+    </div>
+  <% end %>
+
+  <div>
+    <%= f.label :name, "Nombre", class: "label" %>
+    <%= f.text_field :name, class: "input w-full", placeholder: "Newsletter marzo" %>
+  </div>
+
+  <div>
+    <%= f.label :goal, "Objetivo", class: "label" %>
+    <%= f.text_area :goal, class: "input w-full resize-y", rows: 3, placeholder: "Generar leads cualificados para el producto X" %>
+    <p class="text-sm text-ink-faint mt-1">Describe brevemente qué quieres conseguir con esta campaña.</p>
+  </div>
+
+  <div>
+    <%= f.label :starts_on, "Fecha de inicio", class: "label" %>
+    <%= f.date_field :starts_on, class: "input w-full" %>
+  </div>
+
+  <% if campaign.persisted? %>
+    <div>
+      <%= f.label :status, "Estado", class: "label" %>
+      <%= f.select :status,
+            Campaign::STATUSES.map { |s| [ ({ "draft" => "Borrador", "scheduled" => "Programada", "sending" => "Enviando", "sent" => "Enviada" })[s] || s, s ] },
+            {}, class: "input w-full" %>
+    </div>
+  <% end %>
+
+  <fieldset class="space-y-3 border border-line rounded-lg p-3">
+    <legend class="text-sm font-semibold px-1">Parámetros UTM</legend>
+    <p class="text-sm text-ink-faint">Se añaden automáticamente a los enlaces de la campaña para medir atribución.</p>
+    <div>
+      <%= f.label :utm_source, "UTM source", class: "label" %>
+      <%= f.text_field :utm_source, class: "input w-full", placeholder: "newsletter" %>
+    </div>
+    <div>
+      <%= f.label :utm_medium, "UTM medium", class: "label" %>
+      <%= f.text_field :utm_medium, class: "input w-full", placeholder: "email" %>
+    </div>
+    <div>
+      <%= f.label :utm_campaign, "UTM campaign", class: "label" %>
+      <%= f.text_field :utm_campaign, class: "input w-full", placeholder: "marzo-2026" %>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div>
+        <%= f.label :utm_term, "UTM term", class: "label" %>
+        <%= f.text_field :utm_term, class: "input w-full" %>
+      </div>
+      <div>
+        <%= f.label :utm_content, "UTM content", class: "label" %>
+        <%= f.text_field :utm_content, class: "input w-full" %>
+      </div>
+    </div>
+  </fieldset>
+
+  <%= f.submit campaign.persisted? ? "Guardar" : "Crear campaña", class: "btn-primary" %>
+  <%= link_to "Cancelar", campaign.persisted? ? campaign_path(campaign) : campaigns_path, class: "btn-secondary ml-2" %>
+<% end %>

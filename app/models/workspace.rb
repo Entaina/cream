@@ -40,7 +40,18 @@ class Workspace < ApplicationRecord
   has_many :lead_submissions, dependent: :destroy
   has_many :calendar_connections, dependent: :destroy
   has_many :booking_pages, dependent: :destroy
-  has_many :bookings, dependent: :destroy
+    has_many :bookings, dependent: :destroy
+  has_many :subscription_types, dependent: :destroy
+  has_many :email_subscriptions, dependent: :destroy
+  has_many :email_suppressions, dependent: :destroy
+  has_many :campaigns, dependent: :destroy
+  has_many :segments, dependent: :destroy
+  has_many :segment_memberships, dependent: :destroy
+  has_many :campaign_sends, dependent: :destroy
+  has_many :journeys, dependent: :destroy
+  has_many :journey_enrollments, dependent: :destroy
+  has_many :scoring_rules, dependent: :destroy
+  has_many :page_views, dependent: :destroy
 
   validates :name, presence: true
   validates :slug, presence: true, uniqueness: true, format: { with: /\A[a-z0-9-]+\z/ }

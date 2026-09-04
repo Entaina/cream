@@ -63,6 +63,7 @@ Rails.application.routes.draw do
     end
     member do
       match :merge, via: %i[get post]
+      patch :toggle_subscription
     end
     resources :relationships, only: %i[create destroy], controller: "person_relationships"
   end
@@ -191,6 +192,43 @@ Rails.application.routes.draw do
     get "api/availability", to: "public/booking_api#availability"
     post "api/book", to: "public/booking_api#book"
   end
+
+  get "p/:workspace_slug/:slug", to: "public/landing_pages#show", as: :public_landing_page
+  get "e/preferences/:token", to: "public/email_preferences#show", as: :public_email_preferences
+  patch "e/preferences/:token", to: "public/email_preferences#update"
+  match "e/unsubscribe/:token", to: "public/email_preferences#unsubscribe", via: %i[get post], as: :public_email_unsubscribe
+  post "e/events", to: "public/email_events#create", as: :public_email_events
+  post "t", to: "public/tracking#create", as: :public_tracking
+  get "cream.js", to: "public/tracking#script", as: :cream_tracking_script
+
+  resources :subscription_types, except: :show
+  resources :campaigns do
+    member do
+      post :send_campaign
+      post :send_test
+      post :cancel_send
+      post :mark_winner
+      post :send_winner_rest
+      get :recipient_count
+    end
+  end
+  resources :segments do
+    member do
+      get :preview
+    end
+  end
+  resources :journeys do
+    member do
+      post :enroll
+      patch :toggle_active
+    end
+  end
+  resources :scoring_rules, except: :show do
+    collection do
+      post :recalculate
+    end
+  end
+  resource :marketing_attribution, only: :show, controller: "marketing_attribution"
 
   namespace :api do
     get "docs", to: "docs#show"

@@ -1,0 +1,6 @@
+<% page_title "Editar campaña" %>
+<%= render "shared/page_header", title: "Editar campaña", icon_name: :mail,
+           actions: capture { link_to("Ver campaña", @campaign, class: "btn-secondary") } %>
+<div class="flex-1 overflow-y-auto scrollbar-subtle p-5 max-w-2xl">
+  <%= render "form", campaign: @campaign %>
+</div>

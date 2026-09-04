@@ -1,0 +1,205 @@
+<% page_title @campaign.name %>
+<% actions = capture do %>
+  <%= link_to "Editar", edit_campaign_path(@campaign), class: "btn-secondary" %>
+  <%= button_to "Eliminar", campaign_path(@campaign), method: :delete, class: "btn-danger",
+        form: { data: { turbo_confirm: "¿Eliminar la campaña «#{@campaign.name}»?" } } %>
+<% end %>
+<%= render "shared/page_header", title: @campaign.name, icon_name: :mail, actions: actions %>
+
+<div class="flex-1 overflow-y-auto scrollbar-subtle p-5 space-y-6">
+  <section class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+    <div class="card p-4">
+      <p class="text-sm text-ink-faint">Enviados</p>
+      <p class="text-2xl font-semibold tabular-nums"><%= @stats[:sent] %></p>
+    </div>
+    <div class="card p-4">
+      <p class="text-sm text-ink-faint">Abiertos</p>
+      <p class="text-2xl font-semibold tabular-nums"><%= @stats[:opened] %></p>
+    </div>
+    <div class="card p-4">
+      <p class="text-sm text-ink-faint">Clics</p>
+      <p class="text-2xl font-semibold tabular-nums"><%= @stats[:clicked] %></p>
+    </div>
+  </section>
+
+  <section class="card p-4 space-y-4">
+    <div class="flex items-center gap-2 flex-wrap">
+      <h2 class="font-semibold">Enviar campaña</h2>
+      <%= campaign_status_badge(@campaign.status) %>
+    </div>
+
+    <div data-controller="segment-preview"
+         data-segment-preview-url-value="<%= recipient_count_campaign_path(@campaign) %>">
+      <%= form_with url: send_campaign_campaign_path(@campaign), method: :post, class: "space-y-3 max-w-2xl" do %>
+        <div>
+          <label class="label">Segmento de personas</label>
+          <%= select_tag :segment_id,
+                options_from_collection_for_select(@person_segments, :id, :name),
+                include_blank: "Selecciona un segmento",
+                class: "input w-full",
+                required: true,
+                data: {
+                  "segment-preview-target" => "segmentId",
+                  action: "change->segment-preview#segmentChanged"
+                } %>
+          <p class="text-sm text-ink-faint mt-1">
+            <span data-segment-preview-target="count">…</span> destinatarios coinciden con el segmento.
+          </p>
+        </div>
+
+        <div>
+          <label class="label">Plantilla de email</label>
+          <%= select_tag :email_template_id,
+                options_from_collection_for_select(current_workspace.email_templates.ordered, :id, :name),
+                include_blank: "Selecciona una plantilla",
+                class: "input w-full",
+                required: true %>
+        </div>
+
+        <div>
+          <label class="label">Tipo de suscripción</label>
+          <%= select_tag :subscription_type_id,
+                options_from_collection_for_select(@subscription_types, :id, :name),
+                class: "input w-full" %>
+          <p class="text-sm text-ink-faint mt-1">Solo se enviará a contactos suscritos a este tipo.</p>
+        </div>
+
+        <div>
+          <label class="label">Programar envío (opcional)</label>
+          <%= datetime_local_field_tag :scheduled_at, nil, class: "input w-full" %>
+          <p class="text-sm text-ink-faint mt-1">Déjalo vacío para enviar de inmediato.</p>
+        </div>
+
+        <fieldset class="space-y-3 border border-line rounded-lg p-3">
+          <legend class="text-sm font-semibold px-1">Prueba A/B (opcional)</legend>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label class="label">Asunto variante A</label>
+              <%= text_field_tag :variant_a_subject, nil, class: "input w-full" %>
+            </div>
+            <div>
+              <label class="label">Peso A (%)</label>
+              <%= number_field_tag :variant_a_weight, 50, min: 1, max: 100, class: "input w-full" %>
+            </div>
+            <div class="md:col-span-2">
+              <label class="label">Cuerpo variante A</label>
+              <%= text_area_tag :variant_a_body, nil, rows: 3, class: "input w-full resize-y" %>
+            </div>
+            <div>
+              <label class="label">Asunto variante B</label>
+              <%= text_field_tag :variant_b_subject, nil, class: "input w-full" %>
+            </div>
+            <div>
+              <label class="label">Peso B (%)</label>
+              <%= number_field_tag :variant_b_weight, 50, min: 1, max: 100, class: "input w-full" %>
+            </div>
+            <div class="md:col-span-2">
+              <label class="label">Cuerpo variante B</label>
+              <%= text_area_tag :variant_b_body, nil, rows: 3, class: "input w-full resize-y" %>
+            </div>
+          </div>
+          <p class="text-xs text-ink-faint">Si rellenas los asuntos A/B, se ignorará el asunto de la plantilla base.</p>
+        </fieldset>
+
+        <%= submit_tag "Encolar envío", class: "btn-primary" %>
+      <% end %>
+    </div>
+
+    <%= form_with url: send_test_campaign_path(@campaign), method: :post, class: "border-t border-line pt-4 space-y-3 max-w-2xl" do %>
+      <h3 class="text-sm font-semibold">Enviar prueba a tu email</h3>
+      <div>
+        <label class="label">Plantilla</label>
+        <%= select_tag :email_template_id,
+              options_from_collection_for_select(current_workspace.email_templates.ordered, :id, :name),
+              include_blank: "Selecciona una plantilla",
+              class: "input w-full",
+              required: true %>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div>
+          <label class="label">Asunto prueba (opcional)</label>
+          <%= text_field_tag :variant_a_subject, nil, class: "input w-full", placeholder: "Sustituye asunto de plantilla" %>
+        </div>
+        <div class="md:col-span-2">
+          <label class="label">Cuerpo prueba (opcional)</label>
+          <%= text_area_tag :variant_a_body, nil, rows: 2, class: "input w-full resize-y" %>
+        </div>
+      </div>
+      <%= submit_tag "Enviar prueba", class: "btn-secondary" %>
+    <% end %>
+  </section>
+
+  <section class="card p-4">
+    <h2 class="font-semibold mb-3">Historial de envíos</h2>
+    <% if @sends.empty? %>
+      <p class="text-sm text-ink-faint">Aún no hay envíos para esta campaña.</p>
+    <% else %>
+      <div class="overflow-x-auto">
+        <table class="table-base">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Segmento</th>
+              <th>Estado</th>
+              <th>Resultado</th>
+              <th>Variantes</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @sends.each do |send_record| %>
+              <% stats = send_record.stats.to_h.stringify_keys %>
+              <tr>
+                <td class="text-sm whitespace-nowrap"><%= l send_record.created_at, format: :short %></td>
+                <td class="text-sm"><%= send_record.segment.name %></td>
+                <td><%= send_status_badge(send_record.status) %></td>
+                <td class="text-sm text-ink-soft">
+                  <% if stats.any? %>
+                    <%= stats["sent"] || 0 %> enviados
+                    <% if stats["skipped"].to_i.positive? %>, <%= stats["skipped"] %> omitidos<% end %>
+                    <% if stats["failed"].to_i.positive? %>, <%= stats["failed"] %> fallidos<% end %>
+                  <% else %>
+                    —
+                  <% end %>
+                </td>
+                <td class="text-sm">
+                  <% if send_record.campaign_variants.any? %>
+                    <ul class="space-y-1">
+                      <% send_record.campaign_variants.each do |variant| %>
+                        <li class="flex flex-wrap items-center gap-1">
+                          <strong><%= variant.name %></strong>
+                          <% if variant.winner? %><%= badge "Ganadora", color: "green" %><% end %>
+                          <span class="text-ink-faint"><%= truncate(variant.subject, length: 40) %> (<%= variant.weight %>%)</span>
+                          <% if send_record.status == "sent" && send_record.campaign_variants.size > 1 && !variant.winner? %>
+                            <%= button_to "Marcar ganadora", mark_winner_campaign_path(@campaign, send_id: send_record.id, variant_id: variant.id),
+                                  method: :post, class: "btn-ghost text-xs py-0.5" %>
+                          <% end %>
+                        </li>
+                      <% end %>
+                    </ul>
+                  <% else %>
+                    <span class="text-ink-faint">—</span>
+                  <% end %>
+                </td>
+                <td class="text-right whitespace-nowrap">
+                  <% if send_record.status.in?(%w[pending scheduled]) %>
+                    <%= button_to "Cancelar", cancel_send_campaign_path(@campaign, send_id: send_record.id),
+                          method: :post, class: "btn-ghost text-danger text-sm",
+                          form: { data: { turbo_confirm: "¿Cancelar este envío?" } } %>
+                  <% end %>
+                  <% if send_record.status == "sent" && send_record.campaign_variants.any?(&:winner?) %>
+                    <%= button_to "Enviar ganadora al resto", send_winner_rest_campaign_path(@campaign, send_id: send_record.id),
+                          method: :post, class: "btn-secondary text-sm",
+                          form: { data: { turbo_confirm: "¿Enviar la variante ganadora a quienes aún no la recibieron?" } } %>
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% end %>
+  </section>
+
+  <%= link_to "Ver atribución", marketing_attribution_path, class: "btn-ghost" %>
+</div>

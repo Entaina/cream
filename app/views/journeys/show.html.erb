@@ -1,0 +1,114 @@
+<% page_title @journey.name %>
+<% actions = capture do %>
+  <%= button_to @journey.active? ? "Pausar" : "Activar", toggle_active_journey_path(@journey), method: :patch, class: "btn-secondary" %>
+  <%= link_to "Editar", edit_journey_path(@journey), class: "btn-secondary" %>
+  <%= button_to "Eliminar", journey_path(@journey), method: :delete, class: "btn-danger",
+        form: { data: { turbo_confirm: "¿Eliminar el recorrido «#{@journey.name}»?" } } %>
+<% end %>
+<%= render "shared/page_header", title: @journey.name, icon_name: :zap,
+           actions: actions %>
+
+<div class="flex-1 overflow-y-auto scrollbar-subtle p-5 space-y-6">
+  <div class="flex flex-wrap items-center gap-2">
+    <%= badge @journey.active? ? "Activo" : "Inactivo", color: @journey.active? ? "green" : "chicago" %>
+    <span class="text-sm text-ink-faint">
+      Disparador: <strong><%= journey_trigger_label(@journey.entry_trigger) %></strong>
+    </span>
+  </div>
+
+  <section class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+    <div class="card p-4">
+      <p class="text-sm text-ink-faint">Inscripciones</p>
+      <p class="text-2xl font-semibold tabular-nums"><%= @stats[:total] %></p>
+    </div>
+    <div class="card p-4">
+      <p class="text-sm text-ink-faint">Activas</p>
+      <p class="text-2xl font-semibold tabular-nums"><%= @stats[:active] %></p>
+    </div>
+    <div class="card p-4">
+      <p class="text-sm text-ink-faint">En espera</p>
+      <p class="text-2xl font-semibold tabular-nums"><%= @stats[:waiting] %></p>
+    </div>
+    <div class="card p-4">
+      <p class="text-sm text-ink-faint">Completadas</p>
+      <p class="text-2xl font-semibold tabular-nums"><%= @stats[:completed] %></p>
+    </div>
+  </section>
+
+  <% if @journey.entry_trigger == "manual" %>
+    <section class="card p-4">
+      <h2 class="font-semibold mb-3">Inscribir contacto manualmente</h2>
+      <%= form_with url: enroll_journey_path(@journey), method: :post, class: "flex flex-wrap items-end gap-3 max-w-xl" do %>
+        <div class="flex-1 min-w-[12rem]">
+          <label class="label">Contacto</label>
+          <%= select_tag :person_id,
+                options_from_collection_for_select(current_workspace.people.order(:first_name, :last_name).limit(500), :id, :display_name),
+                include_blank: "Selecciona un contacto",
+                class: "input w-full",
+                required: true %>
+        </div>
+        <%= submit_tag "Inscribir", class: "btn-primary" %>
+      <% end %>
+    </section>
+  <% end %>
+
+  <section class="card p-4">
+    <h2 class="font-semibold mb-3">Pasos del recorrido</h2>
+    <% if @journey.steps.ordered.any? %>
+      <ol class="space-y-3">
+        <% @journey.steps.ordered.each do |step| %>
+          <li class="flex gap-3">
+            <span class="flex size-7 shrink-0 items-center justify-center rounded-full bg-canvas-sunken text-sm font-semibold">
+              <%= step.position + 1 %>
+            </span>
+            <div class="min-w-0 flex-1">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="font-medium"><%= step_type_label(step.step_type) %></span>
+                <% unless step.active? %><%= badge "Inactivo", color: "chicago" %><% end %>
+              </div>
+              <p class="text-sm text-ink-faint mt-0.5"><%= describe_step(step, workspace: current_workspace) %></p>
+            </div>
+          </li>
+        <% end %>
+      </ol>
+    <% else %>
+      <p class="text-sm text-ink-faint">Sin pasos configurados.</p>
+    <% end %>
+  </section>
+
+  <section class="card p-4">
+    <h2 class="font-semibold mb-3">Inscripciones recientes</h2>
+    <% if @enrollments.any? %>
+      <table class="table-base">
+        <thead>
+          <tr>
+            <th>Contacto</th>
+            <th>Estado</th>
+            <th>Paso actual</th>
+            <th>Inscrito</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @enrollments.each do |enrollment| %>
+            <tr>
+              <td>
+                <%= link_to enrollment.person.display_name, enrollment.person, class: "font-medium text-accent hover:underline" %>
+              </td>
+              <td><%= enrollment_state_badge(enrollment.state) %></td>
+              <td class="text-sm text-ink-soft">
+                <% if enrollment.current_step %>
+                  <%= step_type_label(enrollment.current_step.step_type) %>
+                <% else %>
+                  —
+                <% end %>
+              </td>
+              <td class="text-sm text-ink-faint"><%= l enrollment.enrolled_at, format: :short %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% else %>
+      <p class="text-sm text-ink-faint">Nadie inscrito todavía.</p>
+    <% end %>
+  </section>
+</div>

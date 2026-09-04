@@ -4,7 +4,7 @@
 
 Cream is a **workspace**-based CRM for managing **people**, **companies** and **deals** (opportunities), with notes, tasks, lists and an activity history shared across the team.
 
-> **Last revision:** 2026-09-03 (booking and lead notices follow profile channels)
+> **Last revision:** 2026-09-04 (marketing hub: per-type consent, campaigns, journeys, scoring, tracking)
 > This document describes the functionality **visible to the user**. Disabled features are listed at the end under "Coming soon".
 
 ---
@@ -39,7 +39,8 @@ Cream is a **workspace**-based CRM for managing **people**, **companies** and **
 26. [Stripe payments](#26-stripe-payments)
 27. [Lead capture forms](#27-lead-capture-forms)
 28. [Calendar bookings](#28-calendar-bookings)
-29. [Coming soon](#29-coming-soon)
+29. [Marketing](#29-marketing)
+30. [Coming soon](#30-coming-soon)
 
 ---
 
@@ -1122,7 +1123,21 @@ Three-step flow: choose event type → calendar and time (with an ES/EN time zon
 
 ---
 
-## 29. Coming soon
+## 29. Marketing
+
+Marketing hub for consent, campaigns, segments, attribution, journeys and scoring. Sidebar: **Suscripciones**, **Campañas**, **Segmentos**, **Atribución**, **Recorridos**, **Puntuación de leads**.
+
+- **Consent**: per-type subscriptions (general, newsletter, product, events); per-list unsubscribe; global opt-out from preference center; manage from person record.
+- **Campaigns**: send or schedule to person segments, subscription type, A/B with Liquid, test email, A/B winner, Mailjet webhooks (`MAILJET_WEBHOOK_TOKEN`).
+- **Segments**: demographic and behavioral filters with live preview.
+- **Journeys**: multi-step sequences (consent-aware email, wait, branch, list, task, scoring); manual enrollment.
+- **Scoring**: rules with conditions, nightly recalc, lifecycle on person records.
+- **Tracking**: `cream.js` snippet, landing pages at `/p/:workspace/:slug`, `cream_aid` linked on form submit.
+- **Attribution**: UTM dashboard with drill-down to people/deals.
+
+---
+
+## 30. Coming soon
 
 These features exist in the code but are **not available** in the interface until their implementation is complete (controlled by `CreamFeatures`):
 

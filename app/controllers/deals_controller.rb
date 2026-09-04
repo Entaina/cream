@@ -191,6 +191,9 @@ class DealsController < ApplicationController
   def filtered_deals(scope)
     scope = Deal.filter_by(scope, @effective_filters)
     scope = scope.open_deals unless show_closed?
+    if params[:utm_source].present?
+      scope = scope.left_joins(:campaign).where(campaigns: { utm_source: params[:utm_source] })
+    end
     scope = scope.merge(Deal.apply_custom_field_filters(current_workspace, filter_value(:cf))) if filter_value(:cf).present?
     scope
   end

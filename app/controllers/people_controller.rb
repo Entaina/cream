@@ -4,7 +4,7 @@ class PeopleController < ApplicationController
 
   remembers_list_filters only: :index
 
-  before_action :set_person, only: %i[show edit update destroy merge]
+  before_action :set_person, only: %i[show edit update destroy merge toggle_subscription]
 
   SORTABLE = %w[first_name last_name email job_title location created_at].freeze
 
@@ -15,6 +15,15 @@ class PeopleController < ApplicationController
     @people = ListFilters.apply_company(@people, filter_value(:company_id)) if filter_value(:company_id).present?
     @people = ListFilters.apply_owner(@people, filter_value(:owner_id)) if filter_value(:owner_id).present?
     @people = ListFilters.apply_created_at(@people, @effective_filters)
+    @people = @people.where(lifecycle_stage: params[:lifecycle_stage]) if params[:lifecycle_stage].present?
+    if params[:lifecycle_stage_in].present?
+      @people = @people.where(lifecycle_stage: Array(params[:lifecycle_stage_in]))
+    end
+    if params[:utm_source].present?
+      @people = @people.joins(:lead_submissions)
+        .where("lead_submissions.metadata->>'utm_source' = ?", params[:utm_source])
+        .distinct
+    end
     @people = @people.merge(Person.apply_custom_field_filters(current_workspace, filter_value(:cf)))
     @people = apply_sorting(@people, sortable: SORTABLE, default_column: "first_name")
     @companies = current_workspace.companies.order(:name)
@@ -134,6 +143,21 @@ class PeopleController < ApplicationController
     Rails.logger.error("[PeopleController#merge] #{e.class}: #{e.message}\n#{e.backtrace&.first(5)&.join("\n")}")
     flash.now[:alert] = "Could not merge contacts. Please try again or contact support."
     render :merge, status: :unprocessable_entity
+  end
+
+  def toggle_subscription
+    authorize @person, :update?
+    SubscriptionType.ensure_defaults!(current_workspace)
+    type = current_workspace.subscription_types.find(params[:subscription_type_id])
+    subscription = EmailSubscription.find_by(person: @person, subscription_type: type)
+
+    if subscription&.subscribed?
+      Marketing::ConsentService.unsubscribe!(person: @person, subscription_type: type, source: "crm_admin")
+    else
+      Marketing::ConsentService.subscribe!(person: @person, subscription_type: type, source: "crm_admin", legal_basis: "consent")
+    end
+
+    redirect_to @person, notice: "Suscripción actualizada."
   end
 
   private

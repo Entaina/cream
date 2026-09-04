@@ -260,6 +260,62 @@ module CreamFeatures
         "Connect Google Calendar as the page host",
         "Create a booking page with event types and share the public URL"
       ]
+    },
+    marketing_consent: {
+      enabled: true,
+      menu: true,
+      label: "Suscripciones",
+      status: :ready,
+      blockers: [],
+      enable_steps: []
+    },
+    marketing_campaigns: {
+      enabled: true,
+      menu: true,
+      label: "Campañas",
+      status: :ready,
+      blockers: [],
+      enable_steps: []
+    },
+    marketing_segments: {
+      enabled: true,
+      menu: true,
+      label: "Segmentos",
+      status: :ready,
+      blockers: [],
+      enable_steps: []
+    },
+    marketing_attribution: {
+      enabled: true,
+      menu: true,
+      label: "Atribución",
+      status: :ready,
+      blockers: [],
+      enable_steps: []
+    },
+    journeys: {
+      enabled: true,
+      menu: true,
+      label: "Recorridos",
+      status: :ready,
+      blockers: [],
+      enable_steps: []
+    },
+    lead_scoring: {
+      enabled: true,
+      menu: true,
+      label: "Puntuación de leads",
+      status: :ready,
+      blockers: [],
+      enable_steps: []
+    },
+    web_tracking: {
+      enabled: true,
+      menu: false,
+      label: "Web tracking",
+      status: :ready,
+      blockers: [],
+      enable_steps: []
     }
   }.freeze
 
@@ -281,6 +337,12 @@ module CreamFeatures
     when :stripe_payments then helper.stripe_payments_path
     when :lead_forms then helper.lead_forms_path
     when :calendar_booking then helper.booking_pages_path
+    when :marketing_consent then helper.subscription_types_path
+    when :marketing_campaigns then helper.campaigns_path
+    when :marketing_segments then helper.segments_path
+    when :marketing_attribution then helper.marketing_attribution_path
+    when :journeys then helper.journeys_path
+    when :lead_scoring then helper.scoring_rules_path
     else raise KeyError, "No menu path for #{key}"
     end
   end
@@ -297,7 +359,13 @@ module CreamFeatures
       webhooks: :globe,
       stripe_payments: :credit_card,
       lead_forms: :globe,
-      calendar_booking: :calendar
+      calendar_booking: :calendar,
+      marketing_consent: :mail,
+      marketing_campaigns: :mail,
+      marketing_segments: :users,
+      marketing_attribution: :bar_chart,
+      journeys: :zap,
+      lead_scoring: :bar_chart
     }.fetch(key)
   end
 

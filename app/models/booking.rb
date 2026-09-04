@@ -11,6 +11,7 @@ class Booking < ApplicationRecord
   belongs_to :booking_event_type
   belongs_to :person, optional: true
   belongs_to :deal, optional: true
+  belongs_to :campaign, optional: true
 
   validates :first_name, :last_name, :email, :starts_at, :ends_at, :timezone, presence: true
   validates :first_name, :last_name, length: { minimum: 2 }

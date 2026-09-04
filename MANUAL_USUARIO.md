@@ -4,7 +4,7 @@
 
 Cream es un CRM por **workspaces** para gestionar **personas**, **empresas** y **deals** (oportunidades), con notas, tareas, listas y un historial de actividad compartido en el equipo.
 
-> **Última revisión:** 2026-09-03 (avisos de reserva y leads según canales del perfil)
+> **Última revisión:** 2026-09-04 (hub de marketing: consentimiento por tipo, campañas, journeys, scoring, tracking)
 > Este documento describe la funcionalidad **visible para el usuario**. Las funcionalidades desactivadas aparecen al final en «Próximamente».
 
 ---
@@ -39,7 +39,8 @@ Cream es un CRM por **workspaces** para gestionar **personas**, **empresas** y *
 26. [Pagos de Stripe](#26-pagos-de-stripe)
 27. [Formularios de captación](#27-formularios-de-captación)
 28. [Reservas de calendario](#28-reservas-de-calendario)
-29. [Próximamente](#29-próximamente)
+29. [Marketing](#29-marketing)
+30. [Próximamente](#30-próximamente)
 
 ---
 
@@ -1122,7 +1123,21 @@ Flujo en tres pasos: elegir tipo de evento → calendario y hora (con selector d
 
 ---
 
-## 29. Próximamente
+## 29. Marketing
+
+Hub de marketing conectado a captación, consentimiento, envíos y atribución. Menú lateral: **Suscripciones**, **Campañas**, **Segmentos**, **Atribución**, **Recorridos**, **Puntuación de leads**.
+
+- **Consentimiento**: suscripciones por tipo (general, newsletter, producto, eventos); baja por lista sin bloquear otras; baja global desde el centro de preferencias; gestión desde la ficha de persona.
+- **Campañas**: envío o programación a segmento de personas, tipo de suscripción, A/B con Liquid, email de prueba, ganadora A/B, webhooks Mailjet (`MAILJET_WEBHOOK_TOKEN`).
+- **Segmentos**: filtros demográficos y de comportamiento con vista previa en vivo.
+- **Recorridos**: secuencias con pasos (email con consentimiento, espera, rama, lista, tarea, scoring); inscripción manual.
+- **Puntuación**: reglas con condiciones, recálculo nocturno, lifecycle en ficha de persona.
+- **Tracking**: snippet `cream.js`, landing pages `/p/:workspace/:slug`, identificación `cream_aid` al enviar formulario.
+- **Atribución**: dashboard UTM con drill-down a personas/deals.
+
+---
+
+## 30. Próximamente
 
 Estas funcionalidades existen en el código pero **no están disponibles** en la interfaz hasta completar su implementación (controladas por `CreamFeatures`):
 

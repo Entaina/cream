@@ -1,0 +1,2 @@
+class ScoringRulePolicy < MarketingAdminPolicy
+end

@@ -11,6 +11,11 @@ class EmailMessage < ApplicationRecord
   belongs_to :in_reply_to, class_name: "EmailMessage", optional: true
   has_many :replies, class_name: "EmailMessage", foreign_key: :in_reply_to_id, dependent: :nullify, inverse_of: :in_reply_to
 
+  belongs_to :campaign, optional: true
+  belongs_to :campaign_variant, optional: true
+
+  has_many :email_events, dependent: :delete_all
+
   has_many_attached :attachments
 
   validates :to_address, :subject, :body, presence: true
@@ -63,6 +68,8 @@ class EmailMessage < ApplicationRecord
 
     update!(opened_at: Time.current, status: "opened")
     record.track_activity("email_opened", user: user, metadata: { subject: subject, to: to_address }) if record.respond_to?(:track_activity)
+    person = workspace.people.with_email(to_address).first
+    Marketing::ScoringEngine.apply_event!(person: person, event: "email_opened", metadata: { "email_message_id" => id }) if person
     NotificationService.notify_email_opened(message: self) if CreamFeatures.enabled?(:notifications)
   end
 
@@ -85,6 +92,9 @@ class EmailMessage < ApplicationRecord
 
     increment!(:clicks_count)
     record.track_activity("email_clicked", user: user, metadata: { subject: subject }) if record.respond_to?(:track_activity)
+    person = workspace.people.with_email(to_address).first
+    Marketing::ScoringEngine.apply_event!(person: person, event: "email_clicked", metadata: { "email_message_id" => id }) if person
+    Marketing::JourneyTrigger.enqueue_email_clicked!(person: person) if person
   end
 
   # Builds attachment payloads for outbound delivery (Gmail API or SMTP).

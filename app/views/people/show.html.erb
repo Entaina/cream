@@ -28,10 +28,15 @@
 
     <div class="divide-y divide-line/60">
       <%= render "emails_section", person: @person %>
+      <%= render "subscriptions_section", person: @person if feature_enabled?(:marketing_consent) %>
       <%= render "shared/attribute", label: "Phone", icon_name: :phone, value: @person.phone %>
       <%= render "shared/attribute", label: "Company", icon_name: :building,
             value: @person.company ? link_to(@person.company.name, company_path(@person.company), class: "text-accent hover:underline") : nil %>
       <%= render "shared/attribute", label: "Location", icon_name: :map_pin, value: @person.location %>
+      <% if feature_enabled?(:lead_scoring) %>
+        <%= render "shared/attribute", label: "Lead score", icon_name: :bar_chart, value: @person.lead_score %>
+        <%= render "shared/attribute", label: "Lifecycle", icon_name: :activity, value: @person.lifecycle_stage&.humanize %>
+      <% end %>
       <%= render "shared/attribute", label: "LinkedIn", icon_name: :external,
             value: @person.linkedin_url.present? ? link_to("Profile", @person.linkedin_url, target: "_blank", class: "text-accent hover:underline") : nil %>
       <%= render "shared/attribute", label: "Owner", icon_name: :users, value: @person.owner&.name %>

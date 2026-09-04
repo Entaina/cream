@@ -1,0 +1,108 @@
+<%= form_with model: journey,
+      html: {
+        data: {
+          controller: "journey-form",
+          action: "nested-form:changed->journey-form#stepAdded"
+        }
+      },
+      class: "card p-4 space-y-4 max-w-3xl" do |f| %>
+  <% if journey.errors.any? %>
+    <div class="rounded-lg bg-danger-soft text-danger-strong ring-1 ring-danger-line px-3 py-2 text-sm">
+      <%= journey.errors.full_messages.to_sentence %>
+    </div>
+  <% end %>
+
+  <div>
+    <%= f.label :name, "Nombre", class: "label" %>
+    <%= f.text_field :name, class: "input w-full", placeholder: "Bienvenida nuevos leads" %>
+  </div>
+
+  <div>
+    <%= f.label :entry_trigger, "Disparador de entrada", class: "label" %>
+    <%= f.select :entry_trigger,
+          Journey::ENTRY_TRIGGERS.map { |t| [ journey_trigger_label(t), t ] },
+          {}, class: "input w-full",
+          data: { "journey-form-target" => "trigger", action: "journey-form#triggerChanged" } %>
+  </div>
+
+  <div>
+    <%= f.label :max_reenrollments, "Reinscripciones máximas", class: "label" %>
+    <%= f.number_field :max_reenrollments, class: "input w-full", min: 0 %>
+    <p class="text-sm text-ink-faint mt-1">0 = solo una vez por contacto.</p>
+  </div>
+
+  <label class="flex items-center gap-2 text-base"><%= f.check_box :active %> Activo</label>
+
+  <% config = journey.entry_config.to_h.stringify_keys %>
+  <fieldset class="space-y-3 border border-line rounded-lg p-3">
+    <legend class="text-sm font-semibold px-1">Condición de entrada</legend>
+
+    <div data-journey-form-target="entryField" data-trigger="lead_form_submitted" hidden>
+      <label class="label">Formulario de captación</label>
+      <%= select_tag "journey[entry_config][lead_form_id]",
+            options_from_collection_for_select(@lead_forms, :id, :name, config["lead_form_id"]),
+            include_blank: "Cualquier formulario", class: "input w-full" %>
+    </div>
+
+    <div data-journey-form-target="entryField" data-trigger="segment_entry" hidden>
+      <label class="label">Segmento</label>
+      <%= select_tag "journey[entry_config][segment_id]",
+            options_from_collection_for_select(@segments, :id, :name, config["segment_id"]),
+            include_blank: "Selecciona segmento", class: "input w-full" %>
+    </div>
+
+    <div data-journey-form-target="entryField" data-trigger="booking_created" hidden>
+      <label class="label">Página de reservas</label>
+      <%= select_tag "journey[entry_config][booking_page_id]",
+            options_from_collection_for_select(@booking_pages, :id, :name, config["booking_page_id"]),
+            include_blank: "Cualquier página", class: "input w-full" %>
+    </div>
+
+    <div data-journey-form-target="entryField" data-trigger="lifecycle_changed" hidden class="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div>
+        <label class="label">Ciclo de vida anterior</label>
+        <%= select_tag "journey[entry_config][from]",
+              options_for_select(Person::LIFECYCLE_STAGES.map { |s| [ s.humanize, s ] }, config["from"]),
+              include_blank: "Cualquiera", class: "input w-full" %>
+      </div>
+      <div>
+        <label class="label">Ciclo de vida nuevo</label>
+        <%= select_tag "journey[entry_config][to]",
+              options_for_select(Person::LIFECYCLE_STAGES.map { |s| [ s.humanize, s ] }, config["to"]),
+              include_blank: "Cualquiera", class: "input w-full" %>
+      </div>
+    </div>
+
+    <p class="text-sm text-ink-faint" data-journey-form-target="entryField" data-trigger="manual" hidden>
+      Las inscripciones manuales se hacen desde la ficha del recorrido.
+    </p>
+    <p class="text-sm text-ink-faint" data-journey-form-target="entryField" data-trigger="email_clicked" hidden>
+      Se activa cuando el contacto hace clic en un enlace de email de marketing.
+    </p>
+  </fieldset>
+
+  <div data-controller="nested-form">
+    <div class="flex items-center justify-between gap-2 mb-2">
+      <p class="label">Pasos</p>
+      <button type="button" data-action="nested-form#add" class="btn-secondary shrink-0">
+        <%= icon :plus, classes: "size-3.5" %> Añadir paso
+      </button>
+    </div>
+
+    <div data-nested-form-target="list" class="space-y-3">
+      <%= f.fields_for :steps do |step_form| %>
+        <%= render "step_fields", f: step_form %>
+      <% end %>
+    </div>
+
+    <template data-nested-form-target="template">
+      <%= f.fields_for :steps, JourneyStep.new(position: 0, step_type: "send_email", active: true),
+            child_index: "NEW_RECORD" do |step_form| %>
+        <%= render "step_fields", f: step_form %>
+      <% end %>
+    </template>
+  </div>
+
+  <%= f.submit journey.persisted? ? "Guardar" : "Crear recorrido", class: "btn-primary" %>
+  <%= link_to "Cancelar", journey.persisted? ? journey_path(journey) : journeys_path, class: "btn-secondary ml-2" %>
+<% end %>

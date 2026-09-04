@@ -1,0 +1,86 @@
+<% preview_attrs = segment.persisted? ? {
+  controller: "segment-preview",
+  segment_preview_url_value: preview_segment_path(segment)
+} : {} %>
+<%= form_with model: segment,
+      html: { data: preview_attrs },
+      class: "card p-4 space-y-4 max-w-2xl" do |f| %>
+  <% if segment.errors.any? %>
+    <div class="rounded-lg bg-danger-soft text-danger-strong ring-1 ring-danger-line px-3 py-2 text-sm">
+      <%= segment.errors.full_messages.to_sentence %>
+    </div>
+  <% end %>
+
+  <div>
+    <%= f.label :name, "Nombre", class: "label" %>
+    <%= f.text_field :name, class: "input w-full", placeholder: "Leads cualificados" %>
+  </div>
+
+  <div>
+    <%= f.label :record_type, "Tipo de registro", class: "label" %>
+    <%= f.select :record_type, Segment::RECORD_TYPES.map { |t| [ t, t ] }, {}, class: "input w-full" %>
+  </div>
+
+  <div>
+    <%= f.label :description, "Descripción", class: "label" %>
+    <%= f.text_area :description, class: "input w-full resize-y", rows: 2 %>
+  </div>
+
+  <% filters = segment.filters.to_h.stringify_keys %>
+  <fieldset class="space-y-3 border border-line rounded-lg p-3">
+    <legend class="text-sm font-semibold px-1">Filtros</legend>
+
+    <div>
+      <label class="label">Búsqueda</label>
+      <%= text_field_tag "segment[filters][q]", filters["q"], class: "input w-full", placeholder: "Nombre o email" %>
+    </div>
+    <div>
+      <label class="label">Ciclo de vida</label>
+      <%= select_tag "segment[filters][lifecycle_stage]",
+            options_for_select(Person::LIFECYCLE_STAGES.map { |s| [ s.humanize, s ] }, filters["lifecycle_stage"]),
+            include_blank: "Cualquiera", class: "input w-full" %>
+    </div>
+    <div>
+      <label class="label">Email contiene</label>
+      <%= text_field_tag "segment[filters][email_contains]", filters["email_contains"], class: "input w-full" %>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div>
+        <label class="label">Puntuación mínima</label>
+        <%= number_field_tag "segment[filters][lead_score_min]", filters["lead_score_min"], class: "input w-full" %>
+      </div>
+      <div>
+        <label class="label">Puntuación máxima</label>
+        <%= number_field_tag "segment[filters][lead_score_max]", filters["lead_score_max"], class: "input w-full" %>
+      </div>
+    </div>
+    <div>
+      <label class="label">Abrió email (últimos N días)</label>
+      <%= number_field_tag "segment[filters][opened_email_days]", filters["opened_email_days"], class: "input w-full", min: 1 %>
+    </div>
+    <div>
+      <label class="label">Envió formulario (slug)</label>
+      <%= text_field_tag "segment[filters][submitted_form_slug]", filters["submitted_form_slug"], class: "input w-full" %>
+    </div>
+    <div>
+      <label class="label">Visitó URL (contiene)</label>
+      <%= text_field_tag "segment[filters][visited_url]", filters["visited_url"], class: "input w-full" %>
+    </div>
+    <label class="flex items-center gap-2 text-sm">
+      <%= check_box_tag "segment[filters][exclude_suppressed]", "1", filters["exclude_suppressed"].in?([ true, "true", "1", 1 ]) %>
+      Excluir direcciones suprimidas
+    </label>
+  </fieldset>
+
+  <% if segment.persisted? %>
+    <p class="text-sm text-ink-faint">
+      Vista previa: <strong data-segment-preview-target="count">…</strong> registros con los filtros guardados.
+      Guarda los cambios para actualizar el recuento.
+    </p>
+  <% end %>
+
+  <label class="flex items-center gap-2"><%= f.check_box :shared %> Compartido con el equipo</label>
+
+  <%= f.submit segment.persisted? ? "Guardar" : "Crear segmento", class: "btn-primary" %>
+  <%= link_to "Cancelar", segment.persisted? ? segment_path(segment) : segments_path, class: "btn-secondary ml-2" %>
+<% end %>

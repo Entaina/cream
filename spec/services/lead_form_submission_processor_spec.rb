@@ -9,7 +9,15 @@ RSpec.describe LeadFormSubmissionProcessor do
   let(:workspace) { workspaces(:one) }
   let!(:pipeline) { Pipeline.create_default!(workspace) }
   let(:lead_form) { create_lead_form!(workspace, user: member, pipeline: pipeline) }
-  let(:request) { instance_double(ActionDispatch::Request, user_agent: "Mozilla/5.0", remote_ip: "203.0.113.1") }
+  let(:request) do
+    cookie_jar = ActiveSupport::InheritableOptions.new
+    instance_double(
+      ActionDispatch::Request,
+      user_agent: "Mozilla/5.0",
+      remote_ip: "203.0.113.1",
+      cookie_jar: cookie_jar
+    )
+  end
   let(:qualified_stage) { pipeline.pipeline_stages.find_by!(name: "Qualified") }
   let(:proposal_stage) { pipeline.pipeline_stages.find_by!(name: "Proposal") }
 
@@ -285,6 +293,22 @@ RSpec.describe LeadFormSubmissionProcessor do
 
     person = Person.order(:id).last
     expect(person.company.name).to eq(LeadForm::PLACEHOLDER_COMPANY_NAME)
+  end
+
+  it "links anonymous page views to the person when cream_aid is present" do
+    allow(CreamFeatures).to receive(:enabled?).and_call_original
+    allow(CreamFeatures).to receive(:enabled?).with(:web_tracking).and_return(true)
+    anonymous_id = "anon-123"
+    workspace.page_views.create!(
+      anonymous_id: anonymous_id,
+      url: "https://example.com/pricing",
+      occurred_at: Time.current
+    )
+
+    submit(contacto_lead_params("cream_aid" => anonymous_id))
+
+    person = Person.order(:id).last
+    expect(workspace.page_views.where(anonymous_id: anonymous_id).pluck(:person_id)).to eq([ person.id ])
   end
 
   it "finds company by name when collecting company data" do

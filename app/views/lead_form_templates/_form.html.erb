@@ -19,6 +19,16 @@
       </label>
 
       <div>
+        <%= f.label :kind, "Tipo", class: "label" %>
+        <%= f.select :kind, LeadFormTemplate::KINDS.map { |k| [ k == "page" ? "Landing page (/p/:slug)" : "Formulario de lead", k ] }, {}, class: "input w-full" %>
+      </div>
+      <div>
+        <%= f.label :page_slug, "Slug público (solo landing)", class: "label" %>
+        <%= f.text_field :page_slug, class: "input w-full font-mono", placeholder: "mi-landing" %>
+        <p class="mt-1 text-xs text-ink-faint">URL pública: <code class="font-mono">/p/<%= template.workspace.slug %>/&lt;slug&gt;</code></p>
+      </div>
+
+      <div>
         <%= f.label :body, "Contenido Liquid", class: "label" %>
         <%= render "shared/liquid_editor",
               form: f,

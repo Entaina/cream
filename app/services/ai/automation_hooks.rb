@@ -16,9 +16,15 @@ module Ai
     end
 
     def self.score_deal(deal:)
-      return unless CreamFeatures.enabled?(:ai_automations)
+      return unless CreamFeatures.enabled?(:lead_scoring)
 
-      nil
+      deal.contacts.find_each do |person|
+        Marketing::ScoringEngine.apply_event!(
+          person: person,
+          event: "deal_created",
+          metadata: { "deal_id" => deal.id, "value" => deal.value }
+        )
+      end
     end
   end
 end

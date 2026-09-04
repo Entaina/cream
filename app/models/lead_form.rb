@@ -8,7 +8,7 @@ class LeadForm < ApplicationRecord
   MAX_SUBMISSIONS_PER_EMAIL_PER_DAY = 5
   MAX_SUBMISSIONS_PER_FORM_PER_HOUR = 100
   METADATA_FIELDS = %w[
-    lead_form_slug lead_form_name source_page referrer
+    lead_form_slug lead_form_name source_page referrer cream_aid
     utm_source utm_medium utm_campaign utm_term utm_content
   ].freeze
   SYSTEM_FIELD_KEYS = (

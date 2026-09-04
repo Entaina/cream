@@ -1,0 +1,72 @@
+require "net/http"
+require "json"
+
+module Marketing
+  module Esp
+    class MailjetAdapter < Client
+      API_URL = "https://api.mailjet.com/v3.1/send".freeze
+
+      def deliver!
+        response = post_message
+        if response.is_a?(Net::HTTPSuccess)
+          body = JSON.parse(response.body)
+          message_id = body.dig("Messages", 0, "To", 0, "MessageID") || body.dig("Messages", 0, "MessageID")
+          message.update!(esp_message_id: message_id.to_s) if message_id.present?
+          record_event!("delivered", payload: JSON.parse(response.body))
+          true
+        else
+          record_event!("blocked", payload: { "status" => response.code, "body" => response.body })
+          false
+        end
+      rescue StandardError => e
+        record_event!("blocked", payload: { "error" => e.message })
+        false
+      end
+
+      private
+
+      def post_message
+        uri = URI(API_URL)
+        request = Net::HTTP::Post.new(uri)
+        request.basic_auth(ENV.fetch("MAILJET_API_KEY"), ENV.fetch("MAILJET_SECRET_KEY"))
+        request["Content-Type"] = "application/json"
+        request.body = payload.to_json
+        Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) { |http| http.request(request) }
+      end
+
+      def payload
+        {
+          Messages: [
+            {
+              From: { Email: from_address, Name: message.user.name },
+              To: [ { Email: message.to_address } ],
+              Subject: message.subject,
+              HTMLPart: rendered_body,
+              CustomID: message.id.to_s,
+              Headers: headers
+            }
+          ]
+        }
+      end
+
+      def rendered_body
+        body = message.body.to_s
+        body = Marketing::LinkRewriter.rewrite(html: body, message: message, campaign: message.campaign) if message.marketing_send?
+        append_open_pixel(body)
+      end
+
+      def from_address
+        ENV.fetch("MAILER_FROM", message.user.email_address)
+      end
+
+      def record_event!(type, payload: {})
+        EmailEvent.create!(
+          email_message: message,
+          event_type: type,
+          occurred_at: Time.current,
+          payload: payload
+        )
+      end
+    end
+  end
+end

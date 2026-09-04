@@ -8,6 +8,8 @@ class Person < ApplicationRecord
     "team_member" => "Lo trae alguien del equipo"
   }.freeze
 
+  LIFECYCLE_STAGES = %w[subscriber lead mql sql opportunity customer evangelist].freeze
+
   belongs_to :company
   belongs_to :brought_by, class_name: "User", optional: true
   has_many :deal_contacts, dependent: :destroy
@@ -19,10 +21,16 @@ class Person < ApplicationRecord
   has_many :person_emails, dependent: :destroy
   has_many :suggested_stripe_payments, class_name: "StripePayment",
     foreign_key: :suggested_person_id, dependent: :nullify, inverse_of: :suggested_person
+  has_many :email_subscriptions, dependent: :destroy
+  has_many :lead_submissions, dependent: :nullify
+  has_many :journey_enrollments, dependent: :destroy
+  has_many :page_views, dependent: :nullify
+  has_many :segment_memberships, dependent: :destroy
 
   accepts_nested_attributes_for :person_emails, allow_destroy: true,
     reject_if: ->(attrs) { attrs[:address].blank? && attrs[:id].blank? }
 
+  validates :lifecycle_stage, inclusion: { in: LIFECYCLE_STAGES }
   validates :first_name, presence: true, unless: -> { last_name.present? }
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }, allow_blank: true
   validates :source, inclusion: { in: SOURCES.keys }, allow_blank: true
@@ -35,6 +43,7 @@ class Person < ApplicationRecord
   before_validation :assign_workspace_to_person_emails
   before_validation :ensure_primary_email
   after_save :sync_person_emails_from_column, if: :saved_change_to_email?
+  after_update :enqueue_lifecycle_journey, if: :saved_change_to_lifecycle_stage?
 
   scope :search, ->(q) {
     if q.present?
@@ -152,5 +161,10 @@ class Person < ApplicationRecord
     end
   ensure
     @syncing_person_emails = false
+  end
+
+  def enqueue_lifecycle_journey
+    from, to = saved_change_to_lifecycle_stage
+    Marketing::JourneyTrigger.enqueue_lifecycle_changed!(person: self, from: from, to: to)
   end
 end
