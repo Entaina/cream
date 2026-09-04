@@ -34,6 +34,7 @@ Workspace-scoped (`WorkspaceRecordPolicy`):
 
 | Modelo | Rol |
 |--------|-----|
+| `MailjetConnection` | Credenciales ESP por workspace (API Key, Secret, remitente, webhook token, `transactional_enabled`) |
 | `SubscriptionType` | Tipos de suscripción (general, newsletter, producto, eventos…) |
 | `EmailSubscription` | Estado por persona + tipo (`subscribed` / `unsubscribed` / `pending`) |
 | `EmailSuppression` | Bloqueo global por email (bounce, spam, baja total) |
@@ -53,7 +54,7 @@ Workspace-scoped (`WorkspaceRecordPolicy`):
 
 **EmailMessage** ampliada: `campaign_variant_id`, `esp_message_id`; `has_many :email_events`.
 
-Migraciones: `20260904100000_create_marketing_hub.rb`, `20260904110000_marketing_gap_closure.rb`, `20260904120000_marketing_improvements.rb`.
+Migraciones: `20260904100000_create_marketing_hub.rb`, `20260904110000_marketing_gap_closure.rb`, `20260904120000_marketing_improvements.rb`, `20260904140000_create_mailjet_connections.rb`, `20260904150000_add_transactional_enabled_to_mailjet_connections.rb`.
 
 ## Servicios (`app/services/marketing/`)
 
@@ -63,8 +64,8 @@ Migraciones: `20260904100000_create_marketing_hub.rb`, `20260904110000_marketing
 | `ConsentService` | Alta/baja por tipo; `unsubscribe_all!` desde preferencias |
 | `PreferenceToken` | Token firmado para centro de preferencias / one-click unsub |
 | `CampaignSender` | Envío masivo: dedupe emails, A/B Liquid (`EmailTemplate#render_custom_for`), errores ESP → `failed` |
-| `Esp::Client` | Orquestador SMTP/Mailjet; `List-Unsubscribe` dinámico |
-| `Esp::MailjetAdapter` | API Mailjet; `esp_message_id`, pixel apertura |
+| `Esp::Client` | Orquestador SMTP/Mailjet; usa `MailjetConnection` del workspace; `List-Unsubscribe` dinámico |
+| `Esp::MailjetAdapter` | API Mailjet con credenciales del workspace; `esp_message_id`, pixel apertura |
 | `Esp::SmtpAdapter` | Fallback dev (Mailbin) |
 | `WebhookProcessor` | Mailjet webhook: supresión única, soft bounce no suprime, unsub → `ConsentService`, click → journey |
 | `JourneyTrigger` | Entrada en recorridos; `entry_config` vacío = «cualquiera» |
@@ -114,7 +115,7 @@ resource :marketing_attribution, only: :show
 | `GET /p/:workspace_slug/:slug` | `Public::LandingPagesController#show` | Landing scope por tenant |
 | `GET/PATCH /e/preferences/:token` | `Public::EmailPreferencesController` | Centro de preferencias |
 | `GET/POST /e/unsubscribe/:token` | one-click unsub con `?type=` |
-| `POST /e/events?token=` | `Public::EmailEventsController#create` | Webhook Mailjet; requiere `MAILJET_WEBHOOK_TOKEN` |
+| `POST /e/events?token=` | `Public::EmailEventsController#create` | Webhook Mailjet; el token es el `webhook_token` de `MailjetConnection` |
 | `POST /t` | `Public::TrackingController#create` | Eventos tracking |
 | `GET /cream.js` | script cross-origin | Snippet embebible |
 
@@ -153,10 +154,11 @@ resource :marketing_attribution, only: :show
 
 | Variable | Uso |
 |----------|-----|
-| `CREAM_APP_URL` | Píxeles, links preferencias, tracking (obligatorio en prod) |
-| `MAILJET_WEBHOOK_TOKEN` | Auth webhook `POST /e/events`; sin valor → 401 |
+| `CREAM_APP_URL` | Píxeles, links preferencias, tracking, URL de webhook Mailjet (obligatorio en prod) |
 | `MARKETING_DATA_RETENTION_DAYS` | Retención page views / email events (default 180) |
-| `SMTP_*` / `MAILER_FROM` | Envío campañas vía Mailjet (prod); dev usa Mailbin |
+| `SMTP_*` / `MAILER_FROM` | Fallback de instancia (Mailbin en dev). Campañas usan `MailjetConnection` si existe; transaccional solo si `transactional_enabled` |
+
+Mailjet por workspace: **Settings** (admin) → `MailjetConnection` (`api_key`, `secret_key`, `from_email`, `from_name`, `webhook_token`, `transactional_enabled`). URL webhook: `https://<host>/e/events?token=<webhook_token>`.
 
 ## Tests
 
@@ -189,4 +191,4 @@ Smoke tests con `cream-playwright` — sección «Verificar marketing hub».
 2. Specs (servicios + requests); rubocop
 3. Manual §29 si cambió UX
 4. `bin/rails db:migrate` en dev/prod al añadir columnas
-5. Prod: configurar `MAILJET_WEBHOOK_TOKEN` y URL webhook Mailjet → `https://<host>/e/events?token=<token>`
+5. Prod: cada workspace configura Mailjet en **Settings**; registrar en Mailjet la URL de webhook que muestra esa pantalla.

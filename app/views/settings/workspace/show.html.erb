@@ -74,5 +74,89 @@
         <% end %>
       </section>
     <% end %>
+
+    <% if feature_enabled?(:marketing_campaigns) %>
+      <% @mailjet_connection ||= current_workspace.mailjet_connection || current_workspace.build_mailjet_connection(user: current_user) %>
+      <section class="card p-4 space-y-3">
+        <h2 class="text-base font-semibold text-ink">Mailjet</h2>
+        <p class="text-sm text-ink-soft">
+          Cada workspace usa su propia cuenta de Mailjet para campañas y recorridos. El correo transaccional (invitaciones, alertas, reservas, informes y emails de ficha) solo si lo activas abajo.
+        </p>
+
+        <% if @mailjet_connection.errors.any? %>
+          <div class="text-sm text-danger">
+            <% @mailjet_connection.errors.full_messages.each do |message| %>
+              <p><%= message %></p>
+            <% end %>
+          </div>
+        <% end %>
+
+        <% if @mailjet_connection.persisted? && @mailjet_connection.connected? %>
+          <p class="text-sm text-green-700 dark:text-green-400">
+            Conectado con API key <strong class="font-mono"><%= @mailjet_connection.masked_api_key %></strong>
+            y secret <strong class="font-mono"><%= @mailjet_connection.masked_secret_key %></strong>.
+          </p>
+        <% end %>
+
+        <%= form_with model: @mailjet_connection, url: mailjet_connection_path,
+              method: @mailjet_connection.persisted? ? :patch : :post, class: "space-y-3" do |f| %>
+          <div>
+            <%= f.label :api_key, "API Key", class: "block text-sm font-medium text-ink-soft mb-1" %>
+            <%= f.password_field :api_key, value: "", autocomplete: "off", class: "input w-full font-mono",
+                  placeholder: @mailjet_connection.connected? ? "Deja en blanco para conservar la clave actual" : "Clave pública de Mailjet" %>
+          </div>
+          <div>
+            <%= f.label :secret_key, "Secret Key", class: "block text-sm font-medium text-ink-soft mb-1" %>
+            <%= f.password_field :secret_key, value: "", autocomplete: "off", class: "input w-full font-mono",
+                  placeholder: @mailjet_connection.connected? ? "Deja en blanco para conservar la clave actual" : "Clave secreta de Mailjet" %>
+          </div>
+          <div>
+            <%= f.label :from_email, "Email remitente", class: "block text-sm font-medium text-ink-soft mb-1" %>
+            <%= f.email_field :from_email, class: "input w-full", placeholder: "noreply@tudominio.com" %>
+            <p class="text-sm text-ink-faint mt-1">Debe ser un remitente verificado en Mailjet (SPF/DKIM del dominio).</p>
+          </div>
+          <div>
+            <%= f.label :from_name, "Nombre del remitente", class: "block text-sm font-medium text-ink-soft mb-1" %>
+            <%= f.text_field :from_name, class: "input w-full", placeholder: current_workspace.name %>
+          </div>
+          <label class="flex items-center gap-2 text-base">
+            <%= f.check_box :transactional_enabled %>
+            Usar Mailjet para el correo transaccional
+          </label>
+          <p class="text-sm text-ink-faint">
+            Invitaciones, alertas, reservas, informes y emails de ficha. Si está desactivado, esos envíos usan SMTP/Mailbin.
+          </p>
+          <div class="flex gap-2">
+            <%= f.submit @mailjet_connection.persisted? ? "Guardar Mailjet" : "Conectar Mailjet", class: "btn-secondary" %>
+          </div>
+        <% end %>
+        <% if @mailjet_connection.persisted? %>
+          <%= button_to "Desconectar", mailjet_connection_path, method: :delete, class: "btn-danger",
+                form: { data: { turbo_confirm: "¿Desconectar Mailjet de este workspace?" } } %>
+          <div class="pt-2" data-controller="clipboard">
+            <p class="text-sm font-medium text-ink-soft mb-1">URL del webhook</p>
+            <p class="text-sm text-ink-faint mb-1">
+              En Mailjet: Account settings → Event Tracking. Misma URL para sent, open, click, bounce, spam, unsub y blocked (Version 2).
+            </p>
+            <div class="relative">
+              <input type="text" readonly value="<%= @mailjet_connection.webhook_url %>"
+                    class="input w-full text-xs font-mono bg-canvas-sunken pr-24 cursor-default"
+                    data-clipboard-target="source" tabindex="-1" aria-readonly="true" />
+              <div class="absolute top-1.5 right-1.5 flex items-center gap-1">
+                <span data-clipboard-target="feedback"
+                      class="hidden rounded-md bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700 dark:bg-green-950 dark:text-green-300"
+                      role="status" aria-live="polite">Copiado</span>
+                <button type="button" class="rounded-md p-1.5 text-ink-faint hover:text-ink hover:bg-canvas-raised"
+                      title="Copiar URL" aria-label="Copiar URL"
+                      data-action="clipboard#copy" data-clipboard-target="button">
+                  <span data-clipboard-target="copyIcon"><%= icon :copy, classes: "size-4" %></span>
+                  <span data-clipboard-target="copiedIcon" class="hidden"><%= icon :check, classes: "size-4" %></span>
+                </button>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </section>
+    <% end %>
   </div>
 </div>

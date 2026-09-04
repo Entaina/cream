@@ -31,6 +31,18 @@ RSpec.describe Marketing::WebhookProcessor do
     expect(EmailEvent.last.event_type).to eq("open")
   end
 
+  it "ignores events for messages outside the given workspace" do
+    payload = {
+      "Events" => [
+        { "event" => "open", "CustomID" => message.id.to_s, "time" => Time.current.iso8601 }
+      ]
+    }
+
+    expect {
+      described_class.process!(payload: payload, workspace: workspaces(:two))
+    }.not_to change(EmailEvent, :count)
+  end
+
   it "suppresses addresses on hard bounces" do
     payload = {
       "Events" => [

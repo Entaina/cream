@@ -34,4 +34,6 @@ class BookingMailer < ApplicationMailer
   def host_notification_subject
     "[Cream] Nueva reserva: #{@event_type.localized_name} · #{@booking.display_name}"
   end
+
+  def mailjet_workspace = @booking.workspace
 end

@@ -7,4 +7,8 @@ class AlertMailer < ApplicationMailer
 
     mail(to: user.email_address, subject: "[Cream] #{rule.name}")
   end
+
+  private
+
+  def mailjet_workspace = @deal.workspace
 end

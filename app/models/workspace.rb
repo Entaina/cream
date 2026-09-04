@@ -34,6 +34,7 @@ class Workspace < ApplicationRecord
   has_many :stage_field_formats, dependent: :destroy
   has_many :stage_conditions, dependent: :destroy
   has_many :stripe_connections, dependent: :destroy
+  has_one :mailjet_connection, dependent: :destroy
   has_many :stripe_payments, dependent: :destroy
   has_many :lead_forms, dependent: :destroy
   has_many :lead_form_templates, dependent: :destroy

@@ -11,7 +11,7 @@ module Public
       return head :not_found unless CreamFeatures.enabled?(:marketing_campaigns)
 
       payload = JSON.parse(request.raw_post)
-      Marketing::WebhookProcessor.process!(payload: payload)
+      Marketing::WebhookProcessor.process!(payload: payload, workspace: @mailjet_connection.workspace)
       head :ok
     rescue JSON::ParserError
       head :bad_request
@@ -20,13 +20,13 @@ module Public
     private
 
     def verify_webhook_token!
-      expected = ENV["MAILJET_WEBHOOK_TOKEN"].to_s
-      return head :unauthorized if expected.blank?
-
       provided = params[:token].presence ||
         request.headers["X-Mailjet-Token"].presence ||
         request.headers["X-Cream-Webhook-Token"].presence
-      head :unauthorized unless ActiveSupport::SecurityUtils.secure_compare(provided.to_s, expected)
+      return head :unauthorized if provided.blank?
+
+      @mailjet_connection = MailjetConnection.find_by(webhook_token: provided)
+      head :unauthorized unless @mailjet_connection
     end
   end
 end

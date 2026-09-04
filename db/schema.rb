@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_04_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_04_150000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -770,6 +770,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_04_120000) do
     t.datetime "updated_at", null: false
     t.string "user_id", null: false
     t.index ["user_id"], name: "index_llmemory_skills_on_user_id"
+  end
+
+  create_table "mailjet_connections", force: :cascade do |t|
+    t.text "api_key"
+    t.datetime "created_at", null: false
+    t.string "from_email"
+    t.string "from_name"
+    t.text "secret_key"
+    t.boolean "transactional_enabled", default: false, null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.string "webhook_token", null: false
+    t.bigint "workspace_id", null: false
+    t.index ["user_id"], name: "index_mailjet_connections_on_user_id"
+    t.index ["webhook_token"], name: "index_mailjet_connections_on_webhook_token", unique: true
+    t.index ["workspace_id"], name: "index_mailjet_connections_on_workspace_id", unique: true
   end
 
   create_table "memberships", force: :cascade do |t|
@@ -1551,6 +1567,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_04_120000) do
   add_foreign_key "lists", "workspaces"
   add_foreign_key "llmemory_edges", "llmemory_nodes", column: "object_id"
   add_foreign_key "llmemory_edges", "llmemory_nodes", column: "subject_id"
+  add_foreign_key "mailjet_connections", "users"
+  add_foreign_key "mailjet_connections", "workspaces"
   add_foreign_key "memberships", "pipelines", column: "current_pipeline_id", on_delete: :nullify
   add_foreign_key "memberships", "users"
   add_foreign_key "memberships", "workspaces"

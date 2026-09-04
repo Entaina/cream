@@ -7,6 +7,11 @@ module Marketing
       API_URL = "https://api.mailjet.com/v3.1/send".freeze
 
       def deliver!
+        unless connection&.connected?
+          record_event!("blocked", payload: { "error" => "Mailjet is not configured for this workspace" })
+          return false
+        end
+
         response = post_message
         if response.is_a?(Net::HTTPSuccess)
           body = JSON.parse(response.body)
@@ -25,10 +30,14 @@ module Marketing
 
       private
 
+      def connection
+        @connection ||= message.workspace.mailjet_connection
+      end
+
       def post_message
         uri = URI(API_URL)
         request = Net::HTTP::Post.new(uri)
-        request.basic_auth(ENV.fetch("MAILJET_API_KEY"), ENV.fetch("MAILJET_SECRET_KEY"))
+        request.basic_auth(connection.api_key, connection.secret_key)
         request["Content-Type"] = "application/json"
         request.body = payload.to_json
         Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) { |http| http.request(request) }
@@ -38,7 +47,7 @@ module Marketing
         {
           Messages: [
             {
-              From: { Email: from_address, Name: message.user.name },
+              From: { Email: connection.from_email, Name: from_name },
               To: [ { Email: message.to_address } ],
               Subject: message.subject,
               HTMLPart: rendered_body,
@@ -49,14 +58,14 @@ module Marketing
         }
       end
 
+      def from_name
+        connection.from_name.presence || message.user.name
+      end
+
       def rendered_body
         body = message.body.to_s
         body = Marketing::LinkRewriter.rewrite(html: body, message: message, campaign: message.campaign) if message.marketing_send?
         append_open_pixel(body)
-      end
-
-      def from_address
-        ENV.fetch("MAILER_FROM", message.user.email_address)
       end
 
       def record_event!(type, payload: {})

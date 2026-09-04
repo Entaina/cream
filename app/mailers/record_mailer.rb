@@ -28,4 +28,8 @@ class RecordMailer < ApplicationMailer
   rescue StandardError
     {}
   end
+
+  def mailjet_workspace
+    @message&.workspace || @record&.workspace
+  end
 end

@@ -6,6 +6,7 @@ module Settings
 
     def show
       authorize [ :settings, :workspace ]
+      load_mailjet_connection
     end
 
     def update
@@ -32,6 +33,13 @@ module Settings
       )
       permitted.delete(:okm_service_account_key) if permitted[:okm_service_account_key].blank?
       permitted
+    end
+
+    def load_mailjet_connection
+      return unless CreamFeatures.enabled?(:marketing_campaigns)
+
+      @mailjet_connection = current_workspace.mailjet_connection ||
+        current_workspace.build_mailjet_connection(user: current_user)
     end
   end
 end

@@ -6,4 +6,8 @@ class ReportMailer < ApplicationMailer
 
     mail(to: report.user.email_address, subject: "Your “#{report.name}” report")
   end
+
+  private
+
+  def mailjet_workspace = @report.workspace
 end

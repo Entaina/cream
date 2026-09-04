@@ -7,4 +7,8 @@ class InvitationMailer < ApplicationMailer
 
     mail subject: "Join #{@workspace_name} on Cream", to: invitation.email_address
   end
+
+  private
+
+  def mailjet_workspace = @invitation.workspace
 end

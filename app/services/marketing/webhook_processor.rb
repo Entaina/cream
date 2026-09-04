@@ -1,12 +1,12 @@
 module Marketing
   class WebhookProcessor
-    def self.process!(payload:)
+    def self.process!(payload:, workspace: nil)
       events = Array(payload["Events"] || payload["events"] || payload)
-      events.each { |event| process_event!(event) }
+      events.each { |event| process_event!(event, workspace: workspace) }
     end
 
-    def self.process_event!(event)
-      message = find_message(event)
+    def self.process_event!(event, workspace: nil)
+      message = find_message(event, workspace: workspace)
       return unless message
 
       event_type = map_event_type(event["event"] || event["EventType"])
@@ -24,10 +24,11 @@ module Marketing
       email_event
     end
 
-    def self.find_message(event)
+    def self.find_message(event, workspace: nil)
+      scope = workspace ? workspace.email_messages : EmailMessage
       custom_id = event["CustomID"]
-      message = EmailMessage.find_by(id: custom_id) if custom_id.present?
-      message ||= EmailMessage.find_by(esp_message_id: event["MessageID"].to_s) if event["MessageID"].present?
+      message = scope.find_by(id: custom_id) if custom_id.present?
+      message ||= scope.find_by(esp_message_id: event["MessageID"].to_s) if event["MessageID"].present?
       message
     end
     private_class_method :find_message

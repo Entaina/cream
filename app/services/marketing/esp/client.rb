@@ -4,11 +4,11 @@ module Marketing
       BATCH_SIZE = 50
 
       def self.for(message, subscription_type: nil)
-        adapter_class.new(message, subscription_type: subscription_type)
+        adapter_class_for(message).new(message, subscription_type: subscription_type)
       end
 
-      def self.adapter_class
-        if ENV["MAILJET_API_KEY"].present? && ENV["MAILJET_SECRET_KEY"].present?
+      def self.adapter_class_for(message)
+        if message.workspace&.mailjet_connection&.connected?
           MailjetAdapter
         else
           SmtpAdapter

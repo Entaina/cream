@@ -4,7 +4,7 @@
 
 Cream is a **workspace**-based CRM for managing **people**, **companies** and **deals** (opportunities), with notes, tasks, lists and an activity history shared across the team.
 
-> **Last revision:** 2026-09-04 (marketing hub: per-type consent, campaigns, journeys, scoring, tracking)
+> **Last revision:** 2026-09-04 (Mailjet transactional checkbox in Settings)
 > This document describes the functionality **visible to the user**. Disabled features are listed at the end under "Coming soon".
 
 ---
@@ -119,7 +119,7 @@ The left sidebar concentrates the main navigation. On **small screens (mobile)**
 | **Pipelines**    | Sales pipeline configuration |
 | **API tokens**   | Tokens for MCP / API clients |
 | **Profile**      | User name and personal preferences in the workspace (pipeline, briefing, alert channels) |
-| **Settings**     | Workspace configuration (admins only): name, deal visibility, sales director, OKM |
+| **Settings**     | Workspace configuration (admins only): name, deal visibility, sales director, OKM, Mailjet |
 | **Team**         | Members and invitations |
 | **Custom fields**| Extra fields per record type |
 | **Lists**        | Custom lists (bottom of the menu) |
@@ -817,6 +817,20 @@ Connect the corporate knowledge base (Google Shared Drive) for the contextual ch
 
 Each workspace can use a different drive and service account.
 
+### Mailjet
+
+Connect **this workspace's** Mailjet account for campaigns and journeys (admins only):
+
+1. In Mailjet, copy the **API Key** and **Secret Key** (Account settings → SMTP and SEND API settings).
+2. In **Settings**, **Mailjet** section, paste the keys, the verified **from email**, and optionally the sender name.
+3. To also send invitations, alerts, bookings, reports and emails from records through Mailjet, enable **Usar Mailjet para el correo transaccional**.
+4. Click **Conectar Mailjet**. Keys are not shown again; leave the fields blank to keep the stored values.
+5. Copy the **webhook URL** and register it in Mailjet (Account settings → Event Tracking) for sent, open, click, bounce, spam, unsub and blocked (Version 2).
+
+Each workspace has its own URL (it includes a token). Without Mailjet connected, campaigns use SMTP/Mailbin. Transactional email uses Mailjet only when the checkbox is on; otherwise SMTP/Mailbin.
+
+- **Desconectar** removes this workspace's credentials.
+
 ---
 
 ## 22. API tokens
@@ -1128,7 +1142,7 @@ Three-step flow: choose event type → calendar and time (with an ES/EN time zon
 Marketing hub for consent, campaigns, segments, attribution, journeys and scoring. Sidebar: **Suscripciones**, **Campañas**, **Segmentos**, **Atribución**, **Recorridos**, **Puntuación de leads**.
 
 - **Consent**: per-type subscriptions (general, newsletter, product, events); per-list unsubscribe; global opt-out from preference center; manage from person record.
-- **Campaigns**: send or schedule to person segments, subscription type, A/B with Liquid, test email, A/B winner, Mailjet webhooks (`MAILJET_WEBHOOK_TOKEN`).
+- **Campaigns**: send or schedule to person segments, subscription type, A/B with Liquid, test email, A/B winner. Requires Mailjet in workspace **Settings** (per-workspace webhook).
 - **Segments**: demographic and behavioral filters with live preview.
 - **Journeys**: multi-step sequences (consent-aware email, wait, branch, list, task, scoring); manual enrollment.
 - **Scoring**: rules with conditions, nightly recalc, lifecycle on person records.

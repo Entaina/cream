@@ -151,6 +151,7 @@ Rails.application.routes.draw do
   resource :stripe_connection, only: %i[show create update destroy] do
     post :sync, on: :member
   end
+  resource :mailjet_connection, only: %i[create update destroy]
   resources :stripe_payments, only: %i[index show] do
     member do
       post :match

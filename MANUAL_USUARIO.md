@@ -4,7 +4,7 @@
 
 Cream es un CRM por **workspaces** para gestionar **personas**, **empresas** y **deals** (oportunidades), con notas, tareas, listas y un historial de actividad compartido en el equipo.
 
-> **Última revisión:** 2026-09-04 (hub de marketing: consentimiento por tipo, campañas, journeys, scoring, tracking)
+> **Última revisión:** 2026-09-04 (casilla Mailjet transaccional en Settings)
 > Este documento describe la funcionalidad **visible para el usuario**. Las funcionalidades desactivadas aparecen al final en «Próximamente».
 
 ---
@@ -119,7 +119,7 @@ El menú lateral izquierdo concentra el acceso principal. En **pantallas pequeñ
 | **Pipelines**    | Configuración de pipelines de venta |
 | **API tokens**   | Tokens para clientes MCP / API |
 | **Profile**      | Nombre de usuario y preferencias personales en el workspace (pipeline, briefing, canales de alerta) |
-| **Settings**     | Configuración del workspace (solo admins): nombre, visibilidad de deals, director de ventas, OKM |
+| **Settings**     | Configuración del workspace (solo admins): nombre, visibilidad de deals, director de ventas, OKM, Mailjet |
 | **Team**         | Miembros e invitaciones |
 | **Custom fields**| Campos extra por tipo de registro |
 | **Lists**        | Listas personalizadas (parte inferior del menú) |
@@ -817,6 +817,20 @@ Conecta la base de conocimiento corporativa (Google Shared Drive) para el chat c
 
 Cada workspace puede usar un drive y una service account distintos.
 
+### Mailjet
+
+Conecta la cuenta de Mailjet **de este workspace** para campañas y recorridos (solo admins):
+
+1. En Mailjet, copia la **API Key** y la **Secret Key** (Account settings → SMTP and SEND API settings).
+2. En **Settings**, sección **Mailjet**, pega las claves, el **email remitente** verificado en Mailjet y, si quieres, el nombre del remitente.
+3. Si quieres que invitaciones, alertas, reservas, informes y emails de ficha salgan también por Mailjet, activa **Usar Mailjet para el correo transaccional**.
+4. Pulsa **Conectar Mailjet**. Las claves no se vuelven a mostrar; deja los campos en blanco para conservarlas.
+5. Copia la **URL del webhook** y regístrala en Mailjet (Account settings → Event Tracking) para sent, open, click, bounce, spam, unsub y blocked (Version 2).
+
+Cada workspace tiene su propia URL (incluye un token). Sin Mailjet conectado, las campañas usan SMTP/Mailbin. El correo transaccional usa Mailjet solo con la casilla activada; si no, SMTP/Mailbin.
+
+- **Desconectar** elimina las credenciales de este workspace.
+
 ---
 
 ## 22. Tokens de API
@@ -1128,7 +1142,7 @@ Flujo en tres pasos: elegir tipo de evento → calendario y hora (con selector d
 Hub de marketing conectado a captación, consentimiento, envíos y atribución. Menú lateral: **Suscripciones**, **Campañas**, **Segmentos**, **Atribución**, **Recorridos**, **Puntuación de leads**.
 
 - **Consentimiento**: suscripciones por tipo (general, newsletter, producto, eventos); baja por lista sin bloquear otras; baja global desde el centro de preferencias; gestión desde la ficha de persona.
-- **Campañas**: envío o programación a segmento de personas, tipo de suscripción, A/B con Liquid, email de prueba, ganadora A/B, webhooks Mailjet (`MAILJET_WEBHOOK_TOKEN`).
+- **Campañas**: envío o programación a segmento de personas, tipo de suscripción, A/B con Liquid, email de prueba, ganadora A/B. Requiere Mailjet en **Settings** del workspace (webhook por workspace).
 - **Segmentos**: filtros demográficos y de comportamiento con vista previa en vivo.
 - **Recorridos**: secuencias con pasos (email con consentimiento, espera, rama, lista, tarea, scoring); inscripción manual.
 - **Puntuación**: reglas con condiciones, recálculo nocturno, lifecycle en ficha de persona.

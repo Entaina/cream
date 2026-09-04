@@ -22,4 +22,6 @@ class LeadFormMailer < ApplicationMailer
 
     [ "Nuevo lead", @lead_form.name, descriptor.presence ].compact.join(" · ")
   end
+
+  def mailjet_workspace = @lead_form.workspace
 end
