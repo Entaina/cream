@@ -71,6 +71,23 @@ RSpec.describe "Marketing admin access", type: :request do
   end
 
   describe "segments" do
+    it "allows admins to list segments" do
+      sign_in_as(admin)
+
+      get segments_path
+
+      expect(response).to have_http_status(:ok)
+    end
+
+    it "blocks salespeople from listing segments" do
+      sign_in_as(salesperson)
+      patch switch_workspace_path, params: { workspace_id: workspace.id }
+
+      get segments_path
+
+      expect(response).to redirect_to(root_path)
+    end
+
     it "allows admins to create segments" do
       sign_in_as(admin)
 

@@ -7,7 +7,7 @@ class MarketingAdminPolicy < ApplicationPolicy
 
   class Scope < Scope
     def resolve
-      return scope.none unless admin?
+      return scope.none unless context.admin?
 
       scope.where(workspace: workspace)
     end
