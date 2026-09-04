@@ -1,0 +1,192 @@
+---
+name: cream-marketing
+description: >-
+  Hub de marketing HubSpot-like en Cream CRM — consentimiento por tipo, campañas,
+  segmentos, recorridos (journeys), puntuación de leads, tracking web y atribución
+  UTM. Usar al añadir o modificar modelos/servicios/vistas de marketing, flags
+  CreamFeatures, rutas públicas, webhooks Mailjet, jobs recurrentes o tests de
+  marketing.
+---
+
+# Cream — Marketing hub
+
+Hub de marketing conectado a captación (`lead_forms`), email (`record_email` / Mailjet), personas y deals. Arquitectura general del CRM: skill `cream-architecture`. Flags y roadmap: skill `cream-streak-roadmap`.
+
+## Feature flags (`CreamFeatures`)
+
+Siete flags en [`app/services/cream_features.rb`](../../../app/services/cream_features.rb). Todos `enabled: true` en la rama `hubspot` (commit `marketing`).
+
+| Flag | Menú | Etiqueta UI | Gating |
+|------|------|-------------|--------|
+| `:marketing_consent` | sí | Suscripciones | `SubscriptionTypesController`, preferencias públicas |
+| `:marketing_campaigns` | sí | Campañas | `CampaignsController`, ESP, webhooks |
+| `:marketing_segments` | sí | Segmentos | `SegmentsController` |
+| `:marketing_attribution` | sí | Atribución | `MarketingAttributionController` |
+| `:journeys` | sí | Recorridos | `JourneysController`, `JourneyRunnerJob` |
+| `:lead_scoring` | sí | Puntuación de leads | `ScoringRulesController`, `ScoringRecalculateJob` |
+| `:web_tracking` | no | Web tracking | `Public::TrackingController`, landing pages |
+
+Iconos menú: `:mail`, `:users`, `:bar_chart`, `:zap` (ver `CreamFeatures.menu_icon`).
+
+## Modelos
+
+Workspace-scoped (`WorkspaceRecordPolicy`):
+
+| Modelo | Rol |
+|--------|-----|
+| `SubscriptionType` | Tipos de suscripción (general, newsletter, producto, eventos…) |
+| `EmailSubscription` | Estado por persona + tipo (`subscribed` / `unsubscribed` / `pending`) |
+| `EmailSuppression` | Bloqueo global por email (bounce, spam, baja total) |
+| `Campaign` | Campaña con variantes A/B, segmento, plantilla, estado |
+| `CampaignVariant` | Variante A/B con peso y plantilla Liquid |
+| `CampaignSend` | Envío concreto (`pending`, `scheduled`, `sending`, `sent`, `failed`, `cancelled`) |
+| `Segment` | Filtros demográficos + comportamiento (`filters` jsonb) |
+| `SegmentMembership` | Persona ↔ segmento |
+| `Journey` | Recorrido con `entry_trigger`, `entry_config`, `max_reenrollments` |
+| `JourneyStep` | Pasos ordenados (`STEP_TYPES` abajo) |
+| `JourneyEnrollment` | Persona en recorrido (`active`, `waiting`, `completed`, `cancelled`) |
+| `ScoringRule` | Regla con condiciones, puntos, `decay_days` |
+| `EmailEvent` | Eventos ESP (open, click, bounce, unsub…) |
+| `PageView` | Visitas web (tracking) |
+
+**Person** ampliada: `lifecycle_stage`, `lead_score`, `lead_score_decayed_at`; `has_many :email_subscriptions`, `:journey_enrollments`, `:segment_memberships`. Callback `enqueue_lifecycle_journey` → `Marketing::JourneyTrigger`.
+
+**EmailMessage** ampliada: `campaign_variant_id`, `esp_message_id`; `has_many :email_events`.
+
+Migraciones: `20260904100000_create_marketing_hub.rb`, `20260904110000_marketing_gap_closure.rb`, `20260904120000_marketing_improvements.rb`.
+
+## Servicios (`app/services/marketing/`)
+
+| Servicio | Responsabilidad |
+|----------|-----------------|
+| `SendGuard` | Comprueba supresión global + suscripción por tipo antes de enviar |
+| `ConsentService` | Alta/baja por tipo; `unsubscribe_all!` desde preferencias |
+| `PreferenceToken` | Token firmado para centro de preferencias / one-click unsub |
+| `CampaignSender` | Envío masivo: dedupe emails, A/B Liquid (`EmailTemplate#render_custom_for`), errores ESP → `failed` |
+| `Esp::Client` | Orquestador SMTP/Mailjet; `List-Unsubscribe` dinámico |
+| `Esp::MailjetAdapter` | API Mailjet; `esp_message_id`, pixel apertura |
+| `Esp::SmtpAdapter` | Fallback dev (Mailbin) |
+| `WebhookProcessor` | Mailjet webhook: supresión única, soft bounce no suprime, unsub → `ConsentService`, click → journey |
+| `JourneyTrigger` | Entrada en recorridos; `entry_config` vacío = «cualquiera» |
+| `JourneyRunner` | Ejecuta pasos; `branch!` sin destino → completa enrollment; salta journeys/steps inactivos |
+| `ScoringEngine` | Eventos, decay idempotente (`lead_score_decayed_at`), transición lifecycle por umbrales |
+| `AttributionReport` | Dashboard UTM unificado; drill-down MQL (`MQL_STAGES` desde `ScoringEngine`) |
+| `FilterResolver` / `ConditionEvaluator` | Filtros de segmentos y condiciones de scoring |
+| `SegmentWatcher` | Detecta entrada en segmento → `JourneyTrigger.enqueue_segment_entry!` |
+| `LiquidRenderer` / `LinkRewriter` | Personalización y tracking en campañas |
+
+### Tipos de paso (`JourneyStep::STEP_TYPES`)
+
+`send_email`, `wait`, `branch`, `set_field`, `add_to_segment`, `create_task`, `adjust_score`, `notify`
+
+### Triggers de entrada (`Journey#entry_trigger`)
+
+`lead_form_submitted`, `segment_entry`, `lifecycle_changed`, `email_clicked`, `booking_created`, `manual`
+
+### Eventos de scoring (`ScoringRule` / `ScoringEngine`)
+
+`email_opened`, `email_clicked`, `email_sent`, `page_view`, `lead_submission`, `booking_created`, `deal_created`, `form_field`
+
+## Controladores y rutas
+
+### Admin (requieren auth + `RequiresFeature`)
+
+```
+resources :subscription_types, except: :show
+resources :campaigns do
+  member do
+    post :send_campaign, :send_test, :cancel_send, :mark_winner, :send_winner_rest
+    get :recipient_count
+  end
+end
+resources :segments { member { get :preview } }
+resources :journeys { member { post :enroll; patch :toggle_active } }
+resources :scoring_rules, except: :show { collection { post :recalculate } }
+resource :marketing_attribution, only: :show
+```
+
+`PeopleController#toggle_subscription` — gestión de suscripciones desde ficha persona.
+
+### Público (sin auth)
+
+| Ruta | Controlador | Notas |
+|------|-------------|-------|
+| `GET /p/:workspace_slug/:slug` | `Public::LandingPagesController#show` | Landing scope por tenant |
+| `GET/PATCH /e/preferences/:token` | `Public::EmailPreferencesController` | Centro de preferencias |
+| `GET/POST /e/unsubscribe/:token` | one-click unsub con `?type=` |
+| `POST /e/events?token=` | `Public::EmailEventsController#create` | Webhook Mailjet; requiere `MAILJET_WEBHOOK_TOKEN` |
+| `POST /t` | `Public::TrackingController#create` | Eventos tracking |
+| `GET /cream.js` | script cross-origin | Snippet embebible |
+
+**Importante:** landing pages usan `/p/:workspace_slug/:slug` (no `/p/:slug` solo). URL en admin: `LeadFormTemplates` partial `_form.html.erb`.
+
+## Jobs (`config/recurring.yml`)
+
+| Job | Schedule | Entorno |
+|-----|----------|---------|
+| `JourneyRunnerJob` | cada 10 min | production + development |
+| `ScoringRecalculateJob` | daily 3am | production + development |
+| `MarketingDataRetentionJob` | daily 4am | production + development |
+| `CampaignSendJob` | on-demand (`wait_until`) | programación de campañas |
+
+`MarketingDataRetentionJob` purga `PageView` y `EmailEvent` más antiguos que `MARKETING_DATA_RETENTION_DAYS` (default 180).
+
+## UI y convenciones
+
+- **`MarketingHelper`**: badges ES (`campaign_status_badge`, `send_status_badge`), labels de triggers/pasos/eventos, `describe_segment_filters`, `describe_step`.
+- **Stimulus**: `journey_form_controller.js` (pasos dinámicos por tipo), `segment_preview_controller.js` (preview en vivo).
+- **Patrón visual**: mismo que Alertas — `shared/_page_header`, `.card`, `.table-base`, empty states, confirm en acciones destructivas.
+- **Ficha persona**: sección marketing (lifecycle, lead score, suscripciones, recorridos activos).
+
+## Integraciones con el resto del CRM
+
+| Origen | Hook marketing |
+|--------|----------------|
+| `LeadFormSubmissionProcessor` | Propaga consentimiento/`newsletter_opt_in`; `cream_aid` en metadata; journey `lead_form_submitted`; scoring `lead_submission` / `form_field` |
+| `Person#enqueue_lifecycle_journey` | Journey `lifecycle_changed` |
+| `WebhookProcessor` (click) | `JourneyTrigger.enqueue_email_clicked!` |
+| `SegmentWatcher` | Journey `segment_entry` |
+| `BookingCreator` | Journey `booking_created` (si persona vinculada) |
+| `SendGuard` en journeys | `send_email!` respeta suscripción por `subscription_type_id` (default `general`) |
+
+## Variables de entorno
+
+| Variable | Uso |
+|----------|-----|
+| `CREAM_APP_URL` | Píxeles, links preferencias, tracking (obligatorio en prod) |
+| `MAILJET_WEBHOOK_TOKEN` | Auth webhook `POST /e/events`; sin valor → 401 |
+| `MARKETING_DATA_RETENTION_DAYS` | Retención page views / email events (default 180) |
+| `SMTP_*` / `MAILER_FROM` | Envío campañas vía Mailjet (prod); dev usa Mailbin |
+
+## Tests
+
+```
+spec/services/marketing/*           # servicios (mock HTTP)
+spec/requests/marketing_admin_spec.rb
+spec/requests/public/email_preferences_spec.rb
+spec/requests/public/landing_pages_spec.rb
+spec/requests/public/tracking_spec.rb
+spec/requests/public/email_events_spec.rb
+```
+
+Convenciones del proyecto:
+
+- Mock `Net::HTTP` / adaptadores ESP — no llamar Mailjet real.
+- `ActiveJob::Base.queue_adapter = :test` para `CampaignSendJob`, `JourneyRunnerJob`, etc.
+- Suite marketing completa: `bundle exec rspec spec/services/marketing spec/requests/marketing_admin_spec.rb spec/requests/public/email_preferences_spec.rb spec/requests/public/landing_pages_spec.rb spec/requests/public/tracking_spec.rb spec/requests/public/email_events_spec.rb`
+
+## Manual de usuario
+
+Documentación visible: **MANUAL_USUARIO.md §29** y **USER_MANUAL.md §29** (Marketing). Actualizar vía skill `cream-user-manual` al cambiar UX.
+
+## Verificación browser
+
+Smoke tests con `cream-playwright` — sección «Verificar marketing hub».
+
+## Finishing a change
+
+1. Flags en `cream_features.rb` + fila en `TRACKING.md`
+2. Specs (servicios + requests); rubocop
+3. Manual §29 si cambió UX
+4. `bin/rails db:migrate` en dev/prod al añadir columnas
+5. Prod: configurar `MAILJET_WEBHOOK_TOKEN` y URL webhook Mailjet → `https://<host>/e/events?token=<token>`
