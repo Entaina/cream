@@ -71,6 +71,46 @@ pw snapshot   # en Products: campo Edition por línea; al añadir producto, Edit
 
 En una ficha de deal: selecciona producto en «Add product», escribe en Edition — deben listarse solo las ediciones de ese producto (no «+ Create» si ya existe). En una línea existente, el picker debe usar las ediciones del producto de esa fila.
 
+## Verificar marketing hub
+
+Tras cambios en campañas, segmentos, recorridos, scoring, suscripciones o atribución (flags `:marketing_*`, `:journeys`, `:lead_scoring`):
+
+```bash
+pw goto "$CREAM_APP_URL/subscription_types"
+pw snapshot   # CRUD tipos de suscripción
+
+pw goto "$CREAM_APP_URL/campaigns"
+pw snapshot   # lista, formulario, KPIs en show
+
+pw goto "$CREAM_APP_URL/segments/new"
+pw snapshot   # filas de filtros + preview en vivo (segment_preview_controller)
+
+pw goto "$CREAM_APP_URL/journeys/new"
+pw snapshot   # selectores trigger + pasos dinámicos (journey_form_controller)
+
+pw goto "$CREAM_APP_URL/scoring_rules"
+pw snapshot   # reglas + botón recalcular
+
+pw goto "$CREAM_APP_URL/marketing_attribution"
+pw snapshot   # filtros UTM, totales, barras
+
+pw goto "$CREAM_APP_URL/people/<id>"
+pw snapshot   # lifecycle, lead score, suscripciones
+```
+
+Rutas públicas (sin login):
+
+```bash
+pw goto "$CREAM_APP_URL/p/<workspace_slug>/<landing-slug>"
+pw snapshot   # landing scope por workspace
+
+# Preferencias: generar token en consola o desde email de campaña de prueba
+pw goto "$CREAM_APP_URL/cream.js"
+pw snapshot   # script tracking
+```
+
+Detalle técnico: skill `cream-marketing`.
+
 ## Production smoke test
 
 After auto-deploy (push to `main` → GHCR → server deploy path), verify against production:

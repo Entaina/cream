@@ -17,7 +17,9 @@ Local settings live in `.env` at the project root (copy from `.env.example` on f
 | `CREAM_DATABASE_HOST/PORT/USER/PASSWORD` | PostgreSQL connection (Docker Compose `db` service) |
 | `CREAM_SEED_ADMIN_EMAIL/PASSWORD` | Admin demo user for `db:seed` and login |
 | `CREAM_SEED_MEMBER_EMAIL/PASSWORD` | Member demo user |
-| `CREAM_APP_URL` | Base URL for browser verification (`cream-playwright` skill) |
+| `CREAM_APP_URL` | Base URL for browser verification (`cream-playwright` skill), email tracking pixels, marketing preference links and web tracking |
+| `MAILJET_WEBHOOK_TOKEN` | Auth token for Mailjet webhook `POST /e/events` (prod; without it webhooks return 401) |
+| `MARKETING_DATA_RETENTION_DAYS` | Days to keep `PageView` and `EmailEvent` rows (default 180; `MarketingDataRetentionJob`) |
 
 ```bash
 cp .env.example .env   # first time only
@@ -87,11 +89,15 @@ Source files to edit before re-import: `lib/lead_form_templates/public/lead_form
 
 ### Recurring jobs (Solid Queue)
 
-Defined in [`config/recurring.yml`](../../../config/recurring.yml). Production examples: `ScheduledReportsJob`, `AlertRulesJob` (daily alert evaluation), `GmailSyncSchedulerJob`, `StripeSyncSchedulerJob`. Run manually in dev:
+Defined in [`config/recurring.yml`](../../../config/recurring.yml). Production examples: `ScheduledReportsJob`, `AlertRulesJob` (daily alert evaluation), `GmailSyncSchedulerJob`, `StripeSyncSchedulerJob`, `JourneyRunnerJob` (every 10 min), `ScoringRecalculateJob` (daily 3am), `MarketingDataRetentionJob` (daily 4am). Run manually in dev:
 
 ```bash
 bin/rails runner 'AlertRulesJob.perform_now'
+bin/rails runner 'JourneyRunnerJob.perform_now'
+bin/rails runner 'ScoringRecalculateJob.perform_now'
 ```
+
+Marketing jobs also run in **development** (same schedule as production for journey runner, scoring and retention). Full marketing setup: skill `cream-marketing`.
 
 ## Lint (local — not in CI)
 
@@ -106,8 +112,8 @@ Style rules: `.rubocop.yml` (inherits `rubocop-rails-omakase`). For ERB/HTML: `b
 
 ## Gotchas
 
-- **Email (dev):** Action Mailer usa Mailbin. Tras invitar a alguien en Team, abre `http://localhost:$PORT/mailbin` (p. ej. `http://localhost:3030/mailbin`).
-- **Email (prod):** requiere variables `SMTP_*` y `MAILER_FROM` en el `.env` del servidor (ver `deploy/README.md`).
+- **Email (dev):** Action Mailer usa Mailbin. Tras invitar a alguien en Team, abre `http://localhost:$PORT/mailbin` (p. ej. `http://localhost:3030/mailbin`). Campañas de marketing también pasan por Mailbin si no hay SMTP configurado.
+- **Email (prod):** requiere variables `SMTP_*` y `MAILER_FROM` en el `.env` del servidor (ver `deploy/README.md`). Webhooks Mailjet: `MAILJET_WEBHOOK_TOKEN` + URL `https://<host>/e/events?token=<token>`.
 - **Google OAuth (dev):** si `CREAM_APP_URL` es `https://` (ngrok), abre la app con esa URL, no `http://localhost`. Si trabajas solo en local, pon `CREAM_APP_URL=http://localhost:3030` y usa esa redirect URI en Google Cloud Console.
 - Tailwind v4: utilities are defined in `app/assets/tailwind/application.css` with `@theme` tokens (ink, line, canvas, accent). You CANNOT `@apply` a custom class inside another (`@apply btn` fails the build). Dynamic classes like `bg-<%= color %>-500` need the `@source inline(...)` safelist already present there.
 - The user wants backing services via docker compose only — never `sudo systemctl`.

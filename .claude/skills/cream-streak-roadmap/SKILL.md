@@ -3,7 +3,8 @@ name: cream-streak-roadmap
 description: >-
   Tracks and implements Streak-parity features in Cream CRM. Use when enabling
   disabled features, updating CreamFeatures flags, extending partial email/automation
-  integrations, or continuing the roadmap toward Streak-like functionality.
+  integrations, continuing the roadmap toward Streak-like functionality, or working
+  on the marketing hub (campañas, journeys, scoring, tracking).
 ---
 
 # Cream Streak roadmap
@@ -12,6 +13,7 @@ description: >-
 
 - **Feature flags**: [app/services/cream_features.rb](app/services/cream_features.rb)
 - **Tracking checklist**: [TRACKING.md](TRACKING.md) — update on every enable/disable
+- **Marketing hub detail**: skill **`cream-marketing`**
 - **Route guards**: `RequiresFeature` in [app/controllers/concerns/requires_feature.rb](app/controllers/concerns/requires_feature.rb)
 - **Menu**: [app/views/shared/_sidebar.html.erb](app/views/shared/_sidebar.html.erb) reads `CreamFeatures.menu_entries`
 
@@ -45,6 +47,13 @@ record_email + email_tracking (SMTP + public URL)
   └── email_snippets
   └── mail_merge
   └── gmail_sync (optional channel: SendViaGmailJob)
+marketing_consent (subscription types + preference center)
+  └── marketing_campaigns (SendGuard + Mailjet webhooks)
+  └── journeys (send_email steps use SendGuard)
+marketing_segments → journeys (segment_entry trigger)
+lead_scoring (lifecycle thresholds; form_field from lead processor)
+web_tracking + lead_forms (cream.js, landings /p/:workspace/:slug)
+marketing_attribution (UTM dashboard; depends on tracking + deals)
 slack_integrations (wire NotificationService events)
 automations (event-driven: conditions UI + hooks already gated)
 alerts (time-based: AlertRuleEngine + AlertRulesJob; depends on notifications + optional email)
@@ -61,9 +70,10 @@ reports (builder before menu)
 
 ## Tests
 
-- Mock `Net::HTTP` for webhooks/Slack
-- Use `ActiveJob::Base.queue_adapter = :test` and `have_enqueued_job` / `have_enqueued_mail` for mail merge and alert delivery
-- Do not call real Gmail API in specs
+- Mock `Net::HTTP` for webhooks/Slack/Mailjet ESP
+- Use `ActiveJob::Base.queue_adapter = :test` and `have_enqueued_job` / `have_enqueued_mail` for mail merge, alert delivery, campaign sends and journey runner
+- Marketing specs: `spec/services/marketing/*`, `spec/requests/marketing_admin_spec.rb`, `spec/requests/public/{email_preferences,landing_pages,tracking,email_events}_spec.rb` — see skill `cream-marketing`
+- Do not call real Gmail API or Mailjet in specs
 
 ## Quick audit command
 

@@ -1,6 +1,6 @@
 ---
 name: cream-architecture
-description: Domain model, workspaces, API tokens, conventions, design system and production deployment of the Cream CRM (Attio clone). Use when adding features, models, views, auth, multi-tenancy, UI components, or working on production deploy/infra so everything stays consistent. For REST API v1 use skill `cream-api`; for MCP use skill `cream-mcp`.
+description: Domain model, workspaces, API tokens, conventions, design system and production deployment of the Cream CRM (Attio clone). Use when adding features, models, views, auth, multi-tenancy, UI components, or working on production deploy/infra so everything stays consistent. For REST API v1 use skill `cream-api`; for MCP use skill `cream-mcp`; for marketing hub use skill `cream-marketing`.
 ---
 
 # Cream — Architecture & conventions
@@ -162,6 +162,28 @@ Implication: a field only persists if it appears in the stored schema **and** pa
 
 When adding a new public form: Liquid page + optional partials in DB, new `LeadForm` row. Field names only need to match `FIELD_KEY_FORMAT`; no Ruby whitelist to update. Define select options inline with `choices:` in the template. See command `.claude/commands/nuevo-formulario-lead.md`.
 
+## Marketing hub
+
+Feature flags `:marketing_consent`, `:marketing_campaigns`, `:marketing_segments`, `:marketing_attribution`, `:journeys`, `:lead_scoring`, `:web_tracking` — menú lateral **Marketing** (Suscripciones, Campañas, Segmentos, Atribución, Recorridos, Puntuación de leads).
+
+```
+Consent (SubscriptionType / EmailSubscription / EmailSuppression)
+  └── SendGuard en campañas, journeys y record_email masivo
+Campañas (Campaign + CampaignSend) → Esp::Client (Mailjet/SMTP)
+  └── Webhook POST /e/events → WebhookProcessor → scoring + journeys + supresión
+Segmentos (Segment + SegmentMembership) → FilterResolver
+  └── SegmentWatcher → JourneyTrigger (segment_entry)
+Recorridos (Journey + JourneyStep + JourneyEnrollment) → JourneyRunnerJob
+Puntuación (ScoringRule + ScoringEngine) → ScoringRecalculateJob
+Tracking (PageView + cream.js) + landings /p/:workspace_slug/:slug
+Atribución UTM → AttributionReport
+```
+
+- **Detalle completo** (modelos, servicios, rutas, jobs, tests, env): skill **`cream-marketing`**
+- **Manual usuario**: §29 en `MANUAL_USUARIO.md` / `USER_MANUAL.md`
+- **Landings**: scope por workspace en la URL pública; identificación `cream_aid` al enviar formulario de captación
+- **Preferencias**: centro público `/e/preferences/:token`; baja por tipo sin supresión global salvo bounce/spam/unsub-all
+
 ## Testing
 
 - Backend tests use **RSpec** (`bundle exec rspec`). Place request specs in `spec/requests/`, model specs in `spec/models/`.
@@ -175,7 +197,8 @@ Before considering a task done:
 1. If the change affects **user-visible** behaviour (screens, menus, flows, permissions in the UI), update [`USER_MANUAL.md`](../../../USER_MANUAL.md) and [`MANUAL_USUARIO.md`](../../../MANUAL_USUARIO.md) — see skill `cream-user-manual`.
 2. If the change adds or modifies **REST API v1** endpoints, follow skill **`cream-api`** (incl. `docs/openapi.yaml` in the same PR).
 3. If the change adds or modifies **MCP tools or OAuth MCP**, follow skill **`cream-mcp`**.
-4. Run `bin/rubocop` (or `bin/rubocop -a`) and fix style issues, then run the relevant specs. Lint is enforced locally via skills, not in CI — see `cream-dev` for commands.
+4. If the change adds or modifies **marketing** (campañas, journeys, scoring, tracking, consentimiento), follow skill **`cream-marketing`**.
+5. Run `bin/rubocop` (or `bin/rubocop -a`) and fix style issues, then run the relevant specs. Lint is enforced locally via skills, not in CI — see `cream-dev` for commands.
 
 ## Production deployment
 

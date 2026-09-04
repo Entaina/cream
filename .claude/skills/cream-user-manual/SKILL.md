@@ -168,6 +168,24 @@ Al cambiar formularios públicos, plantillas Liquid o admin de formularios, actu
 
 **Validación visible**: el manual puede mencionar que nombre, apellidos, email y consentimiento RGPD son obligatorios; teléfono/empresa según la plantilla y la casilla «Recoger datos de empresa». No detallar validación HTML5 vs servidor.
 
+## Marketing hub (referencia para §29)
+
+Al cambiar campañas, segmentos, recorridos, scoring, suscripciones, tracking o atribución, actualizar **MANUAL_USUARIO.md §29** y **USER_MANUAL.md §29** (Marketing). Detalle técnico: skill `cream-marketing`.
+
+| Pieza | Ubicación en código | Manual (usuario) |
+|-------|---------------------|------------------|
+| Tipos de suscripción | `/subscription_types`, menú **Suscripciones** | §29 consentimiento |
+| Campañas | `/campaigns`, menú **Campañas** | §29 campañas (envío, A/B, programación) |
+| Segmentos | `/segments`, menú **Segmentos** | §29 segmentos + preview |
+| Recorridos | `/journeys`, menú **Recorridos** | §29 journeys (pasos, enrolar) |
+| Puntuación | `/scoring_rules`, menú **Puntuación de leads** | §29 scoring + lifecycle en persona |
+| Atribución | `/marketing_attribution`, menú **Atribución** | §29 UTM dashboard |
+| Preferencias públicas | `/e/preferences/:token` | §29 centro de preferencias |
+| Landings | `/p/:workspace_slug/:slug` | §29 tracking + landings |
+| Ficha persona | suscripciones, lifecycle, lead score | §29 + §13 si cambia timeline |
+
+**No documentar** en el manual: `SendGuard`, `JourneyRunner`, `WebhookProcessor`, tokens firmados, Stimulus `journey_form_controller` / `segment_preview_controller`.
+
 - [ ] ¿Cambió algo que un usuario vería o haría distinto? → manual actualizado
 - [ ] ¿Se movió una feature entre activa / próximamente? → ambas secciones coherentes
 - [ ] ¿Fecha `Última revisión` actualizada?
