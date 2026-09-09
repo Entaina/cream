@@ -23,8 +23,8 @@ class ReportRunner
     "utm_campaign" => Arel.sql("(SELECT lead_submissions.metadata->>'utm_campaign' FROM lead_submissions WHERE lead_submissions.person_id = people.id ORDER BY lead_submissions.created_at ASC LIMIT 1)")
   }.freeze
 
-  Row = Data.define(:key, :label, :value, :color)
-  Result = Data.define(:rows, :metric, :metric_label, :total, :max)
+  Row = Data.define(:key, :label, :value, :color, :segments)
+  Result = Data.define(:rows, :metric, :metric_label, :total, :max, :all_pipelines_stage_chart)
 
   def initialize(workspace:, record_type:, metric:, group_by:, date_range:, pipeline_id: nil, include_closed: false)
     @workspace = workspace
@@ -38,9 +38,13 @@ class ReportRunner
 
   def run
     grouped = aggregate(grouped_scope)
-    rows = grouped.map { |key, value|
-      Row.new(key: key, label: label_for(key), value: value.to_f.round(2), color: color_for(key))
-    }
+    if all_pipelines_stage_grouping?
+      rows = build_all_pipelines_stage_rows(grouped)
+    else
+      rows = grouped.map { |key, value|
+        Row.new(key: key, label: label_for(key), value: value.to_f.round(2), color: color_for(key), segments: nil)
+      }
+    end
     rows = sort_rows(rows)
 
     Result.new(
@@ -48,7 +52,8 @@ class ReportRunner
       metric: @metric,
       metric_label: METRIC_LABELS.fetch(@metric),
       total: rows.sum(&:value),
-      max: rows.map(&:value).max || 0
+      max: rows.map(&:value).max || 0,
+      all_pipelines_stage_chart: all_pipelines_stage_grouping?
     )
   end
 
@@ -141,13 +146,7 @@ class ReportRunner
   end
 
   def stage_labels
-    @stage_labels ||= if @pipeline_id
-      @workspace.pipeline_stages.pluck(:id, :name).to_h
-    else
-      @workspace.pipeline_stages.joins(:pipeline)
-        .pluck("pipeline_stages.id", "pipelines.name", "pipeline_stages.name")
-        .to_h { |id, pipeline_name, stage_name| [ id, "#{pipeline_name} · #{stage_name}" ] }
-    end
+    @stage_labels ||= @workspace.pipeline_stages.pluck(:id, :name).to_h
   end
 
   def stage_colors
@@ -156,5 +155,27 @@ class ReportRunner
 
   def company_names
     @company_names ||= @workspace.companies.pluck(:id, :name).to_h
+  end
+
+  def all_pipelines_stage_grouping?
+    @record_type == "Deal" && @group_by == "stage" && @pipeline_id.blank?
+  end
+
+  def build_all_pipelines_stage_rows(grouped)
+    counts = grouped.transform_values { |value| value.to_f.round(2) }
+    stages = visible_stages_for_chart
+    grouper = StageNameGroup.new(stages)
+    grouper.groups.filter_map do |group|
+      segments = grouper.segments_for(group, counts)
+      total = segments.sum(&:value)
+      next if total.zero?
+
+      Row.new(key: group.name, label: group.name, value: total, color: group.stage_color, segments: segments)
+    end
+  end
+
+  def visible_stages_for_chart
+    stages = @workspace.pipeline_stages.ordered_across_pipelines.includes(:pipeline).to_a
+    @include_closed ? stages : stages.reject(&:closed?)
   end
 end

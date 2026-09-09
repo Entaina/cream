@@ -166,12 +166,17 @@ module ApplicationHelper
     end
   end
 
-  def stage_display_name(stage, include_pipeline: current_pipeline.nil?)
-    if include_pipeline
-      "#{stage.pipeline.name} · #{stage.name}"
-    else
-      stage.name
-    end
+  def stage_display_name(stage, **_options)
+    stage.name
+  end
+
+  def stage_summary_dom_id(stage_or_name)
+    name = stage_or_name.is_a?(PipelineStage) ? stage_or_name.name : stage_or_name.to_s
+    "stage_summary_#{name.parameterize(separator: '_')}"
+  end
+
+  def pipeline_bar_color(pipeline_position)
+    StageNameGroup.pipeline_bar_colors[pipeline_position.to_i % StageNameGroup.pipeline_bar_colors.size]
   end
 
   def money(amount, currency = "EUR")

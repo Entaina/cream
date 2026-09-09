@@ -440,7 +440,7 @@ RSpec.describe "Deals", type: :request do
   end
 
   describe "GET /deals/board (all pipelines)" do
-    it "shows columns and deals from all pipelines" do
+    it "groups columns by stage name and shows the pipeline on each card" do
       sign_in_as(member)
       other = pipeline.duplicate(name: "Partners").tap(&:save!)
       company = create_company!(workspace)
@@ -456,8 +456,9 @@ RSpec.describe "Deals", type: :request do
       expect(response).to have_http_status(:ok)
       expect(response.body).to include("Ventas board deal")
       expect(response.body).to include("Partners board deal")
-      expect(response.body).to include("Ventas · Lead")
-      expect(response.body).to include("Partners · Lead")
+      expect(response.body).to include(">Ventas</p>")
+      expect(response.body).to include(">Partners</p>")
+      expect(response.body.scan(/data-board-pager-stage-name>Lead</).size).to eq(1)
       expect(response.body).to include("All pipelines")
     end
   end
@@ -528,6 +529,8 @@ RSpec.describe "Deals", type: :request do
   end
 
   describe "GET /deals/board (closed stages)" do
+    before { memberships(:one_one).update!(current_pipeline: pipeline) }
+
     it "hides closed stage columns by default" do
       sign_in_as(member)
       get board_deals_path
@@ -769,7 +772,9 @@ RSpec.describe "Deals", type: :request do
   describe "PATCH /deals/:id/move (kanban)" do
     it "responds with a turbo stream that refreshes the stage summaries" do
       sign_in_as(member)
+      memberships(:one_one).update!(current_pipeline: pipeline)
       target = pipeline.pipeline_stages.find_by(name: "Won")
+      source = deal.pipeline_stage
 
       patch move_deal_path(deal), params: { pipeline_stage_id: target.id },
         headers: { "Accept" => "text/vnd.turbo-stream.html" }
@@ -777,7 +782,25 @@ RSpec.describe "Deals", type: :request do
       expect(response).to have_http_status(:ok)
       expect(response.media_type).to eq("text/vnd.turbo-stream.html")
       expect(response.body).to include("stage_summary_#{target.id}")
+      expect(response.body).to include("stage_summary_#{source.id}")
       expect(deal.reload.stage_label).to eq("Won")
+    end
+
+    it "moves a deal by stage name on the all-pipelines board without changing pipeline" do
+      sign_in_as(member)
+      other = pipeline.duplicate(name: "Partners").tap(&:save!)
+      memberships(:one_one).update!(current_pipeline: nil)
+      original_pipeline = deal.pipeline
+
+      patch move_deal_path(deal), params: { pipeline_stage_id: "Qualified" },
+        headers: { "Accept" => "text/vnd.turbo-stream.html" }
+
+      expect(response).to have_http_status(:ok)
+      expect(deal.reload.pipeline).to eq(original_pipeline)
+      expect(deal.stage_label).to eq("Qualified")
+      expect(response.body).to include("stage_summary_proposal")
+      expect(response.body).to include("stage_summary_qualified")
+      expect(other).to be_present
     end
 
     it "responds with a turbo stream that refreshes the show page stage selector" do

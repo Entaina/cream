@@ -12,7 +12,8 @@ RSpec.describe ReportDrillDown do
       key: row_key,
       label: "Label",
       value: 1,
-      color: nil
+      color: nil,
+      segments: nil
     )
     described_class.new(
       config: {

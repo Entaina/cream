@@ -212,17 +212,20 @@ RSpec.describe "Dashboard active pipeline", type: :request do
   end
 
   describe "all pipelines in the stage chart" do
-    it "shows stages from every pipeline when all pipelines is selected" do
+    it "groups stages by name with stacked pipeline segments when all pipelines is selected" do
       other = pipeline.duplicate(name: "Partners").tap(&:save!)
-      create_deal!(workspace, pipeline: pipeline, name: "Ventas dashboard deal")
-      create_deal!(workspace, pipeline: other, name: "Partners dashboard deal")
+      lead_default = pipeline.pipeline_stages.find_by!(name: "Lead")
+      lead_other = other.pipeline_stages.find_by!(name: "Lead")
+      create_deal!(workspace, pipeline: pipeline, stage: lead_default, name: "Ventas dashboard deal")
+      create_deal!(workspace, pipeline: other, stage: lead_other, name: "Partners dashboard deal")
       membership.update!(current_pipeline: nil)
 
       get root_path
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include("Ventas · Lead")
-      expect(response.body).to include("Partners · Lead")
+      expect(response.body).to include('title="Ventas: 1"')
+      expect(response.body).to include('title="Partners: 1"')
+      expect(response.body.scan(/>Lead</).size).to eq(1)
     end
   end
 

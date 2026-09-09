@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* Dynamic color classes interpolated from record color names. */
-@source inline("bg-hoki-300 bg-copperfield-300 bg-golden-300 bg-green-300 bg-red-300 bg-chicago-300 bg-hoki-500 bg-copperfield-500 bg-golden-500 bg-green-500 bg-red-500 bg-chicago-500 bg-blue-500");
+@source inline("bg-hoki-300 bg-hoki-400 bg-hoki-500 bg-hoki-600 bg-copperfield-300 bg-copperfield-400 bg-copperfield-500 bg-copperfield-600 bg-golden-300 bg-golden-500 bg-golden-600 bg-green-300 bg-green-500 bg-green-600 bg-red-300 bg-red-500 bg-red-600 bg-chicago-300 bg-chicago-400 bg-chicago-500 bg-chicago-600 bg-blue-500 dark:bg-hoki-300 dark:bg-hoki-400 dark:bg-copperfield-300 dark:bg-copperfield-400 dark:bg-chicago-400 dark:bg-golden-500 dark:bg-green-500 dark:bg-red-500");
 
 /*
  * Cream design tokens, theme "Technology":

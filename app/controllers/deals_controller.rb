@@ -78,7 +78,8 @@ class DealsController < ApplicationController
       current_workspace.pipeline_stages.ordered_across_pipelines.to_a
     end
     stages = stages.reject(&:closed?) unless show_closed?
-    @deals_by_stage = stages.index_with { |stage| deals.by_stage(stage.id) }
+    @board_all_pipelines = @pipeline.nil?
+    @board_stage_columns = build_board_stage_columns(stages, deals)
     load_deal_filter_options
   end
 
@@ -173,6 +174,7 @@ class DealsController < ApplicationController
   # Kanban drag & drop target.
   def move
     authorize @deal, :move?
+    @board_move_from_stage_name = @deal.pipeline_stage&.name
     @deal.move_to_stage!(params.require(:pipeline_stage_id), position: params[:position]&.to_i)
 
     respond_to do |format|
@@ -349,13 +351,7 @@ class DealsController < ApplicationController
       ]
     else
       deals = board_move_deals_scope
-      stages = board_move_stages
-      reorderable = current_pipeline.present?
-      streams = stages.map { |stage|
-        turbo_stream.replace("stage_summary_#{stage.id}",
-          partial: "deals/stage_summary",
-          locals: { stage: stage, deals: deals.by_stage(stage.id), reorderable: reorderable })
-      }
+      streams = board_move_summary_streams(deals)
       streams << turbo_stream.replace("deal_card_value_#{@deal.id}",
         partial: "deals/card_value", locals: { deal: @deal })
       render turbo_stream: streams
@@ -363,10 +359,35 @@ class DealsController < ApplicationController
   end
 
   def board_move_deals_scope
-    scope = policy_scope(current_workspace.deals)
+    scope = policy_scope(current_workspace.deals).includes(:pipeline, :pipeline_stage)
     scope = scope.where(pipeline_id: current_pipeline.id) if current_pipeline
     scope = scope.open_deals unless show_closed?
     scope
+  end
+
+  def board_move_summary_streams(deals)
+    if current_pipeline
+      stages = board_move_stages
+      stages.map { |stage|
+        turbo_stream.replace("stage_summary_#{stage.id}",
+          partial: "deals/stage_summary",
+          locals: { stage: stage, deals: deals.by_stage(stage.id), reorderable: true })
+      }
+    else
+      stage_names = [ @board_move_from_stage_name, @deal.pipeline_stage&.name ].compact.uniq
+      grouper = StageNameGroup.new(board_move_stages)
+      stage_names.filter_map { |name|
+        group = grouper.groups.find { |entry| entry.name == name }
+        next unless group
+
+        group_deals = group.stages.flat_map { |stage| deals.by_stage(stage.id) }
+        turbo_stream.replace(helpers.stage_summary_dom_id(name),
+          partial: "deals/stage_summary",
+          locals: { stage_name: name, dom_id: helpers.stage_summary_dom_id(name),
+            stage: group.representative_stage, deals: group_deals,
+            reorderable: false, show_probability: false })
+      }
+    end
   end
 
   def board_move_stages
@@ -376,7 +397,39 @@ class DealsController < ApplicationController
       current_workspace.pipeline_stages.ordered_across_pipelines.to_a
     end
     visible = show_closed? ? stages : stages.reject(&:closed?)
-    [ @deal.pipeline_stage, *visible ].compact.uniq
+    [ @deal.pipeline_stage, *visible ].compact.uniq(&:id)
+  end
+
+  def build_board_stage_columns(stages, deals)
+    if @board_all_pipelines
+      StageNameGroup.group(stages).map do |group|
+        {
+          dom_id: helpers.stage_summary_dom_id(group.name),
+          drop_key: group.name,
+          name: group.name,
+          color: group.stage_color,
+          stage: group.representative_stage,
+          deals: group.stages.flat_map { |stage| deals.by_stage(stage.id) },
+          reorderable: false,
+          show_pipeline_on_cards: true,
+          show_probability: false
+        }
+      end
+    else
+      stages.map do |stage|
+        {
+          dom_id: "stage_summary_#{stage.id}",
+          drop_key: stage.id,
+          name: stage.name,
+          color: stage.color,
+          stage: stage,
+          deals: deals.by_stage(stage.id),
+          reorderable: true,
+          show_pipeline_on_cards: false,
+          show_probability: true
+        }
+      end
+    end
   end
 
   def respond_to_stage_move_error(message)
