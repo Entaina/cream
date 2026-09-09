@@ -96,6 +96,11 @@
       </div>
     <% end %>
 
+    <% if feature_enabled?(:mql_pool) %>
+      <%= render "product_interests_section", person: @person %>
+      <%= render "lead_submissions_section", person: @person %>
+    <% end %>
+
     <%= render "relationships_section", person: @person %>
   </aside>
 

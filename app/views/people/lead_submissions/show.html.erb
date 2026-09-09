@@ -1,0 +1,57 @@
+<% page_title "Envío de formulario" %>
+<%= render "shared/page_header",
+      title: @submission.lead_form.name,
+      subtitle: @person.display_name,
+      icon_name: :globe,
+      actions: capture { link_to "Volver a persona", @person, class: "btn-secondary" } %>
+
+<div class="card p-6 max-w-2xl space-y-4">
+  <div class="grid grid-cols-2 gap-3 text-sm">
+    <div><span class="text-ink-faint">Destino captura</span><br><%= @submission.capture_destination.upcase %></div>
+    <div><span class="text-ink-faint">Fecha</span><br><%= l(@submission.created_at, format: :long) %></div>
+    <% if @submission.deal %>
+      <div class="col-span-2"><span class="text-ink-faint">Deal</span><br><%= link_to @submission.deal.name, @submission.deal, class: "text-accent hover:underline" %></div>
+    <% end %>
+  </div>
+
+  <% if @submission.metadata["gdpr_consent_at"].present? || @submission.privacy_policy_version.present? %>
+    <div class="rounded-lg border border-line bg-canvas-sunken/40 p-4 space-y-3">
+      <h3 class="text-sm font-semibold uppercase tracking-wider text-ink-faint">Consentimiento aceptado</h3>
+      <% if @submission.metadata["gdpr_consent_at"].present? %>
+        <p class="text-sm"><span class="text-ink-faint">Fecha:</span> <%= l(Time.zone.parse(@submission.metadata["gdpr_consent_at"]), format: :long) rescue @submission.metadata["gdpr_consent_at"] %></p>
+      <% end %>
+      <% if @submission.metadata["privacy_policy_url"].present? %>
+        <p class="text-sm"><span class="text-ink-faint">Política:</span> <%= link_to @submission.metadata["privacy_policy_url"], @submission.metadata["privacy_policy_url"], class: "text-accent hover:underline break-all", target: "_blank", rel: "noopener" %></p>
+      <% end %>
+      <% hash = @submission.privacy_policy_version&.content_hash || @submission.metadata["privacy_policy_hash"] %>
+      <% if hash.present? %>
+        <p class="text-sm font-mono text-xs break-all"><span class="text-ink-faint font-sans">Hash:</span> <%= hash %></p>
+      <% end %>
+      <% if @submission.metadata["privacy_policy_hash_unverified"] %>
+        <p class="text-sm text-danger-strong">No se pudo verificar la versión de la política enlazada al envío.</p>
+      <% end %>
+      <% if @submission.privacy_policy_version %>
+        <details class="text-sm">
+          <summary class="cursor-pointer text-accent">Ver texto de la política aceptada</summary>
+          <div class="mt-2 prose prose-sm max-w-none"><%= @submission.privacy_policy_version.policy_content.html_safe %></div>
+        </details>
+        <details class="text-sm">
+          <summary class="cursor-pointer text-accent">Ver frase de consentimiento aceptada</summary>
+          <div class="mt-2 text-ink-soft"><%= @submission.privacy_policy_version.statement_content.html_safe %></div>
+        </details>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div>
+    <h3 class="text-sm font-semibold uppercase tracking-wider text-ink-faint mb-2">Respuestas</h3>
+    <dl class="divide-y divide-line text-sm">
+      <% @submission.data.each do |key, value| %>
+        <div class="py-2 grid grid-cols-3 gap-2">
+          <dt class="text-ink-faint"><%= key.humanize %></dt>
+          <dd class="col-span-2"><%= value.is_a?(TrueClass) || value.is_a?(FalseClass) ? (value ? "Sí" : "No") : value %></dd>
+        </div>
+      <% end %>
+    </dl>
+  </div>
+</div>

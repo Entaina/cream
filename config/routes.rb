@@ -66,7 +66,15 @@ Rails.application.routes.draw do
       patch :toggle_subscription
     end
     resources :relationships, only: %i[create destroy], controller: "person_relationships"
+    resources :lead_submissions, only: :show, module: :people
+    resources :product_interests, only: :create, module: :people do
+      member do
+        patch :dismiss
+      end
+      resource :conversion, only: %i[new create], module: :people, controller: "interest_conversions"
+    end
   end
+  resources :mqls, only: :index
   resources :products do
     resources :editions, except: %i[show index] do
       collection do
@@ -164,7 +172,7 @@ Rails.application.routes.draw do
   resources :automations, except: %i[show]
   resources :alert_rules, except: %i[show]
   resources :slack_integrations, except: %i[show]
-  resources :lead_forms, except: %i[show]
+  resources :lead_forms
   resources :lead_form_templates, except: %i[show] do
     member do
       match :preview, via: %i[get post]

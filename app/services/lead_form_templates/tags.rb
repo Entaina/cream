@@ -122,7 +122,9 @@ module LeadFormTemplates
       def render(context)
         renderer(context).hidden_fields(
           lead_form: context.registers[:lead_form],
-          product: context.registers[:product]
+          product: context.registers[:product],
+          privacy_policy_hash: context.registers[:privacy_policy_hash],
+          submission_key: context.registers[:submission_key]
         )
       end
     end

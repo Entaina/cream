@@ -35,6 +35,7 @@ Legend: `ready` | `partial` | `placeholder` — only `ready` features should hav
 | journeys | ready | yes | Recorridos: consent-aware sends, branch/wait/list steps, manual enroll, segment_entry |
 | lead_scoring | ready | yes | Rules with conditions, idempotent decay, form_field/deal_created events |
 | web_tracking | ready | yes | Cross-origin cream.js; landing pages `/p/:workspace/:slug`; cream_aid on lead submit |
+| mql_pool | ready | yes | MQL pool index, product interests, MQL→SQL conversion, lead forms with MQL destination; enabled 2026-09-09 |
 
 ## Disabled (implemented but gated)
 

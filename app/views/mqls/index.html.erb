@@ -1,0 +1,86 @@
+<% page_title "Pool MQL" %>
+<%= render "shared/page_header", title: "Pool MQL", icon_name: :users, count: @pagy.count %>
+
+<div class="flex flex-wrap items-center gap-2 border-b border-line px-5 py-2 shrink-0">
+  <%= form_with url: mqls_path, method: :get, class: "flex flex-wrap items-center gap-2 flex-1", data: { turbo_frame: "_top" } do %>
+    <div class="relative max-w-xs min-w-40 flex-1">
+      <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-ink-faint"><%= icon :search, classes: "size-3.5" %></span>
+      <%= text_field_tag :q, params[:q], placeholder: "Buscar...", class: "input pl-8" %>
+    </div>
+    <%= select_tag :subscription_type_id,
+          options_from_collection_for_select(@subscription_types, :id, :name, params[:subscription_type_id]),
+          include_blank: "Tipo suscripción (elegibilidad)", class: "input w-48", onchange: "this.form.requestSubmit()" %>
+    <%= select_tag :open_deal,
+          options_for_select([ [ "Cualquier oportunidad", "any" ], [ "Con oportunidad abierta", "yes" ], [ "Sin oportunidad abierta", "no" ] ], params[:open_deal] || "any"),
+          class: "input w-52", onchange: "this.form.requestSubmit()" %>
+    <%= select_tag :open_deal_product_id,
+          options_from_collection_for_select(@products, :id, :name, params[:open_deal_product_id]),
+          include_blank: "Producto (oportunidad)", class: "input w-44", onchange: "this.form.requestSubmit()" %>
+    <%= select_tag :interest_product_id,
+          options_from_collection_for_select(@products, :id, :name, params[:interest_product_id]),
+          include_blank: "Interés en producto", class: "input w-44", onchange: "this.form.requestSubmit()" %>
+    <%= select_tag :lead_form_id,
+          options_from_collection_for_select(@lead_forms, :id, :name, params[:lead_form_id]),
+          include_blank: "Formulario origen", class: "input w-44", onchange: "this.form.requestSubmit()" %>
+    <%= link_to "Limpiar", mqls_path, class: "btn-ghost" %>
+  <% end %>
+</div>
+
+<div class="flex-1 overflow-auto scrollbar-subtle">
+  <% if @people.any? %>
+    <table class="table-base">
+      <thead>
+        <tr>
+          <th>Persona</th>
+          <th>Lifecycle (scoring)</th>
+          <th>Score</th>
+          <th>Formularios</th>
+          <th>Intereses pendientes</th>
+          <th>Oportunidades visibles</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @people.each do |person| %>
+          <% interests = @pending_interests[person.id] || [] %>
+          <% deals = @open_deals_by_person[person.id] || [] %>
+          <% forms = @form_summaries[person.id] || [] %>
+          <tr>
+            <td>
+              <%= link_to person_path(person), class: "font-medium hover:text-accent" do %>
+                <%= person.display_name %>
+              <% end %>
+              <div class="text-xs text-ink-faint"><%= person.email %></div>
+            </td>
+            <td class="text-ink-soft"><%= person.lifecycle_stage&.humanize %></td>
+            <td class="text-ink-soft"><%= person.lead_score %></td>
+            <td class="text-sm text-ink-soft">
+              <% forms.first(2).each do |summary| %>
+                <div><%= summary[:form].name %> (<%= summary[:count] %>)</div>
+              <% end %>
+            </td>
+            <td class="text-sm text-ink-soft">
+              <% interests.each do |interest| %>
+                <div><%= interest.product.name %></div>
+              <% end %>
+            </td>
+            <td class="text-sm text-ink-soft">
+              <% deals.each do |deal| %>
+                <%= link_to deal.name, deal_path(deal), class: "hover:text-accent" %><br>
+              <% end %>
+            </td>
+            <td class="text-right">
+              <% if interests.any? %>
+                <%= link_to "Convertir a SQL", new_person_product_interest_conversion_path(person, interests.first), class: "btn-secondary text-xs" %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+    <%= render "shared/pagination", pagy: @pagy %>
+  <% else %>
+    <%= render "shared/empty_state", icon_name: :users, title: "No hay MQLs elegibles",
+          subtitle: "Ajusta los filtros o captura contactos con permiso de marketing." %>
+  <% end %>
+</div>

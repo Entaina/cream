@@ -4,7 +4,7 @@
 
 Cream es un CRM por **workspaces** para gestionar **personas**, **empresas** y **deals** (oportunidades), con notas, tareas, listas y un historial de actividad compartido en el equipo.
 
-> **Última revisión:** 2026-09-04 (casilla Mailjet transaccional en Settings)
+> **Última revisión:** 2026-09-09 (navegación, perfil, formularios, mail merge y resto del manual)
 > Este documento describe la funcionalidad **visible para el usuario**. Las funcionalidades desactivadas aparecen al final en «Próximamente».
 
 ---
@@ -101,30 +101,62 @@ Los **vendedores** ven en el **Dashboard** y en **Deals** únicamente sus deals 
 
 El menú lateral izquierdo concentra el acceso principal. En **pantallas pequeñas (móvil)** el menú está oculto por defecto: pulsa el icono de **hamburguesa** (☰) en la cabecera de la página para abrirlo. Toca fuera del menú, pulsa **Escape** o navega a otra sección para cerrarlo. En escritorio el menú permanece siempre visible.
 
-| Sección        | Descripción |
-|----------------|-------------|
-| **Search...**  | Búsqueda global. Atajo de teclado: `/` |
-| **Notifications** | Avisos del workspace (menciones, etc.) |
-| **Dashboard**  | Resumen del workspace |
-| **People**       | Personas de contacto |
-| **Companies**    | Empresas |
-| **Deals**        | Tablero kanban de oportunidades |
-| **Products**     | Catálogo de productos |
-| **Tasks**        | Todas las tareas del workspace |
-| **Mail merge**   | Envío de email personalizado a varios registros |
-| **Plantillas**   | Plantillas de email reutilizables |
-| **Alertas**      | Reglas de aviso basadas en fechas y condiciones del deal |
-| **Webhooks**     | Integraciones salientes por HTTP |
-| **Stripe**       | Pagos importados de Stripe y su conciliación con deals |
-| **Pipelines**    | Configuración de pipelines de venta |
-| **API tokens**   | Tokens para clientes MCP / API |
-| **Profile**      | Nombre de usuario y preferencias personales en el workspace (pipeline, briefing, canales de alerta) |
-| **Settings**     | Configuración del workspace (solo admins): nombre, visibilidad de deals, director de ventas, OKM, Mailjet |
-| **Team**         | Miembros e invitaciones |
-| **Custom fields**| Campos extra por tipo de registro |
-| **Lists**        | Listas personalizadas (parte inferior del menú) |
+Arriba del menú (**Search…**, **Notifications**) y debajo del selector de **pipeline activo**, las entradas se agrupan así:
 
-Las entradas del menú que dependen de funcionalidades desactivadas no aparecen hasta que se habiliten (ver [Próximamente](#29-próximamente)).
+**Uso diario** (siempre visibles, sin desplegable):
+
+| Entrada | Descripción |
+|---------|-------------|
+| **Search…** | Búsqueda global. Atajo: `/` |
+| **Notifications** | Avisos del workspace (menciones, alertas, formularios, reservas…) |
+| **Dashboard** | Resumen del workspace |
+| **People** | Personas; puede incluir submenú de **vistas guardadas** |
+| **Companies** | Empresas; vistas guardadas |
+| **Deals** | Tablero kanban; vistas guardadas |
+| **Tasks** | Todas las tareas del workspace |
+
+**Marketing** (grupo desplegable; ver [§29](#29-marketing)):
+
+| Entrada | Descripción |
+|---------|-------------|
+| **Suscripciones** | Tipos de lista y consentimiento |
+| **Campañas** | Envíos masivos a segmentos |
+| **Segmentos** | Audiencias filtradas |
+| **Atribución** | Informe UTM |
+| **Recorridos** | Secuencias automatizadas |
+| **Puntuación de leads** | Reglas de scoring |
+| **MQLs** | Pool de contactos con permiso de marketing |
+| **Plantillas** | Plantillas de email (campañas, ficha, formularios) |
+
+**Configuración** (solo **admins**; grupo desplegable):
+
+| Entrada | Descripción |
+|---------|-------------|
+| **Team** | Miembros e invitaciones |
+| **Products** | Catálogo de productos |
+| **Pipelines** | Etapas, disparadores, condiciones |
+| **Custom fields** | Campos personalizados |
+| **Alertas** | Reglas de aviso por fechas |
+| **Automations** | Automatizaciones por eventos |
+| **Formularios** | Captación web pública |
+| **Stripe** | Pagos importados y conciliación |
+| **Webhooks** | Integraciones salientes HTTP |
+| **Reports** | Informes y exportación CSV |
+| **Settings** | Ajustes del workspace (OKM, Mailjet, permisos…) |
+
+**Mi perfil** (grupo desplegable; cada usuario):
+
+| Entrada | Descripción |
+|---------|-------------|
+| **Profile** | Nombre, pipeline predeterminado, briefing IA, canales de alerta |
+| **Gmail** | Conexión OAuth para enviar desde ficha y detectar respuestas |
+| **Reservas** | Páginas públicas de reserva de calendario |
+| **Mis listas** | Listas personales del workspace |
+| **API tokens** | Tokens MCP / REST API v1 |
+
+También puedes abrir **Profile** pulsando tu **nombre** en la parte inferior del menú lateral.
+
+Las entradas que dependen de funcionalidades desactivadas **no aparecen** hasta habilitarlas (ver [Próximamente](#30-próximamente)). Ejemplo hoy: **Mail merge**.
 
 ### Personalizar el menú
 
@@ -133,7 +165,7 @@ Junto al título **Menu** del menú lateral hay un icono de engranaje. Al pulsar
 - **Reordenar:** arrastra un apartado por el icono de agarre (⋮⋮) a la posición que quieras.
 - **Ocultar o mostrar:** usa el icono del ojo en cada apartado. Los ocultos dejan de verse en el menú normal, pero siguen visibles (atenuados) mientras editas para poder recuperarlos.
 
-Los cambios se guardan automáticamente para **tu usuario** al salir del modo edición (vuelve a pulsar el engranaje). Cada persona del workspace tiene su propia configuración; no afecta a Search, Notifications ni a la sección Lists.
+Los cambios se guardan automáticamente para **tu usuario** al salir del modo edición (vuelve a pulsar el engranaje). Cada persona del workspace tiene su propia configuración; no afecta a Search ni a Notifications. Puedes ocultar entradas de cualquier grupo (incluido Marketing o Mi perfil) sin borrarlas del workspace.
 
 ### Pipeline activo
 
@@ -163,7 +195,7 @@ La preferencia se guarda en tu usuario, así que se mantiene entre sesiones y di
 
 El dashboard muestra un resumen del workspace:
 
-- **Director de ventas:** briefing diario generado por IA con indicaciones para el equipo, clasificadas en **Urgente** e **Importante**. Solo aparece en workspaces donde un administrador lo haya activado en **Settings** (checkbox *Briefing diario del director de ventas*), y además requiere que la IA esté configurada en el servidor (`CREAM_AI_API_KEY`). Cada usuario puede desactivarlo para sí en **Settings → Profile** (checkbox *Mostrar briefing del director de ventas en el dashboard*); también puedes abrir Profile desde tu nombre en la parte inferior del menú lateral. Para enriquecer el informe, el director usa herramientas de lectura del CRM, el **OKM** del workspace (si está configurado) y **memoria persistente** (llmemory) con aprendizajes de briefings anteriores. Además, cada usuario que lo tenga activado recibe un bloque **Para ti** con indicaciones directas, **Aciertos** (felicitaciones por logros recientes) y **A mejorar** (fallos u omisiones con recomendación). Si un deal ya tiene una **próxima acción** (tarea abierta con fecha futura), el briefing no pide acciones paralelas ni lo marca como inactivo; como mucho puede sugerir **adelantar** esa fecha. Los deals sin tarea abierta sí pueden aparecer como pendientes de definir siguiente paso.Si aún no hay briefing del día, puedes pulsar **Generar ahora**; si ya existe, puedes pulsar **Regenerar** hasta 5 veces al día (se muestra cuántas regeneraciones te quedan). Las indicaciones pueden enlazar a deals, personas, empresas o tareas; en el bloque de equipo se resaltan las asignadas a ti.
+- **Director de ventas:** briefing diario generado por IA con indicaciones para el equipo, clasificadas en **Urgente** e **Importante**. Solo aparece en workspaces donde un administrador lo haya activado en **Settings** (checkbox *Briefing diario del director de ventas*), y además requiere que la IA esté configurada en el servidor (`CREAM_AI_API_KEY`). Cada usuario puede desactivarlo para sí en **Settings → Profile** (checkbox *Mostrar briefing del director de ventas en el dashboard*); también puedes abrir Profile desde tu nombre en la parte inferior del menú lateral. Para enriquecer el informe, el director usa herramientas de lectura del CRM, el **OKM** del workspace (si está configurado) y **memoria persistente** (llmemory) con aprendizajes de briefings anteriores. Además, cada usuario que lo tenga activado recibe un bloque **Para ti** con indicaciones directas, **Aciertos** (felicitaciones por logros recientes) y **A mejorar** (fallos u omisiones con recomendación). Si un deal ya tiene una **próxima acción** (tarea abierta con fecha futura), el briefing no pide acciones paralelas ni lo marca como inactivo; como mucho puede sugerir **adelantar** esa fecha. Los deals sin tarea abierta sí pueden aparecer como pendientes de definir siguiente paso. Si aún no hay briefing del día, puedes pulsar **Generar ahora**; si ya existe, puedes pulsar **Regenerar** hasta 5 veces al día (se muestra cuántas regeneraciones te quedan). Las indicaciones pueden enlazar a deals, personas, empresas o tareas; en el bloque de equipo se resaltan las asignadas a ti.
 - **Tarjetas de métricas:** número de personas, empresas, valor del pipeline abierto y ingresos ganados (deals en etapa *won*). Las métricas de deals respetan el **pipeline activo** (ver abajo); personas y empresas son del workspace completo.
 - **Pipeline por etapa:** barras con el reparto de deals por etapa. Si tienes un pipeline activo, el gráfico y las tarjetas de deals usan ese pipeline; si eliges **Todos los pipelines**, el gráfico muestra el pipeline por defecto del workspace y las tarjetas suman todos los deals.
 - **Upcoming tasks:** tareas pendientes próximas (marca completadas con un clic).
@@ -207,6 +239,8 @@ El listado muestra **50 registros por página**. Cuando hay más, aparece una ba
 - **Relaciones entre contactos:** en el panel izquierdo de la ficha, la sección **Relationships** permite vincular esta persona con otra del workspace. Elige la otra persona, el tipo de relación (**Invitó a**, **Referido por**, **Trabajó con**, **Colega de**) y pulsa **Add**. La relación se guarda con dirección: lo que declares desde la ficha actual es el origen (por ejemplo, «Ana invitó a Bruno»). En la ficha de Bruno verás la etiqueta inversa coherente («invitado por Ana»). Puedes eliminar la relación desde cualquiera de las dos fichas; desaparece en ambas.
 - **Crear deal desde la ficha:** pulsa **Add deal** en la barra superior. Se abre un cuadro donde eliges el **pipeline** (por defecto el tuyo en *Settings → Profile*, o el del workspace si no tienes uno), el **producto** y la **primera acción** (título y fecha). El deal se crea en la **primera etapa** del pipeline elegido, con la empresa y el contacto de la persona; el nombre se genera como «Empresa — Producto». Tras crearlo irás a la ficha del deal. Si hay errores de validación, se muestran dentro del mismo cuadro sin salir de la ficha. Si no hay productos en el catálogo, el cuadro te indica que debes crear uno antes.
 - **Deals de la persona:** en el panel izquierdo, la sección **Deals** lista los deals en los que la persona es contacto activo, ordenados por fecha de creación (más recientes primero). Cada fila muestra el nombre (enlace a la ficha del deal), la **etapa** actual, la fecha y los **productos** de las líneas del deal. Si hay deals con más de un producto distinto, aparece un desplegable **All products** para filtrar la lista por producto.
+- **Suscripciones** (marketing): si el workspace tiene activo el módulo de consentimiento, en el panel izquierdo verás cada **tipo de suscripción** (general, newsletter, etc.) con su estado (**Suscrito**, **Dado de baja** o **Pendiente**). Puedes **Suscribir** o **Dar de baja** manualmente, y copiar el enlace al **centro de preferencias** del contacto para que gestione sus listas (ver [§29](#29-marketing)).
+- **Lead score** y **Lifecycle**: con la puntuación de leads activa, el panel izquierdo muestra la puntuación numérica y la etapa del ciclo de vida (*subscriber*, *lead*, *mql*, *sql*, *opportunity*, *customer*, *evangelist*). El lifecycle refleja la puntuación automática; **no** equivale a tener una oportunidad (deal) abierta en ventas.
 
 **Posibles duplicados**
 
@@ -344,11 +378,12 @@ Al escribir el **título** de una tarea puedes mencionar a un compañero del wor
 
 ## 8. Listas
 
-Las **listas** agrupan registros de un solo tipo (Person, Company o Deal) con un nombre y color. Aparecen en la parte inferior del menú lateral.
+Las **listas** agrupan registros de un solo tipo (Person, Company o Deal) con un nombre y color. Están en el grupo **Mi perfil** → **Mis listas** (cada usuario ve las del workspace; el submenú despliega acceso rápido a cada lista).
 
-- Crea una lista con el botón **+** junto a «Lists».
+- Crea una lista con el botón **+** junto a **Mis listas**.
 - Añade o quita registros desde la ficha del registro o desde la vista de la lista.
-- Útil para segmentar campañas, seguimiento manual o agrupaciones ad hoc.
+- Los **recorridos** pueden incluir un paso **Añadir a lista** para meter contactos automáticamente.
+- Para envíos masivos de email usa **Campañas** con un **segmento** ([§29](#29-marketing)); las listas del CRM son útiles para seguimiento manual y pasos de recorridos.
 
 ---
 
@@ -465,7 +500,7 @@ En las tablas de personas, empresas y deals, Cream añade columnas calculadas au
 
 Al abrir una persona, empresa o deal verás:
 
-**Panel izquierdo (atributos):** datos principales, campos personalizados, relaciones entre contactos (solo personas), listas a las que pertenece y (en deals) selector de pipeline y etapa.
+**Panel izquierdo (atributos):** datos principales, campos personalizados, relaciones entre contactos (solo personas), listas a las que pertenece y (en deals) selector de pipeline y etapa. En **personas**, según las funcionalidades activas, también pueden aparecer **Suscripciones**, **Lead score**, **Lifecycle**, **Intereses por producto** y **Formularios enviados** (ver [§29 Marketing](#29-marketing)).
 
 > **En móvil** la ficha muestra un panel a la vez: desliza el dedo hacia la izquierda o la derecha para pasar del panel de atributos a la columna principal y viceversa.
 
@@ -560,7 +595,7 @@ Los correos que envías **desde la ficha de un cliente** (persona, empresa o dea
 - la lista de emails (enviados y **Received** si aplica): asunto, destinatario o remitente, cuerpo y etiquetas como **Sent**, **Opened**, **Replied** o **Received**
 - la actividad relacionada en el **Timeline** (envíos, aperturas, clics, respuestas detectadas)
 
-Lo mismo aplica a los envíos de **Mail merge**: cada correo aparece en la ficha del registro correspondiente y es visible para todo el equipo del workspace.
+Lo mismo aplica a los envíos de **Campañas** (cada destinatario queda registrado en su ficha cuando el envío es trazable desde el CRM).
 
 **No hay emails privados por usuario** dentro del mismo workspace: lo enviado desde una ficha forma parte del historial compartido del equipo sobre ese cliente. La visibilidad de **deals** depende del rol (ver [Roles](#roles)); personas y empresas siguen siendo visibles para todo el workspace.
 
@@ -636,28 +671,11 @@ Las **plantillas** te ahorran reescribir correos frecuentes (presentación, segu
 - **Variables:** usa `{first_name}`, `{last_name}`, `{name}`, `{company}` y `{email}` en el asunto o el cuerpo; al insertarlas se sustituyen por los datos del registro. Los textos entre corchetes como `[Nombre del curso]` o `[fechas]` son marcadores que debes completar manualmente tras cargar la plantilla.
 - **Usar en un email:** en la sección **Send email** de una ficha (Person, Company o Deal), despliega **Insertar plantilla…** y elige una. El asunto y el cuerpo se rellenan automáticamente con las variables ya sustituidas para ese contacto. Puedes editar el texto con el mismo editor enriquecido antes de enviar. Si aún no hay plantillas, verás un enlace para crearlas.
 
-### Envío masivo (Mail merge)
+### Envío masivo
 
-**Mail merge** envía un mismo email **personalizado** a varios registros a la vez.
+Para comunicaciones masivas con consentimiento y métricas usa **Campañas** + **Segmentos** ([§29](#29-marketing)): eliges audiencia, tipo de suscripción, plantilla, programación y prueba A/B.
 
-#### Cómo acceder
-
-Entrada **Mail merge** en el menú lateral.
-
-#### Pasos
-
-1. En **Recipients**, elige a quién enviar:
-   - una **vista guardada** (todos los registros que cumplen sus filtros),
-   - una **lista**, o
-   - **Enter record IDs manually** para indicar IDs separados por comas.
-   El texto bajo el selector muestra **cuántos destinatarios** recibirán el correo.
-2. Opcional: elige una **plantilla**; si la usas, se envía su cuerpo (personalizado por destinatario). Si no, redacta el **Subject** y el **Body** con el editor enriquecido del formulario.
-3. Usa variables como `{name}` o `{first_name}` en asunto y cuerpo para personalizar cada envío.
-4. Pulsa **Send mail merge**. Cada correo se registra en la ficha del registro correspondiente, con seguimiento de apertura igual que un envío individual.
-
-> **Notas**
-> - Solo se envía a registros con email (en deals se usa el del primer contacto).
-> - Cada envío queda asociado a su registro y comparte un identificador de lote.
+> **Mail merge** (envío manual a vista guardada, lista o IDs) está **desactivado** en el menú; ver [Próximamente](#30-próximamente). Los envíos desde **Send email** en una ficha siguen disponibles registro a registro.
 
 ---
 
@@ -686,7 +704,7 @@ Entrada **Automations** en el menú lateral; pulsa **New automation**.
 ### Notas
 
 - Las automatizaciones **inactivas** no se ejecutan.
-- *Notify Slack* no hace nada hasta que se habilite la integración de Slack (ver [Próximamente](#28-próximamente)).
+- *Notify Slack* no hace nada hasta que se habilite la integración de Slack (ver [Próximamente](#30-próximamente)).
 
 ### Disparadores de etapa (IA)
 
@@ -795,7 +813,18 @@ Los invitados aceptan con el enlace recibido y crean cuenta o inician sesión si
 
 ## 21. Ajustes del workspace
 
-En **Settings** (solo admins):
+### Mi perfil (Profile)
+
+Disponible para **todos los miembros** en **Profile** (grupo **Mi perfil** del menú, o clic en tu nombre abajo del sidebar). Ajusta preferencias **personales en el workspace activo**:
+
+1. **Datos personales** — tu **nombre** (visible en menciones y actividad). El email de cuenta es solo lectura.
+2. **Pipeline predeterminado** — pipeline que se selecciona al iniciar sesión, en el selector del sidebar y en el add-on de Gmail ([§3](#3-navegación)).
+3. **Briefing del director de ventas** — casilla para mostrar u ocultar el bloque de IA en el dashboard ([§4](#4-dashboard)). Solo aparece si el admin lo activó en **Settings** del workspace y la IA está configurada en el servidor.
+4. **Alertas** — canales **Notificación in-app (campana)** y **Email** para alertas configuradas, **envíos de formularios** (si eres responsable) y **reservas de calendario** (si eres anfitrión). Si desactivas ambos, no recibirás esos avisos ([§17](#17-alertas-configurables), [§19](#19-notificaciones)).
+
+### Ajustes del workspace (Settings)
+
+En **Settings** (solo **admins**):
 
 ### General
 
@@ -1030,31 +1059,53 @@ En el menú lateral, abre **Formularios**.
 ### Configurar un formulario
 
 1. Pulsa **Nuevo formulario**.
-2. Indica el **nombre**, el **slug** (aparecerá en la URL pública `/f/slug`), la **plantilla** del formulario, el **pipeline** donde se creará el deal, la **etapa** opcional (tras elegir el pipeline), el **responsable** (recibe la notificación y la tarea de seguimiento), el **texto de la primera tarea** y los **días hasta el vencimiento** (desde la creación del deal al enviar el formulario; 0 = el mismo día), y la **plantilla de email** que se enviará al lead.
-3. Opcional: indica la **URL de redirección tras envío** (p. ej. `https://entaina.com/gracias`) para llevar al visitante a una página de tu web. Si se deja vacía, se muestra la página de gracias de Cream (`/f/slug/success`).
-4. Opcional: define **campos ocultos adicionales** (uno por línea, p. ej. `producto`, `landing`). Sus valores se pasan como query params en la URL pública o del iframe, p. ej. `/f/slug?producto=curso-ia`. Se guardan con el envío y aparecen en **Formulario de origen** del deal.
-5. Opcional: elige un **producto** del catálogo si el formulario debe asociar una línea de producto al deal (p. ej. reservas de curso). El visitante puede sobrescribirlo con `?product_id=` en la URL. Las plantillas de reserva muestran las **ediciones abiertas** de ese producto.
-6. Marca **Recoger datos de empresa** si el formulario debe pedir nombre y CIF de la empresa. Con esta opción, un envío sin nombre de empresa sigue aceptándose en servidor (se usa una empresa placeholder); marca el campo `required: true` en la plantilla si quieres exigirlo en el navegador.
-7. Guarda. En el listado verás la **URL pública** y el **código iframe** listos para copiar.
+2. Indica el **nombre**, el **slug** (aparecerá en la URL pública `/f/slug`), la **plantilla** del formulario y si el formulario está **Activo**.
+3. En **Destino del envío**, elige **Deal (ventas)** o **MQL (marketing)**. Deal crea o reutiliza una oportunidad (flujo descrito abajo). MQL captura persona, consentimiento e historial de envíos **sin crear deal** (ver [§29 Pool MQL](#pool-mql)). Para destino MQL puedes indicar el **tipo de suscripción** y el **texto de permiso de marketing** que verá el visitante.
+4. En **CRM y asignación** (solo destino Deal): el **pipeline** donde se creará el deal, la **etapa** opcional, el **responsable** (recibe la notificación y la tarea de seguimiento), el **producto** opcional y rutas de pipeline por valor de campo.
+5. Configura la **primera tarea** (texto y días hasta vencimiento; 0 = el mismo día) y la **plantilla de email** al lead (o **Sin email**).
+6. Opcional: indica la **URL de redirección tras envío** (p. ej. `https://entaina.com/gracias`) para llevar al visitante a una página de tu web. Si se deja vacía, se muestra la página de gracias de Cream (`/f/slug/success`).
+7. Opcional: define **campos ocultos adicionales** (uno por línea, p. ej. `producto`, `landing`). Sus valores se pasan como query params en la URL pública o del iframe, p. ej. `/f/slug?producto=curso-ia`. Se guardan con el envío y aparecen en **Formulario de origen** del deal o en el historial del contacto.
+8. Marca **Recoger datos de empresa** si el formulario debe pedir nombre y CIF de la empresa. Con esta opción, un envío sin nombre de empresa sigue aceptándose en servidor (se usa una empresa placeholder); marca el campo `required: true` en la plantilla si quieres exigirlo en el navegador.
+9. Guarda. En el listado verás la **URL pública**, la **política de privacidad** (`/f/slug/privacy`) y el **código iframe** listos para copiar.
+
+### Ficha del formulario (Ver)
+
+Desde el listado, **Ver** abre el detalle del formulario:
+
+- Badge **Destino Deal** o **Destino MQL** y enlace a la URL pública.
+- **MQL captados** — personas que enviaron con destino MQL desde este formulario: número de envíos, primera y última captura, y si son **elegibles** ahora para marketing.
+- **Envíos recientes** — todos los envíos (Deal o MQL) con enlace **Detalle** al registro completo del envío, incluido el bloque **Consentimiento aceptado** (política, hash y textos versionados).
 
 ### Plantillas de formulario (administradores)
 
 La **apariencia y los campos** de cada página pública se definen en plantillas **Liquid** guardadas en el workspace, no en el propio registro del formulario.
 
 1. Desde **Formularios**, pulsa **Plantillas de formulario** (solo administradores).
-2. Filtra por **Páginas** (formularios completos, p. ej. `contacto`, `liderando_ia_reserva`) o **Parciales** (bloques reutilizables: datos de contacto, consentimiento RGPD, etc.).
+2. Filtra por **Páginas** (formularios completos, p. ej. `contacto`, `liderando_ia_reserva`), **Parciales** (bloques reutilizables: contacto, consentimiento RGPD…) o **Landing page** (páginas de marketing en `/p/slug-workspace/slug-landing`; ver [§29](#29-marketing)).
 3. **Editar** abre un editor con resaltado Liquid. Las páginas usan etiquetas como `{% field %}`, `{% partial 'contact_fields' %}`, `{% form_open %}` y variables como `{{ lead_form.name }}`.
-4. **Nueva plantilla**: indica un **nombre** corto (p. ej. `mi_formulario` para una página, o `mi_bloque` para un parcial) y marca **Es un parcial** si no es una página completa.
-5. Tras crear o cambiar una plantilla de **página**, elige ese nombre en el campo **Plantilla del formulario** al configurar un formulario de captación.
+4. **Nueva plantilla**: indica un **nombre** corto, el **tipo** (formulario de lead o landing) y, si aplica, marca **Es un parcial**.
+5. Tras crear o cambiar una plantilla de **página** de formulario, elige ese nombre en **Plantilla del formulario** al configurar un formulario de captación. La plantilla `privacy` define la política enlazada desde cada formulario público.
 
 Si la plantilla de una página no existe en el workspace, la URL pública `/f/slug` responderá con error.
 
-### Qué ocurre al enviar un formulario
+### Política de privacidad y consentimiento
+
+- Cada formulario público incluye un enlace a la **política de privacidad** (`/f/slug/privacy`). El contenido se define en **Plantillas de formulario** → plantilla `privacy` (editable por administradores).
+- El visitante debe marcar la casilla de **consentimiento de protección de datos** (RGPD) para enviar. Opcionalmente la plantilla puede ofrecer **newsletter** u otro permiso de marketing; si el contacto lo acepta, se registra la suscripción al tipo correspondiente (ver [§29](#29-marketing)).
+- Al cargar el formulario, Cream guarda una **versión inmutable** de la política y de la frase del checkbox. Cada envío queda enlazado a esa versión (fecha, URL, hash y textos aceptados). El detalle completo se consulta en **Formularios → Ver → Envíos recientes → Detalle**, o desde la ficha del contacto → **Formularios enviados**. En deals, **Formulario de origen** muestra las respuestas del envío pero no el bloque extendido de consentimiento.
+
+### Qué ocurre al enviar un formulario (destino Deal)
 
 - Se crea o reutiliza una **persona** por email (origen «Formulario web»). Si la persona ya existía, solo se rellenan los campos que estuvieran vacíos (nombre, apellidos, teléfono, cargo…).
 - Si esa persona ya tiene un **deal abierto** en el pipeline del formulario, se **reutiliza** ese deal: se añaden al envío los datos nuevos del formulario (sin crear otro deal ni otra tarea de seguimiento). Si has configurado una **etapa**, el deal avanza hasta ella solo si está en una etapa anterior (nunca retrocede). Si no hay deal abierto en ese pipeline (por ejemplo, solo deals ganados o perdidos, o deals en otro pipeline), se crea un deal nuevo en la etapa configurada o, si no hay etapa, en la **primera etapa** del pipeline, con la **primera tarea** configurada en el formulario (por defecto «Contactar lead» al día siguiente) asignada al responsable.
 - Los datos del envío (campos del formulario, página de origen, UTM, navegador, IP…) quedan guardados y visibles en la ficha del deal, en **Formulario de origen**.
 - El lead recibe el email configurado; el responsable recibe aviso según sus canales en **Settings → Profile → Alertas** (campana y/o email), con los datos y un enlace al deal.
+
+### Qué ocurre al enviar un formulario (destino MQL)
+
+- Se crea o actualiza la **persona** y se guarda el **envío** con destino MQL (sin deal).
+- Si el visitante acepta el permiso de marketing configurado en el formulario, se crea o actualiza la **suscripción** al tipo elegido, con trazabilidad de la misma versión de política que el envío.
+- El historial de envíos e intereses por producto aparece en la ficha del contacto. Desde ahí puedes **Convertir a SQL** cuando haya interés comercial (ver [§29](#29-marketing)).
 
 ### Notas
 
@@ -1139,15 +1190,157 @@ Flujo en tres pasos: elegir tipo de evento → calendario y hora (con selector d
 
 ## 29. Marketing
 
-Hub de marketing conectado a captación, consentimiento, envíos y atribución. Menú lateral: **Suscripciones**, **Campañas**, **Segmentos**, **Atribución**, **Recorridos**, **Puntuación de leads**.
+El **hub de marketing** conecta captación web, consentimiento por email, envíos masivos, segmentación, recorridos automatizados, puntuación de leads, tracking y atribución UTM. Se apoya en los **formularios de captación** ([§27](#27-formularios-de-captación)) y en la configuración de **Mailjet** en **Settings** ([§21](#21-ajustes-del-workspace)) para campañas y métricas de apertura/clic.
 
-- **Consentimiento**: suscripciones por tipo (general, newsletter, producto, eventos); baja por lista sin bloquear otras; baja global desde el centro de preferencias; gestión desde la ficha de persona.
-- **Campañas**: envío o programación a segmento de personas, tipo de suscripción, A/B con Liquid, email de prueba, ganadora A/B. Requiere Mailjet en **Settings** del workspace (webhook por workspace).
-- **Segmentos**: filtros demográficos y de comportamiento con vista previa en vivo.
-- **Recorridos**: secuencias con pasos (email con consentimiento, espera, rama, lista, tarea, scoring); inscripción manual.
-- **Puntuación**: reglas con condiciones, recálculo nocturno, lifecycle en ficha de persona.
-- **Tracking**: snippet `cream.js`, landing pages `/p/:workspace/:slug`, identificación `cream_aid` al enviar formulario.
-- **Atribución**: dashboard UTM con drill-down a personas/deals.
+### Cómo acceder
+
+En el menú lateral (según funcionalidades activas en tu workspace):
+
+| Menú | Uso |
+|------|-----|
+| **Suscripciones** | Tipos de lista (newsletter, general, etc.) |
+| **Campañas** | Envíos masivos a segmentos |
+| **Segmentos** | Audiencias filtradas de personas |
+| **Atribución** | Informe por parámetros UTM |
+| **Recorridos** | Secuencias automatizadas |
+| **Puntuación de leads** | Reglas de scoring y lifecycle |
+| **Formularios** | Captación pública (Deal o MQL) |
+| **MQLs** | Pool de contactos con permiso de marketing |
+
+### Pool MQL
+
+Contactos con **permiso de marketing vigente** (suscripción activa al tipo elegido, email principal válido y sin supresión). El pool es independiente del lifecycle de scoring: un cliente con permiso puede seguir en el pool mientras tenga oportunidades abiertas en otros productos.
+
+**Cómo acceder:** menú **MQLs**.
+
+**Pasos:**
+
+1. Abre **MQLs**. La tabla muestra persona, lifecycle (scoring), puntuación, formularios de origen, intereses pendientes y oportunidades visibles.
+2. Filtra por búsqueda, **tipo de suscripción**, **oportunidad abierta** (cualquiera / sí / no), **producto** (de la oportunidad), **interés en producto** o **formulario de origen**.
+3. Desde una fila con interés pendiente, pulsa **Convertir a SQL** para crear o vincular una oportunidad con ese producto (pipeline, tarea y responsable).
+
+**En la ficha de una persona:**
+
+- **Intereses por producto** — registra manualmente una señal comercial (producto + descripción) o proviene de un formulario MQL con producto. Estados: pendiente, convertido o descartado.
+- **Formularios enviados** — historial de envíos agrupados por formulario, con enlace al detalle (respuestas, destino, consentimiento).
+
+**Notas:**
+
+- **Convertir a SQL** exige permiso para crear deals. Si ya hay una oportunidad abierta del mismo producto, Cream ofrece vincular en lugar de duplicar.
+- El lifecycle de scoring (*mql*, *sql*, etc.) **no** indica si hay deal abierto; mira la columna **Oportunidades visibles** o la ficha del contacto.
+- Los recorridos pueden configurarse con **Salir del recorrido si hay oportunidad abierta del producto** para pausar el nurturing comercial.
+
+### Suscripciones y consentimiento
+
+**Tipos de suscripción** (menú **Suscripciones**):
+
+1. Pulsa **Nuevo tipo**.
+2. Indica **nombre**, **identificador (slug)**, **descripción** (visible en el centro de preferencias del contacto) y **orden**.
+3. Marca **Activo** y guarda. Cream crea por defecto tipos como *general* y *newsletter* al usar el módulo.
+
+**En la ficha de una persona** (panel izquierdo → **Suscripciones**):
+
+- Cada tipo muestra su estado: **Suscrito**, **Dado de baja** o **Pendiente**.
+- **Suscribir** / **Dar de baja** cambia el permiso manualmente (con confirmación).
+- Copia la URL del **centro de preferencias** y compártela con el contacto.
+
+**Centro de preferencias (página pública del contacto):**
+
+- El contacto marca qué listas quiere recibir y pulsa **Guardar preferencias**.
+- **Darse de baja de todas las comunicaciones** suprime el email para marketing (sin afectar emails transaccionales de CRM salvo que estén suprimidos por rebote/spam).
+
+**Dos consentimientos distintos en formularios:**
+
+| Consentimiento | Qué es | Dónde se configura |
+|----------------|--------|-------------------|
+| **Protección de datos (RGPD)** | Obligatorio para enviar cualquier formulario | Partial `consent_fields` en plantillas |
+| **Marketing / newsletter** | Opcional; activa una suscripción | Casillas en la plantilla + tipo en formulario MQL |
+
+Las suscripciones creadas desde un formulario guardan la misma **versión de política de privacidad** que el envío (ver [§27](#27-formularios-de-captación)).
+
+### Campañas
+
+1. Menú **Campañas** → **Nueva campaña**: nombre, objetivo, fecha de inicio y parámetros **UTM** (se añaden a los enlaces del email para atribución).
+2. Abre la campaña creada. En **Enviar campaña** elige:
+   - **Segmento de personas** (obligatorio; muestra cuántos destinatarios coinciden).
+   - **Plantilla de email**.
+   - **Tipo de suscripción**: solo recibirán el envío contactos **suscritos** a ese tipo.
+   - **Programar envío** (opcional): fecha y hora; vacío = envío inmediato al pulsar **Encolar envío**.
+3. **Prueba A/B (opcional):** asunto y cuerpo de variantes A y B con pesos (%). Si rellenas asuntos A/B, sustituyen al de la plantilla base.
+4. **Enviar prueba a tu email:** elige plantilla y, opcionalmente, asunto/cuerpo de prueba.
+5. Tras el envío, revisa **Historial de envíos** (estado, omitidos, fallidos). Con A/B puedes **Marcar ganadora** y **Enviar ganadora al resto** a quienes no la recibieron.
+
+**Requisitos:** Mailjet conectado en **Settings → Mailjet** y **URL del webhook** registrada en Mailjet para registrar aperturas, clics y bajas (ver [§21](#21-ajustes-del-workspace)). Sin Mailjet, los envíos usan SMTP/Mailbin del servidor.
+
+### Segmentos
+
+1. Menú **Segmentos** → **Nuevo segmento**.
+2. Elige **tipo de registro** (personas) y define **filtros**: búsqueda, ciclo de vida, email, puntuación, emails abiertos recientes, formulario enviado, URL visitada, oportunidad abierta, interés por producto, historial comercial, formulario de origen, etc.
+3. Marca **Excluir direcciones suprimidas** para respetar rebotes y bajas globales.
+4. Tras guardar, la **vista previa** muestra cuántos registros coinciden (actualiza al guardar cambios).
+5. Opcional: **Compartido con el equipo** para que otros miembros lo usen en campañas.
+
+Los segmentos alimentan **Campañas** y pueden usarse como disparador de **Recorridos**.
+
+### Recorridos
+
+Secuencias automatizadas por contacto.
+
+1. Menú **Recorridos** → **Nuevo recorrido**: nombre, **disparador de entrada**, reinscripciones máximas (0 = una sola vez) y si está **Activo**.
+2. **Disparadores de entrada:** formulario enviado, entrada en segmento, cambio de ciclo de vida, clic en email de marketing, reserva creada o **manual**.
+3. Configura la **condición de entrada** según el disparador (formulario concreto, segmento, página de reservas, transición de lifecycle…).
+4. Opcional: **Producto (salida comercial)** y **Salir del recorrido si hay oportunidad abierta del producto** — cancela el nurturing cuando ya hay deal abierto con ese producto.
+5. Añade **pasos** (ordenados por posición):
+
+| Paso | Qué hace |
+|------|----------|
+| **Enviar email** | Plantilla + tipo de suscripción (respeta consentimiento) |
+| **Esperar** | Pausa N minutos |
+| **Condición** | Rama según campo del contacto |
+| **Establecer campo** | Cambia ciclo de vida |
+| **Añadir a lista** | Añade el contacto a una lista del CRM |
+| **Crear tarea** | Tarea comercial con vencimiento |
+| **Ajustar puntuación** | Suma o resta puntos |
+| **Notificar** | Aviso a un usuario del equipo |
+
+6. En recorridos **manuales**, abre la ficha del recorrido → **Inscribir contacto manualmente**.
+7. Desde la ficha del recorrido puedes **Pausar** / **Activar**, ver inscripciones activas y el paso actual de cada contacto.
+
+### Puntuación de leads
+
+1. Menú **Puntuación de leads** → **Nueva regla**: nombre, tipo de evento (email abierto, clic, formulario, visita web, deal creado…), puntos (+/-), decaimiento en días (0 = sin decaimiento) y condiciones adicionales.
+2. Las reglas **activas** se evalúan con los eventos de marketing; el **lead score** y el **lifecycle** del contacto se actualizan (recálculo completo también de noche).
+3. Etapas de lifecycle visibles en la ficha persona: *subscriber* → *lead* → *mql* → *sql* → *opportunity* → *customer* → *evangelist*.
+
+> **Importante:** el lifecycle de scoring **no** indica si hay una oportunidad (deal) abierta. Para ventas operativas mira los **Deals** del contacto.
+
+### Tracking web y landing pages
+
+**Snippet de tracking:** incluye en tu web un script servido por Cream:
+
+```html
+<script src="https://TU-DOMINIO-CREAM/cream.js" async></script>
+```
+
+Registra visitas y parámetros UTM; al enviar un formulario de captación, Cream intenta vincular la actividad anónima previa al contacto identificado.
+
+**Landing pages:** en **Formularios → Plantillas de formulario**, crea una plantilla con tipo **Landing page** e indica el **slug público**. La URL será `/p/slug-del-workspace/slug-de-la-landing`. El contenido es Liquid, como los formularios.
+
+### Atribución
+
+Menú **Atribución**:
+
+1. Filtra por **UTM source**, **UTM medium**, **UTM campaign** y **periodo** (mes, trimestre, año).
+2. La tabla agrupa por canal: **Visitas**, **Leads**, **MQL**, **Deals** e **Ingresos**.
+3. Pulsa los números de **Leads**, **MQL** o **Deals** para abrir listados filtrados por ese canal.
+
+Las campañas pueden definir UTMs que se propagan a los enlaces del email; los formularios y el tracking web alimentan el mismo informe.
+
+### Notas
+
+- Cualquier miembro puede usar campañas, segmentos, recorridos y atribución; **Settings → Mailjet** es solo **admins**.
+- Los envíos de campaña y recorridos **no llegan** a contactos dados de baja del tipo elegido ni a direcciones **suprimidas** (rebote, spam, baja global).
+- **Formularios** y captación detallada: [§27](#27-formularios-de-captación).
 
 ---
 
@@ -1157,6 +1350,7 @@ Estas funcionalidades existen en el código pero **no están disponibles** en la
 
 | Funcionalidad   | Estado actual |
 |-----------------|---------------|
+| **Mail merge**  | Envío masivo clásico a vista guardada, lista o IDs manuales; sustituido en la práctica por **Campañas** + **Segmentos** |
 | Slack           | Notificaciones parciales (solo cambio de etapa en deals) |
 | AI automations  | Hooks proactivos en automatizaciones (resumir al cerrar deal, scoring, etc.) |
 

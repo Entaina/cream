@@ -4,11 +4,14 @@ class Journey < ApplicationRecord
   ].freeze
 
   belongs_to :workspace
+  belongs_to :product, optional: true
   has_many :steps, class_name: "JourneyStep", dependent: :destroy, inverse_of: :journey
   has_many :enrollments, class_name: "JourneyEnrollment", dependent: :destroy
 
   validates :name, :entry_trigger, presence: true
   validates :entry_trigger, inclusion: { in: ENTRY_TRIGGERS }
+  validate :product_required_when_stop_on_open_deal
+  validate :product_belongs_to_workspace
 
   scope :active, -> { where(active: true) }
   scope :ordered, -> { order(:name, :id) }
@@ -27,5 +30,17 @@ class Journey < ApplicationRecord
 
   def all_blank_step?(attributes)
     attributes["step_type"].blank? && attributes["position"].blank?
+  end
+
+  def product_required_when_stop_on_open_deal
+    return unless stop_on_open_deal?
+
+    errors.add(:product, "is required when stop on open deal is enabled") if product_id.blank?
+  end
+
+  def product_belongs_to_workspace
+    return if product.nil? || workspace.nil?
+
+    errors.add(:product, "must belong to the workspace") if product.workspace_id != workspace_id
   end
 end

@@ -19,7 +19,48 @@ class LeadFormSubmissionProcessor
   # Returns nil (silent discard) when containment caps are exceeded.
   def call
     return nil if throttled?
+    return nil if lead_form.mql_destination? && !mql_capture_allowed?
 
+    if lead_form.mql_destination?
+      process_mql_capture
+    else
+      process_deal_capture
+    end
+  end
+
+  private
+
+  attr_reader :lead_form, :workspace, :params, :request, :product, :open_editions
+
+  def mql_capture_allowed?
+    CreamFeatures.enabled?(:mql_pool) && CreamFeatures.enabled?(:marketing_consent)
+  end
+
+  def process_mql_capture
+    validate_mql_submission_key!
+
+    existing = find_existing_mql_submission
+    return Result.new(submission: existing, deal: nil, person: existing.person) if existing
+
+    ActiveRecord::Base.transaction do
+      person, created = find_or_create_person!(lock_email: true)
+      fill_person_blanks!(person) unless created
+      company = resolve_company!(person:, created:)
+      fill_company_blanks!(company)
+      person.update!(company: company) if person.company_id != company.id
+      submission = persist_submission!(deal: nil, person:, capture_destination: "mql")
+      propagate_mql_consent!(person:, submission:)
+      person.update!(lifecycle_stage: "lead") if person.lifecycle_stage == "subscriber"
+      assign_campaign_from_utm!(submission)
+      link_anonymous_page_views!(person)
+      create_product_interest_from_form!(person:, submission:)
+      apply_marketing_events!(person:, submission:)
+      enqueue_mql_emails(submission:, person:)
+      Result.new(submission:, deal: nil, person:)
+    end
+  end
+
+  def process_deal_capture
     ActiveRecord::Base.transaction do
       person, created = find_or_create_person!
       fill_person_blanks!(person) unless created
@@ -29,30 +70,44 @@ class LeadFormSubmissionProcessor
       deal, deal_created = find_or_create_deal!(person:, company:)
       create_first_task!(deal) unless deal_created
       attach_deal_product!(deal)
-      submission = persist_submission!(deal:, person:)
+      submission = persist_submission!(deal:, person:, capture_destination: "deal")
       Marketing::ConsentService.propagate_from_lead_form!(
         person: person,
         workspace: workspace,
         params: params,
         request: request,
-        lead_form: lead_form
+        lead_form: lead_form,
+        privacy_policy_version: submission.privacy_policy_version
       )
       person.update!(lifecycle_stage: "lead") if person.lifecycle_stage == "subscriber"
       assign_campaign_from_utm!(submission)
       link_anonymous_page_views!(person)
-      Marketing::ScoringEngine.apply_event!(person: person, event: "lead_submission", metadata: submission.metadata)
-      Marketing::ScoringEngine.apply_event!(person: person, event: "form_field", metadata: submission.data)
-      Marketing::JourneyTrigger.enqueue_lead_form_submitted!(person: person, lead_form: lead_form)
-      Marketing::SegmentWatcher.sync_person!(person)
+      apply_marketing_events!(person:, submission:)
       Ai::AutomationHooks.score_deal(deal: deal)
-      enqueue_emails(submission:, deal:, person:)
+      enqueue_deal_emails(submission:, deal:, person:)
       Result.new(submission:, deal:, person:)
     end
   end
 
-  private
+  def find_existing_mql_submission
+    key = submission_key
+    return if key.blank?
 
-  attr_reader :lead_form, :workspace, :params, :request, :product, :open_editions
+    LeadSubmission.find_by(workspace: workspace, lead_form: lead_form, submission_key: key)
+  end
+
+  def submission_key
+    params["_submission_key"].presence
+  end
+
+  def validate_mql_submission_key!
+    key = submission_key
+    return if key.present? && key.match?(/\A[0-9a-f-]{36}\z/i)
+
+    submission = LeadSubmission.new
+    submission.errors.add(:submission_key, "is invalid or missing")
+    raise ActiveRecord::RecordInvalid, submission
+  end
 
   def throttled?
     form_throttled? || email_throttled?
@@ -90,10 +145,11 @@ class LeadFormSubmissionProcessor
     [ submission.created_at ]
   end
 
-  def find_or_create_person!
+  def find_or_create_person!(lock_email: false)
     validate_submission!
 
     email = normalized_email
+    lock_mql_email!(email) if lock_email && email.present?
 
     existing = workspace.people.with_email(email).first
     return [ existing, false ] if existing
@@ -109,6 +165,12 @@ class LeadFormSubmissionProcessor
       owner: lead_form.responsible
     )
     [ person, true ]
+  end
+
+  def lock_mql_email!(email)
+    ActiveRecord::Base.connection.execute(
+      ActiveRecord::Base.sanitize_sql_array([ "SELECT pg_advisory_xact_lock(hashtext(?))", "mql:#{workspace.id}:#{email}" ])
+    )
   end
 
   def fill_person_blanks!(person)
@@ -199,7 +261,7 @@ class LeadFormSubmissionProcessor
     stage = lead_form.resolve_stage(for_pipeline: pipeline)
     deal_name = [ person.display_name, lead_form.name ].compact.join(" — ")
     deal_name = "#{deal_name} (#{lead_form.help_type_label(params['help_type'])})" if params["help_type"].present?
-    deal = workspace.deals.create!(
+    workspace.deals.create!(
       name: deal_name,
       company: company,
       pipeline: pipeline,
@@ -208,7 +270,6 @@ class LeadFormSubmissionProcessor
       contacts: [ person ],
       tasks: [ Task.new(first_task_attributes) ]
     )
-    deal
   end
 
   def create_first_task!(deal)
@@ -250,22 +311,104 @@ class LeadFormSubmissionProcessor
     product.editions.not_started.find_by(id: edition_id)
   end
 
-  def persist_submission!(deal:, person:)
+  def persist_submission!(deal:, person:, capture_destination:)
     now = Time.current.iso8601
+    privacy_policy_version = resolve_privacy_policy_version
 
     LeadSubmission.create!(
       workspace: workspace,
       lead_form: lead_form,
       deal: deal,
       person: person,
+      privacy_policy_version: privacy_policy_version,
+      capture_destination: capture_destination,
+      submission_key: submission_key,
       data: submission_data,
       metadata: submission_metadata.merge(
-        Marketing::ConsentService.gdpr_audit_metadata(params:, request:, lead_form:)
+        Marketing::ConsentService.gdpr_audit_metadata(
+          params:, request:, lead_form:, privacy_policy_version:
+        )
       ).merge(
         "last_submitted_at" => now,
-        "submissions_at" => [ now ]
+        "submissions_at" => [ now ],
+        "capture_destination" => capture_destination
       )
     )
+  end
+
+  def resolve_privacy_policy_version
+    hash = params["privacy_policy_hash"].presence
+    return if hash.blank?
+
+    workspace.privacy_policy_versions.find_by(content_hash: hash)
+  end
+
+  def propagate_mql_consent!(person:, submission:)
+    return unless CreamFeatures.enabled?(:marketing_consent)
+
+    SubscriptionType.ensure_defaults!(workspace)
+    type = lead_form.subscription_type || workspace.subscription_types.active.find_by(slug: "general")
+    return unless type
+
+    subscription_metadata = subscription_consent_metadata(submission)
+
+    if params["marketing_consent"] == "1" || params["marketing_consent"] == true
+      Marketing::ConsentService.subscribe!(
+        person: person,
+        subscription_type: type,
+        source: "lead_form:#{lead_form.slug}",
+        legal_basis: "consent",
+        metadata: subscription_metadata.merge("marketing_consent_text" => lead_form.marketing_consent_text)
+      )
+    end
+
+    if params["newsletter_opt_in"] == "1" || params["newsletter_opt_in"] == true
+      newsletter_type = workspace.subscription_types.active.find_by(slug: "newsletter")
+      if newsletter_type
+        Marketing::ConsentService.subscribe!(
+          person: person,
+          subscription_type: newsletter_type,
+          source: "lead_form:#{lead_form.slug}",
+          legal_basis: "consent",
+          metadata: subscription_metadata
+        )
+      end
+    end
+  end
+
+  def subscription_consent_metadata(submission)
+    Marketing::ConsentService.consent_metadata(params:, request:, lead_form:).merge(
+      "lead_submission_id" => submission.id
+    ).merge(
+      Marketing::ConsentService.privacy_policy_trace(
+        privacy_policy_version: submission.privacy_policy_version,
+        params: params,
+        lead_form: lead_form
+      )
+    )
+  end
+
+  def create_product_interest_from_form!(person:, submission:)
+    product = resolved_product
+    return unless product
+
+    Marketing::ProductInterest.create!(
+      workspace: workspace,
+      person: person,
+      product: product,
+      source_kind: "lead_form",
+      lead_submission: submission,
+      description: "Lead form «#{lead_form.name}»",
+      occurred_at: Time.current,
+      metadata: { "lead_form_id" => lead_form.id, "lead_form_slug" => lead_form.slug }
+    )
+  end
+
+  def apply_marketing_events!(person:, submission:)
+    Marketing::ScoringEngine.apply_event!(person: person, event: "lead_submission", metadata: submission.metadata)
+    Marketing::ScoringEngine.apply_event!(person: person, event: "form_field", metadata: submission.data)
+    Marketing::JourneyTrigger.enqueue_lead_form_submitted!(person: person, lead_form: lead_form)
+    Marketing::SegmentWatcher.sync_person!(person)
   end
 
   def link_anonymous_page_views!(person)
@@ -278,9 +421,10 @@ class LeadFormSubmissionProcessor
   end
 
   def submission_data
-    excluded = LeadForm::METADATA_FIELDS + [ LeadForm::HONEYPOT_FIELD, LeadForm::TIMESTAMP_FIELD, "gdpr_consent" ]
+    excluded = LeadForm::METADATA_FIELDS + [ LeadForm::HONEYPOT_FIELD, LeadForm::TIMESTAMP_FIELD, "gdpr_consent", "marketing_consent", "_submission_key", "privacy_policy_hash" ]
     data = params.except(*excluded).reject { |_key, value| value.blank? }
     data["newsletter_opt_in"] = params["newsletter_opt_in"] == "1"
+    data["marketing_consent"] = params["marketing_consent"] == "1"
     data
   end
 
@@ -332,25 +476,39 @@ class LeadFormSubmissionProcessor
     )
   end
 
-  def enqueue_emails(submission:, deal:, person:)
+  def enqueue_mql_emails(submission:, person:)
     if lead_form.email_template
-      template = lead_form.email_template
-      extra_tokens = lead_email_tokens(submission:)
-      rendered_body = template.render_for(person, extra_tokens:)
-      rendered_subject = template.render_subject_for(person, extra_tokens:)
-
-      message = workspace.email_messages.create!(
-        user: lead_form.responsible,
-        record: deal,
-        to_address: person.email,
-        subject: rendered_subject,
-        body: rendered_body
-      )
-      attach_template_files(message, template)
-      SendViaGmailJob.perform_later(message.id)
+      send_response_email(submission:, record: person)
     end
+    notify_responsible!(submission:, deal: nil, person:)
+  end
 
+  def enqueue_deal_emails(submission:, deal:, person:)
+    if lead_form.email_template
+      send_response_email(submission:, record: deal)
+    end
     notify_responsible!(submission:, deal:, person:)
+  end
+
+  def send_response_email(submission:, record:)
+    template = lead_form.email_template
+    extra_tokens = lead_email_tokens(submission:)
+    rendered_body = template.render_for(record, extra_tokens:)
+    rendered_subject = template.render_subject_for(record, extra_tokens:)
+
+    message = workspace.email_messages.create!(
+      user: lead_form.responsible,
+      record: record,
+      to_address: person_from_submission(submission).email,
+      subject: rendered_subject,
+      body: rendered_body
+    )
+    attach_template_files(message, template)
+    SendViaGmailJob.perform_later(message.id)
+  end
+
+  def person_from_submission(submission)
+    submission.person
   end
 
   def assign_campaign_from_utm!(submission)
@@ -414,6 +572,8 @@ class LeadFormSubmissionProcessor
     value = case name
     when "newsletter_opt_in"
       params.key?("newsletter_opt_in") ? params["newsletter_opt_in"] == "1" : nil
+    when "marketing_consent"
+      params.key?("marketing_consent") ? params["marketing_consent"] == "1" : nil
     else
       params[name]
     end

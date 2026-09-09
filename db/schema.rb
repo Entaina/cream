@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_04_150000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_09_130000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -582,8 +582,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_04_150000) do
     t.string "entry_trigger", null: false
     t.integer "max_reenrollments", default: 0, null: false
     t.string "name", null: false
+    t.bigint "product_id"
+    t.boolean "stop_on_open_deal", default: false, null: false
     t.datetime "updated_at", null: false
     t.bigint "workspace_id", null: false
+    t.index ["product_id"], name: "index_journeys_on_product_id"
     t.index ["workspace_id"], name: "index_journeys_on_workspace_id"
   end
 
@@ -607,17 +610,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_04_150000) do
     t.boolean "active", default: true, null: false
     t.boolean "collects_company", default: false, null: false
     t.datetime "created_at", null: false
+    t.string "destination", default: "deal", null: false
     t.bigint "email_template_id"
     t.integer "first_task_due_days", default: 1, null: false
     t.string "first_task_title", default: "Contactar lead", null: false
     t.jsonb "hidden_field_keys", default: [], null: false
+    t.text "marketing_consent_text"
     t.string "name", null: false
-    t.bigint "pipeline_id", null: false
+    t.bigint "pipeline_id"
     t.jsonb "pipeline_routes", default: {}, null: false
     t.bigint "pipeline_stage_id"
     t.bigint "product_id"
     t.bigint "responsible_id", null: false
     t.string "slug", null: false
+    t.bigint "subscription_type_id"
     t.string "success_redirect_url"
     t.string "template_key", null: false
     t.datetime "updated_at", null: false
@@ -628,23 +634,31 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_04_150000) do
     t.index ["product_id"], name: "index_lead_forms_on_product_id"
     t.index ["responsible_id"], name: "index_lead_forms_on_responsible_id"
     t.index ["slug"], name: "index_lead_forms_on_slug", unique: true
+    t.index ["subscription_type_id"], name: "index_lead_forms_on_subscription_type_id"
     t.index ["workspace_id"], name: "index_lead_forms_on_workspace_id"
   end
 
   create_table "lead_submissions", force: :cascade do |t|
     t.bigint "campaign_id"
+    t.string "capture_destination", default: "deal", null: false
     t.datetime "created_at", null: false
     t.jsonb "data", default: {}, null: false
-    t.bigint "deal_id", null: false
+    t.bigint "deal_id"
     t.bigint "lead_form_id", null: false
     t.jsonb "metadata", default: {}, null: false
     t.bigint "person_id", null: false
+    t.bigint "privacy_policy_version_id"
+    t.string "submission_key"
     t.datetime "updated_at", null: false
     t.bigint "workspace_id", null: false
     t.index ["campaign_id"], name: "index_lead_submissions_on_campaign_id"
     t.index ["deal_id"], name: "index_lead_submissions_on_deal_id"
     t.index ["lead_form_id"], name: "index_lead_submissions_on_lead_form_id"
     t.index ["person_id"], name: "index_lead_submissions_on_person_id"
+    t.index ["privacy_policy_version_id"], name: "index_lead_submissions_on_privacy_policy_version_id"
+    t.index ["workspace_id", "lead_form_id", "person_id", "created_at"], name: "index_lead_submissions_on_form_person_created"
+    t.index ["workspace_id", "lead_form_id", "submission_key"], name: "index_lead_submissions_on_form_submission_key", unique: true, where: "(submission_key IS NOT NULL)"
+    t.index ["workspace_id", "person_id", "created_at"], name: "index_lead_submissions_on_person_created"
     t.index ["workspace_id"], name: "index_lead_submissions_on_workspace_id"
   end
 
@@ -786,6 +800,35 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_04_150000) do
     t.index ["user_id"], name: "index_mailjet_connections_on_user_id"
     t.index ["webhook_token"], name: "index_mailjet_connections_on_webhook_token", unique: true
     t.index ["workspace_id"], name: "index_mailjet_connections_on_workspace_id", unique: true
+  end
+
+  create_table "marketing_product_interests", force: :cascade do |t|
+    t.datetime "converted_at"
+    t.bigint "converted_by_id"
+    t.datetime "created_at", null: false
+    t.bigint "deal_id"
+    t.text "description"
+    t.text "dismissal_reason"
+    t.bigint "lead_submission_id"
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "occurred_at", null: false
+    t.bigint "person_id", null: false
+    t.bigint "product_id", null: false
+    t.bigint "recorded_by_id"
+    t.string "source_kind", default: "manual", null: false
+    t.string "status", default: "pending", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "workspace_id", null: false
+    t.index ["converted_by_id"], name: "index_marketing_product_interests_on_converted_by_id"
+    t.index ["deal_id"], name: "index_marketing_product_interests_on_deal_id"
+    t.index ["lead_submission_id", "product_id"], name: "index_mql_interests_on_submission_product", unique: true, where: "(lead_submission_id IS NOT NULL)"
+    t.index ["lead_submission_id"], name: "index_marketing_product_interests_on_lead_submission_id"
+    t.index ["person_id"], name: "index_marketing_product_interests_on_person_id"
+    t.index ["product_id"], name: "index_marketing_product_interests_on_product_id"
+    t.index ["recorded_by_id"], name: "index_marketing_product_interests_on_recorded_by_id"
+    t.index ["workspace_id", "person_id", "status"], name: "index_mql_interests_on_ws_person_status"
+    t.index ["workspace_id", "product_id", "status", "occurred_at"], name: "index_mql_interests_on_ws_product_status_occurred"
+    t.index ["workspace_id"], name: "index_marketing_product_interests_on_workspace_id"
   end
 
   create_table "memberships", force: :cascade do |t|
@@ -982,6 +1025,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_04_150000) do
     t.datetime "updated_at", null: false
     t.bigint "workspace_id", null: false
     t.index ["workspace_id"], name: "index_pipelines_on_workspace_id"
+  end
+
+  create_table "privacy_policy_versions", force: :cascade do |t|
+    t.string "content_hash", null: false
+    t.datetime "created_at", null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.text "policy_content", null: false
+    t.string "policy_path", null: false
+    t.text "statement_content", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "workspace_id", null: false
+    t.index ["workspace_id", "content_hash"], name: "index_privacy_policy_versions_on_workspace_id_and_content_hash", unique: true
+    t.index ["workspace_id"], name: "index_privacy_policy_versions_on_workspace_id"
   end
 
   create_table "products", force: :cascade do |t|
@@ -1548,18 +1604,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_04_150000) do
   add_foreign_key "journey_enrollments", "people"
   add_foreign_key "journey_enrollments", "workspaces"
   add_foreign_key "journey_steps", "journeys"
+  add_foreign_key "journeys", "products"
   add_foreign_key "journeys", "workspaces"
   add_foreign_key "lead_form_templates", "workspaces"
   add_foreign_key "lead_forms", "email_templates"
   add_foreign_key "lead_forms", "pipeline_stages"
   add_foreign_key "lead_forms", "pipelines"
   add_foreign_key "lead_forms", "products"
+  add_foreign_key "lead_forms", "subscription_types"
   add_foreign_key "lead_forms", "users", column: "responsible_id"
   add_foreign_key "lead_forms", "workspaces"
   add_foreign_key "lead_submissions", "campaigns"
   add_foreign_key "lead_submissions", "deals"
   add_foreign_key "lead_submissions", "lead_forms"
   add_foreign_key "lead_submissions", "people"
+  add_foreign_key "lead_submissions", "privacy_policy_versions"
   add_foreign_key "lead_submissions", "workspaces"
   add_foreign_key "list_entries", "lists"
   add_foreign_key "list_filter_states", "sessions"
@@ -1569,6 +1628,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_04_150000) do
   add_foreign_key "llmemory_edges", "llmemory_nodes", column: "subject_id"
   add_foreign_key "mailjet_connections", "users"
   add_foreign_key "mailjet_connections", "workspaces"
+  add_foreign_key "marketing_product_interests", "deals"
+  add_foreign_key "marketing_product_interests", "lead_submissions"
+  add_foreign_key "marketing_product_interests", "people"
+  add_foreign_key "marketing_product_interests", "products"
+  add_foreign_key "marketing_product_interests", "users", column: "converted_by_id"
+  add_foreign_key "marketing_product_interests", "users", column: "recorded_by_id"
+  add_foreign_key "marketing_product_interests", "workspaces"
   add_foreign_key "memberships", "pipelines", column: "current_pipeline_id", on_delete: :nullify
   add_foreign_key "memberships", "users"
   add_foreign_key "memberships", "workspaces"
@@ -1592,6 +1658,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_04_150000) do
   add_foreign_key "pipeline_stages", "pipelines"
   add_foreign_key "pipeline_stages", "workspaces"
   add_foreign_key "pipelines", "workspaces"
+  add_foreign_key "privacy_policy_versions", "workspaces"
   add_foreign_key "products", "workspaces"
   add_foreign_key "record_attachments", "users"
   add_foreign_key "record_attachments", "workspaces"

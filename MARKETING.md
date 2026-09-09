@@ -1,4 +1,4 @@
-CReaM está diseñado en torno a la gestión de pipelines de venta: personas, empresas y deals con etapas. Es decir, gestiona bien los SQL (Sales Qualified Leads) y no tiene nada para los MQL (Marketing Qualified Leads). Conceptualmente en Entaina tenemos los dos tipos, y la mitad de marketing hoy no existe en la aplicación: no hay dónde guardar los contactos que nos dan permiso para comunicarnos con ellos, ni forma de segmentarlos, ni de lanzarles campañas o secuencias de correo.
+CReaM gestiona personas, empresas y deals con etapas (SQL) y, desde 2026-09, también el **pool MQL**: contactos con permiso de marketing vigente, capturados por formularios con destino MQL, intereses por producto y conversión manual a SQL. El hub de marketing (suscripciones, campañas, segmentos, recorridos, scoring, tracking y atribución) está operativo; lo que sigue pendiente está listado al final de este documento.
 
 
 
@@ -70,3 +70,22 @@ Supresión: la baja no borra el contacto, lo marca inescribible (para no volver 
 Relación con lo que ya existe
 Beehiiv: hoy la newsletter de Entaina sale por Beehiiv. Decisión pendiente: si CReaM envía directamente (SMTP/API propia) o si CReaM es el cerebro (segmentos, disparadores) y Beehiiv el brazo que envía. Propuesta (adicional): empezar con CReaM como cerebro y el envío delegado, y decidir con datos de volumen. En cualquier caso, los suscriptores de Beehiiv tienen que existir como contactos MQL en CReaM (sync o importación periódica), o la «misma base de datos» se rompe el primer día.
 Portal de cliente (borrador aparte): el login del portal con email es una fuente de captura más, y las etapas de ciclo de vida de este documento son las mismas que gobiernan los niveles de servicio del portal. Los dos módulos comparten el modelo.
+
+## Estado de implementación (2026-09-09)
+
+**Implementado y activo**
+
+- Pool MQL (`MqlsController`, elegibilidad por suscripción + supresión, filtros compartidos con segmentos).
+- Formularios con destino Deal o MQL; envíos sin deal; idempotencia por `_submission_key` de servidor.
+- `Marketing::ProductInterest` (manual o desde formulario); conversión transaccional MQL→SQL (`MqlToSqlConverter`).
+- Trazabilidad formulario ↔ persona (envíos, consentimiento versionado, ficha de formulario).
+- Salida de recorridos por producto (`Journey#stop_on_open_deal`, `JourneyExit`); inscripción manual acotada al recorrido seleccionado.
+
+**Pendiente (posterior)**
+
+- Importación/sync Beehiiv con evidencia de consentimiento.
+- Conversión automática a deal por señales fuertes.
+- Scoring por producto (cola ordenada por señales de producto).
+- Evento explícito de entrega de proyecto (vuelta al pool sin deducir de `won`).
+- API de captura independiente de formularios Liquid.
+- SLA/asignación automática de MQLs.

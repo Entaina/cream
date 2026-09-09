@@ -62,7 +62,7 @@ class NotificationService
       kind: "lead_submission",
       title: "New lead",
       body: "#{lead_form.name}: #{person.display_name} (#{person.email})",
-      url: record_path_for(deal)
+      url: record_path_for(deal || person)
     )
   end
 

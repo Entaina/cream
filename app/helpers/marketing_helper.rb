@@ -120,6 +120,12 @@ module MarketingHelper
     parts << "formulario «#{filters['submitted_form_slug']}»" if filters["submitted_form_slug"].present?
     parts << "visitó URL «#{filters['visited_url']}»" if filters["visited_url"].present?
     parts << "sin suprimidos" if filters["exclude_suppressed"].in?([ true, "true", "1", 1 ])
+    parts << "oportunidad abierta: #{filters['open_deal']}" if filters["open_deal"].present? && filters["open_deal"] != "any"
+    parts << "sin oportunidad en producto #{filters['open_deal_product_id']}" if filters["open_deal_product_id"].present?
+    parts << "interés producto #{filters['interest_product_id']}" if filters["interest_product_id"].present?
+    parts << "historial producto #{filters['dealt_product_id']}" if filters["dealt_product_id"].present?
+    parts << "formulario #{filters['lead_form_id']}" if filters["lead_form_id"].present?
+    parts << "destino #{filters['capture_destination']}" if filters["capture_destination"].present? && filters["capture_destination"] != "any"
     parts.presence&.join("; ") || "Sin filtros"
   end
 

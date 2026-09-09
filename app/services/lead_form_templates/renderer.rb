@@ -1,12 +1,14 @@
 module LeadFormTemplates
   class Renderer
-    def initialize(workspace:, lead_form:, view_context:, params:, product: nil, open_editions: [], source: nil)
+    def initialize(workspace:, lead_form:, view_context:, params:, product: nil, open_editions: [], source: nil, privacy_policy_hash: nil, submission_key: nil)
       @workspace = workspace
       @lead_form = lead_form
       @view_context = view_context
       @params = params
       @product = product
       @open_editions = open_editions
+      @privacy_policy_hash = privacy_policy_hash
+      @submission_key = submission_key
       @source = source || Source.new(workspace: workspace)
       @field_renderer = FieldRenderer.new(view_context: view_context, params: params, open_editions: open_editions)
       @environment = self.class.build_environment
@@ -43,7 +45,9 @@ module LeadFormTemplates
         open_editions: @open_editions,
         form_action: @view_context.public_lead_form_path(@lead_form.slug),
         csrf_token: @view_context.form_authenticity_token,
-        privacy_url: @view_context.public_lead_form_privacy_path(@lead_form.slug)
+        privacy_url: @view_context.public_lead_form_privacy_path(@lead_form.slug),
+        privacy_policy_hash: @privacy_policy_hash,
+        submission_key: @submission_key
       }
     end
   end

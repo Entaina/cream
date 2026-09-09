@@ -11,7 +11,7 @@ module SidebarMenu
 
   CANONICAL_KEYS_BY_GROUP = {
     daily: %w[dashboard people companies deals tasks],
-    marketing: %w[marketing_campaigns marketing_segments journeys marketing_attribution lead_scoring marketing_consent email_templates],
+    marketing: %w[mql_pool marketing_campaigns marketing_segments journeys marketing_attribution lead_scoring marketing_consent email_templates],
     settings: %w[team products pipelines custom_fields alerts automations lead_forms stripe_payments webhooks reports workspace],
     profile: %w[profile gmail_sync calendar_booking lists api_tokens]
   }.freeze

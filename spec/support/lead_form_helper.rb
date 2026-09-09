@@ -159,6 +159,22 @@ module LeadFormHelper
   def valid_lead_form_timestamp
     LeadForm.signed_timestamp(at: 10.seconds.ago)
   end
+
+  def privacy_policy_hash_for(lead_form)
+    get public_lead_form_path(lead_form.slug)
+    match = response.body.match(/name="lead\[privacy_policy_hash\]"[^>]*value="([^"]+)"/)
+    match&.captures&.first
+  end
+
+  def submission_key_for(lead_form)
+    get public_lead_form_path(lead_form.slug)
+    match = response.body.match(/name="lead\[_submission_key\]"[^>]*value="([^"]+)"/)
+    match&.captures&.first
+  end
+
+  def contacto_lead_params_with_privacy(lead_form, overrides = {})
+    contacto_lead_params(overrides).merge("privacy_policy_hash" => privacy_policy_hash_for(lead_form))
+  end
 end
 
 RSpec.configure { |config| config.include LeadFormHelper }

@@ -27,6 +27,8 @@ class PersonMerger
       merge_deal_contacts!
       merge_person_relationships!
       merge_list_entries!
+      merge_product_interests!
+      merge_lead_submissions!
       merge_custom_field_values!
       update_record_references!
       reassign_stripe_payments!
@@ -140,6 +142,16 @@ class PersonMerger
         )
       end
     end
+  end
+
+  def merge_product_interests!
+    Marketing::ProductInterest.where(person_id: secondaries.map(&:id))
+      .update_all(person_id: primary.id, updated_at: Time.current)
+  end
+
+  def merge_lead_submissions!
+    LeadSubmission.where(person_id: secondaries.map(&:id))
+      .update_all(person_id: primary.id, updated_at: Time.current)
   end
 
   def merge_list_entries!

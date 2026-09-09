@@ -26,6 +26,7 @@ class Person < ApplicationRecord
   has_many :journey_enrollments, dependent: :destroy
   has_many :page_views, dependent: :nullify
   has_many :segment_memberships, dependent: :destroy
+  has_many :product_interests, class_name: "Marketing::ProductInterest", dependent: :destroy
 
   accepts_nested_attributes_for :person_emails, allow_destroy: true,
     reject_if: ->(attrs) { attrs[:address].blank? && attrs[:id].blank? }

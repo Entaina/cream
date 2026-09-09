@@ -4,7 +4,7 @@
 
 Cream is a **workspace**-based CRM for managing **people**, **companies** and **deals** (opportunities), with notes, tasks, lists and an activity history shared across the team.
 
-> **Last revision:** 2026-09-04 (Mailjet transactional checkbox in Settings)
+> **Last revision:** 2026-09-09 (navigation, profile, forms, mail merge and rest of manual)
 > This document describes the functionality **visible to the user**. Disabled features are listed at the end under "Coming soon".
 
 ---
@@ -101,30 +101,62 @@ If you belong to more than one workspace, the sidebar header shows the name of t
 
 The left sidebar concentrates the main navigation. On **small screens (mobile)** the menu is hidden by default: tap the **hamburger** icon (☰) in the page header to open it. Tap outside the menu, press **Escape** or navigate to another section to close it. On desktop the menu is always visible.
 
-| Section        | Description |
-|----------------|-------------|
-| **Search...**  | Global search. Keyboard shortcut: `/` |
-| **Notifications** | Workspace alerts (mentions, etc.) |
-| **Dashboard**  | Workspace overview |
-| **People**       | Contact people |
-| **Companies**    | Companies |
-| **Deals**        | Kanban board of opportunities |
-| **Products**     | Product catalog |
-| **Tasks**        | All workspace tasks |
-| **Mail merge**   | Personalized email sending to several records |
-| **Plantillas**   | Reusable email templates |
-| **Alertas**      | Date-based alert rules with deal/company conditions |
-| **Webhooks**     | Outgoing HTTP integrations |
-| **Stripe**       | Payments imported from Stripe and their reconciliation with deals |
-| **Pipelines**    | Sales pipeline configuration |
-| **API tokens**   | Tokens for MCP / API clients |
-| **Profile**      | User name and personal preferences in the workspace (pipeline, briefing, alert channels) |
-| **Settings**     | Workspace configuration (admins only): name, deal visibility, sales director, OKM, Mailjet |
-| **Team**         | Members and invitations |
-| **Custom fields**| Extra fields per record type |
-| **Lists**        | Custom lists (bottom of the menu) |
+Above the menu (**Search…**, **Notifications**) and below the **active pipeline** selector, entries are grouped as follows:
 
-Menu entries that depend on disabled features do not appear until they are enabled (see [Coming soon](#29-coming-soon)).
+**Daily use** (always visible, not collapsible):
+
+| Entry | Description |
+|-------|-------------|
+| **Search…** | Global search. Shortcut: `/` |
+| **Notifications** | Workspace alerts (mentions, alerts, forms, bookings…) |
+| **Dashboard** | Workspace overview |
+| **People** | Contacts; may include **saved views** submenu |
+| **Companies** | Companies; saved views |
+| **Deals** | Kanban board; saved views |
+| **Tasks** | All workspace tasks |
+
+**Marketing** (collapsible group; see [§29](#29-marketing)):
+
+| Entry | Description |
+|-------|-------------|
+| **Suscripciones** (Subscriptions) | List types and consent |
+| **Campañas** (Campaigns) | Bulk sends to segments |
+| **Segmentos** (Segments) | Filtered audiences |
+| **Atribución** (Attribution) | UTM report |
+| **Recorridos** (Journeys) | Automated sequences |
+| **Puntuación de leads** (Lead scoring) | Scoring rules |
+| **MQLs** | Marketing-qualified contact pool |
+| **Plantillas** (Templates) | Email templates (campaigns, records, forms) |
+
+**Configuración** (Settings group — **admins** only):
+
+| Entry | Description |
+|-------|-------------|
+| **Team** | Members and invitations |
+| **Products** | Product catalog |
+| **Pipelines** | Stages, triggers, conditions |
+| **Custom fields** | Custom fields |
+| **Alertas** (Alerts) | Date-based alert rules |
+| **Automations** | Event-driven automations |
+| **Formularios** (Forms) | Public web capture |
+| **Stripe** | Imported payments and reconciliation |
+| **Webhooks** | Outgoing HTTP integrations |
+| **Reports** | Reports and CSV export |
+| **Settings** | Workspace settings (OKM, Mailjet, permissions…) |
+
+**Mi perfil** (My profile — each user):
+
+| Entry | Description |
+|-------|-------------|
+| **Profile** | Name, default pipeline, AI briefing, alert channels |
+| **Gmail** | OAuth to send from records and detect replies |
+| **Reservas** (Bookings) | Public calendar booking pages |
+| **Mis listas** (My lists) | Workspace lists |
+| **API tokens** | MCP / REST API v1 tokens |
+
+You can also open **Profile** by clicking your **name** at the bottom of the sidebar.
+
+Entries for disabled features **do not appear** until enabled (see [Coming soon](#30-coming-soon)). Example today: **Mail merge**.
 
 ### Customizing the menu
 
@@ -133,7 +165,7 @@ Next to the **Menu** title in the sidebar there is a gear icon. Clicking it ente
 - **Reorder:** drag a section by the grab icon (⋮⋮) to the position you want.
 - **Hide or show:** use the eye icon on each section. Hidden entries no longer show in the normal menu, but remain visible (dimmed) while editing so you can restore them.
 
-Changes are saved automatically for **your user** when you leave edit mode (click the gear again). Each person in the workspace has their own configuration; it does not affect Search, Notifications or the Lists section.
+Changes are saved automatically for **your user** when you leave edit mode (click the gear again). Each person in the workspace has their own configuration; it does not affect Search or Notifications. You can hide entries from any group (including Marketing or My profile) without removing them from the workspace.
 
 ### Active pipeline
 
@@ -207,6 +239,8 @@ The list shows **50 records per page**. When there are more, a pagination bar ap
 - **Relationships between contacts:** in the left panel of the record, the **Relationships** section lets you link this person with another one in the workspace. Choose the other person, the relationship type (**Invitó a**, **Referido por**, **Trabajó con**, **Colega de** — invited, referred by, worked with, colleague of) and click **Add**. The relationship is stored with a direction: what you declare from the current record is the origin (for example, «Ana invitó a Bruno» — Ana invited Bruno). On Bruno's record you will see the consistent inverse label («invitado por Ana» — invited by Ana). You can delete the relationship from either of the two records; it disappears from both.
 - **Create a deal from the record:** click **Add deal** in the top bar. A dialog opens where you choose the **pipeline** (by default yours from *Settings → Profile*, or the workspace's if you don't have one), the **product** and the **first action** (title and date). The deal is created in the **first stage** of the chosen pipeline, with the person's company and contact; the name is generated as «Empresa — Producto» (Company — Product). After creating it you go to the deal page. If there are validation errors, they are shown inside the same dialog without leaving the record. If there are no products in the catalog, the dialog tells you that you must create one first.
 - **Person's deals:** in the left panel, the **Deals** section lists deals where the person is an active contact, sorted by creation date (newest first). Each row shows the name (link to the deal page), the current **stage**, the date and the deal line **products**. If there are deals with more than one distinct product, an **All products** dropdown appears to filter the list by product.
+- **Subscriptions** (marketing): when the consent module is active, the left panel lists each **subscription type** (general, newsletter, etc.) with its status (**Suscrito** / Subscribed, **Dado de baja** / Unsubscribed or **Pendiente** / Pending). You can **Suscribir** / **Subscribe** or **Dar de baja** / **Unsubscribe** manually, and copy the link to the contact's **preference center** (see [§29](#29-marketing)).
+- **Lead score** and **Lifecycle**: with lead scoring enabled, the left panel shows the numeric score and lifecycle stage (*subscriber*, *lead*, *mql*, *sql*, *opportunity*, *customer*, *evangelist*). Lifecycle reflects automatic scoring; it is **not** the same as having an open sales **deal**.
 
 **Possible duplicates**
 
@@ -344,11 +378,12 @@ When typing a task **title** you can mention a workspace teammate:
 
 ## 8. Lists
 
-**Lists** group records of a single type (Person, Company or Deal) with a name and a color. They appear at the bottom of the sidebar.
+**Lists** group records of a single type (Person, Company or Deal) with a name and a color. They live under **Mi perfil** → **Mis listas** (My lists); the submenu gives quick access to each list.
 
-- Create a list with the **+** button next to «Lists».
+- Create a list with the **+** button next to **Mis listas**.
 - Add or remove records from the record page or from the list view.
-- Useful for campaign segmentation, manual follow-up or ad hoc groupings.
+- **Journeys** can include an **Add to list** step to add contacts automatically.
+- For bulk email with consent and metrics use **Campaigns** + **Segments** ([§29](#29-marketing)); CRM lists are useful for manual follow-up and journey steps.
 
 ---
 
@@ -465,7 +500,7 @@ In the people, companies and deals tables, Cream adds automatically calculated c
 
 When you open a person, company or deal you will see:
 
-**Left panel (attributes):** main data, custom fields, relationships between contacts (people only), lists it belongs to and (for deals) the pipeline and stage selector.
+**Left panel (attributes):** main data, custom fields, relationships between contacts (people only), lists it belongs to and (for deals) the pipeline and stage selector. On **people**, depending on enabled features, you may also see **Subscriptions**, **Lead score**, **Lifecycle**, **Product interests** and **Form submissions** (see [§29 Marketing](#29-marketing)).
 
 > **On mobile** the record page shows one panel at a time: swipe left or right to switch between the attributes panel and the main column.
 
@@ -560,7 +595,7 @@ Emails you send **from a client's record** (person, company or deal) are stored 
 - the email list (sent and **Received** if applicable): subject, recipient or sender, body and labels such as **Sent**, **Opened**, **Replied** or **Received**
 - the related activity in the **Timeline** (sends, opens, clicks, detected replies)
 
-The same applies to **Mail merge** sends: each email appears on the corresponding record's page and is visible to the whole workspace team.
+The same applies to **Campaign** sends when each recipient is tracked on their record in the CRM.
 
 **There are no per-user private emails** within the same workspace: anything sent from a record is part of the team's shared history for that client. Visibility of **deals** depends on the role (see [Roles](#roles)); people and companies remain visible to the whole workspace.
 
@@ -636,28 +671,11 @@ account; do not share authorization links or tokens.
 - **Variables:** use `{first_name}`, `{last_name}`, `{name}`, `{company}` and `{email}` in the subject or body; when inserted they are replaced with the record's data. Texts in square brackets such as `[Nombre del curso]` or `[fechas]` are placeholders you must fill in manually after loading the template.
 - **Use in an email:** in the **Send email** section of a record (Person, Company or Deal), open **Insertar plantilla…** (Insert template…) and pick one. The subject and body are filled in automatically with the variables already substituted for that contact. You can edit the message with the same rich text editor before sending. If there are no templates yet, you will see a link to create them.
 
-### Bulk sending (Mail merge)
+### Bulk sending
 
-**Mail merge** sends the same **personalized** email to several records at once.
+For bulk communication with consent and metrics use **Campaigns** + **Segments** ([§29](#29-marketing)): choose audience, subscription type, template, scheduling and A/B tests.
 
-#### How to access
-
-**Mail merge** entry in the sidebar menu.
-
-#### Steps
-
-1. In **Recipients**, choose who to send to:
-   - a **saved view** (all records matching its filters),
-   - a **list**, or
-   - **Enter record IDs manually** to provide comma-separated IDs.
-   The text below the selector shows **how many recipients** will receive the email.
-2. Optional: choose a **template**; if you use one, its body is sent (personalized per recipient). If not, compose the form's **Subject** and **Body** with the rich text editor.
-3. Use variables such as `{name}` or `{first_name}` in the subject and body to personalize each send.
-4. Click **Send mail merge**. Each email is recorded on the corresponding record's page, with open tracking just like an individual send.
-
-> **Notes**
-> - Emails are only sent to records with an email address (for deals, the first contact's email is used).
-> - Each send is linked to its record and shares a batch identifier.
+> **Mail merge** (manual send to saved view, list or IDs) is **disabled** in the menu; see [Coming soon](#30-coming-soon). **Send email** from a record page remains available one record at a time.
 
 ---
 
@@ -686,7 +704,7 @@ account; do not share authorization links or tokens.
 ### Notes
 
 - **Inactive** automations do not run.
-- *Notify Slack* does nothing until the Slack integration is enabled (see [Coming soon](#29-coming-soon)).
+- *Notify Slack* does nothing until the Slack integration is enabled (see [Coming soon](#30-coming-soon)).
 
 ### Stage triggers (AI)
 
@@ -795,7 +813,18 @@ Invitees accept with the link they received and create an account, or sign in if
 
 ## 21. Workspace settings
 
-In **Settings** (admins only):
+### My profile (Profile)
+
+Available to **all members** under **Profile** ( **Mi perfil** menu group, or click your name at the bottom of the sidebar). Personal preferences **in the active workspace**:
+
+1. **Personal details** — your **name** (shown in mentions and activity). Account email is read-only.
+2. **Default pipeline** — pipeline selected at sign-in, in the sidebar selector and in the Gmail add-on ([§3](#3-navigation)).
+3. **Sales director briefing** — checkbox to show or hide the AI block on the dashboard ([§4](#4-dashboard)). Only shown if an admin enabled it in workspace **Settings** and AI is configured on the server.
+4. **Alertas** (Alerts) — **In-app notification (bell)** and **Email** channels for configured alerts, **form submissions** (if you are the owner) and **calendar bookings** (if you are the host). If you disable both, you will not receive those notices ([§17](#17-configurable-alerts), [§19](#19-notifications)).
+
+### Workspace settings (Settings)
+
+In **Settings** (**admins** only):
 
 ### General
 
@@ -1030,31 +1059,53 @@ In the sidebar menu, open **Formularios** (Forms).
 ### Setting up a form
 
 1. Click **Nuevo formulario** (New form).
-2. Provide the **name**, the **slug** (it will appear in the public URL `/f/slug`), the form **template**, the **pipeline** where the deal will be created, the optional **stage** (after choosing the pipeline), the **owner** (receives the notification and the follow-up task), the **first task text** and **days until due** (from deal creation when the form is submitted; 0 = same day), and the **email template** that will be sent to the lead.
-3. Optional: set a **redirect URL after submission** (e.g. `https://example.com/thanks`) to send the visitor to a page on your site. If left blank, Cream's thank-you page is shown (`/f/slug/success`).
-4. Optional: define **additional hidden fields** (one per line, e.g. `producto`, `landing`). Their values are passed as query params in the public or iframe URL, e.g. `/f/slug?producto=curso-ia`. They are saved with the submission and shown on the deal under **Formulario de origen** (Source form).
-5. Optional: select a **product** from the catalog if the form should attach a product line to the deal (e.g. course reservations). Visitors can override it with `?product_id=` in the URL. Reservation templates show that product's **open editions**.
-6. Check **Recoger datos de empresa** (Collect company data) if the form should ask for the company name and tax ID (CIF). When enabled, submissions with an empty company name still succeed server-side (a placeholder company is used); mark the field `required: true` in the template if you want to enforce it in the browser.
-7. Save. In the list you will see the **public URL** and the **iframe code** ready to copy.
+2. Provide the **name**, the **slug** (it will appear in the public URL `/f/slug`), the form **template** and whether the form is **Activo** (Active).
+3. Under **Destino del envío** (Submission destination), choose **Deal (ventas)** / Deal (sales) or **MQL (marketing)**. Deal creates or reuses an opportunity (flow below). MQL captures the person, consent and submission history **without creating a deal** (see [§29 MQL pool](#mql-pool)). For MQL destination you can set the **subscription type** and **marketing consent text** shown to visitors.
+4. Under **CRM y asignación** (CRM and assignment) — Deal destination only: **pipeline**, optional **stage**, **owner** (receives notification and follow-up task), optional **product** and pipeline routes by field value.
+5. Configure the **first task** (text and days until due; 0 = same day) and the **email template** to the lead (or **Sin email** / No email).
+6. Optional: set a **redirect URL after submission** (e.g. `https://example.com/thanks`) to send the visitor to a page on your site. If left blank, Cream's thank-you page is shown (`/f/slug/success`).
+7. Optional: define **additional hidden fields** (one per line, e.g. `producto`, `landing`). Their values are passed as query params in the public or iframe URL, e.g. `/f/slug?producto=curso-ia`. They are saved with the submission and shown on the deal under **Formulario de origen** (Source form) or in the contact's history.
+8. Check **Recoger datos de empresa** (Collect company data) if the form should ask for the company name and tax ID (CIF). When enabled, submissions with an empty company name still succeed server-side (a placeholder company is used); mark the field `required: true` in the template if you want to enforce it in the browser.
+9. Save. In the list you will see the **public URL**, the **privacy policy** link (`/f/slug/privacy`) and the **iframe code** ready to copy.
+
+### Form detail page (View)
+
+From the list, **Ver** (View) opens the form detail:
+
+- **Destino Deal** or **Destino MQL** badge and link to the public URL.
+- **MQL captados** (MQL captured) — people who submitted with MQL destination from this form: submission count, first and last capture, and whether they are **eligible** for marketing now.
+- **Envíos recientes** (Recent submissions) — all submissions (Deal or MQL) with a **Detalle** (Detail) link to the full submission record, including the **Consentimiento aceptado** (Consent accepted) block (versioned policy, hash and texts).
 
 ### Form templates (administrators)
 
 The **layout and fields** of each public page are defined in **Liquid** templates stored in the workspace, not in the form record itself.
 
 1. From **Formularios** (Forms), click **Plantillas de formulario** (Form templates) — administrators only.
-2. Filter by **Páginas** (Pages — full forms, e.g. `contacto`, `liderando_ia_reserva`) or **Parciales** (Partials — reusable blocks: contact fields, GDPR consent, etc.).
+2. Filter by **Páginas** (Pages — full forms), **Parciales** (Partials — contact fields, GDPR consent…) or **Landing page** (marketing pages at `/p/workspace-slug/landing-slug`; see [§29](#29-marketing)).
 3. **Edit** opens a syntax-highlighted Liquid editor. Pages use tags such as `{% field %}`, `{% partial 'contact_fields' %}`, `{% form_open %}`, and variables like `{{ lead_form.name }}`.
-4. **New template**: enter a short **name** (e.g. `my_form` for a page, or `my_block` for a partial) and check **Es un parcial** (Is a partial) if it is not a full page.
-5. After creating or changing a **page** template, select that name in **Plantilla del formulario** (Form template) when configuring a capture form.
+4. **New template**: enter a short **name**, choose **type** (lead form or landing) and, if applicable, check **Es un parcial** (Is a partial).
+5. After creating or changing a **lead page** template, select that name in **Plantilla del formulario** (Form template) when configuring a capture form. The `privacy` template defines the policy linked from each public form.
 
 If a page template does not exist in the workspace, the public URL `/f/slug` will return an error.
 
-### What happens when a form is submitted
+### Privacy policy and consent
+
+- Each public form links to a **privacy policy** page (`/f/slug/privacy`). Content is defined in **Plantillas de formulario** (Form templates) → `privacy` template (editable by administrators).
+- Visitors must check the **data protection consent** (GDPR) box to submit. Templates may optionally offer **newsletter** or other marketing opt-ins; if accepted, the corresponding subscription is recorded (see [§29](#29-marketing)).
+- When the form loads, Cream stores an **immutable version** of the policy and checkbox text. Each submission is linked to that version (date, URL, hash and accepted content). Full detail is under **Formularios → Ver → Envíos recientes → Detalle**, or on the contact record → **Form submissions**. On deals, **Formulario de origen** shows submission answers but not the extended consent block.
+
+### What happens when a form is submitted (Deal destination)
 
 - A **person** is created or reused by email (source "Formulario web"). If the person already existed, only blank fields are filled in (name, last name, phone, job title…).
 - If that person already has an **open deal** in the form's pipeline, that deal is **reused**: new form data is added to the submission (without creating another deal or another follow-up task). If you configured a **stage**, the deal advances to it only when it is in an earlier stage (it never moves backwards). If there is no open deal in that pipeline (for example, only won or lost deals, or deals in another pipeline), a new deal is created in the configured stage or, if none is set, in the pipeline's **first stage**, with the form's configured **first task** (default: **Contactar lead** / Contact lead, due the next day) assigned to the owner.
 - The submission data (form fields, source page, UTM, browser, IP…) is saved and visible on the deal's page, under **Formulario de origen** (Source form).
 - The lead receives the configured email; the owner is notified according to their channels in **Settings → Profile → Alertas** (bell and/or email), with the data and a link to the deal.
+
+### What happens when a form is submitted (MQL destination)
+
+- The **person** is created or updated and the **submission** is saved with MQL destination (no deal).
+- If the visitor accepts the marketing permission configured on the form, the **subscription** to the chosen type is created or updated, with the same policy version traceability as the submission.
+- Submission history and product interests appear on the contact record. From there you can **Convertir a SQL** (Convert to SQL) when there is commercial interest (see [§29](#29-marketing)).
 
 ### Notes
 
@@ -1139,15 +1190,157 @@ Three-step flow: choose event type → calendar and time (with an ES/EN time zon
 
 ## 29. Marketing
 
-Marketing hub for consent, campaigns, segments, attribution, journeys and scoring. Sidebar: **Suscripciones**, **Campañas**, **Segmentos**, **Atribución**, **Recorridos**, **Puntuación de leads**.
+The **marketing hub** connects web capture, email consent, bulk sends, segmentation, automated journeys, lead scoring, web tracking and UTM attribution. It builds on **lead capture forms** ([§27](#27-lead-capture-forms)) and **Mailjet** configuration in **Settings** ([§21](#21-workspace-settings)) for campaigns and open/click metrics.
 
-- **Consent**: per-type subscriptions (general, newsletter, product, events); per-list unsubscribe; global opt-out from preference center; manage from person record.
-- **Campaigns**: send or schedule to person segments, subscription type, A/B with Liquid, test email, A/B winner. Requires Mailjet in workspace **Settings** (per-workspace webhook).
-- **Segments**: demographic and behavioral filters with live preview.
-- **Journeys**: multi-step sequences (consent-aware email, wait, branch, list, task, scoring); manual enrollment.
-- **Scoring**: rules with conditions, nightly recalc, lifecycle on person records.
-- **Tracking**: `cream.js` snippet, landing pages at `/p/:workspace/:slug`, `cream_aid` linked on form submit.
-- **Attribution**: UTM dashboard with drill-down to people/deals.
+### How to access
+
+In the sidebar (depending on features enabled in your workspace):
+
+| Menu | Purpose |
+|------|---------|
+| **Suscripciones** (Subscriptions) | List types (newsletter, general, etc.) |
+| **Campañas** (Campaigns) | Bulk sends to segments |
+| **Segmentos** (Segments) | Filtered person audiences |
+| **Atribución** (Attribution) | UTM report |
+| **Recorridos** (Journeys) | Automated sequences |
+| **Puntuación de leads** (Lead scoring) | Scoring rules and lifecycle |
+| **Formularios** (Forms) | Public capture (Deal or MQL) |
+| **MQLs** | Marketing-qualified contact pool |
+
+### MQL pool
+
+Contacts with **active marketing permission** (subscribed to the chosen type, valid primary email and not suppressed). The pool is independent of scoring lifecycle: a customer with permission can remain in the pool while having open opportunities on other products.
+
+**How to access:** **MQLs** menu.
+
+**Steps:**
+
+1. Open **MQLs**. The table shows person, lifecycle (scoring), score, source forms, pending interests and visible opportunities.
+2. Filter by search, **subscription type**, **open opportunity** (any / yes / no), **product** (of the opportunity), **product interest** or **source form**.
+3. From a row with a pending interest, click **Convertir a SQL** (Convert to SQL) to create or link an opportunity for that product (pipeline, task and owner).
+
+**On a person's record:**
+
+- **Product interests** — record a commercial signal manually (product + description) or from an MQL form with a product. States: pending, converted or dismissed.
+- **Form submissions** — submission history grouped by form, with a link to detail (answers, destination, consent).
+
+**Notes:**
+
+- **Convert to SQL** requires permission to create deals. If an open opportunity already exists for the same product, Cream offers to link instead of duplicating.
+- Scoring lifecycle (*mql*, *sql*, etc.) **does not** indicate an open deal; check **Visible opportunities** or the contact record.
+- Journeys can be configured with **Exit journey if open opportunity for product** to pause commercial nurturing.
+
+### Subscriptions and consent
+
+**Subscription types** (menu **Suscripciones**):
+
+1. Click **Nuevo tipo** (New type).
+2. Enter **name**, **slug**, **description** (shown in the contact preference center) and **order**.
+3. Check **Activo** (Active) and save. Cream creates default types such as *general* and *newsletter* when you use the module.
+
+**On a person's record** (left panel → **Subscriptions**):
+
+- Each type shows its status: **Suscrito** (Subscribed), **Dado de baja** (Unsubscribed) or **Pendiente** (Pending).
+- **Suscribir** / **Subscribe** or **Dar de baja** / **Unsubscribe** changes permission manually (with confirmation).
+- Copy the **preference center** URL and share it with the contact.
+
+**Preference center (contact's public page):**
+
+- The contact selects which lists to receive and clicks **Guardar preferencias** (Save preferences).
+- **Darse de baja de todas las comunicaciones** (Unsubscribe from all communications) suppresses the address for marketing (without affecting CRM transactional email unless suppressed for bounce/spam).
+
+**Two different consents on forms:**
+
+| Consent | What it is | Where configured |
+|---------|------------|------------------|
+| **Data protection (GDPR)** | Required to submit any form | `consent_fields` partial in templates |
+| **Marketing / newsletter** | Optional; activates a subscription | Checkboxes in template + type on MQL form |
+
+Subscriptions created from a form store the same **privacy policy version** as the submission (see [§27](#27-lead-capture-forms)).
+
+### Campaigns
+
+1. Menu **Campañas** → **Nueva campaña** (New campaign): name, goal, start date and **UTM** parameters (added to email links for attribution).
+2. Open the campaign. Under **Enviar campaña** (Send campaign) choose:
+   - **Person segment** (required; shows how many recipients match).
+   - **Email template**.
+   - **Subscription type**: only contacts **subscribed** to that type receive the send.
+   - **Schedule send** (optional): date and time; leave blank for immediate send when you click **Encolar envío** (Queue send).
+3. **A/B test (optional):** subject and body for variants A and B with weights (%). If you fill A/B subjects, they replace the base template subject.
+4. **Send test to your email:** pick template and optional test subject/body.
+5. After sending, review **Historial de envíos** (Send history). With A/B you can **Marcar ganadora** (Mark winner) and **Enviar ganadora al resto** (Send winner to the rest) to those who did not receive it.
+
+**Requirements:** Mailjet connected under **Settings → Mailjet** and the **webhook URL** registered in Mailjet for opens, clicks and unsubscribes (see [§21](#21-workspace-settings)). Without Mailjet, sends use server SMTP/Mailbin.
+
+### Segments
+
+1. Menu **Segmentos** → **Nuevo segmento** (New segment).
+2. Choose **record type** (people) and set **filters**: search, lifecycle, email, score, recent email opens, form submitted, visited URL, open opportunity, product interest, commercial history, source form, etc.
+3. Check **Excluir direcciones suprimidas** (Exclude suppressed addresses) to respect bounces and global opt-outs.
+4. After saving, **preview** shows how many records match (updates when you save changes).
+5. Optional: **Compartido con el equipo** (Shared with the team) so others can use it in campaigns.
+
+Segments feed **Campaigns** and can trigger **Journeys**.
+
+### Journeys
+
+Automated per-contact sequences.
+
+1. Menu **Recorridos** → **Nuevo recorrido** (New journey): name, **entry trigger**, max re-enrollments (0 = once only) and **Activo** (Active).
+2. **Entry triggers:** form submitted, segment entry, lifecycle change, marketing email click, booking created or **manual**.
+3. Set the **entry condition** for the trigger (specific form, segment, booking page, lifecycle transition…).
+4. Optional: **Product (commercial exit)** and **Salir del recorrido si hay oportunidad abierta del producto** (Exit journey if open opportunity for product) — stops nurturing when there is already an open deal for that product.
+5. Add **steps** (ordered by position):
+
+| Step | Action |
+|------|--------|
+| **Enviar email** (Send email) | Template + subscription type (respects consent) |
+| **Esperar** (Wait) | Pause N minutes |
+| **Condición** (Condition) | Branch on contact field |
+| **Establecer campo** (Set field) | Change lifecycle |
+| **Añadir a lista** (Add to list) | Add contact to a CRM list |
+| **Crear tarea** (Create task) | Sales task with due date |
+| **Ajustar puntuación** (Adjust score) | Add or subtract points |
+| **Notificar** (Notify) | Alert a team user |
+
+6. For **manual** journeys, open the journey page → **Inscribir contacto manualmente** (Enroll contact manually).
+7. From the journey page you can **Pausar** / **Activar** (Pause / Activate), view active enrollments and each contact's current step.
+
+### Lead scoring
+
+1. Menu **Puntuación de leads** → **Nueva regla** (New rule): name, event type (email opened, click, form, web visit, deal created…), points (+/-), decay in days (0 = no decay) and additional conditions.
+2. **Active** rules are evaluated on marketing events; the contact's **lead score** and **lifecycle** update (full recalculation also runs nightly).
+3. Lifecycle stages on the person record: *subscriber* → *lead* → *mql* → *sql* → *opportunity* → *customer* → *evangelist*.
+
+> **Important:** scoring lifecycle **does not** indicate an open sales **deal**. For operational sales, check the contact's **Deals**.
+
+### Web tracking and landing pages
+
+**Tracking snippet:** add this script to your site (served by Cream):
+
+```html
+<script src="https://YOUR-CREAM-DOMAIN/cream.js" async></script>
+```
+
+It records visits and UTM parameters; when a capture form is submitted, Cream tries to link prior anonymous activity to the identified contact.
+
+**Landing pages:** in **Formularios → Plantillas de formulario**, create a template with type **Landing page** and set the **public slug**. URL: `/p/workspace-slug/landing-slug`. Content is Liquid, like lead forms.
+
+### Attribution
+
+Menu **Atribución**:
+
+1. Filter by **UTM source**, **UTM medium**, **UTM campaign** and **period** (month, quarter, year).
+2. The table groups by channel: **Visitas** (Visits), **Leads**, **MQL**, **Deals** and **Ingresos** (Revenue).
+3. Click **Leads**, **MQL** or **Deals** numbers to open filtered lists for that channel.
+
+Campaigns can define UTMs propagated to email links; forms and web tracking feed the same report.
+
+### Notes
+
+- Any member can use campaigns, segments, journeys and attribution; **Settings → Mailjet** is **admins** only.
+- Campaign and journey sends **do not reach** contacts unsubscribed from the chosen type or **suppressed** addresses (bounce, spam, global opt-out).
+- **Forms** and detailed capture: [§27](#27-lead-capture-forms).
 
 ---
 
@@ -1157,6 +1350,7 @@ These features exist in the code but are **not available** in the interface unti
 
 | Feature   | Current status |
 |-----------------|---------------|
+| **Mail merge**  | Classic bulk send to saved view, list or manual IDs; practically replaced by **Campaigns** + **Segments** |
 | Slack           | Partial notifications (deal stage changes only) |
 | AI automations  | Proactive hooks in automations (summarize on deal close, scoring, etc.) |
 

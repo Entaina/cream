@@ -21,10 +21,12 @@
       <div class="flex items-center gap-2">
         <h2 class="font-semibold text-base"><%= form.name %></h2>
         <%= badge form.active? ? "Activo" : "Inactivo", color: form.active? ? "green" : "chicago" %>
+        <%= badge form.destination == "mql" ? "MQL" : "Deal", color: form.destination == "mql" ? "hoki" : "chicago" %>
         <% if form.collects_company? %>
           <%= badge "Con empresa", color: "hoki" %>
         <% end %>
         <div class="ml-auto flex gap-2">
+          <%= link_to "Ver", lead_form_path(form), class: "btn-secondary" %>
           <%= link_to "Editar", edit_lead_form_path(form), class: "btn-secondary" %>
           <%= button_to "Eliminar", lead_form_path(form), method: :delete, class: "btn-danger" %>
         </div>
@@ -32,7 +34,7 @@
 
       <dl class="grid gap-2 text-sm sm:grid-cols-2">
         <div><dt class="text-ink-faint">Plantilla</dt><dd><%= form.template_key %></dd></div>
-        <div><dt class="text-ink-faint">Pipeline</dt><dd><%= form.pipeline.name %></dd></div>
+        <div><dt class="text-ink-faint">Pipeline</dt><dd><%= form.pipeline&.name || "—" %></dd></div>
         <div><dt class="text-ink-faint">Responsable</dt><dd><%= form.responsible.name %></dd></div>
         <div><dt class="text-ink-faint">Email al lead</dt><dd><% if form.email_template %><%= link_to form.email_template.name, edit_email_template_path(form.email_template), class: "text-accent hover:underline" %><% else %><span class="text-ink-faint">Sin email</span><% end %></dd></div>
       </dl>

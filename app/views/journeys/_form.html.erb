@@ -33,6 +33,17 @@
 
   <label class="flex items-center gap-2 text-base"><%= f.check_box :active %> Activo</label>
 
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-3 border border-line rounded-lg p-3">
+    <div>
+      <%= f.label :product_id, "Producto (salida comercial)", class: "label" %>
+      <%= f.collection_select :product_id, current_workspace.products.ordered, :id, :name,
+            { include_blank: "Ninguno" }, class: "input w-full" %>
+    </div>
+    <label class="flex items-center gap-2 text-sm pt-6">
+      <%= f.check_box :stop_on_open_deal %> Salir del recorrido si hay oportunidad abierta del producto
+    </label>
+  </div>
+
   <% config = journey.entry_config.to_h.stringify_keys %>
   <fieldset class="space-y-3 border border-line rounded-lg p-3">
     <legend class="text-sm font-semibold px-1">Condición de entrada</legend>

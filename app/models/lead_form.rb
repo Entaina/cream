@@ -1,4 +1,6 @@
 class LeadForm < ApplicationRecord
+  DESTINATIONS = %w[deal mql].freeze
+
   PLACEHOLDER_COMPANY_NAME = "Particulares".freeze
   HONEYPOT_FIELD = "_honeypot".freeze
   TIMESTAMP_FIELD = "_ts".freeze
@@ -12,7 +14,7 @@ class LeadForm < ApplicationRecord
     utm_source utm_medium utm_campaign utm_term utm_content
   ].freeze
   SYSTEM_FIELD_KEYS = (
-    METADATA_FIELDS + [ HONEYPOT_FIELD, TIMESTAMP_FIELD, "gdpr_consent" ]
+    METADATA_FIELDS + [ HONEYPOT_FIELD, TIMESTAMP_FIELD, "gdpr_consent", "marketing_consent", "_submission_key", "privacy_policy_hash" ]
   ).freeze
   FIELD_KEY_FORMAT = /\A[a-z][a-z0-9_]{0,39}\z/
   # Datos del envío que viajan como query params a la URL de redirección tras envío,
@@ -22,15 +24,18 @@ class LeadForm < ApplicationRecord
   REDIRECT_PREFILL_KEYS = %w[first_name last_name email phone].freeze
 
   belongs_to :workspace
-  belongs_to :pipeline
+  belongs_to :pipeline, optional: true
   belongs_to :pipeline_stage, optional: true
   belongs_to :product, optional: true
+  belongs_to :subscription_type, optional: true
   belongs_to :responsible, class_name: "User"
   belongs_to :email_template, optional: true
 
-  has_many :lead_submissions, dependent: :destroy
+  has_many :lead_submissions, dependent: :restrict_with_error
 
-  validates :name, :slug, :template_key, :first_task_title, presence: true
+  validates :name, :slug, :template_key, presence: true
+  validates :destination, inclusion: { in: DESTINATIONS }
+  validates :first_task_title, presence: true, if: :deal_destination?
   validates :slug, uniqueness: true, format: { with: /\A[a-z0-9-]+\z/ }
   validates :template_key, inclusion: { in: ->(form) { form.class.available_template_keys(workspace: form.workspace) } }
   validates :first_task_due_days, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
@@ -39,6 +44,9 @@ class LeadForm < ApplicationRecord
   validate :pipeline_routes_belong_to_workspace
   validate :pipeline_route_keys_are_valid
   validate :hidden_field_keys_are_valid
+  validate :deal_destination_requires_pipeline
+  validate :mql_destination_allowed
+  validate :subscription_type_belongs_to_workspace
 
   before_validation :normalize_slug
   before_validation :normalize_success_redirect_url
@@ -47,6 +55,16 @@ class LeadForm < ApplicationRecord
 
   scope :active, -> { where(active: true) }
   scope :ordered, -> { order(:name, :id) }
+  scope :mql_destination, -> { where(destination: "mql") }
+  scope :deal_destination, -> { where(destination: "deal") }
+
+  def deal_destination?
+    destination == "deal"
+  end
+
+  def mql_destination?
+    destination == "mql"
+  end
 
   def first_task_due_on(on: Date.current)
     on + first_task_due_days.days
@@ -242,6 +260,26 @@ class LeadForm < ApplicationRecord
 
       errors.add(:pipeline_routes, "invalid pipeline for #{help_type}")
     end
+  end
+
+  def deal_destination_requires_pipeline
+    return unless deal_destination?
+
+    errors.add(:pipeline, "is required for deal destination forms") if pipeline.blank?
+  end
+
+  def mql_destination_allowed
+    return unless mql_destination?
+
+    unless CreamFeatures.enabled?(:mql_pool) && CreamFeatures.enabled?(:marketing_consent)
+      errors.add(:destination, "requires MQL pool and marketing consent features")
+    end
+  end
+
+  def subscription_type_belongs_to_workspace
+    return if subscription_type.nil? || workspace.nil?
+
+    errors.add(:subscription_type, "must belong to the workspace") if subscription_type.workspace_id != workspace_id
   end
 
   def associations_belong_to_workspace

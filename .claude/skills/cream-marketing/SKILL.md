@@ -14,10 +14,11 @@ Hub de marketing conectado a captación (`lead_forms`), email (`record_email` / 
 
 ## Feature flags (`CreamFeatures`)
 
-Siete flags en [`app/services/cream_features.rb`](../../../app/services/cream_features.rb). Todos `enabled: true` en la rama `hubspot` (commit `marketing`).
+Ocho flags en [`app/services/cream_features.rb`](../../../app/services/cream_features.rb). `:mql_pool` está `enabled: true` (activado tras validación 2026-09-09).
 
 | Flag | Menú | Etiqueta UI | Gating |
 |------|------|-------------|--------|
+| `:mql_pool` | sí | MQLs | `MqlsController`, intereses, conversión MQL→SQL, formularios destino MQL |
 | `:marketing_consent` | sí | Suscripciones | `SubscriptionTypesController`, preferencias públicas |
 | `:marketing_campaigns` | sí | Campañas | `CampaignsController`, ESP, webhooks |
 | `:marketing_segments` | sí | Segmentos | `SegmentsController` |
@@ -49,6 +50,15 @@ Workspace-scoped (`WorkspaceRecordPolicy`):
 | `ScoringRule` | Regla con condiciones, puntos, `decay_days` |
 | `EmailEvent` | Eventos ESP (open, click, bounce, unsub…) |
 | `PageView` | Visitas web (tracking) |
+| `Marketing::ProductInterest` | Interés por producto (`pending` / `converted` / `dismissed`); tabla `marketing_product_interests` |
+
+**LeadForm** ampliado: `destination` (`deal` / `mql`), `subscription_type_id`, `marketing_consent_text`; `pipeline` opcional en MQL.
+
+**LeadSubmission** ampliado: `deal` opcional, `capture_destination`, `submission_key` (idempotencia MQL), `privacy_policy_version_id`.
+
+**PrivacyPolicyVersion** — snapshot inmutable de política + frase de consentimiento (`content_hash` SHA-256 por workspace). Captura en `Public::LeadFormsController#show` vía `Marketing::ConsentPolicySnapshot`; campo oculto `lead[privacy_policy_hash]`.
+
+**Journey** ampliado: `product_id`, `stop_on_open_deal` (salida al abrir oportunidad del producto).
 
 **Person** ampliada: `lifecycle_stage`, `lead_score`, `lead_score_decayed_at`; `has_many :email_subscriptions`, `:journey_enrollments`, `:segment_memberships`. Callback `enqueue_lifecycle_journey` → `Marketing::JourneyTrigger`.
 
@@ -68,11 +78,15 @@ Migraciones: `20260904100000_create_marketing_hub.rb`, `20260904110000_marketing
 | `Esp::MailjetAdapter` | API Mailjet con credenciales del workspace; `esp_message_id`, pixel apertura |
 | `Esp::SmtpAdapter` | Fallback dev (Mailbin) |
 | `WebhookProcessor` | Mailjet webhook: supresión única, soft bounce no suprime, unsub → `ConsentService`, click → journey |
-| `JourneyTrigger` | Entrada en recorridos; `entry_config` vacío = «cualquiera» |
+| `JourneyTrigger` | Entrada en recorridos; `entry_config` vacío = «cualquiera»; `enroll!(journey:, person:)` para inscripción manual acotada |
 | `JourneyRunner` | Ejecuta pasos; `branch!` sin destino → completa enrollment; salta journeys/steps inactivos |
 | `ScoringEngine` | Eventos, decay idempotente (`lead_score_decayed_at`), transición lifecycle por umbrales |
 | `AttributionReport` | Dashboard UTM unificado; drill-down MQL (`MQL_STAGES` desde `ScoringEngine`) |
-| `FilterResolver` / `ConditionEvaluator` | Filtros de segmentos y condiciones de scoring |
+| `FilterResolver` / `ConditionEvaluator` | Filtros de segmentos y condiciones de scoring; claves MQL: `marketing_eligible`, `open_deal`, `interest_product_id`, `lead_form_id`, `capture_destination` |
+| `MqlEligibility` | Elegibilidad del pool (suscripción activa + email principal + no suprimido) |
+| `MqlToSqlConverter` | Conversión transaccional de interés → deal (crear o vincular) |
+| `JourneyExit` | Cancelar/bloquear recorridos con `stop_on_open_deal` |
+| `ConsentPolicySnapshot` | Versionar política + frase de checkbox por hash; find_or_create idempotente |
 | `SegmentWatcher` | Detecta entrada en segmento → `JourneyTrigger.enqueue_segment_entry!` |
 | `LiquidRenderer` / `LinkRewriter` | Personalización y tracking en campañas |
 

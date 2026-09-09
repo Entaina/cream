@@ -22,6 +22,14 @@ RSpec.describe "Public lead forms", type: :request do
       expect(response.body).to include("beehiiv")
       expect(response.body).to include(public_lead_form_privacy_path(lead_form.slug))
       expect(response.headers["Content-Security-Policy"]).to include("frame-ancestors *")
+      expect(response.body).to include('name="lead[privacy_policy_hash]"')
+    end
+
+    it "embeds the privacy policy hash from the captured version" do
+      get public_lead_form_path(lead_form.slug)
+
+      version = PrivacyPolicyVersion.find_by!(workspace: workspace)
+      expect(response.body).to include(%(value="#{version.content_hash}"))
     end
 
     it "returns not found for inactive forms" do
@@ -119,7 +127,8 @@ RSpec.describe "Public lead forms", type: :request do
     it "creates a lead and redirects to success" do
       expect {
         post public_lead_form_path(lead_form.slug), params: {
-          lead: contacto_lead_params(
+          lead: contacto_lead_params_with_privacy(
+            lead_form,
             help_type: "entrenamiento",
             newsletter_opt_in: "1",
             message: "Quiero saber más",
@@ -138,6 +147,21 @@ RSpec.describe "Public lead forms", type: :request do
       expect(submission.data["how_heard"]).to eq("evento")
       expect(submission.data["help_type"]).to eq("entrenamiento")
       expect(submission.data["message"]).to eq("Quiero saber más")
+      expect(submission.privacy_policy_version).to be_present
+      expect(submission.metadata["privacy_policy_url"]).to include("/f/#{lead_form.slug}/privacy")
+      subscription = EmailSubscription.order(:id).last
+      expect(subscription.metadata["privacy_policy_version_id"]).to eq(submission.privacy_policy_version_id)
+    end
+
+    it "creates a new privacy policy version when the policy template changes" do
+      first_hash = privacy_policy_hash_for(lead_form)
+      workspace.lead_form_templates.find_by!(path: PrivacyPolicyVersion::POLICY_PATH).update!(
+        body: '<div class="mx-auto max-w-xl"><p id="privacy-marker">Política v2</p></div>'
+      )
+      second_hash = privacy_policy_hash_for(lead_form)
+
+      expect(second_hash).not_to eq(first_hash)
+      expect(PrivacyPolicyVersion.where(workspace: workspace).count).to eq(2)
     end
 
     it "redirects to configured success URL with lead data as query params" do

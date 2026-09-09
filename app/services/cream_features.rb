@@ -316,6 +316,14 @@ module CreamFeatures
       status: :ready,
       blockers: [],
       enable_steps: []
+    },
+    mql_pool: {
+      enabled: true,
+      menu: true,
+      label: "MQLs",
+      status: :ready,
+      blockers: [],
+      enable_steps: []
     }
   }.freeze
 
@@ -343,6 +351,7 @@ module CreamFeatures
     when :marketing_attribution then helper.marketing_attribution_path
     when :journeys then helper.journeys_path
     when :lead_scoring then helper.scoring_rules_path
+    when :mql_pool then helper.mqls_path
     else raise KeyError, "No menu path for #{key}"
     end
   end
@@ -365,7 +374,8 @@ module CreamFeatures
       marketing_segments: :users,
       marketing_attribution: :bar_chart,
       journeys: :zap,
-      lead_scoring: :bar_chart
+      lead_scoring: :bar_chart,
+      mql_pool: :users
     }.fetch(key)
   end
 

@@ -53,6 +53,8 @@ class Workspace < ApplicationRecord
   has_many :journey_enrollments, dependent: :destroy
   has_many :scoring_rules, dependent: :destroy
   has_many :page_views, dependent: :destroy
+  has_many :product_interests, class_name: "Marketing::ProductInterest", dependent: :destroy
+  has_many :privacy_policy_versions, dependent: :destroy
 
   validates :name, presence: true
   validates :slug, presence: true, uniqueness: true, format: { with: /\A[a-z0-9-]+\z/ }

@@ -9,6 +9,7 @@ module Public
 
     before_action :ensure_feature_enabled
     before_action :set_lead_form
+    before_action :ensure_mql_form_allowed
     before_action :set_resolved_product
     after_action :allow_iframe_embedding
 
@@ -72,9 +73,37 @@ module Public
       head :not_found
     end
 
+    def ensure_mql_form_allowed
+      return unless @lead_form.mql_destination?
+      return if CreamFeatures.enabled?(:mql_pool) && CreamFeatures.enabled?(:marketing_consent)
+
+      head :not_found
+    end
+
     def prepare_show_page
+      capture_privacy_policy_version!
+      @submission_key = SecureRandom.uuid if @lead_form.mql_destination?
       path = LeadFormTemplate.form_page_path_for(@lead_form.template_key)
       @lead_form_page_html = template_renderer.render(path)
+    end
+
+    def capture_privacy_policy_version!
+      base_renderer = LeadFormTemplates::Renderer.new(
+        workspace: @lead_form.workspace,
+        lead_form: @lead_form,
+        view_context: view_context,
+        params: params,
+        product: @product,
+        open_editions: @open_editions || []
+      )
+      policy_html = base_renderer.render(PrivacyPolicyVersion::POLICY_PATH)
+      statement_html = base_renderer.render("public/lead_forms/partials/consent_fields")
+      @privacy_policy_version = Marketing::ConsentPolicySnapshot.capture(
+        workspace: @lead_form.workspace,
+        policy_html: policy_html,
+        statement_html: statement_html
+      )
+      @privacy_policy_hash = @privacy_policy_version.content_hash
     end
 
     def render_show_or_not_found(status: :ok)
@@ -91,7 +120,9 @@ module Public
         view_context: view_context,
         params: params,
         product: @product,
-        open_editions: @open_editions || []
+        open_editions: @open_editions || [],
+        privacy_policy_hash: @privacy_policy_hash,
+        submission_key: @submission_key
       )
     end
 

@@ -33,6 +33,21 @@ RSpec.describe LeadFormSubmissionProcessor do
     }.to raise_error(ActiveRecord::RecordInvalid, /Last name can't be blank/)
   end
 
+  it "links privacy policy version to submission when hash is present" do
+    version = Marketing::ConsentPolicySnapshot.capture(
+      workspace: workspace,
+      policy_html: "<p>Policy</p>",
+      statement_html: "<p>Statement</p>"
+    )
+    params = contacto_lead_params("privacy_policy_hash" => version.content_hash)
+
+    result = submit(params)
+
+    expect(result.submission.privacy_policy_version).to eq(version)
+    expect(result.submission.metadata["privacy_policy_hash"]).to eq(version.content_hash)
+    expect(result.submission.metadata["privacy_policy_url"]).to be_present
+  end
+
   it "creates person, deal, submission and enqueues emails" do
     params = contacto_lead_params(
       "last_name" => "López",

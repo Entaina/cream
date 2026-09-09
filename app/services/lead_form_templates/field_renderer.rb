@@ -122,9 +122,11 @@ module LeadFormTemplates
       HTML
     end
 
-    def hidden_fields(lead_form:, product:)
+    def hidden_fields(lead_form:, product:, privacy_policy_hash: nil, submission_key: nil)
       lines = []
       lines << hidden_input(LeadForm::TIMESTAMP_FIELD, LeadForm.signed_timestamp)
+      lines << hidden_input("privacy_policy_hash", privacy_policy_hash) if privacy_policy_hash.present?
+      lines << hidden_input("_submission_key", submission_key) if submission_key.present?
       lines << hidden_input("lead_form_slug", lead_form.slug)
       lines << hidden_input("lead_form_name", lead_form.name)
       lines << hidden_input("product_id", product.id) if product&.persisted?

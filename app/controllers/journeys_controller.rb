@@ -61,8 +61,25 @@ class JourneysController < ApplicationController
   def enroll
     authorize @journey, :update?
     person = current_workspace.people.find(params[:person_id])
-    JourneyTrigger.trigger!("manual", person: person)
-    redirect_to @journey, notice: "#{person.display_name} inscrito en el recorrido."
+    outcome = Marketing::JourneyTrigger.enroll!(journey: @journey, person: person)
+    notice = case outcome
+    when :enrolled
+      "#{person.display_name} inscrito en el recorrido."
+    when :blocked
+      "No se puede inscribir: hay una oportunidad abierta para este producto."
+    when :max_reenrollments
+      "Se alcanzó el límite de reinscripciones para este contacto."
+    when :no_steps
+      "El recorrido no tiene pasos activos."
+    else
+      "No se pudo inscribir al contacto."
+    end
+
+    if outcome == :enrolled
+      redirect_to @journey, notice: notice
+    else
+      redirect_to @journey, alert: notice
+    end
   end
 
   def toggle_active
@@ -90,7 +107,7 @@ class JourneysController < ApplicationController
 
   def journey_params
     params.require(:journey).permit(
-      :name, :active, :entry_trigger, :max_reenrollments,
+      :name, :active, :entry_trigger, :max_reenrollments, :product_id, :stop_on_open_deal,
       entry_config: {},
       steps_attributes: [ :id, :position, :step_type, :active, :_destroy, config: {} ]
     )

@@ -17,6 +17,7 @@ module Marketing
     def advance!
       return @enrollment.complete! unless @journey.active?
       return @enrollment.complete! if @step.nil?
+      return cancel_for_open_deal! if JourneyExit.blocked_by_open_deal?(person: person, journey: journey)
 
       return advance_past_inactive_step! unless @step.active?
 
@@ -183,6 +184,16 @@ module Marketing
       return enrollment.complete! unless next_step
 
       enrollment.advance_to!(next_step)
+    end
+
+    def cancel_for_open_deal!
+      enrollment.update!(
+        state: "cancelled",
+        metadata: enrollment.metadata.merge(
+          "cancelled_reason" => "open_deal",
+          "cancelled_at" => Time.current.iso8601
+        )
+      )
     end
   end
 end
