@@ -1,22 +1,59 @@
 module Marketing
   class ConsentService
+    LEGACY_FIELD_ALIASES = {
+      "newsletter" => "newsletter_opt_in",
+      "general" => "marketing_consent"
+    }.freeze
+
     def self.propagate_from_lead_form!(person:, workspace:, params:, request:, lead_form:, privacy_policy_version: nil)
+      propagate_subscription_fields!(
+        person: person,
+        workspace: workspace,
+        params: params,
+        request: request,
+        lead_form: lead_form,
+        privacy_policy_version: privacy_policy_version
+      )
+    end
+
+    def self.propagate_subscription_fields!(person:, workspace:, params:, request:, lead_form:, privacy_policy_version: nil, extra_metadata: {})
       return unless CreamFeatures.enabled?(:marketing_consent)
 
       SubscriptionType.ensure_defaults!(workspace)
-      newsletter_type = workspace.subscription_types.find_by!(slug: "newsletter")
+      base_metadata = consent_metadata(params:, request:, lead_form:).merge(extra_metadata).merge(
+        privacy_policy_trace(privacy_policy_version:, params:, lead_form:)
+      )
 
-      if params["newsletter_opt_in"] == "1" || params["newsletter_opt_in"] == true
+      workspace.subscription_types.active.find_each do |type|
+        next if field_key_for(type).blank?
+        next unless consent_param_checked?(params, type)
+
+        metadata = base_metadata.dup
+        if primary_mql_subscription_type?(lead_form, type) && lead_form.marketing_consent_text.present?
+          metadata["marketing_consent_text"] = lead_form.marketing_consent_text
+        end
+
         subscribe!(
           person: person,
-          subscription_type: newsletter_type,
+          subscription_type: type,
           source: "lead_form:#{lead_form.slug}",
           legal_basis: "consent",
-          metadata: consent_metadata(params:, request:, lead_form:).merge(
-            privacy_policy_trace(privacy_policy_version:, params:, lead_form:)
-          )
+          metadata: metadata
         )
       end
+    end
+
+    def self.consent_param_checked?(params, subscription_type)
+      field_key_for(subscription_type).present? &&
+        (params[field_key_for(subscription_type)] == "1" || params[field_key_for(subscription_type)] == true)
+    end
+
+    def self.field_key_for(subscription_type)
+      subscription_type.consent_field_key.presence || LEGACY_FIELD_ALIASES[subscription_type.slug]
+    end
+
+    def self.primary_mql_subscription_type?(lead_form, subscription_type)
+      lead_form.mql_destination? && lead_form.mql_subscription_type&.id == subscription_type.id
     end
 
     def self.gdpr_audit_metadata(params:, request:, lead_form:, privacy_policy_version: nil)

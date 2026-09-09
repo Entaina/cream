@@ -70,21 +70,27 @@ Conventions:
 - Mock external HTTP calls and background jobs (Solid Queue / `deliver_later`) — do not hit real services in specs.
 - `SessionHelper` (`spec/support/session_helper.rb`) provides `sign_in_as` / `sign_out` for authenticated request specs.
 - `DealHelper` (`spec/support/deal_helper.rb`) provides `create_deal!`, `create_company!`, `create_person!` for deal-related specs.
-- Public lead form request specs auto-import Liquid templates via `spec/support/public_lead_form_templates.rb` (mirrors `lib/lead_form_templates/` into the workspace DB).
+- Public lead form request specs auto-import Liquid templates via `spec/support/public_lead_form_templates.rb` — **solo en test**, para tener datos mínimos en el workspace fixture.
 
 ### Lead form templates (dev)
 
-Public forms render Liquid from **`lead_form_templates`** in the workspace DB (not from `app/views/public/lead_forms/` at runtime).
+**Fuente de verdad en runtime:** tabla `lead_form_templates` del workspace (editable por admins en **Formularios → Plantillas de formulario**). No hay fallback a disco en producción ni en desarrollo con datos reales.
+
+- **Respeta lo que haya cambiado el usuario.** No reimportes plantillas sobre workspaces con personalización (p. ej. producción). El importer **sobrescribe el body** cuando el fichero del repo difiere — úsalo solo en contextos controlados.
+- **`lib/lead_form_templates/`** = catálogo de referencia para `db:seed` del workspace de ejemplo y para specs. Editar ahí **no** cambia formularios ya desplegados hasta que alguien importe o edite en la UI.
+- Tras cambiar Liquid en la UI (o añadir tags nuevos en código), el admin debe **guardar la plantilla** para recompilar `submission_schema`. No asumas reimport masivo.
+
+**Import (solo cuando proceda):**
 
 ```bash
-# Import/update all repo templates into a workspace (idempotent)
+# Workspace vacío / demo tras db:seed — NO en producción con plantillas custom
 bin/rails 'lead_form_templates:import[WORKSPACE_ID]'
 
-# Example workspace after db:seed
+# Workspace de ejemplo en seed
 bin/rails runner "w=Workspace.find_by(slug: ENV.fetch('CREAM_ORGANIZATION_WORKSPACE_NAME', 'Example').parameterize); LeadFormTemplates::Importer.import!(w)"
 ```
 
-Source files to edit before re-import: `lib/lead_form_templates/public/lead_forms/*.liquid` and `partials/`. Admins can also edit templates in the UI (**Formularios → Plantillas de formulario**). `db:seed` (organization workspace) runs `LeadFormTemplates::Importer` via `LeadFormsExample.seed!` before creating example forms. Production: see `deploy/README.md` § Lead capture form templates. Architecture details: skill `cream-architecture` § Lead capture forms.
+`db:seed` importa vía `LeadFormsExample.seed!` solo en el workspace de organización de demo. Detalle de arquitectura: skill `cream-architecture` § Lead capture forms.
 
 ### Recurring jobs (Solid Queue)
 

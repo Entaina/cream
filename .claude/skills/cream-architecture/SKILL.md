@@ -121,13 +121,13 @@ When adding a new alert trigger or condition, extend constants + `AlertRuleEngin
 
 Feature flag `:lead_forms`. Public URLs `/f/:slug` (POST creates lead) and `/f/:slug/success` (thank-you page). Admin CRUD: `LeadFormsController`, `LeadFormTemplatesController` (templates admin-only).
 
-### Runtime rendering (Liquid, DB-only)
+### Runtime rendering (Liquid, DB-only, user-configurable)
 
 - **`LeadForm`** (`template_key`) picks which **page template** to render from `lead_form_templates` in DB. Public views: only `app/views/public/lead_forms/show.html.erb` and `success.html.erb` wrap rendered Liquid HTML.
-- **`LeadFormTemplate`**: workspace-scoped Liquid body in DB. Paths like `public/lead_forms/contacto` (pages) or `public/lead_forms/partials/contact_fields` (partials). System view: `public/lead_forms/success`.
+- **`LeadFormTemplate`**: workspace-scoped Liquid body in DB, editable by admins (**Formularios → Plantillas de formulario**). Paths like `public/lead_forms/contacto` (pages) or `public/lead_forms/partials/contact_fields` (partials). System view: `public/lead_forms/success`.
 - **`LeadFormTemplates::Source#find_body`**: reads **only from DB**; no filesystem fallback at runtime. Missing template → 404.
 - **`LeadFormTemplates::Renderer`**: Liquid env + custom tags in `app/services/lead_form_templates/tags.rb`. Assigns: `lead_form`, `product`, `open_editions`. Registers: `field_renderer`, `form_action`, CSRF, etc.
-- **Repo seed files** (import only): `lib/lead_form_templates/public/lead_forms/*.liquid` + `partials/`. Import: `rake lead_form_templates:import[WORKSPACE_ID]` → `LeadFormTemplates::Importer`.
+- **`lib/lead_form_templates/`** (repo): canonical examples for **seed + tests only**. `LeadFormTemplates::Importer` may populate or update DB rows when explicitly run — **never** assume reimport on deploy; production workspaces keep admin edits. When shipping Liquid tag/behaviour changes, document what admins must add or change in their templates (field keys, `{% subscription_opt_in %}`, etc.).
 
 ### Liquid tags (form pages)
 
@@ -136,6 +136,7 @@ Feature flag `:lead_forms`. Public URLs `/f/:slug` (POST creates lead) and `/f/:
 | `{% form_open %}` / `{% form_close %}` | `<form>` + Stimulus `lead-form` |
 | `{% hidden_fields %}` | Honeypot metadata, UTM, `product_id`, `hidden_field_keys` from URL |
 | `{% field type: "…", name: "…", required: true %}` | Inputs via `FieldRenderer` |
+| `{% subscription_opt_in slug: "newsletter" %}` | Marketing checkbox; `name` = `SubscriptionType#consent_field_key`; label from tag arg, MQL form text, or type default |
 | `{% partial 'name' %}` | Renders `public/lead_forms/partials/name` |
 | `{% phone_with_prefix %}` | Phone + country prefix select |
 | `{% honeypot %}`, `{% turnstile %}`, `{% submit '…' %}` | Anti-spam / submit |
@@ -154,7 +155,7 @@ Select options: inline in Liquid via `choices: "Label|value; Label2|value2"` on 
 2. **At submit** (`SubmissionSchema.build`): loads stored schema, applies runtime context (`collects_company?`, product, `open_editions`), validates params. Fallback: live render if schema empty (legacy rows).
 3. `Public::LeadFormsController#lead_params` whitelists to `schema.allowed_param_keys`.
 
-Implication: a field only persists if it appears in the stored schema **and** passes contextual filters for that submit. Re-import or re-save templates after Liquid changes to refresh the schema.
+Implication: a field only persists if it appears in the stored schema **and** passes contextual filters for that submit. After Liquid changes, **re-save the template in admin** (recompiles schema). Do not rely on repo reimport in workspaces where users customized templates.
 
 **URL prefill**: `hidden_field_keys` + `?key=value`; Stimulus `lead_form_controller.js` fills `[data-lead-form-param]`. Also `?product_id=` overrides configured product. **`open_editions`**: `LeadForm#open_editions_for(product)` → `product.editions.not_finished`, exposed to Liquid and `{% field collection: "open_editions" %}`.
 

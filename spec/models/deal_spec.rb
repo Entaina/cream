@@ -86,6 +86,25 @@ RSpec.describe Deal, type: :model do
     expect(second.reload.position).to eq(2)
   end
 
+  it "moves to a stage in another pipeline by id and logs pipeline_changed" do
+    other = workspace.pipelines.create!(name: "Partners", position: 1,
+      pipeline_stages: [ PipelineStage.new(name: "New lead", color: "hoki", probability: 5, position: 0, workspace: workspace) ])
+    target_stage = other.first_stage
+
+    expect { deal.move_to_stage!(target_stage.id) }
+      .to change { deal.reload.pipeline }.from(pipeline).to(other)
+    expect(deal.pipeline_stage).to eq(target_stage)
+    expect(deal.activities.where(action: "pipeline_changed").last.metadata).to include("to" => "Partners")
+  end
+
+  it "does not move to a same-named stage in another pipeline when using the stage name" do
+    other = pipeline.duplicate(name: "Partners").tap(&:save!)
+    qualified = pipeline.pipeline_stages.find_by!(name: "Qualified")
+    deal.move_to_stage!(qualified)
+
+    expect { deal.move_to_stage!("Qualified") }.not_to change { deal.reload.pipeline_id }
+  end
+
   it "moves to another pipeline landing on its initial stage" do
     other = workspace.pipelines.create!(name: "Partners", position: 1,
       pipeline_stages: [ PipelineStage.new(name: "New lead", color: "hoki", probability: 5, position: 0, workspace: workspace) ])

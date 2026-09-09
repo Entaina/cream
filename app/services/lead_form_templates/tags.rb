@@ -171,6 +171,40 @@ module LeadFormTemplates
       end
     end
 
+    class SubscriptionOptInTag < BaseTag
+      def initialize(tag_name, markup, parse_context)
+        super
+        @attributes = parse_attributes(markup)
+      end
+
+      def render(context)
+        lead_form = context.registers[:lead_form]
+        slug = @attributes.fetch("slug")
+        subscription_type = lead_form.workspace.subscription_types.active.find_by(slug: slug)
+        field_key = subscription_type && Marketing::ConsentService.field_key_for(subscription_type)
+        return "" if field_key.blank?
+
+        label = @attributes["label"].presence ||
+                primary_consent_label(lead_form, subscription_type) ||
+                subscription_type.default_consent_label.presence ||
+                subscription_type.name
+
+        renderer(context).render(
+          type: "checkbox",
+          name: field_key.to_sym,
+          label: label
+        )
+      end
+
+      private
+
+      def primary_consent_label(lead_form, subscription_type)
+        return unless lead_form.mql_subscription_type&.id == subscription_type.id
+
+        lead_form.marketing_consent_text.presence
+      end
+    end
+
     REGISTRY = {
       "partial" => PartialTag,
       "field" => FieldTag,
@@ -182,7 +216,8 @@ module LeadFormTemplates
       "turnstile" => TurnstileTag,
       "submit" => SubmitTag,
       "privacy_link" => PrivacyLinkTag,
-      "required_marker" => RequiredMarkerTag
+      "required_marker" => RequiredMarkerTag,
+      "subscription_opt_in" => SubscriptionOptInTag
     }.freeze
   end
 end

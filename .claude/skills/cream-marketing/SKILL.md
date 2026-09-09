@@ -36,7 +36,7 @@ Workspace-scoped (`WorkspaceRecordPolicy`):
 | Modelo | Rol |
 |--------|-----|
 | `MailjetConnection` | Credenciales ESP por workspace (API Key, Secret, remitente, webhook token, `transactional_enabled`) |
-| `SubscriptionType` | Tipos de suscripción (general, newsletter, producto, eventos…) |
+| `SubscriptionType` | Tipos de suscripción; `consent_field_key` + `default_consent_label` enlazan checkbox de formulario ↔ suscripción |
 | `EmailSubscription` | Estado por persona + tipo (`subscribed` / `unsubscribed` / `pending`) |
 | `EmailSuppression` | Bloqueo global por email (bounce, spam, baja total) |
 | `Campaign` | Campaña con variantes A/B, segmento, plantilla, estado |
@@ -135,6 +135,8 @@ resource :marketing_attribution, only: :show
 
 **Importante:** landing pages usan `/p/:workspace_slug/:slug` (no `/p/:slug` solo). URL en admin: `LeadFormTemplates` partial `_form.html.erb`.
 
+**Plantillas de captación:** Liquid vive en DB por workspace (admin **Formularios → Plantillas de formulario**). Checkboxes de marketing: tag `{% subscription_opt_in slug: "…" %}` o `lead[consent_field_key]` alineado con **Suscripciones**. No reimportar plantillas del repo en producción — respetar ediciones del usuario; documentar cambios manuales en plantilla cuando el código añada tags o claves nuevas.
+
 ## Jobs (`config/recurring.yml`)
 
 | Job | Schedule | Entorno |
@@ -157,7 +159,7 @@ resource :marketing_attribution, only: :show
 
 | Origen | Hook marketing |
 |--------|----------------|
-| `LeadFormSubmissionProcessor` | Propaga consentimiento/`newsletter_opt_in`; `cream_aid` en metadata; journey `lead_form_submitted`; scoring `lead_submission` / `form_field` |
+| `LeadFormSubmissionProcessor` | `ConsentService.propagate_subscription_fields!` (por `SubscriptionType#consent_field_key`); `cream_aid` en metadata; journey `lead_form_submitted`; scoring `lead_submission` / `form_field` |
 | `Person#enqueue_lifecycle_journey` | Journey `lifecycle_changed` |
 | `WebhookProcessor` (click) | `JourneyTrigger.enqueue_email_clicked!` |
 | `SegmentWatcher` | Journey `segment_entry` |

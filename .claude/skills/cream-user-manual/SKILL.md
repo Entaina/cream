@@ -153,10 +153,12 @@ Modelo: `Edition` `belongs_to :product`; unicidad de nombre por producto. No doc
 
 Al cambiar formularios públicos, plantillas Liquid o admin de formularios, actualizar **MANUAL_USUARIO.md** §27 y **USER_MANUAL.md** §27 (Lead capture forms).
 
+**Plantillas = datos del workspace, no del repo.** Cada workspace guarda su Liquid en `lead_form_templates` (UI **Formularios → Plantillas de formulario**). Los ficheros en `lib/lead_form_templates/` solo alimentan seed de demo y tests. Al documentar cambios de plantilla, describe qué debe editar el **administrador en la UI** (tags, claves de campo, partials); no indiques «reimportar desde el repo» salvo entorno demo vacío.
+
 | Pieza | Ubicación en código | Manual (usuario) |
 |-------|---------------------|------------------|
 | Listado / CRUD formularios | `/lead_forms`, menú **Formularios** | §27 «Cómo acceder», «Configurar un formulario» |
-| Plantillas Liquid (admin) | `/lead_form_templates`, enlace **Plantillas de formulario** | §27 «Plantillas de formulario» — solo admins |
+| Plantillas Liquid (admin) | `/lead_form_templates`, enlace **Plantillas de formulario** | §27 «Plantillas de formulario» — solo admins; contenido editable por workspace |
 | Página pública | `/f/:slug` | §27 URL, iframe, campos ocultos por query param |
 | Producto en formulario reserva | `LeadForm#product_id`, `?product_id=` | §27 nota producto / ediciones abiertas |
 | Página de gracias | `/f/:slug/success` | §27 redirección vs success de Cream |
@@ -164,7 +166,7 @@ Al cambiar formularios públicos, plantillas Liquid o admin de formularios, actu
 
 **No documentar** en el manual: tags Liquid, `LeadFormSubmissionProcessor`, importer rake, `FieldRenderer`, Stimulus.
 
-**Formularios de ejemplo** (slugs en seeds `db/seeds/lead_forms_example.rb`): mantener la lista de bullets al final de §27 sincronizada con plantillas reales (`contacto`, `demo`, `liderando_ia`, reservas, etc.). Si se elimina un formulario de ejemplo, quitar su bullet.
+**Formularios de ejemplo** (slugs en seeds `db/seeds/lead_forms_example.rb`): mantener la lista de bullets al final de §27 sincronizada con las plantillas del **workspace de demo** (`contacto`, `demo`, `liderando_ia`, reservas, etc.). No confundir con plantillas de producción, que pueden diferir. Si se elimina un formulario de ejemplo, quitar su bullet.
 
 **Validación visible**: el manual puede mencionar que nombre, apellidos, email y consentimiento RGPD son obligatorios; teléfono/empresa según la plantilla y la casilla «Recoger datos de empresa». No detallar validación HTML5 vs servidor.
 

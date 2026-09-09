@@ -52,7 +52,19 @@
     <div>
       <%= f.label :marketing_consent_text, "Texto de permiso de marketing (MQL)", class: "label" %>
       <%= f.text_area :marketing_consent_text, rows: 2, class: "input mt-1 w-full resize-y" %>
+      <p class="mt-1 text-xs text-ink-faint">Sobrescribe la etiqueta del checkbox del tipo de suscripción principal en formularios MQL.</p>
     </div>
+    <% if feature_enabled?(:marketing_consent) && lead_form.destination == "mql" %>
+      <% expected_key = lead_form.expected_mql_consent_field_key %>
+      <% if expected_key.present? %>
+        <div class="rounded-lg border border-line bg-canvas-soft px-3 py-2 text-sm text-ink-soft space-y-1">
+          <p>La plantilla debe incluir un checkbox de marketing con clave <code class="font-mono text-xs"><%= expected_key %></code> (p. ej. <code class="font-mono text-xs">{% subscription_opt_in slug: "<%= lead_form.mql_subscription_type&.slug %>" %}</code>).</p>
+          <% unless lead_form.template_includes_consent_field? %>
+            <p class="font-medium text-orange-700 dark:text-orange-300">La plantilla «<%= lead_form.template_key %>» no incluye ese campo en su esquema de envío. Los visitantes no podrán marcar el consentimiento de marketing.</p>
+          <% end %>
+        </div>
+      <% end %>
+    <% end %>
   </div>
 
   <div class="card space-y-4 p-6" data-controller="pipeline-stage-select">

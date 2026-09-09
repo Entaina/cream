@@ -44,6 +44,17 @@ RSpec.describe LeadFormSubmissionProcessor, "MQL destination" do
       .and change(LeadSubmission, :count).by(1)
       .and change(Deal, :count).by(0)
       .and change(Marketing::ProductInterest, :count).by(1)
+      .and change(EmailSubscription, :count).by(1)
+  end
+
+  it "subscribes via the subscription type consent field key" do
+    params = contacto_lead_params("marketing_consent" => "1", "_submission_key" => SecureRandom.uuid)
+
+    described_class.call(lead_form:, params:, request:)
+
+    general = workspace.subscription_types.find_by!(slug: "general")
+    person = Person.find_by!(email: params["email"])
+    expect(EmailSubscription.find_by!(person: person, subscription_type: general).status).to eq("subscribed")
   end
 
   it "reuses submission for duplicate submission key" do

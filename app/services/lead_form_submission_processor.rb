@@ -71,13 +71,14 @@ class LeadFormSubmissionProcessor
       create_first_task!(deal) unless deal_created
       attach_deal_product!(deal)
       submission = persist_submission!(deal:, person:, capture_destination: "deal")
-      Marketing::ConsentService.propagate_from_lead_form!(
+      Marketing::ConsentService.propagate_subscription_fields!(
         person: person,
         workspace: workspace,
         params: params,
         request: request,
         lead_form: lead_form,
-        privacy_policy_version: submission.privacy_policy_version
+        privacy_policy_version: submission.privacy_policy_version,
+        extra_metadata: { "lead_submission_id" => submission.id }
       )
       person.update!(lifecycle_stage: "lead") if person.lifecycle_stage == "subscriber"
       assign_campaign_from_utm!(submission)
@@ -344,47 +345,14 @@ class LeadFormSubmissionProcessor
   end
 
   def propagate_mql_consent!(person:, submission:)
-    return unless CreamFeatures.enabled?(:marketing_consent)
-
-    SubscriptionType.ensure_defaults!(workspace)
-    type = lead_form.subscription_type || workspace.subscription_types.active.find_by(slug: "general")
-    return unless type
-
-    subscription_metadata = subscription_consent_metadata(submission)
-
-    if params["marketing_consent"] == "1" || params["marketing_consent"] == true
-      Marketing::ConsentService.subscribe!(
-        person: person,
-        subscription_type: type,
-        source: "lead_form:#{lead_form.slug}",
-        legal_basis: "consent",
-        metadata: subscription_metadata.merge("marketing_consent_text" => lead_form.marketing_consent_text)
-      )
-    end
-
-    if params["newsletter_opt_in"] == "1" || params["newsletter_opt_in"] == true
-      newsletter_type = workspace.subscription_types.active.find_by(slug: "newsletter")
-      if newsletter_type
-        Marketing::ConsentService.subscribe!(
-          person: person,
-          subscription_type: newsletter_type,
-          source: "lead_form:#{lead_form.slug}",
-          legal_basis: "consent",
-          metadata: subscription_metadata
-        )
-      end
-    end
-  end
-
-  def subscription_consent_metadata(submission)
-    Marketing::ConsentService.consent_metadata(params:, request:, lead_form:).merge(
-      "lead_submission_id" => submission.id
-    ).merge(
-      Marketing::ConsentService.privacy_policy_trace(
-        privacy_policy_version: submission.privacy_policy_version,
-        params: params,
-        lead_form: lead_form
-      )
+    Marketing::ConsentService.propagate_subscription_fields!(
+      person: person,
+      workspace: workspace,
+      params: params,
+      request: request,
+      lead_form: lead_form,
+      privacy_policy_version: submission.privacy_policy_version,
+      extra_metadata: { "lead_submission_id" => submission.id }
     )
   end
 
@@ -421,10 +389,14 @@ class LeadFormSubmissionProcessor
   end
 
   def submission_data
-    excluded = LeadForm::METADATA_FIELDS + [ LeadForm::HONEYPOT_FIELD, LeadForm::TIMESTAMP_FIELD, "gdpr_consent", "marketing_consent", "_submission_key", "privacy_policy_hash" ]
+    consent_keys = LeadForm.consent_field_keys_for(workspace)
+    excluded = LeadForm::METADATA_FIELDS + [
+      LeadForm::HONEYPOT_FIELD, LeadForm::TIMESTAMP_FIELD, "gdpr_consent", "_submission_key", "privacy_policy_hash"
+    ] + consent_keys
     data = params.except(*excluded).reject { |_key, value| value.blank? }
-    data["newsletter_opt_in"] = params["newsletter_opt_in"] == "1"
-    data["marketing_consent"] = params["marketing_consent"] == "1"
+    consent_keys.each do |key|
+      data[key] = params[key] == "1"
+    end
     data
   end
 

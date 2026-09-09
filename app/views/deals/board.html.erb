@@ -3,7 +3,8 @@
   <% if @pipelines.size > 1 %>
     <%= render "shared/active_pipeline_select",
           pipelines: @pipelines,
-          selected_pipeline: current_pipeline || @pipeline,
+          selected_pipeline: current_pipeline,
+          include_all: true,
           return_to: board_deals_path %>
   <% end %>
   <% closed_toggle_params = show_closed? ? filter_form_params.except(:closed) : filter_form_params.merge(closed: "1") %>
@@ -81,28 +82,28 @@
                 <%= link_to deal.name, deal_path(deal), class: "text-base font-medium hover:text-accent leading-snug" %>
                 <div class="flex items-center gap-1.5 shrink-0">
                   <%= deal_task_indicator(deal) %>
-                  <% if @pipeline&.show_card_field?(:owner) && deal.owner %>
+                  <% if deal.pipeline.show_card_field?(:owner) && deal.owner %>
                     <%= avatar deal.owner, size: "size-5", text: "text-2xs" %>
                   <% end %>
                 </div>
               </div>
-              <% if @pipeline&.show_card_field?(:value) %>
+              <% if deal.pipeline.show_card_field?(:value) %>
                 <%= render "card_value", deal: deal %>
               <% end %>
-              <% if @pipeline&.show_card_field?(:probability) && deal.probability.present? %>
+              <% if deal.pipeline.show_card_field?(:probability) && deal.probability.present? %>
                 <p class="text-xs text-ink-faint tabular-nums mt-1"><%= deal_field_display(deal, :probability) %></p>
               <% end %>
-              <% if @pipeline&.show_card_field?(:invoice_number) && deal.invoice_number.present? %>
+              <% if deal.pipeline.show_card_field?(:invoice_number) && deal.invoice_number.present? %>
                 <p class="text-xs text-ink-faint mt-1 truncate"><%= deal.invoice_number %></p>
               <% end %>
-              <% if @pipeline&.show_card_field?(:products) && deal.deal_products.any? %>
+              <% if deal.pipeline.show_card_field?(:products) && deal.deal_products.any? %>
                 <%= render "card_products", deal: deal %>
               <% end %>
-              <% if @pipeline&.show_card_field?(:contacts) && deal.contacts.any? %>
+              <% if deal.pipeline.show_card_field?(:contacts) && deal.contacts.any? %>
                 <p class="text-xs text-ink-faint mt-1.5 truncate"><%= deal.contacts.map(&:display_name).join(", ") %></p>
               <% end %>
-              <% show_company = @pipeline&.show_card_field?(:company) && deal.company %>
-              <% show_close = @pipeline&.show_card_field?(:expected_close_date) && deal.expected_close_date %>
+              <% show_company = deal.pipeline.show_card_field?(:company) && deal.company %>
+              <% show_close = deal.pipeline.show_card_field?(:expected_close_date) && deal.expected_close_date %>
               <% if show_company || show_close %>
               <div class="flex items-center gap-2 mt-2 text-xs text-ink-faint">
                 <% if show_company %>

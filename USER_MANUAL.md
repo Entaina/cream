@@ -173,7 +173,7 @@ Below the workspace name, the sidebar shows the **active pipeline**. You can cho
 
 - **Deals** (board and table) filter by that pipeline.
 - **Dashboard** and **Reports** use that pipeline as the default filter in deal metrics.
-- The **Todos los pipelines** (all pipelines) option removes the filter where applicable (the kanban board keeps showing the default pipeline, because its columns belong to a specific pipeline).
+- The **Todos los pipelines** (all pipelines) option removes the deal filter: the dashboard and reports group by stages from every pipeline (labeled *Pipeline · Stage*), the kanban board shows one column per stage across all pipelines (you can drag a deal into another pipeline's stage), and the table view adds a **Pipeline** column.
 
 The selection is stored per user and workspace, and persists across sessions. You can also change it from the selectors in Deals and Dashboard when there are several pipelines.
 
@@ -197,7 +197,7 @@ The dashboard shows a workspace overview:
 
 - **Director de ventas (sales director):** daily AI-generated briefing with guidance for the team, classified as **Urgente** (urgent) and **Importante** (important). It only appears in workspaces where an administrator has enabled it in **Settings** (checkbox *Briefing diario del director de ventas*), and it also requires AI to be configured on the server (`CREAM_AI_API_KEY`). Each user can turn it off for themselves in **Settings → Profile** (checkbox *Mostrar briefing del director de ventas en el dashboard*); you can also open Profile from your name at the bottom of the sidebar. To enrich the report, the director uses CRM read tools, the workspace **OKM** (if configured) and **persistent memory** (llmemory) with learnings from previous briefings. In addition, each user who has it enabled receives a **Para ti** (for you) block with direct guidance, **Aciertos** (congratulations on recent wins) and **A mejorar** (mistakes or omissions with a recommendation). If a deal already has a **next action** (an open task with a future date), the briefing does not ask for parallel actions nor flags it as inactive; at most it may suggest **moving that date up**. Deals without an open task can appear as pending a defined next step. If there is no briefing for the day yet, you can click **Generar ahora** (generate now); if one already exists, you can click **Regenerar** (regenerate) up to 5 times a day (the number of regenerations you have left is shown). Guidance items can link to deals, people, companies or tasks; in the team block, the ones assigned to you are highlighted.
 - **Metric cards:** number of people, companies, open pipeline value and won revenue (deals in a *won* stage). Deal metrics respect the **active pipeline** (see above); people and companies cover the whole workspace.
-- **Pipeline by stage:** bars showing the distribution of deals per stage. If you have an active pipeline, the chart and the deal cards use that pipeline; if you choose **Todos los pipelines**, the chart shows the workspace's default pipeline and the cards add up all deals.
+- **Pipeline by stage:** bars showing the distribution of deals per stage. If you have an active pipeline, the chart and the deal cards use that pipeline; if you choose **Todos los pipelines**, the cards add up all deals and the chart lists stages from every pipeline (labeled *Pipeline · Stage*).
 - **Upcoming tasks:** upcoming pending tasks (mark them complete with one click).
 - **Recent activity:** the team's latest actions (creations, field changes, stage changes, etc.).
 
@@ -320,7 +320,7 @@ Active filters are kept when switching between **Board** and **Table**, when pag
 **Deal list views:**
 
 - **Board** (Deals menu): kanban board by stage — drag cards between columns to change stage. Filter bar with search, product, edition and first-contact range, plus **saved views** tabs (same as the table).
-- **Table** (button on the board): table view with the same filters (including stage), saved views, custom fields and CSV import/export.
+- **Table** (button on the board): table view with the same filters (including stage), saved views, custom fields and CSV import/export. With **Todos los pipelines** active, the table includes a **Pipeline** column before the stage.
 
 On the board, a saved view with a **stage** filter does not restrict the columns (stages already are columns); the other filters do apply.
 
@@ -398,7 +398,7 @@ In **Pipelines** you can:
 - Create a new pipeline with its stages.
 - Edit stages, probabilities and colors.
 - **Reorder stages** by dragging the row by its handle (dots icon) while editing a pipeline; save the changes with **Save changes**.
-- Mark a pipeline as the **default** (the one used by new deals and by the board when you choose *Todos los pipelines* — all pipelines).
+- Mark a pipeline as the **default** (the one used by new deals).
 - Choose which **fields are visible on board cards** (checkboxes when editing the pipeline): value, company, owner, close date, probability, **invoice number**, contacts, products and editions. Default: value, company, close date and owner.
 - **Duplicate** a pipeline (copies the stages and the board field selection, not the deals).
 - Create from predefined **templates** (Sales, Recruiting, etc.).
@@ -415,7 +415,7 @@ In **Deals** (board view):
 - **Filter bar** below the title: search, product, edition and **First contact date** range. There is no stage filter (the columns already represent the stages).
 - **Drag** a card to another column to move the deal to another stage. The change is saved instantly and the column counters and totals update on their own, without reloading the page. If the move cannot be saved (e.g. because of the target stage's entry conditions), the card returns to its original column and an **error notice** appears at the top of the screen.
 - **Reorder the columns** by dragging a stage header by the dots icon; the new order is saved on drop.
-- If there are several pipelines, you can also change the active pipeline from the header selector (the board always shows one specific pipeline).
+- If there are several pipelines, you can also change the active pipeline from the header selector. With **Todos los pipelines**, the board shows columns from every pipeline (labeled *Pipeline · Stage*) and you can drag a deal into another pipeline's stage.
 - Cards with **pending tasks** show a task icon in the top-right corner: **red** if any task is overdue, **blue** if all are on time or have no due date. **Hover** over the icon to see the next pending task (title, due date and assignee) without opening the deal page; if there are several pending ones, it also shows how many remain.
 - The fields visible on each card (value, company, owner, close date, probability, invoice number, contacts, products and editions) depend on the active pipeline's configuration — see [Managing pipelines](#managing-pipelines).
 - From a deal's page you can also change stage (**Move to stage** buttons; the selector updates instantly) or **move it to another pipeline** (it will start in the first stage of the target pipeline).
@@ -1060,7 +1060,7 @@ In the sidebar menu, open **Formularios** (Forms).
 
 1. Click **Nuevo formulario** (New form).
 2. Provide the **name**, the **slug** (it will appear in the public URL `/f/slug`), the form **template** and whether the form is **Activo** (Active).
-3. Under **Destino del envío** (Submission destination), choose **Deal (ventas)** / Deal (sales) or **MQL (marketing)**. Deal creates or reuses an opportunity (flow below). MQL captures the person, consent and submission history **without creating a deal** (see [§29 MQL pool](#mql-pool)). For MQL destination you can set the **subscription type** and **marketing consent text** shown to visitors.
+3. Under **Destino del envío** (Submission destination), choose **Deal (ventas)** / Deal (sales) or **MQL (marketing)**. Deal creates or reuses an opportunity (flow below). MQL captures the person, consent and submission history **without creating a deal** (see [§29 MQL pool](#mql-pool)). For MQL destination you can set the **subscription type** (defines the expected checkbox field key) and **marketing consent text** that overrides the type's default label. Cream warns if the form template schema does not include that field.
 4. Under **CRM y asignación** (CRM and assignment) — Deal destination only: **pipeline**, optional **stage**, **owner** (receives notification and follow-up task), optional **product** and pipeline routes by field value.
 5. Configure the **first task** (text and days until due; 0 = same day) and the **email template** to the lead (or **Sin email** / No email).
 6. Optional: set a **redirect URL after submission** (e.g. `https://example.com/thanks`) to send the visitor to a page on your site. If left blank, Cream's thank-you page is shown (`/f/slug/success`).
@@ -1091,7 +1091,7 @@ If a page template does not exist in the workspace, the public URL `/f/slug` wil
 ### Privacy policy and consent
 
 - Each public form links to a **privacy policy** page (`/f/slug/privacy`). Content is defined in **Plantillas de formulario** (Form templates) → `privacy` template (editable by administrators).
-- Visitors must check the **data protection consent** (GDPR) box to submit. Templates may optionally offer **newsletter** or other marketing opt-ins; if accepted, the corresponding subscription is recorded (see [§29](#29-marketing)).
+- Visitors must check the **data protection consent** (GDPR) box to submit. Templates may optionally include marketing checkboxes with `{% subscription_opt_in slug: "newsletter" %}` (or another subscription type slug); if accepted, the subscription for the matching type **checkbox field key** is recorded (see [§29](#29-marketing)).
 - When the form loads, Cream stores an **immutable version** of the policy and checkbox text. Each submission is linked to that version (date, URL, hash and accepted content). Full detail is under **Formularios → Ver → Envíos recientes → Detalle**, or on the contact record → **Form submissions**. On deals, **Formulario de origen** shows submission answers but not the extended consent block.
 
 ### What happens when a form is submitted (Deal destination)
@@ -1236,7 +1236,9 @@ Contacts with **active marketing permission** (subscribed to the chosen type, va
 
 1. Click **Nuevo tipo** (New type).
 2. Enter **name**, **slug**, **description** (shown in the contact preference center) and **order**.
-3. Check **Activo** (Active) and save. Cream creates default types such as *general* and *newsletter* when you use the module.
+3. Optional: **Checkbox field key in forms** — `lead[key]` name that activates this subscription when checked (e.g. `newsletter_opt_in`). Must be unique within the workspace.
+4. Optional: **Default checkbox label** — shown in Liquid templates unless the template or MQL form overrides it.
+5. Check **Activo** (Active) and save. Cream creates default types such as *general* (`marketing_consent`) and *newsletter* (`newsletter_opt_in`) when you use the module.
 
 **On a person's record** (left panel → **Subscriptions**):
 
@@ -1254,7 +1256,7 @@ Contacts with **active marketing permission** (subscribed to the chosen type, va
 | Consent | What it is | Where configured |
 |---------|------------|------------------|
 | **Data protection (GDPR)** | Required to submit any form | `consent_fields` partial in templates |
-| **Marketing / newsletter** | Optional; activates a subscription | Checkboxes in template + type on MQL form |
+| **Marketing / newsletter** | Optional; activates a subscription | `{% subscription_opt_in slug: "…" %}` tag in templates (uses the type's field key) + type on MQL form |
 
 Subscriptions created from a form store the same **privacy policy version** as the submission (see [§27](#27-lead-capture-forms)).
 

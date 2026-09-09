@@ -55,6 +55,9 @@
       <thead>
         <tr>
           <th><%= sort_link "Name", :name %></th>
+          <% unless @display_pipeline %>
+            <th>Pipeline</th>
+          <% end %>
           <th><%= @display_pipeline ? sort_link("Stage", :stage) : "Stage" %></th>
           <th><%= sort_link "Value", :value %></th>
           <th>Company</th>
@@ -78,6 +81,9 @@
             <td class="font-medium">
               <%= link_to deal.name, deal_path(deal), class: "hover:text-accent" %>
             </td>
+            <% unless @display_pipeline %>
+              <td class="text-ink-soft"><%= deal.pipeline.name %></td>
+            <% end %>
             <td><%= stage_badge deal %></td>
             <td class="text-ink-soft tabular-nums"><%= deal_field_display(deal, :value) %></td>
             <td>

@@ -211,6 +211,21 @@ RSpec.describe "Dashboard active pipeline", type: :request do
     end
   end
 
+  describe "all pipelines in the stage chart" do
+    it "shows stages from every pipeline when all pipelines is selected" do
+      other = pipeline.duplicate(name: "Partners").tap(&:save!)
+      create_deal!(workspace, pipeline: pipeline, name: "Ventas dashboard deal")
+      create_deal!(workspace, pipeline: other, name: "Partners dashboard deal")
+      membership.update!(current_pipeline: nil)
+
+      get root_path
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("Ventas · Lead")
+      expect(response.body).to include("Partners · Lead")
+    end
+  end
+
   describe "closed stages in the stage chart" do
     it "hides closed stages by default" do
       get root_path
@@ -221,6 +236,8 @@ RSpec.describe "Dashboard active pipeline", type: :request do
     end
 
     it "shows closed stages when closed=1" do
+      membership.update!(current_pipeline: pipeline)
+
       get root_path, params: { closed: "1" }
 
       expect(response).to have_http_status(:ok)

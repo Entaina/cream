@@ -166,6 +166,14 @@ module ApplicationHelper
     end
   end
 
+  def stage_display_name(stage, include_pipeline: current_pipeline.nil?)
+    if include_pipeline
+      "#{stage.pipeline.name} · #{stage.name}"
+    else
+      stage.name
+    end
+  end
+
   def money(amount, currency = "EUR")
     number = amount.to_d
     number_to_currency(number,

@@ -45,7 +45,8 @@ module LeadFormTemplates
     attr_reader :fields
 
     def allowed_param_keys
-      fields.map(&:name) + LeadForm::SYSTEM_FIELD_KEYS + [ LeadForm::HONEYPOT_FIELD, LeadForm::TIMESTAMP_FIELD ]
+      system_keys = @workspace ? LeadForm.system_field_keys_for(@workspace) : LeadForm::SYSTEM_FIELD_KEYS
+      (fields.map(&:name) + system_keys).uniq
     end
 
     def apply_context(lead_form:, product:, open_editions:)
@@ -57,7 +58,9 @@ module LeadFormTemplates
 
       contextual_fields.concat(admin_hidden_fields(lead_form.hidden_field_keys))
 
-      self.class.new(fields: contextual_fields)
+      schema = self.class.new(fields: contextual_fields)
+      schema.instance_variable_set(:@workspace, lead_form.workspace)
+      schema
     end
 
     def validate!(params)

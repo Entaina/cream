@@ -16,7 +16,7 @@ class DealsController < ApplicationController
     end
     @deals = apply_pipeline_scope(
       filtered_deals(
-        policy_scope(current_workspace.deals).includes(:company, :owner, :pipeline_stage, :contacts, custom_field_values: :custom_field)
+        policy_scope(current_workspace.deals).includes(:company, :owner, :pipeline, :pipeline_stage, :contacts, custom_field_values: :custom_field)
       )
     )
     @display_pipeline = pipeline_for_display
@@ -56,14 +56,27 @@ class DealsController < ApplicationController
     load_saved_views("Deal")
     @effective_filters = @effective_filters.except(:stage)
     @pipelines = current_workspace.pipelines.ordered.includes(:pipeline_stages)
-    @pipeline = current_pipeline || Pipeline.default_for(current_workspace)
-    @effective_filters = @effective_filters.merge(pipeline_id: @pipeline.id) if @pipeline
-    includes = [ :company, :owner, { tasks: :assignee } ]
-    includes << :contacts if @pipeline&.show_card_field?(:contacts)
-    includes << { deal_products: [ :product, :edition ] } if @pipeline&.show_card_field?(:products)
+    @pipeline = current_pipeline
+    if @pipeline
+      @effective_filters = @effective_filters.merge(pipeline_id: @pipeline.id)
+    end
+    includes = [ :company, :owner, :pipeline, { tasks: :assignee } ]
+    if @pipeline
+      includes << :contacts if @pipeline.show_card_field?(:contacts)
+      includes << { deal_products: [ :product, :edition ] } if @pipeline.show_card_field?(:products)
+    else
+      includes << :contacts if @pipelines.any? { |pipeline| pipeline.show_card_field?(:contacts) }
+      if @pipelines.any? { |pipeline| pipeline.show_card_field?(:products) }
+        includes << { deal_products: [ :product, :edition ] }
+      end
+    end
     deals = filtered_deals(policy_scope(current_workspace.deals).includes(*includes))
     deals = deals.where(pipeline_id: @pipeline.id) if @pipeline
-    stages = @pipeline ? @pipeline.pipeline_stages.ordered.to_a : []
+    stages = if @pipeline
+      @pipeline.pipeline_stages.ordered.to_a
+    else
+      current_workspace.pipeline_stages.ordered_across_pipelines.to_a
+    end
     stages = stages.reject(&:closed?) unless show_closed?
     @deals_by_stage = stages.index_with { |stage| deals.by_stage(stage.id) }
     load_deal_filter_options
@@ -335,18 +348,35 @@ class DealsController < ApplicationController
         turbo_stream.replace("deal_value_display_#{@deal.id}", partial: "deals/value_display", locals: { deal: @deal })
       ]
     else
-      pipeline = @deal.pipeline
-      deals = policy_scope(current_workspace.deals).where(pipeline_id: pipeline.id)
-      stages = pipeline.pipeline_stages.ordered.to_a
+      deals = board_move_deals_scope
+      stages = board_move_stages
+      reorderable = current_pipeline.present?
       streams = stages.map { |stage|
         turbo_stream.replace("stage_summary_#{stage.id}",
           partial: "deals/stage_summary",
-          locals: { stage: stage, deals: deals.by_stage(stage.id), reorderable: true })
+          locals: { stage: stage, deals: deals.by_stage(stage.id), reorderable: reorderable })
       }
       streams << turbo_stream.replace("deal_card_value_#{@deal.id}",
         partial: "deals/card_value", locals: { deal: @deal })
       render turbo_stream: streams
     end
+  end
+
+  def board_move_deals_scope
+    scope = policy_scope(current_workspace.deals)
+    scope = scope.where(pipeline_id: current_pipeline.id) if current_pipeline
+    scope = scope.open_deals unless show_closed?
+    scope
+  end
+
+  def board_move_stages
+    stages = if current_pipeline
+      current_pipeline.pipeline_stages.ordered.to_a
+    else
+      current_workspace.pipeline_stages.ordered_across_pipelines.to_a
+    end
+    visible = show_closed? ? stages : stages.reject(&:closed?)
+    [ @deal.pipeline_stage, *visible ].compact.uniq
   end
 
   def respond_to_stage_move_error(message)

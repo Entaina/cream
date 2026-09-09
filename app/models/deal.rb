@@ -122,11 +122,15 @@ class Deal < ApplicationRecord
   def move_to_stage!(stage, position: nil)
     target = resolve_stage(stage)
     old_stage = pipeline_stage
+    old_pipeline = pipeline
     update!(pipeline_stage: target, pipeline: target.pipeline,
       position: position || (workspace.deals.where(pipeline_stage_id: target.id).maximum(:position) || 0) + 1)
     reposition_in_stage!(target, position) unless position.nil?
     track_activity("stage_changed", metadata: { from: old_stage&.name, to: target.name }) if old_stage != target
     if old_stage != target
+      if old_pipeline.id != target.pipeline_id
+        track_activity("pipeline_changed", metadata: { from: old_pipeline.name, to: target.pipeline.name })
+      end
       if CreamFeatures.enabled?(:webhooks)
         WebhookDispatcher.dispatch(
           workspace: workspace,
@@ -199,9 +203,13 @@ class Deal < ApplicationRecord
   def resolve_stage(stage)
     return stage if stage.is_a?(PipelineStage)
 
+    if stage.to_s.match?(/\A\d+\z/)
+      found = workspace.pipeline_stages.find_by(id: stage)
+      return found if found
+    end
+
     scope = pipeline&.pipeline_stages || PipelineStage.where(workspace_id: workspace_id)
-    found = scope.find_by(id: stage) if stage.to_s.match?(/\A\d+\z/)
-    found ||= scope.where("name ILIKE ?", stage.to_s).first
+    found = scope.where("name ILIKE ?", stage.to_s).first
     found || raise(ActiveRecord::RecordNotFound, "Unknown pipeline stage: #{stage}")
   end
 

@@ -6,7 +6,10 @@ RSpec.describe LeadFormTemplates::HtmlSchema do
   let(:member) { users(:one) }
   let(:workspace) { workspaces(:one) }
 
-  before { import_lead_form_templates!(workspace) }
+  before do
+    import_lead_form_templates!(workspace)
+    SubscriptionType.ensure_defaults!(workspace)
+  end
 
   def schema_for(template_key:, **lead_form_attrs)
     lead_form = create_lead_form!(workspace, user: member, template_key: template_key, **lead_form_attrs)
@@ -74,5 +77,15 @@ RSpec.describe LeadFormTemplates::HtmlSchema do
         "injected_field" => "malicious"
       )
     }.to raise_error(ActiveRecord::RecordInvalid, /Unknown field injected_field/)
+  end
+
+  it "allows configured consent field keys from subscription types" do
+    schema = schema_for(template_key: "entrenadores").apply_context(
+      lead_form: create_lead_form!(workspace, user: member, template_key: "entrenadores"),
+      product: nil,
+      open_editions: []
+    )
+
+    expect(schema.allowed_param_keys).to include("newsletter_opt_in", "marketing_consent")
   end
 end

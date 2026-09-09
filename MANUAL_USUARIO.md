@@ -173,7 +173,7 @@ Debajo del nombre del workspace, la barra lateral muestra el **pipeline activo**
 
 - **Deals** (tablero y tabla) filtran por ese pipeline.
 - **Dashboard** y **Reports** usan ese pipeline como filtro por defecto en las métricas de deals.
-- La opción **Todos los pipelines** quita el filtro donde aplique (en el tablero kanban se sigue mostrando el pipeline por defecto, porque las columnas pertenecen a un pipeline concreto).
+- La opción **Todos los pipelines** quita el filtro de deals: el dashboard y los informes agrupan por etapas de todos los pipelines (etiquetadas como *Pipeline · Etapa*), el tablero kanban muestra una columna por cada etapa de todos los pipelines (puedes arrastrar un deal a una etapa de otro pipeline) y la vista tabla añade una columna **Pipeline**.
 
 La selección se guarda por usuario y workspace, y se mantiene entre sesiones. También puedes cambiarla desde los selectores de Deals y Dashboard cuando hay varios pipelines.
 
@@ -197,7 +197,7 @@ El dashboard muestra un resumen del workspace:
 
 - **Director de ventas:** briefing diario generado por IA con indicaciones para el equipo, clasificadas en **Urgente** e **Importante**. Solo aparece en workspaces donde un administrador lo haya activado en **Settings** (checkbox *Briefing diario del director de ventas*), y además requiere que la IA esté configurada en el servidor (`CREAM_AI_API_KEY`). Cada usuario puede desactivarlo para sí en **Settings → Profile** (checkbox *Mostrar briefing del director de ventas en el dashboard*); también puedes abrir Profile desde tu nombre en la parte inferior del menú lateral. Para enriquecer el informe, el director usa herramientas de lectura del CRM, el **OKM** del workspace (si está configurado) y **memoria persistente** (llmemory) con aprendizajes de briefings anteriores. Además, cada usuario que lo tenga activado recibe un bloque **Para ti** con indicaciones directas, **Aciertos** (felicitaciones por logros recientes) y **A mejorar** (fallos u omisiones con recomendación). Si un deal ya tiene una **próxima acción** (tarea abierta con fecha futura), el briefing no pide acciones paralelas ni lo marca como inactivo; como mucho puede sugerir **adelantar** esa fecha. Los deals sin tarea abierta sí pueden aparecer como pendientes de definir siguiente paso. Si aún no hay briefing del día, puedes pulsar **Generar ahora**; si ya existe, puedes pulsar **Regenerar** hasta 5 veces al día (se muestra cuántas regeneraciones te quedan). Las indicaciones pueden enlazar a deals, personas, empresas o tareas; en el bloque de equipo se resaltan las asignadas a ti.
 - **Tarjetas de métricas:** número de personas, empresas, valor del pipeline abierto y ingresos ganados (deals en etapa *won*). Las métricas de deals respetan el **pipeline activo** (ver abajo); personas y empresas son del workspace completo.
-- **Pipeline por etapa:** barras con el reparto de deals por etapa. Si tienes un pipeline activo, el gráfico y las tarjetas de deals usan ese pipeline; si eliges **Todos los pipelines**, el gráfico muestra el pipeline por defecto del workspace y las tarjetas suman todos los deals.
+- **Pipeline por etapa:** barras con el reparto de deals por etapa. Si tienes un pipeline activo, el gráfico y las tarjetas de deals usan ese pipeline; si eliges **Todos los pipelines**, las tarjetas suman todos los deals y el gráfico lista las etapas de todos los pipelines (etiquetadas como *Pipeline · Etapa*).
 - **Upcoming tasks:** tareas pendientes próximas (marca completadas con un clic).
 - **Recent activity:** últimas acciones del equipo (creaciones, cambios de campo, cambios de etapa, etc.).
 
@@ -320,7 +320,7 @@ Los filtros activos se conservan al cambiar entre **Board** y **Table**, al pagi
 **Vistas del listado de deals:**
 
 - **Board** (menú Deals): tablero kanban por etapas — arrastra tarjetas entre columnas para cambiar de etapa. Barra de filtros con búsqueda, producto, edición y rango de primer contacto, más pestañas de **vistas guardadas** (igual que en la tabla).
-- **Table** (botón en el tablero): vista en tabla con los mismos filtros (incluida etapa), vistas guardadas, campos personalizados e importación/exportación CSV.
+- **Table** (botón en el tablero): vista en tabla con los mismos filtros (incluida etapa), vistas guardadas, campos personalizados e importación/exportación CSV. Con **Todos los pipelines** activo, la tabla incluye una columna **Pipeline** antes de la etapa.
 
 En el tablero, una vista guardada con filtro de **etapa** no restringe las columnas (las etapas ya son columnas); el resto de filtros sí se aplican.
 
@@ -398,7 +398,7 @@ En **Pipelines** puedes:
 - Crear un pipeline nuevo con sus etapas.
 - Editar etapas, probabilidades y colores.
 - **Reordenar etapas** arrastrando la fila por el asa (icono de puntos) al editar un pipeline; guarda los cambios con **Save changes**.
-- Marcar un pipeline como **por defecto** (el que usan los deals nuevos y el tablero cuando eliges *Todos los pipelines*).
+- Marcar un pipeline como **por defecto** (el que usan los deals nuevos).
 - Elegir qué **campos visibles en las tarjetas del tablero** (checkboxes al editar el pipeline): valor, empresa, responsable, fecha de cierre, probabilidad, **número de factura**, contactos, productos y ediciones. Por defecto: valor, empresa, fecha de cierre y responsable.
 - **Duplicar** un pipeline (copia etapas y la selección de campos del tablero, no los deals).
 - Crear desde **plantillas** predefinidas (Sales, Recruiting, etc.).
@@ -415,7 +415,7 @@ En **Deals** (vista board):
 - **Barra de filtros** bajo el título: búsqueda, producto, edición y rango de **First contact date**. No hay filtro por etapa (las columnas ya representan las etapas).
 - **Arrastra** una tarjeta a otra columna para mover el deal de etapa. El cambio se guarda al instante y los contadores y totales de las columnas se actualizan solos, sin recargar la página. Si el movimiento no se puede guardar (p. ej. por condiciones de entrada de la etapa destino), la tarjeta vuelve a su columna de origen y aparece un **aviso de error** en la parte superior de la pantalla.
 - **Reordena las columnas** arrastrando la cabecera de una etapa por el icono de puntos; el nuevo orden se guarda al soltar.
-- Si hay varios pipelines, también puedes cambiar el pipeline activo desde el selector de la cabecera (el tablero siempre muestra un pipeline concreto).
+- Si hay varios pipelines, también puedes cambiar el pipeline activo desde el selector de la cabecera. Con **Todos los pipelines**, el tablero muestra columnas de todos los pipelines (etiquetadas como *Pipeline · Etapa*) y puedes arrastrar un deal a una etapa de otro pipeline.
 - Las tarjetas con **tareas pendientes** muestran un icono de tarea en la esquina superior derecha: **rojo** si alguna tarea está vencida, **azul** si todas están al día o sin fecha límite. **Pasa el cursor** sobre el icono para ver la próxima tarea pendiente (título, fecha límite y asignado) sin abrir la ficha del deal; si hay varias pendientes, también indica cuántas quedan.
 - Los campos visibles en cada tarjeta (valor, empresa, responsable, fecha de cierre, probabilidad, número de factura, contactos, productos y ediciones) dependen de la configuración del pipeline activo — ver [Gestionar pipelines](#gestionar-pipelines).
 - Desde la ficha de un deal también puedes cambiar etapa (botones **Move to stage**; el selector se actualiza al instante) o **mover a otro pipeline** (empezará en la primera etapa del pipeline destino).
@@ -1060,7 +1060,7 @@ En el menú lateral, abre **Formularios**.
 
 1. Pulsa **Nuevo formulario**.
 2. Indica el **nombre**, el **slug** (aparecerá en la URL pública `/f/slug`), la **plantilla** del formulario y si el formulario está **Activo**.
-3. En **Destino del envío**, elige **Deal (ventas)** o **MQL (marketing)**. Deal crea o reutiliza una oportunidad (flujo descrito abajo). MQL captura persona, consentimiento e historial de envíos **sin crear deal** (ver [§29 Pool MQL](#pool-mql)). Para destino MQL puedes indicar el **tipo de suscripción** y el **texto de permiso de marketing** que verá el visitante.
+3. En **Destino del envío**, elige **Deal (ventas)** o **MQL (marketing)**. Deal crea o reutiliza una oportunidad (flujo descrito abajo). MQL captura persona, consentimiento e historial de envíos **sin crear deal** (ver [§29 Pool MQL](#pool-mql)). Para destino MQL puedes indicar el **tipo de suscripción** (define la clave del checkbox esperada) y el **texto de permiso de marketing** que sobrescribe la etiqueta por defecto del tipo. Cream avisa si la plantilla del formulario no incluye ese campo.
 4. En **CRM y asignación** (solo destino Deal): el **pipeline** donde se creará el deal, la **etapa** opcional, el **responsable** (recibe la notificación y la tarea de seguimiento), el **producto** opcional y rutas de pipeline por valor de campo.
 5. Configura la **primera tarea** (texto y días hasta vencimiento; 0 = el mismo día) y la **plantilla de email** al lead (o **Sin email**).
 6. Opcional: indica la **URL de redirección tras envío** (p. ej. `https://entaina.com/gracias`) para llevar al visitante a una página de tu web. Si se deja vacía, se muestra la página de gracias de Cream (`/f/slug/success`).
@@ -1091,7 +1091,7 @@ Si la plantilla de una página no existe en el workspace, la URL pública `/f/sl
 ### Política de privacidad y consentimiento
 
 - Cada formulario público incluye un enlace a la **política de privacidad** (`/f/slug/privacy`). El contenido se define en **Plantillas de formulario** → plantilla `privacy` (editable por administradores).
-- El visitante debe marcar la casilla de **consentimiento de protección de datos** (RGPD) para enviar. Opcionalmente la plantilla puede ofrecer **newsletter** u otro permiso de marketing; si el contacto lo acepta, se registra la suscripción al tipo correspondiente (ver [§29](#29-marketing)).
+- El visitante debe marcar la casilla de **consentimiento de protección de datos** (RGPD) para enviar. Opcionalmente la plantilla puede incluir casillas de marketing con `{% subscription_opt_in slug: "newsletter" %}` (u otro slug de tipo de suscripción); si el contacto las acepta, se registra la suscripción al tipo cuya **clave de checkbox** coincida (ver [§29](#29-marketing)).
 - Al cargar el formulario, Cream guarda una **versión inmutable** de la política y de la frase del checkbox. Cada envío queda enlazado a esa versión (fecha, URL, hash y textos aceptados). El detalle completo se consulta en **Formularios → Ver → Envíos recientes → Detalle**, o desde la ficha del contacto → **Formularios enviados**. En deals, **Formulario de origen** muestra las respuestas del envío pero no el bloque extendido de consentimiento.
 
 ### Qué ocurre al enviar un formulario (destino Deal)
@@ -1236,7 +1236,9 @@ Contactos con **permiso de marketing vigente** (suscripción activa al tipo eleg
 
 1. Pulsa **Nuevo tipo**.
 2. Indica **nombre**, **identificador (slug)**, **descripción** (visible en el centro de preferencias del contacto) y **orden**.
-3. Marca **Activo** y guarda. Cream crea por defecto tipos como *general* y *newsletter* al usar el módulo.
+3. Opcional: **Clave del checkbox en formularios** — nombre del campo `lead[clave]` que activará esta suscripción cuando el visitante lo marque (p. ej. `newsletter_opt_in`). Debe ser única en el workspace.
+4. Opcional: **Texto por defecto del checkbox** — etiqueta mostrada en plantillas Liquid salvo que la plantilla o el formulario MQL la sobrescriban.
+5. Marca **Activo** y guarda. Cream crea por defecto tipos como *general* (`marketing_consent`) y *newsletter* (`newsletter_opt_in`) al usar el módulo.
 
 **En la ficha de una persona** (panel izquierdo → **Suscripciones**):
 
@@ -1254,7 +1256,7 @@ Contactos con **permiso de marketing vigente** (suscripción activa al tipo eleg
 | Consentimiento | Qué es | Dónde se configura |
 |----------------|--------|-------------------|
 | **Protección de datos (RGPD)** | Obligatorio para enviar cualquier formulario | Partial `consent_fields` en plantillas |
-| **Marketing / newsletter** | Opcional; activa una suscripción | Casillas en la plantilla + tipo en formulario MQL |
+| **Marketing / newsletter** | Opcional; activa una suscripción | Tag `{% subscription_opt_in slug: "…" %}` en plantillas (usa la clave del tipo) + tipo en formulario MQL |
 
 Las suscripciones creadas desde un formulario guardan la misma **versión de política de privacidad** que el envío (ver [§27](#27-formularios-de-captación)).
 

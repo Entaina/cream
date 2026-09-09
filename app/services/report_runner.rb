@@ -119,7 +119,7 @@ class ReportRunner
   def label_for(key)
     case @group_by
     when "owner" then owner_names[key] || "Unassigned"
-    when "stage" then stage_names[key] || "—"
+    when "stage" then stage_labels[key] || "—"
     when "company" then company_names[key] || "—"
     when "industry" then key.presence || "—"
     when "month" then key ? key.to_date.strftime("%b %Y") : "—"
@@ -140,8 +140,14 @@ class ReportRunner
     stage_colors[key]
   end
 
-  def stage_names
-    @stage_names ||= @workspace.pipeline_stages.pluck(:id, :name).to_h
+  def stage_labels
+    @stage_labels ||= if @pipeline_id
+      @workspace.pipeline_stages.pluck(:id, :name).to_h
+    else
+      @workspace.pipeline_stages.joins(:pipeline)
+        .pluck("pipeline_stages.id", "pipelines.name", "pipeline_stages.name")
+        .to_h { |id, pipeline_name, stage_name| [ id, "#{pipeline_name} · #{stage_name}" ] }
+    end
   end
 
   def stage_colors

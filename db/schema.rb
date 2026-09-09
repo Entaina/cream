@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_09_130000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_09_140000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -1429,13 +1429,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_09_130000) do
 
   create_table "subscription_types", force: :cascade do |t|
     t.boolean "active", default: true, null: false
+    t.string "consent_field_key"
     t.datetime "created_at", null: false
+    t.text "default_consent_label"
     t.text "description"
     t.string "name", null: false
     t.integer "position", default: 0, null: false
     t.string "slug", null: false
     t.datetime "updated_at", null: false
     t.bigint "workspace_id", null: false
+    t.index ["workspace_id", "consent_field_key"], name: "index_subscription_types_on_workspace_consent_field_key", unique: true, where: "(consent_field_key IS NOT NULL)"
     t.index ["workspace_id", "slug"], name: "index_subscription_types_on_workspace_id_and_slug", unique: true
     t.index ["workspace_id"], name: "index_subscription_types_on_workspace_id"
   end

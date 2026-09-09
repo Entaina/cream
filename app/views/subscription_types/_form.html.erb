@@ -28,6 +28,22 @@
     <%= f.number_field :position, class: "input w-full", min: 0 %>
   </div>
 
+  <div>
+    <%= f.label :consent_field_key, "Clave del checkbox en formularios", class: "label" %>
+    <%= f.text_field :consent_field_key, class: "input w-full font-mono",
+          placeholder: "newsletter_opt_in",
+          pattern: LeadForm::FIELD_KEY_FORMAT.source,
+          title: "Letras minúsculas, números y guiones bajos" %>
+    <p class="text-sm text-ink-faint mt-1">Opcional. Nombre del campo <code class="text-2xs">lead[clave]</code> en plantillas Liquid (<code class="text-2xs">{% subscription_opt_in slug: \"…\" %}</code>). Debe ser única en el workspace.</p>
+  </div>
+
+  <div>
+    <%= f.label :default_consent_label, "Texto por defecto del checkbox", class: "label" %>
+    <%= f.text_area :default_consent_label, class: "input w-full resize-y", rows: 2,
+          placeholder: "Quiero recibir la newsletter" %>
+    <p class="text-sm text-ink-faint mt-1">Etiqueta mostrada en formularios salvo que la plantilla o el formulario MQL la sobrescriban.</p>
+  </div>
+
   <label class="flex items-center gap-2 text-base">
     <%= f.check_box :active %> Activo
   </label>

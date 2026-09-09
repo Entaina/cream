@@ -59,6 +59,20 @@ RSpec.describe ReportRunner do
     expect(run(metric: "count", group_by: "stage", date_range: "month").total).to eq(1)
   end
 
+  it "labels stages with pipeline name when no pipeline is selected" do
+    other = pipeline.duplicate(name: "Hiring").tap(&:save!)
+    lead_in_default = pipeline.pipeline_stages.find_by!(name: "Lead")
+    lead_in_other = other.pipeline_stages.find_by!(name: "Lead")
+    create_deal!(workspace, pipeline: pipeline, stage: lead_in_default)
+    create_deal!(workspace, pipeline: other, stage: lead_in_other)
+
+    result = run(metric: "count", group_by: "stage", pipeline_id: nil)
+    labels = result.rows.map(&:label)
+
+    expect(labels).to include("#{pipeline.name} · Lead")
+    expect(labels).to include("#{other.name} · Lead")
+  end
+
   it "filters deals by pipeline" do
     other_pipeline = pipeline.duplicate(name: "Hiring").tap(&:save!)
     create_deal!(workspace, pipeline: pipeline)
@@ -83,7 +97,7 @@ RSpec.describe ReportRunner do
     won_stage = pipeline.pipeline_stages.find_by(name: "Won")
     create_deal!(workspace, pipeline: pipeline, stage: won_stage, name: "Won deal")
 
-    result = run(metric: "count", group_by: "stage", include_closed: true)
+    result = run(metric: "count", group_by: "stage", include_closed: true, pipeline_id: pipeline.id)
 
     expect(result.rows.map(&:label)).to include("Won")
   end

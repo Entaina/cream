@@ -294,6 +294,33 @@ RSpec.describe "Deals", type: :request do
       expect(response.body).not_to include("Partners deal")
     end
 
+    it "shows the Pipeline column when all pipelines is selected" do
+      sign_in_as(member)
+      other = pipeline.duplicate(name: "Partners").tap(&:save!)
+      company = create_company!(workspace)
+      contact = create_person!(workspace, company: company)
+      create_deal!(workspace, pipeline: pipeline, name: "Ventas deal", company: company, contacts: [ contact ])
+      create_deal!(workspace, pipeline: other, name: "Partners deal", company: company, contacts: [ contact ])
+      memberships(:one_one).update!(current_pipeline: nil)
+
+      get deals_path
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(">Pipeline</th>")
+      expect(response.body).to include("Ventas")
+      expect(response.body).to include("Partners")
+    end
+
+    it "hides the Pipeline column when a specific pipeline is selected" do
+      sign_in_as(member)
+      memberships(:one_one).update!(current_pipeline: pipeline)
+
+      get deals_path
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).not_to include(">Pipeline</th>")
+    end
+
     it "shows all deals when all pipelines is selected" do
       sign_in_as(member)
       other = pipeline.duplicate(name: "Partners").tap(&:save!)
@@ -409,6 +436,29 @@ RSpec.describe "Deals", type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include("Closed deal")
+    end
+  end
+
+  describe "GET /deals/board (all pipelines)" do
+    it "shows columns and deals from all pipelines" do
+      sign_in_as(member)
+      other = pipeline.duplicate(name: "Partners").tap(&:save!)
+      company = create_company!(workspace)
+      contact = create_person!(workspace, company: company)
+      create_deal!(workspace, pipeline: pipeline, name: "Ventas board deal",
+        company: company, contacts: [ contact ])
+      create_deal!(workspace, pipeline: other, name: "Partners board deal",
+        company: company, contacts: [ contact ])
+      memberships(:one_one).update!(current_pipeline: nil)
+
+      get board_deals_path
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("Ventas board deal")
+      expect(response.body).to include("Partners board deal")
+      expect(response.body).to include("Ventas · Lead")
+      expect(response.body).to include("Partners · Lead")
+      expect(response.body).to include("All pipelines")
     end
   end
 

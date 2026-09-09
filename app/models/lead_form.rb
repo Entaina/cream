@@ -14,8 +14,17 @@ class LeadForm < ApplicationRecord
     utm_source utm_medium utm_campaign utm_term utm_content
   ].freeze
   SYSTEM_FIELD_KEYS = (
-    METADATA_FIELDS + [ HONEYPOT_FIELD, TIMESTAMP_FIELD, "gdpr_consent", "marketing_consent", "_submission_key", "privacy_policy_hash" ]
+    METADATA_FIELDS + [ HONEYPOT_FIELD, TIMESTAMP_FIELD, "gdpr_consent", "_submission_key", "privacy_policy_hash" ]
   ).freeze
+
+  def self.consent_field_keys_for(workspace)
+    SubscriptionType.ensure_defaults!(workspace)
+    workspace.subscription_types.where.not(consent_field_key: nil).pluck(:consent_field_key)
+  end
+
+  def self.system_field_keys_for(workspace)
+    (SYSTEM_FIELD_KEYS + consent_field_keys_for(workspace)).uniq
+  end
   FIELD_KEY_FORMAT = /\A[a-z][a-z0-9_]{0,39}\z/
   # Datos del envío que viajan como query params a la URL de redirección tras envío,
   # para que el destino (p. ej. una página de reservas) pueda autorrellenarse.
@@ -115,6 +124,35 @@ class LeadForm < ApplicationRecord
     return Edition.none unless product
 
     product.editions.not_started.order(:starts_on, :name)
+  end
+
+  def mql_subscription_type
+    subscription_type || workspace.subscription_types.find_by(slug: "general")
+  end
+
+  def expected_mql_consent_field_key
+    type = mql_subscription_type
+    return if type.nil?
+
+    type.consent_field_key.presence || Marketing::ConsentService::LEGACY_FIELD_ALIASES[type.slug]
+  end
+
+  def template_consent_field_keys
+    template = workspace.lead_form_templates.find_by(path: LeadFormTemplate.form_page_path_for(template_key))
+    return [] unless template
+
+    if template.submission_schema.present?
+      Array(template.submission_schema["fields"]).map { |field| field["name"] }
+    else
+      html = LeadFormTemplates::FormHtmlRenderer.render(lead_form: self)
+      LeadFormTemplates::HtmlSchema.parse(html).fields.map(&:name)
+    end
+  end
+
+  def template_includes_consent_field?(key = expected_mql_consent_field_key)
+    return true if key.blank?
+
+    template_consent_field_keys.include?(key)
   end
 
   def self.available_template_keys(workspace: nil)

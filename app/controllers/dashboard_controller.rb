@@ -17,8 +17,12 @@ class DashboardController < ApplicationController
       .due_order.includes(:taskable, :assignee).limit(8)
     @recent_activities = current_workspace.activities.includes(:user, :subject).recent_first.limit(15)
     @pipelines = current_workspace.pipelines.ordered
-    @pipeline = current_pipeline || Pipeline.default_for(current_workspace)
-    stages = @pipeline&.pipeline_stages&.ordered.to_a || []
+    @pipeline = current_pipeline
+    stages = if current_pipeline
+      current_pipeline.pipeline_stages.ordered.to_a
+    else
+      current_workspace.pipeline_stages.ordered_across_pipelines.to_a
+    end
     @stages = show_closed? ? stages : stages.reject(&:closed?)
     @deals_by_stage = deals_scope.group(:pipeline_stage_id).count
     if current_membership&.sales_director_briefing_visible?

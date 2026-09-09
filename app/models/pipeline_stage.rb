@@ -13,6 +13,10 @@ class PipelineStage < ApplicationRecord
   validates :probability, numericality: { only_integer: true, in: 0..100 }
 
   scope :ordered, -> { order(:position, :id) }
+  scope :ordered_across_pipelines, -> {
+    joins(:pipeline).includes(:pipeline)
+      .order(Arel.sql("pipelines.position, pipelines.id, pipeline_stages.position, pipeline_stages.id"))
+  }
 
   def open? = !closed?
 end
