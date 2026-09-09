@@ -5,7 +5,8 @@ class Person < ApplicationRecord
     "web_form" => "Formulario web",
     "booking" => "Reserva online",
     "referral" => "Recomendado",
-    "team_member" => "Lo trae alguien del equipo"
+    "team_member" => "Lo trae alguien del equipo",
+    "beehiiv" => "Beehiiv"
   }.freeze
 
   LIFECYCLE_STAGES = %w[subscriber lead mql sql opportunity customer evangelist].freeze

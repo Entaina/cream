@@ -4,7 +4,7 @@
 
 Cream is a **workspace**-based CRM for managing **people**, **companies** and **deals** (opportunities), with notes, tasks, lists and an activity history shared across the team.
 
-> **Last revision:** 2026-09-09 (navigation, profile, forms, mail merge and rest of manual)
+> **Last revision:** 2026-09-09 (Beehiiv sync, MQL pool)
 > This document describes the functionality **visible to the user**. Disabled features are listed at the end under "Coming soon".
 
 ---
@@ -860,6 +860,21 @@ Each workspace has its own URL (it includes a token). Without Mailjet connected,
 
 - **Desconectar** removes this workspace's credentials.
 
+### Beehiiv
+
+Syncs the Beehiiv audience with Cream's **Newsletter** subscription type (admins only). Beehiiv still sends the newsletter; Cream mirrors subscribe/unsubscribe into the MQL pool.
+
+1. In Beehiiv, copy the **API Key** and **Publication ID** (`pub_…`).
+2. In **Settings**, **Beehiiv** section, paste the key and publication ID.
+3. Optional: paste the **Webhook signing secret** (`whsec_…`) from Beehiiv → Settings → Webhooks (Scale plan+).
+4. Click **Conectar Beehiiv** or **Guardar Beehiiv**. The API key is not shown again; leave the field blank to keep the stored value.
+5. Click **Sincronizar ahora** to import existing subscribers. Hourly auto-sync runs when enabled.
+6. Copy the **webhook URL** and register it in Beehiiv for `subscription.created`, `subscription.confirmed` and `subscription.deleted`.
+
+**Bidirectional:** subscribe/unsubscribe in Cream (form, person record or preference center) is pushed to Beehiiv. Changes originating in Beehiiv are not pushed back.
+
+- **Desconectar** removes Beehiiv settings for this workspace (does not delete imported people or subscriptions).
+
 ---
 
 ## 22. API tokens
@@ -1209,7 +1224,7 @@ In the sidebar (depending on features enabled in your workspace):
 
 ### MQL pool
 
-Contacts with **active marketing permission** (subscribed to the chosen type, valid primary email and not suppressed). The pool is independent of scoring lifecycle: a customer with permission can remain in the pool while having open opportunities on other products.
+Contacts with **active marketing permission** (at least one active subscription to an active type, valid primary email and not suppressed). By default any type counts (e.g. **General** or **Newsletter** imported from Beehiiv). Narrow with the **subscription type** filter. The pool is independent of scoring lifecycle: a customer with permission can remain in the pool while having open opportunities on other products.
 
 **How to access:** **MQLs** menu.
 

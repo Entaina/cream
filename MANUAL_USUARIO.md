@@ -4,7 +4,7 @@
 
 Cream es un CRM por **workspaces** para gestionar **personas**, **empresas** y **deals** (oportunidades), con notas, tareas, listas y un historial de actividad compartido en el equipo.
 
-> **Última revisión:** 2026-09-09 (navegación, perfil, formularios, mail merge y resto del manual)
+> **Última revisión:** 2026-09-09 (sync Beehiiv, pool MQL)
 > Este documento describe la funcionalidad **visible para el usuario**. Las funcionalidades desactivadas aparecen al final en «Próximamente».
 
 ---
@@ -860,6 +860,21 @@ Cada workspace tiene su propia URL (incluye un token). Sin Mailjet conectado, la
 
 - **Desconectar** elimina las credenciales de este workspace.
 
+### Beehiiv
+
+Sincroniza la audiencia de Beehiiv con el tipo de suscripción **Newsletter** de Cream (solo admins). Beehiiv sigue enviando la newsletter; Cream refleja altas y bajas en el pool MQL.
+
+1. En Beehiiv, copia la **API Key** y el **Publication ID** (`pub_…`).
+2. En **Settings**, sección **Beehiiv**, pega la clave y el ID de publicación.
+3. Opcional: pega el **Webhook signing secret** (`whsec_…`) desde Beehiiv → Settings → Webhooks (plan Scale+).
+4. Pulsa **Conectar Beehiiv** o **Guardar Beehiiv**. La API key no se vuelve a mostrar; deja el campo en blanco para conservarla.
+5. Pulsa **Sincronizar ahora** para importar suscriptores existentes. La sync automática se repite cada hora si está activada.
+6. Copia la **URL del webhook** y regístrala en Beehiiv con los eventos `subscription.created`, `subscription.confirmed` y `subscription.deleted`.
+
+**Bidireccional:** si alguien se suscribe o se da de baja de la newsletter en Cream (formulario, ficha de persona o centro de preferencias), el cambio se empuja a Beehiiv. Los cambios originados en Beehiiv no se reenvían.
+
+- **Desconectar** elimina la configuración de Beehiiv en este workspace (no borra personas ni suscripciones ya importadas).
+
 ---
 
 ## 22. Tokens de API
@@ -1209,7 +1224,7 @@ En el menú lateral (según funcionalidades activas en tu workspace):
 
 ### Pool MQL
 
-Contactos con **permiso de marketing vigente** (suscripción activa al tipo elegido, email principal válido y sin supresión). El pool es independiente del lifecycle de scoring: un cliente con permiso puede seguir en el pool mientras tenga oportunidades abiertas en otros productos.
+Contactos con **permiso de marketing vigente** (al menos una suscripción activa a un tipo activo, email principal válido y sin supresión). Por defecto aparecen suscriptores de cualquier tipo (p. ej. **General** o **Newsletter** importados desde Beehiiv). Puedes acotar con el filtro **tipo de suscripción**. El pool es independiente del lifecycle de scoring: un cliente con permiso puede seguir en el pool mientras tenga oportunidades abiertas en otros productos.
 
 **Cómo acceder:** menú **MQLs**.
 

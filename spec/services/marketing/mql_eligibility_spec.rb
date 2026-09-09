@@ -32,4 +32,17 @@ RSpec.describe Marketing::MqlEligibility do
 
     expect(described_class.eligible?(person)).to be(false)
   end
+
+  it "includes newsletter subscribers in the default pool without a type filter" do
+    newsletter = workspace.subscription_types.find_by!(slug: "newsletter")
+    Marketing::ConsentService.subscribe!(
+      person: person,
+      subscription_type: newsletter,
+      source: "beehiiv:sync",
+      legal_basis: "consent"
+    )
+
+    expect(described_class.eligible?(person)).to be(true)
+    expect(described_class.scope(workspace: workspace)).to contain_exactly(person)
+  end
 end

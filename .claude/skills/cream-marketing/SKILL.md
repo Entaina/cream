@@ -36,6 +36,7 @@ Workspace-scoped (`WorkspaceRecordPolicy`):
 | Modelo | Rol |
 |--------|-----|
 | `MailjetConnection` | Credenciales ESP por workspace (API Key, Secret, remitente, webhook token, `transactional_enabled`) |
+| `BeehiivConnection` | API Key, `publication_id`, webhook token/secret, sync horaria con audiencia Beehiiv |
 | `SubscriptionType` | Tipos de suscripción; `consent_field_key` + `default_consent_label` enlazan checkbox de formulario ↔ suscripción |
 | `EmailSubscription` | Estado por persona + tipo (`subscribed` / `unsubscribed` / `pending`) |
 | `EmailSuppression` | Bloqueo global por email (bounce, spam, baja total) |
@@ -83,7 +84,8 @@ Migraciones: `20260904100000_create_marketing_hub.rb`, `20260904110000_marketing
 | `ScoringEngine` | Eventos, decay idempotente (`lead_score_decayed_at`), transición lifecycle por umbrales |
 | `AttributionReport` | Dashboard UTM unificado; drill-down MQL (`MQL_STAGES` desde `ScoringEngine`) |
 | `FilterResolver` / `ConditionEvaluator` | Filtros de segmentos y condiciones de scoring; claves MQL: `marketing_eligible`, `open_deal`, `interest_product_id`, `lead_form_id`, `capture_destination` |
-| `MqlEligibility` | Elegibilidad del pool (suscripción activa + email principal + no suprimido) |
+| `MqlEligibility` | Elegibilidad del pool (≥1 suscripción activa subscribed + email principal + no suprimido; filtro opcional por tipo) |
+| `Beehiiv::Client` / `SubscriberSync` / `PushService` / `WebhookProcessor` | Sync bidireccional newsletter Beehiiv ↔ tipo `newsletter` |
 | `MqlToSqlConverter` | Conversión transaccional de interés → deal (crear o vincular) |
 | `JourneyExit` | Cancelar/bloquear recorridos con `stop_on_open_deal` |
 | `ConsentPolicySnapshot` | Versionar política + frase de checkbox por hash; find_or_create idempotente |
@@ -130,6 +132,7 @@ resource :marketing_attribution, only: :show
 | `GET/PATCH /e/preferences/:token` | `Public::EmailPreferencesController` | Centro de preferencias |
 | `GET/POST /e/unsubscribe/:token` | one-click unsub con `?type=` |
 | `POST /e/events?token=` | `Public::EmailEventsController#create` | Webhook Mailjet; el token es el `webhook_token` de `MailjetConnection` |
+| `POST /e/beehiiv/:token` | `Public::BeehiivWebhooksController#create` | Webhook Beehiiv (Svix); token de `BeehiivConnection` |
 | `POST /t` | `Public::TrackingController#create` | Eventos tracking |
 | `GET /cream.js` | script cross-origin | Snippet embebible |
 
@@ -144,6 +147,7 @@ resource :marketing_attribution, only: :show
 | `JourneyRunnerJob` | cada 10 min | production + development |
 | `ScoringRecalculateJob` | daily 3am | production + development |
 | `MarketingDataRetentionJob` | daily 4am | production + development |
+| `BeehiivSyncSchedulerJob` | cada hora | production + development |
 | `CampaignSendJob` | on-demand (`wait_until`) | programación de campañas |
 
 `MarketingDataRetentionJob` purga `PageView` y `EmailEvent` más antiguos que `MARKETING_DATA_RETENTION_DAYS` (default 180).
@@ -175,6 +179,8 @@ resource :marketing_attribution, only: :show
 | `SMTP_*` / `MAILER_FROM` | Fallback de instancia (Mailbin en dev). Campañas usan `MailjetConnection` si existe; transaccional solo si `transactional_enabled` |
 
 Mailjet por workspace: **Settings** (admin) → `MailjetConnection` (`api_key`, `secret_key`, `from_email`, `from_name`, `webhook_token`, `transactional_enabled`). URL webhook: `https://<host>/e/events?token=<webhook_token>`.
+
+Beehiiv por workspace: **Settings** (admin) → `BeehiivConnection` (`api_key`, `publication_id`, `webhook_signing_secret`, `sync_enabled`). URL webhook: `https://<host>/e/beehiiv/<webhook_token>`. Push outbound desde `ConsentService` (tipo newsletter) vía `BeehiivPushJob`; inbound no reempuja (`source` `beehiiv:*`).
 
 ## Tests
 

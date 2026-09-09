@@ -7,6 +7,7 @@ module Settings
     def show
       authorize [ :settings, :workspace ]
       load_mailjet_connection
+      load_beehiiv_connection
     end
 
     def update
@@ -40,6 +41,13 @@ module Settings
 
       @mailjet_connection = current_workspace.mailjet_connection ||
         current_workspace.build_mailjet_connection(user: current_user)
+    end
+
+    def load_beehiiv_connection
+      return unless CreamFeatures.enabled?(:marketing_consent)
+
+      @beehiiv_connection = current_workspace.beehiiv_connection ||
+        current_workspace.build_beehiiv_connection(user: current_user)
     end
   end
 end

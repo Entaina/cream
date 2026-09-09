@@ -28,6 +28,9 @@ production:
   purge_marketing_events:
     class: MarketingDataRetentionJob
     schedule: every day at 4am
+  sync_beehiiv_subscribers:
+    class: BeehiivSyncSchedulerJob
+    schedule: every hour
   sync_gmail_inboxes:
     class: GmailSyncSchedulerJob
     schedule: every 10 minutes
@@ -54,5 +57,8 @@ development:
   purge_marketing_events:
     class: MarketingDataRetentionJob
     schedule: every day at 4am
+  sync_beehiiv_subscribers:
+    class: BeehiivSyncSchedulerJob
+    schedule: every hour
 
 # Recurring tasks are loaded per environment. database_backup is production-only.

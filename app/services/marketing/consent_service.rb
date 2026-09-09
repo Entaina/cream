@@ -69,21 +69,25 @@ module Marketing
     def self.subscribe!(person:, subscription_type:, source:, legal_basis: nil, metadata: {})
       subscription = EmailSubscription.find_or_initialize_by(person: person, subscription_type: subscription_type)
       subscription.workspace = subscription_type.workspace
+      reactivate = subscription.persisted? && !subscription.subscribed?
       subscription.subscribe!(source: source, legal_basis: legal_basis, metadata: metadata)
+      enqueue_beehiiv_push!(subscription, action: :subscribe, reactivate: reactivate, source: source)
       subscription
     end
 
-    def self.unsubscribe!(person:, subscription_type:, source: "preference_center", metadata: {})
+    def self.unsubscribe!(person:, subscription_type:, source: "preference_center", metadata: {}, push_to_beehiiv: true)
       subscription = EmailSubscription.find_by(person: person, subscription_type: subscription_type)
       return unless subscription
 
       subscription.unsubscribe!(source: source, metadata: metadata)
+      enqueue_beehiiv_push!(subscription, action: :unsubscribe, source: source) if push_to_beehiiv
+      subscription
     end
 
     def self.unsubscribe_all!(person:, source: "preference_center", metadata: {})
       workspace = person.workspace
       workspace.subscription_types.active.find_each do |type|
-        unsubscribe!(person: person, subscription_type: type, source: source, metadata: metadata)
+        unsubscribe!(person: person, subscription_type: type, source: source, metadata: metadata, push_to_beehiiv: false)
       end
       EmailSuppression.suppress!(
         workspace: workspace,
@@ -91,7 +95,34 @@ module Marketing
         reason: "unsubscribe",
         metadata: metadata.merge("scope" => "all")
       )
+      enqueue_beehiiv_unsubscribe_all!(person, source: source)
     end
+
+    def self.beehiiv_source?(source)
+      source.to_s.start_with?("beehiiv:")
+    end
+
+    def self.enqueue_beehiiv_push!(subscription, action:, source:, reactivate: false)
+      return if beehiiv_source?(source)
+      return unless subscription.subscription_type.slug == "newsletter"
+      return unless subscription.person.workspace.beehiiv_connection&.connected?
+
+      BeehiivPushJob.perform_later(
+        subscription.workspace_id,
+        subscription.person_id,
+        action.to_s,
+        { "reactivate" => reactivate }
+      )
+    end
+    private_class_method :enqueue_beehiiv_push!
+
+    def self.enqueue_beehiiv_unsubscribe_all!(person, source:)
+      return if beehiiv_source?(source)
+      return unless person.workspace.beehiiv_connection&.connected?
+
+      BeehiivPushJob.perform_later(person.workspace_id, person.id, "unsubscribe")
+    end
+    private_class_method :enqueue_beehiiv_unsubscribe_all!
 
     def self.consent_metadata(params:, request:, lead_form:)
       {

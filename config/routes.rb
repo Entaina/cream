@@ -160,6 +160,9 @@ Rails.application.routes.draw do
     post :sync, on: :member
   end
   resource :mailjet_connection, only: %i[create update destroy]
+  resource :beehiiv_connection, only: %i[create update destroy] do
+    post :sync, on: :member
+  end
   resources :stripe_payments, only: %i[index show] do
     member do
       post :match
@@ -207,6 +210,7 @@ Rails.application.routes.draw do
   patch "e/preferences/:token", to: "public/email_preferences#update"
   match "e/unsubscribe/:token", to: "public/email_preferences#unsubscribe", via: %i[get post], as: :public_email_unsubscribe
   post "e/events", to: "public/email_events#create", as: :public_email_events
+  post "e/beehiiv/:token", to: "public/beehiiv_webhooks#create", as: :public_beehiiv_webhook
   post "t", to: "public/tracking#create", as: :public_tracking
   get "cream.js", to: "public/tracking#script", as: :cream_tracking_script
 

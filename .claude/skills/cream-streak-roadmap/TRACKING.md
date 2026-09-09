@@ -36,6 +36,7 @@ Legend: `ready` | `partial` | `placeholder` — only `ready` features should hav
 | lead_scoring | ready | yes | Rules with conditions, idempotent decay, form_field/deal_created events |
 | web_tracking | ready | yes | Cross-origin cream.js; landing pages `/p/:workspace/:slug`; cream_aid on lead submit |
 | mql_pool | ready | yes | MQL pool index, product interests, MQL→SQL conversion, lead forms with MQL destination; enabled 2026-09-09 |
+| beehiiv_sync | ready | no | Bidirectional Beehiiv ↔ Newsletter subscription; Settings UI, hourly sync, Svix webhooks |
 
 ## Disabled (implemented but gated)
 

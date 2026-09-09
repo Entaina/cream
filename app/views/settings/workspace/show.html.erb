@@ -75,6 +75,94 @@
       </section>
     <% end %>
 
+    <% if feature_enabled?(:marketing_consent) %>
+      <% @beehiiv_connection ||= current_workspace.beehiiv_connection || current_workspace.build_beehiiv_connection(user: current_user) %>
+      <section class="card p-4 space-y-3">
+        <h2 class="text-base font-semibold text-ink">Beehiiv</h2>
+        <p class="text-sm text-ink-soft">
+          Sincroniza la audiencia de Beehiiv con el tipo de suscripción <strong>Newsletter</strong> de Cream.
+          Beehiiv sigue enviando la newsletter; Cream refleja altas y bajas en el pool MQL.
+        </p>
+
+        <% if @beehiiv_connection.errors.any? %>
+          <div class="text-sm text-danger">
+            <% @beehiiv_connection.errors.full_messages.each do |message| %>
+              <p><%= message %></p>
+            <% end %>
+          </div>
+        <% end %>
+
+        <% if @beehiiv_connection.persisted? && @beehiiv_connection.connected? %>
+          <p class="text-sm text-green-700 dark:text-green-400">
+            Conectado a publicación <strong class="font-mono"><%= @beehiiv_connection.publication_id %></strong>
+            con API key <strong class="font-mono"><%= @beehiiv_connection.masked_api_key %></strong>.
+            <% if @beehiiv_connection.last_synced_at.present? %>
+              Última sync: <%= l(@beehiiv_connection.last_synced_at, format: :short) %>.
+            <% end %>
+          </p>
+          <% if @beehiiv_connection.last_error.present? %>
+            <p class="text-sm text-danger">Último error: <%= @beehiiv_connection.last_error %></p>
+          <% end %>
+        <% end %>
+
+        <%= form_with model: @beehiiv_connection, url: beehiiv_connection_path,
+              method: @beehiiv_connection.persisted? ? :patch : :post, class: "space-y-3" do |f| %>
+          <div>
+            <%= f.label :api_key, "API Key", class: "block text-sm font-medium text-ink-soft mb-1" %>
+            <%= f.password_field :api_key, value: "", autocomplete: "off", class: "input w-full font-mono",
+                  placeholder: @beehiiv_connection.connected? ? "Deja en blanco para conservar la clave actual" : "Clave de la API de Beehiiv" %>
+          </div>
+          <div>
+            <%= f.label :publication_id, "Publication ID", class: "block text-sm font-medium text-ink-soft mb-1" %>
+            <%= f.text_field :publication_id, class: "input w-full font-mono", placeholder: "pub_00000000-0000-0000-0000-000000000000" %>
+          </div>
+          <div>
+            <%= f.label :webhook_signing_secret, "Webhook signing secret (Svix)", class: "block text-sm font-medium text-ink-soft mb-1" %>
+            <%= f.password_field :webhook_signing_secret, value: "", autocomplete: "off", class: "input w-full font-mono",
+                  placeholder: @beehiiv_connection.webhook_signing_secret.present? ? "Deja en blanco para conservar el secret actual" : "whsec_… (Settings → Webhooks en Beehiiv)" %>
+            <p class="text-sm text-ink-faint mt-1">Opcional pero recomendado para webhooks en tiempo real (plan Scale+).</p>
+          </div>
+          <label class="flex items-center gap-2 text-base">
+            <%= f.check_box :sync_enabled %>
+            Sincronización automática cada hora
+          </label>
+          <div class="flex gap-2">
+            <%= f.submit @beehiiv_connection.persisted? ? "Guardar Beehiiv" : "Conectar Beehiiv", class: "btn-secondary" %>
+          </div>
+        <% end %>
+
+        <% if @beehiiv_connection.persisted? %>
+          <div class="flex flex-wrap gap-2">
+            <%= button_to "Sincronizar ahora", sync_beehiiv_connection_path, method: :post, class: "btn-secondary" %>
+            <%= button_to "Desconectar", beehiiv_connection_path, method: :delete, class: "btn-danger",
+                  form: { data: { turbo_confirm: "¿Desconectar Beehiiv de este workspace?" } } %>
+          </div>
+          <div class="pt-2" data-controller="clipboard">
+            <p class="text-sm font-medium text-ink-soft mb-1">URL del webhook</p>
+            <p class="text-sm text-ink-faint mb-1">
+              En Beehiiv: Settings → Webhooks. Eventos recomendados: subscription.created, subscription.confirmed, subscription.deleted.
+            </p>
+            <div class="relative">
+              <input type="text" readonly value="<%= @beehiiv_connection.webhook_url %>"
+                    class="input w-full text-xs font-mono bg-canvas-sunken pr-24 cursor-default"
+                    data-clipboard-target="source" tabindex="-1" aria-readonly="true" />
+              <div class="absolute top-1.5 right-1.5 flex items-center gap-1">
+                <span data-clipboard-target="feedback"
+                      class="hidden rounded-md bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700 dark:bg-green-950 dark:text-green-300"
+                      role="status" aria-live="polite">Copiado</span>
+                <button type="button" class="rounded-md p-1.5 text-ink-faint hover:text-ink hover:bg-canvas-raised"
+                      title="Copiar URL" aria-label="Copiar URL"
+                      data-action="clipboard#copy" data-clipboard-target="button">
+                  <span data-clipboard-target="copyIcon"><%= icon :copy, classes: "size-4" %></span>
+                  <span data-clipboard-target="copiedIcon" class="hidden"><%= icon :check, classes: "size-4" %></span>
+                </button>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </section>
+    <% end %>
+
     <% if feature_enabled?(:marketing_campaigns) %>
       <% @mailjet_connection ||= current_workspace.mailjet_connection || current_workspace.build_mailjet_connection(user: current_user) %>
       <section class="card p-4 space-y-3">
