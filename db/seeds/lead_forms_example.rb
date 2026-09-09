@@ -3,17 +3,9 @@
 # Idempotent seed of example public lead capture forms into the organization workspace.
 # Add new forms to FORMS; run LeadFormsExample.seed!(workspace:, user:).
 module LeadFormsExample
-  PIPELINE_NAMES = {
-    "formacion" => "Formación",
-    "formacion_b2c" => "Formación B2C",
-    "consultoria" => "Consultoría",
-    "proyectos" => "Proyectos",
-    "entrenadores" => "Entrenadores"
-  }.freeze
-
   CONTACTO_PIPELINE_ROUTES = {
-    "curso" => "Formación B2C",
-    "entrenamiento" => "Entrenadores",
+    "curso" => "Formación",
+    "entrenamiento" => "Consultoría",
     "proyecto_consultoria" => "Consultoría",
     "otro" => "Proyectos"
   }.freeze
@@ -85,63 +77,21 @@ module LeadFormsExample
       }
     },
     {
-      slug: "liderando-ia-reserva",
-      name: "Liderando con IA — Reserva",
-      template_key: "liderando_ia_reserva",
+      slug: "reserva",
+      name: "Reserva",
+      template_key: "reserva",
       active: true,
       collects_company: false,
-      default_pipeline: "Formación B2C",
+      default_pipeline: "Formación",
       pipeline_routes: {},
       email_template: {
-        key: "liderando_ia_reserva_lead",
-        name: "Liderando con IA — Reserva — acuse de recibo",
-        subject: "Example | Hemos recibido tu reserva — Liderando con IA",
+        key: "reserva_lead",
+        name: "Reserva — acuse de recibo",
+        subject: "Example | Hemos recibido tu reserva",
         body: <<~BODY.strip
           Hola {first_name}:
 
-          Gracias por tu interés en Liderando con IA. Hemos recibido tu solicitud de reserva y alguien del equipo se pondrá en contacto contigo en breve.
-
-          Un cordial saludo,
-        BODY
-      }
-    },
-    {
-      slug: "desarrollando-con-ia-reservas",
-      name: "Desarrollando con IA — Reservas",
-      template_key: "desarrollando_ia_reserva",
-      active: true,
-      collects_company: false,
-      default_pipeline: "Formación B2C",
-      pipeline_routes: {},
-      email_template: {
-        key: "desarrollando_ia_reserva_lead",
-        name: "Desarrollando con IA — Reservas — acuse de recibo",
-        subject: "Example | Hemos recibido tu reserva — Desarrollando con IA",
-        body: <<~BODY.strip
-          Hola {first_name}:
-
-          Gracias por tu interés en Desarrollando con IA. Hemos recibido tu solicitud de reserva y alguien del equipo se pondrá en contacto contigo en breve.
-
-          Un cordial saludo,
-        BODY
-      }
-    },
-    {
-      slug: "entrenadores",
-      name: "Entrenadores",
-      template_key: "entrenadores",
-      active: true,
-      collects_company: false,
-      default_pipeline: "Entrenadores",
-      pipeline_routes: {},
-      email_template: {
-        key: "entrenadores_lead",
-        name: "Entrenadores — acuse de recibo",
-        subject: "Example | Hemos recibido tu solicitud — Entrenadores",
-        body: <<~BODY.strip
-          Hola {first_name}:
-
-          Gracias por contactar con Example. Hemos recibido tu solicitud y alguien del equipo se pondrá en contacto contigo en breve.
+          Gracias por tu interés. Hemos recibido tu solicitud de reserva y alguien del equipo se pondrá en contacto contigo en breve.
 
           Un cordial saludo,
         BODY
@@ -162,7 +112,7 @@ module LeadFormsExample
   def self.seed_form!(workspace:, user:, responsible:, pipelines:, definition:)
     email_template = ensure_email_template!(workspace:, user:, attrs: definition.fetch(:email_template))
     default_pipeline = pipelines.fetch(definition[:default_pipeline]) do
-      pipelines.fetch("otro")
+      pipelines.fetch("Proyectos")
     end
 
     form = workspace.lead_forms.find_or_initialize_by(slug: definition.fetch(:slug))
@@ -204,9 +154,9 @@ module LeadFormsExample
 
   def self.ensure_pipelines!(workspace)
     default = Pipeline.default_for(workspace) || Pipeline.create_default!(workspace)
-    routes = { "Proyectos" => default, "otro" => default }
+    routes = { "Proyectos" => default }
 
-    PIPELINE_NAMES.each_value do |name|
+    %w[Formación Consultoría].each do |name|
       routes[name] = workspace.pipelines.find_by(name: name) || duplicate_pipeline!(default, name: name)
     end
 

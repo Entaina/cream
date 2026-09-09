@@ -213,35 +213,23 @@ If you filled in the `CREAM_SEED_*` variables in `.env`:
 docker compose exec web bin/rails db:seed
 ```
 
-`db:seed` imports public lead form **Liquid templates** into the organization workspace (from `lib/lead_form_templates/` in the image) and creates example lead forms when `CREAM_ORGANIZATION_*` is configured.
+`db:seed` imports **demo example** Liquid templates into the organization workspace (from `lib/lead_form_templates/` in the image) and creates example lead forms when `CREAM_ORGANIZATION_*` is configured.
 
 ### 7. Lead capture form templates (Liquid)
 
-Public forms at `/f/:slug` render **Liquid stored in the database** (`lead_form_templates`), not ERB files. The repo ships canonical templates under `lib/lead_form_templates/public/lead_forms/` (import only).
+Public forms at `/f/:slug` render **Liquid stored in the database** (`lead_form_templates`), not ERB files. The repo ships a small **demo catalog** under `lib/lead_form_templates/public/lead_forms/` (`contacto`, `demo`, `newsletter`, `reserva` + partials). It is imported only by `db:seed` on the organization workspace — **do not re-import on production** workspaces with customized templates.
 
-**After the first deploy**, or whenever a release updates those files, import them into each workspace that uses lead forms:
+Admins create and edit templates in the CRM (**Formularios → Plantillas de formulario**). If a form's `template_key` has no matching row in the workspace DB, the public URL returns **404**.
+
+Manual import (empty workspace / local demo only):
 
 ```bash
-# List workspaces
-docker compose exec web bin/rails runner "Workspace.pluck(:id, :slug, :name).each { |r| puts r.join(' — ') }"
-
-# Import / update (idempotent)
 docker compose exec web bin/rails 'lead_form_templates:import[WORKSPACE_ID]'
 ```
-
-Example for the organization workspace after `db:seed`:
-
-```bash
-docker compose exec web bin/rails runner "w=Workspace.find_by(slug: ENV.fetch('CREAM_ORGANIZATION_WORKSPACE_NAME', 'Example').parameterize); puts LeadFormTemplates::Importer.import!(w).inspect"
-```
-
-If templates are missing for a form's `template_key`, the public URL returns **404**. Admins can also edit templates in the CRM (**Formularios → Plantillas de formulario**); UI changes are not overwritten by import unless the repo file changed (import updates body when the file differs).
 
 ## Updating the app
 
 After a push to `main`, GitHub Actions deploys to the `production` environment (if the environment secrets are configured).
-
-If the release changed files under `lib/lead_form_templates/`, re-import templates on the server (see [§ Lead capture form templates](#7-lead-capture-form-templates-liquid) above).
 
 Manual deployment (if needed):
 

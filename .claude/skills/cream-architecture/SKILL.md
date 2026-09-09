@@ -127,7 +127,7 @@ Feature flag `:lead_forms`. Public URLs `/f/:slug` (POST creates lead) and `/f/:
 - **`LeadFormTemplate`**: workspace-scoped Liquid body in DB, editable by admins (**Formularios → Plantillas de formulario**). Paths like `public/lead_forms/contacto` (pages) or `public/lead_forms/partials/contact_fields` (partials). System view: `public/lead_forms/success`.
 - **`LeadFormTemplates::Source#find_body`**: reads **only from DB**; no filesystem fallback at runtime. Missing template → 404.
 - **`LeadFormTemplates::Renderer`**: Liquid env + custom tags in `app/services/lead_form_templates/tags.rb`. Assigns: `lead_form`, `product`, `open_editions`. Registers: `field_renderer`, `form_action`, CSRF, etc.
-- **`lib/lead_form_templates/`** (repo): canonical examples for **seed + tests only**. `LeadFormTemplates::Importer` may populate or update DB rows when explicitly run — **never** assume reimport on deploy; production workspaces keep admin edits. When shipping Liquid tag/behaviour changes, document what admins must add or change in their templates (field keys, `{% subscription_opt_in %}`, etc.).
+- **`lib/lead_form_templates/`** (repo): **demo catalog only** — pages `contacto`, `demo`, `newsletter`, `reserva` + partials (`contact_fields`, `consent_fields`, …) and system `privacy`/`success`. Imported by `db:seed` / specs; **never** reimport on production deploy. Real workspaces: admins create templates in UI. `LeadForm.available_template_keys(workspace:)` reads **DB form pages only**.
 
 ### Liquid tags (form pages)
 

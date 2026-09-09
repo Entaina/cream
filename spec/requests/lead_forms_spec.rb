@@ -8,7 +8,10 @@ RSpec.describe "Lead forms", type: :request do
   let!(:pipeline) { Pipeline.create_default!(workspace) }
   let(:template) { create_email_template!(workspace, user: member) }
 
-  before { sign_in_as(member) }
+  before do
+    sign_in_as(member)
+    import_lead_form_templates!(workspace)
+  end
 
   describe "CRUD" do
     it "lists lead forms" do
@@ -244,13 +247,13 @@ RSpec.describe "Lead forms", type: :request do
     end
 
     it "stores an optional product" do
-      product = workspace.products.create!(name: "Liderando con IA", price: 990)
+      product = workspace.products.create!(name: "Curso ejemplo", price: 990)
 
       post lead_forms_path, params: {
         lead_form: {
-          name: "Reserva Liderando",
-          slug: "reserva-liderando",
-          template_key: "liderando_ia_reserva",
+          name: "Reserva",
+          slug: "reserva-ejemplo",
+          template_key: "reserva",
           pipeline_id: pipeline.id,
           responsible_id: member.id,
           email_template_id: template.id,
@@ -260,7 +263,7 @@ RSpec.describe "Lead forms", type: :request do
       }
 
       expect(response).to redirect_to(lead_forms_path)
-      expect(LeadForm.find_by!(slug: "reserva-liderando").product).to eq(product)
+      expect(LeadForm.find_by!(slug: "reserva-ejemplo").product).to eq(product)
     end
 
     it "rejects a pipeline stage from another pipeline" do

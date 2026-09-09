@@ -40,8 +40,8 @@ RSpec.describe LeadFormTemplates::HtmlSchema do
   end
 
   it "respects conditional fields from Liquid" do
-    schema_with_company = schema_for(template_key: "indice_adopcion_ia", collects_company: true)
-    schema_without_company = schema_for(template_key: "indice_adopcion_ia", collects_company: false)
+    schema_with_company = schema_for(template_key: "demo", collects_company: true)
+    schema_without_company = schema_for(template_key: "demo", collects_company: false)
 
     expect(schema_with_company.fields.map(&:name)).to include("company_name")
     expect(schema_without_company.fields.map(&:name)).not_to include("company_name")
@@ -66,7 +66,7 @@ RSpec.describe LeadFormTemplates::HtmlSchema do
   end
 
   it "rejects unknown submitted fields" do
-    schema = schema_for(template_key: "entrenadores")
+    schema = schema_for(template_key: "newsletter")
 
     expect {
       schema.validate!(
@@ -80,8 +80,8 @@ RSpec.describe LeadFormTemplates::HtmlSchema do
   end
 
   it "allows configured consent field keys from subscription types" do
-    schema = schema_for(template_key: "entrenadores").apply_context(
-      lead_form: create_lead_form!(workspace, user: member, template_key: "entrenadores"),
+    schema = schema_for(template_key: "newsletter").apply_context(
+      lead_form: create_lead_form!(workspace, user: member, template_key: "newsletter"),
       product: nil,
       open_editions: []
     )

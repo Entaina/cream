@@ -156,21 +156,20 @@ class LeadForm < ApplicationRecord
   end
 
   def self.available_template_keys(workspace: nil)
-    keys = filesystem_template_keys
-    return keys if workspace.nil?
+    return filesystem_template_keys if workspace.nil?
 
-    db_keys = workspace.lead_form_templates
+    workspace.lead_form_templates
       .form_pages
       .pluck(:path)
       .filter_map { |path| LeadFormTemplate.template_key_for(path) }
-
-    (keys + db_keys).uniq.sort
+      .uniq
+      .sort
   end
 
   def self.filesystem_template_keys
     Dir.glob(Rails.root.join("lib/lead_form_templates/public/lead_forms/*.liquid")).filter_map do |path|
       key = File.basename(path, ".liquid")
-      key unless key.in?(%w[show success])
+      key unless key.in?(%w[show success privacy])
     end.sort
   end
 

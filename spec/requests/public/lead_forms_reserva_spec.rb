@@ -1,64 +1,68 @@
 require "rails_helper"
 
-RSpec.describe "Public lead form Desarrollando con IA — Reservas", type: :request do
+RSpec.describe "Public lead form Reserva", type: :request do
   fixtures :users, :workspaces, :memberships
 
   let(:member) { users(:one) }
   let(:workspace) { workspaces(:one) }
   let!(:pipeline) { Pipeline.create_default!(workspace) }
-  let(:product) { workspace.products.create!(name: "Desarrollando con IA", price: 990) }
+  let(:product) { workspace.products.create!(name: "Curso ejemplo", price: 990) }
   let!(:open_edition) { product.editions.create!(name: "Marzo 2026", starts_on: Date.current + 30.days, ends_on: Date.current + 60.days) }
-  let!(:second_edition) { product.editions.create!(name: "Junio 2026", starts_on: Date.current + 90.days, ends_on: Date.current + 120.days) }
   let!(:finished_edition) { product.editions.create!(name: "Enero 2026", starts_on: Date.current - 30.days, ends_on: Date.current - 1.day) }
   let(:lead_form) do
     create_lead_form!(
       workspace,
       user: member,
-      slug: "desarrollando-con-ia-reservas",
-      name: "Desarrollando con IA — Reservas",
-      template_key: "desarrollando_ia_reserva",
+      slug: "reserva",
+      name: "Reserva",
+      template_key: "reserva",
       collects_company: false,
       product: product
     )
   end
 
-  describe "GET /f/desarrollando-con-ia-reservas" do
-    it "renders the form fields with edition buttons and phone prefix selector" do
+  describe "GET /f/reserva" do
+    it "renders the form fields with open editions from the configured product" do
       get public_lead_form_path(lead_form.slug)
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include("Desarrollando con IA — Reservas")
+      expect(response.body).to include("Reserva")
       expect(response.body).to include('name="lead[product_id]"')
       expect(response.body).to include('value="' + product.id.to_s + '"')
       expect(response.body).to include('name="lead[edition_id]"')
-      expect(response.body).to include('type="radio"')
-      expect(response.body).to include("Elige tu edición")
+      expect(response.body).to include("Edición")
       expect(response.body).to include("Marzo 2026")
-      expect(response.body).to include("Junio 2026")
       expect(response.body).not_to include("Enero 2026")
-      expect(response.body).not_to include('<select name="lead[edition_id]"')
       expect(response.body).to include('name="lead[first_name]"')
       expect(response.body).to include('name="lead[last_name]"')
-      expect(response.body).to include("Apellidos")
       expect(response.body).to include('name="lead[email]"')
-      expect(response.body).to include('name="lead[phone_prefix]"')
       expect(response.body).to include('name="lead[phone]"')
-      expect(response.body).to include("¿En qué te podemos ayudar?")
+      expect(response.body).to include('name="lead[message]"')
       expect(response.body).not_to include('name="lead[how_heard]"')
       expect(response.body).not_to include('name="lead[newsletter_opt_in]"')
       expect(response.body).to include(public_lead_form_privacy_path(lead_form.slug))
-      expect(response.body).to include("CRM de Entaina")
       expect(response.body).to include('name="lead[gdpr_consent]"')
+    end
+
+    it "allows overriding the product via query param" do
+      other_product = workspace.products.create!(name: "Otro curso", price: 500)
+      other_edition = other_product.editions.create!(name: "Septiembre 2026", starts_on: Date.current + 60.days)
+
+      get public_lead_form_path(lead_form.slug, product_id: other_product.id)
+
+      expect(response.body).to include('value="' + other_product.id.to_s + '"')
+      expect(response.body).to include("Septiembre 2026")
+      expect(response.body).not_to include("Marzo 2026")
     end
   end
 
-  describe "POST /f/desarrollando-con-ia-reservas" do
-    it "creates a lead with product, edition and prefixed phone on the deal" do
+  describe "POST /f/reserva" do
+    it "creates a lead with product and edition on the deal" do
       allow(TurnstileVerifier).to receive_messages(enabled?: false)
 
       expect {
         post public_lead_form_path(lead_form.slug), params: {
-          lead: desarrollando_ia_reserva_lead_params(product: product, edition: open_edition)
+          lead: reserva_lead_params(product: product, edition: open_edition)
         }
       }.to change(Deal, :count).by(1)
         .and change(DealProduct, :count).by(1)
@@ -74,11 +78,8 @@ RSpec.describe "Public lead form Desarrollando con IA — Reservas", type: :requ
 
       expect(submission.data["edition_id"]).to eq(open_edition.id.to_s)
       expect(submission.data["product_id"]).to eq(product.id.to_s)
-      expect(submission.data["phone_prefix"]).to eq("+34")
-      expect(submission.data["phone"]).to eq("600111222")
       expect(submission.data["message"]).to eq("Quiero reservar plaza")
       expect(person.last_name).to eq("García")
-      expect(person.phone).to eq("+34 600111222")
       expect(person.company.name).to eq("Particulares")
       expect(line.product).to eq(product)
       expect(line.edition).to eq(open_edition)

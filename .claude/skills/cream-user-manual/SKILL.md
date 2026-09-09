@@ -166,7 +166,7 @@ Al cambiar formularios públicos, plantillas Liquid o admin de formularios, actu
 
 **No documentar** en el manual: tags Liquid, `LeadFormSubmissionProcessor`, importer rake, `FieldRenderer`, Stimulus.
 
-**Formularios de ejemplo** (slugs en seeds `db/seeds/lead_forms_example.rb`): mantener la lista de bullets al final de §27 sincronizada con las plantillas del **workspace de demo** (`contacto`, `demo`, `liderando_ia`, reservas, etc.). No confundir con plantillas de producción, que pueden diferir. Si se elimina un formulario de ejemplo, quitar su bullet.
+**Formularios de ejemplo** (slugs en seeds `db/seeds/lead_forms_example.rb`): mantener la lista de bullets al final de §27 sincronizada con las plantillas del **workspace de demo** (`contacto`, `demo`, `newsletter`, `reserva`). No confundir con plantillas de producción, que viven solo en BD. Si se elimina un formulario de ejemplo, quitar su bullet.
 
 **Validación visible**: el manual puede mencionar que nombre, apellidos, email y consentimiento RGPD son obligatorios; teléfono/empresa según la plantilla y la casilla «Recoger datos de empresa». No detallar validación HTML5 vs servidor.
 

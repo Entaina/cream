@@ -7,6 +7,9 @@
   <div class="space-y-4">
     {% partial 'contact_fields' %}
   <div class="space-y-3">
+    {% if lead_form.collects_company %}
+      {% field type: "text", name: "company_name", label: "Empresa", required: true, autocomplete: "organization" %}
+    {% endif %}
     {% field type: "textarea", name: "message", label: "¿Qué te gustaría ver en la demo?", placeholder: "Opcional" %}
     {% partial 'how_heard_field' %}
   </div>

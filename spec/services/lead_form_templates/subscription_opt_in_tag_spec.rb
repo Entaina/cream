@@ -5,7 +5,7 @@ RSpec.describe "subscription_opt_in Liquid tag" do
 
   let(:member) { users(:one) }
   let(:workspace) { workspaces(:one) }
-  let(:lead_form) { create_lead_form!(workspace, user: member, template_key: "entrenadores") }
+  let(:lead_form) { create_lead_form!(workspace, user: member, template_key: "newsletter") }
 
   before do
     SubscriptionType.ensure_defaults!(workspace)

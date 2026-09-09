@@ -8,8 +8,8 @@ RSpec.describe LeadFormTemplates::Importer do
   it "imports all repository templates into the workspace" do
     result = described_class.import!(workspace)
 
-    expect(result[:total]).to eq(19)
-    expect(result[:created]).to eq(19)
+    expect(result[:total]).to eq(11)
+    expect(result[:created]).to eq(11)
     expect(result[:updated]).to eq(0)
     expect(workspace.lead_form_templates.find_by!(path: "public/lead_forms/success").body).to include("Gracias")
     expect(workspace.lead_form_templates.find_by!(path: "public/lead_forms/contacto").partial).to be(false)

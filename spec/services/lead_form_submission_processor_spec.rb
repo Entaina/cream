@@ -327,11 +327,11 @@ RSpec.describe LeadFormSubmissionProcessor do
   end
 
   it "finds company by name when collecting company data" do
-    lead_form.update!(template_key: "liderando_ia", collects_company: true)
+    lead_form.update!(template_key: "demo", collects_company: true)
     company = create_company!(workspace, name: "Acme SL")
 
     submit(
-      liderando_ia_lead_params(
+      demo_lead_params(
         "email" => "ceo@acme.com",
         "first_name" => "CEO",
         "company_name" => "Acme SL"
@@ -343,10 +343,10 @@ RSpec.describe LeadFormSubmissionProcessor do
   end
 
   it "rejects company_cif when the rendered form does not include that field" do
-    lead_form.update!(template_key: "liderando_ia", collects_company: true)
+    lead_form.update!(template_key: "demo", collects_company: true)
 
     expect {
-      submit(liderando_ia_lead_params("company_cif" => "B12345678"))
+      submit(demo_lead_params("company_cif" => "B12345678"))
     }.to raise_error(ActiveRecord::RecordInvalid, /Unknown field company_cif/)
   end
 
@@ -443,21 +443,21 @@ RSpec.describe LeadFormSubmissionProcessor do
   end
 
   describe "product and edition attachment" do
-    let(:product) { workspace.products.create!(name: "Liderando con IA", price: 990) }
+    let(:product) { workspace.products.create!(name: "Curso ejemplo", price: 990) }
     let(:edition) { product.editions.create!(name: "Marzo 2026", starts_on: Date.current + 30.days, ends_on: Date.current + 60.days) }
     let(:lead_form) do
       create_lead_form!(
         workspace,
         user: member,
         pipeline: pipeline,
-        template_key: "liderando_ia_reserva",
+        template_key: "reserva",
         product: product,
         slug: "reserva-#{SecureRandom.hex(3)}"
       )
     end
 
     def reserva_params(overrides = {})
-      liderando_ia_reserva_lead_params(product: product, edition: edition, **overrides)
+      reserva_lead_params(product: product, edition: edition, **overrides)
     end
 
     it "creates a deal product line when the form has a configured product and edition" do
@@ -488,7 +488,7 @@ RSpec.describe LeadFormSubmissionProcessor do
         .and have_enqueued_job(SendViaGmailJob)
 
       message = EmailMessage.order(:id).last
-      expect(message.subject).to eq("Reserva Liderando con IA")
+      expect(message.subject).to eq("Reserva Curso ejemplo")
       expect(message.body).to eq("Edición: Marzo 2026")
     end
 
@@ -498,7 +498,7 @@ RSpec.describe LeadFormSubmissionProcessor do
       override_edition = override.editions.create!(name: "Override edition", starts_on: Date.current + 30.days, ends_on: Date.current + 60.days)
       lead_form.update!(product: configured)
 
-      result = submit(liderando_ia_reserva_lead_params(
+      result = submit(reserva_lead_params(
         product: override,
         edition: override_edition
       ))
@@ -526,7 +526,7 @@ RSpec.describe LeadFormSubmissionProcessor do
       line = existing_deal.deal_products.create!(product: product, edition: edition, quantity: 1)
 
       expect {
-        result = submit(liderando_ia_reserva_lead_params(product: product, edition: other_edition))
+        result = submit(reserva_lead_params(product: product, edition: other_edition))
         expect(result.deal).to eq(existing_deal)
       }.not_to change(DealProduct, :count)
 
@@ -542,7 +542,7 @@ RSpec.describe LeadFormSubmissionProcessor do
       existing_deal.deal_products.create!(product: product, edition: edition, quantity: 1)
 
       expect {
-        result = submit(liderando_ia_reserva_lead_params(product: other_product, edition: other_edition))
+        result = submit(reserva_lead_params(product: other_product, edition: other_edition))
         expect(result.deal).to eq(existing_deal)
       }.to change(DealProduct, :count).by(1)
 

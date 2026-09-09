@@ -77,7 +77,8 @@ Conventions:
 **Fuente de verdad en runtime:** tabla `lead_form_templates` del workspace (editable por admins en **Formularios → Plantillas de formulario**). No hay fallback a disco en producción ni en desarrollo con datos reales.
 
 - **Respeta lo que haya cambiado el usuario.** No reimportes plantillas sobre workspaces con personalización (p. ej. producción). El importer **sobrescribe el body** cuando el fichero del repo difiere — úsalo solo en contextos controlados.
-- **`lib/lead_form_templates/`** = catálogo de referencia para `db:seed` del workspace de ejemplo y para specs. Editar ahí **no** cambia formularios ya desplegados hasta que alguien importe o edite en la UI.
+- **`lib/lead_form_templates/`** = catálogo **demo** (`contacto`, `demo`, `newsletter`, `reserva` + partials/sistema) para `db:seed` y specs. Editar ahí **no** cambia formularios ya desplegados. En producción, las plantillas se crean/editan en la UI.
+- **`LeadForm.available_template_keys(workspace:)`** lista solo plantillas **Página** en BD del workspace (no mezcla con el repo).
 - Tras cambiar Liquid en la UI (o añadir tags nuevos en código), el admin debe **guardar la plantilla** para recompilar `submission_schema`. No asumas reimport masivo.
 
 **Import (solo cuando proceda):**

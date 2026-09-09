@@ -8,7 +8,7 @@ RSpec.describe LeadFormTemplates::SchemaCompiler do
   before { import_lead_form_templates!(workspace) }
 
   it "marks company fields as requiring collects_company" do
-    template = workspace.lead_form_templates.find_by!(path: "public/lead_forms/indice_adopcion_ia")
+    template = workspace.lead_form_templates.find_by!(path: "public/lead_forms/demo")
     schema = described_class.compile(template: template)
     company = schema["fields"].find { |field| field["name"] == "company_name" }
 
@@ -16,7 +16,7 @@ RSpec.describe LeadFormTemplates::SchemaCompiler do
   end
 
   it "marks edition_id as requiring open editions with dynamic allowed values" do
-    template = workspace.lead_form_templates.find_by!(path: "public/lead_forms/liderando_ia_reserva")
+    template = workspace.lead_form_templates.find_by!(path: "public/lead_forms/reserva")
     schema = described_class.compile(template: template)
     edition = schema["fields"].find { |field| field["name"] == "edition_id" }
 

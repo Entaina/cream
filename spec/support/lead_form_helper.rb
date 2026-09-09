@@ -13,6 +13,10 @@ module LeadFormHelper
   end
 
   def create_lead_form!(workspace, user:, pipeline: nil, **attrs)
+    template_key = (attrs[:template_key] || attrs["template_key"] || "contacto").to_s
+    path = LeadFormTemplate.form_page_path_for(template_key)
+    import_lead_form_templates!(workspace) unless workspace.lead_form_templates.exists?(path: path)
+
     pipeline ||= Pipeline.default_for(workspace) || Pipeline.create_default!(workspace)
     template = if attrs.key?(:email_template)
       attrs.delete(:email_template)
@@ -44,7 +48,7 @@ module LeadFormHelper
     }.merge(overrides.stringify_keys)
   end
 
-  def trabajando_ia_lead_params(overrides = {})
+  def demo_lead_params(overrides = {})
     {
       "email" => "lead@example.com",
       "first_name" => "Ana",
@@ -56,62 +60,7 @@ module LeadFormHelper
     }.merge(overrides.stringify_keys)
   end
 
-  def desarrollando_ia_lead_params(overrides = {})
-    {
-      "email" => "lead@example.com",
-      "first_name" => "Ana",
-      "last_name" => "García",
-      "phone" => "600111222",
-      "tech_profile" => "desarrollo",
-      "audience" => "para_mi",
-      "how_heard" => "evento",
-      "gdpr_consent" => "1",
-      LeadForm::TIMESTAMP_FIELD => valid_lead_form_timestamp
-    }.merge(overrides.stringify_keys)
-  end
-
-  def adoption_lead_params(overrides = {})
-    {
-      "email" => "lead@example.com",
-      "first_name" => "Ana",
-      "last_name" => "García",
-      "phone" => "600111222",
-      "how_heard" => "evento",
-      "gdpr_consent" => "1",
-      LeadForm::TIMESTAMP_FIELD => valid_lead_form_timestamp
-    }.merge(overrides.stringify_keys)
-  end
-
-  def indice_adopcion_ia_lead_params(overrides = {})
-    {
-      "email" => "lead@example.com",
-      "first_name" => "Ana",
-      "last_name" => "García",
-      "phone" => "600111222",
-      "company_name" => "Acme SL",
-      "job_title" => "Directora de innovación",
-      "employee_range" => "51-200",
-      "how_heard" => "evento",
-      "gdpr_consent" => "1",
-      LeadForm::TIMESTAMP_FIELD => valid_lead_form_timestamp
-    }.merge(overrides.stringify_keys)
-  end
-
-  def liderando_ia_lead_params(overrides = {})
-    {
-      "email" => "lead@example.com",
-      "first_name" => "Ana",
-      "last_name" => "García",
-      "phone" => "600111222",
-      "company_name" => "Acme SL",
-      "audience" => "para_equipo",
-      "how_heard" => "linkedin",
-      "gdpr_consent" => "1",
-      LeadForm::TIMESTAMP_FIELD => valid_lead_form_timestamp
-    }.merge(overrides.stringify_keys)
-  end
-
-  def liderando_ia_reserva_lead_params(overrides = {})
+  def reserva_lead_params(overrides = {})
     product = overrides.delete(:product) || overrides.delete("product")
     edition = overrides.delete(:edition) || overrides.delete("edition")
     params = {
@@ -126,34 +75,6 @@ module LeadFormHelper
     params["product_id"] = product.id.to_s if product
     params["edition_id"] = edition.id.to_s if edition
     params.merge(overrides.stringify_keys)
-  end
-
-  def desarrollando_ia_reserva_lead_params(overrides = {})
-    product = overrides.delete(:product) || overrides.delete("product")
-    edition = overrides.delete(:edition) || overrides.delete("edition")
-    params = {
-      "email" => "lead@example.com",
-      "first_name" => "Ana",
-      "last_name" => "García",
-      "phone_prefix" => "+34",
-      "phone" => "600111222",
-      "message" => "Quiero reservar plaza",
-      "gdpr_consent" => "1",
-      LeadForm::TIMESTAMP_FIELD => valid_lead_form_timestamp
-    }
-    params["product_id"] = product.id.to_s if product
-    params["edition_id"] = edition.id.to_s if edition
-    params.merge(overrides.stringify_keys)
-  end
-
-  def entrenadores_lead_params(overrides = {})
-    {
-      "email" => "lead@example.com",
-      "first_name" => "Ana",
-      "last_name" => "García",
-      "gdpr_consent" => "1",
-      LeadForm::TIMESTAMP_FIELD => valid_lead_form_timestamp
-    }.merge(overrides.stringify_keys)
   end
 
   def valid_lead_form_timestamp

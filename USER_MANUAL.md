@@ -1081,7 +1081,7 @@ From the list, **Ver** (View) opens the form detail:
 The **layout and fields** of each public page are defined in **Liquid** templates stored in the workspace, not in the form record itself.
 
 1. From **Formularios** (Forms), click **Plantillas de formulario** (Form templates) — administrators only.
-2. Filter by **Páginas** (Pages — full forms), **Parciales** (Partials — contact fields, GDPR consent…) or **Landing page** (marketing pages at `/p/workspace-slug/landing-slug`; see [§29](#29-marketing)).
+2. Filter by **Páginas** (Pages — full forms), **Parciales** (Partials — contact fields, GDPR consent…) or **Landing page** (marketing pages at `/p/workspace-slug/landing-slug`; see [§29](#29-marketing)). Each workspace stores its own templates in the database; they are not tied to server source files.
 3. **Edit** opens a syntax-highlighted Liquid editor. Pages use tags such as `{% field %}`, `{% partial 'contact_fields' %}`, `{% form_open %}`, and variables like `{{ lead_form.name }}`.
 4. **New template**: enter a short **name**, choose **type** (lead form or landing) and, if applicable, check **Es un parcial** (Is a partial).
 5. After creating or changing a **lead page** template, select that name in **Plantilla del formulario** (Form template) when configuring a capture form. The `privacy` template defines the policy linked from each public form.
@@ -1112,14 +1112,14 @@ If a page template does not exist in the workspace, the public URL `/f/slug` wil
 - Inactive forms do not accept submissions.
 - If the configured stage has **entry conditions** and the deal does not meet them, it stays in its current stage and the submission is still saved.
 - If the form does not ask for a company, the person is associated with the workspace's generic **Particulares** (Individuals) company (unless the person already existed with another company).
-- The **Liderando con IA** form (`/f/liderando-ia`) asks for name, email, phone, company, whether it is for you or your team, how you heard about us, newsletter (optional, unchecked) and data-protection consent; it creates deals in the **Formación B2C** pipeline.
-- The **Liderando con IA — Reserva** form (`/f/liderando-ia-reserva`) asks for edition, name, last name, email, phone, an optional free-text message and data-protection consent; it creates deals in the **Formación B2C** pipeline.
-- The **Desarrollando con IA — Reservas** form (`/f/desarrollando-con-ia-reservas`) asks for edition (buttons), name, last name, email, phone with country prefix, an optional free-text question (“How can we help you?”) and data-protection consent; it creates deals in the **Formación B2C** pipeline.
-- The **Trabajando con IA** form (`/f/trabajando-ia`) asks for name, email, phone, an optional question about which work task to solve with AI, how you heard about us, newsletter and GDPR consent; it creates deals in the **Formación B2C** pipeline.
-- The **Desarrollando con IA** form (`/f/desarrollando-ia`) asks for name, email, phone, technical profile, audience (individual or team), how you heard about us, newsletter and GDPR consent; it creates deals in the **Formación B2C** pipeline.
-- The **Demo Adoption** form (`/f/adoption`) asks for name, email, phone, an optional question about the organization's degree of AI adoption, how you heard about us, newsletter and GDPR consent; it creates deals in the **Proyectos** pipeline.
-- The **Assessment · Índice de adopción** form (`/f/indice-adopcion-ia`) asks for name, email, phone, company, job title, size (number of employees), how you heard about us, newsletter and GDPR consent; it creates deals in the **Proyectos** pipeline.
-- The **Entrenadores** form (`/f/entrenadores`) asks for name, email, an optional question about your main challenge with AI, newsletter (optional, unchecked) and data-protection consent; it does not ask for phone or how you heard about us; it creates deals in the **Entrenadores** pipeline.
+**Example forms (demo workspace only, after `db:seed`):**
+
+- **Contacto** (`/f/contacto`) — standard contact, help type, message, optional newsletter and GDPR; routes deals by `help_type`.
+- **Request demo** (`/f/demo`) — contact + company (when the form collects company), message and optional newsletter.
+- **Newsletter** (`/f/newsletter`) — minimal capture with optional subscription.
+- **Reserva** (`/f/reserva`) — product edition, contact, message and GDPR (reservation pattern with open editions).
+
+In a real workspace, administrators create and edit templates under **Forms → Form templates**; there is no fixed server-side list.
 - Any workspace member can manage forms; **editing Liquid templates** is administrators only.
 
 ---

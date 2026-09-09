@@ -1,5 +1,5 @@
 ---
-description: Crear un formulario público de captación de leads operativo (Liquid, email, seed, specs)
+description: Crear un formulario público de captación de leads operativo (Liquid en BD, email, seed opcional, specs)
 argument-hint: "slug nombre [pipeline] — describe campos extra en el mensaje si hace falta"
 allowed-tools: Read, Write, Edit, Grep, Glob, Bash, AskQuestion
 ---
@@ -14,24 +14,29 @@ Si `$ARGUMENTS` o el mensaje del usuario no bastan, pregunta hasta tener:
 
 | Dato | Ejemplo |
 |------|---------|
-| **slug** (URL `/f/slug`) | `liderando-ia` |
-| **name** (título visible) | `Liderando con IA` |
-| **template_key** | igual que nombre corto: `liderando_ia` |
-| **pipeline por defecto** | `Proyectos` (nombre en workspace Example) |
-| **pipeline_routes** | solo si hay desplegable `help_type` (como contacto) |
+| **slug** (URL `/f/slug`) | `solicitud-demo` |
+| **name** (título visible) | `Solicitar demo` |
+| **template_key** | identificador de plantilla Página en BD, p. ej. `solicitud_demo` |
+| **pipeline por defecto** | `Proyectos` |
+| **pipeline_routes** | solo si hay desplegable `help_type` (como contacto demo) |
 | **collects_company** | sí/no |
 | **product_id** | opcional; obligatorio lógico en formularios de reserva con edición |
 | **Campos extra** | tipo, label, `name`, `required`, `options` si select |
 | **Email al lead** | key, name, subject, body (`{first_name}`, `{name}`, `{email}`) |
-| **Responsable** | por defecto: admin del workspace en seed |
+| **Responsable** | por defecto: admin del workspace |
 
-Campos **reutilizables** vía parciales Liquid (`lib/lead_form_templates/public/lead_forms/partials/`):
+## Dónde vive la plantilla
 
-- `contact_fields` — nombre, apellidos, email, teléfono (todos `required: true` en HTML)
-- `contact_fields_with_prefix` — igual + teléfono con prefijo de país
-- `how_heard_field`, `newsletter_opt_in`, `consent_fields`
+**Runtime = BD del workspace.** Las plantillas se crean o editan en **Formularios → Plantillas de formulario** (admin). El repo solo incluye ejemplos demo en `lib/lead_form_templates/` (`contacto`, `demo`, `newsletter`, `reserva`).
 
-Tags de sistema en cada **página** (no en parciales):
+- **Workspace real / producción:** crear la plantilla Liquid en la UI (o vía consola en `LeadFormTemplate`), guardar para recompilar `submission_schema`. **No** añadir ficheros al repo salvo que sea un nuevo ejemplo de demo.
+- **Workspace demo (`db:seed`):** opcionalmente añadir página en `lib/lead_form_templates/public/lead_forms/` + entrada en [`db/seeds/lead_forms_example.rb`](db/seeds/lead_forms_example.rb) + import en seed.
+
+Parciales reutilizables (demo repo o creados en BD como partials):
+
+- `contact_fields`, `contact_fields_with_prefix`, `how_heard_field`, `newsletter_opt_in`, `consent_fields`
+
+Tags de sistema en cada **página**:
 
 ```liquid
 {% form_open %}
@@ -43,17 +48,11 @@ Tags de sistema en cada **página** (no en parciales):
 {% form_close %}
 ```
 
-## Archivos a crear o tocar
-
-### 1. Plantilla Liquid (página)
-
-`lib/lead_form_templates/public/lead_forms/<template_key>.liquid`
-
-Patrones de referencia:
+## Patrones de referencia (demo repo)
 
 - [`contacto.liquid`](lib/lead_form_templates/public/lead_forms/contacto.liquid) — `help_type` + `message`
-- [`curso.liquid`](lib/lead_form_templates/public/lead_forms/curso.liquid) — `qualifying_answer`
-- [`liderando_ia_reserva.liquid`](lib/lead_form_templates/public/lead_forms/liderando_ia_reserva.liquid) — `open_editions` + `contact_fields_with_prefix`
+- [`demo.liquid`](lib/lead_form_templates/public/lead_forms/demo.liquid) — `collects_company` condicional
+- [`reserva.liquid`](lib/lead_form_templates/public/lead_forms/reserva.liquid) — `open_editions` + contacto
 
 Ejemplo mínimo:
 
@@ -84,105 +83,55 @@ Select con opciones inline:
 {% field type: "select", name: "help_type", label: "¿En qué te ayudamos?", choices: "Curso|curso; Entrenamiento|entrenamiento", blank: "Selecciona", required: true %}
 ```
 
-Formato `choices`: pares `Etiqueta|valor` separados por `;`. Prefijos telefónicos: `{% phone_with_prefix prefixes: "+34|+34; +351|+351" %}`.
-
-### 2. Importar plantillas al workspace
-
-Tras crear/editar ficheros en `lib/lead_form_templates/`:
-
-```bash
-bin/rails 'lead_form_templates:import[WORKSPACE_ID]'
-```
-
-En dev (workspace Example): usar el id del workspace tras seed. Los specs usan `spec/support/public_lead_form_templates.rb`.
-
-**No** añadir fallback filesystem en runtime — solo BD.
+Marketing: `{% subscription_opt_in slug: "newsletter" %}` (clave desde **Suscripciones**).
 
 ### 3. Nombres de campo
 
-Los campos del POST deben llamarse `lead[nombre_campo]` con `nombre_campo` en minúsculas, empezando por letra (`FIELD_KEY_FORMAT`: `[a-z][a-z0-9_]{0,39}`). No hace falta registrar el nombre en Ruby.
-
-Campos ocultos adicionales del admin no pueden usar claves de **sistema** (UTM, `_honeypot`, `_ts`, `gdpr_consent`, `lead_form_slug`, etc.).
+Los campos del POST deben llamarse `lead[nombre_campo]` con `nombre_campo` en minúsculas (`FIELD_KEY_FORMAT`). No hace falta registrar el nombre en Ruby.
 
 ### 4. Validación servidor
 
-El esquema se **persiste** en `LeadFormTemplate#submission_schema` (solo páginas de formulario, no partials) y se **recompila al guardar** la plantilla (`SchemaCompiler`).
+Esquema en `LeadFormTemplate#submission_schema`, recompilado **al guardar** la plantilla en admin. Tras editar Liquid, guardar la plantilla. Si el esquema está vacío, hay fallback a render en vivo.
 
-En cada submit:
-1. Cargar `submission_schema` de la plantilla del formulario
-2. Aplicar contexto runtime (`collects_company?`, producto, ediciones abiertas)
-3. Whitelist + validación de params
+### 5. Configuración del LeadForm
 
-Tras editar Liquid en admin, guardar la plantilla (o `lead_form_templates:import`) para actualizar el esquema. Si el esquema está vacío, hay fallback a render en vivo.
+En admin: **Formularios → Nuevo formulario** — el `template_key` debe existir como plantilla **Página** en el workspace.
 
-### 5. Configuración del LeadForm (admin / seed)
-
-[`db/seeds/lead_forms_example.rb`](db/seeds/lead_forms_example.rb):
-
-```ruby
-{
-  slug: "liderando-ia",
-  name: "Liderando con IA",
-  template_key: "liderando_ia",
-  active: true,
-  collects_company: false,
-  default_pipeline: "Formación B2C",
-  pipeline_routes: {},
-  email_template: { key: "...", name: "...", subject: "...", body: "..." }
-}
-```
-
-`LeadFormsExample.seed!` crea formulario + plantilla de email de forma idempotente.
-
-En admin: **Formularios → Nuevo formulario** — el `template_key` debe existir como plantilla **Página** importada o creada en **Plantillas de formulario**.
+Solo para demo: añadir a [`db/seeds/lead_forms_example.rb`](db/seeds/lead_forms_example.rb) y ejecutar `db:seed`.
 
 ### 6. Tests
 
-Archivo `spec/requests/public/lead_forms_<slug>_spec.rb` o ampliar [`spec/requests/public/lead_forms_spec.rb`](spec/requests/public/lead_forms_spec.rb):
+`spec/requests/public/lead_forms_<slug>_spec.rb` o ampliar [`spec/requests/public/lead_forms_spec.rb`](spec/requests/public/lead_forms_spec.rb):
 
 - GET renderiza campos clave
 - POST con params de [`LeadFormHelper`](spec/support/lead_form_helper.rb) crea deal (incluye `_ts` válido)
-- Mock Turnstile / jobs como en specs existentes
+- Mock Turnstile / jobs
 
-Processor: [`spec/services/lead_form_submission_processor_spec.rb`](spec/services/lead_form_submission_processor_spec.rb) solo si añades reglas de negocio nuevas en Ruby.
+Los specs importan plantillas demo al workspace fixture vía `import_lead_form_templates!`.
 
 ### 7. Documentación
 
-Actualizar [`MANUAL_USUARIO.md`](MANUAL_USUARIO.md) y [`USER_MANUAL.md`](USER_MANUAL.md) §27 (bullet del nuevo formulario si es de ejemplo) y `Última revisión:`.
+Actualizar [`MANUAL_USUARIO.md`](MANUAL_USUARIO.md) y [`USER_MANUAL.md`](USER_MANUAL.md) §27 solo si el formulario es **de ejemplo demo** (bullet en la lista de 4).
 
 ## Formulario de reserva (producto + edición)
 
-1. Plantilla con bloque `edition_id` y `{% if product.blank %}`, `{% elsif open_editions.size == 0 %}`, etc. (ver `liderando_ia_reserva.liquid`).
-2. En admin del **LeadForm**: asignar **Producto** (se envía oculto; override con `?product_id=`).
-3. `open_editions` se calcula en [`LeadForm#open_editions_for`](app/models/lead_form.rb) — no hardcodear en la plantilla.
+Ver [`reserva.liquid`](lib/lead_form_templates/public/lead_forms/reserva.liquid). Asignar **Producto** en el LeadForm; override con `?product_id=`.
 
-## Pipeline routes (formulario tipo contacto)
+## Pipeline routes
 
-1. Define las opciones del campo (p. ej. `help_type`) con `choices:` en la plantilla Liquid.
-2. En admin del **LeadForm**, añade filas «valor → pipeline». La clave debe ser el **value** de `choices:` (`curso`, no «Curso»). En seeds: `pipeline_routes: { "curso" => "Formación B2C", ... }` (nombres de pipeline del workspace).
-3. `LeadForm#resolve_pipeline(help_type:)` enruta; el nombre del deal incluye `help_type.humanize` si viene en el POST.
+Claves de `pipeline_routes` = **value** de `choices:` en Liquid (`curso`, no «Curso»).
 
-## Checklist final (obligatorio)
+## Checklist final
 
 ```bash
-bin/rails 'lead_form_templates:import[WORKSPACE_ID]'
-
-bin/rubocop app/models/lead_form.rb app/controllers/public/lead_forms_controller.rb \
-  app/services/lead_form_submission_processor.rb app/services/lead_form_templates/ \
-  db/seeds/lead_forms_example.rb spec/requests/public/ \
-  spec/services/lead_form_submission_processor_spec.rb
-
-bundle exec rspec spec/requests/public/ spec/services/lead_form_submission_processor_spec.rb spec/services/turnstile_verifier_spec.rb
+bundle exec rspec spec/requests/public/ spec/services/lead_form_submission_processor_spec.rb
 ```
 
 Verifica URL: `http://localhost:3030/f/<slug>`
 
 ## Resumen al usuario
 
-Al terminar, indica:
-
-- URL pública e iframe (desde CRM → Formularios)
-- `template_key` y si hubo parciales nuevos
+- URL pública e iframe
+- `template_key` y dónde se creó la plantilla (UI vs demo seed)
 - Campos y pipeline asignado
 - Key de plantilla de email
-- Comando `lead_form_templates:import[…]` si el workspace aún no tenía la plantilla

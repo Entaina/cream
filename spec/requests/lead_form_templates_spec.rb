@@ -101,8 +101,8 @@ RSpec.describe "Lead form templates", type: :request do
 
     it "previews a page template with a selected product" do
       import_lead_form_templates!(workspace)
-      template = workspace.lead_form_templates.find_by!(path: "public/lead_forms/liderando_ia_reserva")
-      product = workspace.products.create!(name: "Liderando con IA", price: 990)
+      template = workspace.lead_form_templates.find_by!(path: "public/lead_forms/reserva")
+      product = workspace.products.create!(name: "Curso ejemplo", price: 990)
       product.editions.create!(name: "Marzo 2026", starts_on: Date.current + 30.days, ends_on: Date.current + 60.days)
 
       get preview_lead_form_template_path(template, preview_product_id: product.id)

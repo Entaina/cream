@@ -1081,7 +1081,7 @@ Desde el listado, **Ver** abre el detalle del formulario:
 La **apariencia y los campos** de cada página pública se definen en plantillas **Liquid** guardadas en el workspace, no en el propio registro del formulario.
 
 1. Desde **Formularios**, pulsa **Plantillas de formulario** (solo administradores).
-2. Filtra por **Páginas** (formularios completos, p. ej. `contacto`, `liderando_ia_reserva`), **Parciales** (bloques reutilizables: contacto, consentimiento RGPD…) o **Landing page** (páginas de marketing en `/p/slug-workspace/slug-landing`; ver [§29](#29-marketing)).
+2. Filtra por **Páginas** (formularios completos), **Parciales** (bloques reutilizables: contacto, consentimiento RGPD…) o **Landing page** (páginas de marketing en `/p/slug-workspace/slug-landing`; ver [§29](#29-marketing)). Cada workspace guarda sus propias plantillas en la base de datos; no dependen del código fuente del servidor.
 3. **Editar** abre un editor con resaltado Liquid. Las páginas usan etiquetas como `{% field %}`, `{% partial 'contact_fields' %}`, `{% form_open %}` y variables como `{{ lead_form.name }}`.
 4. **Nueva plantilla**: indica un **nombre** corto, el **tipo** (formulario de lead o landing) y, si aplica, marca **Es un parcial**.
 5. Tras crear o cambiar una plantilla de **página** de formulario, elige ese nombre en **Plantilla del formulario** al configurar un formulario de captación. La plantilla `privacy` define la política enlazada desde cada formulario público.
@@ -1112,14 +1112,14 @@ Si la plantilla de una página no existe en el workspace, la URL pública `/f/sl
 - Los formularios inactivos no aceptan envíos.
 - Si la etapa configurada tiene **condiciones de entrada** y el deal no las cumple, se queda en su etapa actual y el envío se guarda igualmente.
 - Si el formulario no pide empresa, la persona se asocia a la empresa genérica **Particulares** del workspace (salvo que ya existiera con otra empresa).
-- El formulario **Liderando con IA** (`/f/liderando-ia`) pide nombre, email, teléfono, empresa, si es para ti o para tu equipo, cómo nos has conocido, newsletter (opcional, desmarcada) y consentimiento de protección de datos; crea deals en el pipeline **Formación B2C**.
-- El formulario **Liderando con IA — Reserva** (`/f/liderando-ia-reserva`) pide edición, nombre, apellidos, email, teléfono, un mensaje libre (opcional) y consentimiento de protección de datos; crea deals en el pipeline **Formación B2C**.
-- El formulario **Desarrollando con IA — Reservas** (`/f/desarrollando-con-ia-reservas`) pide edición (botones), nombre, apellidos, email, teléfono con prefijo de país, una pregunta libre opcional («¿En qué te podemos ayudar?») y consentimiento de protección de datos; crea deals en el pipeline **Formación B2C**.
-- El formulario **Trabajando con IA** (`/f/trabajando-ia`) pide nombre, email, teléfono, una pregunta opcional sobre qué tarea del trabajo resolver con IA, cómo nos has conocido, newsletter y consentimiento RGPD; crea deals en el pipeline **Formación B2C**.
-- El formulario **Desarrollando con IA** (`/f/desarrollando-ia`) pide nombre, email, teléfono, perfil técnico, audiencia (individual o equipo), cómo nos has conocido, newsletter y consentimiento RGPD; crea deals en el pipeline **Formación B2C**.
-- El formulario **Demo Adoption** (`/f/adoption`) pide nombre, email, teléfono, una pregunta opcional sobre el grado de adopción de IA en la organización, cómo nos has conocido, newsletter y consentimiento RGPD; crea deals en el pipeline **Proyectos**.
-- El formulario **Assessment · Índice de adopción** (`/f/indice-adopcion-ia`) pide nombre, email, teléfono, empresa, cargo, tamaño (nº de empleados), cómo nos has conocido, newsletter y consentimiento RGPD; crea deals en el pipeline **Proyectos**.
-- El formulario **Entrenadores** (`/f/entrenadores`) pide nombre, email, una pregunta opcional sobre el principal reto con la IA, newsletter (opcional, desmarcada) y consentimiento de protección de datos; no pide teléfono ni cómo nos has conocido; crea deals en el pipeline **Entrenadores**.
+**Formularios de ejemplo (solo workspace de demo tras `db:seed`):**
+
+- **Contacto** (`/f/contacto`) — contacto estándar, tipo de ayuda, mensaje, newsletter opcional y RGPD; enruta deals por `help_type`.
+- **Solicitar demo** (`/f/demo`) — contacto + empresa (si el formulario recoge empresa), mensaje y newsletter opcional.
+- **Newsletter** (`/f/newsletter`) — captación mínima con suscripción opcional.
+- **Reserva** (`/f/reserva`) — edición de producto, contacto, mensaje y RGPD (patrón de reserva con ediciones abiertas).
+
+En un workspace real, los administradores crean y editan plantillas en **Formularios → Plantillas de formulario**; no hay lista fija en el servidor.
 - Cualquier miembro del workspace puede gestionar los formularios; **editar plantillas Liquid** es solo para administradores.
 
 ---

@@ -33,11 +33,11 @@
       <% if @submission.privacy_policy_version %>
         <details class="text-sm">
           <summary class="cursor-pointer text-accent">Ver texto de la política aceptada</summary>
-          <div class="mt-2 prose prose-sm max-w-none"><%= @submission.privacy_policy_version.policy_content.html_safe %></div>
+          <div class="mt-2 prose prose-sm max-w-none"><%= sanitize @submission.privacy_policy_version.policy_content %></div>
         </details>
         <details class="text-sm">
           <summary class="cursor-pointer text-accent">Ver frase de consentimiento aceptada</summary>
-          <div class="mt-2 text-ink-soft"><%= @submission.privacy_policy_version.statement_content.html_safe %></div>
+          <div class="mt-2 text-ink-soft"><%= sanitize @submission.privacy_policy_version.statement_content %></div>
         </details>
       <% end %>
     </div>

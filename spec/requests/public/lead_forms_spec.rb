@@ -53,9 +53,10 @@ RSpec.describe "Public lead forms", type: :request do
     end
 
     it "returns not found when workspace templates are not imported" do
+      slug = lead_form.slug
       LeadFormTemplate.delete_all
 
-      get public_lead_form_path(lead_form.slug)
+      get public_lead_form_path(slug)
 
       expect(response).to have_http_status(:not_found)
     end
@@ -107,9 +108,10 @@ RSpec.describe "Public lead forms", type: :request do
     end
 
     it "returns not found when workspace templates are not imported" do
+      slug = lead_form.slug
       LeadFormTemplate.delete_all
 
-      get public_lead_form_privacy_path(lead_form.slug)
+      get public_lead_form_privacy_path(slug)
 
       expect(response).to have_http_status(:not_found)
     end
