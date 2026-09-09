@@ -62,10 +62,11 @@ export default class extends Controller {
   onPointerMove(event) {
     if (!this.dragged) return
 
+    const list = this.draggedList()
     const row = document.elementFromPoint(event.clientX, event.clientY)
       ?.closest("[data-sidebar-edit-target='item']")
 
-    if (row && row !== this.dragged) {
+    if (row && row !== this.dragged && list.contains(row)) {
       this.moveRelativeTo(row)
       return
     }
@@ -113,8 +114,15 @@ export default class extends Controller {
     if (last) last.after(this.dragged)
   }
 
+  draggedList() {
+    return this.dragged.closest("[data-sidebar-edit-target='list']")
+  }
+
   rows() {
-    return [...this.listTarget.querySelectorAll("[data-sidebar-edit-target='item']")]
+    const list = this.draggedList()
+    if (!list) return []
+
+    return [...list.querySelectorAll("[data-sidebar-edit-target='item']")]
   }
 
   toggleVisibility(event) {
@@ -147,7 +155,9 @@ export default class extends Controller {
   }
 
   async save() {
-    const order = this.itemTargets.map((item) => item.dataset.key)
+    const order = this.listTargets.flatMap((list) =>
+      [...list.querySelectorAll("[data-sidebar-edit-target='item']")].map((item) => item.dataset.key)
+    )
     const hidden = this.itemTargets
       .filter((item) => item.dataset.hidden === "true")
       .map((item) => item.dataset.key)

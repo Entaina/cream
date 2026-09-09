@@ -8,7 +8,16 @@ RSpec.describe "Mail merges", type: :request do
 
   before { sign_in_as(member) }
 
+  shared_context "with mail merge enabled" do
+    before do
+      allow(CreamFeatures).to receive(:enabled?).and_call_original
+      allow(CreamFeatures).to receive(:enabled?).with(:mail_merge).and_return(true)
+    end
+  end
+
   describe "POST /mail_merge (manual source)" do
+    include_context "with mail merge enabled"
+
     it "enqueues the job with the parsed record IDs" do
       post mail_merge_path, params: {
         source: "manual", record_type: "Person", record_ids: " 1, 2 ,3 ",
@@ -23,6 +32,8 @@ RSpec.describe "Mail merges", type: :request do
   end
 
   describe "POST /mail_merge (saved view source)" do
+    include_context "with mail merge enabled"
+
     it "resolves the view's records and derives the record type from the view" do
       at_acme = create_person!(workspace, company: companies(:acme))
       create_person!(workspace, company: create_company!(workspace, name: "Other Inc"))
@@ -37,6 +48,8 @@ RSpec.describe "Mail merges", type: :request do
   end
 
   describe "POST /mail_merge (list source)" do
+    include_context "with mail merge enabled"
+
     it "resolves the list entries and derives the record type from the list" do
       person = create_person!(workspace, company: companies(:acme))
       list = workspace.lists.create!(name: "Targets", record_type: "Person")
@@ -51,6 +64,8 @@ RSpec.describe "Mail merges", type: :request do
   end
 
   describe "POST /mail_merge with no recipients" do
+    include_context "with mail merge enabled"
+
     it "does not enqueue and redirects with an alert" do
       post mail_merge_path, params: { source: "manual", record_type: "Person", record_ids: "" }
 
@@ -60,6 +75,8 @@ RSpec.describe "Mail merges", type: :request do
   end
 
   describe "GET /mail_merge/recipients_count" do
+    include_context "with mail merge enabled"
+
     it "returns the resolved recipient count as JSON" do
       create_person!(workspace, company: companies(:acme))
       view = saved_views(:person_shared)
@@ -72,11 +89,6 @@ RSpec.describe "Mail merges", type: :request do
   end
 
   describe "when mail_merge is disabled" do
-    before do
-      allow(CreamFeatures).to receive(:enabled?).and_call_original
-      allow(CreamFeatures).to receive(:enabled?).with(:mail_merge).and_return(false)
-    end
-
     it "blocks the action and redirects to root" do
       post mail_merge_path, params: { source: "manual", record_type: "Person", record_ids: "1" }
 

@@ -110,25 +110,28 @@ class User < ApplicationRecord
     default_workspace
   end
 
-  def self.sidebar_default_keys
-    base = %w[dashboard people companies deals products tasks]
-    feature_keys = CreamFeatures.menu_entries.keys.map(&:to_s)
-    base + feature_keys + %w[pipelines api_tokens profile workspace team custom_fields]
+  def self.sidebar_default_keys(admin: true)
+    SidebarMenu.default_keys(admin: admin)
   end
 
-  def sidebar_order
+  def sidebar_default_keys(admin: true)
+    self.class.sidebar_default_keys(admin: admin)
+  end
+
+  def sidebar_order(admin: true)
+    known = sidebar_default_keys(admin: admin)
     saved = sidebar_prefs["order"]
-    return self.class.sidebar_default_keys if saved.blank?
+    return known if saved.blank?
 
-    self.class.merge_sidebar_order(saved, self.class.sidebar_default_keys)
+    self.class.merge_sidebar_order(saved, known)
   end
 
-  def sidebar_hidden
-    Array(sidebar_prefs["hidden"]).map(&:to_s) & self.class.sidebar_default_keys
+  def sidebar_hidden(admin: true)
+    Array(sidebar_prefs["hidden"]).map(&:to_s) & sidebar_default_keys(admin: admin)
   end
 
-  def update_sidebar_prefs!(order:, hidden:)
-    known = self.class.sidebar_default_keys
+  def update_sidebar_prefs!(order:, hidden:, admin: true)
+    known = sidebar_default_keys(admin: admin)
     merged_order = self.class.merge_sidebar_order(order, known)
     valid_hidden = hidden.map(&:to_s) & known
 
@@ -136,8 +139,6 @@ class User < ApplicationRecord
   end
 
   def self.merge_sidebar_order(saved_order, default_keys)
-    saved = saved_order.map(&:to_s).select { |key| default_keys.include?(key) }.uniq
-    missing = default_keys.reject { |key| saved.include?(key) }
-    saved + missing
+    SidebarMenu.merge_order(saved_order, default_keys)
   end
 end

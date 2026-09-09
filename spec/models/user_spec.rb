@@ -55,6 +55,22 @@ RSpec.describe User, type: :model do
       expect(user.sidebar_hidden).to eq(%w[api_tokens])
     end
 
+    it "drops orphan keys such as mail_merge when merging order" do
+      user = User.create!(name: "Prefs User", email_address: "prefs4@example.com", password: "password")
+      user.update!(sidebar_prefs: { "order" => %w[mail_merge tasks dashboard], "hidden" => %w[mail_merge] })
+
+      expect(user.sidebar_order).not_to include("mail_merge")
+      expect(user.sidebar_hidden).not_to include("mail_merge")
+      expect(user.sidebar_order.first(2)).to eq(%w[tasks dashboard])
+    end
+
+    it "excludes settings keys for non-admin users" do
+      user = User.create!(name: "Prefs User", email_address: "prefs5@example.com", password: "password")
+
+      expect(user.sidebar_default_keys(admin: false)).not_to include("products", "workspace")
+      expect(user.sidebar_default_keys(admin: true)).to include("products", "workspace")
+    end
+
     it "updates preferences with validated keys" do
       user = User.create!(name: "Prefs User", email_address: "prefs3@example.com", password: "password")
 

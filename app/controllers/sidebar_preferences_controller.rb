@@ -3,9 +3,11 @@ class SidebarPreferencesController < ApplicationController
   skip_after_action :verify_policy_scoped
 
   def update
+    admin = current_membership&.admin?
     current_user.update_sidebar_prefs!(
       order: sidebar_preference_params[:order] || [],
-      hidden: sidebar_preference_params[:hidden] || []
+      hidden: sidebar_preference_params[:hidden] || [],
+      admin: admin
     )
 
     head :ok

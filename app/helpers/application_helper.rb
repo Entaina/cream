@@ -317,56 +317,118 @@ module ApplicationHelper
   end
 
   def sidebar_known_keys
-    User.sidebar_default_keys
+    current_user&.sidebar_default_keys(admin: sidebar_admin?) || User.sidebar_default_keys(admin: sidebar_admin?)
+  end
+
+  def sidebar_admin?
+    current_membership&.admin?
+  end
+
+  def sidebar_nav_groups
+    items_by_key = default_sidebar_nav_items.index_by { |item| item[:key] }
+    order = current_user&.sidebar_order(admin: sidebar_admin?) || sidebar_known_keys
+    hidden_keys = current_user&.sidebar_hidden(admin: sidebar_admin?) || []
+
+    SidebarMenu.nav_groups(admin: sidebar_admin?).map do |group|
+      items = order.filter_map do |key|
+        next unless group[:keys].include?(key)
+
+        item = items_by_key[key]
+        next unless item
+
+        item.merge(hidden: hidden_keys.include?(key))
+      end
+
+      active = items.any? do |item|
+        item[:active] || item[:children]&.any? { |child| child[:active] }
+      end
+
+      group.merge(items: items, active: active)
+    end
   end
 
   def sidebar_nav_items
-    items_by_key = default_sidebar_nav_items.index_by { |item| item[:key] }
-    order = current_user&.sidebar_order || User.sidebar_default_keys
-    hidden_keys = current_user&.sidebar_hidden || []
-
-    order.filter_map do |key|
-      item = items_by_key[key]
-      next unless item
-
-      item.merge(hidden: hidden_keys.include?(key))
-    end
+    sidebar_nav_groups.flat_map { |group| group[:items] }
   end
 
   def default_sidebar_nav_items
-    base = [
-      sidebar_nav_item("dashboard", "Dashboard", root_path, :home, current_page?(root_path)),
-      sidebar_nav_item("people", "People", people_path, :users, request.path.start_with?("/people"), sidebar_saved_views_for("Person")),
-      sidebar_nav_item("companies", "Companies", companies_path, :building, request.path.start_with?("/companies"), sidebar_saved_views_for("Company")),
-      sidebar_nav_item("deals", "Deals", board_deals_path, :banknote, request.path.start_with?("/deals"), sidebar_saved_views_for("Deal")),
-      sidebar_nav_item("products", "Products", products_path, :briefcase, request.path.start_with?("/products")),
-      sidebar_nav_item("tasks", "Tasks", tasks_path, :check_circle, request.path.start_with?("/tasks"))
-    ]
-
-    feature_items = CreamFeatures.menu_entries.map do |key, meta|
-      path = CreamFeatures.menu_path(key)
-      sidebar_nav_item(key.to_s, meta[:label], path, CreamFeatures.menu_icon(key), request.path.start_with?(path))
-    end
-
-    settings = [
-      sidebar_nav_item("profile", "Profile", settings_profile_path, :users, request.path.start_with?("/settings/profile")),
-      sidebar_nav_item("pipelines", "Pipelines", pipelines_path, :columns, request.path.start_with?("/pipelines")),
-      sidebar_nav_item("api_tokens", "API tokens", api_tokens_path, :globe, request.path.start_with?("/api_tokens"))
-    ]
-    if current_membership&.admin?
-      settings << sidebar_nav_item("workspace", "Settings", settings_workspace_path, :settings,
-        request.path.start_with?("/settings/workspace"))
-    end
-    settings += [
-      sidebar_nav_item("team", "Team", settings_team_path, :users, request.path.start_with?("/settings/team")),
-      sidebar_nav_item("custom_fields", "Custom fields", settings_custom_fields_path, :columns, request.path.start_with?("/settings/custom_fields"))
-    ]
-
-    base + feature_items + settings
+    SidebarMenu.default_keys(admin: sidebar_admin?).filter_map { |key| sidebar_item_for(key) }
   end
 
-  def sidebar_nav_item(key, label, path, icon_name, active, saved_views = nil)
-    { key: key, label: label, path: path, icon: icon_name, active: active, saved_views: saved_views }
+  def sidebar_item_for(key)
+    case key
+    when "dashboard"
+      sidebar_nav_item("dashboard", "Dashboard", root_path, :home, current_page?(root_path), group: :daily)
+    when "people"
+      sidebar_nav_item("people", "People", people_path, :users, request.path.start_with?("/people"),
+        sidebar_saved_view_children("Person"), group: :daily)
+    when "companies"
+      sidebar_nav_item("companies", "Companies", companies_path, :building, request.path.start_with?("/companies"),
+        sidebar_saved_view_children("Company"), group: :daily)
+    when "deals"
+      sidebar_nav_item("deals", "Deals", board_deals_path, :banknote, request.path.start_with?("/deals"),
+        sidebar_saved_view_children("Deal"), group: :daily)
+    when "tasks"
+      sidebar_nav_item("tasks", "Tasks", tasks_path, :check_circle, request.path.start_with?("/tasks"), group: :daily)
+    when "team"
+      sidebar_nav_item("team", "Team", settings_team_path, :users, request.path.start_with?("/settings/team"), group: :settings)
+    when "products"
+      sidebar_nav_item("products", "Products", products_path, :briefcase, request.path.start_with?("/products"), group: :settings)
+    when "pipelines"
+      sidebar_nav_item("pipelines", "Pipelines", pipelines_path, :columns, request.path.start_with?("/pipelines"), group: :settings)
+    when "custom_fields"
+      sidebar_nav_item("custom_fields", "Custom fields", settings_custom_fields_path, :columns,
+        request.path.start_with?("/settings/custom_fields"), group: :settings)
+    when "profile"
+      sidebar_nav_item("profile", "Profile", settings_profile_path, :users, request.path.start_with?("/settings/profile"), group: :profile)
+    when "workspace"
+      return unless sidebar_admin?
+
+      sidebar_nav_item("workspace", "Settings", settings_workspace_path, :settings,
+        request.path.start_with?("/settings/workspace"), group: :settings)
+    when "api_tokens"
+      sidebar_nav_item("api_tokens", "API tokens", api_tokens_path, :globe, request.path.start_with?("/api_tokens"), group: :profile)
+    when "lists"
+      sidebar_nav_item("lists", "Mis listas", lists_path, :list, request.path.start_with?("/lists"),
+        sidebar_list_children, group: :profile)
+    else
+      feature_key = key.to_sym
+      return unless CreamFeatures.menu_entries.key?(feature_key)
+
+      meta = CreamFeatures.menu_entries[feature_key]
+      path = CreamFeatures.menu_path(feature_key)
+      sidebar_nav_item(key, meta[:label], path, CreamFeatures.menu_icon(feature_key),
+        request.path.start_with?(path), group: SidebarMenu.group_for(key))
+    end
+  end
+
+  def sidebar_saved_view_children(record_type)
+    sidebar_saved_views_for(record_type).map do |view|
+      {
+        label: view.name,
+        path: saved_views_index_path(record_type, view: view.id),
+        active: params[:view].to_s == view.id.to_s,
+        icon: :list
+      }
+    end
+  end
+
+  def sidebar_list_children
+    return [] unless current_workspace
+
+    current_workspace.lists.order(:name).map do |list|
+      {
+        label: list.name,
+        path: list_path(list),
+        active: current_page?(list_path(list)),
+        icon: :list,
+        color: list.color
+      }
+    end
+  end
+
+  def sidebar_nav_item(key, label, path, icon_name, active, children = nil, group: nil)
+    { key: key, label: label, path: path, icon: icon_name, active: active, children: children, group: group }
   end
 
   def saved_views_index_path(record_type, view: nil, clear_filters: nil, surface: nil)

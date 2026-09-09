@@ -13,11 +13,11 @@ module CreamFeatures
       enable_steps: []
     },
     mail_merge: {
-      enabled: true,
-      menu: true,
+      enabled: false,
+      menu: false,
       label: "Mail merge",
       status: :ready,
-      blockers: [],
+      blockers: [ "Removed from sidebar; segments replace manual ID mail merge" ],
       enable_steps: []
     },
     email_templates: {
