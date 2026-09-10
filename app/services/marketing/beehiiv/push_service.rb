@@ -18,8 +18,16 @@ module Marketing
       def subscribe!(person:, reactivate: false)
         return unless person.email.present?
 
-        subscription_type = @publication.subscription_type
-        subscription = EmailSubscription.find_by(person: person, subscription_type: subscription_type)
+        subscription = EmailSubscription.find_by(
+          person: person,
+          subscription_type: @publication.subscription_type
+        )
+        existing_id = resolve_beehiiv_subscription_id(subscription, person.email)
+
+        if existing_id.present? && !reactivate
+          persist_beehiiv_id!(subscription, existing_id, person: person)
+          return
+        end
 
         response = @client.create_subscription(
           email: person.email,
@@ -28,14 +36,7 @@ module Marketing
         sub_id = response.dig("data", "id")
         return if sub_id.blank?
 
-        record = subscription || EmailSubscription.new(person: person, subscription_type: subscription_type, workspace: @workspace)
-        record.beehiiv_subscription_id = sub_id
-        record.metadata = record.metadata.merge(
-          "beehiiv_subscription_id" => sub_id,
-          "beehiiv_publication_id" => @publication.publication_id,
-          "beehiiv_pushed_at" => Time.current.iso8601
-        )
-        record.save! if record.changed?
+        persist_beehiiv_id!(subscription, sub_id, person: person)
       end
 
       def unsubscribe!(person:)
@@ -60,6 +61,30 @@ module Marketing
             "beehiiv_unsubscribed_at" => Time.current.iso8601
           )
         )
+      end
+
+      def resolve_beehiiv_subscription_id(subscription, email)
+        sub_id = subscription&.beehiiv_subscription_id
+        return sub_id if sub_id.present?
+
+        remote = @client.find_subscription_by_email(email)
+        remote&.dig("id")
+      end
+
+      def persist_beehiiv_id!(subscription, sub_id, person:)
+        record = subscription || EmailSubscription.new(
+          person: person,
+          subscription_type: @publication.subscription_type,
+          workspace: @workspace
+        )
+
+        record.beehiiv_subscription_id = sub_id
+        record.metadata = (record.metadata || {}).merge(
+          "beehiiv_subscription_id" => sub_id,
+          "beehiiv_publication_id" => @publication.publication_id,
+          "beehiiv_pushed_at" => Time.current.iso8601
+        )
+        record.save! if record.changed?
       end
     end
   end

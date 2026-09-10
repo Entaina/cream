@@ -574,4 +574,47 @@ RSpec.describe LeadFormSubmissionProcessor do
       }.to raise_error(ActiveRecord::RecordInvalid, /edition id is invalid/)
     end
   end
+
+  describe "subscription opt-in on deal forms" do
+    let!(:publication) { create_beehiiv_publication!(workspace) }
+
+    before do
+      ActiveJob::Base.queue_adapter = :test
+      allow(CreamFeatures).to receive(:enabled?).and_call_original
+      allow(CreamFeatures).to receive(:enabled?).with(:marketing_consent).and_return(true)
+      SubscriptionType.ensure_defaults!(workspace)
+    end
+
+    it "creates person and subscription and enqueues Beehiiv push when newsletter is checked" do
+      params = contacto_lead_params("newsletter_opt_in" => "1")
+
+      expect {
+        result = submit(params)
+        expect(result.person.email).to eq("lead@example.com")
+        expect(result.deal).to be_present
+      }.to change(Person, :count).by(1)
+        .and change(EmailSubscription, :count).by(1)
+        .and have_enqueued_job(BeehiivPushJob).with(publication.id, kind_of(Integer), "subscribe", { "reactivate" => false })
+
+      newsletter = workspace.subscription_types.find_by!(slug: "newsletter")
+      person = Person.find_by!(email: "lead@example.com")
+      expect(EmailSubscription.find_by!(person: person, subscription_type: newsletter).status).to eq("subscribed")
+    end
+
+    it "reuses existing person and still creates subscription when newsletter is checked" do
+      company = create_company!(workspace, name: "Acme SL")
+      existing = create_person!(workspace, company: company, email: "lead@example.com", first_name: "Existente")
+
+      params = contacto_lead_params("newsletter_opt_in" => "1")
+
+      expect {
+        submit(params)
+      }.to change(Person, :count).by(0)
+        .and change(EmailSubscription, :count).by(1)
+        .and have_enqueued_job(BeehiivPushJob)
+
+      newsletter = workspace.subscription_types.find_by!(slug: "newsletter")
+      expect(EmailSubscription.find_by!(person: existing, subscription_type: newsletter).status).to eq("subscribed")
+    end
+  end
 end
