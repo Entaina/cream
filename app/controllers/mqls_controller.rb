@@ -1,6 +1,7 @@
 class MqlsController < ApplicationController
   include RequiresFeature
   requires_feature :mql_pool
+  skip_after_action :verify_policy_scoped
 
   def index
     authorize :mql, :index?
@@ -76,8 +77,10 @@ class MqlsController < ApplicationController
       .includes(:lead_form)
       .group_by(&:person_id)
       .transform_values do |submissions|
-        submissions.group_by(&:lead_form_id).map do |_form_id, rows|
+        submissions.group_by(&:lead_form_id).filter_map do |_form_id, rows|
           form = rows.first.lead_form
+          next if form.nil?
+
           { form: form, count: rows.size, first_at: rows.map(&:created_at).min, last_at: rows.map(&:created_at).max }
         end
       end
