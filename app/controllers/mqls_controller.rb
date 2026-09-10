@@ -3,6 +3,8 @@ class MqlsController < ApplicationController
   requires_feature :mql_pool
   skip_after_action :verify_policy_scoped
 
+  SORTABLE = %w[lead_score lifecycle_stage first_name updated_at].freeze
+
   helper_method :index_query_params
 
   def index
@@ -21,7 +23,8 @@ class MqlsController < ApplicationController
       deal_scope: policy_scope(current_workspace.deals)
     ).resolve(
       base.includes(:company, email_subscriptions: :subscription_type, product_interests: :product, lead_submissions: :lead_form)
-    ).order(lead_score: :desc, updated_at: :desc)
+    )
+    @people = apply_mql_sorting(@people)
 
     @pagy, @people = pagy(:offset, @people)
     @subscription_types = current_workspace.subscription_types.active.order(:name)
@@ -38,11 +41,19 @@ class MqlsController < ApplicationController
     mql_filters.except("marketing_eligible").merge(overrides.stringify_keys).compact_blank
   end
 
+  def apply_mql_sorting(scope)
+    sort_param = params[:sort].to_s
+    column = SORTABLE.include?(sort_param) ? sort_param : "lead_score"
+    direction = params[:dir] == "asc" ? :asc : :desc
+    scope.order(column => direction, updated_at: :desc)
+  end
+
   def mql_filters
     raw = params.permit(
       :q, :subscription_type_id, :subscription_status, :open_deal, :open_deal_product_id,
       :interest_product_id, :interest_status, :dealt_product_id, :lead_form_id,
-      :capture_destination, :submitted_from, :submitted_to, :lead_score_min, :lead_score_max
+      :capture_destination, :submitted_from, :submitted_to, :lead_score_min, :lead_score_max,
+      :sort, :dir
     ).to_h.stringify_keys
 
     raw["marketing_eligible"] = true

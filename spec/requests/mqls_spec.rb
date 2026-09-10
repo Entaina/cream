@@ -35,6 +35,23 @@ RSpec.describe "MQL pool", type: :request do
     expect(response).to redirect_to(root_path)
   end
 
+  it "sorts MQLs by lead score" do
+    type = workspace.subscription_types.find_by!(slug: "general")
+    low = create_person!(workspace, email: "low@example.com", lead_score: 5)
+    high = create_person!(workspace, email: "high@example.com", lead_score: 50)
+    Marketing::ConsentService.subscribe!(person: low, subscription_type: type, source: "spec", legal_basis: "consent")
+    Marketing::ConsentService.subscribe!(person: high, subscription_type: type, source: "spec", legal_basis: "consent")
+
+    get mqls_path(sort: "lead_score", dir: "asc")
+
+    expect(response).to have_http_status(:ok)
+    expect(response.body.index("low@example.com")).to be < response.body.index("high@example.com")
+
+    get mqls_path(sort: "lead_score", dir: "desc")
+
+    expect(response.body.index("high@example.com")).to be < response.body.index("low@example.com")
+  end
+
   it "paginates without error when there are more than one page of MQLs" do
     type = workspace.subscription_types.find_by!(slug: "general")
     51.times do |i|
