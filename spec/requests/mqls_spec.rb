@@ -32,4 +32,17 @@ RSpec.describe "MQL pool", type: :request do
 
     expect(response).to redirect_to(root_path)
   end
+
+  it "paginates without error when there are more than one page of MQLs" do
+    type = workspace.subscription_types.find_by!(slug: "general")
+    51.times do |i|
+      person = create_person!(workspace, email: "pool#{i}@example.com")
+      Marketing::ConsentService.subscribe!(person: person, subscription_type: type, source: "spec", legal_basis: "consent")
+    end
+
+    get mqls_path
+
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include("Siguiente")
+  end
 end

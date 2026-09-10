@@ -3,6 +3,8 @@ class MqlsController < ApplicationController
   requires_feature :mql_pool
   skip_after_action :verify_policy_scoped
 
+  helper_method :index_query_params
+
   def index
     authorize :mql, :index?
     SubscriptionType.ensure_defaults!(current_workspace)
@@ -31,6 +33,10 @@ class MqlsController < ApplicationController
   end
 
   private
+
+  def index_query_params(overrides = {})
+    mql_filters.except("marketing_eligible").merge(overrides.stringify_keys).compact_blank
+  end
 
   def mql_filters
     raw = params.permit(
