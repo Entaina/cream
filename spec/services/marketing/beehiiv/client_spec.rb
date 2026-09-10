@@ -4,14 +4,8 @@ RSpec.describe Marketing::Beehiiv::Client do
   fixtures :users, :workspaces, :memberships
 
   let(:workspace) { workspaces(:one) }
-  let(:connection) do
-    workspace.create_beehiiv_connection!(
-      user: users(:one),
-      api_key: "beehiiv-api-key",
-      publication_id: "pub_00000000-0000-0000-0000-000000000000"
-    )
-  end
-  let(:client) { described_class.new(connection) }
+  let(:publication) { create_beehiiv_publication!(workspace) }
+  let(:client) { described_class.new(publication) }
   let(:http) { instance_double(Net::HTTP) }
 
   before do

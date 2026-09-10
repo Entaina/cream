@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_09_150000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_10_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -127,16 +127,29 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_09_150000) do
     t.datetime "created_at", null: false
     t.text "last_error"
     t.datetime "last_synced_at"
-    t.string "publication_id", null: false
     t.boolean "sync_enabled", default: true, null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
-    t.string "webhook_signing_secret"
-    t.string "webhook_token", null: false
     t.bigint "workspace_id", null: false
     t.index ["user_id"], name: "index_beehiiv_connections_on_user_id"
-    t.index ["webhook_token"], name: "index_beehiiv_connections_on_webhook_token", unique: true
     t.index ["workspace_id"], name: "index_beehiiv_connections_on_workspace_id", unique: true
+  end
+
+  create_table "beehiiv_publications", force: :cascade do |t|
+    t.bigint "beehiiv_connection_id", null: false
+    t.datetime "created_at", null: false
+    t.text "last_error"
+    t.datetime "last_synced_at"
+    t.string "publication_id", null: false
+    t.bigint "subscription_type_id", null: false
+    t.datetime "updated_at", null: false
+    t.string "webhook_signing_secret"
+    t.string "webhook_token", null: false
+    t.index ["beehiiv_connection_id", "publication_id"], name: "idx_beehiiv_pubs_connection_publication", unique: true
+    t.index ["beehiiv_connection_id", "subscription_type_id"], name: "idx_beehiiv_pubs_connection_subscription_type", unique: true
+    t.index ["beehiiv_connection_id"], name: "index_beehiiv_publications_on_beehiiv_connection_id"
+    t.index ["subscription_type_id"], name: "index_beehiiv_publications_on_subscription_type_id"
+    t.index ["webhook_token"], name: "index_beehiiv_publications_on_webhook_token", unique: true
   end
 
   create_table "booking_event_types", force: :cascade do |t|
@@ -1562,6 +1575,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_09_150000) do
   add_foreign_key "automations", "workspaces"
   add_foreign_key "beehiiv_connections", "users"
   add_foreign_key "beehiiv_connections", "workspaces"
+  add_foreign_key "beehiiv_publications", "beehiiv_connections"
+  add_foreign_key "beehiiv_publications", "subscription_types"
   add_foreign_key "booking_event_types", "booking_pages"
   add_foreign_key "booking_event_types", "email_templates", on_delete: :nullify
   add_foreign_key "booking_pages", "pipelines"

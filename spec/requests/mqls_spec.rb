@@ -23,6 +23,8 @@ RSpec.describe "MQL pool", type: :request do
 
     expect(response).to have_http_status(:ok)
     expect(response.body).to include(person.display_name)
+    expect(response.body).to include(type.name)
+    expect(response.body).to include("Suscrito")
   end
 
   it "redirects when feature is disabled" do

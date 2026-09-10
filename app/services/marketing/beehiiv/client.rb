@@ -11,8 +11,9 @@ module Marketing
       class AuthenticationError < Error; end
       class RateLimitError < Error; end
 
-      def initialize(connection)
-        @connection = connection
+      def initialize(publication)
+        @publication = publication
+        @connection = publication.beehiiv_connection
       end
 
       def list_subscriptions(cursor: nil, limit: 100, status: "all", email: nil, expand: [])
@@ -21,7 +22,7 @@ module Marketing
         params[:email] = email if email.present?
         params["expand[]"] = expand if expand.any?
 
-        get("/publications/#{@connection.publication_id}/subscriptions", params)
+        get("/publications/#{@publication.publication_id}/subscriptions", params)
       end
 
       def find_subscription_by_email(email)
@@ -38,12 +39,12 @@ module Marketing
           utm_source: "cream"
         }.merge(options.compact)
 
-        post("/publications/#{@connection.publication_id}/subscriptions", body)
+        post("/publications/#{@publication.publication_id}/subscriptions", body)
       end
 
       def unsubscribe(subscription_id:)
         put(
-          "/publications/#{@connection.publication_id}/subscriptions/#{subscription_id}",
+          "/publications/#{@publication.publication_id}/subscriptions/#{subscription_id}",
           { unsubscribe: true }
         )
       end

@@ -5,16 +5,16 @@ module Public
     skip_after_action :verify_authorized
     skip_after_action :verify_policy_scoped
 
-    before_action :load_connection!
+    before_action :load_publication!
 
     def create
       return head :not_found unless CreamFeatures.enabled?(:marketing_consent)
 
       payload = request.raw_post
-      verify_signature!(payload) if @connection.webhook_signing_secret.present?
+      verify_signature!(payload) if @publication.webhook_signing_secret.present?
 
       parsed = JSON.parse(payload)
-      Marketing::Beehiiv::WebhookProcessor.process!(connection: @connection, payload: parsed)
+      Marketing::Beehiiv::WebhookProcessor.process!(publication: @publication, payload: parsed)
       head :ok
     rescue JSON::ParserError
       head :bad_request
@@ -24,16 +24,16 @@ module Public
 
     private
 
-    def load_connection!
-      @connection = BeehiivConnection.find_by(webhook_token: params[:token].to_s)
-      head :unauthorized unless @connection
+    def load_publication!
+      @publication = BeehiivPublication.find_by(webhook_token: params[:token].to_s)
+      head :unauthorized unless @publication
     end
 
     def verify_signature!(payload)
       Marketing::Beehiiv::SignatureVerifier.verify!(
         payload: payload,
         headers: request.headers.to_h,
-        secret: @connection.webhook_signing_secret
+        secret: @publication.webhook_signing_secret
       )
     end
   end

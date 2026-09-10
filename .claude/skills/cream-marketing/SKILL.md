@@ -36,7 +36,8 @@ Workspace-scoped (`WorkspaceRecordPolicy`):
 | Modelo | Rol |
 |--------|-----|
 | `MailjetConnection` | Credenciales ESP por workspace (API Key, Secret, remitente, webhook token, `transactional_enabled`) |
-| `BeehiivConnection` | API Key, `publication_id`, webhook token/secret, sync horaria con audiencia Beehiiv |
+| `BeehiivConnection` | API Key de cuenta + `sync_enabled`; `has_many :beehiiv_publications` |
+| `BeehiivPublication` | Mapeo `publication_id` + webhook token/secret + `subscription_type`; URL `/e/beehiiv/:token` por publicación |
 | `SubscriptionType` | Tipos de suscripción; `consent_field_key` + `default_consent_label` enlazan checkbox de formulario ↔ suscripción |
 | `EmailSubscription` | Estado por persona + tipo (`subscribed` / `unsubscribed` / `pending`) |
 | `EmailSuppression` | Bloqueo global por email (bounce, spam, baja total) |
@@ -85,7 +86,7 @@ Migraciones: `20260904100000_create_marketing_hub.rb`, `20260904110000_marketing
 | `AttributionReport` | Dashboard UTM unificado; drill-down MQL (`MQL_STAGES` desde `ScoringEngine`) |
 | `FilterResolver` / `ConditionEvaluator` | Filtros de segmentos y condiciones de scoring; claves MQL: `marketing_eligible`, `open_deal`, `interest_product_id`, `lead_form_id`, `capture_destination` |
 | `MqlEligibility` | Elegibilidad del pool (≥1 suscripción activa subscribed + email principal + no suprimido; filtro opcional por tipo) |
-| `Beehiiv::Client` / `SubscriberSync` / `PushService` / `WebhookProcessor` | Sync bidireccional newsletter Beehiiv ↔ tipo `newsletter` |
+| `Beehiiv::Client` / `SubscriberSync` / `PushService` / `WebhookProcessor` | Sync bidireccional por `BeehiivPublication` ↔ `subscription_type` mapeado |
 | `MqlToSqlConverter` | Conversión transaccional de interés → deal (crear o vincular) |
 | `JourneyExit` | Cancelar/bloquear recorridos con `stop_on_open_deal` |
 | `ConsentPolicySnapshot` | Versionar política + frase de checkbox por hash; find_or_create idempotente |
@@ -132,7 +133,7 @@ resource :marketing_attribution, only: :show
 | `GET/PATCH /e/preferences/:token` | `Public::EmailPreferencesController` | Centro de preferencias |
 | `GET/POST /e/unsubscribe/:token` | one-click unsub con `?type=` |
 | `POST /e/events?token=` | `Public::EmailEventsController#create` | Webhook Mailjet; el token es el `webhook_token` de `MailjetConnection` |
-| `POST /e/beehiiv/:token` | `Public::BeehiivWebhooksController#create` | Webhook Beehiiv (Svix); token de `BeehiivConnection` |
+| `POST /e/beehiiv/:token` | `Public::BeehiivWebhooksController#create` | Webhook Beehiiv (Svix); token de `BeehiivPublication` |
 | `POST /t` | `Public::TrackingController#create` | Eventos tracking |
 | `GET /cream.js` | script cross-origin | Snippet embebible |
 
@@ -180,7 +181,7 @@ resource :marketing_attribution, only: :show
 
 Mailjet por workspace: **Settings** (admin) → `MailjetConnection` (`api_key`, `secret_key`, `from_email`, `from_name`, `webhook_token`, `transactional_enabled`). URL webhook: `https://<host>/e/events?token=<webhook_token>`.
 
-Beehiiv por workspace: **Settings** (admin) → `BeehiivConnection` (`api_key`, `publication_id`, `webhook_signing_secret`, `sync_enabled`). URL webhook: `https://<host>/e/beehiiv/<webhook_token>`. Push outbound desde `ConsentService` (tipo newsletter) vía `BeehiivPushJob`; inbound no reempuja (`source` `beehiiv:*`).
+Beehiiv por workspace: **Settings** (admin) → `BeehiivConnection` (`api_key`, `sync_enabled`) + N `BeehiivPublication` (`publication_id`, `webhook_signing_secret`, `subscription_type_id`, `webhook_token` único). URL webhook por publicación: `https://<host>/e/beehiiv/<webhook_token>`. Migración `20260910120000` backfill preserva token/URL de newsletter en prod. Push outbound desde `ConsentService` (por `subscription_type` mapeado) vía `BeehiivPushJob`; inbound no reempuja (`source` `beehiiv:*`).
 
 ## Tests
 

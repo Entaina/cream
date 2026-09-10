@@ -2,10 +2,12 @@ class BeehiivSyncSchedulerJob < ApplicationJob
   queue_as :default
 
   def perform
-    BeehiivConnection.where(sync_enabled: true).find_each do |connection|
+    BeehiivConnection.where(sync_enabled: true).includes(:beehiiv_publications).find_each do |connection|
       next unless connection.connected?
 
-      BeehiivSyncJob.perform_later(connection.id)
+      connection.beehiiv_publications.find_each do |publication|
+        BeehiivSyncJob.perform_later(publication.id)
+      end
     end
   end
 end

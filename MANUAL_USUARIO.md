@@ -862,16 +862,16 @@ Cada workspace tiene su propia URL (incluye un token). Sin Mailjet conectado, la
 
 ### Beehiiv
 
-Sincroniza la audiencia de Beehiiv con el tipo de suscripción **Newsletter** de Cream (solo admins). Beehiiv sigue enviando la newsletter; Cream refleja altas y bajas en el pool MQL.
+Sincroniza publicaciones de Beehiiv con tipos de suscripción de Cream (solo admins). Beehiiv sigue enviando cada newsletter; Cream refleja altas y bajas en el pool MQL. Cada publicación Beehiiv tiene su propia URL de webhook.
 
-1. En Beehiiv, copia la **API Key** y el **Publication ID** (`pub_…`).
-2. En **Settings**, sección **Beehiiv**, pega la clave y el ID de publicación.
-3. Opcional: pega el **Webhook signing secret** (`whsec_…`) desde Beehiiv → Settings → Webhooks (plan Scale+).
-4. Pulsa **Conectar Beehiiv** o **Guardar Beehiiv**. La API key no se vuelve a mostrar; deja el campo en blanco para conservarla.
-5. Pulsa **Sincronizar ahora** para importar suscriptores existentes. La sync automática se repite cada hora si está activada.
-6. Copia la **URL del webhook** y regístrala en Beehiiv con los eventos `subscription.created`, `subscription.confirmed` y `subscription.deleted`.
+1. En Beehiiv, copia la **API Key** de la cuenta.
+2. En **Settings**, sección **Beehiiv**, pega la clave y pulsa **Conectar Beehiiv** o **Guardar Beehiiv**. La API key no se vuelve a mostrar; deja el campo en blanco para conservarla.
+3. En **Añadir publicación**, elige el **tipo de suscripción Cream** (p. ej. Newsletter), el **Publication ID** (`pub_…`) y, opcionalmente, el **Webhook signing secret** (`whsec_…`) de esa publicación en Beehiiv → Settings → Webhooks (plan Scale+).
+4. Copia la **URL del webhook** de esa publicación y regístrala en Beehiiv con los eventos `subscription.created`, `subscription.confirmed` y `subscription.deleted`.
+5. Repite los pasos 3–4 por cada publicación Beehiiv que quieras sincronizar (p. ej. otra newsletter o lista distinta).
+6. Pulsa **Sincronizar ahora** para importar suscriptores existentes. La sync automática se repite cada hora si está activada.
 
-**Bidireccional:** si alguien se suscribe o se da de baja de la newsletter en Cream (formulario, ficha de persona o centro de preferencias), el cambio se empuja a Beehiiv. Los cambios originados en Beehiiv no se reenvían.
+**Bidireccional:** si alguien se suscribe o se da de baja en Cream de un tipo enlazado a Beehiiv (formulario, ficha de persona o centro de preferencias), el cambio se empuja a la publicación correspondiente. Los cambios originados en Beehiiv no se reenvían.
 
 - **Desconectar** elimina la configuración de Beehiiv en este workspace (no borra personas ni suscripciones ya importadas).
 

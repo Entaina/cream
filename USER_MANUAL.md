@@ -862,16 +862,16 @@ Each workspace has its own URL (it includes a token). Without Mailjet connected,
 
 ### Beehiiv
 
-Syncs the Beehiiv audience with Cream's **Newsletter** subscription type (admins only). Beehiiv still sends the newsletter; Cream mirrors subscribe/unsubscribe into the MQL pool.
+Syncs Beehiiv publications with Cream subscription types (admins only). Beehiiv still sends each newsletter; Cream mirrors subscribe/unsubscribe into the MQL pool. Each Beehiiv publication has its own webhook URL.
 
-1. In Beehiiv, copy the **API Key** and **Publication ID** (`pub_…`).
-2. In **Settings**, **Beehiiv** section, paste the key and publication ID.
-3. Optional: paste the **Webhook signing secret** (`whsec_…`) from Beehiiv → Settings → Webhooks (Scale plan+).
-4. Click **Conectar Beehiiv** or **Guardar Beehiiv**. The API key is not shown again; leave the field blank to keep the stored value.
-5. Click **Sincronizar ahora** to import existing subscribers. Hourly auto-sync runs when enabled.
-6. Copy the **webhook URL** and register it in Beehiiv for `subscription.created`, `subscription.confirmed` and `subscription.deleted`.
+1. In Beehiiv, copy the account **API Key**.
+2. In **Settings**, **Beehiiv** section, paste the key and click **Conectar Beehiiv** or **Guardar Beehiiv**. The API key is not shown again; leave the field blank to keep the stored value.
+3. Under **Add publication**, choose the **Cream subscription type** (e.g. Newsletter), the **Publication ID** (`pub_…`) and optionally the **Webhook signing secret** (`whsec_…`) from that publication in Beehiiv → Settings → Webhooks (Scale plan+).
+4. Copy that publication's **webhook URL** and register it in Beehiiv for `subscription.created`, `subscription.confirmed` and `subscription.deleted`.
+5. Repeat steps 3–4 for each Beehiiv publication you want to sync.
+6. Click **Sincronizar ahora** to import existing subscribers. Hourly auto-sync runs when enabled.
 
-**Bidirectional:** subscribe/unsubscribe in Cream (form, person record or preference center) is pushed to Beehiiv. Changes originating in Beehiiv are not pushed back.
+**Bidirectional:** subscribe/unsubscribe in Cream for a type linked to Beehiiv (form, person record or preference center) is pushed to the matching publication. Changes originating in Beehiiv are not pushed back.
 
 - **Desconectar** removes Beehiiv settings for this workspace (does not delete imported people or subscriptions).
 

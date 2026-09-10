@@ -4,13 +4,7 @@ RSpec.describe "Public Beehiiv webhooks", type: :request do
   fixtures :users, :workspaces, :memberships
 
   let(:workspace) { workspaces(:one) }
-  let(:connection) do
-    workspace.create_beehiiv_connection!(
-      user: users(:one),
-      api_key: "beehiiv-api-key",
-      publication_id: "pub_00000000-0000-0000-0000-000000000000"
-    )
-  end
+  let!(:publication) { create_beehiiv_publication!(workspace) }
 
   before do
     allow(CreamFeatures).to receive(:enabled?).and_call_original
@@ -28,7 +22,7 @@ RSpec.describe "Public Beehiiv webhooks", type: :request do
       }
     }.to_json
 
-    post public_beehiiv_webhook_path(token: connection.webhook_token),
+    post public_beehiiv_webhook_path(token: publication.webhook_token),
       params: payload,
       headers: { "CONTENT_TYPE" => "application/json" }
 

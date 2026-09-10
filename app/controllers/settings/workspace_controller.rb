@@ -48,6 +48,7 @@ module Settings
 
       @beehiiv_connection = current_workspace.beehiiv_connection ||
         current_workspace.build_beehiiv_connection(user: current_user)
+      @new_beehiiv_publication = @beehiiv_connection.beehiiv_publications.build if @beehiiv_connection.persisted?
     end
   end
 end

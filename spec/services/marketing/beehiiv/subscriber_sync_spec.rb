@@ -4,14 +4,7 @@ RSpec.describe Marketing::Beehiiv::SubscriberSync do
   fixtures :users, :workspaces, :memberships
 
   let(:workspace) { workspaces(:one) }
-  let(:user) { users(:one) }
-  let!(:connection) do
-    workspace.create_beehiiv_connection!(
-      user: user,
-      api_key: "beehiiv-api-key",
-      publication_id: "pub_00000000-0000-0000-0000-000000000000"
-    )
-  end
+  let!(:publication) { create_beehiiv_publication!(workspace) }
 
   before do
     allow(CreamFeatures).to receive(:enabled?).and_call_original
@@ -31,7 +24,7 @@ RSpec.describe Marketing::Beehiiv::SubscriberSync do
       ]
     }
 
-    person = described_class.apply!(connection: connection, record: record, source: "beehiiv:sync")
+    person = described_class.apply!(publication: publication, record: record, source: "beehiiv:sync")
 
     expect(person.email).to eq("beehiiv@example.com")
     expect(person.first_name).to eq("Ada")
@@ -48,7 +41,7 @@ RSpec.describe Marketing::Beehiiv::SubscriberSync do
     person = create_person!(workspace, email: "pending@example.com")
 
     described_class.apply!(
-      connection: connection,
+      publication: publication,
       record: { "id" => "sub_pending", "email" => person.email, "status" => "pending" },
       source: "beehiiv:sync"
     )
@@ -62,7 +55,7 @@ RSpec.describe Marketing::Beehiiv::SubscriberSync do
     person = create_person!(workspace, email: "bounce@example.com")
 
     described_class.apply!(
-      connection: connection,
+      publication: publication,
       record: { "id" => "sub_invalid", "email" => person.email, "status" => "invalid" },
       source: "beehiiv:sync"
     )

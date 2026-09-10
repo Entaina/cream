@@ -11,25 +11,34 @@ RSpec.describe "Beehiiv connections", type: :request do
     allow(CreamFeatures).to receive(:enabled?).and_call_original
     allow(CreamFeatures).to receive(:enabled?).with(:marketing_consent).and_return(true)
     ActiveJob::Base.queue_adapter = :test
+    SubscriptionType.ensure_defaults!(workspace)
   end
 
   def connection_params(**overrides)
     {
       beehiiv_connection: {
         api_key: "beehiiv-api-key",
-        publication_id: "pub_00000000-0000-0000-0000-000000000000",
-        webhook_signing_secret: "whsec_testsecret",
         sync_enabled: "1"
+      }.merge(overrides)
+    }
+  end
+
+  def publication_params(**overrides)
+    {
+      beehiiv_publication: {
+        subscription_type_id: workspace.subscription_types.find_by!(slug: "newsletter").id,
+        publication_id: "pub_00000000-0000-0000-0000-000000000000",
+        webhook_signing_secret: "whsec_testsecret"
       }.merge(overrides)
     }
   end
 
   describe "GET /settings/workspace" do
     it "shows the Beehiiv form without echoing stored keys" do
-      workspace.create_beehiiv_connection!(
+      create_beehiiv_publication!(
+        workspace,
         user: admin,
         api_key: "supersecretbeehiivkey",
-        publication_id: "pub_00000000-0000-0000-0000-000000000000",
         webhook_signing_secret: "whsec_supersecret"
       )
       sign_in_as(admin)
@@ -44,18 +53,15 @@ RSpec.describe "Beehiiv connections", type: :request do
   end
 
   describe "POST /beehiiv_connection" do
-    it "creates the connection for admins and enqueues sync" do
+    it "creates the connection for admins" do
       sign_in_as(admin)
 
       expect {
         post beehiiv_connection_path, params: connection_params
       }.to change(BeehiivConnection, :count).by(1)
-        .and have_enqueued_job(BeehiivSyncJob)
 
       connection = workspace.reload.beehiiv_connection
       expect(connection.api_key).to eq("beehiiv-api-key")
-      expect(connection.publication_id).to eq("pub_00000000-0000-0000-0000-000000000000")
-      expect(connection.webhook_token).to be_present
     end
 
     it "is admin-only" do
@@ -70,18 +76,30 @@ RSpec.describe "Beehiiv connections", type: :request do
     end
   end
 
+  describe "POST /beehiiv_publications" do
+    it "creates a publication mapping and enqueues sync" do
+      workspace.create_beehiiv_connection!(user: admin, api_key: "beehiiv-api-key")
+      sign_in_as(admin)
+
+      expect {
+        post beehiiv_publications_path, params: publication_params
+      }.to change(BeehiivPublication, :count).by(1)
+        .and have_enqueued_job(BeehiivSyncJob)
+
+      publication = workspace.beehiiv_connection.beehiiv_publications.last
+      expect(publication.publication_id).to eq("pub_00000000-0000-0000-0000-000000000000")
+      expect(publication.webhook_token).to be_present
+    end
+  end
+
   describe "POST /beehiiv_connection/sync" do
-    it "enqueues a sync job" do
-      connection = workspace.create_beehiiv_connection!(
-        user: admin,
-        api_key: "beehiiv-api-key",
-        publication_id: "pub_00000000-0000-0000-0000-000000000000"
-      )
+    it "enqueues a sync job per publication" do
+      publication = create_beehiiv_publication!(workspace, user: admin)
       sign_in_as(admin)
 
       expect {
         post sync_beehiiv_connection_path
-      }.to have_enqueued_job(BeehiivSyncJob).with(connection.id)
+      }.to have_enqueued_job(BeehiivSyncJob).with(publication.id)
     end
   end
 end

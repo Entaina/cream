@@ -163,6 +163,7 @@ Rails.application.routes.draw do
   resource :beehiiv_connection, only: %i[create update destroy] do
     post :sync, on: :member
   end
+  resources :beehiiv_publications, only: %i[create update destroy]
   resources :stripe_payments, only: %i[index show] do
     member do
       post :match

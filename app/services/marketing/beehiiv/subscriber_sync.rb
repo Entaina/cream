@@ -6,13 +6,14 @@ module Marketing
       INACTIVE_STATUSES = %w[inactive].freeze
       INVALID_STATUSES = %w[invalid].freeze
 
-      def self.apply!(connection:, record:, source: "beehiiv:sync", event_type: nil)
-        new(connection:, record:, source:, event_type:).apply!
+      def self.apply!(publication:, record:, source: "beehiiv:sync", event_type: nil)
+        new(publication:, record:, source:, event_type:).apply!
       end
 
-      def initialize(connection:, record:, source:, event_type:)
-        @connection = connection
-        @workspace = connection.workspace
+      def initialize(publication:, record:, source:, event_type:)
+        @publication = publication
+        @connection = publication.beehiiv_connection
+        @workspace = @connection.workspace
         @record = normalize_record(record)
         @source = source
         @event_type = event_type
@@ -104,9 +105,8 @@ module Marketing
       end
 
       def apply_subscription_state!(person)
-        SubscriptionType.ensure_defaults!(@workspace)
-        newsletter_type = @workspace.subscription_types.active.find_by!(slug: "newsletter")
-        subscription = EmailSubscription.find_or_initialize_by(person: person, subscription_type: newsletter_type)
+        subscription_type = @publication.subscription_type
+        subscription = EmailSubscription.find_or_initialize_by(person: person, subscription_type: subscription_type)
         subscription.workspace = @workspace
         subscription.beehiiv_subscription_id = @record[:id] if @record[:id].present?
 
@@ -165,6 +165,7 @@ module Marketing
       def beehiiv_metadata
         {
           "beehiiv_subscription_id" => @record[:id],
+          "beehiiv_publication_id" => @publication.publication_id,
           "beehiiv_status" => @record[:status],
           "beehiiv_event_type" => @event_type,
           "utm_source" => @record[:utm_source],

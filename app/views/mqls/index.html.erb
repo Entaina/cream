@@ -32,6 +32,7 @@
       <thead>
         <tr>
           <th>Persona</th>
+          <th>Suscripciones</th>
           <th>Lifecycle (scoring)</th>
           <th>Score</th>
           <th>Formularios</th>
@@ -51,6 +52,14 @@
                 <%= person.display_name %>
               <% end %>
               <div class="text-xs text-ink-faint"><%= person.email %></div>
+            </td>
+            <td class="text-sm text-ink-soft">
+              <% person.email_subscriptions.sort_by { |s| s.subscription_type.name }.each do |subscription| %>
+                <div class="flex flex-wrap items-center gap-1.5 py-0.5">
+                  <span><%= subscription.subscription_type.name %></span>
+                  <%= subscription_status_badge(subscription.status) %>
+                </div>
+              <% end %>
             </td>
             <td class="text-ink-soft"><%= person.lifecycle_stage&.humanize %></td>
             <td class="text-ink-soft"><%= person.lead_score %></td>

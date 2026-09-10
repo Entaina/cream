@@ -20,7 +20,7 @@ class MqlsController < ApplicationController
       filters: @filters,
       deal_scope: policy_scope(current_workspace.deals)
     ).resolve(
-      base.includes(:company, :email_subscriptions, product_interests: :product, lead_submissions: :lead_form)
+      base.includes(:company, email_subscriptions: :subscription_type, product_interests: :product, lead_submissions: :lead_form)
     ).order(lead_score: :desc, updated_at: :desc)
 
     @pagy, @people = pagy(:offset, @people)

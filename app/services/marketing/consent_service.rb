@@ -104,11 +104,15 @@ module Marketing
 
     def self.enqueue_beehiiv_push!(subscription, action:, source:, reactivate: false)
       return if beehiiv_source?(source)
-      return unless subscription.subscription_type.slug == "newsletter"
-      return unless subscription.person.workspace.beehiiv_connection&.connected?
+
+      connection = subscription.person.workspace.beehiiv_connection
+      return unless connection&.connected?
+
+      publication = connection.beehiiv_publications.find_by(subscription_type_id: subscription.subscription_type_id)
+      return unless publication
 
       BeehiivPushJob.perform_later(
-        subscription.workspace_id,
+        publication.id,
         subscription.person_id,
         action.to_s,
         { "reactivate" => reactivate }
@@ -118,9 +122,13 @@ module Marketing
 
     def self.enqueue_beehiiv_unsubscribe_all!(person, source:)
       return if beehiiv_source?(source)
-      return unless person.workspace.beehiiv_connection&.connected?
 
-      BeehiivPushJob.perform_later(person.workspace_id, person.id, "unsubscribe")
+      connection = person.workspace.beehiiv_connection
+      return unless connection&.connected?
+
+      connection.beehiiv_publications.find_each do |publication|
+        BeehiivPushJob.perform_later(publication.id, person.id, "unsubscribe")
+      end
     end
     private_class_method :enqueue_beehiiv_unsubscribe_all!
 

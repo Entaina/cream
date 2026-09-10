@@ -7,12 +7,12 @@ module Marketing
         subscription.deleted
       ].freeze
 
-      def self.process!(connection:, payload:)
-        new(connection:, payload:).process!
+      def self.process!(publication:, payload:)
+        new(publication:, payload:).process!
       end
 
-      def initialize(connection:, payload:)
-        @connection = connection
+      def initialize(publication:, payload:)
+        @publication = publication
         @payload = payload.is_a?(Hash) ? payload : {}
       end
 
@@ -22,7 +22,7 @@ module Marketing
 
         record = @payload["data"].presence || {}
         SubscriberSync.apply!(
-          connection: @connection,
+          publication: @publication,
           record: record,
           source: "beehiiv:webhook",
           event_type: event_type

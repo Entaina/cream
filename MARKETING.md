@@ -68,7 +68,7 @@ Cumplimiento (RGPD)
 Consentimiento con fecha, origen y texto aceptado; doble opt-in configurable por formulario.
 Supresión: la baja no borra el contacto, lo marca inescribible (para no volver a darlo de alta por error desde otro lead magnet).
 Relación con lo que ya existe
-Beehiiv: la newsletter de Entaina sigue saliendo por Beehiiv. CReaM sincroniza la audiencia bidireccionalmente con el tipo **Newsletter** (Settings → Beehiiv): importación horaria + webhooks, y push de altas/bajas desde formularios, ficha y preferencias. CReaM no envía posts por Beehiiv; Mailjet sigue siendo el ESP de campañas CRM.
+Beehiiv: la newsletter de Entaina sigue saliendo por Beehiiv. CReaM sincroniza la audiencia bidireccionalmente por publicación (Settings → Beehiiv): cada publicación Beehiiv se asocia a un tipo de suscripción Cream con su `publication_id`, secret Svix y URL de webhook propia; importación horaria + webhooks, y push de altas/bajas desde formularios, ficha y preferencias. CReaM no envía posts por Beehiiv; Mailjet sigue siendo el ESP de campañas CRM.
 Portal de cliente (borrador aparte): el login del portal con email es una fuente de captura más, y las etapas de ciclo de vida de este documento son las mismas que gobiernan los niveles de servicio del portal. Los dos módulos comparten el modelo.
 
 ## Estado de implementación (2026-09-09)
@@ -80,7 +80,7 @@ Portal de cliente (borrador aparte): el login del portal con email es una fuente
 - `Marketing::ProductInterest` (manual o desde formulario); conversión transaccional MQL→SQL (`MqlToSqlConverter`).
 - Trazabilidad formulario ↔ persona (envíos, consentimiento versionado, ficha de formulario).
 - Salida de recorridos por producto (`Journey#stop_on_open_deal`, `JourneyExit`); inscripción manual acotada al recorrido seleccionado.
-- Sync bidireccional Beehiiv ↔ Cream (`BeehiivConnection`, `Marketing::Beehiiv::*`, jobs horarios y webhooks Svix).
+- Sync bidireccional Beehiiv ↔ Cream (`BeehiivConnection` + `BeehiivPublication` por tipo de suscripción, `Marketing::Beehiiv::*`, jobs horarios y webhooks Svix con token por publicación).
 
 **Pendiente (posterior)**
 - Conversión automática a deal por señales fuertes.
