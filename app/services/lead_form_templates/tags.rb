@@ -107,8 +107,19 @@ module LeadFormTemplates
         target = lead_form.success_redirect_url.present? ? ' target="_top" data-turbo="false"' : ""
         <<~HTML
           <form action="#{context.registers[:form_action]}" method="post" class="space-y-4" data-controller="lead-form"#{target}>
+            #{inline_alert(context.registers[:flash_alert])}
             <input type="hidden" name="authenticity_token" value="#{ERB::Util.html_escape(context.registers[:csrf_token])}" autocomplete="off" />
         HTML
+      end
+
+      private
+
+      # Persistent error notice inside the form: the floating flash auto-hides,
+      # so on a 422 re-render the visitor needs a message that stays put.
+      def inline_alert(message)
+        return "" if message.blank?
+
+        %(<div class="rounded-lg bg-danger-soft text-danger-strong ring-1 ring-danger-line px-4 py-3 text-sm" role="alert">#{ERB::Util.html_escape(message)}</div>)
       end
     end
 

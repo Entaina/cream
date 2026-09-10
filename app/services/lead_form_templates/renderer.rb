@@ -47,7 +47,8 @@ module LeadFormTemplates
         csrf_token: @view_context.form_authenticity_token,
         privacy_url: @view_context.public_lead_form_privacy_path(@lead_form.slug),
         privacy_policy_hash: @privacy_policy_hash,
-        submission_key: @submission_key
+        submission_key: @submission_key,
+        flash_alert: (@view_context.flash[:alert] if @view_context.respond_to?(:flash))
       }
     end
   end
