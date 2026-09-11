@@ -24,7 +24,7 @@ RSpec.describe "Companies", type: :request do
       get companies_path
 
       expect(response).to redirect_to(root_path)
-      expect(flash[:alert]).to include("not authorized")
+      expect(flash[:alert]).to eq(not_authorized_message)
     end
   end
 
@@ -87,7 +87,7 @@ RSpec.describe "Companies", type: :request do
       get company_path(company)
 
       expect(response).to redirect_to(root_path)
-      expect(flash[:alert]).to include("not authorized")
+      expect(flash[:alert]).to eq(not_authorized_message)
     end
 
     it "shows fiscal information when present" do

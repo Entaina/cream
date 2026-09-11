@@ -22,7 +22,8 @@ module Settings
 
     def update_name
       if current_user.update(user_params)
-        redirect_to settings_profile_path, notice: "Nombre actualizado."
+        persist_locale_cookie(current_user.locale)
+        redirect_to settings_profile_path, notice: t("profile.flashes.name_updated")
       else
         redirect_to settings_profile_path, alert: current_user.errors.full_messages.to_sentence
       end
@@ -30,14 +31,14 @@ module Settings
 
     def update_membership_preferences
       if current_membership.update(membership_params)
-        redirect_to settings_profile_path, notice: "Preferencias actualizadas."
+        redirect_to settings_profile_path, notice: t("profile.flashes.preferences_updated")
       else
         redirect_to settings_profile_path, alert: current_membership.errors.full_messages.to_sentence
       end
     end
 
     def user_params
-      params.require(:user).permit(:name)
+      params.require(:user).permit(:name, :locale)
     end
 
     def membership_params

@@ -9,7 +9,9 @@ export default class extends Controller {
     searchUrl: String,
     createUrl: String,
     createParam: String,
-    records: Array
+    records: Array,
+    noResults: { type: String, default: "No results" },
+    createLabel: { type: String, default: '+ Create "%{name}"' }
   }
 
   connect() {
@@ -121,7 +123,7 @@ export default class extends Controller {
     }
 
     if (items.length === 0) {
-      this.menuEl.innerHTML = `<li class="px-3 py-1.5 text-sm text-ink-faint">No results</li>`
+      this.menuEl.innerHTML = `<li class="px-3 py-1.5 text-sm text-ink-faint">${this.escape(this.noResultsValue)}</li>`
       this.openMenu()
       this.activeIndex = -1
       return
@@ -211,7 +213,7 @@ export default class extends Controller {
   createItem(query, index) {
     return `<li role="option" data-create="true" data-index="${index}"
                 class="cursor-pointer px-3 py-1.5 text-sm text-accent hover:bg-canvas-sunken">
-              <span class="font-medium">+ Create "${this.escape(query)}"</span>
+              <span class="font-medium">${this.escape(this.createLabelValue.replace("%{name}", query))}</span>
             </li>`
   }
 

@@ -1,6 +1,7 @@
 class InvitationAcceptsController < ApplicationController
   skip_after_action :verify_authorized
   skip_after_action :verify_policy_scoped
+  skip_before_action :ensure_workspace_membership
 
   allow_unauthenticated_access only: %i[show create]
 
@@ -41,7 +42,7 @@ class InvitationAcceptsController < ApplicationController
     @invitation = Invitation.find_by_token(params[:token])
     return if @invitation
 
-    redirect_to new_session_path, alert: "Invitation link is invalid." and return
+    redirect_to new_session_path, alert: t("auth.flashes.invitation_invalid") and return
   end
 
   def store_pending_invitation_token
@@ -50,16 +51,16 @@ class InvitationAcceptsController < ApplicationController
 
   def accept_for_current_user
     unless current_user.email_address == @invitation.email_address
-      redirect_to accept_invitation_path(params[:token]), alert: "Sign in with #{@invitation.email_address} to accept this invitation."
+      redirect_to accept_invitation_path(params[:token]), alert: t("auth.flashes.sign_in_with_invited_email", email: @invitation.email_address)
       return
     end
 
     @invitation.accept_for!(current_user)
     session.delete(:pending_invitation_token)
     session[:workspace_id] = @invitation.workspace_id
-    redirect_to root_path, notice: "You joined #{@invitation.workspace.name}."
+    redirect_to root_path, notice: t("auth.flashes.joined_workspace", workspace: @invitation.workspace.name)
   rescue ActiveRecord::RecordInvalid
-    redirect_to accept_invitation_path(params[:token]), alert: @invitation.errors.full_messages.to_sentence.presence || "Could not accept invitation."
+    redirect_to accept_invitation_path(params[:token]), alert: @invitation.errors.full_messages.to_sentence.presence || t("auth.flashes.invitation_accept_failed")
   end
 
   def accept_with_registration
@@ -70,7 +71,7 @@ class InvitationAcceptsController < ApplicationController
       session.delete(:pending_invitation_token)
       start_new_session_for(@user)
       session[:workspace_id] = @invitation.workspace_id
-      redirect_to root_path, notice: "Welcome to #{@invitation.workspace.name}!"
+      redirect_to root_path, notice: t("auth.flashes.welcome_workspace", workspace: @invitation.workspace.name)
     else
       render :show, status: :unprocessable_entity
     end

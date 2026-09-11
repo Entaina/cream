@@ -38,7 +38,7 @@ RSpec.describe "Api::V1::DealNotes", type: :request do
       }.not_to change(Note, :count)
 
       expect(response).to have_http_status(:unprocessable_entity)
-      expect(response.parsed_body["errors"]).to include("Body can't be blank")
+      expect(response.parsed_body["errors"]).to include(blank_error_for(Note, :body))
     end
 
     it "does not allow adding notes to a deal from another workspace" do

@@ -77,7 +77,7 @@ RSpec.describe "Deal accesses", type: :request do
 
       expect(response).to redirect_to(root_path)
       follow_redirect!
-      expect(response.body).to include("not authorized")
+      expect(response.body).to include(not_authorized_message)
       expect(deal.reload.collaborators).to include(salesperson)
     end
   end

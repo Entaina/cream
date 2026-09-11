@@ -48,7 +48,7 @@ RSpec.describe SubscriptionType do
       )
 
       expect(duplicate).not_to be_valid
-      expect(duplicate.errors[:consent_field_key]).to include("has already been taken")
+      expect(duplicate.errors[:consent_field_key]).to include(I18n.t("errors.messages.taken"))
     end
   end
 end

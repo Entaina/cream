@@ -4,7 +4,7 @@
 
 Cream is a **workspace**-based CRM for managing **people**, **companies** and **deals** (opportunities), with notes, tasks, lists and an activity history shared across the team.
 
-> **Last revision:** 2026-09-11 (person workspace redesign)
+> **Last revision:** 2026-09-11 (ES/EN language in menu, login and profile)
 > This document describes the functionality **visible to the user**. Disabled features are listed at the end under "Coming soon".
 
 ---
@@ -55,6 +55,8 @@ On the sign-in screen you can:
 
 If you forgot your password, use **Forgot password?** to receive a reset link by email.
 
+In the top-right corner of the sign-in (and registration) screen you will see the **ES | EN** switch. Choose the interface language; the preference is stored in your browser until you create an account or sign in.
+
 ### Create account
 
 In **Create account** you enter your name, email, password and the workspace name. When you sign up:
@@ -65,11 +67,13 @@ In **Create account** you enter your name, email, password and the workspace nam
 
 ### Change your name
 
-1. Open **Settings → Profile** (also from your name at the bottom of the sidebar).
-2. In **Datos personales**, edit the **Nombre** field.
-3. Click **Guardar**.
+1. Open **Profile** (also from your name at the bottom of the sidebar).
+2. In **Personal details**, edit your **Name** and, if you want, **Language** (Español / English).
+3. Click **Save**.
 
-Your name updates in the sidebar, mentions and team activity. The email is shown in the same section, but it cannot be changed from there.
+Your name updates in the sidebar, mentions and team activity. Language affects the menu, login, app chrome and shared record sections (notes, tasks, activity…). The email is shown in the same section, but it cannot be changed from there.
+
+You can also switch language on the fly with **ES | EN** at the bottom of the sidebar (next to the light/dark theme control).
 
 ### Sign out
 
@@ -148,7 +152,7 @@ Above the menu (**Search…**, **Notifications**) and below the **active pipelin
 
 | Entry | Description |
 |-------|-------------|
-| **Profile** | Name, default pipeline, AI briefing, alert channels |
+| **Profile** | Name, language, default pipeline, AI briefing, alert channels |
 | **Gmail** | OAuth to send from records and detect replies |
 | **Reservas** (Bookings) | Public calendar booking pages |
 | **Mis listas** (My lists) | Workspace lists |
@@ -832,7 +836,7 @@ Invitees accept with the link they received and create an account, or sign in if
 
 Available to **all members** under **Profile** ( **Mi perfil** menu group, or click your name at the bottom of the sidebar). Personal preferences **in the active workspace**:
 
-1. **Personal details** — your **name** (shown in mentions and activity). Account email is read-only.
+1. **Personal details** — your **name** (shown in mentions and activity) and **language** (Español / English). Account email is read-only.
 2. **Default pipeline** — pipeline selected at sign-in, in the sidebar selector and in the Gmail add-on ([§3](#3-navigation)).
 3. **Sales director briefing** — checkbox to show or hide the AI block on the dashboard ([§4](#4-dashboard)). Only shown if an admin enabled it in workspace **Settings** and AI is configured on the server.
 4. **Alertas** (Alerts) — **In-app notification (bell)** and **Email** channels for configured alerts, **form submissions** (if you are the owner) and **calendar bookings** (if you are the host). If you disable both, you will not receive those notices ([§17](#17-configurable-alerts), [§19](#19-notifications)).

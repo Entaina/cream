@@ -223,7 +223,7 @@ RSpec.describe "Deals", type: :request do
       expect(response).to have_http_status(:unprocessable_entity)
       expect(response.media_type).to eq("text/vnd.turbo-stream.html")
       expect(response.body).to include(ActionView::RecordIdentifier.dom_id(person, :quick_deal_form))
-      expect(response.body).to include("Tasks title can&#39;t be blank")
+      expect(response.body).to include("Tasks title #{I18n.t('errors.messages.blank')}")
     end
   end
 

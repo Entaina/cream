@@ -4,7 +4,7 @@ class PasswordsController < ApplicationController
 
   allow_unauthenticated_access
   before_action :set_user_by_token, only: %i[edit update]
-  rate_limit to: 10, within: 3.minutes, only: :create, with: -> { redirect_to new_password_path, alert: "Try again later." }
+  rate_limit to: 10, within: 3.minutes, only: :create, with: -> { redirect_to new_password_path, alert: I18n.t("auth.flashes.try_again_later") }
 
   def new
   end
@@ -14,7 +14,7 @@ class PasswordsController < ApplicationController
       PasswordsMailer.reset(user).deliver_later
     end
 
-    redirect_to new_session_path, notice: "Password reset instructions sent (if user with that email address exists)."
+    redirect_to new_session_path, notice: t("auth.flashes.password_reset_sent")
   end
 
   def edit
@@ -23,9 +23,9 @@ class PasswordsController < ApplicationController
   def update
     if @user.update(params.permit(:password, :password_confirmation))
       @user.sessions.destroy_all
-      redirect_to new_session_path, notice: "Password has been reset."
+      redirect_to new_session_path, notice: t("auth.flashes.password_reset")
     else
-      redirect_to edit_password_path(params[:token]), alert: "Passwords did not match."
+      redirect_to edit_password_path(params[:token]), alert: t("auth.flashes.passwords_did_not_match")
     end
   end
 
@@ -34,6 +34,6 @@ class PasswordsController < ApplicationController
   def set_user_by_token
     @user = User.find_by_password_reset_token!(params[:token])
   rescue ActiveSupport::MessageVerifier::InvalidSignature
-    redirect_to new_password_path, alert: "Password reset link is invalid or has expired."
+    redirect_to new_password_path, alert: t("auth.flashes.password_reset_invalid")
   end
 end

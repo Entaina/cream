@@ -25,6 +25,7 @@ RSpec.describe "Settings::Profile", type: :request do
 
       expect(response).to have_http_status(:success)
       expect(response.body).to include("Datos personales")
+      expect(response.body).to include("Idioma")
       expect(response.body).to include(admin.name)
       expect(response.body).to include(admin.email_address)
       expect(response.body).to include("Mostrar briefing del director de ventas en el dashboard")
@@ -62,8 +63,21 @@ RSpec.describe "Settings::Profile", type: :request do
       patch settings_profile_path, params: { user: { name: "Nuevo Nombre" } }
 
       expect(response).to redirect_to(settings_profile_path)
-      expect(flash[:notice]).to eq("Nombre actualizado.")
+      expect(flash[:notice]).to eq(I18n.t("profile.flashes.name_updated"))
       expect(member.reload.name).to eq("Nuevo Nombre")
+    end
+
+    it "allows users to update their locale" do
+      sign_in_as(member)
+      patch switch_workspace_path, params: { workspace_id: workspace.id }
+      member.update!(locale: "es")
+
+      patch settings_profile_path, params: { user: { name: member.name, locale: "en" } }
+
+      expect(response).to redirect_to(settings_profile_path)
+      expect(flash[:notice]).to eq(I18n.t("profile.flashes.name_updated"))
+      expect(member.reload.locale).to eq("en")
+      expect(cookies[:locale]).to eq("en")
     end
 
     it "rejects a blank name" do

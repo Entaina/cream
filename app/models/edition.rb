@@ -23,9 +23,9 @@ class Edition < ApplicationRecord
     if starts_on && ends_on
       "#{I18n.l(starts_on, format: :short)} – #{I18n.l(ends_on, format: :short)}"
     elsif starts_on
-      "From #{I18n.l(starts_on, format: :short)}"
+      I18n.t("editions.from", date: I18n.l(starts_on, format: :short))
     elsif ends_on
-      "Until #{I18n.l(ends_on, format: :short)}"
+      I18n.t("editions.until", date: I18n.l(ends_on, format: :short))
     end
   end
 

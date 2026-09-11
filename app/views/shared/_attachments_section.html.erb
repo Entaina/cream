@@ -1,7 +1,7 @@
 <%# locals: (record:) %>
 <section>
   <h3 class="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-ink-faint mb-2">
-    <%= icon :paperclip, classes: "size-3.5" %> Attachments
+    <%= icon :paperclip, classes: "size-3.5" %> <%= t("shared.attachments.title") %>
     <span class="text-ink-faint font-normal normal-case tracking-normal">(<%= record.record_attachments.count %>)</span>
   </h3>
 
@@ -10,7 +10,7 @@
     <%= hidden_field_tag :attachable_id, record.id %>
     <div class="flex items-center gap-2">
       <%= file_field_tag "record_attachment[file]", class: "file-input flex-1" %>
-      <%= submit_tag "Upload", class: "btn-primary" %>
+      <%= submit_tag t("shared.attachments.upload"), class: "btn-primary" %>
     </div>
   <% end %>
 
@@ -21,7 +21,7 @@
           <%= icon :paperclip, classes: "size-3.5 text-ink-faint" %>
           <%= link_to attachment.display_name, rails_blob_path(attachment.file, disposition: "attachment"), class: "text-accent hover:underline truncate" %>
           <span class="text-xs text-ink-faint ml-auto"><%= number_to_human_size(attachment.file.byte_size) %></span>
-          <%= button_to record_attachment_path(attachment), method: :delete, form: { data: { turbo_confirm: "Remove this file?" } },
+          <%= button_to record_attachment_path(attachment), method: :delete, form: { data: { turbo_confirm: t("shared.attachments.remove_confirm") } },
                 class: "text-ink-faint hover:text-danger p-1" do %>
             <%= icon :trash, classes: "size-3" %>
           <% end %>

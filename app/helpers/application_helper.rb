@@ -234,30 +234,30 @@ module ApplicationHelper
   end
 
   def activity_sentence(activity)
-    actor = activity.user&.name || "Someone"
+    actor = activity.user&.name || t("shared.someone")
     case activity.action
-    when "created" then "#{actor} created this record"
+    when "created" then t("activities.created", actor: actor)
     when "updated"
       fields = (activity.metadata["changes"] || {}).keys.map(&:humanize).join(", ")
-      "#{actor} updated #{fields.presence || "the record"}"
-    when "note_added" then "#{actor} added a note"
-    when "comment_added" then "#{actor} added a comment"
-    when "attachment_added" then "#{actor} attached #{activity.metadata["filename"]}"
-    when "email_opened" then "#{activity.metadata["to"]} opened “#{activity.metadata["subject"]}”"
-    when "email_sent" then "#{actor} sent “#{activity.metadata["subject"]}” to #{activity.metadata["to"]}"
-    when "email_clicked" then "Link clicked in “#{activity.metadata["subject"]}”"
-    when "email_replied" then "#{activity.metadata["from"] || "Someone"} replied to “#{activity.metadata["subject"]}”"
-    when "task_completed" then "#{actor} completed the task “#{activity.metadata["title"]}”"
+      t("activities.updated", actor: actor, fields: fields.presence || t("activities.updated_record"))
+    when "note_added" then t("activities.note_added", actor: actor)
+    when "comment_added" then t("activities.comment_added", actor: actor)
+    when "attachment_added" then t("activities.attachment_added", actor: actor, filename: activity.metadata["filename"])
+    when "email_opened" then t("activities.email_opened", to: activity.metadata["to"], subject: activity.metadata["subject"])
+    when "email_sent" then t("activities.email_sent", actor: actor, subject: activity.metadata["subject"], to: activity.metadata["to"])
+    when "email_clicked" then t("activities.email_clicked", subject: activity.metadata["subject"])
+    when "email_replied" then t("activities.email_replied", from: activity.metadata["from"] || t("shared.someone"), subject: activity.metadata["subject"])
+    when "task_completed" then t("activities.task_completed", actor: actor, title: activity.metadata["title"])
     when "stage_changed"
-      "#{actor} moved the deal from #{activity.metadata["from"]} to #{activity.metadata["to"]}"
+      t("activities.stage_changed", actor: actor, from: activity.metadata["from"], to: activity.metadata["to"])
     when "pipeline_changed"
-      "#{actor} moved the deal to the #{activity.metadata["to"]} pipeline"
+      t("activities.pipeline_changed", actor: actor, to: activity.metadata["to"])
     when "contacts_changed"
       contact = activity.metadata["contact"]
       case activity.metadata["change"]
-      when "added" then "#{actor} added #{contact} as a contact"
-      when "removed" then "#{actor} removed #{contact} as a contact"
-      else "#{actor} updated contacts (#{contact})"
+      when "added" then t("activities.contact_added", actor: actor, contact: contact)
+      when "removed" then t("activities.contact_removed", actor: actor, contact: contact)
+      else t("activities.contacts_updated", actor: actor, contact: contact)
       end
     when "merged"
       if activity.metadata["merged_companies"].present?
@@ -266,48 +266,49 @@ module ApplicationHelper
           label += " (#{company["domain"]})" if company["domain"].present?
           label
         }.join(", ")
-        "#{actor} merged #{names} into this record"
+        t("activities.merged_companies", actor: actor, names: names)
       else
         names = Array(activity.metadata["merged_people"]).map { |person|
           label = person["name"]
           label += " (#{person["email"]})" if person["email"].present?
           label
         }.join(", ")
-        "#{actor} merged #{names} into this record"
+        t("activities.merged_people", actor: actor, names: names)
       end
     when "products_changed"
       product = activity.metadata["product"]
       case activity.metadata["change"]
-      when "added" then "#{actor} added product line #{product}"
-      when "removed" then "#{actor} removed product line #{product}"
-      when "updated" then "#{actor} updated product line #{product}"
-      else "#{actor} updated products (#{product})"
+      when "added" then t("activities.product_added", actor: actor, product: product)
+      when "removed" then t("activities.product_removed", actor: actor, product: product)
+      when "updated" then t("activities.product_updated", actor: actor, product: product)
+      else t("activities.products_updated", actor: actor, product: product)
       end
-    when "ai_task_created" then "#{actor} created the AI-suggested task “#{activity.metadata["title"]}”"
+    when "ai_task_created" then t("activities.ai_task_created", actor: actor, title: activity.metadata["title"])
     when "payment_received"
       amount = number_to_currency(activity.metadata["amount"],
         unit: activity.metadata["currency"] == "EUR" ? "€" : activity.metadata["currency"],
         precision: 2, delimiter: ".", separator: ",", format: "%n %u")
-      "#{actor} linked a Stripe payment of #{amount}#{" from #{activity.metadata["customer_email"]}" if activity.metadata["customer_email"].present?}"
-    else "#{actor} #{activity.action.humanize.downcase}"
+      suffix = activity.metadata["customer_email"].present? ? t("activities.payment_received_from", email: activity.metadata["customer_email"]) : ""
+      t("activities.payment_received", actor: actor, amount: "#{amount}#{suffix}")
+    else t("activities.generic", actor: actor, action: activity.action.humanize.downcase)
     end
   end
 
   def version_actor(version)
-    return "Someone" if version.whodunnit.blank?
+    return t("shared.someone") if version.whodunnit.blank?
 
-    User.find_by(id: version.whodunnit)&.name || "Someone"
+    User.find_by(id: version.whodunnit)&.name || t("shared.someone")
   end
 
   def version_sentence(version)
     actor = version_actor(version)
     case version.event
-    when "create" then "#{actor} created this deal"
+    when "create" then t("deal_versions.created", actor: actor)
     when "update"
       fields = version.changeset.keys.map(&:humanize).join(", ")
-      "#{actor} updated #{fields.presence || "the deal"}"
-    when "destroy" then "#{actor} deleted this deal"
-    else "#{actor} #{version.event.humanize.downcase} this deal"
+      t("deal_versions.updated", actor: actor, fields: fields.presence || t("deal_versions.updated_deal"))
+    when "destroy" then t("deal_versions.destroyed", actor: actor)
+    else t("activities.generic", actor: actor, action: version.event.humanize.downcase)
     end
   end
 
@@ -371,46 +372,45 @@ module ApplicationHelper
   def sidebar_item_for(key)
     case key
     when "dashboard"
-      sidebar_nav_item("dashboard", "Dashboard", root_path, :home, current_page?(root_path), group: :daily)
+      sidebar_nav_item("dashboard", t("nav.dashboard"), root_path, :home, current_page?(root_path), group: :daily)
     when "people"
-      sidebar_nav_item("people", "People", people_path, :users, request.path.start_with?("/people"),
+      sidebar_nav_item("people", t("nav.people"), people_path, :users, request.path.start_with?("/people"),
         sidebar_saved_view_children("Person"), group: :daily)
     when "companies"
-      sidebar_nav_item("companies", "Companies", companies_path, :building, request.path.start_with?("/companies"),
+      sidebar_nav_item("companies", t("nav.companies"), companies_path, :building, request.path.start_with?("/companies"),
         sidebar_saved_view_children("Company"), group: :daily)
     when "deals"
-      sidebar_nav_item("deals", "Deals", board_deals_path, :banknote, request.path.start_with?("/deals"),
+      sidebar_nav_item("deals", t("nav.deals"), board_deals_path, :banknote, request.path.start_with?("/deals"),
         sidebar_saved_view_children("Deal"), group: :daily)
     when "tasks"
-      sidebar_nav_item("tasks", "Tasks", tasks_path, :check_circle, request.path.start_with?("/tasks"), group: :daily)
+      sidebar_nav_item("tasks", t("nav.tasks"), tasks_path, :check_circle, request.path.start_with?("/tasks"), group: :daily)
     when "team"
-      sidebar_nav_item("team", "Team", settings_team_path, :users, request.path.start_with?("/settings/team"), group: :settings)
+      sidebar_nav_item("team", t("nav.team"), settings_team_path, :users, request.path.start_with?("/settings/team"), group: :settings)
     when "products"
-      sidebar_nav_item("products", "Products", products_path, :briefcase, request.path.start_with?("/products"), group: :settings)
+      sidebar_nav_item("products", t("nav.products"), products_path, :briefcase, request.path.start_with?("/products"), group: :settings)
     when "pipelines"
-      sidebar_nav_item("pipelines", "Pipelines", pipelines_path, :columns, request.path.start_with?("/pipelines"), group: :settings)
+      sidebar_nav_item("pipelines", t("nav.pipelines"), pipelines_path, :columns, request.path.start_with?("/pipelines"), group: :settings)
     when "custom_fields"
-      sidebar_nav_item("custom_fields", "Custom fields", settings_custom_fields_path, :columns,
+      sidebar_nav_item("custom_fields", t("nav.custom_fields"), settings_custom_fields_path, :columns,
         request.path.start_with?("/settings/custom_fields"), group: :settings)
     when "profile"
-      sidebar_nav_item("profile", "Profile", settings_profile_path, :users, request.path.start_with?("/settings/profile"), group: :profile)
+      sidebar_nav_item("profile", t("nav.profile"), settings_profile_path, :users, request.path.start_with?("/settings/profile"), group: :profile)
     when "workspace"
       return unless sidebar_admin?
 
-      sidebar_nav_item("workspace", "Settings", settings_workspace_path, :settings,
+      sidebar_nav_item("workspace", t("nav.workspace_settings"), settings_workspace_path, :settings,
         request.path.start_with?("/settings/workspace"), group: :settings)
     when "api_tokens"
-      sidebar_nav_item("api_tokens", "API tokens", api_tokens_path, :globe, request.path.start_with?("/api_tokens"), group: :profile)
+      sidebar_nav_item("api_tokens", t("nav.api_tokens"), api_tokens_path, :globe, request.path.start_with?("/api_tokens"), group: :profile)
     when "lists"
-      sidebar_nav_item("lists", "Mis listas", lists_path, :list, request.path.start_with?("/lists"),
+      sidebar_nav_item("lists", t("nav.lists"), lists_path, :list, request.path.start_with?("/lists"),
         sidebar_list_children, group: :profile)
     else
       feature_key = key.to_sym
       return unless CreamFeatures.menu_entries.key?(feature_key)
 
-      meta = CreamFeatures.menu_entries[feature_key]
       path = CreamFeatures.menu_path(feature_key)
-      sidebar_nav_item(key, meta[:label], path, CreamFeatures.menu_icon(feature_key),
+      sidebar_nav_item(key, t("nav.features.#{feature_key}"), path, CreamFeatures.menu_icon(feature_key),
         request.path.start_with?(path), group: SidebarMenu.group_for(key))
     end
   end

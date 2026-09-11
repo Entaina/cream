@@ -64,18 +64,22 @@ RSpec.describe Edition, type: :model do
         starts_on: Date.new(2026, 1, 12),
         ends_on: Date.new(2026, 3, 20)
       )
-      expect(edition.date_range_label).to include("Jan 12")
-      expect(edition.date_range_label).to include("Mar 20")
+      expect(edition.date_range_label).to include(I18n.l(Date.new(2026, 1, 12), format: :short))
+      expect(edition.date_range_label).to include(I18n.l(Date.new(2026, 3, 20), format: :short))
     end
 
     it "formats a start-only range" do
       edition = product.editions.new(name: "Cohort", starts_on: Date.new(2026, 1, 12))
-      expect(edition.date_range_label).to start_with("From ")
+      expect(edition.date_range_label).to eq(
+        I18n.t("editions.from", date: I18n.l(Date.new(2026, 1, 12), format: :short))
+      )
     end
 
     it "formats an end-only range" do
       edition = product.editions.new(name: "Cohort", ends_on: Date.new(2026, 3, 20))
-      expect(edition.date_range_label).to start_with("Until ")
+      expect(edition.date_range_label).to eq(
+        I18n.t("editions.until", date: I18n.l(Date.new(2026, 3, 20), format: :short))
+      )
     end
   end
 

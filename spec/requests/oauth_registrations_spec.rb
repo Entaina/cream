@@ -93,7 +93,9 @@ RSpec.describe "OauthRegistrations", type: :request do
       expect(response).to have_http_status(:bad_request)
       body = JSON.parse(response.body)
       expect(body["error"]).to eq("invalid_client_metadata")
-      expect(body["error_description"]).to include("Redirect URI must be an HTTPS/SSL URI")
+      invalid_app = Doorkeeper::Application.new(name: "Bad client", redirect_uri: "http://example.com/callback")
+      invalid_app.valid?
+      expect(body["error_description"]).to include(invalid_app.errors.full_messages_for(:redirect_uri).first)
     end
   end
 end

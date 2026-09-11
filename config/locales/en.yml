@@ -1,31 +1,286 @@
-# Files in the config/locales directory are used for internationalization and
-# are automatically loaded by Rails. If you want to use locales other than
-# English, add the necessary files in this directory.
-#
-# To use the locales, use `I18n.t`:
-#
-#     I18n.t "hello"
-#
-# In views, this is aliased to just `t`:
-#
-#     <%= t("hello") %>
-#
-# To use a different locale, set it with `I18n.locale`:
-#
-#     I18n.locale = :es
-#
-# This would use the information in config/locales/es.yml.
-#
-# To learn more about the API, please read the Rails Internationalization guide
-# at https://guides.rubyonrails.org/i18n.html.
-#
-# Be aware that YAML interprets the following case-insensitive strings as
-# booleans: `true`, `false`, `on`, `off`, `yes`, `no`. Therefore, these strings
-# must be quoted to be interpreted as strings. For example:
-#
-#     en:
-#       "yes": yup
-#       enabled: "ON"
-
 en:
-  hello: "Hello world"
+  time:
+    formats:
+      default: "%m/%d/%Y %I:%M %p"
+      short: "%b %d, %Y"
+      long: "%A, %B %d, %Y"
+  datetime:
+    distance_in_words:
+      x_seconds:
+        one: "1 second"
+        other: "%{count} seconds"
+      x_minutes:
+        one: "1 minute"
+        other: "%{count} minutes"
+      x_hours:
+        one: "1 hour"
+        other: "%{count} hours"
+      x_days:
+        one: "1 day"
+        other: "%{count} days"
+      x_months:
+        one: "1 month"
+        other: "%{count} months"
+      x_years:
+        one: "1 year"
+        other: "%{count} years"
+      about_x_hours:
+        one: "about 1 hour"
+        other: "about %{count} hours"
+      about_x_months:
+        one: "about 1 month"
+        other: "about %{count} months"
+      over_x_years:
+        one: "over 1 year"
+        other: "over %{count} years"
+      almost_x_years:
+        one: "almost 1 year"
+        other: "almost %{count} years"
+      less_than_x_minutes:
+        one: "less than a minute"
+        other: "less than %{count} minutes"
+      half_a_minute: "half a minute"
+      less_than_x_seconds:
+        one: "less than 1 second"
+        other: "less than %{count} seconds"
+
+  nav:
+    search: "Search..."
+    notifications: "Notifications"
+    menu: "Menu"
+    customize_menu: "Customize menu"
+    sign_out: "Sign out"
+    language: "Language"
+    groups:
+      marketing: "Marketing"
+      settings: "Settings"
+      profile: "My profile"
+    dashboard: "Dashboard"
+    people: "People"
+    companies: "Companies"
+    deals: "Deals"
+    tasks: "Tasks"
+    team: "Team"
+    products: "Products"
+    pipelines: "Pipelines"
+    custom_fields: "Custom fields"
+    profile: "Profile"
+    workspace_settings: "Settings"
+    api_tokens: "API tokens"
+    lists: "My lists"
+    features:
+      reports: "Reports"
+      email_templates: "Templates"
+      gmail_sync: "Gmail"
+      automations: "Automations"
+      alerts: "Alerts"
+      slack_integrations: "Slack"
+      webhooks: "Webhooks"
+      stripe_payments: "Stripe"
+      lead_forms: "Lead forms"
+      calendar_booking: "Bookings"
+      marketing_consent: "Subscriptions"
+      marketing_campaigns: "Campaigns"
+      marketing_segments: "Segments"
+      marketing_attribution: "Attribution"
+      journeys: "Journeys"
+      lead_scoring: "Lead scoring"
+      mql_pool: "MQLs"
+
+  auth:
+    sign_in:
+      title: "Sign in to cream"
+      subtitle: "The CRM your team will love."
+      email: "Email"
+      password: "Password"
+      submit: "Sign in"
+      forgot_password: "Forgot password?"
+      create_account: "Create account"
+      or: "or"
+    registration:
+      title: "Create your account"
+      subtitle: "Start managing relationships in minutes."
+      name: "Name"
+      workspace_name: "Workspace name"
+      password_confirmation: "Confirm password"
+      submit: "Create account"
+      already_have_account: "Already have an account?"
+      sign_in: "Sign in"
+    google: "Continue with Google"
+    password_reset:
+      title: "Forgot your password?"
+      email_placeholder: "Enter your email address"
+      submit: "Email reset instructions"
+      update_title: "Update your password"
+      new_password_placeholder: "Enter new password"
+      confirm_placeholder: "Repeat new password"
+      save: "Save"
+    invitation:
+      accept_title: "Accept invitation"
+      join_workspace: "Join %{workspace}"
+      invited_as: "%{inviter} invited you as a %{role}."
+      signed_in_as: "Signed in as %{email}."
+      accept: "Accept invitation"
+      email_mismatch_html: "You are signed in as <strong>%{current}</strong>, but this invitation was sent to <strong>%{invited}</strong>."
+      sign_out_and_use_invited: "Sign out and use the invited email"
+      existing_account: "An account already exists for <strong>%{email}</strong>. Sign in to accept."
+      sign_in_and_accept: "Sign in and accept"
+      create_to_join: "Create your account to join <strong>%{workspace}</strong>."
+      create_and_accept: "Create account and accept"
+      already_accepted_title: "Invitation already accepted"
+      already_accepted_body: "This invitation to %{workspace} has already been used."
+      expired_title: "Invitation expired"
+      expired_body: "This invitation to %{workspace} has expired. Ask a workspace admin to send a new one."
+      sign_in: "Sign in"
+    flashes:
+      try_again_later: "Try again later."
+      invalid_credentials: "Try another email address or password."
+      joined_workspace: "You joined %{workspace}."
+      welcome_workspace: "Welcome to %{workspace}!"
+      password_reset_sent: "Password reset instructions sent (if user with that email address exists)."
+      password_reset: "Password has been reset."
+      passwords_did_not_match: "Passwords did not match."
+      password_reset_invalid: "Password reset link is invalid or has expired."
+      not_authorized: "You are not authorized to perform this action."
+      invitation_invalid: "Invitation link is invalid."
+      sign_in_with_invited_email: "Sign in with %{email} to accept this invitation."
+      invitation_accept_failed: "Could not accept invitation."
+
+  profile:
+    title: "Profile"
+    intro_html: "Personal preferences in <strong>%{workspace}</strong>."
+    personal_data: "Personal data"
+    name: "Name"
+    name_hint: "Shown in the sidebar, mentions and team activity."
+    email: "Email"
+    save: "Save"
+    preferences: "Preferences"
+    default_pipeline: "Default pipeline"
+    default_pipeline_hint: "Selected when you sign in and when opening the Gmail add-on."
+    sales_director_briefing: "Show sales director briefing on the dashboard"
+    sales_director_hint_html: "Personal preference in this workspace. The admin must enable it in %{team_link}."
+    sales_director_team: "Team"
+    sales_director_requires_ai: "Requires configuring <code>CREAM_AI_API_KEY</code> on the server."
+    alerts: "Alerts"
+    alerts_intro: "Choose how you receive alerts, form submissions and calendar bookings in this workspace."
+    alert_in_app: "In-app notification (bell)"
+    alert_email: "Email"
+    alerts_channels_hint: "If you disable both channels, you will not receive alerts, form or booking notifications."
+    locale: "Language"
+    locale_hint: "Interface language for Cream."
+    locales:
+      es: "Español"
+      en: "English"
+    flashes:
+      name_updated: "Name updated."
+      preferences_updated: "Preferences updated."
+
+  shared:
+    notes:
+      title: "Notes"
+      title_placeholder: "Note title (optional)"
+      body_placeholder: "Write a note..."
+      add: "Add note"
+      delete_confirm: "Delete this note?"
+      delete: "Delete note"
+    tasks:
+      title: "Tasks"
+      open_count:
+        one: "(%{count} open)"
+        other: "(%{count} open)"
+      placeholder: "Add a task..."
+      add: "Add"
+      edit: "Edit task"
+      delete: "Delete task"
+      delete_confirm: "Delete this task?"
+      edit_title: "Edit task"
+      title_label: "Title"
+      due_date: "Due date"
+      assignee: "Assignee"
+      unassigned: "Unassigned"
+      cancel: "Cancel"
+      save: "Save"
+    comments:
+      title: "Comments"
+      placeholder: "Add a comment... use @name to mention teammates"
+      add: "Add comment"
+      delete: "Delete comment"
+      delete_confirm: "Delete this comment?"
+    attachments:
+      title: "Attachments"
+      upload: "Upload"
+      remove_confirm: "Remove this file?"
+    timeline:
+      title: "Activity"
+      empty: "No activity yet."
+      ago: "%{time} ago"
+    email:
+      title: "Send email"
+      insert_template: "Insert template…"
+      no_templates: "No templates available"
+      create_templates_html: "%{link} to reuse when composing emails."
+      create_templates_link: "Create templates"
+      to: "To"
+      subject: "Subject"
+      body_placeholder: "Message body..."
+      attachments: "Attachments"
+      attachments_hint: "Uncheck any you do not want to send."
+      send_later: "Send later"
+      follow_up: "Follow up"
+      follow_up_options:
+        none: "No reminder"
+        two_days: "in 2 days"
+        three_days: "in 3 days"
+        one_week: "in 1 week"
+        two_weeks: "in 2 weeks"
+      send: "Send email"
+    pagination:
+      aria_label: "Pagination"
+      range_html: "<span class=\"font-medium text-ink\">%{from}</span>–<span class=\"font-medium text-ink\">%{to}</span> of <span class=\"font-medium text-ink\">%{count}</span>"
+      previous: "Previous"
+      next: "Next"
+      page_of: "Page %{page} of %{pages}"
+    record_picker:
+      search_placeholder: "Type to search…"
+      no_results: "No results"
+      create: '+ Create "%{name}"'
+    someone: "Someone"
+    empty_value: "—"
+
+  editions:
+    from: "From %{date}"
+    until: "Until %{date}"
+
+  activities:
+    created: "%{actor} created this record"
+    updated: "%{actor} updated %{fields}"
+    updated_record: "the record"
+    note_added: "%{actor} added a note"
+    comment_added: "%{actor} added a comment"
+    attachment_added: '%{actor} attached %{filename}'
+    email_opened: '%{to} opened "%{subject}"'
+    email_sent: '%{actor} sent "%{subject}" to %{to}'
+    email_clicked: 'Link clicked in "%{subject}"'
+    email_replied: '%{from} replied to "%{subject}"'
+    task_completed: '%{actor} completed the task "%{title}"'
+    stage_changed: "%{actor} moved the deal from %{from} to %{to}"
+    pipeline_changed: "%{actor} moved the deal to the %{to} pipeline"
+    contact_added: "%{actor} added %{contact} as a contact"
+    contact_removed: "%{actor} removed %{contact} as a contact"
+    contacts_updated: "%{actor} updated contacts (%{contact})"
+    merged_companies: "%{actor} merged %{names} into this record"
+    merged_people: "%{actor} merged %{names} into this record"
+    product_added: "%{actor} added product line %{product}"
+    product_removed: "%{actor} removed product line %{product}"
+    product_updated: "%{actor} updated product line %{product}"
+    products_updated: "%{actor} updated products (%{product})"
+    ai_task_created: '%{actor} created the AI-suggested task "%{title}"'
+    payment_received: "%{actor} linked a Stripe payment of %{amount}"
+    payment_received_from: " from %{email}"
+    generic: "%{actor} %{action}"
+
+  deal_versions:
+    created: "%{actor} created this deal"
+    updated: "%{actor} updated %{fields}"
+    updated_deal: "the deal"
+    destroyed: "%{actor} deleted this deal"

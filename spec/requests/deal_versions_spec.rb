@@ -38,8 +38,8 @@ RSpec.describe "Deal versions", type: :request do
       get deal_versions_path(deal)
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include("added a note")
-      expect(response.body).to include("added a comment")
+      expect(response.body).to include(I18n.t("activities.note_added", actor: member.name))
+      expect(response.body).to include(I18n.t("activities.comment_added", actor: member.name))
     end
   end
 

@@ -1,6 +1,8 @@
 <div class="relative"
      data-controller="record-picker"
      data-record-picker-search-url-value="<%= search_url %>"
+     data-record-picker-no-results-value="<%= t("shared.record_picker.no_results") %>"
+     data-record-picker-create-label-value="<%= t("shared.record_picker.create", name: "%{name}") %>"
      <% if create_param.present? %>
      data-record-picker-create-url-value="<%= create_url %>"
      data-record-picker-create-param-value="<%= create_param %>"
@@ -13,7 +15,7 @@
          autocomplete="off"
          class="input"
          value="<%= selected_name %>"
-         placeholder="Type to search…"
+         placeholder="<%= t("shared.record_picker.search_placeholder") %>"
          <%= "required" if required %>
          <%= "disabled" if disabled %>
          data-record-picker-target="input"

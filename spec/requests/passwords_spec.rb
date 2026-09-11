@@ -20,7 +20,7 @@ RSpec.describe "Passwords", type: :request do
 
       expect(response).to redirect_to(new_session_path)
       follow_redirect!
-      expect_notice("reset instructions sent")
+      expect_notice(I18n.t("auth.flashes.password_reset_sent"))
     end
 
     it "redirects for unknown user without sending mail" do
@@ -30,7 +30,7 @@ RSpec.describe "Passwords", type: :request do
 
       expect(response).to redirect_to(new_session_path)
       follow_redirect!
-      expect_notice("reset instructions sent")
+      expect_notice(I18n.t("auth.flashes.password_reset_sent"))
     end
   end
 
@@ -45,7 +45,7 @@ RSpec.describe "Passwords", type: :request do
 
       expect(response).to redirect_to(new_password_path)
       follow_redirect!
-      expect_notice("reset link is invalid")
+      expect_notice(I18n.t("auth.flashes.password_reset_invalid"))
     end
   end
 
@@ -57,7 +57,7 @@ RSpec.describe "Passwords", type: :request do
       }.to change { user.reload.password_digest }
 
       follow_redirect!
-      expect_notice("Password has been reset")
+      expect_notice(I18n.t("auth.flashes.password_reset"))
     end
 
     it "rejects non matching passwords" do
@@ -69,7 +69,7 @@ RSpec.describe "Passwords", type: :request do
       }.not_to change { user.reload.password_digest }
 
       follow_redirect!
-      expect_notice("Passwords did not match")
+      expect_notice(I18n.t("auth.flashes.passwords_did_not_match"))
     end
   end
 end

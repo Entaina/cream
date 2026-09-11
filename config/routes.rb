@@ -44,6 +44,7 @@ Rails.application.routes.draw do
   patch "active_pipeline", to: "active_pipelines#update", as: :active_pipeline
   resource :sidebar_preferences, only: :update
   resource :theme_preference, only: :update
+  resource :locale_preference, only: :update
 
   root "dashboard#show"
   resource :sales_briefing, only: :create

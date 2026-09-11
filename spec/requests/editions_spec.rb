@@ -73,7 +73,7 @@ RSpec.describe "Editions", type: :request do
       expect(results.size).to eq(1)
       expect(results.first["id"]).to eq(edition.id)
       expect(results.first["name"]).to eq("Madrid 2026")
-      expect(results.first["hint"]).to include("Mar")
+      expect(results.first["hint"]).to include(I18n.l(Date.new(2026, 3, 1), format: :short))
     end
 
     it "does not return editions from other products" do

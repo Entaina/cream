@@ -41,7 +41,7 @@ RSpec.describe "OAuth authorization", type: :request do
       get "/oauth/authorize", params: params
 
       expect(response).to have_http_status(:ok), -> { "redirected to #{response.location}" }
-      expect(response.body).to include("Authorization required")
+      expect(response.body).to include(I18n.t("doorkeeper.authorizations.new.title"))
       expect(response.body).to include("btn-primary")
       expect(response.body).to include("tailwind")
       expect(response.body).not_to include("doorkeeper/application")
@@ -63,7 +63,7 @@ RSpec.describe "OAuth authorization", type: :request do
         get "/oauth/authorize", params: params
 
         expect(response).to have_http_status(:ok), -> { "redirected to #{response.location}" }
-        expect(response.body).to include("Authorization required")
+        expect(response.body).to include(I18n.t("doorkeeper.authorizations.new.title"))
       end
     end
   end

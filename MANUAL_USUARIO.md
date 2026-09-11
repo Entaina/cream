@@ -4,7 +4,7 @@
 
 Cream es un CRM por **workspaces** para gestionar **personas**, **empresas** y **deals** (oportunidades), con notas, tareas, listas y un historial de actividad compartido en el equipo.
 
-> **Última revisión:** 2026-09-11 (rediseño de la ficha de persona)
+> **Última revisión:** 2026-09-11 (idioma ES/EN en menú, login y perfil)
 > Este documento describe la funcionalidad **visible para el usuario**. Las funcionalidades desactivadas aparecen al final en «Próximamente».
 
 ---
@@ -53,11 +53,13 @@ En la pantalla de acceso puedes:
 - **Iniciar sesión con Google** (si está configurado en tu entorno).
 - Usar **email y contraseña** registrados en Cream.
 
-Si olvidaste la contraseña, usa **Forgot password?** para recibir un enlace de restablecimiento por email.
+Si olvidaste la contraseña, usa **¿Olvidaste la contraseña?** para recibir un enlace de restablecimiento por email.
+
+En la esquina superior derecha de la pantalla de acceso (y registro) verás el selector **ES | EN**. Elige el idioma de la interfaz; la preferencia se guarda en tu navegador hasta que crees cuenta o inicies sesión.
 
 ### Crear cuenta
 
-En **Create account** introduces tu nombre, email, contraseña y el nombre del workspace. Al registrarte:
+En **Crear cuenta** introduces tu nombre, email, contraseña y el nombre del workspace. Al registrarte:
 
 - Se crea tu usuario.
 - Se crea un workspace nuevo con el nombre indicado (o «Nombre's Workspace» si no indicas uno).
@@ -65,11 +67,13 @@ En **Create account** introduces tu nombre, email, contraseña y el nombre del w
 
 ### Cambiar tu nombre
 
-1. Abre **Settings → Profile** (también desde tu nombre en la parte inferior del menú lateral).
-2. En **Datos personales**, edita el campo **Nombre**.
+1. Abre **Perfil** (también desde tu nombre en la parte inferior del menú lateral).
+2. En **Datos personales**, edita el campo **Nombre** y, si quieres, el **Idioma** (Español / English).
 3. Pulsa **Guardar**.
 
-El nombre se actualiza en el menú lateral, en las menciones y en la actividad del equipo. El email se muestra en esa misma sección, pero no se puede cambiar desde ahí.
+El nombre se actualiza en el menú lateral, en las menciones y en la actividad del equipo. El idioma afecta al menú, login, notificaciones del cromo de la app y secciones compartidas de las fichas (notas, tareas, actividad…). El email se muestra en esa misma sección, pero no se puede cambiar desde ahí.
+
+También puedes cambiar el idioma al vuelo con **ES | EN** en la parte inferior del menú lateral (junto al tema claro/oscuro).
 
 ### Cerrar sesión
 
@@ -101,19 +105,19 @@ Los **vendedores** ven en el **Dashboard** y en **Deals** únicamente sus deals 
 
 El menú lateral izquierdo concentra el acceso principal. En **pantallas pequeñas (móvil)** el menú está oculto por defecto: pulsa el icono de **hamburguesa** (☰) en la cabecera de la página para abrirlo. Toca fuera del menú, pulsa **Escape** o navega a otra sección para cerrarlo. En escritorio el menú permanece siempre visible.
 
-Arriba del menú (**Search…**, **Notifications**) y debajo del selector de **pipeline activo**, las entradas se agrupan así:
+Arriba del menú (**Buscar…**, **Notificaciones**) y debajo del selector de **pipeline activo**, las entradas se agrupan así:
 
 **Uso diario** (siempre visibles, sin desplegable):
 
 | Entrada | Descripción |
 |---------|-------------|
-| **Search…** | Búsqueda global. Atajo: `/` |
-| **Notifications** | Avisos del workspace (menciones, alertas, formularios, reservas…) |
-| **Dashboard** | Resumen del workspace |
-| **People** | Personas; puede incluir submenú de **vistas guardadas** |
-| **Companies** | Empresas; vistas guardadas |
-| **Deals** | Tablero kanban; vistas guardadas |
-| **Tasks** | Todas las tareas del workspace |
+| **Buscar…** | Búsqueda global. Atajo: `/` |
+| **Notificaciones** | Avisos del workspace (menciones, alertas, formularios, reservas…) |
+| **Panel** | Resumen del workspace |
+| **Personas** | Contactos; puede incluir submenú de **vistas guardadas** |
+| **Empresas** | Empresas; vistas guardadas |
+| **Oportunidades** | Tablero kanban; vistas guardadas |
+| **Tareas** | Todas las tareas del workspace |
 
 **Marketing** (grupo desplegable; ver [§29](#29-marketing)):
 
@@ -132,44 +136,44 @@ Arriba del menú (**Search…**, **Notifications**) y debajo del selector de **p
 
 | Entrada | Descripción |
 |---------|-------------|
-| **Team** | Miembros e invitaciones |
-| **Products** | Catálogo de productos |
+| **Equipo** | Miembros e invitaciones |
+| **Productos** | Catálogo de productos |
 | **Pipelines** | Etapas, disparadores, condiciones |
-| **Custom fields** | Campos personalizados |
+| **Campos personalizados** | Campos personalizados |
 | **Alertas** | Reglas de aviso por fechas |
-| **Automations** | Automatizaciones por eventos |
+| **Automatizaciones** | Automatizaciones por eventos |
 | **Formularios** | Captación web pública |
 | **Stripe** | Pagos importados y conciliación |
 | **Webhooks** | Integraciones salientes HTTP |
-| **Reports** | Informes y exportación CSV |
-| **Settings** | Ajustes del workspace (OKM, Mailjet, permisos…) |
+| **Informes** | Informes y exportación CSV |
+| **Ajustes** | Ajustes del workspace (OKM, Mailjet, permisos…) |
 
 **Mi perfil** (grupo desplegable; cada usuario):
 
 | Entrada | Descripción |
 |---------|-------------|
-| **Profile** | Nombre, pipeline predeterminado, briefing IA, canales de alerta |
+| **Perfil** | Nombre, idioma, pipeline predeterminado, briefing IA, canales de alerta |
 | **Gmail** | Conexión OAuth para enviar desde ficha y detectar respuestas |
 | **Reservas** | Páginas públicas de reserva de calendario |
 | **Mis listas** | Listas personales del workspace |
-| **API tokens** | Tokens MCP / REST API v1 |
+| **Tokens de API** | Tokens MCP / REST API v1 |
 
-También puedes abrir **Profile** pulsando tu **nombre** en la parte inferior del menú lateral.
+También puedes abrir **Perfil** pulsando tu **nombre** en la parte inferior del menú lateral.
 
 Las entradas que dependen de funcionalidades desactivadas **no aparecen** hasta habilitarlas (ver [Próximamente](#30-próximamente)). Ejemplo hoy: **Mail merge**.
 
 ### Personalizar el menú
 
-Junto al título **Menu** del menú lateral hay un icono de engranaje. Al pulsarlo entras en **modo edición**:
+Junto al título **Menú** del menú lateral hay un icono de engranaje. Al pulsarlo entras en **modo edición**:
 
 - **Reordenar:** arrastra un apartado por el icono de agarre (⋮⋮) a la posición que quieras.
 - **Ocultar o mostrar:** usa el icono del ojo en cada apartado. Los ocultos dejan de verse en el menú normal, pero siguen visibles (atenuados) mientras editas para poder recuperarlos.
 
-Los cambios se guardan automáticamente para **tu usuario** al salir del modo edición (vuelve a pulsar el engranaje). Cada persona del workspace tiene su propia configuración; no afecta a Search ni a Notifications. Puedes ocultar entradas de cualquier grupo (incluido Marketing o Mi perfil) sin borrarlas del workspace.
+Los cambios se guardan automáticamente para **tu usuario** al salir del modo edición (vuelve a pulsar el engranaje). Cada persona del workspace tiene su propia configuración; no afecta a Buscar ni a Notificaciones. Puedes ocultar entradas de cualquier grupo (incluido Marketing o Mi perfil) sin borrarlas del workspace.
 
 ### Pipeline activo
 
-Debajo del nombre del workspace, la barra lateral muestra el **pipeline activo**. Puedes elegir tu pipeline predeterminado para ese workspace en **Settings → Profile**. Es el que se selecciona al iniciar sesión y al abrir el add-on de Gmail. Al cambiar el pipeline activo:
+Debajo del nombre del workspace, la barra lateral muestra el **pipeline activo**. Puedes elegir tu pipeline predeterminado para ese workspace en **Perfil**. Es el que se selecciona al iniciar sesión y al abrir el add-on de Gmail. Al cambiar el pipeline activo:
 
 - **Deals** (tablero y tabla) filtran por ese pipeline.
 - **Dashboard** y **Reports** usan ese pipeline como filtro por defecto en las métricas de deals.
@@ -830,9 +834,9 @@ Los invitados aceptan con el enlace recibido y crean cuenta o inician sesión si
 
 ### Mi perfil (Profile)
 
-Disponible para **todos los miembros** en **Profile** (grupo **Mi perfil** del menú, o clic en tu nombre abajo del sidebar). Ajusta preferencias **personales en el workspace activo**:
+Disponible para **todos los miembros** en **Perfil** (grupo **Mi perfil** del menú, o clic en tu nombre abajo del sidebar). Ajusta preferencias **personales en el workspace activo**:
 
-1. **Datos personales** — tu **nombre** (visible en menciones y actividad). El email de cuenta es solo lectura.
+1. **Datos personales** — tu **nombre** (visible en menciones y actividad) e **idioma** (Español / English). El email de cuenta es solo lectura.
 2. **Pipeline predeterminado** — pipeline que se selecciona al iniciar sesión, en el selector del sidebar y en el add-on de Gmail ([§3](#3-navegación)).
 3. **Briefing del director de ventas** — casilla para mostrar u ocultar el bloque de IA en el dashboard ([§4](#4-dashboard)). Solo aparece si el admin lo activó en **Settings** del workspace y la IA está configurada en el servidor.
 4. **Alertas** — canales **Notificación in-app (campana)** y **Email** para alertas configuradas, **envíos de formularios** (si eres responsable) y **reservas de calendario** (si eres anfitrión). Si desactivas ambos, no recibirás esos avisos ([§17](#17-alertas-configurables), [§19](#19-notificaciones)).

@@ -21,6 +21,21 @@ RSpec.describe User, type: :model do
     end
   end
 
+  describe "locale" do
+    it "defaults to es" do
+      user = User.create!(name: "Locale User", email_address: "locale@example.com", password: "password")
+
+      expect(user.locale).to eq("es")
+    end
+
+    it "rejects values outside LOCALES" do
+      user = User.new(name: "Locale User", email_address: "locale2@example.com", password: "password", locale: "fr")
+
+      expect(user).not_to be_valid
+      expect(user.errors[:locale]).to be_present
+    end
+  end
+
   describe "#active_workspace" do
     fixtures :users, :workspaces, :memberships
 

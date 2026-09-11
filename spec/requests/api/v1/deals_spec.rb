@@ -179,7 +179,7 @@ RSpec.describe "Api::V1::Deals", type: :request do
       }.not_to change(Deal, :count)
 
       expect(response).to have_http_status(:unprocessable_entity)
-      expect(response.parsed_body["errors"]).to include("Body can't be blank")
+      expect(response.parsed_body["errors"]).to include(blank_error_for(Note, :body))
     end
 
     context "with nested email" do

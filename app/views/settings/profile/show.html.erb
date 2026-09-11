@@ -1,78 +1,82 @@
-<% page_title "Perfil" %>
-<%= render "shared/page_header", title: "Perfil", icon_name: :users, actions: nil %>
+<% page_title t("profile.title") %>
+<%= render "shared/page_header", title: t("profile.title"), icon_name: :users, actions: nil %>
 
 <div class="flex-1 overflow-y-auto scrollbar-subtle p-5">
   <div class="max-w-2xl space-y-6">
     <p class="text-base text-ink-soft">
-      Preferencias personales en <strong><%= current_workspace.name %></strong>.
+      <%= t("profile.intro_html", workspace: current_workspace.name).html_safe %>
     </p>
 
     <section class="card p-4 space-y-3">
-      <h2 class="text-base font-semibold text-ink">Datos personales</h2>
+      <h2 class="text-base font-semibold text-ink"><%= t("profile.personal_data") %></h2>
       <%= form_with model: current_user, url: settings_profile_path, method: :patch, class: "space-y-3" do |f| %>
         <div>
-          <%= f.label :name, "Nombre", class: "label" %>
+          <%= f.label :name, t("profile.name"), class: "label" %>
           <%= f.text_field :name, required: true, class: "input mt-1 w-full", autocomplete: "name" %>
           <p class="mt-1 text-sm text-ink-faint">
-            Se muestra en el menú lateral, menciones y actividad del equipo.
+            <%= t("profile.name_hint") %>
           </p>
         </div>
         <div>
-          <span class="label">Email</span>
+          <%= f.label :locale, t("profile.locale"), class: "label" %>
+          <%= f.select :locale, User::LOCALES.map { |locale| [ t("profile.locales.#{locale}"), locale ] }, {}, class: "input mt-1 w-full" %>
+          <p class="mt-1 text-sm text-ink-faint"><%= t("profile.locale_hint") %></p>
+        </div>
+        <div>
+          <span class="label"><%= t("profile.email") %></span>
           <p class="mt-1 text-base text-ink"><%= current_user.email_address %></p>
         </div>
-        <%= f.submit "Guardar", class: "btn-secondary" %>
+        <%= f.submit t("profile.save"), class: "btn-secondary" %>
       <% end %>
     </section>
 
     <section class="card p-4 space-y-3">
-      <h2 class="text-base font-semibold text-ink">Preferencias</h2>
+      <h2 class="text-base font-semibold text-ink"><%= t("profile.preferences") %></h2>
       <%= form_with model: current_membership, url: settings_profile_path, method: :patch, class: "space-y-3" do |f| %>
         <div>
-          <%= f.label :current_pipeline_id, "Pipeline predeterminado", class: "label" %>
+          <%= f.label :current_pipeline_id, t("profile.default_pipeline"), class: "label" %>
           <%= f.collection_select :current_pipeline_id, current_workspace.pipelines.ordered,
                 :id, :name, {}, class: "input mt-1 w-full" %>
           <p class="mt-1 text-sm text-ink-faint">
-            Se seleccionará al iniciar sesión y al abrir el add-on de Gmail.
+            <%= t("profile.default_pipeline_hint") %>
           </p>
         </div>
 
         <% if feature_enabled?(:sales_director) && current_workspace.sales_director_enabled? %>
           <label class="flex items-center gap-2 text-base">
             <%= f.check_box :sales_director_briefing_enabled %>
-            Mostrar briefing del director de ventas en el dashboard
+            <%= t("profile.sales_director_briefing") %>
           </label>
           <p class="text-sm text-ink-faint">
-            Preferencia personal en este workspace. El administrador debe tenerlo activado en
-            <%= link_to "Team", settings_team_path, class: "text-accent hover:underline" %>.
+            <%= t("profile.sales_director_hint_html", team_link: link_to(t("profile.sales_director_team"), settings_team_path, class: "text-accent hover:underline")).html_safe %>
           </p>
           <% unless Ai::Configuration.configured? %>
-            <p class="text-sm text-ink-faint">Requiere configurar <code>CREAM_AI_API_KEY</code> en el servidor.</p>
+            <p class="text-sm text-ink-faint"><%= t("profile.sales_director_requires_ai").html_safe %></p>
           <% end %>
         <% end %>
-        <%= f.submit "Guardar", class: "btn-secondary" %>
+        <%= f.submit t("profile.save"), class: "btn-secondary" %>
       <% end %>
     </section>
 
     <% if feature_enabled?(:alerts) %>
       <section class="card p-4 space-y-3">
-        <h2 class="text-base font-semibold text-ink">Alertas</h2>
+        <h2 class="text-base font-semibold text-ink"><%= t("profile.alerts") %></h2>
         <p class="text-sm text-ink-faint">
-          Elige cómo quieres recibir las alertas, los envíos de formularios y las reservas de calendario en este workspace.
+          <%= t("profile.alerts_intro") %>
         </p>
         <%= form_with model: current_membership, url: settings_profile_path, method: :patch, class: "space-y-3" do |f| %>
           <label class="flex items-center gap-2 text-base">
             <%= f.check_box :alert_in_app %>
-            Notificación in-app (campana)
+            <%= t("profile.alert_in_app") %>
           </label>
           <label class="flex items-center gap-2 text-base">
             <%= f.check_box :alert_email %>
-            Email
+            <%= t("profile.alert_email") %>
           </label>
           <p class="text-sm text-ink-faint">
-            Si desactivas ambos canales, no recibirás alertas, avisos de formularios ni de reservas.
+            <%= t("profile.alerts_channels_hint") %>
           </p>
-          <%= f.submit "Guardar", class: "btn-secondary" %>
+          <%= f.submit t("profile.save"), class: "btn-secondary" %>
         <% end %>
       </section>
     <% end %>

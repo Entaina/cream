@@ -17,7 +17,7 @@ RSpec.describe "InvitationAccepts", type: :request do
       get accept_invitation_path(token: invitation.plaintext_token)
 
       expect(response).to have_http_status(:success)
-      expect(response.body).to include("Create your account")
+      expect(response.body).to include(I18n.t("auth.registration.title"))
       expect(response.body).to include(invitation.email_address)
     end
 

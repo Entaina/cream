@@ -4,9 +4,9 @@
 module SidebarMenu
   GROUPS = {
     daily: { label: nil, collapsible: false, admin_only: false },
-    marketing: { label: "Marketing", collapsible: true, admin_only: false },
-    settings: { label: "Configuración", collapsible: true, admin_only: true },
-    profile: { label: "Mi perfil", collapsible: true, admin_only: false }
+    marketing: { label: :marketing, collapsible: true, admin_only: false },
+    settings: { label: :settings, collapsible: true, admin_only: true },
+    profile: { label: :profile, collapsible: true, admin_only: false }
   }.freeze
 
   CANONICAL_KEYS_BY_GROUP = {
@@ -46,7 +46,9 @@ module SidebarMenu
     GROUPS.filter_map do |key, meta|
       next if meta[:admin_only] && !admin
 
-      { key: key, **meta, keys: CANONICAL_KEYS_BY_GROUP[key] & default_keys(admin: admin) }
+      label = meta[:label] ? I18n.t("nav.groups.#{meta[:label]}") : nil
+      { key: key, label: label, collapsible: meta[:collapsible], admin_only: meta[:admin_only],
+        keys: CANONICAL_KEYS_BY_GROUP[key] & default_keys(admin: admin) }
     end
   end
 end

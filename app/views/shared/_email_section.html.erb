@@ -9,37 +9,37 @@
   data-template-picker-company-value="<%= record.try(:company)&.name %>"
   data-template-picker-email-value="<%= record.try(:email) %>">
   <h3 class="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-ink-faint mb-2">
-    <%= icon :mail, classes: "size-3.5" %> Send email
+    <%= icon :mail, classes: "size-3.5" %> <%= t("shared.email.title") %>
   </h3>
 
   <%= form_with model: email_message, url: record_emails_path(record_type: record.class.name, record_id: record.id), class: "card p-3 mb-3", multipart: true do |f| %>
     <% if templates_enabled %>
       <div class="mb-2">
         <%= select_tag :template_picker,
-              safe_join(templates.map { |t|
-                attachment_meta = t.attachments.map { |file| { id: file.id, filename: file.filename.to_s, byte_size: file.byte_size } }
-                tag.option(t.name, value: t.id, data: { subject: t.subject, body: t.body, attachments: attachment_meta.to_json })
+              safe_join(templates.map { |template|
+                attachment_meta = template.attachments.map { |file| { id: file.id, filename: file.filename.to_s, byte_size: file.byte_size } }
+                tag.option(template.name, value: template.id, data: { subject: template.subject, body: template.body, attachments: attachment_meta.to_json })
               }),
-              include_blank: templates.any? ? "Insertar plantilla…" : "No hay plantillas disponibles",
+              include_blank: templates.any? ? t("shared.email.insert_template") : t("shared.email.no_templates"),
               disabled: templates.none?,
               class: "input w-full",
               data: { "template-picker-target" => "select", action: "template-picker#apply" } %>
         <%= hidden_field_tag :email_template_id, nil, data: { "template-picker-target" => "templateId" } %>
         <% if templates.none? %>
           <p class="text-sm text-ink-faint mt-1">
-            <%= link_to "Crear plantillas", email_templates_path, class: "text-accent hover:underline" %> para reutilizarlas al redactar correos.
+            <%= t("shared.email.create_templates_html", link: link_to(t("shared.email.create_templates_link"), email_templates_path, class: "text-accent hover:underline")).html_safe %>
           </p>
         <% end %>
       </div>
     <% end %>
-    <%= f.email_field :to_address, placeholder: "To", class: "input w-full mb-2" %>
-    <%= f.text_field :subject, placeholder: "Subject", class: "input w-full mb-2", data: { "template-picker-target" => "subject" } %>
+    <%= f.email_field :to_address, placeholder: t("shared.email.to"), class: "input w-full mb-2" %>
+    <%= f.text_field :subject, placeholder: t("shared.email.subject"), class: "input w-full mb-2", data: { "template-picker-target" => "subject" } %>
     <div class="mb-2">
-      <%= render "shared/rich_text_editor", form: f, field: :body, placeholder: "Message body...", compact: true, input_data: { data: { "template-picker-target" => "body" } } %>
+      <%= render "shared/rich_text_editor", form: f, field: :body, placeholder: t("shared.email.body_placeholder"), compact: true, input_data: { data: { "template-picker-target" => "body" } } %>
     </div>
     <div class="mb-2">
-      <label class="label">Attachments</label>
-      <p class="text-xs text-ink-faint mb-1">Desmarca los que no quieras enviar.</p>
+      <label class="label"><%= t("shared.email.attachments") %></label>
+      <p class="text-xs text-ink-faint mb-1"><%= t("shared.email.attachments_hint") %></p>
       <ul class="space-y-1 mb-2" data-template-picker-target="attachmentList">
         <% if feature_enabled?(:attachments) %>
           <% record.record_attachments.includes(file_attachment: :blob).each do |attachment| %>
@@ -59,17 +59,23 @@
     <div class="flex items-end justify-between gap-2 flex-wrap">
       <div class="flex gap-2 flex-wrap">
         <label class="text-sm text-ink-faint flex items-center gap-1.5">
-          Send later
+          <%= t("shared.email.send_later") %>
           <%= datetime_field_tag :scheduled_at, nil, class: "input py-1 text-sm" %>
         </label>
         <label class="text-sm text-ink-faint flex items-center gap-1.5">
-          Follow up
+          <%= t("shared.email.follow_up") %>
           <%= select_tag :follow_up_days,
-                options_for_select([ [ "No reminder", "" ], [ "in 2 days", 2 ], [ "in 3 days", 3 ], [ "in 1 week", 7 ], [ "in 2 weeks", 14 ] ]),
+                options_for_select([
+                  [ t("shared.email.follow_up_options.none"), "" ],
+                  [ t("shared.email.follow_up_options.two_days"), 2 ],
+                  [ t("shared.email.follow_up_options.three_days"), 3 ],
+                  [ t("shared.email.follow_up_options.one_week"), 7 ],
+                  [ t("shared.email.follow_up_options.two_weeks"), 14 ]
+                ]),
                 class: "input py-1 text-sm" %>
         </label>
       </div>
-      <%= f.submit "Send email", class: "btn-primary" %>
+      <%= f.submit t("shared.email.send"), class: "btn-primary" %>
     </div>
   <% end %>
 

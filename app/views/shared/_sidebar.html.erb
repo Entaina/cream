@@ -8,12 +8,12 @@
   <div class="p-2 space-y-1">
     <%= link_to search_path, class: "flex items-center gap-2 rounded-md border border-line-strong bg-canvas-raised px-2.5 py-1.5 text-ink-faint hover:border-ink-faint transition-colors text-base" do %>
       <%= icon :search, classes: "size-3.5" %>
-      <span>Search...</span>
+      <span><%= t("nav.search") %></span>
       <kbd class="ml-auto text-2xs text-ink-faint border border-line rounded px-1">/</kbd>
     <% end %>
     <%= link_to notifications_path, class: "flex items-center gap-2 rounded-md border border-line-strong bg-canvas-raised px-2.5 py-1.5 text-ink-soft hover:border-ink-faint transition-colors text-base" do %>
       <%= icon :bell, classes: "size-3.5" %>
-      <span>Notifications</span>
+      <span><%= t("nav.notifications") %></span>
       <% if unread_notifications_count.positive? %>
         <span class="ml-auto rounded-full bg-accent text-on-dark text-2xs px-1.5 py-0.5"><%= unread_notifications_count %></span>
       <% end %>
@@ -26,10 +26,10 @@
          data-controller="sidebar-edit sidebar-groups"
          data-sidebar-edit-url-value="<%= sidebar_preferences_path %>">
       <div class="flex items-center justify-between px-2.5 mb-1">
-        <span class="text-xs font-semibold uppercase tracking-wider text-ink-faint">Menu</span>
+        <span class="text-xs font-semibold uppercase tracking-wider text-ink-faint"><%= t("nav.menu") %></span>
         <button type="button"
-                title="Customize menu"
-                aria-label="Customize menu"
+                title="<%= t("nav.customize_menu") %>"
+                aria-label="<%= t("nav.customize_menu") %>"
                 aria-pressed="false"
                 data-sidebar-edit-target="toggleBtn"
                 data-action="sidebar-edit#toggleEdit"
@@ -90,7 +90,8 @@
       <span data-theme-target="option" data-theme="dark" class="hidden"><%= icon :moon, classes: "size-4" %></span>
       <span data-theme-target="option" data-theme="system" class="hidden"><%= icon :monitor, classes: "size-4" %></span>
     </button>
-    <%= button_to session_path, method: :delete, class: "text-ink-faint hover:text-ink p-1.5 rounded-md hover:bg-accent-soft/70", title: "Sign out" do %>
+    <%= render "shared/locale_switcher" %>
+    <%= button_to session_path, method: :delete, class: "text-ink-faint hover:text-ink p-1.5 rounded-md hover:bg-accent-soft/70", title: t("nav.sign_out") do %>
       <%= icon :logout, classes: "size-4" %>
     <% end %>
   </div>

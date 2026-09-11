@@ -10,8 +10,11 @@ class RegistrationsController < ApplicationController
 
   def create
     @user = User.new(user_params)
+    guest_locale = cookies[:locale].presence_in(User::LOCALES)
+    @user.locale = guest_locale if guest_locale
 
     if @user.save
+      persist_locale_cookie(@user.locale)
       User.provision_default_workspace!(@user, workspace_name: params[:workspace_name])
       start_new_session_for @user
       redirect_to root_path, notice: "Welcome to Cream!"

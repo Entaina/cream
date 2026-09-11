@@ -325,6 +325,14 @@
   @apply bg-canvas-raised text-ink shadow-sm;
 }
 
+.locale-btn {
+  @apply rounded px-2 py-1 text-2xs font-semibold uppercase tracking-wide text-ink-faint transition-colors cursor-pointer;
+}
+
+.locale-btn.is-active {
+  @apply bg-accent-soft text-ink;
+}
+
 .public-booking-progress {
   @apply border-b border-line px-6 py-4 sm:px-8;
 }

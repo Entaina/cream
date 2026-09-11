@@ -13,10 +13,12 @@ class User < ApplicationRecord
   normalizes :email_address, with: ->(e) { e.strip.downcase }
 
   THEMES = %w[light dark system].freeze
+  LOCALES = %w[es en].freeze
 
   validates :name, presence: true
   validates :email_address, presence: true, uniqueness: true
   validates :theme, inclusion: { in: THEMES }
+  validates :locale, inclusion: { in: LOCALES }
 
   def self.organization_workspace_configured?
     ENV["CREAM_ORGANIZATION_EMAIL_DOMAIN"].present? &&

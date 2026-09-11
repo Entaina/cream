@@ -25,5 +25,9 @@ module Cream
     # config.eager_load_paths << Rails.root.join("extras")
 
     config.action_mailer.preview_paths = [ Rails.root.join("spec/mailers/previews") ]
+
+    config.i18n.available_locales = %i[es en]
+    config.i18n.default_locale = :es
+    config.i18n.fallbacks = true
   end
 end

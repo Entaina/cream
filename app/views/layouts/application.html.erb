@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="h-full overflow-hidden" data-theme="<%= authenticated? ? current_user.theme : "system" %>">
+<html class="h-full overflow-hidden" lang="<%= I18n.locale %>" data-theme="<%= authenticated? ? current_user.theme : "system" %>">
   <head>
     <title><%= content_for(:title) || "Cream" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -42,7 +42,10 @@
         </main>
       </div>
     <% else %>
-      <main class="min-h-full flex flex-col items-center justify-center bg-canvas-soft px-4">
+      <main class="relative min-h-full flex flex-col items-center justify-center bg-canvas-soft px-4">
+        <div class="absolute top-4 right-4">
+          <%= render "shared/locale_switcher" %>
+        </div>
         <%= render "shared/flash" %>
         <%= render "shared/next_task_prompt" %>
         <%= yield %>

@@ -2,6 +2,7 @@ class ApplicationController < ActionController::Base
   include Authentication
   include Pundit::Authorization
   include Pagy::Method
+  include SetLocale
 
   # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
   allow_browser versions: :modern
@@ -84,7 +85,7 @@ class ApplicationController < ActionController::Base
     respond_to do |format|
       format.html do
         destination = (request.path == root_path) ? new_session_path : root_path
-        redirect_to destination, alert: "You are not authorized to perform this action."
+        redirect_to destination, alert: t("auth.flashes.not_authorized")
       end
       format.json { head :forbidden }
       format.any { head :forbidden }

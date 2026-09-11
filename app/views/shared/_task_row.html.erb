@@ -8,7 +8,7 @@
   <button type="button"
           class="text-base flex-1 min-w-0 truncate text-left cursor-pointer hover:text-accent <%= "line-through text-ink-faint" if task.completed? %>"
           data-action="task-edit#open"
-          title="Edit task">
+          title="<%= t("shared.tasks.edit") %>">
     <%= mention_html(task.title) %>
   </button>
   <% if show_taskable && task.taskable %>
@@ -27,35 +27,35 @@
   <% end %>
   <button type="button"
           class="text-ink-faint hover:text-ink p-0.5 rounded cursor-pointer"
-          title="Edit task"
+          title="<%= t("shared.tasks.edit") %>"
           data-action="task-edit#open">
     <%= icon :pencil, classes: "size-3.5" %>
   </button>
-  <%= button_to task_path(task), method: :delete, form: { data: { turbo_confirm: "Delete this task?" } },
-        class: "text-ink-faint hover:text-danger p-0.5 rounded cursor-pointer", title: "Delete task" do %>
+  <%= button_to task_path(task), method: :delete, form: { data: { turbo_confirm: t("shared.tasks.delete_confirm") } },
+        class: "text-ink-faint hover:text-danger p-0.5 rounded cursor-pointer", title: t("shared.tasks.delete") do %>
     <%= icon :trash, classes: "size-3.5" %>
   <% end %>
 
   <dialog data-task-edit-target="dialog" class="modal-dialog max-w-md rounded-xl border border-line shadow-lg backdrop:bg-chicago-950/40">
     <div class="p-4 space-y-3">
-      <h3 class="text-base font-semibold">Edit task</h3>
+      <h3 class="text-base font-semibold"><%= t("shared.tasks.edit_title") %></h3>
       <%= form_with model: task, url: task_path(task), method: :patch, class: "space-y-3" do |f| %>
         <div>
-          <label class="label">Title</label>
+          <label class="label"><%= t("shared.tasks.title_label") %></label>
           <%= mention_text_field f, :title, class: "input w-full", wrapper_class: "w-full" %>
         </div>
         <div>
-          <label class="label">Due date</label>
+          <label class="label"><%= t("shared.tasks.due_date") %></label>
           <%= f.date_field :due_on, class: "input w-full" %>
         </div>
         <div>
-          <label class="label">Assignee</label>
+          <label class="label"><%= t("shared.tasks.assignee") %></label>
           <%= f.collection_select :assignee_id, current_workspace.users.order(:name), :id, :name,
-                { include_blank: "Unassigned" }, class: "input w-full" %>
+                { include_blank: t("shared.tasks.unassigned") }, class: "input w-full" %>
         </div>
         <div class="flex justify-end gap-2 pt-1">
-          <button type="button" class="btn-secondary" data-action="task-edit#close">Cancel</button>
-          <%= f.submit "Save", class: "btn-primary" %>
+          <button type="button" class="btn-secondary" data-action="task-edit#close"><%= t("shared.tasks.cancel") %></button>
+          <%= f.submit t("shared.tasks.save"), class: "btn-primary" %>
         </div>
       <% end %>
     </div>
