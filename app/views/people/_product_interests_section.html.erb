@@ -25,6 +25,8 @@
     <p class="text-sm text-ink-faint px-2">Sin intereses registrados.</p>
   <% end %>
 
+  <details class="record-disclosure">
+    <summary>Registrar interés</summary>
   <%= form_with url: person_product_interests_path(person), class: "mt-3 space-y-2" do %>
     <div>
       <%= label_tag "product_interest[product_id]", "Producto", class: "label" %>
@@ -38,4 +40,5 @@
     </div>
     <%= submit_tag "Registrar interés", class: "btn-secondary" %>
   <% end %>
+  </details>
 </div>

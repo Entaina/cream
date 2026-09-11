@@ -5,6 +5,7 @@ class PeopleController < ApplicationController
   remembers_list_filters only: :index
 
   before_action :set_person, only: %i[show edit update destroy merge toggle_subscription]
+  before_action :set_edit_section, only: %i[edit update]
 
   SORTABLE = %w[first_name last_name email job_title location created_at].freeze
 
@@ -54,8 +55,13 @@ class PeopleController < ApplicationController
       deals_scope
     end
     @deals = deals.includes(:pipeline_stage, :products).order(created_at: :desc)
+    @person_tab = params[:tab].presence_in(%w[activity deals information files]) || (@deal_product_id ? "deals" : "activity")
+    @person_tab = "activity" if @person_tab == "files" && !CreamFeatures.enabled?(:attachments)
+    @pending_tasks = @person.tasks.pending.includes(:assignee).due_order
+    @completed_tasks = @person.tasks.completed.includes(:assignee).order(completed_at: :desc)
+    @activity_feed = RecordActivityFeed.new(@person, filter: params[:activity_filter], page: params[:activity_page],
+      emails: CreamFeatures.enabled?(:record_email), comments: CreamFeatures.enabled?(:comments))
     @okm_chat_record = @person
-    @activities = @person.activities.includes(:user, :subject).recent_first.limit(50)
     @note = Note.new
     @comment = Comment.new
     @email_message = EmailMessage.new(to_address: @person.email)
@@ -98,7 +104,7 @@ class PeopleController < ApplicationController
     if inline_edit?
       update_inline
     elsif @person.update(person_params)
-      redirect_to @person, notice: "Person updated."
+      redirect_to @edit_section ? person_path(@person, tab: "information") : person_path(@person), notice: "Person updated."
     else
       render :edit, status: :unprocessable_entity
     end
@@ -161,6 +167,10 @@ class PeopleController < ApplicationController
   end
 
   private
+
+  def set_edit_section
+    @edit_section = params[:section].presence_in(%w[contact profile management custom])
+  end
 
   def set_person
     @person = policy_scope(current_workspace.people).includes(:person_emails).find(params[:id])

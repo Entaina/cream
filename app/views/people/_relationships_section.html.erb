@@ -27,6 +27,8 @@
     <p class="text-base text-ink-faint mb-3">No relationships yet.</p>
   <% end %>
 
+  <details class="record-disclosure">
+    <summary>Add relationship</summary>
   <%= form_with url: person_relationships_path(person), scope: :person_relationship, class: "space-y-2" do |form| %>
     <%= render RecordPickerComponent.new(
           form: form,
@@ -46,4 +48,5 @@
     </div>
     <%= form.submit "Add", class: "btn-secondary w-full justify-center" %>
   <% end %>
+  </details>
 </div>

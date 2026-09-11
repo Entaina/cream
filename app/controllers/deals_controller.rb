@@ -5,6 +5,7 @@ class DealsController < ApplicationController
   remembers_list_filters only: %i[index board]
 
   before_action :set_deal, only: %i[show edit update destroy move move_pipeline duplicate]
+  before_action :set_edit_section, only: %i[edit update]
 
   SORTABLE = %w[name value expected_close_date invoice_number created_at].freeze
 
@@ -85,8 +86,13 @@ class DealsController < ApplicationController
 
   def show
     authorize @deal
+    @deal_tab = params[:tab].presence_in(%w[activity pipeline products information files]) || "activity"
+    @deal_tab = "activity" if @deal_tab == "files" && !CreamFeatures.enabled?(:attachments)
+    @pending_tasks = @deal.tasks.pending.includes(:assignee).due_order
+    @completed_tasks = @deal.tasks.completed.includes(:assignee).order(completed_at: :desc)
+    @activity_feed = RecordActivityFeed.new(@deal, filter: params[:activity_filter], page: params[:activity_page],
+      emails: CreamFeatures.enabled?(:record_email), comments: CreamFeatures.enabled?(:comments))
     @okm_chat_record = @deal
-    @activities = @deal.activities.includes(:user, :subject).recent_first.limit(50)
     @line_items = @deal.deal_products.includes(:product, :edition)
     @products = current_workspace.products.ordered
     @note = Note.new
@@ -146,10 +152,12 @@ class DealsController < ApplicationController
       @deal.update!(attrs)
       @deal.move_to_stage!(new_stage) if new_stage
     end
-    redirect_to @deal, notice: "Deal updated."
+    redirect_to @edit_section ? deal_path(@deal, tab: "information") : @deal, notice: "Deal updated."
   rescue ActiveRecord::RecordInvalid
-    @deal.reload
-    @deal.pipeline_stage_id = original_stage_id if original_stage_id
+    unless @edit_section
+      @deal.reload
+      @deal.pipeline_stage_id = original_stage_id if original_stage_id
+    end
     flash.now[:alert] = @deal.errors.full_messages.to_sentence
     render :edit, status: :unprocessable_entity
   end
@@ -202,6 +210,10 @@ class DealsController < ApplicationController
   end
 
   private
+
+  def set_edit_section
+    @edit_section = params[:section].presence_in(%w[overview relationships management custom])
+  end
 
   def filtered_deals(scope)
     scope = Deal.filter_by(scope, @effective_filters)

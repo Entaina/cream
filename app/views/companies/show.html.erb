@@ -1,115 +1,132 @@
 <% page_title @company.name %>
-<% actions = capture do %>
-  <%= link_to new_person_path(company_id: @company.id), class: "btn-secondary" do %>
-    <%= icon :plus, classes: "size-3.5" %> Add person
-  <% end %>
-  <%= link_to new_deal_path(company_id: @company.id), class: "btn-secondary" do %>
-    <%= icon :plus, classes: "size-3.5" %> Add deal
-  <% end %>
-  <%= link_to merge_company_path(@company), class: "btn-secondary" do %>
-    <%= icon :building, classes: "size-3.5" %> Merge
-  <% end %>
-  <%= link_to edit_company_path(@company), class: "btn-secondary" do %>
-    <%= icon :pencil, classes: "size-3.5" %> Edit
-  <% end %>
-  <%= button_to company_path(@company), method: :delete, form: { data: { turbo_confirm: "Delete #{@company.name}? This cannot be undone." } }, class: "btn-danger" do %>
-    <%= icon :trash, classes: "size-3.5" %> Delete
-  <% end %>
-<% end %>
-<%= render "shared/page_header", title: @company.name, icon_name: :building, count: nil, actions: actions %>
-
-<div class="flex-1 flex min-h-0 overflow-x-auto snap-x snap-mandatory md:overflow-x-visible md:snap-none">
-  <aside class="w-80 shrink-0 snap-start border-r border-line overflow-y-auto scrollbar-subtle p-4">
-    <div class="flex items-center gap-3 mb-4">
-      <%= avatar @company, size: "size-12", text: "text-base" %>
-      <div class="min-w-0">
-        <h2 class="font-semibold text-lg truncate"><%= @company.name %></h2>
-        <% if @company.domain.present? %>
-          <%= link_to @company.domain, "https://#{@company.domain}", target: "_blank",
-                class: "text-sm text-accent hover:underline" %>
-        <% end %>
-      </div>
+<div class="record-workspace" data-controller="record-workspace"
+     data-action="turbo:before-visit@document->record-workspace#beforeVisit beforeunload@window->record-workspace#beforeUnload input->record-workspace#markDirty change->record-workspace#markDirty submit->record-workspace#submit turbo:submit-end->record-workspace#submitted">
+  <header class="record-header">
+    <div class="flex items-center gap-2 text-sm text-ink-soft mb-5">
+      <button type="button" class="btn-ghost md:hidden" aria-label="Open menu" data-action="mobile-nav#open"><%= icon :menu, classes: "size-4" %></button>
+      <%= link_to "Companies", companies_path, class: "hover:text-accent hover:underline" %>
+      <span aria-hidden="true">/</span><span>Company overview</span>
     </div>
-
-    <div class="divide-y divide-line/60">
-      <%= render "shared/attribute", label: "Industry", icon_name: :briefcase, value: @company.industry %>
-      <%= render "shared/attribute", label: "Employees", icon_name: :users, value: @company.employee_range %>
-      <%= render "shared/attribute", label: "Location", icon_name: :map_pin, value: @company.location %>
-      <%= render "shared/attribute", label: "Revenue", icon_name: :banknote,
-            value: @company.annual_revenue.present? ? money(@company.annual_revenue) : nil %>
-      <%= render "shared/attribute", label: "LinkedIn", icon_name: :external,
-            value: @company.linkedin_url.present? ? link_to("Profile", @company.linkedin_url, target: "_blank", class: "text-accent hover:underline") : nil %>
-      <%= render "shared/attribute", label: "Owner", icon_name: :users, value: @company.owner&.name %>
-      <%= render "shared/attribute", label: "Created", icon_name: :clock, value: l(@company.created_at, format: :short) %>
-      <%= render "shared/custom_attributes", record: @company %>
-    </div>
-
-    <% if @company.description.present? %>
-      <div class="mt-4">
-        <h3 class="text-sm font-semibold uppercase tracking-wider text-ink-faint mb-1.5">About</h3>
-        <p class="text-base text-ink-soft whitespace-pre-wrap"><%= @company.description %></p>
-      </div>
-    <% end %>
-
-    <div class="mt-4">
-      <h3 class="text-sm font-semibold uppercase tracking-wider text-ink-faint mb-1.5">Fiscal information</h3>
-      <% if @company.fiscal_information.present? %>
-        <p class="text-base text-ink-soft whitespace-pre-wrap"><%= @company.fiscal_information %></p>
-      <% else %>
-        <p class="text-base text-ink-faint">—</p>
-      <% end %>
-    </div>
-
-    <div class="mt-4">
-      <h3 class="text-sm font-semibold uppercase tracking-wider text-ink-faint mb-1.5">People (<%= @company.people.size %>)</h3>
-      <ul class="space-y-1">
-        <% @company.people.each do |person| %>
-          <li>
-            <%= link_to person_path(person), class: "flex items-center gap-2 rounded-md px-2 py-1.5 hover:bg-canvas-sunken text-base" do %>
-              <%= avatar person, size: "size-5", text: "text-2xs" %>
-              <span class="truncate font-medium"><%= person.display_name %></span>
-              <span class="text-ink-faint truncate text-sm"><%= person.job_title %></span>
-            <% end %>
-          </li>
-        <% end %>
-      </ul>
-    </div>
-
-    <% if @deals.any? %>
-      <div class="mt-4">
-        <h3 class="text-sm font-semibold uppercase tracking-wider text-ink-faint mb-1.5">Deals (<%= @deals.size %>)</h3>
-        <ul class="space-y-1">
-          <% @deals.each do |deal| %>
-            <li>
-              <%= link_to deal_path(deal), class: "flex items-center justify-between gap-2 rounded-md px-2 py-1.5 hover:bg-canvas-sunken text-base" do %>
-                <span class="truncate font-medium"><%= deal.name %></span>
-                <%= stage_badge deal %>
-              <% end %>
-            </li>
-          <% end %>
-        </ul>
-      </div>
-    <% end %>
-
-    <% if @company.lists.any? %>
-      <div class="mt-4">
-        <h3 class="text-sm font-semibold uppercase tracking-wider text-ink-faint mb-1.5">Lists</h3>
-        <div class="flex flex-wrap gap-1.5">
-          <% @company.lists.each do |list| %>
-            <%= link_to list.name, list_path(list), class: "inline-flex items-center gap-1.5 rounded-full bg-canvas-sunken px-2 py-0.5 text-sm hover:bg-line" %>
-          <% end %>
+    <div class="flex items-start justify-between gap-4">
+      <div class="flex items-center gap-4 min-w-0">
+        <%= avatar @company, size: "size-14", text: "text-lg" %>
+        <div class="min-w-0">
+          <h1 class="text-2xl font-semibold tracking-tight break-words"><%= @company.name %></h1>
+          <p class="text-base text-ink-soft mt-1">
+            <% subtitle = [ @company.industry, @company.employee_range ].compact_blank.join(" · ") %>
+            <%= subtitle.presence || "Company" %>
+          </p>
         </div>
       </div>
-    <% end %>
-  </aside>
+      <div class="flex items-center gap-2 shrink-0">
+        <%= link_to edit_company_path(@company), class: "btn-secondary" do %><%= icon :pencil, classes: "size-3.5" %><span>Edit</span><% end %>
+        <details class="record-menu">
+          <summary class="btn-ghost" aria-label="More company actions">•••</summary>
+          <div class="record-menu-items">
+            <%= link_to merge_company_path(@company), class: "btn-ghost justify-start" do %><%= icon :building, classes: "size-4" %> Merge duplicates<% end %>
+            <%= button_to company_path(@company), method: :delete, form: { data: { turbo_confirm: "Delete #{@company.name}? This cannot be undone." } }, class: "btn-ghost text-danger w-full justify-start" do %><%= icon :trash, classes: "size-4" %> Delete company<% end %>
+          </div>
+        </details>
+      </div>
+    </div>
+    <div class="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm mt-4 text-ink-soft">
+      <% if @company.domain.present? %><%= link_to @company.domain, "https://#{@company.domain}", target: "_blank", rel: "noopener", class: "inline-flex items-center gap-2 hover:text-accent" do %><%= icon :external, classes: "size-4 shrink-0" %><%= @company.domain %><% end %><% end %>
+      <% if @company.location.present? %><span class="inline-flex items-center gap-2"><%= icon :map_pin, classes: "size-4" %><%= @company.location %></span><% end %>
+      <% if @company.annual_revenue.present? %><span class="inline-flex items-center gap-2"><%= icon :banknote, classes: "size-4" %><%= money(@company.annual_revenue) %></span><% end %>
+    </div>
+    <div class="record-actions">
+      <% if feature_enabled?(:record_email) %>
+        <button type="button" class="btn-primary" data-action="record-workspace#openComposer" data-composer="email"><%= icon :mail, classes: "size-4" %> Send email</button>
+      <% end %>
+      <button type="button" class="btn-secondary" data-action="record-workspace#openComposer" data-composer="note"><%= icon :note, classes: "size-4" %> Add note</button>
+      <button type="button" class="btn-secondary" data-action="record-workspace#openComposer" data-composer="task"><%= icon :check_circle, classes: "size-4" %> Create task</button>
+      <%= link_to new_person_path(company_id: @company.id), class: "btn-secondary" do %><%= icon :plus, classes: "size-4" %> Add person<% end %>
+      <%= link_to new_deal_path(company_id: @company.id), class: "btn-secondary" do %><%= icon :plus, classes: "size-4" %> Add deal<% end %>
+    </div>
+  </header>
 
-  <div class="w-full shrink-0 snap-start md:flex-1 md:w-auto overflow-y-auto scrollbar-subtle p-5 space-y-6 bg-canvas-soft/50">
-    <%= render "shared/tasks_section", record: @company, task: @task %>
-    <%= render "shared/ai_assistant_section", record: @company if feature_enabled?(:ai_assistant) %>
-    <%= render "shared/notes_section", record: @company, note: @note %>
-    <%= render "shared/comments_section", record: @company, comment: @comment if feature_enabled?(:comments) %>
-    <%= render "shared/attachments_section", record: @company if feature_enabled?(:attachments) %>
-    <%= render "shared/email_section", record: @company, email_message: @email_message if feature_enabled?(:record_email) %>
-    <%= render "shared/timeline", activities: @activities %>
+  <nav class="record-tabs" aria-label="Company sections" role="tablist">
+    <% tabs = [["activity", "Activity", nil], ["people", "People", @people.size], ["deals", "Deals", @deals.size], ["information", "Information", nil]] %>
+    <% tabs << ["files", "Files", @company.record_attachments.count] if feature_enabled?(:attachments) %>
+    <% tabs.each do |key, label, count| %>
+      <%= link_to company_path(@company, tab: key), id: "record-tab-#{key}", role: "tab", class: "record-tab", tabindex: @company_tab == key ? 0 : -1,
+            aria: { selected: @company_tab == key, controls: "record-panel-#{key}" },
+            data: { record_workspace_target: "tab", tab: key, action: "click->record-workspace#selectTab keydown->record-workspace#navigateTabs" } do %>
+        <%= label %><% unless count.nil? %><span class="record-count"><%= count %></span><% end %>
+      <% end %>
+    <% end %>
+  </nav>
+
+  <div class="record-content">
+    <section id="record-panel-activity" role="tabpanel" aria-labelledby="record-tab-activity" tabindex="0" data-record-workspace-target="panel" <%= "hidden" unless @company_tab == "activity" %>>
+      <div class="record-overview-grid">
+        <div class="min-w-0 space-y-6">
+          <section class="record-card" aria-labelledby="record-next-tasks">
+            <div class="flex items-center justify-between gap-3 mb-4">
+              <h2 id="record-next-tasks" class="record-section-title">Next tasks <span class="record-count"><%= @pending_tasks.size %></span></h2>
+              <button type="button" class="btn-ghost" data-action="record-workspace#openComposer" data-composer="task"><%= icon :plus, classes: "size-4" %> Add</button>
+            </div>
+            <% if @pending_tasks.any? %>
+              <ul class="space-y-2"><%= render partial: "shared/task_row", collection: @pending_tasks.first(3), as: :task %></ul>
+              <% if @pending_tasks.size > 3 %>
+                <details class="record-disclosure mt-3"><summary>Show <%= @pending_tasks.size - 3 %> more pending tasks</summary><ul class="space-y-2 mt-3"><%= render partial: "shared/task_row", collection: @pending_tasks.drop(3), as: :task %></ul></details>
+              <% end %>
+            <% else %>
+              <p class="text-sm text-ink-soft">No pending tasks. Create a task to plan your next follow-up.</p>
+            <% end %>
+            <% if @completed_tasks.any? %>
+              <details class="record-disclosure mt-4"><summary>Completed tasks (<%= @completed_tasks.size %>)</summary><ul class="space-y-2 mt-3"><%= render partial: "shared/task_row", collection: @completed_tasks, as: :task %></ul></details>
+            <% end %>
+          </section>
+          <%= render "activity_feed" %>
+        </div>
+        <aside class="space-y-5 min-w-0" aria-label="Company context">
+          <section class="record-card">
+            <h2 class="record-section-title mb-4">At a glance</h2>
+            <dl class="record-context-list">
+              <div><dt>Owner</dt><dd><%= @company.owner&.name || "Unassigned" %></dd></div>
+              <div><dt>Industry</dt><dd><%= @company.industry.presence || "—" %></dd></div>
+              <div><dt>Employees</dt><dd><%= @company.employee_range.presence || "—" %></dd></div>
+              <div><dt>People</dt><dd><%= @people.size %></dd></div>
+            </dl>
+            <button type="button" class="btn-ghost mt-4 -ml-2" data-action="record-workspace#selectTab" data-tab="information">View all information <%= icon :chevron_right, classes: "size-3.5" %></button>
+          </section>
+          <section class="record-card">
+            <h2 class="record-section-title mb-4">Open deals</h2>
+            <% open_deals = @deals.select(&:open) %>
+            <% if open_deals.any? %>
+              <ul class="space-y-4">
+                <% open_deals.first(3).each do |deal| %>
+                  <li><%= link_to deal.name, deal_path(deal), class: "block font-medium hover:text-accent break-words" %><div class="mt-2"><%= stage_badge deal %></div></li>
+                <% end %>
+              </ul>
+              <button type="button" class="btn-ghost mt-4 -ml-2" data-action="record-workspace#selectTab" data-tab="deals">View deals (<%= @deals.size %>) <%= icon :chevron_right, classes: "size-3.5" %></button>
+            <% else %><p class="text-sm text-ink-soft">No open deals.</p><% end %>
+          </section>
+          <% if feature_enabled?(:ai_assistant) %>
+            <details class="record-disclosure record-card"><summary>AI Assistant</summary><div class="mt-4"><%= render "shared/ai_assistant_section", record: @company %></div></details>
+          <% end %>
+        </aside>
+      </div>
+    </section>
+
+    <section id="record-panel-people" role="tabpanel" aria-labelledby="record-tab-people" tabindex="0" data-record-workspace-target="panel" <%= "hidden" unless @company_tab == "people" %>>
+      <%= render "people_panel" %>
+    </section>
+
+    <section id="record-panel-deals" role="tabpanel" aria-labelledby="record-tab-deals" tabindex="0" data-record-workspace-target="panel" <%= "hidden" unless @company_tab == "deals" %>>
+      <%= render "deals_panel" %>
+    </section>
+
+    <section id="record-panel-information" role="tabpanel" aria-labelledby="record-tab-information" tabindex="0" data-record-workspace-target="panel" <%= "hidden" unless @company_tab == "information" %>>
+      <%= render "information_panel" %>
+    </section>
+
+    <% if feature_enabled?(:attachments) %>
+      <section id="record-panel-files" role="tabpanel" aria-labelledby="record-tab-files" tabindex="0" data-record-workspace-target="panel" <%= "hidden" unless @company_tab == "files" %>>
+        <div class="record-card"><%= render "shared/attachments_section", record: @company %></div>
+      </section>
+    <% end %>
   </div>
+  <%= render "composers" %>
 </div>

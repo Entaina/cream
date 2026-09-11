@@ -955,7 +955,7 @@ RSpec.describe "Deals", type: :request do
       get edit_deal_path(deal)
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include('data-controller="deal-stage-celebration"')
+      expect(response.body).to include("deal-stage-celebration")
       expect(response.body).to include(
         "data-stage-won=\"true\" data-stage-closed=\"true\" value=\"#{won_stage.id}\""
       )

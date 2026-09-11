@@ -1,0 +1,44 @@
+<div class="record-information-grid">
+  <section class="record-card">
+    <div class="record-card-heading"><h2 class="record-section-title">Deal details</h2><%= link_to "Edit", edit_deal_path(@deal, section: "overview"), class: "btn-ghost", aria: { label: "Edit deal details" } %></div>
+    <div class="divide-y divide-line/60">
+      <%= render "shared/attribute", label: "Value", icon_name: :banknote, value: deal_field_display(@deal, :value) %>
+      <%= render "shared/attribute", label: "Probability", icon_name: :activity, value: deal_field_display(@deal, :probability) %>
+      <%= render "shared/attribute", label: "Close date", icon_name: :calendar, value: deal_field_display(@deal, :expected_close_date) %>
+      <%= render "shared/attribute", label: "Nº factura", icon_name: :note, value: deal_field_display(@deal, :invoice_number) %>
+      <%= render "shared/attribute", label: "Stage", icon_name: :activity, value: @deal.stage_label %>
+      <%= render "shared/attribute", label: "Pipeline", icon_name: :activity, value: @deal.pipeline&.name %>
+    </div>
+  </section>
+  <section class="record-card">
+    <div class="record-card-heading"><h2 class="record-section-title">Relationships</h2><%= link_to "Edit", edit_deal_path(@deal, section: "relationships"), class: "btn-ghost", aria: { label: "Edit relationships" } %></div>
+    <div class="divide-y divide-line/60">
+      <%= render "shared/attribute", label: "Company", icon_name: :building, value: @deal.company ? link_to(@deal.company.name, company_path(@deal.company), class: "text-accent hover:underline") : nil %>
+      <%= render "shared/attribute", label: "Partner", icon_name: :building, value: @deal.partner ? link_to(@deal.partner.name, company_path(@deal.partner), class: "text-accent hover:underline") : nil %>
+      <%= render "shared/attribute", label: "Contacts", icon_name: :users,
+            value: @deal.contacts.any? ? safe_join(@deal.contacts.map { |p| link_to(p.display_name, person_path(p), class: "text-accent hover:underline") }, ", ") : nil %>
+    </div>
+  </section>
+  <section class="record-card">
+    <div class="record-card-heading"><h2 class="record-section-title">Management</h2><%= link_to "Edit", edit_deal_path(@deal, section: "management"), class: "btn-ghost", aria: { label: "Edit management" } %></div>
+    <%= render "shared/attribute", label: "Owner", icon_name: :users, value: @deal.owner&.name %>
+    <%= render "shared/attribute", label: "Created", icon_name: :clock, value: l(@deal.created_at, format: :short) %>
+    <% if @deal.lists.any? %>
+      <h3 class="text-sm font-medium mt-4 mb-2">Lists</h3>
+      <div class="flex flex-wrap gap-2"><% @deal.lists.each do |list| %><%= link_to list.name, list_path(list), class: "record-count hover:text-accent" %><% end %></div>
+    <% end %>
+  </section>
+  <section class="record-card"><%= render "collaborators_section", deal: @deal %></section>
+  <% if @deal.custom_field_definitions.any? %>
+    <section class="record-card">
+      <div class="record-card-heading"><h2 class="record-section-title">Custom fields</h2><%= link_to "Edit", edit_deal_path(@deal, section: "custom"), class: "btn-ghost", aria: { label: "Edit custom fields" } %></div>
+      <%= render "shared/custom_attributes", record: @deal %>
+    </section>
+  <% end %>
+  <% if @deal.lead_submissions.any? %>
+    <section class="record-card"><%= render "lead_submission_section", deal: @deal %></section>
+  <% end %>
+  <% if @deal.bookings.any? %>
+    <section class="record-card"><%= render "booking_submission_section", deal: @deal %></section>
+  <% end %>
+</div>

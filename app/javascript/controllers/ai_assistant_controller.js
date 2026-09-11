@@ -54,7 +54,7 @@ export default class extends Controller {
     const goal = this.hasGoalTarget ? this.goalTarget.value.trim() : ""
     await this.run("email draft", this.draftEmailUrlValue, (data) => {
       this.fillEmailComposer(data.subject, data.body)
-      this.statusTarget.textContent = "Email draft inserted into the composer below."
+      this.statusTarget.textContent = "Email draft ready in the editor."
     }, { goal })
   }
 
@@ -184,9 +184,21 @@ export default class extends Controller {
   fillEmailComposer(subject, body) {
     const subjectField = document.querySelector('[data-template-picker-target="subject"]')
     const bodyField = document.querySelector('[data-template-picker-target="body"]')
+    const dialog = subjectField?.closest("dialog")
+    if (dialog && !dialog.open) {
+      document.querySelector('[data-action="record-workspace#openComposer"][data-composer="email"]')?.click()
+    }
 
     if (subjectField && subject) this.writeFieldValue(subjectField, subject)
-    if (bodyField && body) this.writeFieldValue(bodyField, body)
+    if (bodyField && body) {
+      const editor = bodyField.closest('[data-controller~="rich-text-editor"]')
+      if (editor) {
+        editor.dispatchEvent(new CustomEvent("rich-text-editor:set", { detail: { html: body } }))
+        bodyField.dispatchEvent(new Event("input", { bubbles: true }))
+      } else {
+        this.writeFieldValue(bodyField, body)
+      }
+    }
   }
 
   writeFieldValue(field, value) {

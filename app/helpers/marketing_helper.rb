@@ -63,7 +63,8 @@ module MarketingHelper
   SUBSCRIPTION_STATUS_LABELS = {
     "subscribed" => "Suscrito",
     "unsubscribed" => "Dado de baja",
-    "pending" => "Pendiente"
+    "pending" => "Pendiente",
+    "missing" => "Sin suscripción"
   }.freeze
 
   def campaign_status_badge(status)
@@ -103,7 +104,12 @@ module MarketingHelper
   end
 
   def subscription_status_badge(status)
-    color = status.to_s == "subscribed" ? "green" : "chicago"
+    color = case status.to_s
+    when "subscribed" then "green"
+    when "pending" then "golden"
+    when "missing" then "hoki"
+    else "chicago"
+    end
     badge(SUBSCRIPTION_STATUS_LABELS.fetch(status.to_s, status), color: color)
   end
 

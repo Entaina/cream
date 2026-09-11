@@ -5,6 +5,7 @@ class CompaniesController < ApplicationController
   remembers_list_filters only: :index
 
   before_action :set_company, only: %i[show edit update destroy merge]
+  before_action :set_edit_section, only: %i[edit update]
 
   SORTABLE = %w[name domain industry employee_range location created_at].freeze
 
@@ -41,10 +42,16 @@ class CompaniesController < ApplicationController
     authorize @company
     @deals = policy_scope(current_workspace.deals)
       .where(company_id: @company.id)
-      .includes(:pipeline_stage)
-      .order(:name)
+      .includes(:pipeline_stage, :products)
+      .order(created_at: :desc)
+    @people = @company.people.order(:first_name, :last_name)
+    @company_tab = params[:tab].presence_in(%w[activity people deals information files]) || "activity"
+    @company_tab = "activity" if @company_tab == "files" && !CreamFeatures.enabled?(:attachments)
+    @pending_tasks = @company.tasks.pending.includes(:assignee).due_order
+    @completed_tasks = @company.tasks.completed.includes(:assignee).order(completed_at: :desc)
+    @activity_feed = RecordActivityFeed.new(@company, filter: params[:activity_filter], page: params[:activity_page],
+      emails: CreamFeatures.enabled?(:record_email), comments: CreamFeatures.enabled?(:comments))
     @okm_chat_record = @company
-    @activities = @company.activities.includes(:user, :subject).recent_first.limit(50)
     @note = Note.new
     @comment = Comment.new
     @email_message = EmailMessage.new
@@ -81,7 +88,7 @@ class CompaniesController < ApplicationController
   def update
     authorize @company
     if @company.update(company_params)
-      redirect_to @company, notice: "Company updated."
+      redirect_to @edit_section ? company_path(@company, tab: "information") : @company, notice: "Company updated."
     else
       render :edit, status: :unprocessable_entity
     end
@@ -122,6 +129,10 @@ class CompaniesController < ApplicationController
   end
 
   private
+
+  def set_edit_section
+    @edit_section = params[:section].presence_in(%w[profile about fiscal management custom])
+  end
 
   def set_company
     @company = policy_scope(current_workspace.companies).find(params[:id])

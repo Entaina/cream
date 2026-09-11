@@ -1,0 +1,66 @@
+<div>
+  <%= f.label :name, class: "label" %>
+  <%= f.text_field :name, class: "input", autofocus: true, placeholder: "Acme — Annual plan" %>
+</div>
+
+<% if deal.new_record? %>
+  <div data-controller="pipeline-stage-select" class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+    <div>
+      <%= f.label :pipeline_id, "Pipeline", class: "label" %>
+      <%= f.collection_select :pipeline_id, current_workspace.pipelines.ordered, :id, :name, {},
+            class: "input",
+            data: { pipeline_stage_select_target: "pipeline", action: "change->pipeline-stage-select#pipelineChanged" } %>
+    </div>
+    <div>
+      <%= f.label :pipeline_stage_id, "Stage", class: "label" %>
+      <%= f.select :pipeline_stage_id,
+            options_for_select(
+              current_workspace.pipelines.ordered.flat_map { |p|
+                p.pipeline_stages.ordered.map { |s|
+                  [s.name, s.id, { data: { pipeline_id: p.id } }]
+                }
+              },
+              deal.pipeline_stage_id
+            ),
+            {}, class: "input", data: { pipeline_stage_select_target: "stage" } %>
+    </div>
+  </div>
+<% else %>
+  <div>
+    <%= f.label :pipeline_stage_id, "Stage", class: "label" %>
+    <%= f.select :pipeline_stage_id,
+          options_for_select(
+            deal.pipeline.pipeline_stages.ordered.map { |s|
+              [s.name, s.id, { data: { "stage-won": s.won?, "stage-closed": s.closed? } }]
+            },
+            deal.pipeline_stage_id
+          ),
+          {}, class: "input" %>
+  </div>
+<% end %>
+
+<div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+  <div>
+    <%= f.label :value, "Value", class: "label" %>
+    <%= f.number_field :value, class: "input", min: 0, step: 0.01, id: "deal_value" %>
+  </div>
+  <div>
+    <%= f.label :currency, class: "label" %>
+    <%= f.select :currency, %w[EUR USD], {}, class: "input" %>
+  </div>
+  <div>
+    <%= f.label :invoice_number, "Nº factura", class: "label" %>
+    <%= f.text_field :invoice_number, class: "input", placeholder: "FAC-2026-001" %>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+  <div>
+    <%= f.label :probability, "Probability (%)", class: "label" %>
+    <%= f.number_field :probability, class: "input", min: 0, max: 100, step: 5 %>
+  </div>
+  <div>
+    <%= f.label :expected_close_date, class: "label" %>
+    <%= f.date_field :expected_close_date, class: "input" %>
+  </div>
+</div>

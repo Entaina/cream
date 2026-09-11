@@ -679,3 +679,50 @@
   max-height: none;
   border-radius: 0;
 }
+
+/* Record workspace: one scroll surface, task-focused overview and explicit sections. */
+.record-workspace { @apply flex-1 min-h-0 overflow-y-auto bg-canvas-soft/50; }
+.record-header { @apply bg-canvas-raised px-5 py-5 sm:px-8 sm:pt-6; }
+.record-actions { @apply flex flex-wrap gap-2 mt-5; }
+.record-tabs { @apply sticky top-0 z-10 flex border-b border-line bg-canvas-raised px-3 sm:px-6; }
+.record-tab { @apply inline-flex items-center justify-center gap-2 px-3 py-4 text-sm font-medium text-ink-soft border-b-2 border-transparent transition-colors hover:text-ink; }
+.record-tab[aria-selected="true"] { @apply text-accent border-accent; }
+.record-tab:focus-visible, .record-filter:focus-visible, .record-disclosure > summary:focus-visible { @apply outline-2 outline-offset-2 outline-accent rounded; }
+.record-count { @apply inline-flex items-center rounded-full bg-canvas-sunken px-2 py-0.5 text-xs font-normal text-ink-soft; }
+.record-content { @apply p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto; }
+.record-overview-grid { @apply grid gap-6 xl:grid-cols-[minmax(0,1fr)_18rem]; }
+.record-information-grid { @apply grid gap-5 lg:grid-cols-2 items-start; }
+.record-card { @apply rounded-xl border border-line bg-canvas-raised p-5 sm:p-6 min-w-0; }
+.record-card-heading { @apply flex items-center justify-between gap-3 mb-4; }
+.record-section-title { @apply flex items-center gap-2 text-base font-semibold text-ink; }
+.record-context-list { @apply space-y-4 text-sm; }
+.record-context-list > div { @apply flex items-start justify-between gap-4; }
+.record-context-list dt { @apply text-ink-soft; }
+.record-context-list dd { @apply text-right font-medium break-words min-w-0; }
+.record-filter { @apply rounded-full px-3 py-1.5 text-sm text-ink-soft hover:bg-canvas-sunken; }
+.record-filter[aria-current="true"] { @apply bg-accent-soft text-accent-dark font-semibold; }
+.record-feed { @apply space-y-5; }
+.record-feed-entry { @apply flex gap-3 border-b border-line/60 pb-5 last:border-0 last:pb-0; }
+.record-feed-marker { @apply flex items-center justify-center size-8 rounded-full bg-canvas-soft text-ink-soft shrink-0; }
+.record-disclosure > summary { @apply cursor-pointer text-sm font-medium text-ink-soft hover:text-ink; }
+.record-disclosure > form { @apply mt-4; }
+.record-menu { @apply relative; }
+.record-menu > summary { @apply list-none cursor-pointer; }
+.record-menu > summary::-webkit-details-marker { display: none; }
+.record-menu-items { @apply absolute right-0 top-full mt-2 z-20 w-52 rounded-xl border border-line bg-canvas-raised p-2 shadow-lg flex flex-col gap-1; }
+.record-composer { @apply fixed inset-0 m-auto w-[calc(100%-2rem)] max-w-2xl max-h-[calc(100%-2rem)] overflow-y-auto rounded-2xl border border-line bg-canvas-raised p-0 text-ink shadow-xl; }
+.record-composer::backdrop { background: rgb(0 0 0 / 0.35); }
+.record-composer-header { @apply sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-line bg-canvas-raised px-5 py-4 sm:px-6; }
+.record-composer-footer { @apply sticky bottom-0 flex justify-end gap-2 border-t border-line bg-canvas-raised py-4; }
+.record-composer .mention-field { @apply min-w-0; }
+@media (max-width: 639px) {
+  .record-composer { width: 100%; height: 100%; max-height: 100%; border-radius: 0; }
+  .record-tab { @apply px-2 flex-1 text-xs; }
+  .record-tab .record-count { @apply px-1; }
+  .record-actions > button, .record-actions > div { @apply flex-1; }
+  .record-actions > div > button { @apply w-full justify-center; }
+}
+@media (max-width: 399px) {
+  .record-tab { @apply px-1 gap-1; font-size: 12px; }
+  .record-tab .record-count { display: none; }
+}

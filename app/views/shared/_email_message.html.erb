@@ -1,0 +1,59 @@
+<%# locals: (message:) %>
+        <% timestamp = message.scheduled? ? message.scheduled_at : message.created_at %>
+        <li class="card p-2.5">
+          <details class="group">
+            <summary class="flex items-start justify-between gap-2 cursor-pointer list-none">
+              <div class="min-w-0">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <%= icon :chevron_right, classes: "size-3 text-ink-faint transition-transform group-open:rotate-90" %>
+                  <span class="text-base font-medium text-ink truncate"><%= message.subject.presence || "(no subject)" %></span>
+                  <% if message.inbound? %>
+                    <%= badge "Received", color: "hoki" %>
+                  <% elsif message.scheduled? %>
+                    <%= badge "Scheduled", color: "golden" %>
+                  <% elsif message.failed? %>
+                    <%= badge "Failed to send", color: "red" %>
+                  <% else %>
+                    <%= badge "Sent", color: "green" %>
+                    <% if message.opened? %><%= badge "Opened", color: "green" %><% end %>
+                    <% if message.awaiting_follow_up? %>
+                      <%= badge "Follow up #{message.follow_up_at.strftime('%-d %b')}", color: "copperfield" %>
+                    <% elsif message.replied? %>
+                      <%= badge "Replied", color: "chicago" %>
+                    <% end %>
+                  <% end %>
+                </div>
+                <% if message.inbound? %>
+                  <div class="text-xs text-ink-faint truncate mt-0.5">From: <%= message.from_address.presence || "Unknown sender" %></div>
+                <% else %>
+                  <div class="text-xs text-ink-faint truncate mt-0.5">To: <%= message.to_address %></div>
+                <% end %>
+                <p class="text-sm text-ink-soft truncate mt-0.5 group-open:hidden"><%= email_body_preview(message.body) %></p>
+              </div>
+              <time class="text-xs text-ink-faint whitespace-nowrap shrink-0" datetime="<%= timestamp&.iso8601 %>">
+                <%= timestamp&.strftime("%-d %b %Y, %H:%M") %>
+              </time>
+            </summary>
+            <div class="mt-2 pt-2 border-t border-line text-sm text-ink-soft break-words email-body"><%= email_body_html(message.body) %></div>
+            <% if message.attachments.attached? %>
+              <ul class="mt-2 space-y-1">
+                <% message.attachments.each do |file| %>
+                  <li class="flex items-center gap-2 text-sm">
+                    <%= icon :paperclip, classes: "size-3.5 text-ink-faint" %>
+                    <%= link_to file.filename, rails_blob_path(file, disposition: "attachment"), class: "text-accent hover:underline truncate" %>
+                    <span class="text-xs text-ink-faint"><%= number_to_human_size(file.byte_size) %></span>
+                  </li>
+                <% end %>
+              </ul>
+            <% end %>
+            <% if message.outbound? && (message.scheduled? || message.awaiting_follow_up?) %>
+              <div class="mt-2 flex gap-2 flex-wrap">
+                <% if message.scheduled? %>
+                  <%= button_to "Cancel send", record_email_path(message), method: :delete, class: "btn-ghost text-xs px-1.5 py-0.5", form_class: "inline-block" %>
+                <% elsif message.awaiting_follow_up? %>
+                  <%= button_to "Mark replied", mark_replied_record_email_path(message), method: :patch, class: "btn-ghost text-xs px-1.5 py-0.5", form_class: "inline-block" %>
+                <% end %>
+              </div>
+            <% end %>
+          </details>
+        </li>

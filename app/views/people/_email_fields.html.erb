@@ -1,10 +1,11 @@
 <%# locals: (form:) %>
 <div class="flex items-end gap-2 rounded-lg ring-1 ring-transparent hover:ring-line p-1"
      data-nested-form-target="row">
-  <%= form.email_field :address, class: "input flex-1", placeholder: "name@company.com" %>
+  <%= form.label :address, "Email address", class: "sr-only" %>
+  <%= form.email_field :address, class: "input flex-1 min-w-0", placeholder: "name@company.com", autocomplete: "email" %>
   <label class="flex items-center gap-1.5 text-sm text-ink-soft shrink-0 pb-2">
     <%= form.check_box :primary, class: "rounded border-line text-accent focus:ring-accent" %>
-    Principal
+    Primary
   </label>
   <%= form.hidden_field :_destroy %>
   <button type="button" data-action="nested-form#remove" class="text-ink-faint hover:text-danger p-1.5 mb-0.5 shrink-0" title="Remove email">

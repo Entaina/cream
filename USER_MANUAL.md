@@ -4,7 +4,7 @@
 
 Cream is a **workspace**-based CRM for managing **people**, **companies** and **deals** (opportunities), with notes, tasks, lists and an activity history shared across the team.
 
-> **Last revision:** 2026-09-09 (Beehiiv sync, MQL pool)
+> **Last revision:** 2026-09-11 (person workspace redesign)
 > This document describes the functionality **visible to the user**. Disabled features are listed at the end under "Coming soon".
 
 ---
@@ -498,7 +498,22 @@ In the people, companies and deals tables, Cream adds automatically calculated c
 
 ## 13. Record page
 
-When you open a person, company or deal you will see:
+### People
+
+The contact header shows their name, company and main contact details. Use **Send email**, **Add note**, **Create task** or **Add deal** when you need them: the editors open on demand. **Edit** opens the grouped contact form; **Merge duplicates** and **Delete contact** are in the **•••** menu.
+
+- **Activity** opens by default. **Next tasks** puts overdue tasks first, followed by upcoming tasks; expand the remaining or completed tasks when needed. The history combines notes, emails, comments and record changes. Filter by type and use **Older / Newer** to browse the history.
+- **Opportunities** contains deals and the product filter, plus product interests and form submissions when enabled. Expand **Registrar interés** to add an interest.
+- **Information** groups contact details, professional profile, ownership, relationships, custom fields and email preferences. Each editable block has its own **Edit** link. Expand **Add relationship** to link another person.
+- **Files**, when enabled, contains the upload form and existing attachments.
+
+Closing an editor or switching sections keeps its draft while you remain on the page. Leaving with unsaved drafts prompts you first. Drafts are not saved across a reload. Editing a block only submits that block; **Save changes** returns to Information, and **Cancel** leaves the contact unchanged.
+
+On mobile, use the section tabs in a single column; note, task, comment and email editors fill the screen. Tabs also support arrow keys, Home and End, and editors close with Escape.
+
+### Companies and deals
+
+When you open a company or deal you will see:
 
 **Left panel (attributes):** main data, custom fields, relationships between contacts (people only), lists it belongs to and (for deals) the pipeline and stage selector. On **people**, depending on enabled features, you may also see **Subscriptions**, **Lead score**, **Lifecycle**, **Product interests** and **Form submissions** (see [§29 Marketing](#29-marketing)).
 
@@ -546,7 +561,7 @@ From the detail page of a **person**, **company** or **deal**, the **Send email*
 
 ### How to access
 
-Open the record's detail page and scroll down to the **Send email** section (in the main column, next to Notes and Tasks).
+For a person, click **Send email** in the header. For a company or deal, scroll down to the **Send email** section in the main column.
 
 ### Sending an email
 
@@ -555,7 +570,7 @@ Open the record's detail page and scroll down to the **Send email** section (in 
 3. The email is sent (from the workspace address via SMTP, or from **your Gmail** if you have it connected) and is saved in the record's history.
 4. An entry of the form *"Your name sent “Subject” to recipient@…"* appears in the record's **Timeline**.
 
-Right below the form you will see the **last 10 emails** for that record (sent and, with Gmail, received replies), with their subject and labels.
+For a person, read emails in **Activity → Emails**, with their subject, status and expandable body; use **Older / Newer** for the rest of the history. On companies and deals, the **last 10 emails** appear below the form. Both views include sent emails and, with Gmail, received replies.
 
 ### Open and click tracking
 
@@ -1255,7 +1270,7 @@ Contacts with **active marketing permission** (at least one active subscription 
 4. Optional: **Default checkbox label** — shown in Liquid templates unless the template or MQL form overrides it.
 5. Check **Activo** (Active) and save. Cream creates default types such as *general* (`marketing_consent`) and *newsletter* (`newsletter_opt_in`) when you use the module.
 
-**On a person's record** (left panel → **Subscriptions**):
+**On a person's record** (**Information** → **Email preferences**):
 
 - Each type shows its status: **Suscrito** (Subscribed), **Dado de baja** (Unsubscribed) or **Pendiente** (Pending).
 - **Suscribir** / **Subscribe** or **Dar de baja** / **Unsubscribe** changes permission manually (with confirmation).

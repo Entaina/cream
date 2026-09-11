@@ -1,0 +1,57 @@
+<section class="record-card" aria-labelledby="record-activity-title">
+  <div class="record-card-heading">
+    <h2 id="record-activity-title" class="record-section-title">Activity</h2>
+    <% if feature_enabled?(:comments) %><button type="button" class="btn-ghost" data-action="record-workspace#openComposer" data-composer="comment">Add comment</button><% end %>
+  </div>
+  <nav class="flex flex-wrap gap-2 mb-6" aria-label="Filter activity">
+    <% filters = [["all", "All"], ["notes", "Notes"]] %>
+    <% filters << ["emails", "Emails"] if feature_enabled?(:record_email) %>
+    <% filters << ["comments", "Comments"] if feature_enabled?(:comments) %>
+    <% filters << ["changes", "Changes"] %>
+    <% filters.each do |key, label| %>
+      <%= link_to label, company_path(@company, tab: "activity", activity_filter: key), class: "record-filter", aria: { current: @activity_feed.filter == key ? "true" : nil } %>
+    <% end %>
+  </nav>
+  <% if @activity_feed.entries.any? %>
+    <ol class="record-feed">
+      <% @activity_feed.entries.each do |entry| %>
+        <% if entry.is_a?(EmailMessage) %>
+          <%= render "shared/email_message", message: entry %>
+        <% else %>
+          <li class="record-feed-entry">
+            <div class="record-feed-marker"><%= icon(entry.is_a?(Note) ? :note : entry.is_a?(Comment) ? :message : :activity, classes: "size-4") %></div>
+            <article class="min-w-0 flex-1">
+              <div class="flex items-center gap-2 flex-wrap text-sm mb-1.5">
+                <% if entry.is_a?(Activity) %>
+                  <span class="text-ink-soft break-words"><%= activity_sentence(entry) %></span>
+                <% else %>
+                  <span class="font-semibold"><%= entry.user&.name || "Someone" %></span>
+                  <span class="text-ink-soft"><%= entry.is_a?(Note) ? "added a note" : "commented" %></span>
+                <% end %>
+                <time class="text-xs text-ink-soft ml-auto" datetime="<%= entry.created_at.iso8601 %>" title="<%= l(entry.created_at, format: :long) %>"><%= l(entry.created_at, format: :short) %></time>
+              </div>
+              <% if entry.is_a?(Activity) %>
+                <% if entry.action == "updated" && entry.metadata["changes"].present? %>
+                  <details class="record-disclosure mt-2"><summary>View changes</summary><dl class="text-sm space-y-2 mt-2"><% entry.metadata["changes"].each do |field, (from, to)| %><div class="break-words"><dt class="font-medium"><%= field.humanize %></dt><dd><del class="text-ink-soft"><%= from.presence || "—" %></del> → <%= to.presence || "—" %></dd></div><% end %></dl></details>
+                <% end %>
+              <% else %>
+                <% if entry.is_a?(Note) && entry.title.present? %><h3 class="font-medium mb-1 break-words"><%= entry.title %></h3><% end %>
+                <p class="text-base text-ink-soft whitespace-pre-wrap break-words"><%= entry.is_a?(Comment) ? mention_html(entry.body) : auto_link_html(entry.body) %></p>
+                <details class="record-disclosure mt-2"><summary>Actions</summary><%= button_to entry.is_a?(Note) ? "Delete note" : "Delete comment", entry.is_a?(Note) ? note_path(entry) : comment_path(entry), method: :delete, class: "btn-ghost text-danger mt-2", form: { data: { turbo_confirm: "Delete this #{entry.is_a?(Note) ? 'note' : 'comment'}?" } } %></details>
+              <% end %>
+            </article>
+          </li>
+        <% end %>
+      <% end %>
+    </ol>
+  <% else %>
+    <div class="py-8 text-center text-ink-soft"><p class="font-medium">No activity in this view.</p><p class="text-sm mt-1">Try another filter, or add a note to start the conversation.</p></div>
+  <% end %>
+  <% if @activity_feed.pages > 1 %>
+    <nav class="flex items-center justify-between gap-3 border-t border-line pt-4 mt-6 text-sm" aria-label="Activity pages">
+      <% if @activity_feed.page > 1 %><%= link_to "Newer", company_path(@company, tab: "activity", activity_filter: @activity_feed.filter, activity_page: @activity_feed.page - 1), class: "btn-secondary" %><% end %>
+      <span class="text-ink-soft">Page <%= @activity_feed.page %> of <%= @activity_feed.pages %></span>
+      <% if @activity_feed.page < @activity_feed.pages %><%= link_to "Older", company_path(@company, tab: "activity", activity_filter: @activity_feed.filter, activity_page: @activity_feed.page + 1), class: "btn-secondary" %><% end %>
+    </nav>
+  <% end %>
+</section>

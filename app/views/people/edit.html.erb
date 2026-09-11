@@ -1,7 +1,8 @@
 <% page_title "Edit #{@person.display_name}" %>
 <%= render "shared/page_header", title: "Edit #{@person.display_name}", icon_name: :users, count: nil, actions: nil %>
-<div class="flex-1 overflow-y-auto p-5">
-  <div class="max-w-xl">
+<div class="flex-1 overflow-y-auto bg-canvas-soft/50 p-4 sm:p-6">
+  <div class="max-w-2xl mx-auto">
+    <%= link_to "← Back to contact", person_path(@person, tab: "information"), class: "inline-block text-sm text-ink-soft hover:text-accent mb-5" %>
     <%= render "form", person: @person %>
   </div>
 </div>

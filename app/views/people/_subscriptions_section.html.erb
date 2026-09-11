@@ -13,7 +13,7 @@
     <div class="space-y-2 pl-0">
       <% current_workspace.subscription_types.active.ordered.each do |type| %>
         <% subscription = subscriptions_by_type[type.id] %>
-        <% status = subscription&.status || "unsubscribed" %>
+        <% status = subscription&.status || "missing" %>
         <div class="flex flex-wrap items-center gap-2 py-1">
           <span class="text-base text-ink min-w-[8rem]"><%= type.name %></span>
           <%= subscription_status_badge(status) %>

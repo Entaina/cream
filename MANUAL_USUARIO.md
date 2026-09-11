@@ -4,7 +4,7 @@
 
 Cream es un CRM por **workspaces** para gestionar **personas**, **empresas** y **deals** (oportunidades), con notas, tareas, listas y un historial de actividad compartido en el equipo.
 
-> **Última revisión:** 2026-09-09 (sync Beehiiv, pool MQL)
+> **Última revisión:** 2026-09-11 (rediseño de la ficha de persona)
 > Este documento describe la funcionalidad **visible para el usuario**. Las funcionalidades desactivadas aparecen al final en «Próximamente».
 
 ---
@@ -498,7 +498,22 @@ En las tablas de personas, empresas y deals, Cream añade columnas calculadas au
 
 ## 13. Ficha de un registro
 
-Al abrir una persona, empresa o deal verás:
+### Personas
+
+La cabecera muestra el nombre, la empresa y los datos principales de contacto. Usa **Send email**, **Add note**, **Create task** o **Add deal** cuando lo necesites: los editores se abren bajo demanda. **Edit** abre el formulario de contacto agrupado; **Merge duplicates** y **Delete contact** están en el menú **•••**.
+
+- **Activity** se abre por defecto. **Next tasks** muestra primero las tareas vencidas y después las próximas; despliega las restantes o completadas cuando lo necesites. El historial reúne notas, correos, comentarios y cambios del registro. Filtra por tipo y usa **Older / Newer** para consultar entradas anteriores o más recientes.
+- **Opportunities** contiene los deals y el filtro por producto, además de intereses por producto y formularios enviados cuando están habilitados. Despliega **Registrar interés** para añadir un interés.
+- **Information** agrupa contacto, perfil profesional, responsable, relaciones, campos personalizados y preferencias de correo. Cada bloque editable tiene su enlace **Edit**. Despliega **Add relationship** para vincular a otra persona.
+- **Files**, cuando está habilitado, contiene el formulario de subida y los archivos adjuntos.
+
+Cerrar un editor o cambiar de sección conserva el borrador mientras sigas en la página. Si intentas salir con borradores sin guardar, aparece un aviso. Los borradores no se conservan al recargar. Editar un bloque solo envía sus campos; **Save changes** vuelve a Information y **Cancel** deja el contacto sin cambios.
+
+En móvil, usa las pestañas en una sola columna; los editores de nota, tarea, comentario y correo ocupan la pantalla. Las pestañas también admiten las flechas, Inicio y Fin, y puedes cerrar los editores con Escape.
+
+### Empresas y deals
+
+Al abrir una empresa o deal verás:
 
 **Panel izquierdo (atributos):** datos principales, campos personalizados, relaciones entre contactos (solo personas), listas a las que pertenece y (en deals) selector de pipeline y etapa. En **personas**, según las funcionalidades activas, también pueden aparecer **Suscripciones**, **Lead score**, **Lifecycle**, **Intereses por producto** y **Formularios enviados** (ver [§29 Marketing](#29-marketing)).
 
@@ -546,7 +561,7 @@ Desde la ficha de una **persona**, **empresa** o **deal**, la sección **Send em
 
 ### Cómo acceder
 
-Abre la ficha del registro y baja a la sección **Send email** (en la columna principal, junto a Notes y Tasks).
+En una persona, pulsa **Send email** en la cabecera. En una empresa o deal, baja a la sección **Send email** de la columna principal.
 
 ### Enviar un email
 
@@ -555,7 +570,7 @@ Abre la ficha del registro y baja a la sección **Send email** (en la columna pr
 3. El correo se envía (desde la dirección del workspace por SMTP, o desde **tu Gmail** si lo tienes conectado) y se guarda en el historial del registro.
 4. En el **Timeline** del registro aparece una entrada del tipo *«Tu nombre sent “Asunto” to destinatario@…»*.
 
-Justo debajo del formulario verás los **últimos 10 emails** de esa ficha (enviados y, con Gmail, respuestas recibidas), con su asunto y etiquetas.
+En una persona, consulta los correos en **Activity → Emails**, con asunto, estado y cuerpo desplegable; usa **Older / Newer** para recorrer el historial. En empresas y deals aparecen los **últimos 10 emails** debajo del formulario. Ambas vistas incluyen envíos y, con Gmail, respuestas recibidas.
 
 ### Seguimiento de aperturas y clics
 
@@ -1255,7 +1270,7 @@ Contactos con **permiso de marketing vigente** (al menos una suscripción activa
 4. Opcional: **Texto por defecto del checkbox** — etiqueta mostrada en plantillas Liquid salvo que la plantilla o el formulario MQL la sobrescriban.
 5. Marca **Activo** y guarda. Cream crea por defecto tipos como *general* (`marketing_consent`) y *newsletter* (`newsletter_opt_in`) al usar el módulo.
 
-**En la ficha de una persona** (panel izquierdo → **Suscripciones**):
+**En la ficha de una persona** (**Information** → **Email preferences**):
 
 - Cada tipo muestra su estado: **Suscrito**, **Dado de baja** o **Pendiente**.
 - **Suscribir** / **Dar de baja** cambia el permiso manualmente (con confirmación).
