@@ -43,7 +43,54 @@ module Api
         head :no_content
       end
 
+      def marketing
+        person = policy_scope(current_workspace.people).find(params[:id])
+        authorize person, :show?
+        render json: ::Marketing::ApiPresenter.person_marketing_json(person, current_workspace)
+      end
+
+      def subscription
+        return feature_unavailable!(:marketing_consent) unless CreamFeatures.enabled?(:marketing_consent)
+
+        person = policy_scope(current_workspace.people).find(params[:id])
+        authorize person, :update?
+        type = current_workspace.subscription_types.find(subscription_params[:subscription_type_id])
+
+        case subscription_params[:action]
+        when "subscribe"
+          subscription = ::Marketing::ConsentService.subscribe!(
+            person: person,
+            subscription_type: type,
+            source: "api",
+            legal_basis: "consent"
+          )
+        when "unsubscribe"
+          ::Marketing::ConsentService.unsubscribe!(
+            person: person,
+            subscription_type: type,
+            source: "api"
+          )
+          subscription = EmailSubscription.find_by(person: person, subscription_type: type)
+        else
+          return render json: { error: "action must be subscribe or unsubscribe" }, status: :unprocessable_entity
+        end
+
+        render json: {
+          action: subscription_params[:action],
+          subscription: subscription && ::Marketing::ApiPresenter.subscription_json(subscription)
+        }
+      end
+
       private
+
+      def feature_unavailable!(flag)
+        label = CreamFeatures.entry(flag).label
+        render json: { error: "#{label} is not available yet." }, status: :not_found
+      end
+
+      def subscription_params
+        params.require(:subscription).permit(:subscription_type_id, :action)
+      end
 
       def person_params
         params.require(:person).permit(:first_name, :last_name, :email, :phone, :job_title, :location, :company_id,

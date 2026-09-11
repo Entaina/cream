@@ -5,6 +5,8 @@ module Api
       include RequiresFeature
       requires_feature :api_v1
 
+      rescue_from Pundit::NotAuthorizedError, with: :render_forbidden
+
       before_action :authenticate_api_request!
 
       private
@@ -54,6 +56,10 @@ module Api
 
       def pundit_user
         UserContext.new(user: current_user, workspace: current_workspace)
+      end
+
+      def render_forbidden
+        render json: { error: "Forbidden" }, status: :forbidden
       end
     end
   end

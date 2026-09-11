@@ -248,7 +248,31 @@ Rails.application.routes.draw do
     get "docs", to: "docs#show"
     get "openapi.yaml", to: "docs#openapi", as: :openapi
     namespace :v1 do
-      resources :people
+      resources :people do
+        member do
+          get :marketing
+          patch :subscription
+        end
+        resources :product_interests, only: %i[index create], module: :marketing
+      end
+      namespace :marketing do
+        resources :mqls, only: :index
+        resources :subscription_types, only: :index
+        resources :campaigns, only: %i[index show] do
+          resources :sends, only: :create, controller: "campaign_sends" do
+            member { post :cancel }
+          end
+        end
+        resources :segments, only: %i[index show]
+        resources :journeys, only: %i[index show] do
+          member { post :enroll }
+        end
+        resources :scoring_rules, only: :index
+        resource :attribution, only: :show, controller: "attribution"
+        resources :email_templates, only: :index
+        resources :lead_forms, only: :index
+        resources :mql_conversions, only: :create
+      end
       resources :companies
       resources :pipelines, only: %i[index show]
       resources :products, only: %i[index show]

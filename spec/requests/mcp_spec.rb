@@ -62,7 +62,8 @@ RSpec.describe "Mcp", type: :request do
         "list_person_duplicates", "list_company_duplicates", "merge_person", "merge_company", "delete_record",
         "create_product", "update_product", "add_deal_product", "update_deal_product", "update_task", "get_deal_history",
         "recent_changes", "sales_forecast",
-        "summarize_record", "suggest_next_steps", "draft_email", "natural_language_search", "enrich_record")
+        "summarize_record", "suggest_next_steps", "draft_email", "natural_language_search", "enrich_record",
+        "list_mqls", "get_person_marketing", "send_campaign", "convert_mql_to_sql")
     end
 
     it "lists products scoped to the token workspace" do
@@ -836,38 +837,4 @@ RSpec.describe "Mcp", type: :request do
     end
   end
 
-  def call_tool(name, arguments, id: 99)
-    post mcp_url,
-      params: { jsonrpc: "2.0", id: id, method: "tools/call",
-                params: { name: name, arguments: arguments } },
-      as: :json, headers: mcp_headers(plaintext)
-
-    expect(response).to have_http_status(:success)
-    JSON.parse(JSON.parse(response.body).dig("result", "content", 0, "text"))
-  end
-
-  def mcp_headers(token)
-    {
-      "Authorization" => "Bearer #{token}",
-      "Accept" => "application/json",
-      "Host" => "localhost"
-    }
-  end
-
-  def initialize_payload
-    {
-      jsonrpc: "2.0",
-      id: 1,
-      method: "initialize",
-      params: {
-        protocolVersion: MCP::Configuration::LATEST_STABLE_PROTOCOL_VERSION,
-        capabilities: {},
-        clientInfo: { name: "test", version: "1.0" }
-      }
-    }
-  end
-
-  def tools_list_payload
-    { jsonrpc: "2.0", id: 2, method: "tools/list", params: {} }
-  end
 end

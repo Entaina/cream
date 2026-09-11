@@ -21,7 +21,7 @@ Expone el CRM a clientes IA (Claude Desktop, Cursor, inspector MCP, etc.) vía *
 Implementación:
 
 - Controlador: [`McpController`](../../../app/controllers/mcp_controller.rb) — `MCP::Server::Transports::StreamableHTTPTransport`
-- Servidor y tools: [`CreamMcp`](../../../app/mcp/cream_mcp.rb) — `CreamMcp.server_for(user:, workspace:)`
+- Servidor y tools: [`CreamMcp`](../../../app/mcp/cream_mcp.rb) + marketing en [`cream_mcp/marketing.rb`](../../../app/mcp/cream_mcp/marketing.rb) — `CreamMcp.server_for(user:, workspace:)`
 - Gema: `mcp` (~> 1.1)
 
 Hosts permitidos en el transport: `CREAM_APP_URL` y `CREAM_DOMAIN` (evita host header injection).
@@ -58,7 +58,7 @@ Config Doorkeeper: [`config/initializers/doorkeeper.rb`](../../../config/initial
 
 ## Herramientas (tools)
 
-Lista canónica: `CreamMcp.tools` en [`cream_mcp.rb`](../../../app/mcp/cream_mcp.rb). Incluye CRUD/listados, pipeline, productos, notas, comentarios, tareas, emails, pagos Stripe, duplicados/merge, custom fields, historial de deals, y tools IA (`summarize_record`, `natural_language_search`, etc.).
+Lista canónica: `CreamMcp.tools` en [`cream_mcp.rb`](../../../app/mcp/cream_mcp.rb) (CRM + IA) y `CreamMcp::Marketing.tools` en [`cream_mcp/marketing.rb`](../../../app/mcp/cream_mcp/marketing.rb). CRM: CRUD/listados, pipeline, productos, notas, comentarios, tareas, emails, pagos Stripe, duplicados/merge, custom fields, historial de deals, tools IA (`summarize_record`, `natural_language_search`, etc.). Marketing (flags `CreamFeatures`): `list_mqls`, `get_person_marketing`, `list_product_interests`, `list_subscription_types`, `list_campaigns`/`get_campaign`, `list_segments`/`get_segment`, `list_journeys`/`get_journey`, `list_scoring_rules`, `get_attribution`, `list_email_templates`, `list_lead_forms`; acciones `create_product_interest`, `convert_mql_to_sql`, `set_subscription`, `enroll_in_journey`, `send_campaign`, `cancel_campaign_send`. Sin credenciales ESP ni CRUD de configuración.
 
 Cada tool:
 
@@ -77,18 +77,18 @@ Tools IA (`summarize_record`, `suggest_next_steps`, `draft_email`, `natural_lang
 
 ## Añadir o cambiar una tool MCP
 
-1. Definir la tool en [`app/mcp/cream_mcp.rb`](../../../app/mcp/cream_mcp.rb) (schema + bloque).
-2. Registrar el nombre en `CreamMcp.tools` (array al inicio del módulo).
+1. Definir la tool en [`app/mcp/cream_mcp.rb`](../../../app/mcp/cream_mcp.rb) o [`app/mcp/cream_mcp/marketing.rb`](../../../app/mcp/cream_mcp/marketing.rb) (schema + bloque). Usar prefijo `::Marketing::` para servicios/modelos del hub (evitar colisión con `CreamMcp::Marketing`).
+2. Registrar el nombre en `CreamMcp.tools` o `CreamMcp::Marketing.tools`.
 3. Actualizar `instructions` en `server_for` si cambia el routing guidance para el LLM.
-4. Añadir cobertura en [`spec/requests/mcp_spec.rb`](../../../spec/requests/mcp_spec.rb) — auth con `ApiToken`, llamadas a tools vía JSON-RPC; **mockear HTTP externo y jobs de IA/Celery**, nunca llamadas reales a APIs de terceros.
+4. Añadir cobertura en [`spec/requests/mcp_spec.rb`](../../../spec/requests/mcp_spec.rb) o [`spec/requests/mcp_marketing_spec.rb`](../../../spec/requests/mcp_marketing_spec.rb) — auth con `ApiToken`, helpers en [`spec/support/mcp_helpers.rb`](../../../spec/support/mcp_helpers.rb); **mockear HTTP externo y jobs**, nunca llamadas reales a APIs de terceros.
 5. Si la tool duplica comportamiento REST, mantener paridad de reglas de negocio (p. ej. `move_to_stage!`, validaciones de deal).
 
 No documentar MCP en [`docs/openapi.yaml`](../../../docs/openapi.yaml) — protocolo distinto (JSON-RPC sobre `/mcp`, no OpenAPI REST).
 
 ## Tests
 
-- Spec principal: [`spec/requests/mcp_spec.rb`](../../../spec/requests/mcp_spec.rb)
-- Helpers: `initialize_payload`, `tools_list_payload`, `call_tool(name, args)` con header Bearer
+- Spec principal: [`spec/requests/mcp_spec.rb`](../../../spec/requests/mcp_spec.rb); marketing: [`spec/requests/mcp_marketing_spec.rb`](../../../spec/requests/mcp_marketing_spec.rb)
+- Helpers: [`spec/support/mcp_helpers.rb`](../../../spec/support/mcp_helpers.rb) — `initialize_payload`, `tools_list_payload`, `call_tool(name, args)` con header Bearer
 - OAuth MCP: specs en [`oauth_authorization_spec.rb`](../../../spec/requests/oauth_authorization_spec.rb), [`oauth_registrations_spec.rb`](../../../spec/requests/oauth_registrations_spec.rb), [`well_known_spec.rb`](../../../spec/requests/well_known_spec.rb)
 
 ## Antes de cerrar un cambio MCP

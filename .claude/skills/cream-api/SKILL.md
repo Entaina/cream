@@ -54,6 +54,25 @@ Namespace `config/routes.rb` → `namespace :api > :v1`:
 | Deal emails | `POST /deals/:deal_id/emails` | `{ email: { to_address?, subject, body, attachments[] } }` — JSON (Base64) o `multipart/form-data` (`email[attachments][]`); Gmail si hay conexión, si no SMTP |
 | Tasks | CRUD | `taskable_type`/`taskable_id`; `completed` dispara side effects |
 | Gmail add-on | `GET gmail/context`, `POST gmail/threads/status`, `POST gmail/threads/link` | Requiere `:gmail_addon` |
+| Marketing | Ver tabla abajo | Paridad operativa con MCP marketing (lectura + acciones clave); presenter en [`api_presenter.rb`](../../../app/services/marketing/api_presenter.rb) |
+
+### Marketing (`/api/v1/marketing/…` y rutas anidadas en people)
+
+| Recurso | Rutas | Flag / permisos |
+|---------|-------|-----------------|
+| MQL pool | `GET marketing/mqls` | `:mql_pool`, miembro |
+| Persona marketing | `GET people/:id/marketing` | `PersonPolicy#show?` |
+| Suscripción | `PATCH people/:id/subscription` | `:marketing_consent`, `PersonPolicy#update?` |
+| Intereses | `GET/POST people/:person_id/product_interests` | `:mql_pool` |
+| Conversión MQL→SQL | `POST marketing/mql_conversions` | `:mql_pool`, `ProductInterestPolicy#convert?` |
+| Tipos suscripción | `GET marketing/subscription_types` | `:marketing_consent`, admin |
+| Campañas | `GET marketing/campaigns`, `GET marketing/campaigns/:id` | `:marketing_campaigns`, admin |
+| Envíos campaña | `POST marketing/campaigns/:id/sends`, `POST …/sends/:id/cancel` | admin; encola `CampaignSendJob` |
+| Segmentos | `GET marketing/segments`, `GET marketing/segments/:id` | `:marketing_segments`, admin |
+| Recorridos | `GET marketing/journeys`, `GET marketing/journeys/:id`, `POST …/enroll` | `:journeys`, admin |
+| Scoring | `GET marketing/scoring_rules` | `:lead_scoring`, admin |
+| Atribución | `GET marketing/attribution` | `:marketing_attribution`, admin |
+| Plantillas / formularios | `GET marketing/email_templates`, `GET marketing/lead_forms` | `:email_templates` / ninguno |
 
 Fuera de este API (ver skill **`cream-mcp`** para `/mcp` y OAuth scope `mcp`): booking público, metadata OAuth compartida.
 

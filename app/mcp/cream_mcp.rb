@@ -36,6 +36,8 @@ module CreamMcp
       deals). Notes, comments (add_comment), emails (list_emails/get_email), Stripe payments
       (list_payments), activity (list_activity), recent_changes. Custom fields:
       list_custom_fields/set_custom_fields. Records include url (needs CREAM_APP_URL).
+      Marketing: MQL pool → list_mqls / get_person_marketing; convert via create_product_interest +
+      convert_mql_to_sql; campaigns → list_campaigns, send_campaign; enroll_in_journey; set_subscription.
     TEXT
     if text.length > MAX_INSTRUCTIONS_LENGTH
       raise "MCP instructions exceed #{MAX_INSTRUCTIONS_LENGTH} chars (#{text.length})"
@@ -53,7 +55,8 @@ module CreamMcp
       ADD_NOTE, ADD_COMMENT, CREATE_TASK, COMPLETE_TASK, PIPELINE_SUMMARY,
       LIST_CUSTOM_FIELDS, SET_CUSTOM_FIELDS, GET_DEAL_HISTORY,
       RECENT_CHANGES, SALES_FORECAST,
-      SUMMARIZE_RECORD, SUGGEST_NEXT_STEPS, DRAFT_EMAIL, NATURAL_LANGUAGE_SEARCH, ENRICH_RECORD ]
+      SUMMARIZE_RECORD, SUGGEST_NEXT_STEPS, DRAFT_EMAIL, NATURAL_LANGUAGE_SEARCH, ENRICH_RECORD,
+      *Marketing.tools ]
   end
 
   def self.respond_with(payload)
@@ -71,6 +74,9 @@ module CreamMcp
     when Person then helpers.person_path(record)
     when Company then helpers.company_path(record)
     when Deal then helpers.deal_path(record)
+    when Campaign then helpers.campaign_path(record)
+    when Segment then helpers.segment_path(record)
+    when Journey then helpers.journey_path(record)
     end
   end
 
@@ -100,6 +106,7 @@ module CreamMcp
     { id: p.id, type: "person", name: p.display_name, email: p.email, phone: p.phone,
      job_title: p.job_title, location: p.location, company_id: p.company_id,
      company: p.company&.name, owner: p.owner&.name, url: record_url(p),
+     lifecycle_stage: p.lifecycle_stage, lead_score: p.lead_score,
      custom_fields: custom_fields_json(p),
      created_at: p.created_at.iso8601, updated_at: p.updated_at.iso8601 }.compact
   end
@@ -236,8 +243,8 @@ module CreamMcp
     UserContext.new(user: ctx[:user], workspace: ctx[:workspace])
   end
 
-  def self.authorize!(pundit_ctx, record, query)
-    Pundit.authorize(pundit_ctx, record, query)
+  def self.authorize!(pundit_ctx, record, query, **options)
+    Pundit.authorize(pundit_ctx, record, query, **options)
   end
 
   def self.policy_scope(pundit_ctx, scope)
@@ -282,6 +289,13 @@ module CreamMcp
     MCP::Tool::Response.new([ { type: "text", text: JSON.generate({
       error: "comments_unavailable",
       message: "Comments feature is disabled"
+    }) } ])
+  end
+
+  def self.feature_unavailable_response(flag)
+    MCP::Tool::Response.new([ { type: "text", text: JSON.generate({
+      error: "feature_unavailable",
+      message: "Feature #{flag} is disabled"
     }) } ])
   end
 
