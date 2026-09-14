@@ -172,7 +172,7 @@ es:
       accept: "Aceptar invitación"
       email_mismatch_html: "Has iniciado sesión como <strong>%{current}</strong>, pero la invitación se envió a <strong>%{invited}</strong>."
       sign_out_and_use_invited: "Cerrar sesión y usar el email invitado"
-      existing_account: "Ya existe una cuenta para <strong>%{email}</strong>. Inicia sesión para aceptar."
+      existing_account_html: "Ya existe una cuenta para <strong>%{email}</strong>. Inicia sesión para aceptar."
       sign_in_and_accept: "Iniciar sesión y aceptar"
       create_to_join_html: "Crea tu cuenta para unirte a <strong>%{workspace}</strong>."
       create_and_accept: "Crear cuenta y aceptar"

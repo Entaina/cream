@@ -16,12 +16,12 @@
       <%= button_to t("auth.invitation.accept"), accept_invitation_path(params[:token]), method: :post, class: "btn-primary w-full justify-center" %>
     <% elsif @email_mismatch %>
       <div class="rounded-lg bg-orange-50 ring-1 ring-orange-200 dark:bg-orange-950 dark:ring-orange-800 px-3 py-2 text-sm text-orange-800 dark:text-orange-200 mb-4">
-        <%= t("auth.invitation.email_mismatch_html", current: current_user.email_address, invited: @invitation.email_address).html_safe %>
+        <%= t("auth.invitation.email_mismatch_html", current: current_user.email_address, invited: @invitation.email_address) %>
       </div>
       <%= button_to t("auth.invitation.sign_out_and_use_invited"), session_path, method: :delete, class: "btn-secondary w-full justify-center" %>
     <% elsif @existing_user %>
       <p class="text-base text-ink-soft mb-4">
-        <%= t("auth.invitation.existing_account", email: @invitation.email_address).html_safe %>
+        <%= t("auth.invitation.existing_account_html", email: @invitation.email_address) %>
       </p>
       <%= render "shared/google_sign_in" %>
       <div class="relative my-5">
@@ -48,7 +48,7 @@
       <% end %>
     <% else %>
       <p class="text-base text-ink-soft mb-4">
-        <%= t("auth.invitation.create_to_join_html", workspace: @invitation.workspace.name).html_safe %>
+        <%= t("auth.invitation.create_to_join_html", workspace: @invitation.workspace.name) %>
       </p>
       <%= render "shared/google_sign_in" %>
       <div class="relative my-5">
