@@ -46,7 +46,7 @@ RSpec.describe "Mcp", type: :request do
       instructions = JSON.parse(response.body).dig("result", "instructions")
       expect(instructions).to be_present
       expect(instructions.length).to be <= CreamMcp::MAX_INSTRUCTIONS_LENGTH
-      expect(instructions).to include("list_my_tasks", "natural_language_search", "list_pipelines")
+      expect(instructions).to include("list_my_tasks", "natural_language_search", "list_pipelines", "send_deal_email")
       expect(instructions).not_to match(/configurable stages \(/)
     end
 
@@ -57,7 +57,7 @@ RSpec.describe "Mcp", type: :request do
       tools = JSON.parse(response.body).dig("result", "tools")
       expect(tools.map { |t| t["name"] }).to include("search_records", "pipeline_summary",
         "list_custom_fields", "set_custom_fields",
-        "list_products", "list_tasks", "list_my_tasks", "list_emails", "get_email", "list_activity", "list_payments", "list_pipelines",
+        "list_products", "list_tasks", "list_my_tasks", "list_emails", "get_email", "send_deal_email", "list_activity", "list_payments", "list_pipelines",
         "update_person", "update_company", "update_deal", "add_comment",
         "list_person_duplicates", "list_company_duplicates", "merge_person", "merge_company", "delete_record",
         "create_product", "update_product", "add_deal_product", "update_deal_product", "update_task", "get_deal_history",
@@ -662,6 +662,151 @@ RSpec.describe "Mcp", type: :request do
 
       expect(response).to have_http_status(:success)
       expect(response.body).not_to include("Confidencial")
+    end
+
+    it "sends a deal email via send_deal_email and enqueues SMTP delivery" do
+      pipeline = Pipeline.default_for(workspace) || Pipeline.create_default!(workspace)
+      deal = create_deal!(workspace, pipeline: pipeline)
+      allow(CreamFeatures).to receive(:enabled?).and_call_original
+      allow(CreamFeatures).to receive(:enabled?).with(:record_email).and_return(true)
+      allow(CreamFeatures).to receive(:enabled?).with(:gmail_sync).and_return(false)
+
+      expect {
+        result = call_tool("send_deal_email", {
+          deal_id: deal.id,
+          to_address: "lead@example.com",
+          subject: "Proposal",
+          body: "Here is the proposal."
+        })
+
+        expect(result.dig("sent", "to_address")).to eq("lead@example.com")
+        expect(result.dig("sent", "subject")).to eq("Proposal")
+        expect(result.dig("sent", "via_gmail")).to be(false)
+      }.to change(EmailMessage, :count).by(1)
+        .and have_enqueued_mail(RecordMailer, :tracked_email)
+    end
+
+    it "defaults send_deal_email recipient to the deal's first contact" do
+      pipeline = Pipeline.default_for(workspace) || Pipeline.create_default!(workspace)
+      company = create_company!(workspace)
+      contact = create_person!(workspace, company: company, email: "contact@example.com")
+      deal = create_deal!(workspace, pipeline: pipeline, company: company, contacts: [ contact ])
+      allow(CreamFeatures).to receive(:enabled?).and_call_original
+      allow(CreamFeatures).to receive(:enabled?).with(:record_email).and_return(true)
+      allow(CreamFeatures).to receive(:enabled?).with(:gmail_sync).and_return(false)
+
+      result = call_tool("send_deal_email", {
+        deal_id: deal.id,
+        subject: "Hi",
+        body: "Hello"
+      })
+
+      expect(result.dig("sent", "to_address")).to eq("contact@example.com")
+    end
+
+    it "attaches Base64 files with send_deal_email" do
+      pipeline = Pipeline.default_for(workspace) || Pipeline.create_default!(workspace)
+      deal = create_deal!(workspace, pipeline: pipeline)
+      pdf_content = Base64.strict_encode64("%PDF-1.4 fake report")
+      allow(CreamFeatures).to receive(:enabled?).and_call_original
+      allow(CreamFeatures).to receive(:enabled?).with(:record_email).and_return(true)
+      allow(CreamFeatures).to receive(:enabled?).with(:gmail_sync).and_return(false)
+
+      result = call_tool("send_deal_email", {
+        deal_id: deal.id,
+        to_address: "lead@example.com",
+        subject: "Tu informe",
+        body: "Adjuntamos tu informe.",
+        attachments: [
+          { filename: "informe.pdf", content_type: "application/pdf", content: pdf_content }
+        ]
+      })
+
+      message = EmailMessage.order(:id).last
+      expect(message.attachments.count).to eq(1)
+      expect(message.attachments.first.filename.to_s).to eq("informe.pdf")
+      expect(result.dig("sent", "attachments")).to eq([ "informe.pdf" ])
+    end
+
+    it "returns feature_unavailable from send_deal_email when record_email is disabled" do
+      pipeline = Pipeline.default_for(workspace) || Pipeline.create_default!(workspace)
+      deal = create_deal!(workspace, pipeline: pipeline)
+      allow(CreamFeatures).to receive(:enabled?).and_call_original
+      allow(CreamFeatures).to receive(:enabled?).with(:record_email).and_return(false)
+
+      result = mcp_tool_error("send_deal_email", {
+        deal_id: deal.id,
+        subject: "Hi",
+        body: "Hello"
+      })
+
+      expect(result["error"]).to eq("feature_unavailable")
+    end
+
+    it "returns invalid_attachment from send_deal_email for invalid Base64 content" do
+      pipeline = Pipeline.default_for(workspace) || Pipeline.create_default!(workspace)
+      deal = create_deal!(workspace, pipeline: pipeline)
+      allow(CreamFeatures).to receive(:enabled?).and_call_original
+      allow(CreamFeatures).to receive(:enabled?).with(:record_email).and_return(true)
+
+      expect {
+        result = mcp_tool_error("send_deal_email", {
+          deal_id: deal.id,
+          to_address: "lead@example.com",
+          subject: "Hi",
+          body: "Hello",
+          attachments: [ { filename: "informe.pdf", content: "not-base64!!!" } ]
+        })
+
+        expect(result["error"]).to eq("invalid_attachment")
+      }.not_to change(EmailMessage, :count)
+    end
+
+    it "creates a deal with an optional email via create_deal" do
+      pipeline = Pipeline.default_for(workspace) || Pipeline.create_default!(workspace)
+      company = create_company!(workspace)
+      contact = create_person!(workspace, company: company, email: "contact@example.com")
+      allow(CreamFeatures).to receive(:enabled?).and_call_original
+      allow(CreamFeatures).to receive(:enabled?).with(:record_email).and_return(true)
+      allow(CreamFeatures).to receive(:enabled?).with(:gmail_sync).and_return(false)
+
+      expect {
+        result = call_tool("create_deal", {
+          name: "New opp",
+          company_id: company.id,
+          person_ids: [ contact.id ],
+          next_action_title: "Follow up",
+          next_action_due_on: (Date.current + 7).iso8601,
+          email: {
+            subject: "Welcome",
+            body: "Thanks for your interest."
+          }
+        })
+
+        expect(result.dig("created", "name")).to eq("New opp")
+        expect(result.dig("email", "to_address")).to eq("contact@example.com")
+        expect(result.dig("email", "subject")).to eq("Welcome")
+      }.to change(Deal, :count).by(1)
+        .and change(EmailMessage, :count).by(1)
+        .and have_enqueued_mail(RecordMailer, :tracked_email)
+    end
+
+    it "returns feature_unavailable from create_deal when email is requested but record_email is disabled" do
+      company = create_company!(workspace)
+      allow(CreamFeatures).to receive(:enabled?).and_call_original
+      allow(CreamFeatures).to receive(:enabled?).with(:record_email).and_return(false)
+
+      expect {
+        result = mcp_tool_error("create_deal", {
+          name: "New opp",
+          company_id: company.id,
+          next_action_title: "Follow up",
+          next_action_due_on: (Date.current + 7).iso8601,
+          email: { subject: "Hi", body: "Hello" }
+        })
+
+        expect(result["error"]).to eq("feature_unavailable")
+      }.not_to change(Deal, :count)
     end
 
     it "summarizes recent workspace changes with recent_changes" do
