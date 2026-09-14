@@ -38,6 +38,36 @@
       <% end %>
     </section>
 
+    <section class="card p-4 space-y-3">
+      <h2 class="text-base font-semibold text-ink">Funcionalidades</h2>
+      <p class="text-sm text-ink-soft">
+        Activa las secciones del menú y la configuración que quieras usar en este workspace. Están desactivadas por defecto.
+      </p>
+      <%= form_with model: current_workspace, url: settings_workspace_path, method: :patch, class: "space-y-3" do |f| %>
+        <label class="flex items-center gap-2 text-base">
+          <%= f.check_box :reports_enabled %>
+          Reports
+        </label>
+        <label class="flex items-center gap-2 text-base">
+          <%= f.check_box :marketing_attribution_enabled %>
+          Atribución
+        </label>
+        <label class="flex items-center gap-2 text-base">
+          <%= f.check_box :lead_scoring_enabled %>
+          Puntuación de leads
+        </label>
+        <label class="flex items-center gap-2 text-base">
+          <%= f.check_box :webhooks_enabled %>
+          Webhooks
+        </label>
+        <label class="flex items-center gap-2 text-base">
+          <%= f.check_box :custom_fields_enabled %>
+          Campos personalizados
+        </label>
+        <%= f.submit "Guardar funcionalidades", class: "btn-secondary" %>
+      <% end %>
+    </section>
+
     <% if feature_enabled?(:okm_chat) %>
       <section class="card p-4 space-y-3">
         <h2 class="text-base font-semibold text-ink">OKM</h2>

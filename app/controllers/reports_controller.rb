@@ -3,6 +3,7 @@ require "csv"
 class ReportsController < ApplicationController
   include RequiresFeature
   requires_feature :reports
+  requires_workspace_feature :reports
   skip_after_action :verify_policy_scoped
 
   def index

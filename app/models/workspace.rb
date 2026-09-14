@@ -1,4 +1,12 @@
 class Workspace < ApplicationRecord
+  WORKSPACE_FEATURE_TOGGLES = {
+    reports: :reports_enabled,
+    marketing_attribution: :marketing_attribution_enabled,
+    lead_scoring: :lead_scoring_enabled,
+    webhooks: :webhooks_enabled,
+    custom_fields: :custom_fields_enabled
+  }.freeze
+
   has_many :memberships, dependent: :destroy
   has_many :users, through: :memberships
   has_many :invitations, dependent: :destroy
@@ -78,6 +86,16 @@ class Workspace < ApplicationRecord
 
   def briefing_actor
     memberships.admins.includes(:user).first&.user || users.first
+  end
+
+  def feature_enabled?(key)
+    key = key.to_sym
+    column = WORKSPACE_FEATURE_TOGGLES[key]
+    return CreamFeatures.enabled?(key) unless column
+
+    return public_send(column) if key == :custom_fields
+
+    CreamFeatures.enabled?(key) && public_send(column)
   end
 
   before_validation :generate_slug, on: :create

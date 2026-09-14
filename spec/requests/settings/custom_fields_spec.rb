@@ -11,6 +11,7 @@ RSpec.describe "Settings::CustomFields", type: :request do
   before do
     sign_in_as(admin)
     patch switch_workspace_path, params: { workspace_id: workspace.id }
+    workspace.update!(custom_fields_enabled: true)
   end
 
   describe "GET /settings/custom_fields" do
@@ -68,6 +69,18 @@ RSpec.describe "Settings::CustomFields", type: :request do
       }.to change(CustomField, :count).by(-1)
 
       expect(response).to redirect_to(settings_custom_fields_path)
+    end
+  end
+
+  describe "when custom fields is disabled for the workspace" do
+    before do
+      workspace.update!(custom_fields_enabled: false)
+    end
+
+    it "redirects to root" do
+      get settings_custom_fields_path
+
+      expect(response).to redirect_to(root_path)
     end
   end
 end

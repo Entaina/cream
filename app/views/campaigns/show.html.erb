@@ -201,5 +201,7 @@
     <% end %>
   </section>
 
-  <%= link_to "Ver atribución", marketing_attribution_path, class: "btn-ghost" %>
+  <% if feature_enabled?(:marketing_attribution) %>
+    <%= link_to "Ver atribución", marketing_attribution_path, class: "btn-ghost" %>
+  <% end %>
 </div>

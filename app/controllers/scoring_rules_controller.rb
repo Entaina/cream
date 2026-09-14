@@ -1,6 +1,7 @@
 class ScoringRulesController < ApplicationController
   include RequiresFeature
   requires_feature :lead_scoring
+  requires_workspace_feature :lead_scoring
   before_action :set_scoring_rule, only: %i[edit update destroy]
 
   def index

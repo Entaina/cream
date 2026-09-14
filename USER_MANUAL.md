@@ -105,7 +105,9 @@ If you belong to more than one workspace, the sidebar header shows the name of t
 
 The left sidebar concentrates the main navigation. On **small screens (mobile)** the menu is hidden by default: tap the **hamburger** icon (☰) in the page header to open it. Tap outside the menu, press **Escape** or navigate to another section to close it. On desktop the menu is always visible.
 
-Above the menu (**Search…**, **Notifications**) and below the **active pipeline** selector, entries are grouped as follows:
+Above the menu (**Search…**, **Notifications**) and below the **active pipeline** selector, entries are grouped as follows.
+
+Some entries are **optional per workspace** and are **hidden by default**. An administrator can enable them under **Settings → Funcionalidades** (Features): **Reports**, **Atribución** (Attribution), **Puntuación de leads** (Lead scoring), **Webhooks** and **Custom fields**.
 
 **Daily use** (always visible, not collapsible):
 
@@ -126,9 +128,9 @@ Above the menu (**Search…**, **Notifications**) and below the **active pipelin
 | **Suscripciones** (Subscriptions) | List types and consent |
 | **Campañas** (Campaigns) | Bulk sends to segments |
 | **Segmentos** (Segments) | Filtered audiences |
-| **Atribución** (Attribution) | UTM report |
+| **Atribución** (Attribution) *(optional)* | UTM report |
 | **Recorridos** (Journeys) | Automated sequences |
-| **Puntuación de leads** (Lead scoring) | Scoring rules |
+| **Puntuación de leads** (Lead scoring) *(optional)* | Scoring rules |
 | **MQLs** | Marketing-qualified contact pool |
 | **Plantillas** (Templates) | Email templates (campaigns, records, forms) |
 
@@ -139,13 +141,13 @@ Above the menu (**Search…**, **Notifications**) and below the **active pipelin
 | **Team** | Members and invitations |
 | **Products** | Product catalog |
 | **Pipelines** | Stages, triggers, conditions |
-| **Custom fields** | Custom fields |
+| **Custom fields** *(optional)* | Custom fields |
 | **Alertas** (Alerts) | Date-based alert rules |
 | **Automations** | Event-driven automations |
 | **Formularios** (Forms) | Public web capture |
 | **Stripe** | Imported payments and reconciliation |
-| **Webhooks** | Outgoing HTTP integrations |
-| **Reports** | Reports and CSV export |
+| **Webhooks** *(optional)* | Outgoing HTTP integrations |
+| **Reports** *(optional)* | Reports and CSV export |
 | **Settings** | Workspace settings (OKM, Mailjet, permissions…) |
 
 **Mi perfil** (My profile — each user):
@@ -456,6 +458,8 @@ With a view active you can **Update view** if you change filters, **Rename**, ma
 ---
 
 ## 11. Custom fields
+
+This section is **hidden by default**. An administrator must enable **Campos personalizados** (Custom fields) under **Settings → Funcionalidades** to see the menu entry and manage fields.
 
 In **Custom fields** (admins only) you define extra attributes per record type.
 
@@ -783,6 +787,8 @@ These channels are used for **alerts** configured by the administrator, **lead f
 
 ## 18. Webhooks
 
+This section is **hidden by default**. Enable it under **Settings → Funcionalidades** to see **Webhooks** in the menu.
+
 In **Webhooks** you configure URLs that Cream will call when events occur (e.g. creation or change of a deal).
 
 - **New webhook:** destination URL and subscribed events.
@@ -855,6 +861,16 @@ By default both options are off: salespeople only see and edit their own deals a
 
 - **Sales director briefing (AI)** — enables the daily team briefing on the dashboard (requires `CREAM_AI_API_KEY` on the server).
 
+### Funcionalidades (Features)
+
+Enable optional menu and settings sections for this workspace (off by default):
+
+- **Reports** — reports and CSV export.
+- **Atribución** (Attribution) — UTM campaign report.
+- **Puntuación de leads** (Lead scoring) — scoring rules and lifecycle on contact records.
+- **Webhooks** — outgoing HTTP integrations.
+- **Campos personalizados** (Custom fields) — extra fields on people, companies and deals.
+
 ### OKM
 
 Connect the corporate knowledge base (Google Shared Drive) for the contextual chat and AI briefings:
@@ -910,11 +926,13 @@ Each token is tied to your user and to the workspace that was active when it was
 
 ## 23. Reports
 
+This section is **hidden by default**. Enable it under **Settings → Funcionalidades** to see **Reports** in the menu.
+
 **Reports** let you measure your activity by combining a metric, a grouping and a period, and save the combinations you use most.
 
 ### How to access
 
-**Reports** entry in the sidebar menu.
+**Reports** entry in the sidebar menu (when enabled under **Settings → Funcionalidades**).
 
 ### Building a report
 
@@ -1228,16 +1246,16 @@ The **marketing hub** connects web capture, email consent, bulk sends, segmentat
 
 ### How to access
 
-In the sidebar (depending on features enabled in your workspace):
+In the sidebar (depending on features enabled in your workspace). **Atribución** (Attribution) and **Puntuación de leads** (Lead scoring) are optional and hidden by default — enable them under **Settings → Funcionalidades**:
 
 | Menu | Purpose |
 |------|---------|
 | **Suscripciones** (Subscriptions) | List types (newsletter, general, etc.) |
 | **Campañas** (Campaigns) | Bulk sends to segments |
 | **Segmentos** (Segments) | Filtered person audiences |
-| **Atribución** (Attribution) | UTM report |
+| **Atribución** (Attribution) *(optional)* | UTM report |
 | **Recorridos** (Journeys) | Automated sequences |
-| **Puntuación de leads** (Lead scoring) | Scoring rules and lifecycle |
+| **Puntuación de leads** (Lead scoring) *(optional)* | Scoring rules and lifecycle |
 | **Formularios** (Forms) | Public capture (Deal or MQL) |
 | **MQLs** | Marketing-qualified contact pool |
 

@@ -59,6 +59,26 @@ RSpec.describe "Settings::Workspace", type: :request do
       expect(workspace.reload.sales_director_enabled?).to be(true)
     end
 
+    it "allows admins to configure workspace feature toggles" do
+      patch settings_workspace_path, params: {
+        workspace: {
+          reports_enabled: true,
+          marketing_attribution_enabled: true,
+          lead_scoring_enabled: true,
+          webhooks_enabled: true,
+          custom_fields_enabled: true
+        }
+      }
+
+      expect(response).to redirect_to(settings_workspace_path)
+      workspace.reload
+      expect(workspace.reports_enabled?).to be(true)
+      expect(workspace.marketing_attribution_enabled?).to be(true)
+      expect(workspace.lead_scoring_enabled?).to be(true)
+      expect(workspace.webhooks_enabled?).to be(true)
+      expect(workspace.custom_fields_enabled?).to be(true)
+    end
+
     it "allows admins to configure salesperson deal scope" do
       patch settings_workspace_path, params: {
         workspace: {

@@ -1,6 +1,7 @@
 class WebhooksController < ApplicationController
   include RequiresFeature
   requires_feature :webhooks
+  requires_workspace_feature :webhooks
   before_action :set_webhook, only: %i[edit update destroy]
 
   def index

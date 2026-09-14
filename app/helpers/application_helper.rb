@@ -391,6 +391,8 @@ module ApplicationHelper
     when "pipelines"
       sidebar_nav_item("pipelines", t("nav.pipelines"), pipelines_path, :columns, request.path.start_with?("/pipelines"), group: :settings)
     when "custom_fields"
+      return unless current_workspace&.feature_enabled?(:custom_fields)
+
       sidebar_nav_item("custom_fields", t("nav.custom_fields"), settings_custom_fields_path, :columns,
         request.path.start_with?("/settings/custom_fields"), group: :settings)
     when "profile"
@@ -408,6 +410,7 @@ module ApplicationHelper
     else
       feature_key = key.to_sym
       return unless CreamFeatures.menu_entries.key?(feature_key)
+      return unless current_workspace&.feature_enabled?(feature_key)
 
       path = CreamFeatures.menu_path(feature_key)
       sidebar_nav_item(key, t("nav.features.#{feature_key}"), path, CreamFeatures.menu_icon(feature_key),
@@ -557,7 +560,9 @@ module ApplicationHelper
   end
 
   def feature_enabled?(key)
-    CreamFeatures.enabled?(key)
+    return current_workspace.feature_enabled?(key) if current_workspace
+
+    key.to_sym == :custom_fields ? false : CreamFeatures.enabled?(key)
   end
 
   def sales_director_enabled?

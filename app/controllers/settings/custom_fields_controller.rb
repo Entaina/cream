@@ -1,9 +1,13 @@
 module Settings
   class CustomFieldsController < ApplicationController
+    include RequiresFeature
+
     skip_after_action :verify_authorized
     skip_after_action :verify_policy_scoped
     after_action :verify_authorized
     after_action :verify_policy_scoped, only: :index
+
+    requires_workspace_feature :custom_fields
 
     before_action :set_custom_field, only: %i[edit update destroy]
 

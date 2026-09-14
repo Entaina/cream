@@ -105,7 +105,9 @@ Los **vendedores** ven en el **Dashboard** y en **Deals** únicamente sus deals 
 
 El menú lateral izquierdo concentra el acceso principal. En **pantallas pequeñas (móvil)** el menú está oculto por defecto: pulsa el icono de **hamburguesa** (☰) en la cabecera de la página para abrirlo. Toca fuera del menú, pulsa **Escape** o navega a otra sección para cerrarlo. En escritorio el menú permanece siempre visible.
 
-Arriba del menú (**Buscar…**, **Notificaciones**) y debajo del selector de **pipeline activo**, las entradas se agrupan así:
+Arriba del menú (**Buscar…**, **Notificaciones**) y debajo del selector de **pipeline activo**, las entradas se agrupan así.
+
+Algunas entradas son **opcionales por workspace** y están **ocultas por defecto**. Un administrador puede activarlas en **Ajustes → Funcionalidades**: **Reports**, **Atribución**, **Puntuación de leads**, **Webhooks** y **Campos personalizados**.
 
 **Uso diario** (siempre visibles, sin desplegable):
 
@@ -126,9 +128,9 @@ Arriba del menú (**Buscar…**, **Notificaciones**) y debajo del selector de **
 | **Suscripciones** | Tipos de lista y consentimiento |
 | **Campañas** | Envíos masivos a segmentos |
 | **Segmentos** | Audiencias filtradas |
-| **Atribución** | Informe UTM |
+| **Atribución** *(opcional)* | Informe UTM |
 | **Recorridos** | Secuencias automatizadas |
-| **Puntuación de leads** | Reglas de scoring |
+| **Puntuación de leads** *(opcional)* | Reglas de scoring |
 | **MQLs** | Pool de contactos con permiso de marketing |
 | **Plantillas** | Plantillas de email (campañas, ficha, formularios) |
 
@@ -139,13 +141,13 @@ Arriba del menú (**Buscar…**, **Notificaciones**) y debajo del selector de **
 | **Equipo** | Miembros e invitaciones |
 | **Productos** | Catálogo de productos |
 | **Pipelines** | Etapas, disparadores, condiciones |
-| **Campos personalizados** | Campos personalizados |
+| **Campos personalizados** *(opcional)* | Campos personalizados |
 | **Alertas** | Reglas de aviso por fechas |
 | **Automatizaciones** | Automatizaciones por eventos |
 | **Formularios** | Captación web pública |
 | **Stripe** | Pagos importados y conciliación |
-| **Webhooks** | Integraciones salientes HTTP |
-| **Informes** | Informes y exportación CSV |
+| **Webhooks** *(opcional)* | Integraciones salientes HTTP |
+| **Informes** *(opcional)* | Informes y exportación CSV |
 | **Ajustes** | Ajustes del workspace (OKM, Mailjet, permisos…) |
 
 **Mi perfil** (grupo desplegable; cada usuario):
@@ -456,6 +458,8 @@ Con una vista activa puedes **Update view** si cambias filtros, **Rename**, marc
 ---
 
 ## 11. Campos personalizados
+
+Esta sección está **oculta por defecto**. Un administrador debe activar **Campos personalizados** en **Ajustes → Funcionalidades** para ver la entrada en el menú y gestionar campos.
 
 En **Custom fields** (solo admins) defines atributos extra por tipo de registro.
 
@@ -783,6 +787,8 @@ Estos canales se usan para las **alertas** configuradas por el administrador, lo
 
 ## 18. Webhooks
 
+Esta sección está **oculta por defecto**. Actívala en **Ajustes → Funcionalidades** para ver **Webhooks** en el menú.
+
 En **Webhooks** configuras URLs que Cream llamará cuando ocurran eventos (p. ej. creación o cambio de un deal).
 
 - **New webhook:** URL de destino y eventos suscritos.
@@ -855,6 +861,16 @@ Por defecto ambas opciones están desactivadas: los vendedores solo ven y editan
 
 - **Briefing del director de ventas (IA)** — activa el briefing diario del equipo en el dashboard (requiere `CREAM_AI_API_KEY` en el servidor).
 
+### Funcionalidades
+
+Activa las secciones opcionales del menú y la configuración para este workspace (desactivadas por defecto):
+
+- **Reports** — informes y exportación CSV.
+- **Atribución** — informe UTM de campañas.
+- **Puntuación de leads** — reglas de scoring y lifecycle en fichas de contacto.
+- **Webhooks** — integraciones salientes HTTP.
+- **Campos personalizados** — gestión de campos extra en personas, empresas y deals.
+
 ### OKM
 
 Conecta la base de conocimiento corporativa (Google Shared Drive) para el chat contextual y los briefings de IA:
@@ -910,11 +926,13 @@ Cada token está ligado a tu usuario y al workspace activo en el momento de crea
 
 ## 23. Reports
 
+Esta sección está **oculta por defecto**. Actívala en **Ajustes → Funcionalidades** para ver **Reports** en el menú.
+
 Los **informes** te dejan medir tu actividad combinando una métrica, un agrupamiento y un periodo, y guardar las combinaciones que más uses.
 
 ### Cómo acceder
 
-Entrada **Reports** en el menú lateral.
+Entrada **Reports** en el menú lateral (si está activa en **Ajustes → Funcionalidades**).
 
 ### Construir un informe
 
@@ -1228,16 +1246,16 @@ El **hub de marketing** conecta captación web, consentimiento por email, envío
 
 ### Cómo acceder
 
-En el menú lateral (según funcionalidades activas en tu workspace):
+En el menú lateral (según funcionalidades activas en tu workspace). **Atribución** y **Puntuación de leads** son opcionales y están ocultas por defecto — actívalas en **Ajustes → Funcionalidades**:
 
 | Menú | Uso |
 |------|-----|
 | **Suscripciones** | Tipos de lista (newsletter, general, etc.) |
 | **Campañas** | Envíos masivos a segmentos |
 | **Segmentos** | Audiencias filtradas de personas |
-| **Atribución** | Informe por parámetros UTM |
+| **Atribución** *(opcional)* | Informe por parámetros UTM |
 | **Recorridos** | Secuencias automatizadas |
-| **Puntuación de leads** | Reglas de scoring y lifecycle |
+| **Puntuación de leads** *(opcional)* | Reglas de scoring y lifecycle |
 | **Formularios** | Captación pública (Deal o MQL) |
 | **MQLs** | Pool de contactos con permiso de marketing |
 

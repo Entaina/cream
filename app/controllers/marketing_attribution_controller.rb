@@ -1,6 +1,7 @@
 class MarketingAttributionController < ApplicationController
   include RequiresFeature
   requires_feature :marketing_attribution
+  requires_workspace_feature :marketing_attribution
 
   def show
     authorize Campaign, :index?

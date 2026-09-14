@@ -8,6 +8,7 @@ RSpec.describe "Reports", type: :request do
 
   before do
     Pipeline.create_default!(workspace)
+    workspace.update!(reports_enabled: true)
     sign_in_as(member)
   end
 
@@ -162,10 +163,9 @@ RSpec.describe "Reports", type: :request do
     end
   end
 
-  describe "when reports is disabled" do
+  describe "when reports is disabled for the workspace" do
     before do
-      allow(CreamFeatures).to receive(:enabled?).and_call_original
-      allow(CreamFeatures).to receive(:enabled?).with(:reports).and_return(false)
+      workspace.update!(reports_enabled: false)
     end
 
     it "blocks and redirects to root" do

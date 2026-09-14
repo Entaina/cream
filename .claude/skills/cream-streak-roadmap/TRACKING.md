@@ -13,9 +13,9 @@ Legend: `ready` | `partial` | `placeholder` — only `ready` features should hav
 | csv_import_export | ready | yes | Index Import/Export buttons |
 | notifications | ready | yes | Quick search area bell (not main nav) |
 | magic_columns | ready | yes | Index tables only |
-| formula_fields | ready | yes | Custom fields settings |
+| formula_fields | ready | yes | Custom fields settings (formula type in form when custom fields section is enabled) |
 | pipeline_templates | ready | yes | Pipelines page |
-| webhooks | ready | yes | Sidebar + admin CRUD |
+| webhooks | ready | yes | Sidebar + admin CRUD; **workspace toggle** `webhooks_enabled` (default off) gates menu + web UI |
 | api_v1 | ready | yes | `/api/v1/*` Bearer token or Doorkeeper OAuth scope `api` |
 | gmail_addon | ready | yes | Gmail Workspace add-on: select workspace/pipeline and create in its first stage, then link Gmail threads to existing or new deals via `/api/v1/gmail/*` (OAuth scope `api`) |
 | record_email | ready | yes | Email section on Person/Company/Deal show pages; SMTP (Mailjet) in prod; send-later; follow-up reminders; **Timeline** entry `email_sent` on send (Gmail or SMTP) |
@@ -25,15 +25,15 @@ Legend: `ready` | `partial` | `placeholder` — only `ready` features should hav
 | gmail_sync | partial | yes | Send-as-Gmail (`SendViaGmailJob`); incremental OAuth (`:send`, `:send_receive`, `:full`); reply detection via thread sync; full reply logging (`Received` inbound) needs `gmail.readonly` without conflicting `gmail.metadata` on token — see deploy/GMAIL_SETUP.md |
 | automations | ready | yes | Condition builder + contextual action fields; create_task & send_email live; notify_slack no-op until Slack |
 | alerts | ready | yes | Admin CRUD `/alert_rules`; time-based rules (edition/deal dates + company/deal conditions); `AlertRuleEngine` + `AlertRulesJob` daily (recurring.yml); dedupe via `AlertDelivery`; in-app + email channels per user (Profile prefs) |
-| reports | ready | yes | Builder: metric × dimension × period, bar chart + save (ReportRunner); CSV export; scheduled email (ReportMailer + ScheduledReportsJob daily via recurring.yml) |
+| reports | ready | yes | Builder: metric × dimension × period, bar chart + save (ReportRunner); CSV export; scheduled email (ReportMailer + ScheduledReportsJob daily via recurring.yml); **workspace toggle** `reports_enabled` (default off) gates menu + web UI |
 | stage_triggers | ready | yes | Per-stage triggers (⚡ in pipeline edit): natural-language LLM mode (tool-use loop, read-only CRM tools + UI actions via user-scoped Turbo Stream broadcasts) or native Ruby functions (`StageTriggers::NativeRegistry`); run audit (`StageTriggerRun`); LLM mode needs `CREAM_AI_API_KEY` |
 | stage_field_formats | ready | yes | Per-stage display rules for deal fields (eye icon in pipeline edit): field + condition (eq/lt/gt/blank) + display text (e.g. price 0 → "guest"); applied via `deal_field_display` helper in show/table/board; value refreshed by turbo stream on stage moves |
 | marketing_consent | ready | yes | Per-type subscriptions; global suppression only on bounce/spam/unsubscribe-all; preference center + one-click unsubscribe with type param |
 | marketing_campaigns | ready | yes | Campaign sends: subscription type, scheduled send, A/B Liquid, test email, winner rollout, per-workspace Mailjet (`MailjetConnection` in Settings) + webhook |
 | marketing_segments | ready | yes | Segment builder with live preview, behavior filters, member list |
-| marketing_attribution | ready | yes | UTM dashboard with unified filters and drill-down |
+| marketing_attribution | ready | yes | UTM dashboard with unified filters and drill-down; **workspace toggle** `marketing_attribution_enabled` (default off) gates menu + web UI |
 | journeys | ready | yes | Recorridos: consent-aware sends, branch/wait/list steps, manual enroll, segment_entry |
-| lead_scoring | ready | yes | Rules with conditions, idempotent decay, form_field/deal_created events |
+| lead_scoring | ready | yes | Rules with conditions, idempotent decay, form_field/deal_created events; **workspace toggle** `lead_scoring_enabled` (default off) gates menu + web UI (background scoring still runs) |
 | web_tracking | ready | yes | Cross-origin cream.js; landing pages `/p/:workspace/:slug`; cream_aid on lead submit |
 | mql_pool | ready | yes | MQL pool index, product interests, MQL→SQL conversion, lead forms with MQL destination; enabled 2026-09-09 |
 | beehiiv_sync | ready | no | Bidirectional Beehiiv ↔ Newsletter subscription; Settings UI, hourly sync, Svix webhooks |
@@ -83,3 +83,4 @@ When enabling `<feature_key>`:
 | 2026-07-29 | alerts | New feature (enabled): admin-configurable time-based alert rules (`AlertRule`, `AlertDelivery`); triggers on edition start/end or deal expected close + optional conditions (company without fiscal info, deal open); recipients deal owner or workspace admins; daily `AlertRulesJob`; in-app (`Notification` kind `alert`) and email (`AlertMailer`) with per-user channel prefs on `Membership`; sidebar **Alertas**; specs in `alert_rule_spec`, `alert_rule_engine_spec`, `alert_rules_spec`; manual §17 | team |
 | 2026-09-04 | marketing_* | Hub de marketing (7 flags enabled): consentimiento por tipo, campañas A/B + programación, segmentos con preview, recorridos, scoring con decay, tracking/landings scope workspace, atribución UTM; gap closure (SendGuard journeys, webhooks Mailjet, UI Alertas-style); manual §29; skill `cream-marketing` | team |
 | 2026-09-04 | marketing_campaigns | Mailjet por workspace: `MailjetConnection` en Settings (admin), webhook token propio, `Esp::Client` deja de usar `ENV MAILJET_*` | team |
+| 2026-09-14 | workspace feature toggles | Optional UI for reports, marketing_attribution, lead_scoring, webhooks, custom_fields via workspace booleans (default off) in Settings → Funcionalidades; `Workspace#feature_enabled?`, `requires_workspace_feature`, menu + web routes gated; background/API unchanged | team |
