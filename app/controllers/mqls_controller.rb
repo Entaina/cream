@@ -98,7 +98,7 @@ class MqlsController < ApplicationController
           form = rows.first.lead_form
           next if form.nil?
 
-          { form: form, count: rows.size, first_at: rows.map(&:created_at).min, last_at: rows.map(&:created_at).max }
+          { form: form, count: rows.size, first_at: rows.map(&:created_at).min, last_at: rows.map(&:created_at).max, latest: rows.max_by(&:created_at) }
         end
       end
   end

@@ -4,7 +4,7 @@
 
 Cream es un CRM por **workspaces** para gestionar **personas**, **empresas** y **deals** (oportunidades), con notas, tareas, listas y un historial de actividad compartido en el equipo.
 
-> **Última revisión:** 2026-09-11 (idioma ES/EN en menú, login y perfil)
+> **Última revisión:** 2026-09-14 (consentimiento accesible desde persona, deal y MQLs)
 > Este documento describe la funcionalidad **visible para el usuario**. Las funcionalidades desactivadas aparecen al final en «Próximamente».
 
 ---
@@ -508,7 +508,7 @@ La cabecera muestra el nombre, la empresa y los datos principales de contacto. U
 
 - **Activity** se abre por defecto. **Next tasks** muestra primero las tareas vencidas y después las próximas; despliega las restantes o completadas cuando lo necesites. El historial reúne notas, correos, comentarios y cambios del registro. Filtra por tipo y usa **Older / Newer** para consultar entradas anteriores o más recientes.
 - **Opportunities** contiene los deals y el filtro por producto, además de intereses por producto y formularios enviados cuando están habilitados. Despliega **Registrar interés** para añadir un interés.
-- **Information** agrupa contacto, perfil profesional, responsable, relaciones, campos personalizados y preferencias de correo. Cada bloque editable tiene su enlace **Edit**. Despliega **Add relationship** para vincular a otra persona.
+- **Information** agrupa contacto, perfil profesional, responsable, relaciones, campos personalizados, preferencias de correo y, si hay envíos, **Formularios enviados** (enlace **Ver consentimiento** a la política y la frase aceptadas). Cada bloque editable tiene su enlace **Edit**. Despliega **Add relationship** para vincular a otra persona.
 - **Files**, cuando está habilitado, contiene el formulario de subida y los archivos adjuntos.
 
 Cerrar un editor o cambiar de sección conserva el borrador mientras sigas en la página. Si intentas salir con borradores sin guardar, aparece un aviso. Los borradores no se conservan al recargar. Editar un bloque solo envía sus campos; **Save changes** vuelve a Information y **Cancel** deja el contacto sin cambios.
@@ -1126,7 +1126,7 @@ Si la plantilla de una página no existe en el workspace, la URL pública `/f/sl
 
 - Cada formulario público incluye un enlace a la **política de privacidad** (`/f/slug/privacy`). El contenido se define en **Plantillas de formulario** → plantilla `privacy` (editable por administradores).
 - El visitante debe marcar la casilla de **consentimiento de protección de datos** (RGPD) para enviar. Opcionalmente la plantilla puede incluir casillas de marketing con `{% subscription_opt_in slug: "newsletter" %}` (u otro slug de tipo de suscripción); si el contacto las acepta, se registra la suscripción al tipo cuya **clave de checkbox** coincida (ver [§29](#29-marketing)).
-- Al cargar el formulario, Cream guarda una **versión inmutable** de la política y de la frase del checkbox. Cada envío queda enlazado a esa versión (fecha, URL, hash y textos aceptados). El detalle completo se consulta en **Formularios → Ver → Envíos recientes → Detalle**, o desde la ficha del contacto → **Formularios enviados**. En deals, **Formulario de origen** muestra las respuestas del envío pero no el bloque extendido de consentimiento.
+- Al cargar el formulario, Cream guarda una **versión inmutable** de la política y de la frase del checkbox. Cada envío queda enlazado a esa versión (fecha, URL, hash y textos aceptados). El detalle completo se consulta con **Ver consentimiento** desde la ficha del contacto (**Information** → **Formularios enviados**), desde el deal (**Information** → **Formulario de origen**), desde **MQLs** (columna Formularios) o en **Formularios → Ver → Envíos recientes → Detalle**. En el deal, al desplegar el envío también aparece el bloque **Consentimiento aceptado**.
 
 ### Qué ocurre al enviar un formulario (destino Deal)
 
@@ -1249,14 +1249,14 @@ Contactos con **permiso de marketing vigente** (al menos una suscripción activa
 
 **Pasos:**
 
-1. Abre **MQLs**. La tabla muestra persona, lifecycle (scoring), puntuación, formularios de origen, intereses pendientes y oportunidades visibles.
+1. Abre **MQLs**. La tabla muestra persona, lifecycle (scoring), puntuación, formularios de origen (con **Ver consentimiento**), intereses pendientes y oportunidades visibles.
 2. Filtra por búsqueda, **tipo de suscripción**, **oportunidad abierta** (cualquiera / sí / no), **producto** (de la oportunidad), **interés en producto** o **formulario de origen**.
 3. Desde una fila con interés pendiente, pulsa **Convertir a SQL** para crear o vincular una oportunidad con ese producto (pipeline, tarea y responsable).
 
 **En la ficha de una persona:**
 
 - **Intereses por producto** — registra manualmente una señal comercial (producto + descripción) o proviene de un formulario MQL con producto. Estados: pendiente, convertido o descartado.
-- **Formularios enviados** — historial de envíos agrupados por formulario, con enlace al detalle (respuestas, destino, consentimiento).
+- **Formularios enviados** — historial de envíos agrupados por formulario, en **Deals** y en **Information**, con enlace **Ver consentimiento** (respuestas, destino, política y frase aceptadas).
 
 **Notas:**
 

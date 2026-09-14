@@ -34,4 +34,7 @@
     </section>
   <% end %>
   <% if feature_enabled?(:marketing_consent) %><section class="record-card"><h2 class="record-section-title mb-4">Email preferences</h2><%= render "subscriptions_section", person: @person %></section><% end %>
+  <% if feature_enabled?(:lead_forms) && @person.lead_submissions.any? %>
+    <section class="record-card"><%= render "lead_submissions_section", person: @person %></section>
+  <% end %>
 </div>

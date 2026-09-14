@@ -65,7 +65,12 @@
             <td class="text-ink-soft"><%= person.lead_score %></td>
             <td class="text-sm text-ink-soft">
               <% forms.first(2).each do |summary| %>
-                <div><%= summary[:form].name %> (<%= summary[:count] %>)</div>
+                <div>
+                  <%= link_to person_lead_submission_path(person, summary[:latest]), class: "hover:text-accent" do %>
+                    <%= summary[:form].name %> (<%= summary[:count] %>)
+                  <% end %>
+                  <div class="text-xs"><%= link_to "Ver consentimiento", person_lead_submission_path(person, summary[:latest]), class: "text-accent hover:underline" %></div>
+                </div>
               <% end %>
             </td>
             <td class="text-sm text-ink-soft">

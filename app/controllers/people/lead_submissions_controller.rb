@@ -1,7 +1,7 @@
 module People
   class LeadSubmissionsController < ApplicationController
     include RequiresFeature
-    requires_feature :mql_pool
+    requires_feature :lead_forms
 
     before_action :set_person
     before_action :set_submission

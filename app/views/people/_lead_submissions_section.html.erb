@@ -12,7 +12,9 @@
           <ul class="mt-2 space-y-1">
             <% submissions.first(3).each do |submission| %>
               <li>
-                <%= link_to l(submission.created_at, format: :short), person_lead_submission_path(person, submission), class: "text-accent hover:underline" %>
+                <%= link_to person_lead_submission_path(person, submission), class: "text-accent hover:underline" do %>
+                  <%= l(submission.created_at, format: :short) %> · Ver consentimiento
+                <% end %>
                 · <%= submission.capture_destination.upcase %>
               </li>
             <% end %>

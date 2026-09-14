@@ -4,7 +4,7 @@
 
 Cream is a **workspace**-based CRM for managing **people**, **companies** and **deals** (opportunities), with notes, tasks, lists and an activity history shared across the team.
 
-> **Last revision:** 2026-09-11 (ES/EN language in menu, login and profile)
+> **Last revision:** 2026-09-14 (consent accessible from person, deal and MQLs)
 > This document describes the functionality **visible to the user**. Disabled features are listed at the end under "Coming soon".
 
 ---
@@ -508,7 +508,7 @@ The contact header shows their name, company and main contact details. Use **Sen
 
 - **Activity** opens by default. **Next tasks** puts overdue tasks first, followed by upcoming tasks; expand the remaining or completed tasks when needed. The history combines notes, emails, comments and record changes. Filter by type and use **Older / Newer** to browse the history.
 - **Opportunities** contains deals and the product filter, plus product interests and form submissions when enabled. Expand **Registrar interés** to add an interest.
-- **Information** groups contact details, professional profile, ownership, relationships, custom fields and email preferences. Each editable block has its own **Edit** link. Expand **Add relationship** to link another person.
+- **Information** groups contact details, professional profile, ownership, relationships, custom fields, email preferences and, when submissions exist, **Formularios enviados** (Form submissions) with a **Ver consentimiento** link to the accepted policy and statement. Each editable block has its own **Edit** link. Expand **Add relationship** to link another person.
 - **Files**, when enabled, contains the upload form and existing attachments.
 
 Closing an editor or switching sections keeps its draft while you remain on the page. Leaving with unsaved drafts prompts you first. Drafts are not saved across a reload. Editing a block only submits that block; **Save changes** returns to Information, and **Cancel** leaves the contact unchanged.
@@ -1126,7 +1126,7 @@ If a page template does not exist in the workspace, the public URL `/f/slug` wil
 
 - Each public form links to a **privacy policy** page (`/f/slug/privacy`). Content is defined in **Plantillas de formulario** (Form templates) → `privacy` template (editable by administrators).
 - Visitors must check the **data protection consent** (GDPR) box to submit. Templates may optionally include marketing checkboxes with `{% subscription_opt_in slug: "newsletter" %}` (or another subscription type slug); if accepted, the subscription for the matching type **checkbox field key** is recorded (see [§29](#29-marketing)).
-- When the form loads, Cream stores an **immutable version** of the policy and checkbox text. Each submission is linked to that version (date, URL, hash and accepted content). Full detail is under **Formularios → Ver → Envíos recientes → Detalle**, or on the contact record → **Form submissions**. On deals, **Formulario de origen** shows submission answers but not the extended consent block.
+- When the form loads, Cream stores an **immutable version** of the policy and checkbox text. Each submission is linked to that version (date, URL, hash and accepted content). Open **Ver consentimiento** from the contact record (**Information** → **Formularios enviados**), from the deal (**Information** → **Formulario de origen**), from **MQLs** (Forms column), or **Formularios → Ver → Envíos recientes → Detalle**. On the deal, expanding the submission also shows the **Consentimiento aceptado** block.
 
 ### What happens when a form is submitted (Deal destination)
 
@@ -1249,14 +1249,14 @@ Contacts with **active marketing permission** (at least one active subscription 
 
 **Steps:**
 
-1. Open **MQLs**. The table shows person, lifecycle (scoring), score, source forms, pending interests and visible opportunities.
+1. Open **MQLs**. The table shows person, lifecycle (scoring), score, source forms (with **Ver consentimiento**), pending interests and visible opportunities.
 2. Filter by search, **subscription type**, **open opportunity** (any / yes / no), **product** (of the opportunity), **product interest** or **source form**.
 3. From a row with a pending interest, click **Convertir a SQL** (Convert to SQL) to create or link an opportunity for that product (pipeline, task and owner).
 
 **On a person's record:**
 
 - **Product interests** — record a commercial signal manually (product + description) or from an MQL form with a product. States: pending, converted or dismissed.
-- **Form submissions** — submission history grouped by form, with a link to detail (answers, destination, consent).
+- **Form submissions** — submission history grouped by form, on **Deals** and **Information**, with a **Ver consentimiento** link (answers, destination, accepted policy and statement).
 
 **Notes:**
 
