@@ -3,7 +3,10 @@ class SubscriptionType < ApplicationRecord
   has_many :email_subscriptions, dependent: :destroy
 
   RESERVED_CONSENT_FIELD_KEYS = (
-    LeadForm::METADATA_FIELDS + %w[gdpr_consent _submission_key privacy_policy_hash product_id]
+    LeadForm::METADATA_FIELDS + %w[
+      gdpr_consent _submission_key privacy_policy_hash product_id
+      subscribe_all subscribe_all_label subscribe_all_exclude_slugs
+    ]
   ).freeze
 
   DEFAULTS = [
@@ -43,6 +46,7 @@ class SubscriptionType < ApplicationRecord
 
   scope :active, -> { where(active: true) }
   scope :ordered, -> { order(:position, :name, :id) }
+  scope :included_in_subscribe_all, -> { active.where(excluded_from_subscribe_all: false) }
 
   before_validation :normalize_slug
   before_validation :normalize_consent_field_key

@@ -182,6 +182,49 @@ module LeadFormTemplates
       end
     end
 
+    class SubscriptionOptInAllTag < BaseTag
+      def initialize(tag_name, markup, parse_context)
+        super
+        @attributes = parse_attributes(markup)
+      end
+
+      def render(context)
+        return "" unless CreamFeatures.enabled?(:marketing_consent)
+
+        lead_form = context.registers[:lead_form]
+        tag_exclude_slugs = parse_exclude_slugs(@attributes["exclude"])
+        active_types = Marketing::ConsentService.subscribe_all_types_for(
+          lead_form.workspace,
+          additional_exclude_slugs: tag_exclude_slugs
+        )
+        return "" if active_types.empty?
+
+        label = @attributes["label"].presence ||
+                Marketing::ConsentService.subscribe_all_default_label(active_types)
+        field_key = Marketing::ConsentService::SUBSCRIBE_ALL_FIELD_KEY
+
+        checkbox = renderer(context).render(
+          type: "checkbox",
+          name: field_key.to_sym,
+          label: label
+        )
+        hidden_fields = %(<input type="hidden" name="lead[subscribe_all_label]" value="#{ERB::Util.html_escape(label)}" />)
+        if tag_exclude_slugs.any?
+          hidden_fields += %(<input type="hidden" name="lead[subscribe_all_exclude_slugs]" value="#{ERB::Util.html_escape(tag_exclude_slugs.join(","))}" />)
+        end
+
+        checkbox + hidden_fields
+      end
+
+      private
+
+      def parse_exclude_slugs(value)
+        return [] if value.blank?
+
+        value.to_s.split(",").map { |slug| slug.strip }.reject(&:blank?)
+      end
+    end
+
     class SubscriptionOptInTag < BaseTag
       def initialize(tag_name, markup, parse_context)
         super
@@ -228,7 +271,8 @@ module LeadFormTemplates
       "submit" => SubmitTag,
       "privacy_link" => PrivacyLinkTag,
       "required_marker" => RequiredMarkerTag,
-      "subscription_opt_in" => SubscriptionOptInTag
+      "subscription_opt_in" => SubscriptionOptInTag,
+      "subscription_opt_in_all" => SubscriptionOptInAllTag
     }.freeze
   end
 end

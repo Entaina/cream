@@ -52,7 +52,8 @@ class SubscriptionTypesController < ApplicationController
 
   def subscription_type_params
     params.require(:subscription_type).permit(
-      :name, :slug, :description, :position, :active, :consent_field_key, :default_consent_label
+      :name, :slug, :description, :position, :active, :consent_field_key, :default_consent_label,
+      :excluded_from_subscribe_all
     )
   end
 end

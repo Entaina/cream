@@ -40,6 +40,7 @@ RSpec.describe "Public lead form Reserva", type: :request do
       expect(response.body).to include('name="lead[message]"')
       expect(response.body).not_to include('name="lead[how_heard]"')
       expect(response.body).not_to include('name="lead[newsletter_opt_in]"')
+      expect(response.body).not_to include('name="lead[subscribe_all]"')
       expect(response.body).to include(public_lead_form_privacy_path(lead_form.slug))
       expect(response.body).to include('name="lead[gdpr_consent]"')
     end

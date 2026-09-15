@@ -390,11 +390,13 @@ class LeadFormSubmissionProcessor
 
   def submission_data
     consent_keys = LeadForm.consent_field_keys_for(workspace)
+    boolean_consent_keys = consent_keys + [ Marketing::ConsentService::SUBSCRIBE_ALL_FIELD_KEY ]
     excluded = LeadForm::METADATA_FIELDS + [
-      LeadForm::HONEYPOT_FIELD, LeadForm::TIMESTAMP_FIELD, "gdpr_consent", "_submission_key", "privacy_policy_hash"
-    ] + consent_keys
+      LeadForm::HONEYPOT_FIELD, LeadForm::TIMESTAMP_FIELD, "gdpr_consent", "_submission_key", "privacy_policy_hash",
+      "subscribe_all_label"
+    ] + boolean_consent_keys
     data = params.except(*excluded).reject { |_key, value| value.blank? }
-    consent_keys.each do |key|
+    boolean_consent_keys.each do |key|
       data[key] = params[key] == "1"
     end
     data

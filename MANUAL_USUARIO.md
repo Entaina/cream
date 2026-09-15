@@ -4,7 +4,7 @@
 
 Cream es un CRM por **workspaces** para gestionar **personas**, **empresas** y **deals** (oportunidades), con notas, tareas, listas y un historial de actividad compartido en el equipo.
 
-> **Última revisión:** 2026-09-15 (email propio en campañas y recorridos)
+> **Última revisión:** 2026-09-15 (exclusiones en suscripción a todas)
 > Este documento describe la funcionalidad **visible para el usuario**. Las funcionalidades desactivadas aparecen al final en «Próximamente».
 
 ---
@@ -1145,7 +1145,7 @@ Si la plantilla de una página no existe en el workspace, la URL pública `/f/sl
 ### Política de privacidad y consentimiento
 
 - Cada formulario público incluye un enlace a la **política de privacidad** (`/f/slug/privacy`). El contenido se define en **Plantillas de formulario** → plantilla `privacy` (editable por administradores).
-- El visitante debe marcar la casilla de **consentimiento de protección de datos** (RGPD) para enviar. Opcionalmente la plantilla puede incluir casillas de marketing con `{% subscription_opt_in slug: "newsletter" %}` (u otro slug de tipo de suscripción); si el contacto las acepta, se registra la suscripción al tipo cuya **clave de checkbox** coincida (ver [§29](#29-marketing)).
+- El visitante debe marcar la casilla de **consentimiento de protección de datos** (RGPD) para enviar. Opcionalmente la plantilla puede incluir casillas de marketing con `{% subscription_opt_in slug: "newsletter" %}` (u otro slug de tipo de suscripción); si el contacto las acepta, se registra la suscripción al tipo cuya **clave de checkbox** coincida (ver [§29](#29-marketing)). También puedes añadir `{% subscription_opt_in_all %}` (o el parcial `subscribe_all_opt_in`) para ofrecer **suscribirse a todos los tipos activos** del workspace con un solo checkbox (`lead[subscribe_all]`).
 - Al cargar el formulario, Cream guarda una **versión inmutable** de la política y de la frase del checkbox. Cada envío queda enlazado a esa versión (fecha, URL, hash y textos aceptados). El detalle completo se consulta con **Ver consentimiento** desde la ficha del contacto (**Information** → **Formularios enviados**), desde el deal (**Information** → **Formulario de origen**), desde **MQLs** (columna Formularios) o en **Formularios → Ver → Envíos recientes → Detalle**. En el deal, al desplegar el envío también aparece el bloque **Consentimiento aceptado**.
 
 ### Qué ocurre al enviar un formulario (destino Deal)
@@ -1293,7 +1293,8 @@ Contactos con **permiso de marketing vigente** (al menos una suscripción activa
 2. Indica **nombre**, **identificador (slug)**, **descripción** (visible en el centro de preferencias del contacto) y **orden**.
 3. Opcional: **Clave del checkbox en formularios** — nombre del campo `lead[clave]` que activará esta suscripción cuando el visitante lo marque (p. ej. `newsletter_opt_in`). Debe ser única en el workspace.
 4. Opcional: **Texto por defecto del checkbox** — etiqueta mostrada en plantillas Liquid salvo que la plantilla o el formulario MQL la sobrescriban.
-5. Marca **Activo** y guarda. Cream crea por defecto tipos como *general* (`marketing_consent`) y *newsletter* (`newsletter_opt_in`) al usar el módulo.
+5. Opcional: **Excluir de «suscribir a todas»** — el tipo no se incluye en `{% subscription_opt_in_all %}` (sigue pudiendo activarse con su checkbox individual).
+6. Marca **Activo** y guarda. Cream crea por defecto tipos como *general* (`marketing_consent`) y *newsletter* (`newsletter_opt_in`) al usar el módulo.
 
 **En la ficha de una persona** (**Information** → **Email preferences**):
 
@@ -1312,6 +1313,7 @@ Contactos con **permiso de marketing vigente** (al menos una suscripción activa
 |----------------|--------|-------------------|
 | **Protección de datos (RGPD)** | Obligatorio para enviar cualquier formulario | Partial `consent_fields` en plantillas |
 | **Marketing / newsletter** | Opcional; activa una suscripción | Tag `{% subscription_opt_in slug: "…" %}` en plantillas (usa la clave del tipo) + tipo en formulario MQL |
+| **Todas las suscripciones** | Opcional; activa los tipos activos no excluidos | Tag `{% subscription_opt_in_all %}` o parcial `subscribe_all_opt_in` (campo `lead[subscribe_all]`). Excluye tipos marcados en **Suscripciones** o con `exclude: "slug1, slug2"` en la plantilla |
 
 Las suscripciones creadas desde un formulario guardan la misma **versión de política de privacidad** que el envío (ver [§27](#27-formularios-de-captación)).
 

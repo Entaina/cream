@@ -14,7 +14,10 @@ class LeadForm < ApplicationRecord
     utm_source utm_medium utm_campaign utm_term utm_content
   ].freeze
   SYSTEM_FIELD_KEYS = (
-    METADATA_FIELDS + [ HONEYPOT_FIELD, TIMESTAMP_FIELD, "gdpr_consent", "_submission_key", "privacy_policy_hash" ]
+    METADATA_FIELDS + [
+      HONEYPOT_FIELD, TIMESTAMP_FIELD, "gdpr_consent", "_submission_key", "privacy_policy_hash",
+      Marketing::ConsentService::SUBSCRIBE_ALL_FIELD_KEY, "subscribe_all_label", "subscribe_all_exclude_slugs"
+    ]
   ).freeze
 
   def self.consent_field_keys_for(workspace)

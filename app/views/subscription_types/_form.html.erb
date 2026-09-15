@@ -48,6 +48,11 @@
     <%= f.check_box :active %> Activo
   </label>
 
+  <label class="flex items-center gap-2 text-base">
+    <%= f.check_box :excluded_from_subscribe_all %> Excluir de «suscribir a todas»
+  </label>
+  <p class="text-sm text-ink-faint -mt-2">Si está marcado, el tag <code class="text-2xs">subscription_opt_in_all</code> no dará de alta este tipo (sigue disponible con su checkbox individual).</p>
+
   <%= f.submit subscription_type.persisted? ? "Guardar" : "Crear tipo", class: "btn-primary" %>
   <%= link_to "Cancelar", subscription_types_path, class: "btn-secondary ml-2" %>
 <% end %>

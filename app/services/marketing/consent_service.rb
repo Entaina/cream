@@ -1,5 +1,7 @@
 module Marketing
   class ConsentService
+    SUBSCRIBE_ALL_FIELD_KEY = "subscribe_all".freeze
+
     LEGACY_FIELD_ALIASES = {
       "newsletter" => "newsletter_opt_in",
       "general" => "marketing_consent"
@@ -24,11 +26,26 @@ module Marketing
         privacy_policy_trace(privacy_policy_version:, params:, lead_form:)
       )
 
-      workspace.subscription_types.active.find_each do |type|
-        next if field_key_for(type).blank?
-        next unless consent_param_checked?(params, type)
+      subscribe_all = subscribe_all_checked?(params)
+      subscribe_all_types = if subscribe_all
+        subscribe_all_types_for(
+          workspace,
+          additional_exclude_slugs: subscribe_all_exclude_slugs_from(params)
+        )
+      end
+      subscribe_all_type_ids = subscribe_all_types&.map(&:id) || []
+      subscribe_all_metadata = subscribe_all ? subscribe_all_metadata_for(subscribe_all_types, params: params) : {}
+
+      workspace.subscription_types.active.ordered.each do |type|
+        should_subscribe = if subscribe_all
+          subscribe_all_type_ids.include?(type.id)
+        else
+          per_type_consent_checked?(params, type)
+        end
+        next unless should_subscribe
 
         metadata = base_metadata.dup
+        metadata.merge!(subscribe_all_metadata) if subscribe_all
         if primary_mql_subscription_type?(lead_form, type) && lead_form.marketing_consent_text.present?
           metadata["marketing_consent_text"] = lead_form.marketing_consent_text
         end
@@ -41,6 +58,44 @@ module Marketing
           metadata: metadata
         )
       end
+    end
+
+    def self.subscribe_all_checked?(params)
+      params[SUBSCRIBE_ALL_FIELD_KEY] == "1" || params[SUBSCRIBE_ALL_FIELD_KEY] == true
+    end
+
+    def self.subscribe_all_types_for(workspace, additional_exclude_slugs: [])
+      excluded_slugs = workspace.subscription_types.active.where(excluded_from_subscribe_all: true).pluck(:slug)
+      excluded_slugs.concat(normalize_exclude_slugs(additional_exclude_slugs))
+      excluded_slugs.uniq!
+
+      workspace.subscription_types.active.ordered.reject { |type| excluded_slugs.include?(type.slug) }
+    end
+
+    def self.subscribe_all_exclude_slugs_from(params)
+      normalize_exclude_slugs(params["subscribe_all_exclude_slugs"].to_s.split(","))
+    end
+
+    def self.normalize_exclude_slugs(slugs)
+      Array(slugs).map { |slug| slug.to_s.strip }.reject(&:blank?)
+    end
+    private_class_method :normalize_exclude_slugs
+
+    def self.subscribe_all_default_label(active_types)
+      names = active_types.map(&:name).join(", ")
+      "Quiero recibir todas las comunicaciones (#{names})"
+    end
+
+    def self.subscribe_all_metadata_for(active_types, params:)
+      {
+        "subscribe_all" => true,
+        "subscribe_all_label" => params["subscribe_all_label"].presence || subscribe_all_default_label(active_types),
+        "subscribe_all_type_slugs" => active_types.map(&:slug)
+      }
+    end
+
+    def self.per_type_consent_checked?(params, subscription_type)
+      field_key_for(subscription_type).present? && consent_param_checked?(params, subscription_type)
     end
 
     def self.consent_param_checked?(params, subscription_type)

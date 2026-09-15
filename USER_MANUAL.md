@@ -4,7 +4,7 @@
 
 Cream is a **workspace**-based CRM for managing **people**, **companies** and **deals** (opportunities), with notes, tasks, lists and an activity history shared across the team.
 
-> **Last revision:** 2026-09-15 (campaign and journey email content)
+> **Last revision:** 2026-09-15 (subscribe-all exclusions)
 > This document describes the functionality **visible to the user**. Disabled features are listed at the end under "Coming soon".
 
 ---
@@ -1145,7 +1145,7 @@ If a page template does not exist in the workspace, the public URL `/f/slug` wil
 ### Privacy policy and consent
 
 - Each public form links to a **privacy policy** page (`/f/slug/privacy`). Content is defined in **Plantillas de formulario** (Form templates) → `privacy` template (editable by administrators).
-- Visitors must check the **data protection consent** (GDPR) box to submit. Templates may optionally include marketing checkboxes with `{% subscription_opt_in slug: "newsletter" %}` (or another subscription type slug); if accepted, the subscription for the matching type **checkbox field key** is recorded (see [§29](#29-marketing)).
+- Visitors must check the **data protection consent** (GDPR) box to submit. Templates may optionally include marketing checkboxes with `{% subscription_opt_in slug: "newsletter" %}` (or another subscription type slug); if accepted, the subscription for the matching type **checkbox field key** is recorded (see [§29](#29-marketing)). You can also add `{% subscription_opt_in_all %}` (or the `subscribe_all_opt_in` partial) to offer **subscribe to all active types** in the workspace with a single checkbox (`lead[subscribe_all]`).
 - When the form loads, Cream stores an **immutable version** of the policy and checkbox text. Each submission is linked to that version (date, URL, hash and accepted content). Open **Ver consentimiento** from the contact record (**Information** → **Formularios enviados**), from the deal (**Information** → **Formulario de origen**), from **MQLs** (Forms column), or **Formularios → Ver → Envíos recientes → Detalle**. On the deal, expanding the submission also shows the **Consentimiento aceptado** block.
 
 ### What happens when a form is submitted (Deal destination)
@@ -1293,7 +1293,8 @@ Contacts with **active marketing permission** (at least one active subscription 
 2. Enter **name**, **slug**, **description** (shown in the contact preference center) and **order**.
 3. Optional: **Checkbox field key in forms** — `lead[key]` name that activates this subscription when checked (e.g. `newsletter_opt_in`). Must be unique within the workspace.
 4. Optional: **Default checkbox label** — shown in Liquid templates unless the template or MQL form overrides it.
-5. Check **Activo** (Active) and save. Cream creates default types such as *general* (`marketing_consent`) and *newsletter* (`newsletter_opt_in`) when you use the module.
+5. Optional: **Exclude from subscribe all** — the type is omitted from `{% subscription_opt_in_all %}` (still available via its own checkbox).
+6. Check **Activo** (Active) and save. Cream creates default types such as *general* (`marketing_consent`) and *newsletter* (`newsletter_opt_in`) when you use the module.
 
 **On a person's record** (**Information** → **Email preferences**):
 
@@ -1312,6 +1313,7 @@ Contacts with **active marketing permission** (at least one active subscription 
 |---------|------------|------------------|
 | **Data protection (GDPR)** | Required to submit any form | `consent_fields` partial in templates |
 | **Marketing / newsletter** | Optional; activates a subscription | `{% subscription_opt_in slug: "…" %}` tag in templates (uses the type's field key) + type on MQL form |
+| **All subscriptions** | Optional; activates active types that are not excluded | `{% subscription_opt_in_all %}` tag or `subscribe_all_opt_in` partial (field `lead[subscribe_all]`). Skips types marked in **Subscriptions** or listed in `exclude: "slug1, slug2"` on the tag |
 
 Subscriptions created from a form store the same **privacy policy version** as the submission (see [§27](#27-lead-capture-forms)).
 

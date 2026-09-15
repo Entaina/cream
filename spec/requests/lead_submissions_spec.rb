@@ -40,6 +40,7 @@ RSpec.describe "Lead submission consents", type: :request do
     expect(response.body).to include("Consentimiento aceptado")
     expect(response.body).to include("Política de prueba")
     expect(response.body).to include("Acepto el tratamiento de datos")
+    expect(response.body).to include("overflow-y-auto")
   end
 
   it "links to the consent from the person Information tab" do

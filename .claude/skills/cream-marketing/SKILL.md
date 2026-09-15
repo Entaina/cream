@@ -139,7 +139,7 @@ resource :marketing_attribution, only: :show
 
 **Importante:** landing pages usan `/p/:workspace_slug/:slug` (no `/p/:slug` solo). URL en admin: `LeadFormTemplates` partial `_form.html.erb`.
 
-**Plantillas de captación:** Liquid vive en DB por workspace (admin **Formularios → Plantillas de formulario**). Checkboxes de marketing: tag `{% subscription_opt_in slug: "…" %}` o `lead[consent_field_key]` alineado con **Suscripciones**. No reimportar plantillas del repo en producción — respetar ediciones del usuario; documentar cambios manuales en plantilla cuando el código añada tags o claves nuevas.
+**Plantillas de captación:** Liquid vive en DB por workspace (admin **Formularios → Plantillas de formulario**). Checkboxes de marketing: tag `{% subscription_opt_in slug: "…" %}` o `lead[consent_field_key]` alineado con **Suscripciones**; opt-in masivo con `{% subscription_opt_in_all %}` → `lead[subscribe_all]` (suscribe todos los tipos activos vía `ConsentService`). No reimportar plantillas del repo en producción — respetar ediciones del usuario; documentar cambios manuales en plantilla cuando el código añada tags o claves nuevas.
 
 ## Jobs (`config/recurring.yml`)
 

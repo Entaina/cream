@@ -19,6 +19,7 @@ RSpec.describe "Public lead forms", type: :request do
       expect(response.body).to include("¿En qué te ayudamos?")
       expect(response.body).to include("Cuéntanos un poco más")
       expect(response.body).to include("newsletter de Entaina")
+      expect(response.body).to include('name="lead[subscribe_all]"')
       expect(response.body).to include("beehiiv")
       expect(response.body).to include(public_lead_form_privacy_path(lead_form.slug))
       expect(response.headers["Content-Security-Policy"]).to include("frame-ancestors *")
@@ -153,6 +154,55 @@ RSpec.describe "Public lead forms", type: :request do
       expect(submission.metadata["privacy_policy_url"]).to include("/f/#{lead_form.slug}/privacy")
       subscription = EmailSubscription.order(:id).last
       expect(subscription.metadata["privacy_policy_version_id"]).to eq(submission.privacy_policy_version_id)
+    end
+
+    it "subscribes to all active types when subscribe_all is checked" do
+      allow(CreamFeatures).to receive(:enabled?).and_call_original
+      allow(CreamFeatures).to receive(:enabled?).with(:marketing_consent).and_return(true)
+
+      active_count = workspace.subscription_types.active.count
+
+      expect {
+        post public_lead_form_path(lead_form.slug), params: {
+          lead: contacto_lead_params_with_privacy(
+            lead_form,
+            subscribe_all: "1",
+            subscribe_all_label: "Quiero todas las comunicaciones"
+          )
+        }
+      }.to change(EmailSubscription, :count).by(active_count)
+
+      submission = LeadSubmission.order(:id).last
+      expect(submission.data["subscribe_all"]).to be(true)
+
+      person = Person.find_by!(email: "lead@example.com")
+      workspace.subscription_types.active.find_each do |type|
+        subscription = EmailSubscription.find_by!(person: person, subscription_type: type)
+        expect(subscription.status).to eq("subscribed")
+        expect(subscription.metadata["subscribe_all"]).to be(true)
+        expect(subscription.metadata["subscribe_all_label"]).to eq("Quiero todas las comunicaciones")
+      end
+    end
+
+    it "skips types excluded from subscribe_all on public submit" do
+      allow(CreamFeatures).to receive(:enabled?).and_call_original
+      allow(CreamFeatures).to receive(:enabled?).with(:marketing_consent).and_return(true)
+
+      excluded = workspace.subscription_types.find_by!(slug: "events")
+      excluded.update!(excluded_from_subscribe_all: true)
+      included_count = workspace.subscription_types.included_in_subscribe_all.count
+
+      expect {
+        post public_lead_form_path(lead_form.slug), params: {
+          lead: contacto_lead_params_with_privacy(lead_form, subscribe_all: "1")
+        }
+      }.to change(EmailSubscription, :count).by(included_count)
+
+      person = Person.find_by!(email: "lead@example.com")
+      expect(EmailSubscription.find_by(person: person, subscription_type: excluded)).to be_nil
+      workspace.subscription_types.included_in_subscribe_all.find_each do |type|
+        expect(EmailSubscription.find_by!(person: person, subscription_type: type).status).to eq("subscribed")
+      end
     end
 
     it "creates a new privacy policy version when the policy template changes" do

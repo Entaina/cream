@@ -4,6 +4,7 @@
       icon_name: :globe,
       actions: capture { link_to "Volver a persona", @person, class: "btn-secondary" } %>
 
+<div class="flex-1 overflow-y-auto scrollbar-subtle p-5">
 <div class="card p-6 max-w-2xl space-y-4">
   <div class="grid grid-cols-2 gap-3 text-sm">
     <div><span class="text-ink-faint">Persona</span><br><%= link_to @person.display_name, @person, class: "text-accent hover:underline" %></div>
@@ -27,4 +28,5 @@
       <% end %>
     </dl>
   </div>
+</div>
 </div>

@@ -34,7 +34,7 @@ Si `$ARGUMENTS` o el mensaje del usuario no bastan, pregunta hasta tener:
 
 Parciales reutilizables (demo repo o creados en BD como partials):
 
-- `contact_fields`, `contact_fields_with_prefix`, `how_heard_field`, `newsletter_opt_in`, `consent_fields`
+- `contact_fields`, `contact_fields_with_prefix`, `how_heard_field`, `newsletter_opt_in`, `subscribe_all_opt_in`, `consent_fields`
 
 Tags de sistema en cada **página**:
 
@@ -68,6 +68,7 @@ Ejemplo mínimo:
     {% field type: "textarea", name: "message", label: "Mensaje", placeholder: "Opcional" %}
     {% partial 'how_heard_field' %}
     {% partial 'newsletter_opt_in' %}
+    {% partial 'subscribe_all_opt_in' %}
     {% partial 'consent_fields' %}
   </div>
 
