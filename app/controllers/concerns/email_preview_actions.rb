@@ -12,6 +12,18 @@ module EmailPreviewActions
   end
 
   def preview_tokens_param
-    params.fetch(:preview_tokens, {}).permit!.to_h
+    allowed_keys = allowed_preview_token_keys
+    params.fetch(:preview_tokens, ActionController::Parameters.new).permit(*allowed_keys).to_h
+  end
+
+  def allowed_preview_token_keys
+    (
+      EmailTemplatePreview::STANDARD_TOKENS +
+      EmailTemplatePreview.extract_tokens(
+        params[:subject],
+        params[:body],
+        params[:sample_content]
+      )
+    ).uniq
   end
 end

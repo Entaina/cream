@@ -24,6 +24,18 @@ RSpec.describe "Email previews", type: :request do
       expect(response.body).to include("Pat Smith")
       expect(response.body).to include("<iframe")
     end
+
+    it "ignores preview token keys that are not declared in the draft content" do
+      post preview_email_templates_path, params: {
+        subject: "Hi {first_name}",
+        body: "<p>Hello {first_name}</p>",
+        preview_tokens: { first_name: "Pat", admin: "true" }
+      }
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("Hi Pat")
+      expect(response.body).not_to include("true")
+    end
   end
 
   describe "POST /email_layouts/preview" do
