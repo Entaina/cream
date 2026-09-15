@@ -30,7 +30,7 @@
       </div>
     </div>
     <div class="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm mt-4 text-ink-soft">
-      <% if @company.domain.present? %><%= link_to @company.domain, "https://#{@company.domain}", target: "_blank", rel: "noopener", class: "inline-flex items-center gap-2 hover:text-accent" do %><%= icon :external, classes: "size-4 shrink-0" %><%= @company.domain %><% end %><% end %>
+      <% if @company.domain.present? %><%= link_to "https://#{@company.domain}", target: "_blank", rel: "noopener", class: "inline-flex items-center gap-2 hover:text-accent" do %><%= icon :external, classes: "size-4 shrink-0" %><%= @company.domain %><% end %><% end %>
       <% if @company.location.present? %><span class="inline-flex items-center gap-2"><%= icon :map_pin, classes: "size-4" %><%= @company.location %></span><% end %>
       <% if @company.annual_revenue.present? %><span class="inline-flex items-center gap-2"><%= icon :banknote, classes: "size-4" %><%= money(@company.annual_revenue) %></span><% end %>
     </div>

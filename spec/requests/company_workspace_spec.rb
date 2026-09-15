@@ -11,6 +11,15 @@ RSpec.describe "Company workspace", type: :request do
 
   def document = Nokogiri::HTML(response.body)
 
+  it "renders a company with a domain without crashing" do
+    company.update!(domain: "acme.com")
+
+    get company_path(company)
+
+    expect(response).to have_http_status(:ok)
+    expect(document.at_css('a[href="https://acme.com"]').text).to include("acme.com")
+  end
+
   it "starts on activity with creation forms inside closed dialogs" do
     get company_path(company)
 
