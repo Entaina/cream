@@ -18,15 +18,15 @@
     "https://www.googleapis.com/auth/script.scriptapp"
   ],
   "urlFetchWhitelist": [
-    "https://YOUR-CREAM-DOMAIN/"
+    "https://crm.entaina.ai/"
   ],
   "runtimeVersion": "V8",
   "addOns": {
     "common": {
       "name": "CReaM",
-      "logoUrl": "https://YOUR-CREAM-DOMAIN/gmail-addon-icon.png",
+      "logoUrl": "https://crm.entaina.ai/gmail-addon-icon.png",
       "openLinkUrlPrefixes": [
-        "https://YOUR-CREAM-DOMAIN/"
+        "https://crm.entaina.ai/"
       ],
       "homepageTrigger": {
         "runFunction": "onHomepage"
