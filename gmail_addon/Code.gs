@@ -175,54 +175,102 @@ function formValue_(e, fieldName) {
 }
 
 function refreshThreadCard_(e) {
-  var threadData = readOpenThread_(e);
-  var context = creamContext_();
-  var status = creamThreadStatus_({
-    gmail_thread_id: threadData.gmail_thread_id,
-    rfc822_message_ids: threadData.rfc822_message_ids,
-    participant_emails: threadData.participant_emails
-  });
-  return CardService.newActionResponseBuilder()
-    .setNavigation(
-      CardService.newNavigation().updateCard(buildThreadCard_(threadData, status, context))
-    )
-    .build();
+  return refreshThreadCardAfterLink_(e, null);
 }
 
 function changeWorkspace(e) {
   setSelectedWorkspaceId_(formValue_(e, "workspace_id"));
   setUserProperty_(CREAM_PIPELINE_KEY, null);
-  return refreshThreadCard_(e);
+  return refreshLinkActionsCard_(e);
 }
 
 function changePipeline(e) {
   setUserProperty_(CREAM_PIPELINE_KEY, formValue_(e, "pipeline_id"));
-  return refreshThreadCard_(e);
+  return refreshLinkActionsCard_(e);
 }
 
-function buildThreadCard_(threadData, status, context) {
+function threadStatus_(threadData) {
+  return creamThreadStatus_({
+    gmail_thread_id: threadData.gmail_thread_id,
+    rfc822_message_ids: threadData.rfc822_message_ids,
+    participant_emails: threadData.participant_emails
+  });
+}
+
+function formatDealValue_(deal) {
+  if (deal.value === undefined || deal.value === null) {
+    return null;
+  }
+  var amount = Number(deal.value).toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+  return deal.currency ? amount + " " + deal.currency : amount;
+}
+
+function formatIsoDate_(value) {
+  if (!value) {
+    return null;
+  }
+  var date = new Date(value);
+  if (isNaN(date.getTime())) {
+    return value;
+  }
+  return Utilities.formatDate(date, Session.getScriptTimeZone(), "dd MMM yyyy");
+}
+
+function addDealField_(section, label, value) {
+  if (value === undefined || value === null || value === "") {
+    return;
+  }
+  section.addWidget(
+    CardService.newDecoratedText()
+      .setTopLabel(label)
+      .setText(String(value))
+      .setWrapText(true)
+  );
+}
+
+function buildLinkedDealSection_(deal, multipleDeals) {
+  var header = multipleDeals ? deal.name : "Linked deal";
+  var section = CardService.newCardSection().setHeader(header);
+  if (multipleDeals) {
+    addDealField_(section, "Deal", deal.name);
+  }
+  var stagePipeline = [deal.stage, deal.pipeline].filter(Boolean).join(" · ");
+  addDealField_(section, "Stage", stagePipeline);
+  addDealField_(section, "Company", deal.company_name);
+  addDealField_(section, "Value", formatDealValue_(deal));
+  addDealField_(section, "Owner", deal.owner_name);
+  if (deal.contacts && deal.contacts.length) {
+    addDealField_(section, "Contacts", deal.contacts.join(", "));
+  }
+  addDealField_(section, "Close date", formatIsoDate_(deal.expected_close_date));
+  if (deal.next_task) {
+    var taskText = deal.next_task.title;
+    if (deal.next_task.due_on) {
+      taskText += " (due " + formatIsoDate_(deal.next_task.due_on) + ")";
+    }
+    addDealField_(section, "Next task", taskText);
+  }
+  if (deal.products && deal.products.length) {
+    addDealField_(section, "Products", deal.products.join("\n"));
+  }
+  if (deal.url) {
+    section.addWidget(
+      CardService.newTextButton()
+        .setText("Open in CReaM")
+        .setOpenLink(CardService.newOpenLink().setUrl(deal.url))
+    );
+  }
+  return section;
+}
+
+function buildLinkActionsCard_(threadData, status, context) {
   var card = CardService.newCardBuilder()
-    .setHeader(CardService.newCardHeader().setTitle("CReaM"));
+    .setHeader(CardService.newCardHeader().setTitle("Link deal"));
 
   card.addSection(buildDestinationSection_(context));
-
-  if (status.linked && status.linked.length) {
-    var linked = CardService.newCardSection().setHeader("Linked deals");
-    status.linked.forEach(function(deal) {
-      linked.addWidget(CardService.newDecoratedText()
-        .setTopLabel(deal.stage || "Deal")
-        .setText(deal.name)
-        .setWrapText(true));
-      if (deal.url) {
-        linked.addWidget(
-          CardService.newTextButton()
-            .setText("Open in CReaM")
-            .setOpenLink(CardService.newOpenLink().setUrl(deal.url))
-        );
-      }
-    });
-    card.addSection(linked);
-  }
 
   if (status.suggestions && status.suggestions.length) {
     var suggestions = CardService.newCardSection().setHeader("Suggested deals");
@@ -240,7 +288,7 @@ function buildThreadCard_(threadData, status, context) {
     card.addSection(suggestions);
   }
 
-  var actions = CardService.newCardSection().setHeader("Actions");
+  var actions = CardService.newCardSection().setHeader("Search");
   actions.addWidget(
     CardService.newTextInput()
       .setFieldName("deal_query")
@@ -279,6 +327,71 @@ function buildThreadCard_(threadData, status, context) {
   return card.build();
 }
 
+function buildThreadCard_(threadData, status, context) {
+  if (!status.linked || !status.linked.length) {
+    return buildLinkActionsCard_(threadData, status, context);
+  }
+
+  var card = CardService.newCardBuilder()
+    .setHeader(CardService.newCardHeader().setTitle("CReaM"));
+
+  var multipleDeals = status.linked.length > 1;
+  status.linked.forEach(function(deal) {
+    card.addSection(buildLinkedDealSection_(deal, multipleDeals));
+  });
+
+  var actions = CardService.newCardSection();
+  actions.addWidget(
+    CardService.newTextButton()
+      .setText("Link another deal")
+      .setOnClickAction(CardService.newAction().setFunctionName("showLinkActions"))
+  );
+  card.addSection(actions);
+  return card.build();
+}
+
+function refreshLinkActionsCard_(e) {
+  var threadData = readOpenThread_(e);
+  var context = creamContext_();
+  var status = threadStatus_(threadData);
+  return CardService.newActionResponseBuilder()
+    .setNavigation(
+      CardService.newNavigation().updateCard(buildLinkActionsCard_(threadData, status, context))
+    )
+    .build();
+}
+
+function showLinkActions(e) {
+  try {
+    var threadData = readOpenThread_(e);
+    var context = creamContext_();
+    var status = threadStatus_(threadData);
+    return CardService.newActionResponseBuilder()
+      .setNavigation(
+        CardService.newNavigation().pushCard(buildLinkActionsCard_(threadData, status, context))
+      )
+      .build();
+  } catch (err) {
+    return CardService.newActionResponseBuilder()
+      .setNotification(CardService.newNotification().setText(String(err.message)))
+      .build();
+  }
+}
+
+function refreshThreadCardAfterLink_(e, message) {
+  var threadData = readOpenThread_(e);
+  var context = creamContext_();
+  var status = threadStatus_(threadData);
+  var builder = CardService.newActionResponseBuilder()
+    .setNavigation(
+      CardService.newNavigation().updateCard(buildThreadCard_(threadData, status, context))
+    );
+  if (message) {
+    builder.setNotification(CardService.newNotification().setText(message));
+  }
+  return builder.build();
+}
+
 function buildErrorCard_(message) {
   return CardService.newCardBuilder()
     .setHeader(CardService.newCardHeader().setTitle("CReaM"))
@@ -301,13 +414,10 @@ function linkToDeal(e) {
         messages: threadData.messages
       }
     });
-    return CardService.newActionResponseBuilder()
-      .setNotification(
-        CardService.newNotification().setText(
-          "Linked " + result.imported_count + " message(s) to " + result.deal.name
-        )
-      )
-      .build();
+    return refreshThreadCardAfterLink_(
+      e,
+      "Linked " + result.imported_count + " message(s) to " + result.deal.name
+    );
   } catch (err) {
     return CardService.newActionResponseBuilder()
       .setNotification(CardService.newNotification().setText(String(err.message)))
@@ -327,13 +437,10 @@ function createDealFromThread(e) {
         messages: threadData.messages
       }
     });
-    return CardService.newActionResponseBuilder()
-      .setNotification(
-        CardService.newNotification().setText(
-          "Created deal \"" + result.deal.name + "\" with " + result.imported_count + " message(s)"
-        )
-      )
-      .build();
+    return refreshThreadCardAfterLink_(
+      e,
+      "Created deal \"" + result.deal.name + "\" with " + result.imported_count + " message(s)"
+    );
   } catch (err) {
     return CardService.newActionResponseBuilder()
       .setNotification(CardService.newNotification().setText(String(err.message)))

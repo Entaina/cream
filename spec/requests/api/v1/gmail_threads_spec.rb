@@ -38,7 +38,17 @@ RSpec.describe "Api::V1::GmailThreads", type: :request do
 
   describe "POST /api/v1/gmail/threads/status" do
     it "returns linked deals for a known thread" do
-      deal = create_deal!(workspace, company: company, name: "Linked opp")
+      deal = create_deal!(
+        workspace,
+        company: company,
+        name: "Linked opp",
+        value: 1500,
+        expected_close_date: Date.new(2026, 6, 15),
+        owner: user
+      )
+      product = workspace.products.create!(name: "Curso X", price: 1500)
+      edition = product.editions.create!(name: "Edición 2026", workspace: workspace)
+      deal.deal_products.create!(product: product, edition: edition, quantity: 1)
       workspace.email_messages.create!(
         user: user, record: deal, direction: "inbound", status: "received",
         from_address: "client@example.com", to_address: user.email_address,
@@ -57,7 +67,19 @@ RSpec.describe "Api::V1::GmailThreads", type: :request do
 
       expect(response).to have_http_status(:success)
       body = JSON.parse(response.body)
-      expect(body["linked"].map { |d| d["name"] }).to include("Linked opp")
+      linked = body["linked"].find { |d| d["name"] == "Linked opp" }
+      expect(linked).to include(
+        "stage" => "Lead",
+        "pipeline" => pipeline.name,
+        "company_name" => company.name,
+        "value" => 1500.0,
+        "currency" => "EUR",
+        "owner_name" => user.name,
+        "expected_close_date" => "2026-06-15",
+        "products" => ["Curso X — Edición 2026"]
+      )
+      expect(linked["contacts"]).to be_present
+      expect(linked["next_task"]).to include("title" => "Next action")
     end
 
     it "suggests deals whose contacts match thread participants" do

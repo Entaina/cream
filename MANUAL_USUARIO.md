@@ -4,7 +4,7 @@
 
 Cream es un CRM por **workspaces** para gestionar **personas**, **empresas** y **deals** (oportunidades), con notas, tareas, listas y un historial de actividad compartido en el equipo.
 
-> **Última revisión:** 2026-09-15 (conectar MCP con token de API)
+> **Última revisión:** 2026-09-15 (ficha de deal en add-on de Gmail)
 > Este documento describe la funcionalidad **visible para el usuario**. Las funcionalidades desactivadas aparecen al final en «Próximamente».
 
 ---
@@ -662,13 +662,17 @@ Cuando tienes **full reply logging** activo y la conexión es correcta, las resp
 Desde el **add-on de CReaM en Gmail** (barra lateral al abrir un correo) puedes:
 
 1. **Conectar con CReaM** — autoriza con tu cuenta de CReaM (OAuth).
-2. Elegir el **Workspace** y **Pipeline** de destino. Al abrirlo se propone el
-   workspace **Example** y tu pipeline predeterminado para ese workspace. Los deals nuevos se
-   crean siempre en la primera etapa del pipeline.
-3. **Vincular el hilo** a un deal existente (las sugerencias y la búsqueda se
-   limitan al workspace seleccionado).
-4. **Crear un deal nuevo** desde el hilo — se crea en la primera etapa del
-   pipeline seleccionado y se importan todos los mensajes a su sección **Emails**.
+2. Si el hilo **ya está vinculado** a un deal, verás una **ficha del deal** con
+   etapa, pipeline, empresa, valor, propietario, contactos, fecha de cierre,
+   siguiente tarea y productos, además de un enlace **Open in CReaM**. Para
+   vincular otro deal o crear uno nuevo, pulsa **Link another deal**.
+3. Si el hilo **aún no está vinculado**, elige el **Workspace** y **Pipeline** de
+   destino (se propone el workspace **Example** y tu pipeline predeterminado).
+   Los deals nuevos se crean en la primera etapa del pipeline.
+4. **Vincular el hilo** a un deal existente (sugerencias y búsqueda limitadas al
+   workspace seleccionado).
+5. **Crear un deal nuevo** desde el hilo — se importan todos los mensajes a su
+   sección **Emails** y la tarjeta pasa a mostrar la ficha del deal.
 
 Para instalarlo (usuarios):
 

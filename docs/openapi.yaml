@@ -749,8 +749,43 @@ components:
           type: string
         stage:
           type: string
+        pipeline:
+          type: string
+          nullable: true
         company_id:
           type: integer
+        company_name:
+          type: string
+          nullable: true
+        value:
+          type: number
+        currency:
+          type: string
+        owner_name:
+          type: string
+          nullable: true
+        contacts:
+          type: array
+          items:
+            type: string
+        expected_close_date:
+          type: string
+          format: date
+          nullable: true
+        next_task:
+          type: object
+          nullable: true
+          properties:
+            title:
+              type: string
+            due_on:
+              type: string
+              format: date
+              nullable: true
+        products:
+          type: array
+          items:
+            type: string
         url:
           type: string
           format: uri

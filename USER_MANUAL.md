@@ -4,7 +4,7 @@
 
 Cream is a **workspace**-based CRM for managing **people**, **companies** and **deals** (opportunities), with notes, tasks, lists and an activity history shared across the team.
 
-> **Last revision:** 2026-09-15 (connect MCP with API token)
+> **Last revision:** 2026-09-15 (Gmail add-on deal card)
 > This document describes the functionality **visible to the user**. Disabled features are listed at the end under "Coming soon".
 
 ---
@@ -662,13 +662,17 @@ When you have **full reply logging** active and the connection is correct, the c
 From the **CReaM add-on in Gmail** (sidebar when opening an email) you can:
 
 1. **Connect with CReaM** — authorize with your CReaM account (OAuth).
-2. Choose the destination **Workspace** and **Pipeline**. When you open it, the
-   **Example** workspace and your default pipeline for that workspace are proposed. New deals are
-   always created in the first stage of the pipeline.
-3. **Link the thread** to an existing deal (suggestions and search are
-   limited to the selected workspace).
-4. **Create a new deal** from the thread — it is created in the first stage of the
-   selected pipeline and all messages are imported into its **Emails** section.
+2. If the thread is **already linked** to a deal, you see a **deal summary** with
+   stage, pipeline, company, value, owner, contacts, close date, next task and
+   products, plus an **Open in CReaM** link. To link another deal or create a
+   new one, click **Link another deal**.
+3. If the thread is **not linked yet**, choose the destination **Workspace** and
+   **Pipeline** (the **Example** workspace and your default pipeline are
+   proposed). New deals are created in the first stage of the pipeline.
+4. **Link the thread** to an existing deal (suggestions and search are limited
+   to the selected workspace).
+5. **Create a new deal** from the thread — all messages are imported into its
+   **Emails** section and the card switches to the deal summary.
 
 To install it (users):
 

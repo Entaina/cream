@@ -1,5 +1,10 @@
 # Links Gmail threads to CRM deals by importing EmailMessage rows from an add-on payload.
 class GmailThreadLinker
+  DEAL_INCLUDES = [
+    :company, :pipeline, :pipeline_stage, :owner, :contacts, :tasks,
+    {deal_products: [:product, :edition]}
+  ].freeze
+
   EmailAddressParser = Class.new do
     def self.extract(raw)
       return nil if raw.blank?
@@ -32,7 +37,7 @@ class GmailThreadLinker
   end
 
   def link(thread:, deal_id: nil, new_deal: nil)
-    deal = resolve_deal(deal_id: deal_id, new_deal: new_deal, thread: thread)
+    deal = reload_deal!(resolve_deal(deal_id: deal_id, new_deal: new_deal, thread: thread))
     imported = import_messages!(deal: deal, thread: thread)
     deal.track_activity(
       "email_linked",
@@ -58,7 +63,7 @@ class GmailThreadLinker
     by_thread = scope.where(gmail_thread_id: gmail_thread_id, user_id: @user.id).distinct.pluck(:record_id)
     by_message = scope.where(rfc822_message_id: rfc822_message_ids.compact).distinct.pluck(:record_id)
     deal_ids = (by_thread + by_message).uniq
-    @workspace.deals.where(id: deal_ids).includes(:company, :pipeline_stage).to_a
+    @workspace.deals.where(id: deal_ids).includes(DEAL_INCLUDES).to_a
   end
 
   def suggested_deals_for(participant_emails:)
@@ -70,7 +75,7 @@ class GmailThreadLinker
 
     @workspace.deals.joins(:deal_contacts)
       .where(deal_contacts: {person_id: person_ids})
-      .includes(:company, :pipeline_stage)
+      .includes(DEAL_INCLUDES)
       .distinct
       .order(updated_at: :desc)
       .limit(5)
@@ -227,14 +232,34 @@ class GmailThreadLinker
     Time.current
   end
 
+  def reload_deal!(deal)
+    @workspace.deals.includes(DEAL_INCLUDES).find(deal.id)
+  end
+
   def deal_payload(deal)
+    task = deal.next_pending_task
     {
       id: deal.id,
       name: deal.name,
       stage: deal.stage_label,
+      pipeline: deal.pipeline&.name,
       company_id: deal.company_id,
+      company_name: deal.company&.name,
+      value: deal.value.to_f,
+      currency: deal.currency,
+      owner_name: deal.owner&.name,
+      contacts: deal.contacts.map(&:display_name),
+      expected_close_date: deal.expected_close_date&.iso8601,
+      next_task: task ? {title: task.title, due_on: task.due_on&.iso8601} : nil,
+      products: deal.deal_products.map { |line| product_line_label(line) },
       url: deal_url(deal)
     }
+  end
+
+  def product_line_label(line)
+    label = line.product.name
+    edition = line.edition&.name
+    edition.present? ? "#{label} — #{edition}" : label
   end
 
   def message_payload(message)
