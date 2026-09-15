@@ -2,7 +2,7 @@
 <%= render RecordPickerComponent.new(
       form: form,
       attribute: :company_id,
-      label: "Company",
+      label: t("records.fields.company"),
       scope: current_workspace.companies.order(:name),
       search_url: picker_companies_path(format: :json),
       create_url: companies_path(format: :json),

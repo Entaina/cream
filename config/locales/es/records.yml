@@ -1,6 +1,65 @@
 ---
 es:
   companies:
+    duplicates:
+      all_companies: Todas las empresas
+      empty_subtitle: Cream busca empresas con el mismo dominio o nombres similares
+        en el workspace.
+      empty_title: No se encontraron empresas duplicadas
+      keep_by_default: Mantener por defecto
+      review_merge: Revisar fusión
+      title: Posibles duplicados
+    form:
+      about:
+        description: Qué hace esta empresa y cómo la describes.
+        title: Acerca de
+      custom:
+        description: Información adicional para tu workspace.
+        title: Campos personalizados
+      fiscal:
+        description: Razón social, CIF/NIF, dirección fiscal y datos bancarios.
+        placeholder: Razón social, CIF/NIF, dirección fiscal, IBAN...
+        title: Información fiscal
+      management:
+        description: Quién es responsable de esta cuenta.
+        title: Gestión
+      profile:
+        description: Dominio, sector, tamaño y ubicación.
+        employees_unknown: Desconocido
+        industry_placeholder: SaaS, Fintech...
+        location_placeholder: Ciudad, País
+        search_linkedin: Buscar en LinkedIn
+        title: Datos de la empresa
+    index:
+      empty_search: Prueba con otra búsqueda.
+      empty_subtitle: Añade las organizaciones con las que trabajas.
+      empty_title: No se encontraron empresas
+      search_placeholder: Buscar empresas...
+    merge:
+      cancel: Cancelar
+      companies_to_merge: Empresas a fusionar
+      company_to_keep: Empresa a conservar
+      confirm: "¿Fusionar las empresas seleccionadas en %{name}? Esta acción no se
+        puede deshacer."
+      merge: Fusionar empresas
+      merging: Fusionando…
+      no_domain: Sin dominio
+      no_suggestions: No hay empresas sugeridas para fusionar. Usa la búsqueda de
+        arriba para encontrar otras empresas en este workspace.
+      no_suggestions_named: No hay empresas duplicadas sugeridas para fusionar con
+        %{name}.
+      people_count:
+        one: "%{count} persona"
+        other: "%{count} personas"
+      subtitle: Las personas, oportunidades, notas, tareas, emails y actividad de
+        las empresas seleccionadas pasarán a la empresa de arriba.
+      title: Fusionar empresas
+    new:
+      back: ← Volver a empresas
+      title: Nueva empresa
+    edit:
+      back: ← Volver a la empresa
+      title: Editar %{name}
     show:
       about: Acerca de
       deals_empty: Todavía no hay oportunidades.
@@ -20,6 +79,67 @@ es:
       overview: Resumen de la empresa
       people_empty: Todavía no hay personas vinculadas a esta empresa.
   deals:
+    board:
+      next_stage: Etapa siguiente
+      previous_stage: Etapa anterior
+      reorder_column: Reordenar columna
+      reorder_column_title: Arrastrar para reordenar columna
+      title: Tablero de oportunidades
+    form:
+      contacts:
+        create: Crear contacto
+        create_contact: Nuevo contacto
+        errors:
+          network: Error de red, inténtalo de nuevo
+          pick_company: Selecciona primero una empresa.
+          select_team_member: Selecciona un miembro del equipo.
+        first_contact_date: Fecha de primer contacto
+        hint: Opcional. Contactos de la empresa cliente o del partner. Mantén ⌘/Ctrl
+          para elegir varios.
+        new: Nuevo
+        select_source: Seleccionar origen
+        select_team_member: Seleccionar miembro del equipo
+        source: Origen del contacto
+        team_member: Miembro del equipo
+      custom:
+        description: Información adicional para tu workspace.
+        title: Campos personalizados
+      management:
+        description: Quién es responsable de esta oportunidad.
+        title: Gestión
+      next_action:
+        task: Tarea
+        title: Siguiente acción (obligatoria)
+      overview:
+        description: Nombre, valor, etapa y fechas clave.
+        invoice_placeholder: FAC-2026-001
+        name_placeholder: Acme — Plan anual
+        title: Datos de la oportunidad
+      products:
+        create_one: Crea uno
+        empty_html: No hay productos en el catálogo. %{link}.
+        remove_title: Quitar producto
+        title: Productos de interés
+      relationships:
+        description: Empresa, partner y contactos de esta oportunidad.
+        title: Relaciones
+      stripe_payment_html: Creando desde un pago de Stripe de <strong>%{amount}</strong>
+        de %{customer}. El pago se vinculará a esta oportunidad al guardar.
+    index:
+      count:
+        one: "%{count} oportunidad"
+        other: "%{count} oportunidades"
+      empty_search: Prueba con otra búsqueda.
+      empty_subtitle: Añade tu primera oportunidad para empezar a seguir el pipeline.
+      empty_title: No se encontraron oportunidades
+      pipeline_column: Pipeline
+      search_placeholder: Buscar oportunidades...
+    new:
+      back: ← Volver al tablero
+      title: Nueva oportunidad
+    edit:
+      back: ← Volver a la oportunidad
+      title: Editar %{name}
     consent:
       date: 'Fecha:'
       hash: 'Hash:'
@@ -88,6 +208,76 @@ es:
       subscribed: Suscrito
       unsubscribed: Dado de baja
   people:
+    duplicates:
+      all_people: Todas las personas
+      empty_subtitle: Cream busca personas con la misma dirección de email en el workspace.
+      empty_title: No se encontraron contactos duplicados
+      keep_by_default: Mantener por defecto
+      review_merge: Revisar fusión
+      title: Posibles duplicados
+    form:
+      contact:
+        add_email: Añadir email
+        description: Cómo contactar con esta persona.
+        email_addresses: Direcciones de email
+        location_placeholder: Ciudad, País
+        remove_email: Quitar email
+        title: Datos de contacto
+      custom:
+        description: Información adicional para tu workspace.
+        title: Campos personalizados
+      management:
+        description: Quién es responsable de esta relación.
+        title: Gestión del contacto
+      profile:
+        description: Su rol, empresa y trayectoria.
+        linkedin_placeholder: https://linkedin.com/in/…
+        search_linkedin: Buscar en LinkedIn
+        title: Perfil profesional
+    index:
+      empty_search: Prueba con otra búsqueda.
+      empty_subtitle: Añade tu primer contacto para empezar a construir relaciones.
+      empty_title: No se encontraron personas
+      search_placeholder: Buscar personas...
+    interest_conversion:
+      cancel: Cancelar
+      create: Crear oportunidad
+      deal_name: Nombre de la oportunidad
+      next_action: Siguiente acción
+      product: Producto
+      signal: Señal
+      task_due: Fecha de la tarea
+      task_title_default: Contactar tras interés en %{product}
+      title: Convertir a SQL
+    merge:
+      cancel: Cancelar
+      confirm: "¿Fusionar los contactos seleccionados en %{name}? Esta acción no se
+        puede deshacer."
+      contact_to_keep: Contacto a conservar
+      contacts_to_merge: Contactos a fusionar
+      merge: Fusionar contactos
+      merging: Fusionando…
+      no_email: Sin email
+      no_suggestions: No hay contactos sugeridos para fusionar. Usa la búsqueda de
+        arriba para encontrar otros contactos en este workspace.
+      search_label: Buscar otros contactos
+      search_placeholder: Escribe para buscar…
+      same_email_hint: También se listan contactos con el mismo email en otras empresas.
+      subtitle: Las notas, tareas, oportunidades, emails y actividad de los contactos
+        seleccionados pasarán al contacto de arriba.
+      title: Fusionar contactos
+    new:
+      back: ← Volver a personas
+      title: Nueva persona
+    edit:
+      back: ← Volver al contacto
+      title: Editar %{name}
+    sources:
+      beehiiv: Beehiiv
+      booking: Reserva online
+      referral: Recomendado
+      team_member: Lo trae alguien del equipo
+      web_form: Formulario web
     interest_status:
       converted: Convertido
       dismissed: Descartado
@@ -274,6 +464,7 @@ es:
       lists: Listas
       location: Ubicación
       management: Gestión
+      name: Nombre
       owner: Propietario
       partner: Partner
       people: Personas

@@ -3,7 +3,7 @@
   <% if reorderable %>
     <span role="button" tabindex="-1" data-kanban-target="columnHandle"
           class="cursor-grab active:cursor-grabbing text-ink-faint hover:text-ink-soft p-0.5 -ml-1 touch-none select-none shrink-0"
-          title="Drag to reorder column" aria-label="Reorder column"
+          title="<%= t("deals.board.reorder_column_title") %>" aria-label="<%= t("deals.board.reorder_column") %>"
           data-action="pointerdown->kanban#columnPointerDown">
       <%= icon :grip, classes: "size-3.5 pointer-events-none" %>
     </span>

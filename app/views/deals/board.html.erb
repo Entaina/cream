@@ -1,4 +1,4 @@
-<% page_title "Deals board" %>
+<% page_title t("deals.board.title") %>
 <% board_deal_count = @board_stage_columns.sum { |column| column[:deals].size } %>
 <% actions = capture do %>
   <% if @pipelines.size > 1 %>
@@ -12,16 +12,16 @@
   <%= link_to board_deals_path(closed_toggle_params),
         class: show_closed? ? "btn-secondary" : "btn-ghost" do %>
     <%= icon :check_circle, classes: "size-3.5" %>
-    <%= show_closed? ? "Closed shown" : "Show closed" %>
+    <%= show_closed? ? t("shared.lists.closed_shown") : t("shared.lists.show_closed") %>
   <% end %>
   <%= link_to deals_path(filter_form_params), class: "btn-secondary" do %>
-    <%= icon :list, classes: "size-3.5" %> Table
+    <%= icon :list, classes: "size-3.5" %> <%= t("shared.lists.table") %>
   <% end %>
   <%= link_to new_deal_path, class: "btn-primary" do %>
-    <%= icon :plus, classes: "size-3.5" %> New deal
+    <%= icon :plus, classes: "size-3.5" %> <%= t("shared.lists.new_deal") %>
   <% end %>
 <% end %>
-<%= render "shared/page_header", title: "Deals", icon_name: :banknote,
+<%= render "shared/page_header", title: t("nav.deals"), icon_name: :banknote,
       count: board_deal_count, actions: actions %>
 <%= render "shared/view_tabs", views: @saved_views, record_type: "Deal" %>
 
@@ -29,7 +29,7 @@
   <div class="md:hidden flex items-center justify-between gap-2 border-b border-line px-5 py-2 shrink-0 bg-canvas">
     <button type="button"
             class="btn-ghost p-1.5 disabled:opacity-40"
-            aria-label="Previous stage"
+            aria-label="<%= t("deals.board.previous_stage") %>"
             data-board-pager-target="prevBtn"
             data-action="board-pager#prev">
       <%= icon :chevron_left, classes: "size-4" %>
@@ -40,7 +40,7 @@
     </div>
     <button type="button"
             class="btn-ghost p-1.5 disabled:opacity-40"
-            aria-label="Next stage"
+            aria-label="<%= t("deals.board.next_stage") %>"
             data-board-pager-target="nextBtn"
             data-action="board-pager#next">
       <%= icon :chevron_right, classes: "size-4" %>
@@ -53,11 +53,11 @@
     <%= hidden_field_tag :closed, "1" if show_closed? %>
     <div class="relative max-w-xs flex-1">
       <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-ink-faint"><%= icon :search, classes: "size-3.5" %></span>
-      <%= text_field_tag :q, filter_value(:q), placeholder: "Search deals...", class: "input pl-8" %>
+      <%= text_field_tag :q, filter_value(:q), placeholder: t("deals.index.search_placeholder"), class: "input pl-8" %>
     </div>
     <%= render "filters", show_stage: false %>
     <% if filters_active? %>
-      <%= link_to "Clear", board_deals_path(clear_filters: 1), class: "btn-ghost" %>
+      <%= link_to t("shared.lists.clear"), board_deals_path(clear_filters: 1), class: "btn-ghost" %>
     <% end %>
   <% end %>
 </div>

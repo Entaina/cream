@@ -4,8 +4,8 @@
 </div>
 <div data-controller="nested-form">
   <div class="flex items-center justify-between gap-2 mb-2">
-    <span class="label mb-0">Email addresses</span>
-    <button type="button" data-action="nested-form#add" class="btn-ghost"><%= icon :plus, classes: "size-3.5" %> Add email</button>
+    <span class="label mb-0"><%= t("people.form.contact.email_addresses") %></span>
+    <button type="button" data-action="nested-form#add" class="btn-ghost"><%= icon :plus, classes: "size-3.5" %> <%= t("people.form.contact.add_email") %></button>
   </div>
   <div data-nested-form-target="list" class="space-y-2">
     <%= f.fields_for :person_emails do |email_form| %><%= render "email_fields", form: email_form %><% end %>
@@ -16,5 +16,5 @@
 </div>
 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
   <div><%= f.label :phone, class: "label" %><%= f.telephone_field :phone, class: "input", autocomplete: "tel" %></div>
-  <div><%= f.label :location, class: "label" %><%= f.text_field :location, class: "input", placeholder: "City, Country" %></div>
+  <div><%= f.label :location, class: "label" %><%= f.text_field :location, class: "input", placeholder: t("people.form.contact.location_placeholder") %></div>
 </div>

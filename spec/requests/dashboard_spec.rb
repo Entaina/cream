@@ -48,8 +48,8 @@ RSpec.describe "Dashboard active pipeline", type: :request do
       get root_path
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include("Director de ventas")
-      expect(response.body).to include("Generar ahora")
+      expect(response.body).to include(I18n.t("dashboard.briefing.sales_director"))
+      expect(response.body).to include(I18n.t("dashboard.briefing.generate"))
     end
 
     it "shows urgent and important items when a briefing exists" do
@@ -69,14 +69,14 @@ RSpec.describe "Dashboard active pipeline", type: :request do
       get root_path
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include("Equipo")
+      expect(response.body).to include(I18n.t("dashboard.briefing.team"))
       expect(response.body).to include("Pipeline estable con riesgos puntuales")
-      expect(response.body).to include("Urgente")
+      expect(response.body).to include(I18n.t("dashboard.briefing.categories.urgent"))
       expect(response.body).to include("Llamar a ACME hoy")
       expect(response.body).to include("Preparar propuesta para Beta")
-      expect(response.body).to include("Regenerar")
-      expect(response.body).to include("Quedan 5 regeneraciones hoy")
-      expect(response.body).not_to include("Generar ahora")
+      expect(response.body).to include(I18n.t("dashboard.briefing.regenerate"))
+      expect(response.body).to include(I18n.t("dashboard.briefing.regenerations_left", count: 5))
+      expect(response.body).not_to include(I18n.t("dashboard.briefing.generate"))
     end
 
     it "hides the regenerate button when the daily limit is reached" do
@@ -100,9 +100,9 @@ RSpec.describe "Dashboard active pipeline", type: :request do
       get root_path
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).not_to include("Regenerar")
-      expect(response.body).not_to include("Generar ahora")
-      expect(response.body).to include("Has usado las 5 regeneraciones de hoy")
+      expect(response.body).not_to include(I18n.t("dashboard.briefing.regenerate"))
+      expect(response.body).not_to include(I18n.t("dashboard.briefing.generate"))
+      expect(response.body).to include(I18n.t("dashboard.briefing.regenerations_used"))
     end
 
     it "shows the personal briefing for the current user only" do
@@ -129,7 +129,7 @@ RSpec.describe "Dashboard active pipeline", type: :request do
       get root_path
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include("Para ti")
+      expect(response.body).to include(I18n.t("dashboard.briefing.for_you"))
       expect(response.body).to include("Hoy debes cerrar ACME")
       expect(response.body).to include("Ganaste el deal Beta la semana pasada")
       expect(response.body).to include("Dejaste vencer la tarea con Gamma")
@@ -144,7 +144,7 @@ RSpec.describe "Dashboard active pipeline", type: :request do
       get root_path
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).not_to include("Director de ventas")
+      expect(response.body).not_to include(I18n.t("dashboard.briefing.sales_director"))
     end
 
     it "hides the section when sales director is disabled for the workspace" do
@@ -154,7 +154,7 @@ RSpec.describe "Dashboard active pipeline", type: :request do
       get root_path
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).not_to include("Director de ventas")
+      expect(response.body).not_to include(I18n.t("dashboard.briefing.sales_director"))
     end
 
     it "hides the section when the user disabled the briefing in profile" do
@@ -164,7 +164,7 @@ RSpec.describe "Dashboard active pipeline", type: :request do
       get root_path
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).not_to include("Director de ventas")
+      expect(response.body).not_to include(I18n.t("dashboard.briefing.sales_director"))
     end
   end
 

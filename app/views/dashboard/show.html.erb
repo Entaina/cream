@@ -1,5 +1,5 @@
-<% page_title "Dashboard" %>
-<%= render "shared/page_header", title: "Dashboard", icon_name: :home, count: nil, actions: nil %>
+<% page_title t("dashboard.title") %>
+<%= render "shared/page_header", title: t("dashboard.title"), icon_name: :home, count: nil, actions: nil %>
 
 <div class="flex-1 overflow-y-auto scrollbar-subtle p-5 space-y-5">
   <%= render "sales_director" if sales_director_enabled? %>
@@ -7,10 +7,10 @@
   <%# Metric cards %>
   <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
     <% [
-      [ "People", @people_count, :users, people_path ],
-      [ "Companies", @companies_count, :building, companies_path ],
-      [ "Open pipeline", money(@open_deals_value), :banknote, board_deals_path ],
-      [ "Won revenue", money(@won_deals_value), :check_circle, board_deals_path ],
+      [ t("dashboard.metrics.people"), @people_count, :users, people_path ],
+      [ t("dashboard.metrics.companies"), @companies_count, :building, companies_path ],
+      [ t("dashboard.metrics.open_pipeline"), money(@open_deals_value), :banknote, board_deals_path ],
+      [ t("dashboard.metrics.won_revenue"), money(@won_deals_value), :check_circle, board_deals_path ],
     ].each do |label, value, icon_name, path| %>
       <%= link_to path, class: "card p-4 hover:border-line-strong transition-colors" do %>
         <div class="flex items-center gap-2 text-ink-faint text-sm font-medium mb-2">
@@ -25,12 +25,12 @@
     <%# Pipeline by stage %>
     <section class="card p-4">
       <div class="flex items-center justify-between mb-3">
-        <h2 class="text-base font-semibold">Pipeline by stage</h2>
+        <h2 class="text-base font-semibold"><%= t("dashboard.pipeline_by_stage") %></h2>
         <div class="flex items-center gap-2">
           <%= link_to root_path(closed: show_closed? ? nil : "1"),
                 class: show_closed? ? "btn-secondary" : "btn-ghost" do %>
             <%= icon :check_circle, classes: "size-3.5" %>
-            <%= show_closed? ? "Closed shown" : "Show closed" %>
+            <%= show_closed? ? t("dashboard.closed_shown") : t("dashboard.show_closed") %>
           <% end %>
           <% if @pipelines.size > 1 %>
             <%= render "shared/active_pipeline_select",
@@ -69,7 +69,7 @@
                     workspace: current_workspace) %>
               <%= link_to drill_down.path,
                     class: "flex items-center gap-3 rounded-md -mx-1 px-1 py-0.5 hover:bg-canvas-soft transition-colors group",
-                    title: "View #{stage.name} deals in list" do %>
+                    title: t("dashboard.view_stage_deals", stage: stage.name) do %>
                 <span class="w-24 text-sm text-ink-soft shrink-0 group-hover:text-ink"><%= stage_display_name(stage) %></span>
                 <div class="flex-1 h-5 rounded bg-canvas-raised ring-1 ring-inset ring-line overflow-hidden">
                   <div class="h-full rounded <%= stage_bar_classes(stage.color) %> group-hover:opacity-90" style="width: <%= count.zero? ? 0 : (count * 100.0 / max).round %>%"></div>
@@ -80,15 +80,15 @@
           <% end %>
         </div>
       <% else %>
-        <p class="text-base text-ink-faint">No stages in this pipeline.</p>
+        <p class="text-base text-ink-faint"><%= t("dashboard.no_stages") %></p>
       <% end %>
     </section>
 
     <%# Upcoming tasks %>
     <section class="card p-4">
       <div class="flex items-center justify-between mb-3">
-        <h2 class="text-base font-semibold">My tasks</h2>
-        <%= link_to "View all", tasks_path, class: "text-sm text-accent hover:underline" %>
+        <h2 class="text-base font-semibold"><%= t("dashboard.my_tasks") %></h2>
+        <%= link_to t("dashboard.view_all_tasks"), tasks_path, class: "text-sm text-accent hover:underline" %>
       </div>
       <% if @pending_tasks.any? %>
         <ul class="space-y-1.5">
@@ -108,14 +108,14 @@
           <% end %>
         </ul>
       <% else %>
-        <p class="text-base text-ink-faint">No pending tasks. Enjoy the calm 🍦</p>
+        <p class="text-base text-ink-faint"><%= t("dashboard.no_pending_tasks") %></p>
       <% end %>
     </section>
   </div>
 
   <%# Recent activity %>
   <section class="card p-4">
-    <h2 class="text-base font-semibold mb-3">Recent activity</h2>
+    <h2 class="text-base font-semibold mb-3"><%= t("dashboard.recent_activity") %></h2>
     <% if @recent_activities.any? %>
       <ul class="space-y-2.5">
         <% @recent_activities.each do |activity| %>
@@ -130,12 +130,12 @@
               <%= link_to activity.subject.display_name, record_path_for(activity.subject),
                     class: "font-medium text-ink hover:text-accent truncate" %>
             <% end %>
-            <span class="ml-auto text-xs text-ink-faint shrink-0"><%= time_ago_in_words(activity.created_at) %> ago</span>
+            <span class="ml-auto text-xs text-ink-faint shrink-0"><%= t("dashboard.time_ago", time: time_ago_in_words(activity.created_at)) %></span>
           </li>
         <% end %>
       </ul>
     <% else %>
-      <p class="text-base text-ink-faint">Nothing has happened yet — create your first record.</p>
+      <p class="text-base text-ink-faint"><%= t("dashboard.nothing_yet") %></p>
     <% end %>
   </section>
 </div>

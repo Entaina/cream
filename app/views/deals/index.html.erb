@@ -1,26 +1,26 @@
-<% page_title "Deals" %>
+<% page_title t("nav.deals") %>
 <% actions = capture do %>
   <%= link_to board_deals_path(filter_form_params), class: "btn-secondary" do %>
-    <%= icon :columns, classes: "size-3.5" %> Board
+    <%= icon :columns, classes: "size-3.5" %> <%= t("shared.lists.board") %>
   <% end %>
   <%= link_to deals_path(index_query_params(closed: show_closed? ? nil : "1")),
         class: show_closed? ? "btn-secondary" : "btn-ghost" do %>
     <%= icon :check_circle, classes: "size-3.5" %>
-    <%= show_closed? ? "Closed shown" : "Show closed" %>
+    <%= show_closed? ? t("shared.lists.closed_shown") : t("shared.lists.show_closed") %>
   <% end %>
 <% if feature_enabled?(:csv_import_export) %>
   <%= link_to new_import_path(record_type: "Deal"), class: "btn-secondary" do %>
-    <%= icon :upload, classes: "size-3.5" %> Import
+    <%= icon :upload, classes: "size-3.5" %> <%= t("shared.lists.import") %>
   <% end %>
   <%= link_to export_path(record_type: "Deal", **filter_form_params), class: "btn-secondary" do %>
-    <%= icon :download, classes: "size-3.5" %> Export
+    <%= icon :download, classes: "size-3.5" %> <%= t("shared.lists.export") %>
   <% end %>
 <% end %>
   <%= link_to new_deal_path, class: "btn-primary" do %>
-    <%= icon :plus, classes: "size-3.5" %> New deal
+    <%= icon :plus, classes: "size-3.5" %> <%= t("shared.lists.new_deal") %>
   <% end %>
 <% end %>
-<%= render "shared/page_header", title: "Deals", icon_name: :banknote, count: @pagy.count, actions: actions %>
+<%= render "shared/page_header", title: t("nav.deals"), icon_name: :banknote, count: @pagy.count, actions: actions %>
 <%= render "shared/view_tabs", views: @saved_views, record_type: "Deal", surface: "table" %>
 
 <div class="flex flex-wrap items-center gap-2 border-b border-line px-5 py-2 shrink-0">
@@ -32,12 +32,12 @@
     <% end %>
     <div class="relative max-w-xs min-w-40 flex-1">
       <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-ink-faint"><%= icon :search, classes: "size-3.5" %></span>
-      <%= text_field_tag :q, filter_value(:q), placeholder: "Search deals...", class: "input pl-8" %>
+      <%= text_field_tag :q, filter_value(:q), placeholder: t("deals.index.search_placeholder"), class: "input pl-8" %>
     </div>
     <%= render "filters" %>
     <%= render "shared/custom_field_filters", fields: @custom_fields, cf: filter_value(:cf) %>
     <% if filters_active? %>
-      <%= link_to "Clear", deals_path(clear_filters: 1), class: "btn-ghost" %>
+      <%= link_to t("shared.lists.clear"), deals_path(clear_filters: 1), class: "btn-ghost" %>
     <% end %>
   <% end %>
   <% if @pipelines.size > 1 %>
@@ -54,20 +54,20 @@
     <table class="table-base">
       <thead>
         <tr>
-          <th><%= sort_link "Name", :name %></th>
+          <th><%= sort_link t("records.fields.name"), :name %></th>
           <% unless @display_pipeline %>
-            <th>Pipeline</th>
+            <th><%= t("deals.index.pipeline_column") %></th>
           <% end %>
-          <th><%= @display_pipeline ? sort_link("Stage", :stage) : "Stage" %></th>
-          <th><%= sort_link "Value", :value %></th>
-          <th>Company</th>
-          <th>First name</th>
-          <th>Last name</th>
-          <th>Email</th>
-          <th>Phone</th>
-          <th><%= sort_link "Close date", :expected_close_date %></th>
-          <th><%= sort_link "Nº factura", :invoice_number %></th>
-          <th>Owner</th>
+          <th><%= @display_pipeline ? sort_link(t("records.fields.stage"), :stage) : t("records.fields.stage") %></th>
+          <th><%= sort_link t("records.fields.value"), :value %></th>
+          <th><%= t("records.fields.company") %></th>
+          <th><%= t("activerecord.attributes.person.first_name") %></th>
+          <th><%= t("activerecord.attributes.person.last_name") %></th>
+          <th><%= t("records.fields.email") %></th>
+          <th><%= t("records.fields.phone") %></th>
+          <th><%= sort_link t("records.fields.close_date"), :expected_close_date %></th>
+          <th><%= sort_link t("records.fields.invoice_number"), :invoice_number %></th>
+          <th><%= t("records.fields.owner") %></th>
           <%= render "shared/magic_column_headers", record_type: "Deal" %>
           <%= render "shared/custom_field_headers", fields: @custom_fields %>
         </tr>
@@ -111,10 +111,10 @@
   <% else %>
     <% action = capture do %>
       <%= link_to new_deal_path, class: "btn-primary" do %>
-        <%= icon :plus, classes: "size-3.5" %> New deal
+        <%= icon :plus, classes: "size-3.5" %> <%= t("shared.lists.new_deal") %>
       <% end %>
     <% end %>
-    <%= render "shared/empty_state", icon_name: :banknote, title: "No deals found",
-          subtitle: "Track your sales opportunities through the pipeline.", action: action %>
+    <%= render "shared/empty_state", icon_name: :banknote, title: t("deals.index.empty_title"),
+          subtitle: t("deals.index.empty_subtitle"), action: action %>
   <% end %>
 </div>

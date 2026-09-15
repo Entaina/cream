@@ -146,7 +146,7 @@ RSpec.describe "People", type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(person.reload.owner).to be_nil
-      expect(response.body).to include("Unassigned")
+      expect(response.body).to include(I18n.t("shared.lists.unassigned"))
     end
 
     it "rejects a company from another workspace" do

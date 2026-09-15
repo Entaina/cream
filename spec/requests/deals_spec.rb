@@ -306,7 +306,7 @@ RSpec.describe "Deals", type: :request do
       get deals_path
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include(">Pipeline</th>")
+      expect(response.body).to include(">#{I18n.t("deals.index.pipeline_column")}</th>")
       expect(response.body).to include("Ventas")
       expect(response.body).to include("Partners")
     end
@@ -318,7 +318,7 @@ RSpec.describe "Deals", type: :request do
       get deals_path
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).not_to include(">Pipeline</th>")
+      expect(response.body).not_to include(">#{I18n.t("deals.index.pipeline_column")}</th>")
     end
 
     it "shows all deals when all pipelines is selected" do
@@ -459,7 +459,7 @@ RSpec.describe "Deals", type: :request do
       expect(response.body).to include(">Ventas</p>")
       expect(response.body).to include(">Partners</p>")
       expect(response.body.scan("data-board-pager-stage-name>Lead<").size).to eq(1)
-      expect(response.body).to include("All pipelines")
+      expect(response.body).to include(I18n.t("shared.lists.all_pipelines"))
     end
   end
 
@@ -481,7 +481,7 @@ RSpec.describe "Deals", type: :request do
       get board_deals_path
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include("Save view")
+      expect(response.body).to include(I18n.t("shared.views.save_view"))
       expect(response.body).to include('href="/deals/board?clear_filters=1"')
     end
 
@@ -524,7 +524,7 @@ RSpec.describe "Deals", type: :request do
       get board_deals_path(view: view.id)
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).not_to include("Update view")
+      expect(response.body).not_to include(I18n.t("shared.views.update_view"))
     end
   end
 

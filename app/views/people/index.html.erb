@@ -1,24 +1,24 @@
-<% page_title "People" %>
+<% page_title t("nav.people") %>
 <% actions = capture do %>
   <%= link_to duplicates_people_path, class: "btn-secondary" do %>
-    <%= icon :users, classes: "size-3.5" %> Possible duplicates
+    <%= icon :users, classes: "size-3.5" %> <%= t("shared.lists.possible_duplicates") %>
     <% if @duplicate_group_count.positive? %>
       <span class="ml-1 inline-flex items-center rounded-full bg-accent-soft px-1.5 py-0.5 text-2xs font-semibold text-accent-dark"><%= @duplicate_group_count %></span>
     <% end %>
   <% end %>
 <% if feature_enabled?(:csv_import_export) %>
   <%= link_to new_import_path(record_type: "Person"), class: "btn-secondary" do %>
-    <%= icon :upload, classes: "size-3.5" %> Import
+    <%= icon :upload, classes: "size-3.5" %> <%= t("shared.lists.import") %>
   <% end %>
   <%= link_to export_path(record_type: "Person", **filter_form_params), class: "btn-secondary" do %>
-    <%= icon :download, classes: "size-3.5" %> Export
+    <%= icon :download, classes: "size-3.5" %> <%= t("shared.lists.export") %>
   <% end %>
 <% end %>
   <%= link_to new_person_path, class: "btn-primary" do %>
-    <%= icon :plus, classes: "size-3.5" %> New person
+    <%= icon :plus, classes: "size-3.5" %> <%= t("shared.lists.new_person") %>
   <% end %>
 <% end %>
-<%= render "shared/page_header", title: "People", icon_name: :users, count: @pagy.count, actions: actions %>
+<%= render "shared/page_header", title: t("nav.people"), icon_name: :users, count: @pagy.count, actions: actions %>
 <%= render "shared/view_tabs", views: @saved_views, record_type: "Person" %>
 
 <div class="flex flex-wrap items-center gap-2 border-b border-line px-5 py-2 shrink-0">
@@ -26,20 +26,20 @@
     <%= hidden_field_tag :view, @active_view.id if @active_view %>
     <div class="relative max-w-xs min-w-40 flex-1">
       <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-ink-faint"><%= icon :search, classes: "size-3.5" %></span>
-      <%= text_field_tag :q, filter_value(:q), placeholder: "Search people...", class: "input pl-8" %>
+      <%= text_field_tag :q, filter_value(:q), placeholder: t("people.index.search_placeholder"), class: "input pl-8" %>
     </div>
     <%= select_tag :company_id,
-          options_for_select([ [ "No company", ListFilters::NONE ] ] + @companies.map { |company| [ company.name, company.id ] }, filter_value(:company_id)),
-          include_blank: "All companies", class: "input w-44",
+          options_for_select([ [ t("shared.lists.no_company"), ListFilters::NONE ] ] + @companies.map { |company| [ company.name, company.id ] }, filter_value(:company_id)),
+          include_blank: t("shared.lists.all_companies"), class: "input w-44",
           onchange: "this.form.requestSubmit()" %>
     <%= select_tag :owner_id,
-          options_for_select([ [ "Unassigned", ListFilters::NONE ] ] + @owners.map { |owner| [ owner.name, owner.id ] }, filter_value(:owner_id)),
-          include_blank: "All owners", class: "input w-44",
+          options_for_select([ [ t("shared.lists.unassigned"), ListFilters::NONE ] ] + @owners.map { |owner| [ owner.name, owner.id ] }, filter_value(:owner_id)),
+          include_blank: t("shared.lists.all_owners"), class: "input w-44",
           onchange: "this.form.requestSubmit()" %>
-    <%= render "shared/date_range_filter", label: "Created", from: :created_from, to: :created_to %>
+    <%= render "shared/date_range_filter", label: t("shared.lists.created"), from: :created_from, to: :created_to %>
     <%= render "shared/custom_field_filters", fields: @custom_fields, cf: filter_value(:cf) %>
     <% if filters_active? %>
-      <%= link_to "Clear", people_path(clear_filters: 1), class: "btn-ghost" %>
+      <%= link_to t("shared.lists.clear"), people_path(clear_filters: 1), class: "btn-ghost" %>
     <% end %>
   <% end %>
 </div>
@@ -49,12 +49,12 @@
     <table class="table-base">
       <thead>
         <tr>
-          <th><%= sort_link "Name", :first_name %></th>
-          <th><%= sort_link "Email", :email %></th>
-          <th>Company</th>
-          <th><%= sort_link "Job title", :job_title %></th>
-          <th><%= sort_link "Location", :location %></th>
-          <th>Owner</th>
+          <th><%= sort_link t("records.fields.name"), :first_name %></th>
+          <th><%= sort_link t("records.fields.email"), :email %></th>
+          <th><%= t("records.fields.company") %></th>
+          <th><%= sort_link t("records.fields.job_title"), :job_title %></th>
+          <th><%= sort_link t("records.fields.location"), :location %></th>
+          <th><%= t("records.fields.owner") %></th>
           <%= render "shared/magic_column_headers", record_type: "Person" %>
           <%= render "shared/custom_field_headers", fields: @custom_fields %>
         </tr>
@@ -86,11 +86,11 @@
   <% else %>
     <% action = capture do %>
       <%= link_to new_person_path, class: "btn-primary" do %>
-        <%= icon :plus, classes: "size-3.5" %> New person
+        <%= icon :plus, classes: "size-3.5" %> <%= t("shared.lists.new_person") %>
       <% end %>
     <% end %>
-    <%= render "shared/empty_state", icon_name: :users, title: "No people found",
-          subtitle: filter_value(:q).present? ? "Try a different search." : "Add your first contact to start building relationships.",
+    <%= render "shared/empty_state", icon_name: :users, title: t("people.index.empty_title"),
+          subtitle: filter_value(:q).present? ? t("people.index.empty_search") : t("people.index.empty_subtitle"),
           action: action %>
   <% end %>
 </div>

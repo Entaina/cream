@@ -4,12 +4,12 @@
 </div>
 <div>
   <div class="flex items-center justify-between gap-2 mb-1">
-    <%= f.label :linkedin_url, "LinkedIn URL", class: "label mb-0" %>
+    <%= f.label :linkedin_url, t("activerecord.attributes.person.linkedin_url"), class: "label mb-0" %>
     <% if person.persisted? %>
-      <%= link_to "Search LinkedIn", "https://www.linkedin.com/search/results/people/?keywords=#{ERB::Util.url_encode([person.display_name, person.company&.name].compact.join(' '))}", target: "_blank", rel: "noopener", class: "btn-ghost text-sm" %>
-    <% else %><button type="button" class="btn-ghost text-sm" data-action="linkedin-suggest#search">Search LinkedIn</button><% end %>
+      <%= link_to t("people.form.profile.search_linkedin"), "https://www.linkedin.com/search/results/people/?keywords=#{ERB::Util.url_encode([person.display_name, person.company&.name].compact.join(' '))}", target: "_blank", rel: "noopener", class: "btn-ghost text-sm" %>
+    <% else %><button type="button" class="btn-ghost text-sm" data-action="linkedin-suggest#search"><%= t("people.form.profile.search_linkedin") %></button><% end %>
   </div>
-  <%= f.url_field :linkedin_url, class: "input", placeholder: "https://linkedin.com/in/…" %>
+  <%= f.url_field :linkedin_url, class: "input", placeholder: t("people.form.profile.linkedin_placeholder") %>
 </div>
-<div><%= f.label :twitter_url, "X / Twitter URL", class: "label" %><%= f.url_field :twitter_url, class: "input" %></div>
-<div><%= f.label :description, "About", class: "label" %><%= f.text_area :description, rows: 4, class: "input" %></div>
+<div><%= f.label :twitter_url, t("activerecord.attributes.person.twitter_url"), class: "label" %><%= f.url_field :twitter_url, class: "input" %></div>
+<div><%= f.label :description, t("activerecord.attributes.person.description"), class: "label" %><%= f.text_area :description, rows: 4, class: "input" %></div>

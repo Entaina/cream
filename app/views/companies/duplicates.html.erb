@@ -1,10 +1,10 @@
-<% page_title "Possible duplicates" %>
+<% page_title t("companies.duplicates.title") %>
 <% actions = capture do %>
   <%= link_to companies_path, class: "btn-secondary" do %>
-    <%= icon :building, classes: "size-3.5" %> All companies
+    <%= icon :building, classes: "size-3.5" %> <%= t("companies.duplicates.all_companies") %>
   <% end %>
 <% end %>
-<%= render "shared/page_header", title: "Possible duplicates", icon_name: :building, count: @groups.size, actions: actions %>
+<%= render "shared/page_header", title: t("companies.duplicates.title"), icon_name: :building, count: @groups.size, actions: actions %>
 
 <div class="flex-1 overflow-y-auto scrollbar-subtle p-5">
   <% if @groups.any? %>
@@ -19,7 +19,7 @@
             </div>
             <%= link_to merge_company_path(primary, secondary_ids: group.companies.drop(1).map(&:id)),
                   class: "btn-primary" do %>
-              <%= icon :building, classes: "size-3.5" %> Review merge
+              <%= icon :building, classes: "size-3.5" %> <%= t("companies.duplicates.review_merge") %>
             <% end %>
           </div>
 
@@ -39,9 +39,9 @@
                 </div>
                 <div class="text-sm text-ink-faint shrink-0 text-right">
                   <% if company == primary %>
-                    <span class="badge">Keep by default</span>
+                    <span class="badge"><%= t("companies.duplicates.keep_by_default") %></span>
                   <% end %>
-                  <p><%= pluralize(company.people.size, "person") %> · <%= pluralize(company.deals.size, "deal") %></p>
+                  <p><%= t("companies.merge.people_count", count: company.people.size) %> · <%= t("deals.index.count", count: company.deals.size) %></p>
                 </div>
               </li>
             <% end %>
@@ -50,7 +50,7 @@
       <% end %>
     </div>
   <% else %>
-    <%= render "shared/empty_state", icon_name: :building, title: "No duplicate companies found",
-          subtitle: "Cream looks for companies with similar names or the same domain." %>
+    <%= render "shared/empty_state", icon_name: :building, title: t("companies.duplicates.empty_title"),
+          subtitle: t("companies.duplicates.empty_subtitle") %>
   <% end %>
 </div>

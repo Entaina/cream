@@ -4,7 +4,12 @@ import { Controller } from "@hotwired/stimulus"
 // their people, and lets you create a new contact in the client company without leaving.
 export default class extends Controller {
   static targets = ["companySelect", "partnerSelect", "select", "dialog", "firstName", "lastName", "email", "phone", "source", "broughtByRow", "broughtBy", "firstContactOn", "notice", "error", "submit"]
-  static values = { peopleUrl: String }
+  static values = {
+    peopleUrl: String,
+    pickCompanyError: String,
+    selectTeamMemberError: String,
+    networkError: String
+  }
 
   connect() {
     this.toggleBroughtBy()
@@ -57,7 +62,7 @@ export default class extends Controller {
   open(event) {
     event.preventDefault()
     if (!this.companySelectTarget.value) {
-      this.noticeTarget.textContent = "Pick a company first."
+      this.noticeTarget.textContent = this.pickCompanyErrorValue
       this.show(this.noticeTarget)
       return
     }
@@ -95,7 +100,7 @@ export default class extends Controller {
     const last = this.lastNameTarget.value.trim()
     if (!first) { this.firstNameTarget.focus(); return }
     if (this.sourceTarget.value === "team_member" && !this.broughtByTarget.value) {
-      this.error("Select a team member.")
+      this.error(this.selectTeamMemberErrorValue)
       this.broughtByTarget.focus()
       return
     }
@@ -130,7 +135,7 @@ export default class extends Controller {
       this.selectTarget.add(new Option(created.name, created.id, true, true))
       this.close()
     } catch {
-      this.error("Network error, please try again")
+      this.error(this.networkErrorValue)
     } finally {
       this.submitTarget.disabled = false
     }

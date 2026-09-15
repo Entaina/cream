@@ -3,7 +3,7 @@
   <%= hidden_field_tag :return_to, return_to %>
   <%= select_tag :pipeline_id,
         options_for_select(pipelines.map { |p| [ p.name, p.id ] }, selected_pipeline&.id),
-        **(include_all ? { include_blank: "All pipelines" } : {}),
+        **(include_all ? { include_blank: t("shared.lists.all_pipelines") } : {}),
         class: select_class,
         onchange: "this.form.requestSubmit()" %>
 <% end %>

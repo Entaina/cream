@@ -7,7 +7,7 @@
   <span class="min-w-0">
     <span class="font-medium block"><%= candidate.display_name %></span>
     <span class="text-sm text-ink-faint block">
-      <%= [ candidate.company.name, candidate.email, candidate.job_title, pluralize(candidate.deals.size, "deal") ].compact_blank.join(" · ") %>
+      <%= [ candidate.company.name, candidate.email, candidate.job_title, t("deals.index.count", count: candidate.deals.size) ].compact_blank.join(" · ") %>
     </span>
   </span>
 </label>

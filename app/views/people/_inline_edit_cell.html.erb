@@ -24,7 +24,7 @@
           <%= avatar(person.owner, size: "size-5", text: "text-2xs") %>
         </span>
       <% else %>
-        <span class="text-ink-faint text-xs">Unassigned</span>
+        <span class="text-ink-faint text-xs"><%= t("shared.lists.unassigned") %></span>
       <% end %>
     <% end %>
   </div>
@@ -40,7 +40,7 @@
         <%= render "shared/company_select", form: f %>
       <% else %>
         <%= f.collection_select :owner_id, current_workspace.users.order(:name), :id, :name,
-              { include_blank: "Unassigned" },
+              { include_blank: t("shared.lists.unassigned") },
               class: "input" %>
       <% end %>
     <% end %>

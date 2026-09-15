@@ -17,7 +17,7 @@
         <%= avatar owner, size: "size-4", text: "text-2xs" %>
         <%= owner.name %>
         <% if mine %>
-          <span class="text-hoki-700 font-medium">(tú)</span>
+          <span class="text-hoki-700 font-medium"><%= t("dashboard.briefing.you") %></span>
         <% end %>
       </span>
     <% end %>

@@ -1,11 +1,16 @@
-<div data-controller="deal-contacts" data-deal-contacts-people-url-value="<%= people_path %>" class="space-y-4">
+<div data-controller="deal-contacts"
+     data-deal-contacts-people-url-value="<%= people_path %>"
+     data-deal-contacts-pick-company-error-value="<%= t("deals.form.contacts.errors.pick_company") %>"
+     data-deal-contacts-select-team-member-error-value="<%= t("deals.form.contacts.errors.select_team_member") %>"
+     data-deal-contacts-network-error-value="<%= t("deals.form.contacts.errors.network") %>"
+     class="space-y-4">
   <%= render "shared/company_select", form: f,
         select_data: {"deal-contacts-target": "companySelect", action: "change->deal-contacts#companyChanged"} %>
 
   <%= render RecordPickerComponent.new(
         form: f,
         attribute: :partner_id,
-        label: "Partner",
+        label: t("records.fields.partner"),
         scope: current_workspace.companies.order(:name),
         search_url: picker_companies_path(format: :json),
         create_url: companies_path(format: :json),
@@ -17,7 +22,7 @@
       ) %>
 
   <div>
-    <%= f.label :contact_ids, "Contacts", class: "label" %>
+    <%= f.label :contact_ids, t("records.fields.contacts"), class: "label" %>
     <div class="flex items-start gap-2">
       <% deal_contacts = []
          deal_contacts += f.object.company.people.order(:first_name, :last_name) if f.object.company
@@ -27,50 +32,50 @@
             options_from_collection_for_select(deal_contacts, :id, :display_name, f.object.contact_ids),
             {}, multiple: true, size: 5, class: "input", data: {"deal-contacts-target": "select"} %>
       <button type="button" class="btn-secondary shrink-0 whitespace-nowrap" data-action="deal-contacts#open">
-        <%= icon :plus, classes: "size-3.5" %> New
+        <%= icon :plus, classes: "size-3.5" %> <%= t("deals.form.contacts.new") %>
       </button>
     </div>
-    <p class="mt-1 text-xs text-ink-faint">Optional. Contacts of the client company or partner. Hold ⌘/Ctrl to pick several.</p>
+    <p class="mt-1 text-xs text-ink-faint"><%= t("deals.form.contacts.hint") %></p>
     <p data-deal-contacts-target="notice" class="hidden mt-1 text-xs text-danger"></p>
   </div>
 
   <dialog data-deal-contacts-target="dialog" class="modal-dialog max-w-md rounded-xl border border-line shadow-lg backdrop:bg-chicago-950/40">
     <div class="p-4 space-y-3">
-      <h3 class="text-base font-semibold">New contact</h3>
+      <h3 class="text-base font-semibold"><%= t("deals.form.contacts.create_contact") %></h3>
       <p data-deal-contacts-target="error" class="hidden text-sm text-danger"></p>
       <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
         <div>
-          <label class="label">First name</label>
+          <label class="label"><%= t("activerecord.attributes.person.first_name") %></label>
           <input type="text" data-deal-contacts-target="firstName" class="input" data-action="keydown.enter->deal-contacts#create" />
         </div>
         <div>
-          <label class="label">Last name</label>
+          <label class="label"><%= t("activerecord.attributes.person.last_name") %></label>
           <input type="text" data-deal-contacts-target="lastName" class="input" data-action="keydown.enter->deal-contacts#create" />
         </div>
       </div>
       <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
         <div>
-          <label class="label">Email</label>
+          <label class="label"><%= t("records.fields.email") %></label>
           <input type="email" data-deal-contacts-target="email" class="input" />
         </div>
         <div>
-          <label class="label">Phone</label>
+          <label class="label"><%= t("records.fields.phone") %></label>
           <input type="tel" data-deal-contacts-target="phone" class="input" />
         </div>
       </div>
       <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
         <div>
-          <label class="label">Contact source</label>
+          <label class="label"><%= t("deals.form.contacts.source") %></label>
           <select data-deal-contacts-target="source" class="input" data-action="change->deal-contacts#sourceChanged">
-            <option value="">Select source</option>
-            <% Person::SOURCES.each do |value, label| %>
-              <option value="<%= value %>"><%= label %></option>
+            <option value=""><%= t("deals.form.contacts.select_source") %></option>
+            <% Person::SOURCES.each_key do |value| %>
+              <option value="<%= value %>"><%= t("people.sources.#{value}") %></option>
             <% end %>
           </select>
           <div data-deal-contacts-target="broughtByRow" class="hidden mt-3">
-            <label class="label">Team member</label>
+            <label class="label"><%= t("deals.form.contacts.team_member") %></label>
             <select data-deal-contacts-target="broughtBy" class="input">
-              <option value="">Select team member</option>
+              <option value=""><%= t("deals.form.contacts.select_team_member") %></option>
               <% current_workspace.users.order(:name).each do |user| %>
                 <option value="<%= user.id %>"><%= user.name %></option>
               <% end %>
@@ -78,13 +83,13 @@
           </div>
         </div>
         <div>
-          <label class="label">First contact date</label>
+          <label class="label"><%= t("deals.form.contacts.first_contact_date") %></label>
           <input type="date" data-deal-contacts-target="firstContactOn" class="input" />
         </div>
       </div>
       <div class="flex justify-end gap-2">
-        <button type="button" class="btn-secondary" data-action="deal-contacts#close">Cancel</button>
-        <button type="button" class="btn-primary" data-deal-contacts-target="submit" data-action="deal-contacts#create">Create contact</button>
+        <button type="button" class="btn-secondary" data-action="deal-contacts#close"><%= t("shared.form.cancel") %></button>
+        <button type="button" class="btn-primary" data-deal-contacts-target="submit" data-action="deal-contacts#create"><%= t("deals.form.contacts.create") %></button>
       </div>
     </div>
   </dialog>

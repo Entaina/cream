@@ -1,5 +1,45 @@
 ---
 es:
+  activerecord:
+    attributes:
+      company:
+        annual_revenue: Facturación anual (€)
+        description: Acerca de
+        domain: Dominio
+        employee_range: Empleados
+        fiscal_information: Información fiscal
+        industry: Sector
+        linkedin_url: URL de LinkedIn
+        location: Ubicación
+        name: Nombre
+        owner_id: Propietario
+        twitter_url: URL de X / Twitter
+      deal:
+        currency: Moneda
+        expected_close_date: Fecha de cierre prevista
+        invoice_number: Nº factura
+        name: Nombre
+        owner_id: Propietario
+        pipeline_id: Pipeline
+        pipeline_stage_id: Etapa
+        probability: Probabilidad (%)
+        value: Valor
+      person:
+        company_id: Empresa
+        description: Acerca de
+        first_name: Nombre
+        job_title: Cargo
+        last_name: Apellidos
+        linkedin_url: URL de LinkedIn
+        location: Ubicación
+        owner_id: Propietario
+        phone: Teléfono
+        twitter_url: URL de X / Twitter
+      person_email:
+        address: Dirección de email
+      task:
+        due_on: Fecha límite
+        title: Tarea
   activities:
     ai_task_created: '%{actor} creó la tarea sugerida por IA "%{title}"'
     attachment_added: "%{actor} adjuntó %{filename}"
@@ -181,6 +221,44 @@ es:
     destroyed: "%{actor} eliminó este deal"
     updated: "%{actor} actualizó %{fields}"
     updated_deal: el deal
+  dashboard:
+    briefing:
+      categories:
+        important: Importante
+        urgent: Urgente
+      empty_category: Nada en esta categoría hoy.
+      for_you: Para ti
+      generate: Generar ahora
+      intro: Análisis diario del pipeline con indicaciones para el equipo.
+      misses: A mejorar
+      no_briefing: Todavía no hay briefing para hoy. Pulsa <strong>Generar ahora</strong>
+        para obtener indicaciones del director de ventas.
+      no_wins: Sin aciertos destacados hoy.
+      regenerate: Regenerar
+      regenerations_left: Quedan %{count} regeneraciones hoy
+      regenerations_used: Has usado las 5 regeneraciones de hoy
+      sales_director: Director de ventas
+      team: Equipo
+      title_on: Briefing del %{date}
+      wins: Aciertos
+      you: (tú)
+    closed_shown: Cerradas visibles
+    metrics:
+      companies: Empresas
+      open_pipeline: Pipeline abierto
+      people: Personas
+      won_revenue: Ingresos ganados
+    my_tasks: Mis tareas
+    no_pending_tasks: No hay tareas pendientes. Disfruta de la calma 🍦
+    no_stages: No hay etapas en este pipeline.
+    nothing_yet: Todavía no ha pasado nada — crea tu primer registro.
+    pipeline_by_stage: Pipeline por etapa
+    recent_activity: Actividad reciente
+    show_closed: Mostrar cerradas
+    time_ago: hace %{time}
+    title: Panel
+    view_all_tasks: Ver todas
+    view_stage_deals: Ver oportunidades en %{stage} en listado
   editions:
     from: Desde %{date}
     until: Hasta %{date}
@@ -226,6 +304,27 @@ es:
     tasks: Tareas
     team: Equipo
     workspace_settings: Ajustes
+  search:
+    index:
+      no_results: Sin resultados para «%{query}»
+      no_results_hint: Revisa la ortografía o prueba con otro término.
+      placeholder: Buscar personas, empresas y oportunidades...
+      sections:
+        companies: Empresas
+        deals: Oportunidades
+        people: Personas
+      title: Buscar
+  tasks:
+    index:
+      add_task: Añadir tarea
+      all: Todas
+      all_assignees: Todos los asignados
+      completed: Completadas
+      empty_subtitle: Mantente al día de los seguimientos añadiendo tareas.
+      empty_title: No hay tareas aquí
+      my_tasks: Mis tareas
+      open: Abiertas
+      title: Tareas
   profile:
     alert_email: Email
     alert_in_app: Notificación in-app (campana)
@@ -260,6 +359,56 @@ es:
     save: Guardar
     title: Perfil
   shared:
+    filters:
+      all_name: Todos los %{name}
+      'no': 'No'
+      range_from: "%{label} desde"
+      range_to: "%{label} hasta"
+      'yes': Sí
+    form:
+      cancel: Cancelar
+      check_errors: 'Revisa lo siguiente antes de guardar:'
+      create_company: Crear empresa
+      create_deal: Crear oportunidad
+      create_person: Crear persona
+      custom_fields: Campos personalizados
+      save_changes: Guardar cambios
+    lists:
+      all_companies: Todas las empresas
+      all_editions: Todas las ediciones
+      all_industries: Todos los sectores
+      all_owners: Todos los propietarios
+      all_pipelines: Todos los pipelines
+      all_products: Todos los productos
+      all_stages: Todas las etapas
+      blank: Vacío
+      board: Tablero
+      clear: Limpiar
+      closed_shown: Cerradas visibles
+      created: Creado
+      export: Exportar
+      first_contact: Primer contacto
+      import: Importar
+      new_company: Nueva empresa
+      new_deal: Nueva oportunidad
+      new_person: Nueva persona
+      no_company: Sin empresa
+      possible_duplicates: Posibles duplicados
+      show_closed: Mostrar cerradas
+      table: Tabla
+      unassigned: Sin asignar
+    views:
+      all: Todas
+      delete_confirm: "¿Eliminar esta vista?"
+      delete_view: Eliminar vista
+      personal_view: Vista personal
+      rename: Renombrar
+      save_view: Guardar vista
+      shared: Compartida
+      shared_view: Vista compartida
+      shared_with_workspace: Compartida con el workspace
+      update_view: Actualizar vista
+      view_name_placeholder: Nombre de la vista
     attachments:
       remove_confirm: "¿Eliminar este archivo?"
       title: Adjuntos

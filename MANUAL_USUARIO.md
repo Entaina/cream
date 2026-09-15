@@ -4,7 +4,7 @@
 
 Cream es un CRM por **workspaces** para gestionar **personas**, **empresas** y **deals** (oportunidades), con notas, tareas, listas y un historial de actividad compartido en el equipo.
 
-> **Última revisión:** 2026-09-15 (exclusiones en suscripción a todas)
+> **Última revisión:** 2026-09-15 (conectar MCP con token de API)
 > Este documento describe la funcionalidad **visible para el usuario**. Las funcionalidades desactivadas aparecen al final en «Próximamente».
 
 ---
@@ -32,7 +32,7 @@ Cream es un CRM por **workspaces** para gestionar **personas**, **empresas** y *
 19. [Notificaciones](#19-notificaciones)
 20. [Equipo e invitaciones](#20-equipo-e-invitaciones)
 21. [Ajustes del workspace](#21-ajustes-del-workspace)
-22. [Tokens de API](#22-tokens-de-api)
+22. [Tokens de API y MCP](#22-tokens-de-api-y-mcp)
 23. [Reports](#23-reports)
 24. [Asistente IA](#24-asistente-ia)
 25. [Chat de conocimiento](#25-chat-de-conocimiento)
@@ -914,15 +914,70 @@ Sincroniza publicaciones de Beehiiv con tipos de suscripción de Cream (solo adm
 
 ---
 
-## 22. Tokens de API
+## 22. Tokens de API y MCP
 
-En **API tokens** generas tokens de acceso para conectar clientes **MCP** (Claude, Cursor, etc.) o la **API REST v1** a tu workspace.
+En **API tokens** generas tokens de acceso para conectar clientes **MCP** (Claude, Cursor y otros agentes IA) o la **API REST v1** a tu workspace.
 
-1. Indica un nombre descriptivo.
-2. **Create token** — el valor completo se muestra **una sola vez**; cópialo antes de salir de la página.
-3. **Revoke** (icono papelera) invalida un token existente.
+### Cómo acceder
 
-Cada token está ligado a tu usuario y al workspace activo en el momento de crearlo.
+**Mi perfil → Tokens de API** en el menú lateral.
+
+### Crear un token
+
+1. En **Token name**, indica un nombre descriptivo (por ejemplo `My MCP client`).
+2. Pulsa **Create token**.
+3. Copia el valor de **Your new token (copy it now):** — se muestra **una sola vez**. Empieza por `cream_`.
+4. Guárdalo en un sitio seguro. No lo compartas ni lo pegues en chats públicos.
+
+Cada token está ligado a **tu usuario** y al **workspace activo** cuando lo creaste. El agente verá y podrá cambiar solo lo que tú puedes en ese workspace.
+
+**Revoke token** (icono papelera) invalida un token. Úsalo si se ha filtrado o ya no usas ese cliente.
+
+### Conectar un cliente MCP
+
+La dirección del servidor MCP es la URL de Cream seguida de `/mcp`. Si entras a Cream en `https://tu-dominio/`, la ruta es:
+
+```
+https://tu-dominio/mcp
+```
+
+En desarrollo local suele ser `http://localhost:3030/mcp`.
+
+#### Con token de API (recomendado)
+
+1. Crea un token como arriba y cópialo.
+2. En el cliente (Cursor, Claude Desktop, etc.) añade un servidor MCP remoto con esa URL y el token en la cabecera de autorización.
+
+Ejemplo para Cursor (`~/.cursor/mcp.json` o `.cursor/mcp.json` del proyecto):
+
+```json
+{
+  "mcpServers": {
+    "cream": {
+      "url": "https://tu-dominio/mcp",
+      "headers": {
+        "Authorization": "Bearer cream_TU_TOKEN"
+      }
+    }
+  }
+}
+```
+
+Sustituye `https://tu-dominio/mcp` por la URL de tu instancia y `cream_TU_TOKEN` por el valor copiado.
+
+En Claude Desktop la configuración es la misma (`mcpServers` en el fichero de ajustes de Claude).
+
+3. Recarga los servidores MCP o reinicia el cliente. Deberías ver las herramientas de Cream (listar deals, crear tareas, resumir fichas, etc.).
+
+#### Sin pegar el token (inicio de sesión)
+
+Algunos clientes pueden conectarse **solo con la URL** (`https://tu-dominio/mcp`). Te pedirán iniciar sesión en Cream y autorizar el acceso. El token de API no hace falta en ese caso.
+
+### Notas
+
+- El token da el mismo acceso que tu usuario en ese workspace. Trátalo como una contraseña.
+- Si cambias de workspace, crea un token nuevo con ese workspace activo.
+- Las herramientas de IA del MCP (`summarize_record`, `suggest_next_steps`, `draft_email`, `natural_language_search`, `enrich_record`) requieren que el asistente IA esté habilitado; ver [Asistente IA](#24-asistente-ia).
 
 ---
 

@@ -1,10 +1,10 @@
-<% page_title "Possible duplicates" %>
+<% page_title t("people.duplicates.title") %>
 <% actions = capture do %>
   <%= link_to people_path, class: "btn-secondary" do %>
-    <%= icon :users, classes: "size-3.5" %> All people
+    <%= icon :users, classes: "size-3.5" %> <%= t("people.duplicates.all_people") %>
   <% end %>
 <% end %>
-<%= render "shared/page_header", title: "Possible duplicates", icon_name: :users, count: @groups.size, actions: actions %>
+<%= render "shared/page_header", title: t("people.duplicates.title"), icon_name: :users, count: @groups.size, actions: actions %>
 
 <div class="flex-1 overflow-y-auto scrollbar-subtle p-5">
   <% if @groups.any? %>
@@ -19,7 +19,7 @@
             </div>
             <%= link_to merge_person_path(primary, secondary_ids: group.people.drop(1).map(&:id)),
                   class: "btn-primary" do %>
-              <%= icon :users, classes: "size-3.5" %> Review merge
+              <%= icon :users, classes: "size-3.5" %> <%= t("people.duplicates.review_merge") %>
             <% end %>
           </div>
 
@@ -39,9 +39,9 @@
                 </div>
                 <div class="text-sm text-ink-faint shrink-0">
                   <% if person == primary %>
-                    <span class="badge">Keep by default</span>
+                    <span class="badge"><%= t("people.duplicates.keep_by_default") %></span>
                   <% end %>
-                  <%= pluralize(person.deals.size, "deal") %>
+                  <%= t("deals.index.count", count: person.deals.size) %>
                 </div>
               </li>
             <% end %>
@@ -50,7 +50,7 @@
       <% end %>
     </div>
   <% else %>
-    <%= render "shared/empty_state", icon_name: :users, title: "No duplicate contacts found",
-          subtitle: "Cream looks for people with the same email address in the workspace." %>
+    <%= render "shared/empty_state", icon_name: :users, title: t("people.duplicates.empty_title"),
+          subtitle: t("people.duplicates.empty_subtitle") %>
   <% end %>
 </div>

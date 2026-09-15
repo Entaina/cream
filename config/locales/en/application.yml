@@ -1,5 +1,45 @@
 ---
 en:
+  activerecord:
+    attributes:
+      company:
+        annual_revenue: Annual revenue (€)
+        description: About
+        domain: Domain
+        employee_range: Employees
+        fiscal_information: Fiscal information
+        industry: Industry
+        linkedin_url: LinkedIn URL
+        location: Location
+        name: Name
+        owner_id: Owner
+        twitter_url: X / Twitter URL
+      deal:
+        currency: Currency
+        expected_close_date: Expected close date
+        invoice_number: Invoice number
+        name: Name
+        owner_id: Owner
+        pipeline_id: Pipeline
+        pipeline_stage_id: Stage
+        probability: Probability (%)
+        value: Value
+      person:
+        company_id: Company
+        description: About
+        first_name: First name
+        job_title: Job title
+        last_name: Last name
+        linkedin_url: LinkedIn URL
+        location: Location
+        owner_id: Owner
+        phone: Phone
+        twitter_url: X / Twitter URL
+      person_email:
+        address: Email address
+      task:
+        due_on: Due date
+        title: Task
   activities:
     ai_task_created: '%{actor} created the AI-suggested task "%{title}"'
     attachment_added: "%{actor} attached %{filename}"
@@ -182,6 +222,44 @@ en:
     destroyed: "%{actor} deleted this deal"
     updated: "%{actor} updated %{fields}"
     updated_deal: the deal
+  dashboard:
+    briefing:
+      categories:
+        important: Important
+        urgent: Urgent
+      empty_category: Nothing in this category today.
+      for_you: For you
+      generate: Generate now
+      intro: Daily pipeline analysis with guidance for the team.
+      misses: To improve
+      no_briefing: No briefing for today yet. Click <strong>Generate now</strong>
+        to get guidance from the sales director.
+      no_wins: No notable wins today.
+      regenerate: Regenerate
+      regenerations_left: "%{count} regenerations left today"
+      regenerations_used: You have used all 5 regenerations today
+      sales_director: Sales director
+      team: Team
+      title_on: Briefing for %{date}
+      wins: Wins
+      you: (you)
+    closed_shown: Closed shown
+    metrics:
+      companies: Companies
+      open_pipeline: Open pipeline
+      people: People
+      won_revenue: Won revenue
+    my_tasks: My tasks
+    no_pending_tasks: No pending tasks. Enjoy the calm 🍦
+    no_stages: No stages in this pipeline.
+    nothing_yet: Nothing has happened yet — create your first record.
+    pipeline_by_stage: Pipeline by stage
+    recent_activity: Recent activity
+    show_closed: Show closed
+    time_ago: "%{time} ago"
+    title: Dashboard
+    view_all_tasks: View all
+    view_stage_deals: View %{stage} deals in list
   editions:
     from: From %{date}
     until: Until %{date}
@@ -227,6 +305,27 @@ en:
     tasks: Tasks
     team: Team
     workspace_settings: Settings
+  search:
+    index:
+      no_results: No results for “%{query}”
+      no_results_hint: Check the spelling or try a different term.
+      placeholder: Search people, companies and deals...
+      sections:
+        companies: Companies
+        deals: Deals
+        people: People
+      title: Search
+  tasks:
+    index:
+      add_task: Add task
+      all: All
+      all_assignees: All assignees
+      completed: Completed
+      empty_subtitle: Stay on top of follow-ups by adding tasks.
+      empty_title: No tasks here
+      my_tasks: My tasks
+      open: Open
+      title: Tasks
   profile:
     alert_email: Email
     alert_in_app: In-app notification (bell)
@@ -260,6 +359,56 @@ en:
     save: Save
     title: Profile
   shared:
+    filters:
+      all_name: All %{name}
+      'no': 'No'
+      range_from: "%{label} from"
+      range_to: "%{label} to"
+      'yes': 'Yes'
+    form:
+      cancel: Cancel
+      check_errors: 'Check the following before saving:'
+      create_company: Create company
+      create_deal: Create deal
+      create_person: Create person
+      custom_fields: Custom fields
+      save_changes: Save changes
+    lists:
+      all_companies: All companies
+      all_editions: All editions
+      all_industries: All industries
+      all_owners: All owners
+      all_pipelines: All pipelines
+      all_products: All products
+      all_stages: All stages
+      blank: Blank
+      board: Board
+      clear: Clear
+      closed_shown: Closed shown
+      created: Created
+      export: Export
+      first_contact: First contact
+      import: Import
+      new_company: New company
+      new_deal: New deal
+      new_person: New person
+      no_company: No company
+      possible_duplicates: Possible duplicates
+      show_closed: Show closed
+      table: Table
+      unassigned: Unassigned
+    views:
+      all: All
+      delete_confirm: Delete this view?
+      delete_view: Delete view
+      personal_view: Personal view
+      rename: Rename
+      save_view: Save view
+      shared: Shared
+      shared_view: Shared view
+      shared_with_workspace: Shared with workspace
+      update_view: Update view
+      view_name_placeholder: View name
     attachments:
       remove_confirm: Remove this file?
       title: Attachments

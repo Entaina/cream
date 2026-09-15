@@ -1,6 +1,64 @@
 ---
 en:
   companies:
+    duplicates:
+      all_companies: All companies
+      empty_subtitle: Cream looks for companies with the same domain or similar names
+        in the workspace.
+      empty_title: No duplicate companies found
+      keep_by_default: Keep by default
+      review_merge: Review merge
+      title: Possible duplicates
+    form:
+      about:
+        description: What this company does and how you describe it.
+        title: About
+      custom:
+        description: Additional information for your workspace.
+        title: Custom fields
+      fiscal:
+        description: Legal name, tax ID, billing address and bank details.
+        placeholder: Legal name, tax ID, billing address, IBAN...
+        title: Fiscal information
+      management:
+        description: Who is responsible for this account.
+        title: Management
+      profile:
+        description: Domain, industry, size and location.
+        employees_unknown: Unknown
+        industry_placeholder: SaaS, Fintech...
+        location_placeholder: City, Country
+        search_linkedin: Search LinkedIn
+        title: Company details
+    index:
+      empty_search: Try a different search.
+      empty_subtitle: Add the organizations you work with.
+      empty_title: No companies found
+      search_placeholder: Search companies...
+    merge:
+      cancel: Cancel
+      companies_to_merge: Companies to merge in
+      company_to_keep: Company to keep
+      confirm: Merge the selected companies into %{name}? This cannot be undone.
+      merge: Merge companies
+      merging: Merging…
+      no_domain: No domain
+      no_suggestions: No suggested companies to merge. Use the search above to find
+        other companies in this workspace.
+      no_suggestions_named: No suggested duplicate companies are available to merge
+        with %{name}.
+      people_count:
+        one: "%{count} person"
+        other: "%{count} people"
+      subtitle: People, deals, notes, tasks, emails and timeline activity from the
+        selected companies will move to the company above.
+      title: Merge companies
+    new:
+      back: ← Back to companies
+      title: New company
+    edit:
+      back: ← Back to company
+      title: Edit %{name}
     show:
       about: About
       deals_empty: No deals yet.
@@ -20,6 +78,67 @@ en:
       overview: Company overview
       people_empty: No people linked to this company yet.
   deals:
+    board:
+      next_stage: Next stage
+      previous_stage: Previous stage
+      reorder_column: Reorder column
+      reorder_column_title: Drag to reorder column
+      title: Deals board
+    form:
+      contacts:
+        create: Create contact
+        create_contact: New contact
+        errors:
+          network: Network error, please try again
+          pick_company: Pick a company first.
+          select_team_member: Select a team member.
+        first_contact_date: First contact date
+        hint: Optional. Contacts of the client company or partner. Hold ⌘/Ctrl to
+          pick several.
+        new: New
+        select_source: Select source
+        select_team_member: Select team member
+        source: Contact source
+        team_member: Team member
+      custom:
+        description: Additional information for your workspace.
+        title: Custom fields
+      management:
+        description: Who is responsible for this opportunity.
+        title: Management
+      next_action:
+        task: Task
+        title: Next action (required)
+      overview:
+        description: Name, value, stage and key dates.
+        invoice_placeholder: FAC-2026-001
+        name_placeholder: Acme — Annual plan
+        title: Deal details
+      products:
+        create_one: Create one
+        empty_html: No products in the catalogue. %{link}.
+        remove_title: Remove product
+        title: Products of interest
+      relationships:
+        description: Company, partner and contacts for this deal.
+        title: Relationships
+      stripe_payment_html: Creating from a Stripe payment of <strong>%{amount}</strong>
+        by %{customer}. The payment will be linked to this deal on save.
+    index:
+      count:
+        one: "%{count} deal"
+        other: "%{count} deals"
+      empty_search: Try a different search.
+      empty_subtitle: Add your first opportunity to start tracking pipeline.
+      empty_title: No deals found
+      pipeline_column: Pipeline
+      search_placeholder: Search deals...
+    new:
+      back: ← Back to board
+      title: New deal
+    edit:
+      back: ← Back to deal
+      title: Edit %{name}
     consent:
       date: 'Date:'
       hash: 'Hash:'
@@ -88,6 +207,75 @@ en:
       subscribed: Subscribed
       unsubscribed: Unsubscribed
   people:
+    duplicates:
+      all_people: All people
+      empty_subtitle: Cream looks for people with the same email address in the workspace.
+      empty_title: No duplicate contacts found
+      keep_by_default: Keep by default
+      review_merge: Review merge
+      title: Possible duplicates
+    form:
+      contact:
+        add_email: Add email
+        description: How to reach this person.
+        email_addresses: Email addresses
+        location_placeholder: City, Country
+        remove_email: Remove email
+        title: Contact details
+      custom:
+        description: Additional information for your workspace.
+        title: Custom fields
+      management:
+        description: Who is responsible for this relationship.
+        title: Contact management
+      profile:
+        description: Their role, company and background.
+        linkedin_placeholder: https://linkedin.com/in/…
+        search_linkedin: Search LinkedIn
+        title: Professional profile
+    index:
+      empty_search: Try a different search.
+      empty_subtitle: Add your first contact to start building relationships.
+      empty_title: No people found
+      search_placeholder: Search people...
+    interest_conversion:
+      cancel: Cancel
+      create: Create opportunity
+      deal_name: Deal name
+      next_action: Next action
+      product: Product
+      signal: Signal
+      task_due: Task due date
+      task_title_default: Follow up after interest in %{product}
+      title: Convert to SQL
+    merge:
+      cancel: Cancel
+      confirm: Merge the selected contacts into %{name}? This cannot be undone.
+      contact_to_keep: Contact to keep
+      contacts_to_merge: Contacts to merge in
+      merge: Merge contacts
+      merging: Merging…
+      no_email: No email
+      no_suggestions: No suggested contacts to merge. Use the search above to find
+        other contacts in this workspace.
+      search_label: Search for other contacts
+      search_placeholder: Type to search…
+      same_email_hint: Contacts with the same email in other companies are also listed.
+      subtitle: Notes, tasks, deals, emails and timeline activity from the selected
+        contacts will move to the contact above.
+      title: Merge contacts
+    new:
+      back: ← Back to people
+      title: New person
+    edit:
+      back: ← Back to contact
+      title: Edit %{name}
+    sources:
+      beehiiv: Beehiiv
+      booking: Online booking
+      referral: Referral
+      team_member: Brought by a team member
+      web_form: Web form
     interest_status:
       converted: Converted
       dismissed: Dismissed
@@ -272,6 +460,7 @@ en:
       lists: Lists
       location: Location
       management: Management
+      name: Name
       owner: Owner
       partner: Partner
       people: People

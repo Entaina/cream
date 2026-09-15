@@ -1,11 +1,15 @@
-<% sections = [["contact", "Contact details", "How to reach this person."], ["profile", "Professional profile", "Their role, company and background."], ["management", "Contact management", "Who is responsible for this relationship."]] %>
-<% sections << ["custom", "Custom fields", "Additional information for your workspace."] if person.custom_field_definitions.any? %>
+<% sections = [
+  ["contact", t("people.form.contact.title"), t("people.form.contact.description")],
+  ["profile", t("people.form.profile.title"), t("people.form.profile.description")],
+  ["management", t("people.form.management.title"), t("people.form.management.description")]
+] %>
+<% sections << ["custom", t("people.form.custom.title"), t("people.form.custom.description")] if person.custom_field_definitions.any? %>
 <% sections.select! { |key, _, _| key == @edit_section } if @edit_section %>
 <%= form_with model: person, class: "space-y-5", data: { controller: "linkedin-suggest record-workspace", linkedin_suggest_entity_value: "person", action: "input->record-workspace#markDirty change->record-workspace#markDirty nested-form:changed->record-workspace#markDirty submit->record-workspace#submit turbo:submit-end->record-workspace#submitted turbo:before-visit@document->record-workspace#beforeVisit beforeunload@window->record-workspace#beforeUnload" } do |f| %>
   <%= hidden_field_tag :section, @edit_section if @edit_section %>
   <% if person.errors.any? %>
     <div role="alert" class="rounded-lg bg-danger-soft ring-1 ring-danger-line px-4 py-3 text-sm text-danger-strong">
-      <p class="font-semibold mb-1">Check the following before saving:</p>
+      <p class="font-semibold mb-1"><%= t("shared.form.check_errors") %></p>
       <ul class="list-disc list-inside"><% person.errors.full_messages.each do |msg| %><li><%= msg %></li><% end %></ul>
     </div>
   <% end %>
@@ -17,7 +21,7 @@
     </section>
   <% end %>
   <div class="sticky bottom-0 flex items-center justify-end gap-2 border-t border-line bg-canvas-raised px-4 py-4 rounded-xl">
-    <%= link_to "Cancel", person.persisted? ? person_path(person, tab: "information") : people_path, class: "btn-secondary" %>
-    <%= f.submit person.persisted? ? "Save changes" : "Create person", class: "btn-primary" %>
+    <%= link_to t("shared.form.cancel"), person.persisted? ? person_path(person, tab: "information") : people_path, class: "btn-secondary" %>
+    <%= f.submit person.persisted? ? t("shared.form.save_changes") : t("shared.form.create_person"), class: "btn-primary" %>
   </div>
 <% end %>

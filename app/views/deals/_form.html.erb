@@ -1,5 +1,9 @@
-<% sections = [["overview", "Deal details", "Name, value, stage and key dates."], ["relationships", "Relationships", "Company, partner and contacts for this deal."], ["management", "Management", "Who is responsible for this opportunity."]] %>
-<% sections << ["custom", "Custom fields", "Additional information for your workspace."] if deal.custom_field_definitions.any? %>
+<% sections = [
+  ["overview", t("deals.form.overview.title"), t("deals.form.overview.description")],
+  ["relationships", t("deals.form.relationships.title"), t("deals.form.relationships.description")],
+  ["management", t("deals.form.management.title"), t("deals.form.management.description")]
+] %>
+<% sections << ["custom", t("deals.form.custom.title"), t("deals.form.custom.description")] if deal.custom_field_definitions.any? %>
 <% sections.select! { |key, _, _| key == @edit_section } if @edit_section %>
 <% workspace_actions = "input->record-workspace#markDirty change->record-workspace#markDirty nested-form:changed->record-workspace#markDirty submit->record-workspace#submit turbo:submit-end->record-workspace#submitted turbo:before-visit@document->record-workspace#beforeVisit beforeunload@window->record-workspace#beforeUnload" %>
 <% form_data = { controller: "record-workspace", action: workspace_actions } %>
@@ -13,7 +17,7 @@
   <%= hidden_field_tag :stripe_payment_id, @stripe_payment.id if @stripe_payment %>
   <% if deal.errors.any? %>
     <div role="alert" class="rounded-lg bg-danger-soft ring-1 ring-danger-line px-4 py-3 text-sm text-danger-strong">
-      <p class="font-semibold mb-1">Check the following before saving:</p>
+      <p class="font-semibold mb-1"><%= t("shared.form.check_errors") %></p>
       <ul class="list-disc list-inside"><% deal.errors.full_messages.each do |msg| %><li><%= msg %></li><% end %></ul>
     </div>
   <% end %>
@@ -28,9 +32,9 @@
   <% if deal.new_record? && !@edit_section %>
     <div data-controller="nested-form" class="record-card">
       <div class="flex items-center justify-between mb-2">
-        <h2 class="record-section-title">Products of interest</h2>
+        <h2 class="record-section-title"><%= t("deals.form.products.title") %></h2>
         <% if current_workspace.products.any? %>
-          <button type="button" data-action="nested-form#add" class="btn-secondary"><%= icon :plus, classes: "size-3.5" %> Add product</button>
+          <button type="button" data-action="nested-form#add" class="btn-secondary"><%= icon :plus, classes: "size-3.5" %> <%= t("deals.show.add_product") %></button>
         <% end %>
       </div>
       <% if current_workspace.products.any? %>
@@ -41,20 +45,20 @@
           <%= f.fields_for :deal_products, DealProduct.new, child_index: "NEW_RECORD" do |pf| %><%= render "product_fields", f: pf %><% end %>
         </template>
       <% else %>
-        <p class="text-base text-ink-faint">No products in the catalogue. <%= link_to "Create one", new_product_path, class: "text-accent hover:underline" %>.</p>
+        <p class="text-base text-ink-faint"><%= t("deals.form.products.empty_html", link: link_to(t("deals.form.products.create_one"), new_product_path, class: "text-accent hover:underline")).html_safe %></p>
       <% end %>
     </div>
 
     <div class="record-card">
-      <h2 class="record-section-title mb-4">Next action (required)</h2>
+      <h2 class="record-section-title mb-4"><%= t("deals.form.next_action.title") %></h2>
       <%= f.fields_for :tasks, (deal.tasks.first || deal.tasks.build) do |tf| %>
         <div class="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_12rem]">
           <div>
-            <%= tf.label :title, "Task", class: "label" %>
-            <%= mention_text_field tf, :title, wrapper_class: "", class: "input", placeholder: "Call to follow up" %>
+            <%= tf.label :title, t("deals.form.next_action.task"), class: "label" %>
+            <%= mention_text_field tf, :title, wrapper_class: "", class: "input", placeholder: t("people.quick_deal.task_placeholder") %>
           </div>
           <div>
-            <%= tf.label :due_on, "Due date", class: "label" %>
+            <%= tf.label :due_on, t("activerecord.attributes.task.due_on"), class: "label" %>
             <%= tf.date_field :due_on, class: "input", min: Date.current %>
           </div>
         </div>
@@ -63,7 +67,7 @@
   <% end %>
 
   <div class="sticky bottom-0 flex items-center justify-end gap-2 border-t border-line bg-canvas-raised px-4 py-4 rounded-xl">
-    <%= link_to "Cancel", deal.persisted? ? deal_path(deal, tab: "information") : board_deals_path, class: "btn-secondary" %>
-    <%= f.submit deal.persisted? ? "Save changes" : "Create deal", class: "btn-primary" %>
+    <%= link_to t("shared.form.cancel"), deal.persisted? ? deal_path(deal, tab: "information") : board_deals_path, class: "btn-secondary" %>
+    <%= f.submit deal.persisted? ? t("shared.form.save_changes") : t("shared.form.create_deal"), class: "btn-primary" %>
   </div>
 <% end %>

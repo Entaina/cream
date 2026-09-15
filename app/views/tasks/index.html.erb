@@ -1,8 +1,8 @@
-<% page_title "Tasks" %>
-<%= render "shared/page_header", title: "Tasks", icon_name: :check_circle, count: @tasks.size, actions: nil %>
+<% page_title t("tasks.index.title") %>
+<%= render "shared/page_header", title: t("tasks.index.title"), icon_name: :check_circle, count: @tasks.size, actions: nil %>
 
 <div class="flex items-center gap-1 border-b border-line px-5 py-2 shrink-0">
-  <% { "pending" => "Open", "completed" => "Completed", "all" => "All" }.each do |key, label| %>
+  <% { "pending" => t("tasks.index.open"), "completed" => t("tasks.index.completed"), "all" => t("tasks.index.all") }.each do |key, label| %>
     <% tab_params = { filter: key } %>
     <% if @can_filter_by_assignee %>
       <% if @assignee_filter == :all %>
@@ -21,7 +21,7 @@
       <%= hidden_field_tag :filter, @filter %>
       <%= select_tag :assignee_id,
             options_for_select(
-              [ [ "My tasks", "" ], [ "All assignees", "all" ] ] + @assignees.map { |user| [ user.name, user.id ] },
+              [ [ t("tasks.index.my_tasks"), "" ], [ t("tasks.index.all_assignees"), "all" ] ] + @assignees.map { |user| [ user.name, user.id ] },
               @assignee_filter == :all ? "all" : (@assignee_filter == current_user.id ? "" : @assignee_filter)
             ),
             class: "input w-44",
@@ -33,9 +33,9 @@
 <div class="flex-1 overflow-y-auto scrollbar-subtle p-5">
   <div class="max-w-3xl space-y-4">
     <%= form_with model: Task.new(due_on: Task.default_due_on), url: tasks_path, class: "relative z-0 flex items-center gap-2 overflow-visible" do |f| %>
-      <%= mention_text_field f, :title, placeholder: "Add a task...", class: "input flex-1" %>
+      <%= mention_text_field f, :title, placeholder: t("shared.tasks.placeholder"), class: "input flex-1" %>
       <%= f.date_field :due_on, class: "input w-36" %>
-      <%= f.submit "Add task", class: "btn-primary" %>
+      <%= f.submit t("tasks.index.add_task"), class: "btn-primary" %>
     <% end %>
 
     <% if @tasks.any? %>
@@ -45,8 +45,8 @@
         <% end %>
       </ul>
     <% else %>
-      <%= render "shared/empty_state", icon_name: :check_circle, title: "No tasks here",
-            subtitle: "Stay on top of follow-ups by adding tasks.", action: nil %>
+      <%= render "shared/empty_state", icon_name: :check_circle, title: t("tasks.index.empty_title"),
+            subtitle: t("tasks.index.empty_subtitle"), action: nil %>
     <% end %>
   </div>
 </div>
