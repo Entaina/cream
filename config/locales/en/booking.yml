@@ -1,22 +1,23 @@
+---
 en:
   booking:
     errors:
-      slot_unavailable: "That time slot is no longer available."
-      invalid_datetime: "The selected date or time is invalid."
-      rate_limited: "Too many requests. Please try again in a minute."
-      event_type_not_found: "Event type not found."
+      event_type_not_found: Event type not found.
+      invalid_datetime: The selected date or time is invalid.
+      rate_limited: Too many requests. Please try again in a minute.
+      slot_unavailable: That time slot is no longer available.
     mailer:
       reminder:
-        subject: "Reminder: %{event_name} · %{date}"
-        greeting: "Hi %{name},"
-        intro: "This is a reminder that your booking «%{event_name}» is starting soon."
-        date: "Date"
-        time: "Time"
-        duration: "Duration"
+        address: Address
+        date: Date
+        duration: Duration
         duration_minutes:
-          one: "1 minute"
+          one: 1 minute
           other: "%{count} minutes"
-        location: "Location"
-        address: "Address"
-        join_meet: "Join Google Meet"
-        footer: "Booking managed by %{host_name}."
+        footer: Booking managed by %{host_name}.
+        greeting: Hi %{name},
+        intro: This is a reminder that your booking «%{event_name}» is starting soon.
+        join_meet: Join Google Meet
+        location: Location
+        subject: 'Reminder: %{event_name} · %{date}'
+        time: Time

@@ -1,305 +1,312 @@
+---
 es:
-  records:
-    open_menu: "Abrir menú"
-    edit: "Editar"
-    more_actions: "Más acciones"
-    send_email: "Enviar email"
-    add_note: "Añadir nota"
-    create_task: "Crear tarea"
-    add_person: "Añadir persona"
-    add_deal: "Añadir oportunidad"
-    add_comment: "Añadir comentario"
-    add: "Añadir"
-    close: "Cerrar"
-    cancel: "Cancelar"
-    profile_link: "Perfil"
-    boolean:
-      yes: "Sí"
-      no: "No"
-    tabs:
-      activity: "Actividad"
-      people: "Personas"
-      deals: "Oportunidades"
-      information: "Información"
-      files: "Archivos"
-      pipeline: "Pipeline"
-      products: "Productos"
-    next_tasks: "Próximas tareas"
-    show_more_pending: "Mostrar %{count} tareas pendientes más"
-    no_pending_tasks: "No hay tareas pendientes. Crea una tarea para planificar el siguiente seguimiento."
-    completed_tasks: "Tareas completadas (%{count})"
-    at_a_glance: "De un vistazo"
-    view_all_information: "Ver toda la información"
-    view_deals: "Ver oportunidades (%{count})"
-    view_pipeline: "Ver pipeline"
-    view_products: "Ver productos (%{count})"
-    open_deals: "Oportunidades abiertas"
-    no_open_deals: "No hay oportunidades abiertas."
-    ai_assistant: "Asistente IA"
-    context_aria:
-      company: "Contexto de la empresa"
-      person: "Contexto del contacto"
-      deal: "Contexto de la oportunidad"
-    sections_aria:
-      company: "Secciones de la empresa"
-      person: "Secciones del contacto"
-      deal: "Secciones de la oportunidad"
-    fields:
-      owner: "Propietario"
-      industry: "Sector"
-      employees: "Empleados"
-      people: "Personas"
-      company: "Empresa"
-      lifecycle: "Ciclo de vida"
-      lead_score: "Puntuación"
-      stage: "Etapa"
-      probability: "Probabilidad"
-      domain: "Dominio"
-      location: "Ubicación"
-      revenue: "Facturación"
-      linkedin: "LinkedIn"
-      twitter: "X / Twitter"
-      phone: "Teléfono"
-      job_title: "Cargo"
-      created: "Creado"
-      lists: "Listas"
-      value: "Valor"
-      close_date: "Fecha de cierre"
-      invoice_number: "Nº factura"
-      pipeline: "Pipeline"
-      partner: "Partner"
-      contacts: "Contactos"
-      email: "Email"
-      custom_fields: "Campos personalizados"
-      management: "Gestión"
-    delete_confirm: "¿Eliminar %{name}? Esta acción no se puede deshacer."
-    activity:
-      title: "Actividad"
-      filter_aria: "Filtrar actividad"
-      filters:
-        all: "Todo"
-        notes: "Notas"
-        emails: "Emails"
-        comments: "Comentarios"
-        changes: "Cambios"
-      added_note: "añadió una nota"
-      commented: "comentó"
-      view_changes: "Ver cambios"
-      actions: "Acciones"
-      empty_title: "No hay actividad en esta vista."
-      empty_hint: "Prueba otro filtro, o añade una nota para empezar la conversación."
-      pages_aria: "Páginas de actividad"
-      newer: "Más recientes"
-      older: "Más antiguas"
-    composers:
-      close_editor: "Cerrar editor"
-      title_optional: "Título (opcional)"
-      note_title_placeholder: "¿De qué trata esta nota?"
-      note_label: "Nota"
-      note_placeholder: "Escribe una nota…"
-      task_label: "Tarea"
-      task_placeholder: "¿Qué tiene que ocurrir a continuación?"
-      comment_label: "Comentario"
-      comment_placeholder: "Menciona a un compañero con @nombre…"
-      draft_hint: "Puedes cerrar este editor y cambiar de sección. El borrador se conserva hasta que salgas de la página."
-    ai:
-      intro: "Resume este registro, sugiere siguientes pasos o redacta un email de seguimiento."
-      summarize: "Resumir"
-      next_steps: "Siguientes pasos"
-      draft_email: "Borrador de email"
-      suggest_fields: "Sugerir campos"
-      email_goal: "Objetivo del email (opcional)"
-      email_goal_placeholder: "p. ej. Seguimiento tras la demo"
-      summary: "Resumen"
-      risks: "Riesgos"
-      suggested_next_steps: "Siguientes pasos sugeridos"
-      missing_data: "Datos faltantes / sugerencias"
-      actionable: "Sugerencias accionables"
-    email_message:
-      no_subject: "(sin asunto)"
-      received: "Recibido"
-      scheduled: "Programado"
-      failed: "Error al enviar"
-      sent: "Enviado"
-      opened: "Abierto"
-      follow_up: "Seguimiento %{date}"
-      replied: "Respondido"
-      from: "De: %{address}"
-      to: "Para: %{address}"
-      unknown_sender: "Remitente desconocido"
-      cancel_send: "Cancelar envío"
-      mark_replied: "Marcar respondido"
   companies:
     show:
-      overview: "Resumen de la empresa"
-      fallback_subtitle: "Empresa"
-      more_actions: "Más acciones de empresa"
-      merge: "Fusionar duplicados"
-      delete: "Eliminar empresa"
-      people_empty: "Todavía no hay personas vinculadas a esta empresa."
-      deals_empty: "Todavía no hay oportunidades."
-      details: "Datos de la empresa"
-      about: "Acerca de"
-      no_description: "Todavía no hay descripción."
-      fiscal: "Información fiscal"
-      no_fiscal: "Todavía no hay información fiscal."
-      edit_details: "Editar datos de la empresa"
-      edit_about: "Editar sección acerca de"
-      edit_fiscal: "Editar información fiscal"
-      edit_management: "Editar gestión"
-      edit_custom: "Editar campos personalizados"
-  people:
+      about: Acerca de
+      deals_empty: Todavía no hay oportunidades.
+      delete: Eliminar empresa
+      details: Datos de la empresa
+      edit_about: Editar sección acerca de
+      edit_custom: Editar campos personalizados
+      edit_details: Editar datos de la empresa
+      edit_fiscal: Editar información fiscal
+      edit_management: Editar gestión
+      fallback_subtitle: Empresa
+      fiscal: Información fiscal
+      merge: Fusionar duplicados
+      more_actions: Más acciones de empresa
+      no_description: Todavía no hay descripción.
+      no_fiscal: Todavía no hay información fiscal.
+      overview: Resumen de la empresa
+      people_empty: Todavía no hay personas vinculadas a esta empresa.
+  deals:
+    consent:
+      date: 'Fecha:'
+      hash: 'Hash:'
+      policy: 'Política:'
+      title: Consentimiento aceptado
+      unverified: No se pudo verificar la versión de la política enlazada al envío.
+      view_policy: Ver texto de la política aceptada
+      view_statement: Ver frase de consentimiento aceptada
     show:
-      overview: "Resumen del contacto"
-      more_actions: "Más acciones del contacto"
-      merge: "Fusionar duplicados"
-      delete: "Eliminar contacto"
-      details: "Datos de contacto"
-      professional: "Perfil profesional"
-      contact_management: "Gestión del contacto"
-      email_preferences: "Preferencias de email"
-      edit_details: "Editar datos de contacto"
-      edit_profile: "Editar perfil profesional"
-      edit_management: "Editar gestión del contacto"
-      edit_custom: "Editar campos personalizados"
-      primary_email: "Principal"
-      all_products: "Todos los productos"
-      deals_empty: "Todavía no hay oportunidades."
-      subscriptions: "Suscripciones"
-      unsubscribe: "Dar de baja"
-      subscribe: "Suscribir"
-      unsubscribe_confirm: "¿Dar de baja a %{name} de «%{type}»?"
-      subscribe_confirm: "¿Suscribir a %{name} a «%{type}»?"
-      preferences_center: "Centro de preferencias"
-      copied: "Copiado"
-      copy_url: "Copiar URL"
-      campaigns: "Campañas enviadas"
-      view_more: "Ver más"
-      view_more_count: "Ver más (%{count})"
-      campaigns_empty: "Ninguna campaña enviada a este contacto."
-      campaigns_limit: "Se muestran las %{count} más recientes."
-      no_delivery_events: "Sin eventos de entrega registrados."
-      product_interests: "Intereses por producto"
-      convert_to_sql: "Convertir a SQL"
-      no_interests: "Sin intereses registrados."
-      register_interest: "Registrar interés"
-      product: "Producto"
-      select_product: "Seleccionar producto"
-      signal: "Señal"
-      signal_placeholder: "Qué pidió o hizo el contacto"
-      submissions: "Formularios enviados"
+      add: Añadir
+      add_collaborator: Añadir colaborador
+      add_product: Añadir producto
+      booked_on_html: Reservado el %{date} en %{page}
+      booking_origin: Origen de la reserva
+      close_date: Cierre %{date}
+      collaborators: Colaboradores
+      collaborators_hint: Añade vendedores que puedan ver y editar esta oportunidad.
+      create_one: Crea uno
+      default_trigger: Disparador de etapa
+      delete: Eliminar oportunidad
+      details: Datos de la oportunidad
+      duplicate: Duplicar
+      edit_custom: Editar campos personalizados
+      edit_details: Editar datos de la oportunidad
+      edit_management: Editar gestión
+      edit_relationships: Editar relaciones
+      edition: Edición
+      hide_trigger: Ocultar
+      more_actions: Más acciones de la oportunidad
+      move_pipeline_confirm: "¿Mover esta oportunidad al pipeline seleccionado? Empezará
+        en la primera etapa de ese pipeline."
+      move_to_stage: Mover a etapa
+      no_catalogue_html: No hay productos en el catálogo. %{link}.
+      no_collaborators: No hay colaboradores en esta oportunidad.
+      no_products: Todavía no hay productos. Añade uno abajo.
+      overview: Resumen de la oportunidad
+      product: Producto
+      products: Productos
+      quantity: Cant.
+      relationships: Relaciones
+      remove_collaborator: Quitar colaborador
+      remove_product: "¿Quitar %{name}?"
+      select_product: Seleccionar un producto
+      source_forms: Formularios de origen
+      subtotal: Subtotal
+      unit_price: Precio unitario
+      version_history: Historial de versiones
+      view_consent: Ver consentimiento
+  marketing:
+    campaign_engagement:
+      clicked: Clic
+      failed: Fallido
+      opened: Abierto
+      sent: Enviado
+    email_events:
+      blocked: Bloqueado
+      bounce: Rebote
+      click: Clic
+      delivered: Entregado
+      open: Abierto
+      spam: Spam
+      unsub: Baja
+    subscription_statuses:
+      missing: Sin suscripción
+      pending: Pendiente
+      subscribed: Suscrito
+      unsubscribed: Dado de baja
+  people:
+    interest_status:
+      converted: Convertido
+      dismissed: Descartado
+      pending: Pendiente
+    lifecycle:
+      customer: Cliente
+      evangelist: Evangelista
+      lead: Lead
+      mql: MQL
+      opportunity: Oportunidad
+      sql: SQL
+      subscriber: Suscriptor
+    quick_deal:
+      create: Crear oportunidad
+      create_pipeline: Crea uno
+      create_product: Crea uno
+      intro: Crea una oportunidad para %{company}. Empieza en la primera etapa del
+        pipeline seleccionado.
+      next_action: Siguiente acción (obligatoria)
+      no_pipeline_html: No hay pipeline configurado. %{link} antes de añadir una oportunidad.
+      no_products_html: No hay productos en el catálogo. %{link} antes de añadir una
+        oportunidad.
+      task_placeholder: Llamar para hacer seguimiento
+      title: Nueva oportunidad
+    relationships:
+      add: Añadir relación
+      empty: Todavía no hay relaciones.
+      person: Persona
+      remove: Quitar relación
+      remove_confirm: "¿Quitar esta relación?"
+      title: Relaciones
+      type: Relación
+      types:
+        colleague_of:
+          from: colega de
+          to: colega de
+        invited:
+          from: invitó a
+          to: invitado por
+        referred_by:
+          from: referido por
+          to: refirió a
+        worked_with:
+          from: trabajó con
+          to: trabajó con
+    show:
+      all_products: Todos los productos
+      campaigns: Campañas enviadas
+      campaigns_empty: Ninguna campaña enviada a este contacto.
+      campaigns_limit: Se muestran las %{count} más recientes.
+      contact_management: Gestión del contacto
+      convert_to_sql: Convertir a SQL
+      copied: Copiado
+      copy_url: Copiar URL
+      deals_empty: Todavía no hay oportunidades.
+      delete: Eliminar contacto
+      details: Datos de contacto
+      edit_custom: Editar campos personalizados
+      edit_details: Editar datos de contacto
+      edit_management: Editar gestión del contacto
+      edit_profile: Editar perfil profesional
+      email_preferences: Preferencias de email
+      merge: Fusionar duplicados
+      more_actions: Más acciones del contacto
+      no_delivery_events: Sin eventos de entrega registrados.
+      no_interests: Sin intereses registrados.
+      no_submissions: Sin envíos de formularios.
+      overview: Resumen del contacto
+      preferences_center: Centro de preferencias
+      primary_email: Principal
+      product: Producto
+      product_interests: Intereses por producto
+      professional: Perfil profesional
+      register_interest: Registrar interés
+      select_product: Seleccionar producto
+      signal: Señal
+      signal_placeholder: Qué pidió o hizo el contacto
+      submissions: Formularios enviados
       submissions_count:
         one: "%{count} envío"
         other: "%{count} envíos"
-      view_consent: "Ver consentimiento"
-      no_submissions: "Sin envíos de formularios."
-    lifecycle:
-      subscriber: "Suscriptor"
-      lead: "Lead"
-      mql: "MQL"
-      sql: "SQL"
-      opportunity: "Oportunidad"
-      customer: "Cliente"
-      evangelist: "Evangelista"
-    interest_status:
-      pending: "Pendiente"
-      converted: "Convertido"
-      dismissed: "Descartado"
-    relationships:
-      title: "Relaciones"
-      empty: "Todavía no hay relaciones."
-      add: "Añadir relación"
-      person: "Persona"
-      type: "Relación"
-      remove: "Quitar relación"
-      remove_confirm: "¿Quitar esta relación?"
-      types:
-        invited:
-          from: "invitó a"
-          to: "invitado por"
-        referred_by:
-          from: "referido por"
-          to: "refirió a"
-        worked_with:
-          from: "trabajó con"
-          to: "trabajó con"
-        colleague_of:
-          from: "colega de"
-          to: "colega de"
-    quick_deal:
-      title: "Nueva oportunidad"
-      no_pipeline_html: "No hay pipeline configurado. %{link} antes de añadir una oportunidad."
-      create_pipeline: "Crea uno"
-      intro: "Crea una oportunidad para %{company}. Empieza en la primera etapa del pipeline seleccionado."
-      no_products_html: "No hay productos en el catálogo. %{link} antes de añadir una oportunidad."
-      create_product: "Crea uno"
-      next_action: "Siguiente acción (obligatoria)"
-      task_placeholder: "Llamar para hacer seguimiento"
-      create: "Crear oportunidad"
-  deals:
-    show:
-      overview: "Resumen de la oportunidad"
-      more_actions: "Más acciones de la oportunidad"
-      version_history: "Historial de versiones"
-      duplicate: "Duplicar"
-      delete: "Eliminar oportunidad"
-      close_date: "Cierre %{date}"
-      details: "Datos de la oportunidad"
-      relationships: "Relaciones"
-      edit_details: "Editar datos de la oportunidad"
-      edit_relationships: "Editar relaciones"
-      edit_management: "Editar gestión"
-      edit_custom: "Editar campos personalizados"
-      move_pipeline_confirm: "¿Mover esta oportunidad al pipeline seleccionado? Empezará en la primera etapa de ese pipeline."
-      move_to_stage: "Mover a etapa"
-      products: "Productos"
-      product: "Producto"
-      edition: "Edición"
-      quantity: "Cant."
-      unit_price: "Precio unitario"
-      subtotal: "Subtotal"
-      no_products: "Todavía no hay productos. Añade uno abajo."
-      add_product: "Añadir producto"
-      select_product: "Seleccionar un producto"
-      remove_product: "¿Quitar %{name}?"
-      no_catalogue_html: "No hay productos en el catálogo. %{link}."
-      create_one: "Crea uno"
-      collaborators: "Colaboradores"
-      add_collaborator: "Añadir colaborador"
-      add: "Añadir"
-      remove_collaborator: "Quitar colaborador"
-      no_collaborators: "No hay colaboradores en esta oportunidad."
-      collaborators_hint: "Añade vendedores que puedan ver y editar esta oportunidad."
-      source_forms: "Formularios de origen"
-      view_consent: "Ver consentimiento"
-      booking_origin: "Origen de la reserva"
-      booked_on_html: "Reservado el %{date} en %{page}"
-      hide_trigger: "Ocultar"
-      default_trigger: "Disparador de etapa"
-    consent:
-      title: "Consentimiento aceptado"
-      date: "Fecha:"
-      policy: "Política:"
-      hash: "Hash:"
-      unverified: "No se pudo verificar la versión de la política enlazada al envío."
-      view_policy: "Ver texto de la política aceptada"
-      view_statement: "Ver frase de consentimiento aceptada"
-  marketing:
-    subscription_statuses:
-      subscribed: "Suscrito"
-      unsubscribed: "Dado de baja"
-      pending: "Pendiente"
-      missing: "Sin suscripción"
-    campaign_engagement:
-      sent: "Enviado"
-      opened: "Abierto"
-      clicked: "Clic"
-      failed: "Fallido"
-    email_events:
-      delivered: "Entregado"
-      open: "Abierto"
-      click: "Clic"
-      bounce: "Rebote"
-      spam: "Spam"
-      unsub: "Baja"
-      blocked: "Bloqueado"
+      subscribe: Suscribir
+      subscribe_confirm: "¿Suscribir a %{name} a «%{type}»?"
+      subscriptions: Suscripciones
+      unsubscribe: Dar de baja
+      unsubscribe_confirm: "¿Dar de baja a %{name} de «%{type}»?"
+      view_consent: Ver consentimiento
+      view_more: Ver más
+      view_more_count: Ver más (%{count})
+  records:
+    activity:
+      actions: Acciones
+      added_note: añadió una nota
+      commented: comentó
+      empty_hint: Prueba otro filtro, o añade una nota para empezar la conversación.
+      empty_title: No hay actividad en esta vista.
+      filter_aria: Filtrar actividad
+      filters:
+        all: Todo
+        changes: Cambios
+        comments: Comentarios
+        emails: Emails
+        notes: Notas
+      newer: Más recientes
+      older: Más antiguas
+      pages_aria: Páginas de actividad
+      title: Actividad
+      view_changes: Ver cambios
+    add: Añadir
+    add_comment: Añadir comentario
+    add_deal: Añadir oportunidad
+    add_note: Añadir nota
+    add_person: Añadir persona
+    ai:
+      actionable: Sugerencias accionables
+      draft_email: Borrador de email
+      email_goal: Objetivo del email (opcional)
+      email_goal_placeholder: p. ej. Seguimiento tras la demo
+      intro: Resume este registro, sugiere siguientes pasos o redacta un email de
+        seguimiento.
+      missing_data: Datos faltantes / sugerencias
+      next_steps: Siguientes pasos
+      risks: Riesgos
+      suggest_fields: Sugerir campos
+      suggested_next_steps: Siguientes pasos sugeridos
+      summarize: Resumir
+      summary: Resumen
+    ai_assistant: Asistente IA
+    at_a_glance: De un vistazo
+    boolean:
+      'false': 'No'
+      'true': Sí
+    cancel: Cancelar
+    close: Cerrar
+    completed_tasks: Tareas completadas (%{count})
+    composers:
+      close_editor: Cerrar editor
+      comment_label: Comentario
+      comment_placeholder: Menciona a un compañero con @nombre…
+      draft_hint: Puedes cerrar este editor y cambiar de sección. El borrador se conserva
+        hasta que salgas de la página.
+      note_label: Nota
+      note_placeholder: Escribe una nota…
+      note_title_placeholder: "¿De qué trata esta nota?"
+      task_label: Tarea
+      task_placeholder: "¿Qué tiene que ocurrir a continuación?"
+      title_optional: Título (opcional)
+    context_aria:
+      company: Contexto de la empresa
+      deal: Contexto de la oportunidad
+      person: Contexto del contacto
+    create_task: Crear tarea
+    delete_confirm: "¿Eliminar %{name}? Esta acción no se puede deshacer."
+    edit: Editar
+    email_message:
+      cancel_send: Cancelar envío
+      failed: Error al enviar
+      follow_up: Seguimiento %{date}
+      from: 'De: %{address}'
+      mark_replied: Marcar respondido
+      no_subject: "(sin asunto)"
+      opened: Abierto
+      received: Recibido
+      replied: Respondido
+      scheduled: Programado
+      sent: Enviado
+      to: 'Para: %{address}'
+      unknown_sender: Remitente desconocido
+    fields:
+      close_date: Fecha de cierre
+      company: Empresa
+      contacts: Contactos
+      created: Creado
+      custom_fields: Campos personalizados
+      domain: Dominio
+      email: Email
+      employees: Empleados
+      industry: Sector
+      invoice_number: Nº factura
+      job_title: Cargo
+      lead_score: Puntuación
+      lifecycle: Ciclo de vida
+      linkedin: LinkedIn
+      lists: Listas
+      location: Ubicación
+      management: Gestión
+      owner: Propietario
+      partner: Partner
+      people: Personas
+      phone: Teléfono
+      pipeline: Pipeline
+      probability: Probabilidad
+      revenue: Facturación
+      stage: Etapa
+      twitter: X / Twitter
+      value: Valor
+    more_actions: Más acciones
+    next_tasks: Próximas tareas
+    no_open_deals: No hay oportunidades abiertas.
+    no_pending_tasks: No hay tareas pendientes. Crea una tarea para planificar el
+      siguiente seguimiento.
+    open_deals: Oportunidades abiertas
+    open_menu: Abrir menú
+    profile_link: Perfil
+    sections_aria:
+      company: Secciones de la empresa
+      deal: Secciones de la oportunidad
+      person: Secciones del contacto
+    send_email: Enviar email
+    show_more_pending: Mostrar %{count} tareas pendientes más
+    tabs:
+      activity: Actividad
+      deals: Oportunidades
+      files: Archivos
+      information: Información
+      people: Personas
+      pipeline: Pipeline
+      products: Productos
+    view_all_information: Ver toda la información
+    view_deals: Ver oportunidades (%{count})
+    view_pipeline: Ver pipeline
+    view_products: Ver productos (%{count})

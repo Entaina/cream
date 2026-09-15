@@ -1,22 +1,23 @@
+---
 es:
   booking:
     errors:
-      slot_unavailable: "Ese horario ya no está disponible."
-      invalid_datetime: "La fecha u hora seleccionada no es válida."
-      rate_limited: "Demasiadas peticiones. Inténtalo de nuevo en un minuto."
-      event_type_not_found: "Tipo de evento no encontrado."
+      event_type_not_found: Tipo de evento no encontrado.
+      invalid_datetime: La fecha u hora seleccionada no es válida.
+      rate_limited: Demasiadas peticiones. Inténtalo de nuevo en un minuto.
+      slot_unavailable: Ese horario ya no está disponible.
     mailer:
       reminder:
-        subject: "Recordatorio: %{event_name} · %{date}"
-        greeting: "Hola %{name},"
-        intro: "Te recordamos que tu reserva «%{event_name}» empieza pronto."
-        date: "Fecha"
-        time: "Hora"
-        duration: "Duración"
+        address: Dirección
+        date: Fecha
+        duration: Duración
         duration_minutes:
-          one: "1 minuto"
+          one: 1 minuto
           other: "%{count} minutos"
-        location: "Ubicación"
-        address: "Dirección"
-        join_meet: "Unirse a Google Meet"
-        footer: "Reserva gestionada por %{host_name}."
+        footer: Reserva gestionada por %{host_name}.
+        greeting: Hola %{name},
+        intro: Te recordamos que tu reserva «%{event_name}» empieza pronto.
+        join_meet: Unirse a Google Meet
+        location: Ubicación
+        subject: 'Recordatorio: %{event_name} · %{date}'
+        time: Hora
