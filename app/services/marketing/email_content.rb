@@ -76,7 +76,7 @@ module Marketing
       else
         render_subject = render_subject_for(record, extra_tokens: extra_tokens)
         render_body = render_for(record, extra_tokens: extra_tokens)
-        [ render_subject, render_body ]
+        [render_subject, render_body]
       end
     end
 

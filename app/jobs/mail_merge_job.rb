@@ -13,7 +13,7 @@ class MailMergeJob < ApplicationJob
       next unless to
 
       rendered_body = template ? template.render_for(record) : body
-      rendered_subject = subject.gsub(/\{name\}/, record.display_name.to_s)
+      rendered_subject = subject.gsub("{name}", record.display_name.to_s)
 
       message = workspace.email_messages.create!(
         user: user,

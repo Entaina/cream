@@ -2,6 +2,7 @@ module Api
   module V1
     class DealEmailsController < BaseController
       include RequiresFeature
+
       requires_feature :record_email
 
       def create
@@ -14,10 +15,10 @@ module Api
           creator.deliver(message)
           render json: Api::DealEmailCreator.json(message), status: :created
         else
-          render json: { errors: message.errors.full_messages }, status: :unprocessable_entity
+          render json: {errors: message.errors.full_messages}, status: :unprocessable_entity
         end
       rescue Api::DealEmailCreator::InvalidAttachment => e
-        render json: { errors: [ e.message ] }, status: :unprocessable_entity
+        render json: {errors: [e.message]}, status: :unprocessable_entity
       end
 
       private

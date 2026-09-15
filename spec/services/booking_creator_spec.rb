@@ -14,11 +14,11 @@ RSpec.describe BookingCreator, type: :service do
       host: user,
       pipeline: pipeline,
       timezone: "Europe/Madrid",
-      calendar_ids: [ "primary" ]
+      calendar_ids: ["primary"]
     )
     page.event_types.build(
       slug: "video",
-      name_i18n: { "es" => "Online" },
+      name_i18n: {"es" => "Online"},
       duration_minutes: 30,
       location_type: "google_meet",
       weekly_hours: BookingEventType::DEFAULT_WEEKLY_HOURS,
@@ -40,7 +40,7 @@ RSpec.describe BookingCreator, type: :service do
       "id" => "evt1",
       "htmlLink" => "https://calendar.google.com/event/1",
       "conferenceData" => {
-        "entryPoints" => [ { "entryPointType" => "video", "uri" => "https://meet.google.com/abc" } ]
+        "entryPoints" => [{"entryPointType" => "video", "uri" => "https://meet.google.com/abc"}]
       }
     )
   end
@@ -308,7 +308,7 @@ RSpec.describe BookingCreator, type: :service do
       pipeline: pipeline,
       stage: pipeline.first_stage,
       company: company,
-      contacts: [ person ],
+      contacts: [person],
       name: "Existing deal"
     )
 

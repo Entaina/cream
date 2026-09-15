@@ -5,7 +5,7 @@ class CreateEditions < ActiveRecord::Migration[8.1]
       t.string :name, null: false
       t.timestamps
     end
-    add_index :editions, [ :workspace_id, :name ], unique: true
+    add_index :editions, [:workspace_id, :name], unique: true
 
     add_reference :deal_products, :edition, foreign_key: true
   end

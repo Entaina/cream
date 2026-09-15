@@ -9,8 +9,8 @@ RSpec.describe StageFieldFormat, type: :model do
   let(:deal) { create_deal!(workspace, pipeline: pipeline, stage: stage) }
 
   def build_format(**attrs)
-    workspace.stage_field_formats.new({ pipeline_stage: stage, field: "value",
-      operator: "eq", compare_value: "0", display_text: "guest" }.merge(attrs))
+    workspace.stage_field_formats.new({pipeline_stage: stage, field: "value",
+                                       operator: "eq", compare_value: "0", display_text: "guest"}.merge(attrs))
   end
 
   describe "validations" do

@@ -11,7 +11,7 @@ RSpec.describe "Lists", type: :request do
 
   def sign_in_to_workspace!(user)
     sign_in_as(user)
-    patch switch_workspace_path, params: { workspace_id: workspace.id }
+    patch switch_workspace_path, params: {workspace_id: workspace.id}
   end
 
   describe "GET /lists/:id for Deal lists" do
@@ -52,7 +52,7 @@ RSpec.describe "Lists", type: :request do
       sign_in_to_workspace!(salesperson)
 
       expect {
-        post list_entries_path(list), params: { record_id: hidden_deal.id }
+        post list_entries_path(list), params: {record_id: hidden_deal.id}
       }.not_to change(ListEntry, :count)
 
       expect(response).to have_http_status(:not_found)

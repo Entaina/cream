@@ -11,7 +11,7 @@ RSpec.describe Ai::Agent::ActionExecutor do
   it "creates a task when authorized" do
     action = Ai::Agent::PendingAction.new(
       tool: "create_task",
-      args: { "title" => "Seguimiento agente", "record_type" => "company", "record_id" => company.id },
+      args: {"title" => "Seguimiento agente", "record_type" => "company", "record_id" => company.id},
       description: "Crear tarea",
       workspace_id: workspace.id,
       user_id: user.id
@@ -26,7 +26,7 @@ RSpec.describe Ai::Agent::ActionExecutor do
   it "adds a note when authorized" do
     action = Ai::Agent::PendingAction.new(
       tool: "add_note",
-      args: { "record_type" => "company", "record_id" => company.id, "body" => "Nota del agente" },
+      args: {"record_type" => "company", "record_id" => company.id, "body" => "Nota del agente"},
       description: "Añadir nota",
       workspace_id: workspace.id,
       user_id: user.id

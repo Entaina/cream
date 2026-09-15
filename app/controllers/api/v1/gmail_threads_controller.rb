@@ -16,7 +16,7 @@ module Api
         deal = authorize_and_link!
         render json: deal, status: :created
       rescue ActiveRecord::RecordInvalid => e
-        render json: { errors: e.record.errors.full_messages }, status: :unprocessable_entity
+        render json: {errors: e.record.errors.full_messages}, status: :unprocessable_entity
       rescue ActiveRecord::RecordNotFound
         head :not_found
       end
@@ -49,7 +49,7 @@ module Api
       def link_params
         params.permit(:deal_id, new_deal: %i[name pipeline_stage_id], thread: [
           :gmail_thread_id,
-          { messages: %i[gmail_message_id rfc822_message_id from to subject body sent_at] }
+          {messages: %i[gmail_message_id rfc822_message_id from to subject body sent_at]}
         ])
       end
     end

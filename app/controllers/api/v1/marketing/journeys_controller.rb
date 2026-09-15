@@ -22,7 +22,7 @@ module Api
           person = policy_scope(current_workspace.people).find(enroll_params[:person_id])
 
           outcome = ::Marketing::JourneyTrigger.enroll!(journey: journey, person: person)
-          render json: { outcome: outcome.to_s }
+          render json: {outcome: outcome.to_s}
         end
 
         private

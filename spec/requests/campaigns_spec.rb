@@ -33,7 +33,7 @@ RSpec.describe "Campaigns", type: :request do
     campaign = workspace.campaigns.create!(name: "Vacía", status: "draft")
     segment = workspace.segments.create!(name: "All", record_type: "Person", user: admin, filters: {})
 
-    post send_campaign_campaign_path(campaign), params: { segment_id: segment.id }
+    post send_campaign_campaign_path(campaign), params: {segment_id: segment.id}
 
     expect(response).to redirect_to(edit_campaign_path(campaign))
     expect(flash[:alert]).to include("asunto y cuerpo")
@@ -50,7 +50,7 @@ RSpec.describe "Campaigns", type: :request do
     segment = workspace.segments.create!(name: "All", record_type: "Person", user: admin, filters: {})
 
     expect {
-      post send_campaign_campaign_path(campaign), params: { segment_id: segment.id }
+      post send_campaign_campaign_path(campaign), params: {segment_id: segment.id}
     }.to have_enqueued_job(CampaignSendJob)
 
     expect(response).to redirect_to(campaign)

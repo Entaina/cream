@@ -13,7 +13,7 @@ RSpec.describe "Sidebar preferences", type: :request do
       hidden = %w[api_tokens custom_fields]
 
       patch sidebar_preferences_path,
-        params: { order: order, hidden: hidden },
+        params: {order: order, hidden: hidden},
         as: :json
 
       expect(response).to have_http_status(:ok)
@@ -26,7 +26,7 @@ RSpec.describe "Sidebar preferences", type: :request do
       order = %w[marketing_segments marketing_campaigns tasks deals dashboard people companies deals tasks]
 
       patch sidebar_preferences_path,
-        params: { order: order, hidden: [] },
+        params: {order: order, hidden: []},
         as: :json
 
       member.reload
@@ -40,7 +40,7 @@ RSpec.describe "Sidebar preferences", type: :request do
 
     it "ignores unknown keys" do
       patch sidebar_preferences_path,
-        params: { order: %w[dashboard unknown_key people], hidden: %w[unknown_key api_tokens] },
+        params: {order: %w[dashboard unknown_key people], hidden: %w[unknown_key api_tokens]},
         as: :json
 
       expect(response).to have_http_status(:ok)
@@ -51,10 +51,10 @@ RSpec.describe "Sidebar preferences", type: :request do
 
     it "strips settings keys for non-admin users" do
       sign_in_as(users(:two))
-      patch switch_workspace_path, params: { workspace_id: workspaces(:one).id }
+      patch switch_workspace_path, params: {workspace_id: workspaces(:one).id}
 
       patch sidebar_preferences_path,
-        params: { order: %w[products dashboard tasks], hidden: %w[pipelines api_tokens] },
+        params: {order: %w[products dashboard tasks], hidden: %w[pipelines api_tokens]},
         as: :json
 
       expect(response).to have_http_status(:ok)
@@ -67,7 +67,7 @@ RSpec.describe "Sidebar preferences", type: :request do
       delete session_path
 
       patch sidebar_preferences_path,
-        params: { order: %w[dashboard], hidden: [] },
+        params: {order: %w[dashboard], hidden: []},
         as: :json
 
       expect(response).to redirect_to(new_session_path)

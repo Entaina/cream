@@ -13,7 +13,7 @@
   <%= render RecordPickerComponent.new(
         form: form,
         attribute: :edition_id,
-        label: "Edition",
+        label: t("deals.show.edition"),
         scope: product ? product.editions.ordered : Edition.none,
         search_url: search_url,
         create_url: create_url,

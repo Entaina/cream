@@ -1,6 +1,7 @@
 module People
   class ProductInterestsController < ApplicationController
     include RequiresFeature
+
     requires_feature :mql_pool
 
     before_action :set_person

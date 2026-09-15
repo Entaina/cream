@@ -2,6 +2,7 @@ require "rails_helper"
 
 RSpec.describe DatabaseBackupService do
   include ActiveSupport::Testing::TimeHelpers
+
   let(:storage) { instance_double(GoogleDriveBackupStorage) }
   let(:db_config) do
     instance_double(
@@ -49,7 +50,7 @@ RSpec.describe DatabaseBackupService do
   end
 
   it "raises when pg_dump fails" do
-    allow(Open3).to receive(:capture3).and_return([ "", "connection refused", instance_double(Process::Status, success?: false, exitstatus: 1) ])
+    allow(Open3).to receive(:capture3).and_return(["", "connection refused", instance_double(Process::Status, success?: false, exitstatus: 1)])
 
     expect { service.call }.to raise_error(DatabaseBackupService::Error, /pg_dump failed/)
   end
@@ -60,7 +61,7 @@ RSpec.describe DatabaseBackupService do
     old_monthly = backup_file("cream_backup_test_2026-05-01.dump")
     recent = backup_file("cream_backup_test_2026-06-20.dump")
 
-    allow(storage).to receive(:list_backups).and_return([ old_daily, old_monthly, recent ])
+    allow(storage).to receive(:list_backups).and_return([old_daily, old_monthly, recent])
 
     travel_to Time.zone.parse("2026-07-02 02:00:00") do
       result = service.call
@@ -68,7 +69,7 @@ RSpec.describe DatabaseBackupService do
       expect(storage).to have_received(:delete).with(old_daily.id)
       expect(storage).not_to have_received(:delete).with(old_monthly.id)
       expect(storage).not_to have_received(:delete).with(recent.id)
-      expect(result.deleted_files).to eq([ "cream_backup_test_2026-05-15.dump" ])
+      expect(result.deleted_files).to eq(["cream_backup_test_2026-05-15.dump"])
     end
   end
 
@@ -76,7 +77,7 @@ RSpec.describe DatabaseBackupService do
     allow(service).to receive(:run_pg_dump)
     old_production = backup_file("cream_backup_production_2026-05-15.dump")
 
-    allow(storage).to receive(:list_backups).and_return([ old_production ])
+    allow(storage).to receive(:list_backups).and_return([old_production])
 
     travel_to Time.zone.parse("2026-07-02 02:00:00") do
       service.call

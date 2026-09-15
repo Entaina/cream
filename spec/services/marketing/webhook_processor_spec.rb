@@ -20,7 +20,7 @@ RSpec.describe Marketing::WebhookProcessor do
   it "records email events from webhook payload" do
     payload = {
       "Events" => [
-        { "event" => "open", "CustomID" => message.id.to_s, "time" => Time.current.iso8601 }
+        {"event" => "open", "CustomID" => message.id.to_s, "time" => Time.current.iso8601}
       ]
     }
 
@@ -34,7 +34,7 @@ RSpec.describe Marketing::WebhookProcessor do
   it "ignores events for messages outside the given workspace" do
     payload = {
       "Events" => [
-        { "event" => "open", "CustomID" => message.id.to_s, "time" => Time.current.iso8601 }
+        {"event" => "open", "CustomID" => message.id.to_s, "time" => Time.current.iso8601}
       ]
     }
 
@@ -46,7 +46,7 @@ RSpec.describe Marketing::WebhookProcessor do
   it "suppresses addresses on hard bounces" do
     payload = {
       "Events" => [
-        { "event" => "bounce", "CustomID" => message.id.to_s, "email" => person.email, "time" => Time.current.iso8601 }
+        {"event" => "bounce", "CustomID" => message.id.to_s, "email" => person.email, "time" => Time.current.iso8601}
       ]
     }
 

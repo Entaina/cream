@@ -11,8 +11,8 @@ module Ai
           description: "Search people, companies and deals by name, email, domain or industry.",
           parameters: {
             type: "object",
-            properties: { query: { type: "string", description: "Search text" } },
-            required: [ "query" ],
+            properties: {query: {type: "string", description: "Search text"}},
+            required: ["query"],
             additionalProperties: false
           }
         },
@@ -23,10 +23,10 @@ module Ai
           parameters: {
             type: "object",
             properties: {
-              record_type: { type: "string", enum: RECORD_TYPES },
-              record_id: { type: "integer" }
+              record_type: {type: "string", enum: RECORD_TYPES},
+              record_id: {type: "integer"}
             },
-            required: [ "record_type", "record_id" ],
+            required: ["record_type", "record_id"],
             additionalProperties: false
           }
         },
@@ -37,7 +37,7 @@ module Ai
           parameters: {
             type: "object",
             properties: {
-              status: { type: "string", enum: %w[pending completed all], description: "Default: pending" }
+              status: {type: "string", enum: %w[pending completed all], description: "Default: pending"}
             },
             additionalProperties: false
           }
@@ -46,7 +46,7 @@ module Ai
           type: "function",
           name: "pipeline_summary",
           description: "Pipeline overview: deal count and total value per stage, plus open/won totals.",
-          parameters: { type: "object", properties: {}, additionalProperties: false }
+          parameters: {type: "object", properties: {}, additionalProperties: false}
         }
       ].freeze
 
@@ -65,7 +65,6 @@ module Ai
         when "get_record" then execute_get_record(args)
         when "list_tasks" then execute_list_tasks(args)
         when "pipeline_summary" then execute_pipeline_summary
-        else nil
         end
       end
 
@@ -118,11 +117,11 @@ module Ai
         counts = deals.group(:pipeline_stage_id).count
         values = deals.group(:pipeline_stage_id).sum(:value)
         stages = ws.pipeline_stages.ordered.to_h do |stage|
-          [ stage.name, {
+          [stage.name, {
             count: counts[stage.id] || 0,
             total_value: (values[stage.id] || 0).to_f,
             probability: stage.probability
-          } ]
+          }]
         end
         JSON.pretty_generate(
           stages: stages,
@@ -151,23 +150,23 @@ module Ai
       end
 
       def person_json(person)
-        { id: person.id, type: "person", name: person.display_name, email: person.email,
-          company: person.company&.name }.compact
+        {id: person.id, type: "person", name: person.display_name, email: person.email,
+         company: person.company&.name}.compact
       end
 
       def company_json(company)
-        { id: company.id, type: "company", name: company.name, domain: company.domain,
-          industry: company.industry }.compact
+        {id: company.id, type: "company", name: company.name, domain: company.domain,
+         industry: company.industry}.compact
       end
 
       def deal_json(deal)
-        { id: deal.id, type: "deal", name: deal.name, stage: deal.stage_label,
-          value: deal.value.to_f, company: deal.company&.name }.compact
+        {id: deal.id, type: "deal", name: deal.name, stage: deal.stage_label,
+         value: deal.value.to_f, company: deal.company&.name}.compact
       end
 
       def task_json(task)
-        { id: task.id, title: task.title, due_on: task.due_on&.iso8601,
-          completed: task.completed?, record: task.taskable&.display_name }.compact
+        {id: task.id, title: task.title, due_on: task.due_on&.iso8601,
+         completed: task.completed?, record: task.taskable&.display_name}.compact
       end
 
       def forbidden(error)

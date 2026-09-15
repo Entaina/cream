@@ -25,7 +25,7 @@ RSpec.describe "Inline contact creation", type: :request do
     company = create_company!(workspace)
 
     expect {
-      post people_path(format: :json), params: { person: { first_name: "Nadia", last_name: "Khan", company_id: company.id } }
+      post people_path(format: :json), params: {person: {first_name: "Nadia", last_name: "Khan", company_id: company.id}}
     }.to change(company.people, :count).by(1)
 
     expect(response).to have_http_status(:created)

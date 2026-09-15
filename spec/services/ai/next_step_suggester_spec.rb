@@ -12,7 +12,7 @@ RSpec.describe Ai::NextStepSuggester do
       deal_risk: "high",
       summary: "Deal needs attention",
       suggestions: [
-        { kind: "task", title: "Confirm budget", due_on: "2026-07-05", reason: "Close date is near" }
+        {kind: "task", title: "Confirm budget", due_on: "2026-07-05", reason: "Close date is near"}
       ]
     }.to_json)
 

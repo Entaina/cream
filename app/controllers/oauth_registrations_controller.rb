@@ -9,7 +9,7 @@ class OauthRegistrationsController < ActionController::API
     allowed_scopes = %w[mcp api]
 
     return render_error("invalid_redirect_uri", "redirect_uris is required") if redirect_uris.empty?
-    return render_error("invalid_scope", "scope must be one of: #{allowed_scopes.join(', ')}") unless allowed_scopes.include?(scope)
+    return render_error("invalid_scope", "scope must be one of: #{allowed_scopes.join(", ")}") unless allowed_scopes.include?(scope)
 
     application = Doorkeeper::Application.new(
       name: payload[:client_name].presence || "#{scope} client",
@@ -24,8 +24,8 @@ class OauthRegistrationsController < ActionController::API
         client_id_issued_at: application.created_at.to_i,
         client_name: application.name,
         redirect_uris: redirect_uris,
-        grant_types: [ "authorization_code", "refresh_token" ],
-        response_types: [ "code" ],
+        grant_types: ["authorization_code", "refresh_token"],
+        response_types: ["code"],
         token_endpoint_auth_method: "none",
         scope: scope
       }, status: :created
@@ -37,6 +37,6 @@ class OauthRegistrationsController < ActionController::API
   private
 
   def render_error(code, description)
-    render json: { error: code, error_description: description }, status: :bad_request
+    render json: {error: code, error_description: description}, status: :bad_request
   end
 end

@@ -9,9 +9,9 @@ class RecordAiController < ApplicationController
     authorize @record, :show?
     render json: Ai::RecordSummarizer.new(record: @record, user: current_user).call
   rescue Ai::Client::NotConfigured
-    render json: { error: "AI is not configured. Set CREAM_AI_API_KEY." }, status: :service_unavailable
+    render json: {error: "AI is not configured. Set CREAM_AI_API_KEY."}, status: :service_unavailable
   rescue Ai::Client::Error => e
-    render json: { error: e.message }, status: :unprocessable_entity
+    render json: {error: e.message}, status: :unprocessable_entity
   end
 
   def draft_email
@@ -22,18 +22,18 @@ class RecordAiController < ApplicationController
       goal: params[:goal]
     ).call
   rescue Ai::Client::NotConfigured
-    render json: { error: "AI is not configured. Set CREAM_AI_API_KEY." }, status: :service_unavailable
+    render json: {error: "AI is not configured. Set CREAM_AI_API_KEY."}, status: :service_unavailable
   rescue Ai::Client::Error => e
-    render json: { error: e.message }, status: :unprocessable_entity
+    render json: {error: e.message}, status: :unprocessable_entity
   end
 
   def next_steps
     authorize @record, :show?
     render json: Ai::NextStepSuggester.new(record: @record, user: current_user).call
   rescue Ai::Client::NotConfigured
-    render json: { error: "AI is not configured. Set CREAM_AI_API_KEY." }, status: :service_unavailable
+    render json: {error: "AI is not configured. Set CREAM_AI_API_KEY."}, status: :service_unavailable
   rescue Ai::Client::Error => e
-    render json: { error: e.message }, status: :unprocessable_entity
+    render json: {error: e.message}, status: :unprocessable_entity
   end
 
   def create_task
@@ -51,11 +51,11 @@ class RecordAiController < ApplicationController
     if task.save
       @record.track_activity(
         "ai_task_created",
-        metadata: { title: task.title, reason: params[:reason].presence }.compact
+        metadata: {title: task.title, reason: params[:reason].presence}.compact
       )
-      render json: { task: { id: task.id, title: task.title, due_on: task.due_on&.iso8601 } }
+      render json: {task: {id: task.id, title: task.title, due_on: task.due_on&.iso8601}}
     else
-      render json: { errors: task.errors.full_messages }, status: :unprocessable_entity
+      render json: {errors: task.errors.full_messages}, status: :unprocessable_entity
     end
   end
 
@@ -64,9 +64,9 @@ class RecordAiController < ApplicationController
     authorize @record, :show?
     render json: Ai::RecordEnricher.new(record: @record, user: current_user).call
   rescue Ai::Client::NotConfigured
-    render json: { error: "AI is not configured. Set CREAM_AI_API_KEY." }, status: :service_unavailable
+    render json: {error: "AI is not configured. Set CREAM_AI_API_KEY."}, status: :service_unavailable
   rescue Ai::Client::Error => e
-    render json: { error: e.message }, status: :unprocessable_entity
+    render json: {error: e.message}, status: :unprocessable_entity
   end
 
   private
@@ -78,6 +78,6 @@ class RecordAiController < ApplicationController
   def requires_ai_enrichment!
     return if CreamFeatures.enabled?(:ai_enrichment)
 
-    render json: { error: "AI enrichment is not available yet." }, status: :not_found
+    render json: {error: "AI enrichment is not available yet."}, status: :not_found
   end
 end

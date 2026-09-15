@@ -18,11 +18,11 @@ class BookingEventType < ApplicationRecord
   }.freeze
 
   DEFAULT_WEEKLY_HOURS = {
-    "monday" => [ [ "10:00", "14:00" ], [ "16:30", "20:00" ] ],
-    "tuesday" => [ [ "10:00", "14:00" ], [ "16:30", "20:00" ] ],
-    "wednesday" => [ [ "10:00", "14:00" ], [ "16:30", "20:00" ] ],
-    "thursday" => [ [ "10:00", "14:00" ], [ "16:30", "20:00" ] ],
-    "friday" => [ [ "10:00", "14:00" ], [ "16:30", "18:30" ] ],
+    "monday" => [["10:00", "14:00"], ["16:30", "20:00"]],
+    "tuesday" => [["10:00", "14:00"], ["16:30", "20:00"]],
+    "wednesday" => [["10:00", "14:00"], ["16:30", "20:00"]],
+    "thursday" => [["10:00", "14:00"], ["16:30", "20:00"]],
+    "friday" => [["10:00", "14:00"], ["16:30", "18:30"]],
     "saturday" => [],
     "sunday" => []
   }.freeze
@@ -32,14 +32,14 @@ class BookingEventType < ApplicationRecord
 
   attribute :reminder_minutes_before, :integer, default: 60
 
-  validates :slug, presence: true, format: { with: /\A[a-z0-9-]+\z/ }
-  validates :slug, uniqueness: { scope: :booking_page_id }
-  validates :duration_minutes, numericality: { greater_than: 0 }
-  validates :slot_increment_minutes, numericality: { greater_than: 0 }
-  validates :min_notice_hours, numericality: { greater_than_or_equal_to: 0 }
-  validates :reminder_minutes_before, numericality: { greater_than_or_equal_to: 0, allow_nil: true }
-  validates :location_type, inclusion: { in: LOCATION_TYPES }
-  validates :color, inclusion: { in: COLORS }
+  validates :slug, presence: true, format: {with: /\A[a-z0-9-]+\z/}
+  validates :slug, uniqueness: {scope: :booking_page_id}
+  validates :duration_minutes, numericality: {greater_than: 0}
+  validates :slot_increment_minutes, numericality: {greater_than: 0}
+  validates :min_notice_hours, numericality: {greater_than_or_equal_to: 0}
+  validates :reminder_minutes_before, numericality: {greater_than_or_equal_to: 0, allow_nil: true}
+  validates :location_type, inclusion: {in: LOCATION_TYPES}
+  validates :color, inclusion: {in: COLORS}
   validate :name_i18n_present
 
   before_validation :normalize_weekly_hours, :normalize_slug, :normalize_reminder_minutes_before
@@ -143,7 +143,7 @@ class BookingEventType < ApplicationRecord
         end_time = window[1].to_s.strip
         next if start_time.blank? || end_time.blank?
 
-        [ start_time, end_time ]
+        [start_time, end_time]
       end
     end
   end

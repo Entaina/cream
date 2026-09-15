@@ -76,7 +76,7 @@ class NotificationService
       workspace: booking.workspace,
       kind: "booking",
       title: "New booking",
-      body: "#{event_name}: #{booking.display_name} (#{booking.email}) — #{starts_at.strftime('%Y-%m-%d %H:%M')}",
+      body: "#{event_name}: #{booking.display_name} (#{booking.email}) — #{starts_at.strftime("%Y-%m-%d %H:%M")}",
       url: record_path_for(booking.deal) || Rails.application.routes.url_helpers.bookings_path
     )
   end

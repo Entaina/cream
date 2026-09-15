@@ -1,12 +1,12 @@
 class CalendarConnection < ApplicationRecord
   READONLY_SCOPE = "https://www.googleapis.com/auth/calendar.readonly"
   EVENTS_SCOPE = "https://www.googleapis.com/auth/calendar.events"
-  OAUTH_SCOPES = [ READONLY_SCOPE, EVENTS_SCOPE ].freeze
+  OAUTH_SCOPES = [READONLY_SCOPE, EVENTS_SCOPE].freeze
 
   belongs_to :workspace
   belongs_to :user
 
-  validates :user_id, uniqueness: { scope: :workspace_id }
+  validates :user_id, uniqueness: {scope: :workspace_id}
 
   def connected? = refresh_token.present?
 

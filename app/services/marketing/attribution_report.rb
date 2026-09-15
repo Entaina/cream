@@ -47,7 +47,6 @@ module Marketing
       when "month" then Time.current.beginning_of_month
       when "quarter" then Time.current.beginning_of_quarter
       when "year" then Time.current.beginning_of_year
-      else nil
       end
     end
 

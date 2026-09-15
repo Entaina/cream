@@ -32,6 +32,6 @@ module SetLocale
     valid_locale = locale.to_s.presence_in(User::LOCALES)
     return unless valid_locale
 
-    cookies[:locale] = { value: valid_locale, expires: 1.year.from_now, same_site: :lax }
+    cookies[:locale] = {value: valid_locale, expires: 1.year.from_now, same_site: :lax}
   end
 end

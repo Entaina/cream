@@ -97,7 +97,7 @@ RSpec.describe "Companies", type: :request do
       get company_path(company)
 
       expect(response).to have_http_status(:success)
-      expect(response.body).to include("Fiscal information")
+      expect(response.body).to include(I18n.t("companies.show.fiscal"))
       expect(response.body).to include("CIF B12345678")
     end
 
@@ -108,7 +108,7 @@ RSpec.describe "Companies", type: :request do
       get company_path(company)
 
       expect(response).to have_http_status(:success)
-      expect(response.body).to include("Fiscal information")
+      expect(response.body).to include(I18n.t("companies.show.fiscal"))
     end
 
     describe "deal visibility" do
@@ -118,7 +118,7 @@ RSpec.describe "Companies", type: :request do
 
       def sign_in_to_workspace!(user)
         sign_in_as(user)
-        patch switch_workspace_path, params: { workspace_id: workspace.id }
+        patch switch_workspace_path, params: {workspace_id: workspace.id}
       end
 
       it "limits a salesperson to owned and shared deals" do
@@ -157,7 +157,7 @@ RSpec.describe "Companies", type: :request do
     it "updates the fiscal information" do
       sign_in_as(member)
 
-      patch company_path(company), params: { company: { fiscal_information: "CIF B12345678" } }
+      patch company_path(company), params: {company: {fiscal_information: "CIF B12345678"}}
 
       expect(response).to redirect_to(company_path(company))
       expect(company.reload.fiscal_information).to eq("CIF B12345678")
@@ -174,7 +174,7 @@ RSpec.describe "Companies", type: :request do
       get picker_companies_path(q: "Zeta"), as: :json
 
       body = JSON.parse(response.body)
-      expect(body.map { |row| row["name"] }).to eq([ "Zeta Industries" ])
+      expect(body.map { |row| row["name"] }).to eq(["Zeta Industries"])
       expect(body.first).to include("id" => matching.id, "name" => "Zeta Industries")
     end
   end

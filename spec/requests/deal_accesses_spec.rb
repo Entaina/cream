@@ -12,7 +12,7 @@ RSpec.describe "Deal accesses", type: :request do
 
   def sign_in_to_workspace!(user)
     sign_in_as(user)
-    patch switch_workspace_path, params: { workspace_id: workspace.id }
+    patch switch_workspace_path, params: {workspace_id: workspace.id}
   end
 
   describe "POST /deals/:deal_id/deal_accesses" do
@@ -20,7 +20,7 @@ RSpec.describe "Deal accesses", type: :request do
       sign_in_to_workspace!(admin)
 
       expect {
-        post deal_deal_accesses_path(deal), params: { user_id: salesperson.id }
+        post deal_deal_accesses_path(deal), params: {user_id: salesperson.id}
       }.to change(DealAccess, :count).by(1)
 
       expect(response).to redirect_to(deal_path(deal))
@@ -31,7 +31,7 @@ RSpec.describe "Deal accesses", type: :request do
       other_deal = create_deal!(workspace, pipeline: pipeline, owner: salesperson, name: "Other deal")
       sign_in_to_workspace!(admin)
 
-      post deal_deal_accesses_path(other_deal), params: { user_id: director.id }
+      post deal_deal_accesses_path(other_deal), params: {user_id: director.id}
 
       expect(response).to redirect_to(deal_path(other_deal))
       expect(other_deal.reload.collaborators).to include(director)
@@ -40,7 +40,7 @@ RSpec.describe "Deal accesses", type: :request do
     it "allows a sales director to add a collaborator" do
       sign_in_to_workspace!(director)
 
-      post deal_deal_accesses_path(deal), params: { user_id: salesperson.id }
+      post deal_deal_accesses_path(deal), params: {user_id: salesperson.id}
 
       expect(response).to redirect_to(deal_path(deal))
       expect(deal.reload.collaborators).to include(salesperson)
@@ -50,7 +50,7 @@ RSpec.describe "Deal accesses", type: :request do
       other_deal = create_deal!(workspace, pipeline: pipeline, owner: admin, name: "Restricted deal")
       sign_in_to_workspace!(salesperson)
 
-      post deal_deal_accesses_path(other_deal), params: { user_id: director.id }
+      post deal_deal_accesses_path(other_deal), params: {user_id: director.id}
 
       expect(response).to have_http_status(:not_found)
       expect(other_deal.reload.collaborators).to be_empty

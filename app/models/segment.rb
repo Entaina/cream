@@ -7,7 +7,7 @@ class Segment < ApplicationRecord
   has_many :segment_memberships, dependent: :destroy
 
   validates :name, :record_type, presence: true
-  validates :record_type, inclusion: { in: RECORD_TYPES }
+  validates :record_type, inclusion: {in: RECORD_TYPES}
 
   scope :ordered, -> { order(:name, :id) }
   scope :visible_to, ->(user) { where(user: user).or(where(shared: true)) }

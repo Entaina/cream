@@ -170,7 +170,7 @@ module Marketing
         publication.id,
         subscription.person_id,
         action.to_s,
-        { "reactivate" => reactivate }
+        {"reactivate" => reactivate}
       )
     end
     private_class_method :enqueue_beehiiv_push!
@@ -199,7 +199,7 @@ module Marketing
     end
 
     def self.privacy_policy_trace(privacy_policy_version:, params:, lead_form:)
-      trace = { "privacy_policy_url" => privacy_policy_url(lead_form) }
+      trace = {"privacy_policy_url" => privacy_policy_url(lead_form)}
 
       if privacy_policy_version
         trace["privacy_policy_version_id"] = privacy_policy_version.id

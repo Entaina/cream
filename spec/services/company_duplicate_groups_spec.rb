@@ -13,7 +13,7 @@ RSpec.describe CompanyDuplicateGroups do
 
     matching = groups.find { |group| group.companies.include?(mapfre) }
     expect(matching.reason).to include("Similar name")
-    expect(matching.companies).to eq([ mapfre, mapfre_spain ])
+    expect(matching.companies).to eq([mapfre, mapfre_spain])
   end
 
   it "groups companies with the same normalized domain" do
@@ -24,7 +24,7 @@ RSpec.describe CompanyDuplicateGroups do
 
     matching = groups.find { |group| group.companies.include?(first) }
     expect(matching.reason).to include("Same domain")
-    expect(matching.companies).to eq([ first, second ])
+    expect(matching.companies).to eq([first, second])
   end
 
   it "does not group unrelated companies" do
@@ -46,7 +46,7 @@ RSpec.describe CompanyDuplicateGroups do
     groups = described_class.call(workspace)
 
     expect(groups.size).to eq(1)
-    expect(groups.first.companies).to eq([ alpha, beta, gamma ])
+    expect(groups.first.companies).to eq([alpha, beta, gamma])
   end
 
   it "returns multiple groups ordered by primary company name" do
@@ -58,8 +58,8 @@ RSpec.describe CompanyDuplicateGroups do
     groups = described_class.call(workspace)
 
     expect(groups.size).to eq(2)
-    expect(groups.map { |group| group.companies.first.name }).to eq([ "Alpha", "Beta" ])
-    expect(groups[0].companies).to eq([ alpha, alpha_spain ])
-    expect(groups[1].companies).to eq([ beta, beta_spain ])
+    expect(groups.map { |group| group.companies.first.name }).to eq(["Alpha", "Beta"])
+    expect(groups[0].companies).to eq([alpha, alpha_spain])
+    expect(groups[1].companies).to eq([beta, beta_spain])
   end
 end

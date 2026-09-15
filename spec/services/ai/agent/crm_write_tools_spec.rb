@@ -11,7 +11,7 @@ RSpec.describe Ai::Agent::CrmWriteTools do
   let(:tools) { described_class.new(ctx: ctx, pending_actions: pending_actions) }
 
   it "proposes a task without creating it" do
-    result = tools.try_execute("create_task", { "title" => "Llamar mañana", "record_type" => "company", "record_id" => company.id })
+    result = tools.try_execute("create_task", {"title" => "Llamar mañana", "record_type" => "company", "record_id" => company.id})
 
     expect(result).to include("Pendiente de confirmación")
     expect(pending_actions.size).to eq(1)
@@ -36,7 +36,7 @@ RSpec.describe Ai::Agent::CrmWriteTools do
     result = tools.try_execute("update_record", {
       "record_type" => "company",
       "record_id" => other_company.id,
-      "fields" => { "name" => "Hacked" }
+      "fields" => {"name" => "Hacked"}
     })
 
     expect(result).to match(/not found|Forbidden/i)

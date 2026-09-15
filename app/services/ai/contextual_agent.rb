@@ -25,7 +25,7 @@ module Ai
 
     MAX_TOOL_ITERATIONS = 12
 
-    def initialize(workspace:, user:, record: nil, message:, history: [], session_id: nil,
+    def initialize(workspace:, user:, message:, record: nil, history: [], session_id: nil,
       client: Ai::Client.new, drive: nil, on_status: nil, memory: nil)
       @workspace = workspace
       @user = user
@@ -114,9 +114,9 @@ module Ai
     def related_record_contexts
       case @record
       when Person
-        [ company_context(@record.company) ].compact
+        [company_context(@record.company)].compact
       when Deal
-        [ company_context(@record.company), *@record.contacts.map { |contact| person_context(contact) } ].compact
+        [company_context(@record.company), *@record.contacts.map { |contact| person_context(contact) }].compact
       else
         []
       end
@@ -157,7 +157,7 @@ module Ai
         next if role.blank? || content.blank?
         next unless %w[user assistant].include?(role.to_s)
 
-        { role: role.to_s, content: content.first(4000) }
+        {role: role.to_s, content: content.first(4000)}
       end.last(20)
     end
 

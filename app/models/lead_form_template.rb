@@ -8,11 +8,11 @@ class LeadFormTemplate < ApplicationRecord
 
   belongs_to :workspace
 
-  validates :path, presence: true, format: { with: PATH_FORMAT }, uniqueness: { scope: :workspace_id }
+  validates :path, presence: true, format: {with: PATH_FORMAT}, uniqueness: {scope: :workspace_id}
   validates :body, presence: true
-  validates :kind, inclusion: { in: KINDS }
-  validates :page_slug, format: { with: /\A[a-z0-9_-]+\z/ }, allow_blank: true
-  validates :page_slug, uniqueness: { scope: :workspace_id }, allow_nil: true
+  validates :kind, inclusion: {in: KINDS}
+  validates :page_slug, format: {with: /\A[a-z0-9_-]+\z/}, allow_blank: true
+  validates :page_slug, uniqueness: {scope: :workspace_id}, allow_nil: true
   validate :body_must_have_valid_liquid_syntax
   validate :page_slug_required_for_pages
 
@@ -96,13 +96,13 @@ class LeadFormTemplate < ApplicationRecord
     end
 
     if partial?
-      self.path = "#{PARTIALS_PREFIX}#{segment.tr('-', '_')}"
+      self.path = "#{PARTIALS_PREFIX}#{segment.tr("-", "_")}"
     elsif page?
       normalized = segment.tr("_", "-")
       self.page_slug = normalized
-      self.path = "#{PAGE_PREFIX}#{normalized.tr('-', '_')}"
+      self.path = "#{PAGE_PREFIX}#{normalized.tr("-", "_")}"
     else
-      self.path = "#{ROOT_PREFIX}#{segment.tr('-', '_')}"
+      self.path = "#{ROOT_PREFIX}#{segment.tr("-", "_")}"
     end
   end
 

@@ -72,7 +72,7 @@ RSpec.describe "Lead forms", type: :request do
     it "updates lead form to remove email template" do
       form = create_lead_form!(workspace, user: member, slug: "with-email")
 
-      patch lead_form_path(form), params: { lead_form: { email_template_id: "" } }
+      patch lead_form_path(form), params: {lead_form: {email_template_id: ""}}
 
       expect(response).to redirect_to(lead_forms_path)
       expect(form.reload.email_template).to be_nil
@@ -101,7 +101,7 @@ RSpec.describe "Lead forms", type: :request do
       form = create_lead_form!(workspace, user: member, slug: "redirect-form")
 
       patch lead_form_path(form), params: {
-        lead_form: { success_redirect_url: "https://example.com/thanks" }
+        lead_form: {success_redirect_url: "https://example.com/thanks"}
       }
 
       expect(response).to redirect_to(lead_forms_path)
@@ -179,19 +179,19 @@ RSpec.describe "Lead forms", type: :request do
           active: "1",
           pipeline_routes_submitted: "1",
           pipeline_route_keys: %w[curso entrenamiento],
-          pipeline_route_pipeline_ids: [ cursos.id, pipeline.id ]
+          pipeline_route_pipeline_ids: [cursos.id, pipeline.id]
         }
       }
 
       form = LeadForm.find_by!(slug: "contacto")
-      expect(form.pipeline_routes).to eq({ "curso" => cursos.id, "entrenamiento" => pipeline.id })
+      expect(form.pipeline_routes).to eq({"curso" => cursos.id, "entrenamiento" => pipeline.id})
     end
 
     it "clears pipeline routes when all rows are removed" do
       form = create_lead_form!(workspace, user: member, slug: "routed-form")
       other = pipeline.duplicate(name: "Other")
       other.save!
-      form.update!(pipeline_routes: { "curso" => other.id })
+      form.update!(pipeline_routes: {"curso" => other.id})
 
       patch lead_form_path(form), params: {
         lead_form: {
@@ -217,8 +217,8 @@ RSpec.describe "Lead forms", type: :request do
             email_template_id: template.id,
             active: "1",
             pipeline_routes_submitted: "1",
-            pipeline_route_keys: [ "Invalid-Key" ],
-            pipeline_route_pipeline_ids: [ pipeline.id ]
+            pipeline_route_keys: ["Invalid-Key"],
+            pipeline_route_pipeline_ids: [pipeline.id]
           }
         }
       }.not_to change(LeadForm, :count)
@@ -293,7 +293,7 @@ RSpec.describe "Lead forms", type: :request do
       form = create_lead_form!(workspace, user: member, slug: "stage-form")
       qualified = pipeline.pipeline_stages.find_by!(name: "Qualified")
 
-      patch lead_form_path(form), params: { lead_form: { pipeline_stage_id: qualified.id } }
+      patch lead_form_path(form), params: {lead_form: {pipeline_stage_id: qualified.id}}
 
       expect(response).to redirect_to(lead_forms_path)
       expect(form.reload.pipeline_stage).to eq(qualified)
@@ -343,7 +343,7 @@ RSpec.describe "Lead forms", type: :request do
       form = create_lead_form!(workspace, user: member, slug: "task-form")
 
       patch lead_form_path(form), params: {
-        lead_form: { first_task_title: "Contactar en 48h", first_task_due_days: "2" }
+        lead_form: {first_task_title: "Contactar en 48h", first_task_due_days: "2"}
       }
 
       expect(response).to redirect_to(lead_forms_path)
@@ -354,7 +354,7 @@ RSpec.describe "Lead forms", type: :request do
     it "updates and deletes a lead form" do
       form = create_lead_form!(workspace, user: member, slug: "editable")
 
-      patch lead_form_path(form), params: { lead_form: { name: "Nuevo nombre", active: "0" } }
+      patch lead_form_path(form), params: {lead_form: {name: "Nuevo nombre", active: "0"}}
       expect(response).to redirect_to(lead_forms_path)
       expect(form.reload.name).to eq("Nuevo nombre")
 

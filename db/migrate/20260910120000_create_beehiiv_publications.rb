@@ -13,11 +13,11 @@ class CreateBeehiivPublications < ActiveRecord::Migration[8.1]
 
     add_index :beehiiv_publications, :webhook_token, unique: true
     add_index :beehiiv_publications,
-      [ :beehiiv_connection_id, :publication_id ],
+      [:beehiiv_connection_id, :publication_id],
       unique: true,
       name: "idx_beehiiv_pubs_connection_publication"
     add_index :beehiiv_publications,
-      [ :beehiiv_connection_id, :subscription_type_id ],
+      [:beehiiv_connection_id, :subscription_type_id],
       unique: true,
       name: "idx_beehiiv_pubs_connection_subscription_type"
 

@@ -12,12 +12,12 @@ module Ai
           parameters: {
             type: "object",
             properties: {
-              title: { type: "string" },
-              due_on: { type: "string", description: "ISO date (YYYY-MM-DD)" },
-              record_type: { type: "string", enum: RECORD_TYPES },
-              record_id: { type: "integer" }
+              title: {type: "string"},
+              due_on: {type: "string", description: "ISO date (YYYY-MM-DD)"},
+              record_type: {type: "string", enum: RECORD_TYPES},
+              record_id: {type: "integer"}
             },
-            required: [ "title" ],
+            required: ["title"],
             additionalProperties: false
           }
         },
@@ -28,12 +28,12 @@ module Ai
           parameters: {
             type: "object",
             properties: {
-              record_type: { type: "string", enum: RECORD_TYPES },
-              record_id: { type: "integer" },
-              title: { type: "string" },
-              body: { type: "string" }
+              record_type: {type: "string", enum: RECORD_TYPES},
+              record_id: {type: "integer"},
+              title: {type: "string"},
+              body: {type: "string"}
             },
-            required: [ "record_type", "record_id", "body" ],
+            required: ["record_type", "record_id", "body"],
             additionalProperties: false
           }
         },
@@ -44,14 +44,14 @@ module Ai
           parameters: {
             type: "object",
             properties: {
-              record_type: { type: "string", enum: RECORD_TYPES },
-              record_id: { type: "integer" },
+              record_type: {type: "string", enum: RECORD_TYPES},
+              record_id: {type: "integer"},
               fields: {
                 type: "object",
                 description: "Fields to update (e.g. name, email, value, probability, stage, description)"
               }
             },
-            required: [ "record_type", "record_id", "fields" ],
+            required: ["record_type", "record_id", "fields"],
             additionalProperties: false
           }
         },
@@ -62,10 +62,10 @@ module Ai
           parameters: {
             type: "object",
             properties: {
-              deal_id: { type: "integer" },
-              stage: { type: "string", description: "Target stage name" }
+              deal_id: {type: "integer"},
+              stage: {type: "string", description: "Target stage name"}
             },
-            required: [ "deal_id", "stage" ],
+            required: ["deal_id", "stage"],
             additionalProperties: false
           }
         },
@@ -75,8 +75,8 @@ module Ai
           description: "Propose marking a task as completed (or reopening it). Requires user confirmation.",
           parameters: {
             type: "object",
-            properties: { task_id: { type: "integer" } },
-            required: [ "task_id" ],
+            properties: {task_id: {type: "integer"}},
+            required: ["task_id"],
             additionalProperties: false
           }
         }
@@ -99,7 +99,6 @@ module Ai
         when "update_record" then propose_update_record(args)
         when "update_deal_stage" then propose_update_deal_stage(args)
         when "complete_task" then propose_complete_task(args)
-        else nil
         end
       end
 

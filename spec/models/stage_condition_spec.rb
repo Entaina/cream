@@ -9,8 +9,8 @@ RSpec.describe StageCondition, type: :model do
   let(:deal) { create_deal!(workspace, pipeline: pipeline, stage: pipeline.first_stage) }
 
   def build_condition(**attrs)
-    workspace.stage_conditions.new({ pipeline_stage: stage, field: "value",
-      operator: "gt", compare_value: "1000" }.merge(attrs))
+    workspace.stage_conditions.new({pipeline_stage: stage, field: "value",
+                                    operator: "gt", compare_value: "1000"}.merge(attrs))
   end
 
   describe "validations" do
@@ -102,9 +102,9 @@ RSpec.describe StageCondition, type: :model do
       company_condition = workspace.stage_conditions.create!(pipeline_stage: stage,
         field: "company.cf:#{company_field.key}", operator: "eq", compare_value: "Enterprise")
 
-      deal.custom_fields = { deal_field.key => "A" }
+      deal.custom_fields = {deal_field.key => "A"}
       deal.save!
-      deal.company.custom_fields = { company_field.key => "Enterprise" }
+      deal.company.custom_fields = {company_field.key => "Enterprise"}
       deal.company.save!
 
       expect(deal_condition.met?(deal.reload)).to be(true)

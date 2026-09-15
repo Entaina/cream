@@ -10,7 +10,7 @@ RSpec.describe "Theme preferences", type: :request do
   describe "PATCH /theme_preference" do
     User::THEMES.each do |theme|
       it "persists the #{theme} theme for the current user" do
-        patch theme_preference_path, params: { theme: theme }, as: :json
+        patch theme_preference_path, params: {theme: theme}, as: :json
 
         expect(response).to have_http_status(:ok)
         expect(member.reload.theme).to eq(theme)
@@ -20,7 +20,7 @@ RSpec.describe "Theme preferences", type: :request do
     it "rejects unknown themes" do
       member.update!(theme: "dark")
 
-      patch theme_preference_path, params: { theme: "purple" }, as: :json
+      patch theme_preference_path, params: {theme: "purple"}, as: :json
 
       expect(response).to have_http_status(:unprocessable_entity)
       expect(member.reload.theme).to eq("dark")
@@ -29,7 +29,7 @@ RSpec.describe "Theme preferences", type: :request do
     it "requires authentication" do
       delete session_path
 
-      patch theme_preference_path, params: { theme: "dark" }, as: :json
+      patch theme_preference_path, params: {theme: "dark"}, as: :json
 
       expect(response).to redirect_to(new_session_path)
     end

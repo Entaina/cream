@@ -78,7 +78,7 @@ class StripePaymentMatcher
     Deal.linkable
       .includes(:pipeline_stage)
       .joins(:deal_contacts)
-      .where(deal_contacts: { person_id: people.map(&:id) })
+      .where(deal_contacts: {person_id: people.map(&:id)})
       .distinct.to_a
   end
 
@@ -86,7 +86,7 @@ class StripePaymentMatcher
     amount = @payment.amount_decimal
     deals.select do |deal|
       deal.currency.to_s.casecmp?(@payment.currency.to_s) &&
-        (deal.value.to_f - amount).abs <= [ 0.01, deal.value.to_f * 0.01 ].max
+        (deal.value.to_f - amount).abs <= [0.01, deal.value.to_f * 0.01].max
     end
   end
 end

@@ -1,5 +1,6 @@
 class LeadFormTemplatesController < ApplicationController
   include RequiresFeature
+
   requires_feature :lead_forms
   before_action :set_template, only: %i[edit update destroy preview]
 

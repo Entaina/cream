@@ -10,11 +10,11 @@ module Api
 
           segment = policy_scope(current_workspace.segments).find(send_params[:segment_id])
           unless segment.record_type == "Person"
-            return render json: { error: "Segment must be of type Person" }, status: :unprocessable_entity
+            return render json: {error: "Segment must be of type Person"}, status: :unprocessable_entity
           end
 
           unless campaign.email_content_present?
-            return render json: { error: "Campaign has no email content configured" }, status: :unprocessable_entity
+            return render json: {error: "Campaign has no email content configured"}, status: :unprocessable_entity
           end
 
           template = resolve_campaign_send_template(campaign, send_params[:email_template_id])

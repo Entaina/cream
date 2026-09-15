@@ -1,5 +1,6 @@
 class StageTriggersController < ApplicationController
   include RequiresFeature
+
   requires_feature :stage_triggers
   before_action :set_stage, only: %i[index new create]
   before_action :set_stage_trigger, only: %i[show edit update destroy]

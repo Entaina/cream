@@ -3,7 +3,7 @@ class DealContact < ApplicationRecord
   belongs_to :deal
   belongs_to :person
 
-  validates :person_id, uniqueness: { scope: :deal_id }
+  validates :person_id, uniqueness: {scope: :deal_id}
 
   after_create :track_contact_added
   after_destroy :track_contact_removed
@@ -19,6 +19,6 @@ class DealContact < ApplicationRecord
   end
 
   def contact_metadata(change)
-    { change: change, contact: person.display_name, contact_id: person_id }
+    {change: change, contact: person.display_name, contact_id: person_id}
   end
 end

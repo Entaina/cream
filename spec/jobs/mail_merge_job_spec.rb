@@ -18,7 +18,7 @@ RSpec.describe MailMergeJob, type: :job do
     mail = instance_double(ActionMailer::MessageDelivery, deliver_now: true)
     allow(RecordMailer).to receive(:tracked_email).and_return(mail)
 
-    described_class.perform_now(workspace.id, user.id, "Person", [ person.id ], "Hi", "Body", template.id)
+    described_class.perform_now(workspace.id, user.id, "Person", [person.id], "Hi", "Body", template.id)
 
     message = workspace.email_messages.order(:id).last
     expect(message.attachments.count).to eq(1)

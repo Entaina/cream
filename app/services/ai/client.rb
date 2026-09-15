@@ -21,7 +21,7 @@ module Ai
         store: false
       }
       payload[:temperature] = Configuration.temperature if Configuration.temperature
-      payload[:text] = { format: { type: "json_object" } } if json
+      payload[:text] = {format: {type: "json_object"}} if json
 
       response = post_json(URI(Configuration.api_url), payload)
       raise Error, "LLM request failed (#{response.code}): #{response.body}" unless response.is_a?(Net::HTTPSuccess)
@@ -38,10 +38,10 @@ module Ai
     def chat_with_tools(system:, input:, tools:, max_iterations: 8)
       raise NotConfigured, "CREAM_AI_API_KEY is not set" unless Configuration.configured?
 
-      conversation = [ { role: "user", content: input } ]
+      conversation = [{role: "user", content: input}]
       max_iterations.times do
-        payload = { model: Configuration.model, instructions: system,
-                    input: conversation, tools: tools, store: false }
+        payload = {model: Configuration.model, instructions: system,
+                   input: conversation, tools: tools, store: false}
         payload[:temperature] = Configuration.temperature if Configuration.temperature
 
         response = post_json(URI(Configuration.api_url), payload)
@@ -54,7 +54,7 @@ module Ai
         calls.each do |call|
           conversation << call.slice("type", "call_id", "name", "arguments")
           result = yield(call["name"], JSON.parse(call["arguments"].presence || "{}"))
-          conversation << { type: "function_call_output", call_id: call["call_id"], output: result.to_s }
+          conversation << {type: "function_call_output", call_id: call["call_id"], output: result.to_s}
         end
       end
       raise Error, "Tool loop exceeded #{max_iterations} iterations"

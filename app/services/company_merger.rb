@@ -46,7 +46,7 @@ class CompanyMerger
     raise Error, "Select at least one company to merge." if secondaries.empty?
     raise Error, "Cannot merge a company into itself." if secondaries.include?(primary)
 
-    ([ primary ] + secondaries).each do |company|
+    ([primary] + secondaries).each do |company|
       raise Error, "All companies must belong to the same workspace." if company.workspace_id != primary.workspace_id
     end
   end
@@ -69,7 +69,7 @@ class CompanyMerger
         person.update_columns(company_id: primary.id, updated_at: Time.current)
 
         if existing
-          PersonMerger.call(primary: existing, secondaries: [ person ], user: user)
+          PersonMerger.call(primary: existing, secondaries: [person], user: user)
         end
       end
     end
@@ -153,7 +153,7 @@ class CompanyMerger
   def track_merge!
     primary.track_activity("merged", user: user, metadata: {
       merged_companies: secondaries.map { |company|
-        { "id" => company.id, "name" => company.display_name, "domain" => company.domain }
+        {"id" => company.id, "name" => company.display_name, "domain" => company.domain}
       }
     })
   end

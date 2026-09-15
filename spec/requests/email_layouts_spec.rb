@@ -24,7 +24,7 @@ RSpec.describe "Email layouts", type: :request do
 
     it "rejects layout without content placeholder" do
       post email_layouts_path, params: {
-        email_layout: { name: "Bad", body: "<html><body></body></html>" }
+        email_layout: {name: "Bad", body: "<html><body></body></html>"}
       }
 
       expect(response).to have_http_status(:unprocessable_entity)
@@ -34,7 +34,7 @@ RSpec.describe "Email layouts", type: :request do
       layout = workspace.email_layouts.create!(name: "Shell", body: "<div>{{ content }}</div>")
 
       patch email_layout_path(layout), params: {
-        email_layout: { name: "Shell updated", body: "<div>{content}</div>" }
+        email_layout: {name: "Shell updated", body: "<div>{content}</div>"}
       }
       expect(response).to redirect_to(email_templates_path)
       expect(layout.reload.name).to eq("Shell updated")

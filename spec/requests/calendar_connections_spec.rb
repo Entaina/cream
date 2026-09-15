@@ -30,7 +30,7 @@ RSpec.describe "Calendar connections", type: :request do
         }
       )
 
-      get "/auth/google_gmail/callback", params: { calendar_mode: "1" }
+      get "/auth/google_gmail/callback", params: {calendar_mode: "1"}
 
       connection = workspace.calendar_connections.find_by(user: user)
       expect(connection).to be_connected

@@ -12,8 +12,8 @@ RSpec.describe "Deals", type: :request do
     it "returns open and won deals matching the query, excluding lost and other workspaces" do
       won = pipeline.pipeline_stages.find_by!(name: "Won")
       lost = pipeline.pipeline_stages.find_by!(name: "Lost")
-      open_deal = create_deal!(workspace, pipeline: pipeline, name: "Curso IA abierto")
-      won_deal = create_deal!(workspace, pipeline: pipeline, stage: won, name: "Curso IA ganado")
+      create_deal!(workspace, pipeline: pipeline, name: "Curso IA abierto")
+      create_deal!(workspace, pipeline: pipeline, stage: won, name: "Curso IA ganado")
       create_deal!(workspace, pipeline: pipeline, stage: lost, name: "Curso IA perdido")
       other_pipeline = Pipeline.create_default!(workspaces(:two))
       create_deal!(workspaces(:two), pipeline: other_pipeline, name: "Curso IA ajeno")
@@ -36,11 +36,11 @@ RSpec.describe "Deals", type: :request do
       contact = create_person!(workspace, company: company)
 
       expect {
-        post deals_path, params: { deal: {
+        post deals_path, params: {deal: {
           name: "ACME — Annual", company_id: company.id, pipeline_id: pipeline.id,
-          contact_ids: [ contact.id ],
-          tasks_attributes: { "0" => { title: "Kickoff call", due_on: (Date.current + 5).to_s } }
-        } }
+          contact_ids: [contact.id],
+          tasks_attributes: {"0" => {title: "Kickoff call", due_on: (Date.current + 5).to_s}}
+        }}
       }.to change(Deal, :count).by(1)
 
       deal = Deal.order(:id).last
@@ -57,12 +57,12 @@ RSpec.describe "Deals", type: :request do
       target_stage = pipeline.pipeline_stages.find_by!(name: "Qualified")
 
       expect {
-        post deals_path, params: { deal: {
+        post deals_path, params: {deal: {
           name: "ACME — Annual", company_id: company.id, pipeline_id: pipeline.id,
           pipeline_stage_id: target_stage.id,
-          contact_ids: [ contact.id ],
-          tasks_attributes: { "0" => { title: "Kickoff call", due_on: (Date.current + 5).to_s } }
-        } }
+          contact_ids: [contact.id],
+          tasks_attributes: {"0" => {title: "Kickoff call", due_on: (Date.current + 5).to_s}}
+        }}
       }.to change(Deal, :count).by(1)
 
       deal = Deal.order(:id).last
@@ -76,14 +76,14 @@ RSpec.describe "Deals", type: :request do
       product = workspace.products.create!(name: "Premium", price: 1200)
 
       expect {
-        post deals_path, params: { deal: {
+        post deals_path, params: {deal: {
           name: "ACME — Annual", company_id: company.id, pipeline_id: pipeline.id,
-          contact_ids: [ contact.id ],
-          tasks_attributes: { "0" => { title: "Kickoff call", due_on: (Date.current + 5).to_s } },
+          contact_ids: [contact.id],
+          tasks_attributes: {"0" => {title: "Kickoff call", due_on: (Date.current + 5).to_s}},
           deal_products_attributes: {
-            "0" => { product_id: product.id, edition_name: "2026", quantity: 2 }
+            "0" => {product_id: product.id, edition_name: "2026", quantity: 2}
           }
-        } }
+        }}
       }.to change(Deal, :count).by(1)
         .and change(DealProduct, :count).by(1)
         .and change(Edition, :count).by(1)
@@ -101,10 +101,10 @@ RSpec.describe "Deals", type: :request do
       company = create_company!(workspace)
 
       expect {
-        post deals_path, params: { deal: {
+        post deals_path, params: {deal: {
           name: "ACME — Company only", company_id: company.id, pipeline_id: pipeline.id,
-          tasks_attributes: { "0" => { title: "Research account", due_on: (Date.current + 5).to_s } }
-        } }
+          tasks_attributes: {"0" => {title: "Research account", due_on: (Date.current + 5).to_s}}
+        }}
       }.to change(Deal, :count).by(1)
 
       deal = Deal.order(:id).last
@@ -120,11 +120,11 @@ RSpec.describe "Deals", type: :request do
       partner_contact = create_person!(workspace, company: partner, first_name: "Laura")
 
       expect {
-        post deals_path, params: { deal: {
+        post deals_path, params: {deal: {
           name: "Asisa — Offer", company_id: client.id, partner_id: partner.id, pipeline_id: pipeline.id,
-          contact_ids: [ partner_contact.id ],
-          tasks_attributes: { "0" => { title: "Send proposal", due_on: (Date.current + 5).to_s } }
-        } }
+          contact_ids: [partner_contact.id],
+          tasks_attributes: {"0" => {title: "Send proposal", due_on: (Date.current + 5).to_s}}
+        }}
       }.to change(Deal, :count).by(1)
 
       deal = Deal.order(:id).last
@@ -139,7 +139,7 @@ RSpec.describe "Deals", type: :request do
       company = create_company!(workspace)
 
       expect {
-        post deals_path, params: { deal: { name: "Bad", company_id: company.id, pipeline_id: pipeline.id } }
+        post deals_path, params: {deal: {name: "Bad", company_id: company.id, pipeline_id: pipeline.id}}
       }.not_to change(Deal, :count)
       expect(response).to have_http_status(:unprocessable_entity)
     end
@@ -157,9 +157,9 @@ RSpec.describe "Deals", type: :request do
             company_id: company.id,
             pipeline_id: pipeline.id,
             pipeline_stage_id: pipeline.first_stage.id,
-            contact_ids: [ person.id ],
-            deal_products_attributes: { "0" => { product_id: product.id, quantity: 1 } },
-            tasks_attributes: { "0" => { title: "Initial call", due_on: (Date.current + 1).to_s } }
+            contact_ids: [person.id],
+            deal_products_attributes: {"0" => {product_id: product.id, quantity: 1}},
+            tasks_attributes: {"0" => {title: "Initial call", due_on: (Date.current + 1).to_s}}
           }
         }
       }.to change(Deal, :count).by(1)
@@ -188,9 +188,9 @@ RSpec.describe "Deals", type: :request do
           deal: {
             company_id: company.id,
             pipeline_id: other.id,
-            contact_ids: [ person.id ],
-            deal_products_attributes: { "0" => { product_id: product.id, quantity: 1 } },
-            tasks_attributes: { "0" => { title: "Initial call", due_on: (Date.current + 1).to_s } }
+            contact_ids: [person.id],
+            deal_products_attributes: {"0" => {product_id: product.id, quantity: 1}},
+            tasks_attributes: {"0" => {title: "Initial call", due_on: (Date.current + 1).to_s}}
           }
         }
       }.to change(Deal, :count).by(1)
@@ -205,7 +205,7 @@ RSpec.describe "Deals", type: :request do
       company = create_company!(workspace)
       person = create_person!(workspace, company: company)
       product = workspace.products.create!(name: "Basic", price: 100)
-      turbo_headers = { "Accept" => "text/vnd.turbo-stream.html" }
+      turbo_headers = {"Accept" => "text/vnd.turbo-stream.html"}
 
       expect {
         post deals_path, params: {
@@ -213,9 +213,9 @@ RSpec.describe "Deals", type: :request do
           deal: {
             company_id: company.id,
             pipeline_id: pipeline.id,
-            contact_ids: [ person.id ],
-            deal_products_attributes: { "0" => { product_id: product.id, quantity: 1 } },
-            tasks_attributes: { "0" => { title: "", due_on: (Date.current + 1).to_s } }
+            contact_ids: [person.id],
+            deal_products_attributes: {"0" => {product_id: product.id, quantity: 1}},
+            tasks_attributes: {"0" => {title: "", due_on: (Date.current + 1).to_s}}
           }
         }, headers: turbo_headers
       }.not_to change(Deal, :count)
@@ -223,7 +223,7 @@ RSpec.describe "Deals", type: :request do
       expect(response).to have_http_status(:unprocessable_entity)
       expect(response.media_type).to eq("text/vnd.turbo-stream.html")
       expect(response.body).to include(ActionView::RecordIdentifier.dom_id(person, :quick_deal_form))
-      expect(response.body).to include("Tasks title #{I18n.t('errors.messages.blank')}")
+      expect(response.body).to include("Tasks title #{I18n.t("errors.messages.blank")}")
     end
   end
 
@@ -236,11 +236,11 @@ RSpec.describe "Deals", type: :request do
       lead_stage = pipeline.pipeline_stages.find_by(name: "Lead")
       proposal_stage = pipeline.pipeline_stages.find_by(name: "Proposal")
       create_deal!(workspace, pipeline: pipeline, stage: proposal_stage, name: "Late stage",
-        company: company, contacts: [ contact ], position: 0)
+        company: company, contacts: [contact], position: 0)
       create_deal!(workspace, pipeline: pipeline, stage: lead_stage, name: "Early stage",
-        company: company, contacts: [ contact ], position: 0)
+        company: company, contacts: [contact], position: 0)
 
-      get deals_path, params: { sort: "stage", dir: "asc" }
+      get deals_path, params: {sort: "stage", dir: "asc"}
 
       expect(response).to have_http_status(:ok)
       expect(response.body.index("Early stage")).to be < response.body.index("Late stage")
@@ -251,7 +251,7 @@ RSpec.describe "Deals", type: :request do
       memberships(:one_one).update!(current_pipeline: pipeline)
       company = create_company!(workspace)
       contact = create_person!(workspace, company: company)
-      create_deal!(workspace, company: company, contacts: [ contact ])
+      create_deal!(workspace, company: company, contacts: [contact])
 
       get deals_path
 
@@ -264,7 +264,7 @@ RSpec.describe "Deals", type: :request do
       company = create_company!(workspace)
       contact = create_person!(workspace, company: company,
         first_name: "Ana", last_name: "García", email: "ana@acme.com", phone: "+34 600 000 000")
-      create_deal!(workspace, pipeline: pipeline, company: company, contacts: [ contact ], name: "Contact info deal")
+      create_deal!(workspace, pipeline: pipeline, company: company, contacts: [contact], name: "Contact info deal")
 
       get deals_path
 
@@ -283,8 +283,8 @@ RSpec.describe "Deals", type: :request do
       other = pipeline.duplicate(name: "Partners").tap(&:save!)
       company = create_company!(workspace)
       contact = create_person!(workspace, company: company)
-      create_deal!(workspace, pipeline: pipeline, name: "Ventas deal", company: company, contacts: [ contact ])
-      create_deal!(workspace, pipeline: other, name: "Partners deal", company: company, contacts: [ contact ])
+      create_deal!(workspace, pipeline: pipeline, name: "Ventas deal", company: company, contacts: [contact])
+      create_deal!(workspace, pipeline: other, name: "Partners deal", company: company, contacts: [contact])
       memberships(:one_one).update!(current_pipeline: pipeline)
 
       get deals_path
@@ -299,8 +299,8 @@ RSpec.describe "Deals", type: :request do
       other = pipeline.duplicate(name: "Partners").tap(&:save!)
       company = create_company!(workspace)
       contact = create_person!(workspace, company: company)
-      create_deal!(workspace, pipeline: pipeline, name: "Ventas deal", company: company, contacts: [ contact ])
-      create_deal!(workspace, pipeline: other, name: "Partners deal", company: company, contacts: [ contact ])
+      create_deal!(workspace, pipeline: pipeline, name: "Ventas deal", company: company, contacts: [contact])
+      create_deal!(workspace, pipeline: other, name: "Partners deal", company: company, contacts: [contact])
       memberships(:one_one).update!(current_pipeline: nil)
 
       get deals_path
@@ -326,8 +326,8 @@ RSpec.describe "Deals", type: :request do
       other = pipeline.duplicate(name: "Partners").tap(&:save!)
       company = create_company!(workspace)
       contact = create_person!(workspace, company: company)
-      create_deal!(workspace, pipeline: pipeline, name: "Ventas deal", company: company, contacts: [ contact ])
-      create_deal!(workspace, pipeline: other, name: "Partners deal", company: company, contacts: [ contact ])
+      create_deal!(workspace, pipeline: pipeline, name: "Ventas deal", company: company, contacts: [contact])
+      create_deal!(workspace, pipeline: other, name: "Partners deal", company: company, contacts: [contact])
       memberships(:one_one).update!(current_pipeline: nil)
 
       get deals_path
@@ -343,14 +343,14 @@ RSpec.describe "Deals", type: :request do
       sign_in_as(member)
       company = create_company!(workspace)
       contact = create_person!(workspace, company: company)
-      51.times { create_deal!(workspace, pipeline: pipeline, company: company, contacts: [ contact ]) }
+      51.times { create_deal!(workspace, pipeline: pipeline, company: company, contacts: [contact]) }
 
       get deals_path
       expect(response).to have_http_status(:ok)
       expect(response.body).to include("Página 1 de 2")
       expect(response.body).to include("Siguiente")
 
-      get deals_path, params: { page: 2 }
+      get deals_path, params: {page: 2}
       expect(response.body).to include("Página 2 de 2")
     end
   end
@@ -361,9 +361,9 @@ RSpec.describe "Deals", type: :request do
       company = create_company!(workspace)
       contact = create_person!(workspace, company: company)
       unassigned = create_deal!(workspace, pipeline: pipeline, name: "No owner deal",
-        company: company, contacts: [ contact ], owner: nil)
+        company: company, contacts: [contact], owner: nil)
       create_deal!(workspace, pipeline: pipeline, name: "Owned deal",
-        company: company, contacts: [ contact ], owner: member)
+        company: company, contacts: [contact], owner: member)
 
       get deals_path(owner_id: ListFilters::NONE, pipeline_id: pipeline.id)
 
@@ -377,10 +377,10 @@ RSpec.describe "Deals", type: :request do
       company = create_company!(workspace)
       contact = create_person!(workspace, company: company)
       recent = create_deal!(workspace, pipeline: pipeline, name: "Recent deal",
-        company: company, contacts: [ contact ])
+        company: company, contacts: [contact])
       recent.update_column(:created_at, Time.zone.local(2025, 6, 10, 12))
       old = create_deal!(workspace, pipeline: pipeline, name: "Old deal",
-        company: company, contacts: [ contact ])
+        company: company, contacts: [contact])
       old.update_column(:created_at, Time.zone.local(2025, 1, 10, 12))
 
       get deals_path(created_from: "2025-06-01", created_to: "2025-06-30", pipeline_id: pipeline.id)
@@ -396,9 +396,9 @@ RSpec.describe "Deals", type: :request do
       company = create_company!(workspace)
       contact = create_person!(workspace, company: company)
       create_deal!(workspace, pipeline: pipeline, name: "Default pipeline deal",
-        company: company, contacts: [ contact ])
+        company: company, contacts: [contact])
       create_deal!(workspace, pipeline: other_pipeline, name: "Other pipeline deal",
-        company: company, contacts: [ contact ])
+        company: company, contacts: [contact])
       memberships(:one_one).update!(current_pipeline: pipeline)
 
       get deals_path(pipeline_id: "all")
@@ -416,7 +416,7 @@ RSpec.describe "Deals", type: :request do
       contact = create_person!(workspace, company: company)
       won_stage = pipeline.pipeline_stages.find_by(name: "Won")
       create_deal!(workspace, pipeline: pipeline, stage: won_stage, name: "Closed deal",
-        company: company, contacts: [ contact ])
+        company: company, contacts: [contact])
 
       get deals_path
 
@@ -430,9 +430,9 @@ RSpec.describe "Deals", type: :request do
       contact = create_person!(workspace, company: company)
       won_stage = pipeline.pipeline_stages.find_by(name: "Won")
       create_deal!(workspace, pipeline: pipeline, stage: won_stage, name: "Closed deal",
-        company: company, contacts: [ contact ])
+        company: company, contacts: [contact])
 
-      get deals_path, params: { closed: "1" }
+      get deals_path, params: {closed: "1"}
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include("Closed deal")
@@ -446,9 +446,9 @@ RSpec.describe "Deals", type: :request do
       company = create_company!(workspace)
       contact = create_person!(workspace, company: company)
       create_deal!(workspace, pipeline: pipeline, name: "Ventas board deal",
-        company: company, contacts: [ contact ])
+        company: company, contacts: [contact])
       create_deal!(workspace, pipeline: other, name: "Partners board deal",
-        company: company, contacts: [ contact ])
+        company: company, contacts: [contact])
       memberships(:one_one).update!(current_pipeline: nil)
 
       get board_deals_path
@@ -458,7 +458,7 @@ RSpec.describe "Deals", type: :request do
       expect(response.body).to include("Partners board deal")
       expect(response.body).to include(">Ventas</p>")
       expect(response.body).to include(">Partners</p>")
-      expect(response.body.scan(/data-board-pager-stage-name>Lead</).size).to eq(1)
+      expect(response.body.scan("data-board-pager-stage-name>Lead<").size).to eq(1)
       expect(response.body).to include("All pipelines")
     end
   end
@@ -470,7 +470,7 @@ RSpec.describe "Deals", type: :request do
 
     def filtered_deal(name:, contact_date: Date.new(2026, 1, 15))
       contact = create_person!(workspace, company: company, first_contact_on: contact_date)
-      deal = create_deal!(workspace, pipeline: pipeline, name: name, company: company, contacts: [ contact ])
+      deal = create_deal!(workspace, pipeline: pipeline, name: name, company: company, contacts: [contact])
       deal.deal_products.create!(product: product, edition: edition, quantity: 1)
       deal
     end
@@ -518,7 +518,7 @@ RSpec.describe "Deals", type: :request do
         user: member,
         record_type: "Deal",
         name: "Lead stage view",
-        filters: { "stage" => lead_stage.id.to_s }
+        filters: {"stage" => lead_stage.id.to_s}
       )
 
       get board_deals_path(view: view.id)
@@ -536,24 +536,24 @@ RSpec.describe "Deals", type: :request do
       get board_deals_path
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).not_to include("stage_summary_#{pipeline.pipeline_stages.find_by(name: 'Won').id}")
-      expect(response.body).not_to include("stage_summary_#{pipeline.pipeline_stages.find_by(name: 'Lost').id}")
+      expect(response.body).not_to include("stage_summary_#{pipeline.pipeline_stages.find_by(name: "Won").id}")
+      expect(response.body).not_to include("stage_summary_#{pipeline.pipeline_stages.find_by(name: "Lost").id}")
     end
 
     it "shows closed stage columns when closed=1" do
       sign_in_as(member)
-      get board_deals_path, params: { closed: "1" }
+      get board_deals_path, params: {closed: "1"}
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include("stage_summary_#{pipeline.pipeline_stages.find_by(name: 'Won').id}")
-      expect(response.body).to include("stage_summary_#{pipeline.pipeline_stages.find_by(name: 'Lost').id}")
+      expect(response.body).to include("stage_summary_#{pipeline.pipeline_stages.find_by(name: "Won").id}")
+      expect(response.body).to include("stage_summary_#{pipeline.pipeline_stages.find_by(name: "Lost").id}")
     end
 
     it "hides closed stage columns again after toggling them off" do
       sign_in_as(member)
       won = pipeline.pipeline_stages.find_by!(name: "Won")
 
-      get board_deals_path, params: { closed: "1" }
+      get board_deals_path, params: {closed: "1"}
       expect(response.body).to include("stage_summary_#{won.id}")
 
       get board_deals_path
@@ -568,9 +568,9 @@ RSpec.describe "Deals", type: :request do
       won = stages.find { |s| s.name == "Won" }
       lost = stages.find { |s| s.name == "Lost" }
       lead = stages.find { |s| s.name == "Lead" }
-      pipeline.reorder_stages!([ lead.id, won.id, lost.id ] + stages.reject { |s| [ won, lost, lead ].include?(s) }.map(&:id))
+      pipeline.reorder_stages!([lead.id, won.id, lost.id] + stages.reject { |s| [won, lost, lead].include?(s) }.map(&:id))
 
-      get board_deals_path, params: { closed: "1" }
+      get board_deals_path, params: {closed: "1"}
       expect(response.body).to include("stage_summary_#{won.id}")
 
       get board_deals_path
@@ -589,7 +589,7 @@ RSpec.describe "Deals", type: :request do
 
     def filtered_deal(name:, stage: lead_stage, product_line: product, edition_line: edition, contact_date: Date.new(2026, 1, 15))
       contact = create_person!(workspace, company: company, first_contact_on: contact_date)
-      deal = create_deal!(workspace, pipeline: pipeline, stage: stage, name: name, company: company, contacts: [ contact ])
+      deal = create_deal!(workspace, pipeline: pipeline, stage: stage, name: name, company: company, contacts: [contact])
       deal.deal_products.create!(product: product_line, edition: edition_line, quantity: 1)
       deal
     end
@@ -650,12 +650,12 @@ RSpec.describe "Deals", type: :request do
       qualified_stage = pipeline.pipeline_stages.find_by!(name: "Qualified")
       company = create_company!(workspace)
       contact = create_person!(workspace, company: company)
-      lead_deal = create_deal!(workspace, pipeline: pipeline, stage: lead_stage, name: "Lead only",
-        company: company, contacts: [ contact ])
+      create_deal!(workspace, pipeline: pipeline, stage: lead_stage, name: "Lead only",
+        company: company, contacts: [contact])
       create_deal!(workspace, pipeline: pipeline, stage: qualified_stage, name: "Qualified only",
-        company: company, contacts: [ contact ])
+        company: company, contacts: [contact])
 
-      get board_deals_path, params: { stage: lead_stage.id }
+      get board_deals_path, params: {stage: lead_stage.id}
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include("Lead only")
@@ -687,7 +687,7 @@ RSpec.describe "Deals", type: :request do
 
     it "shows products and editions on cards when products is selected" do
       sign_in_as(member)
-      pipeline.update!(card_fields: pipeline.card_fields + [ "products" ])
+      pipeline.update!(card_fields: pipeline.card_fields + ["products"])
       deal = create_deal!(workspace, pipeline: pipeline, name: "With products", company: company)
       deal.deal_products.create!(product: product, edition: edition, quantity: 2)
 
@@ -776,8 +776,8 @@ RSpec.describe "Deals", type: :request do
       target = pipeline.pipeline_stages.find_by(name: "Won")
       source = deal.pipeline_stage
 
-      patch move_deal_path(deal), params: { pipeline_stage_id: target.id },
-        headers: { "Accept" => "text/vnd.turbo-stream.html" }
+      patch move_deal_path(deal), params: {pipeline_stage_id: target.id},
+        headers: {"Accept" => "text/vnd.turbo-stream.html"}
 
       expect(response).to have_http_status(:ok)
       expect(response.media_type).to eq("text/vnd.turbo-stream.html")
@@ -792,8 +792,8 @@ RSpec.describe "Deals", type: :request do
       memberships(:one_one).update!(current_pipeline: nil)
       original_pipeline = deal.pipeline
 
-      patch move_deal_path(deal), params: { pipeline_stage_id: "Qualified" },
-        headers: { "Accept" => "text/vnd.turbo-stream.html" }
+      patch move_deal_path(deal), params: {pipeline_stage_id: "Qualified"},
+        headers: {"Accept" => "text/vnd.turbo-stream.html"}
 
       expect(response).to have_http_status(:ok)
       expect(deal.reload.pipeline).to eq(original_pipeline)
@@ -807,8 +807,8 @@ RSpec.describe "Deals", type: :request do
       sign_in_as(member)
       target = pipeline.pipeline_stages.find_by(name: "Won")
 
-      patch move_deal_path(deal), params: { pipeline_stage_id: target.id, source: "show" },
-        headers: { "Accept" => "text/vnd.turbo-stream.html" }
+      patch move_deal_path(deal), params: {pipeline_stage_id: target.id, source: "show"},
+        headers: {"Accept" => "text/vnd.turbo-stream.html"}
 
       expect(response).to have_http_status(:ok)
       expect(response.media_type).to eq("text/vnd.turbo-stream.html")
@@ -826,8 +826,8 @@ RSpec.describe "Deals", type: :request do
       deal.update_column(:value, 100)
       original_stage = deal.pipeline_stage
 
-      patch move_deal_path(deal), params: { pipeline_stage_id: target.id },
-        headers: { "Accept" => "text/vnd.turbo-stream.html" }
+      patch move_deal_path(deal), params: {pipeline_stage_id: target.id},
+        headers: {"Accept" => "text/vnd.turbo-stream.html"}
 
       expect(response).to have_http_status(:unprocessable_content)
       expect(response.body).to include('target="toasts"')
@@ -840,7 +840,7 @@ RSpec.describe "Deals", type: :request do
     it "updates the invoice number" do
       sign_in_as(member)
 
-      patch deal_path(deal), params: { deal: { invoice_number: "FAC-2026-099" } }
+      patch deal_path(deal), params: {deal: {invoice_number: "FAC-2026-099"}}
 
       expect(response).to redirect_to(deal_path(deal))
       expect(deal.reload.invoice_number).to eq("FAC-2026-099")
@@ -849,7 +849,7 @@ RSpec.describe "Deals", type: :request do
     it "accepts an exact value with cents" do
       sign_in_as(member)
 
-      patch deal_path(deal), params: { deal: { value: "590.50" } }
+      patch deal_path(deal), params: {deal: {value: "590.50"}}
 
       expect(response).to redirect_to(deal_path(deal))
       expect(deal.reload.value).to eq(590.50)
@@ -860,7 +860,7 @@ RSpec.describe "Deals", type: :request do
       target = pipeline.pipeline_stages.find_by(name: "Won")
 
       expect {
-        patch deal_path(deal), params: { deal: { name: "Renamed", pipeline_stage_id: target.id } }
+        patch deal_path(deal), params: {deal: {name: "Renamed", pipeline_stage_id: target.id}}
       }.to change { deal.activities.where(action: "stage_changed").count }.by(1)
 
       expect(deal.reload.stage_label).to eq("Won")
@@ -877,7 +877,7 @@ RSpec.describe "Deals", type: :request do
         execution_mode: "llm", instructions: "x")
 
       expect {
-        patch deal_path(deal), params: { deal: { pipeline_stage_id: target.id } }
+        patch deal_path(deal), params: {deal: {pipeline_stage_id: target.id}}
       }.to have_enqueued_job(StageTriggerJob)
     end
 
@@ -885,7 +885,7 @@ RSpec.describe "Deals", type: :request do
       sign_in_as(member)
 
       expect {
-        patch deal_path(deal), params: { deal: { name: "Renamed", pipeline_stage_id: deal.pipeline_stage_id } }
+        patch deal_path(deal), params: {deal: {name: "Renamed", pipeline_stage_id: deal.pipeline_stage_id}}
       }.not_to change { deal.activities.where(action: "stage_changed").count }
 
       expect(deal.reload.name).to eq("Renamed")
@@ -896,7 +896,7 @@ RSpec.describe "Deals", type: :request do
       partner = create_company!(workspace, name: "Avantis Group")
       partner_contact = create_person!(workspace, company: partner, first_name: "Laura")
 
-      patch deal_path(deal), params: { deal: { partner_id: partner.id, contact_ids: [ partner_contact.id ] } }
+      patch deal_path(deal), params: {deal: {partner_id: partner.id, contact_ids: [partner_contact.id]}}
 
       expect(response).to redirect_to(deal_path(deal))
       expect(deal.reload.partner).to eq(partner)
@@ -911,7 +911,7 @@ RSpec.describe "Deals", type: :request do
         operator: "gt", compare_value: "10000")
       deal.update_column(:value, 100)
 
-      patch deal_path(deal), params: { deal: { name: "Should not save", pipeline_stage_id: target.id } }
+      patch deal_path(deal), params: {deal: {name: "Should not save", pipeline_stage_id: target.id}}
 
       expect(response).to have_http_status(:unprocessable_content)
       expect(response.body).to include("No se puede pasar")
@@ -924,9 +924,9 @@ RSpec.describe "Deals", type: :request do
     it "moves the deal to another pipeline's initial stage" do
       sign_in_as(member)
       other = workspace.pipelines.create!(name: "Partners", position: 1,
-        pipeline_stages: [ PipelineStage.new(name: "New lead", color: "hoki", probability: 5, position: 0, workspace: workspace) ])
+        pipeline_stages: [PipelineStage.new(name: "New lead", color: "hoki", probability: 5, position: 0, workspace: workspace)])
 
-      patch move_pipeline_deal_path(deal), params: { pipeline_id: other.id }
+      patch move_pipeline_deal_path(deal), params: {pipeline_id: other.id}
 
       expect(response).to redirect_to(deal_path(deal))
       expect(deal.reload.pipeline).to eq(other)
@@ -972,11 +972,11 @@ RSpec.describe "Deals", type: :request do
       company = create_company!(workspace)
       contact = create_person!(workspace, company: company)
       source = create_deal!(workspace, pipeline: pipeline, name: "Source deal",
-        company: company, contacts: [ contact ], value: 5000)
+        company: company, contacts: [contact], value: 5000)
       source.tasks.create!(title: "Open task", due_on: Date.current + 2,
         workspace: workspace, user: member, assignee: member)
       field = workspace.custom_fields.create!(record_type: "Deal", name: "Tier", field_type: "text")
-      source.update!(custom_fields: { field.key => "Gold" })
+      source.update!(custom_fields: {field.key => "Gold"})
 
       expect {
         post duplicate_deal_path(source)
@@ -1014,11 +1014,11 @@ RSpec.describe "Deals", type: :request do
 
     def sign_in_to_workspace!(user)
       sign_in_as(user)
-      patch switch_workspace_path, params: { workspace_id: workspace.id }
+      patch switch_workspace_path, params: {workspace_id: workspace.id}
     end
 
     it "limits a salesperson to owned and shared deals on index" do
-      own_deal = create_deal!(workspace, pipeline: pipeline, owner: salesperson, name: "Own deal")
+      create_deal!(workspace, pipeline: pipeline, owner: salesperson, name: "Own deal")
       shared_deal = create_deal!(workspace, pipeline: pipeline, owner: admin, name: "Shared deal")
       shared_deal.deal_accesses.create!(user: salesperson)
       create_deal!(workspace, pipeline: pipeline, owner: admin, name: "Hidden deal")
@@ -1065,7 +1065,7 @@ RSpec.describe "Deals", type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include("Shared deal")
-      expect(response.body).to include("Colaboradores")
+      expect(response.body).to include(I18n.t("deals.show.collaborators"))
     end
 
     context "when salespeople_can_view_all_deals is enabled" do
@@ -1081,7 +1081,7 @@ RSpec.describe "Deals", type: :request do
         get deal_path(other_deal)
         expect(response).to have_http_status(:ok)
 
-        patch deal_path(other_deal), params: { deal: { name: "Blocked rename" } }
+        patch deal_path(other_deal), params: {deal: {name: "Blocked rename"}}
         expect(response).to redirect_to(root_path)
         expect(other_deal.reload.name).to eq("Other deal")
       end
@@ -1097,7 +1097,7 @@ RSpec.describe "Deals", type: :request do
         get deal_path(other_deal)
         expect(response).to have_http_status(:ok)
 
-        patch deal_path(other_deal), params: { deal: { name: "Renamed by salesperson" } }
+        patch deal_path(other_deal), params: {deal: {name: "Renamed by salesperson"}}
         expect(response).to redirect_to(deal_path(other_deal))
         expect(other_deal.reload.name).to eq("Renamed by salesperson")
       end
@@ -1107,7 +1107,7 @@ RSpec.describe "Deals", type: :request do
         target = pipeline.pipeline_stages.find_by!(name: "Qualified")
         sign_in_to_workspace!(salesperson)
 
-        patch move_deal_path(other_deal), params: { pipeline_stage_id: target.id }
+        patch move_deal_path(other_deal), params: {pipeline_stage_id: target.id}
 
         expect(response).to have_http_status(:redirect)
         expect(other_deal.reload.pipeline_stage).to eq(target)

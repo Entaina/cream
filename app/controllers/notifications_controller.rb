@@ -1,5 +1,6 @@
 class NotificationsController < ApplicationController
   include RequiresFeature
+
   requires_feature :notifications
   skip_after_action :verify_policy_scoped, only: :index
 

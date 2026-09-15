@@ -33,7 +33,7 @@ RSpec.describe "Email templates", type: :request do
     it "creates a template" do
       expect {
         post email_templates_path, params: {
-          email_template: { name: "Intro", subject: "Hi {first_name}", body: "Hello {name}", shared: "1" }
+          email_template: {name: "Intro", subject: "Hi {first_name}", body: "Hello {name}", shared: "1"}
         }
       }.to change(EmailTemplate, :count).by(1)
 
@@ -45,7 +45,7 @@ RSpec.describe "Email templates", type: :request do
         email_template: {
           name: "Styled",
           subject: "Hi",
-          body: '<p><strong>Hello</strong> {first_name}</p>'
+          body: "<p><strong>Hello</strong> {first_name}</p>"
         }
       }
 
@@ -60,7 +60,7 @@ RSpec.describe "Email templates", type: :request do
         email_template: {
           name: "Table mail",
           subject: "Hi",
-          body: '<table><tr><td>Hello</td></tr></table>',
+          body: "<table><tr><td>Hello</td></tr></table>",
           body_editor: "html",
           email_layout_id: layout.id
         }
@@ -76,7 +76,7 @@ RSpec.describe "Email templates", type: :request do
       file = fixture_file_upload("spec/fixtures/files/sample.txt", "text/plain")
 
       post email_templates_path, params: {
-        email_template: { name: "With file", subject: "Hi", body: "Hello", attachments: [ file ] }
+        email_template: {name: "With file", subject: "Hi", body: "Hello", attachments: [file]}
       }
 
       template = EmailTemplate.order(:id).last
@@ -91,12 +91,12 @@ RSpec.describe "Email templates", type: :request do
       remove_id = template.attachments.find { |f| f.filename.to_s == "remove.txt" }.id
 
       patch email_template_path(template), params: {
-        email_template: { name: "Intro", subject: "Hi", body: "Hello" },
-        purge_attachment_ids: [ remove_id ]
+        email_template: {name: "Intro", subject: "Hi", body: "Hello"},
+        purge_attachment_ids: [remove_id]
       }
 
       filenames = template.reload.attachments.map { |f| f.filename.to_s }
-      expect(filenames).to eq([ "keep.txt" ])
+      expect(filenames).to eq(["keep.txt"])
     end
 
     it "keeps existing attachments when updating without new files" do
@@ -105,13 +105,13 @@ RSpec.describe "Email templates", type: :request do
 
       # Browsers submit an empty string for an untouched multiple file input.
       patch email_template_path(template), params: {
-        email_template: { name: "Intro updated", subject: "Hi", body: "Hello", attachments: [ "" ] }
+        email_template: {name: "Intro updated", subject: "Hi", body: "Hello", attachments: [""]}
       }
 
       expect(response).to redirect_to(email_templates_path)
       template.reload
       expect(template.name).to eq("Intro updated")
-      expect(template.attachments.map { |f| f.filename.to_s }).to eq([ "keep.txt" ])
+      expect(template.attachments.map { |f| f.filename.to_s }).to eq(["keep.txt"])
     end
 
     it "appends new attachments on update without replacing existing ones" do
@@ -120,7 +120,7 @@ RSpec.describe "Email templates", type: :request do
       new_file = fixture_file_upload("spec/fixtures/files/sample.txt", "text/plain")
 
       patch email_template_path(template), params: {
-        email_template: { name: "Intro", subject: "Hi", body: "Hello", attachments: [ new_file ] }
+        email_template: {name: "Intro", subject: "Hi", body: "Hello", attachments: [new_file]}
       }
 
       filenames = template.reload.attachments.map { |f| f.filename.to_s }

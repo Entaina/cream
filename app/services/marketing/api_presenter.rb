@@ -16,7 +16,7 @@ module Marketing
       ).to_h.stringify_keys
 
       filters["marketing_eligible"] = true
-      filters["open_deal"] = filters["open_deal"].presence || (params[:view] == "no_open_deal" ? "no" : "any")
+      filters["open_deal"] = filters["open_deal"].presence || ((params[:view] == "no_open_deal") ? "no" : "any")
       filters["open_deal_product_id"] = params[:product_id] if params[:product_id].present?
       filters
     end
@@ -57,7 +57,7 @@ module Marketing
     end
 
     def self.person_ref_json(record)
-      { type: record.class.name.downcase, id: record.id, name: record.display_name, url: record_url(record) }.compact
+      {type: record.class.name.downcase, id: record.id, name: record.display_name, url: record_url(record)}.compact
     end
 
     def self.mql_json(person)
@@ -182,7 +182,7 @@ module Marketing
         started_at: send_record.started_at&.iso8601,
         completed_at: send_record.completed_at&.iso8601,
         variants: send_record.campaign_variants.map { |v|
-          { id: v.id, name: v.name, weight: v.weight, winner: v.winner }
+          {id: v.id, name: v.name, weight: v.weight, winner: v.winner}
         }.presence
       }.compact
     end
@@ -273,11 +273,11 @@ module Marketing
     end
 
     def self.email_template_json(template)
-      { id: template.id, name: template.name, shared: template.shared }.compact
+      {id: template.id, name: template.name, shared: template.shared}.compact
     end
 
     def self.subscription_type_json(type)
-      { id: type.id, name: type.name, slug: type.slug, active: type.active }.compact
+      {id: type.id, name: type.name, slug: type.slug, active: type.active}.compact
     end
 
     def self.deal_json(deal)

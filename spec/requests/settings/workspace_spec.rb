@@ -19,7 +19,7 @@ RSpec.describe "Settings::Workspace", type: :request do
 
   before do
     sign_in_as(admin)
-    patch switch_workspace_path, params: { workspace_id: workspace.id }
+    patch switch_workspace_path, params: {workspace_id: workspace.id}
   end
 
   describe "GET /settings/workspace" do
@@ -33,7 +33,7 @@ RSpec.describe "Settings::Workspace", type: :request do
 
     it "forbids members from viewing workspace settings" do
       sign_in_as(member)
-      patch switch_workspace_path, params: { workspace_id: workspace.id }
+      patch switch_workspace_path, params: {workspace_id: workspace.id}
 
       get settings_workspace_path
 
@@ -43,7 +43,7 @@ RSpec.describe "Settings::Workspace", type: :request do
 
   describe "PATCH /settings/workspace" do
     it "renames the workspace for admins" do
-      patch settings_workspace_path, params: { workspace: { name: "Renamed Workspace" } }
+      patch settings_workspace_path, params: {workspace: {name: "Renamed Workspace"}}
 
       expect(response).to redirect_to(settings_workspace_path)
       expect(workspace.reload.name).to eq("Renamed Workspace")
@@ -53,7 +53,7 @@ RSpec.describe "Settings::Workspace", type: :request do
       allow(CreamFeatures).to receive(:enabled?).and_call_original
       allow(CreamFeatures).to receive(:enabled?).with(:sales_director).and_return(true)
 
-      patch settings_workspace_path, params: { workspace: { sales_director_enabled: true } }
+      patch settings_workspace_path, params: {workspace: {sales_director_enabled: true}}
 
       expect(response).to redirect_to(settings_workspace_path)
       expect(workspace.reload.sales_director_enabled?).to be(true)
@@ -134,9 +134,9 @@ RSpec.describe "Settings::Workspace", type: :request do
 
     it "forbids members from updating workspace settings" do
       sign_in_as(member)
-      patch switch_workspace_path, params: { workspace_id: workspace.id }
+      patch switch_workspace_path, params: {workspace_id: workspace.id}
 
-      patch settings_workspace_path, params: { workspace: { name: "Blocked" } }
+      patch settings_workspace_path, params: {workspace: {name: "Blocked"}}
 
       expect(response).to redirect_to(root_path)
       expect(workspace.reload.name).not_to eq("Blocked")

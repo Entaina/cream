@@ -10,7 +10,7 @@ RSpec.describe "Record emails", type: :request do
   let(:valid_params) do
     {
       record_type: "Company", record_id: company.id,
-      email_message: { to_address: "lead@example.com", subject: "Hi", body: "Hello" }
+      email_message: {to_address: "lead@example.com", subject: "Hi", body: "Hello"}
     }
   end
 
@@ -41,7 +41,7 @@ RSpec.describe "Record emails", type: :request do
         sign_in_as(member)
 
         expect {
-          post record_emails_path, params: valid_params.deep_merge(email_message: { to_address: "nope" })
+          post record_emails_path, params: valid_params.deep_merge(email_message: {to_address: "nope"})
         }.not_to change(EmailMessage, :count)
 
         expect(response).to redirect_to(company_path(company))
@@ -105,7 +105,7 @@ RSpec.describe "Record emails", type: :request do
         file = fixture_file_upload("spec/fixtures/files/sample.txt", "text/plain")
 
         expect {
-          post record_emails_path, params: valid_params.deep_merge(email_message: { attachments: [ file ] })
+          post record_emails_path, params: valid_params.deep_merge(email_message: {attachments: [file]})
         }.to change(EmailMessage, :count).by(1)
 
         message = EmailMessage.order(:id).last
@@ -122,7 +122,7 @@ RSpec.describe "Record emails", type: :request do
         )
 
         expect {
-          post record_emails_path, params: valid_params.merge(record_attachment_ids: [ record_attachment.id ])
+          post record_emails_path, params: valid_params.merge(record_attachment_ids: [record_attachment.id])
         }.to change(EmailMessage, :count).by(1)
 
         message = EmailMessage.order(:id).last
@@ -139,7 +139,7 @@ RSpec.describe "Record emails", type: :request do
           file: fixture_file_upload("spec/fixtures/files/sample.txt", "text/plain")
         )
 
-        post record_emails_path, params: valid_params.merge(record_attachment_ids: [ other_attachment.id ])
+        post record_emails_path, params: valid_params.merge(record_attachment_ids: [other_attachment.id])
 
         message = EmailMessage.order(:id).last
         expect(message.attachments).not_to be_attached
@@ -162,7 +162,7 @@ RSpec.describe "Record emails", type: :request do
 
         post record_emails_path, params: valid_params.merge(
           email_template_id: template.id,
-          email_template_attachment_ids: [ keep_id ]
+          email_template_attachment_ids: [keep_id]
         )
 
         message = EmailMessage.order(:id).last

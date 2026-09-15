@@ -3,6 +3,7 @@ module Api
     class BaseController < ActionController::API
       include Pundit::Authorization
       include RequiresFeature
+
       requires_feature :api_v1
 
       rescue_from Pundit::NotAuthorizedError, with: :render_forbidden
@@ -51,15 +52,15 @@ module Api
         authorization.delete_prefix("Bearer ").strip.presence
       end
 
-      def current_user = @current_user
-      def current_workspace = @current_workspace
+      attr_reader :current_user
+      attr_reader :current_workspace
 
       def pundit_user
         UserContext.new(user: current_user, workspace: current_workspace)
       end
 
       def render_forbidden
-        render json: { error: "Forbidden" }, status: :forbidden
+        render json: {error: "Forbidden"}, status: :forbidden
       end
     end
   end

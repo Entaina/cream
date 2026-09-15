@@ -4,7 +4,7 @@ RSpec.describe DatabaseBackupJob do
   let(:result) do
     DatabaseBackupService::Result.new(
       uploaded_file_name: "cream_backup_production_2026-07-02.dump",
-      deleted_files: [ "cream_backup_production_2026-05-15.dump" ]
+      deleted_files: ["cream_backup_production_2026-05-15.dump"]
     )
   end
 

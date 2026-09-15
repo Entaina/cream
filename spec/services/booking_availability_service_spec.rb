@@ -15,16 +15,16 @@ RSpec.describe BookingAvailabilityService do
       pipeline: pipeline,
       timezone: "Europe/Madrid",
       booking_window_days: 60,
-      calendar_ids: [ "primary" ]
+      calendar_ids: ["primary"]
     )
     page.event_types.build(
       slug: "video",
-      name_i18n: { "es" => "Online" },
+      name_i18n: {"es" => "Online"},
       duration_minutes: 30,
       location_type: "google_meet",
       weekly_hours: {
-        "monday" => [ [ "10:00", "12:00" ] ],
-        "tuesday" => [ [ "10:00", "12:00" ] ],
+        "monday" => [["10:00", "12:00"]],
+        "tuesday" => [["10:00", "12:00"]],
         "wednesday" => [],
         "thursday" => [],
         "friday" => [],
@@ -98,7 +98,7 @@ RSpec.describe BookingAvailabilityService do
     travel_to Time.zone.parse("2026-07-28 08:00")
     zone = ActiveSupport::TimeZone["Europe/Madrid"]
     busy_start = zone.parse("2026-07-28 10:00")
-    allow(client).to receive(:free_busy).and_return([ { start: busy_start, end: busy_start + 1.hour } ])
+    allow(client).to receive(:free_busy).and_return([{start: busy_start, end: busy_start + 1.hour}])
 
     result = described_class.daily(
       booking_page: booking_page,

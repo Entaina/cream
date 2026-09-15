@@ -40,9 +40,9 @@ RSpec.describe Okm::DriveClient do
         id: "f1",
         name: "KaleQ.md",
         mime_type: "text/markdown",
-        parents: [ "folder1" ]
+        parents: ["folder1"]
       )
-      response = instance_double(Google::Apis::DriveV3::FileList, files: [ file ])
+      response = instance_double(Google::Apis::DriveV3::FileList, files: [file])
       allow(drive_service).to receive(:list_files).and_return(response)
 
       results = client.search("KaleQ")
@@ -70,9 +70,9 @@ RSpec.describe Okm::DriveClient do
         id: "f1",
         name: "KaleQ.md",
         mime_type: "text/markdown",
-        parents: [ "folder1" ]
+        parents: ["folder1"]
       )
-      response = instance_double(Google::Apis::DriveV3::FileList, files: [ file ])
+      response = instance_double(Google::Apis::DriveV3::FileList, files: [file])
       allow(drive_service).to receive(:list_files).and_return(response)
 
       client.search("KaleQ")
@@ -87,18 +87,18 @@ RSpec.describe Okm::DriveClient do
         id: "f1",
         name: "KaleQ.md",
         mime_type: "text/markdown",
-        parents: [ "folder1" ]
+        parents: ["folder1"]
       )
       file_b = instance_double(
         Google::Apis::DriveV3::File,
         id: "f2",
         name: "Acme.md",
         mime_type: "text/markdown",
-        parents: [ "folder2" ]
+        parents: ["folder2"]
       )
       allow(drive_service).to receive(:list_files).and_return(
-        instance_double(Google::Apis::DriveV3::FileList, files: [ file_a ]),
-        instance_double(Google::Apis::DriveV3::FileList, files: [ file_b ])
+        instance_double(Google::Apis::DriveV3::FileList, files: [file_a]),
+        instance_double(Google::Apis::DriveV3::FileList, files: [file_b])
       )
 
       client.search("KaleQ")
@@ -115,9 +115,9 @@ RSpec.describe Okm::DriveClient do
         id: "f2",
         name: "index.md",
         mime_type: "text/markdown",
-        parents: [ "folder1" ]
+        parents: ["folder1"]
       )
-      response = instance_double(Google::Apis::DriveV3::FileList, files: [ file ])
+      response = instance_double(Google::Apis::DriveV3::FileList, files: [file])
       allow(drive_service).to receive(:list_files).and_return(response)
 
       entries = client.list_folder("folder1")
@@ -131,9 +131,9 @@ RSpec.describe Okm::DriveClient do
         id: "f2",
         name: "index.md",
         mime_type: "text/markdown",
-        parents: [ "folder1" ]
+        parents: ["folder1"]
       )
-      response = instance_double(Google::Apis::DriveV3::FileList, files: [ file ])
+      response = instance_double(Google::Apis::DriveV3::FileList, files: [file])
       allow(drive_service).to receive(:list_files).and_return(response)
 
       client.list_folder("folder1")

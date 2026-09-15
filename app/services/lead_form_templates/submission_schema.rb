@@ -15,7 +15,7 @@ module LeadFormTemplates
           lead_form: lead_form,
           product: product,
           open_editions: open_editions,
-          params: { lead: params }
+          params: {lead: params}
         )
         HtmlSchema.parse(html)
       end

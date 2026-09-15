@@ -15,7 +15,7 @@ RSpec.describe StripeClient do
     response
   end
 
-  def failure(klass, code, body = { error: { message: "nope" } })
+  def failure(klass, code, body = {error: {message: "nope"}})
     response = instance_double(klass, code: code.to_s, body: body.to_json)
     allow(response).to receive(:is_a?) { |k| klass <= k }
     response
@@ -23,11 +23,14 @@ RSpec.describe StripeClient do
 
   describe "#list_charges" do
     it "yields succeeded charges oldest-first and paginates with starting_after" do
-      page1 = success({ data: [ { "id" => "ch_2", "created" => 200 }, { "id" => "ch_1", "created" => 100 } ],
-                        has_more: true })
-      page2 = success({ data: [ { "id" => "ch_0", "created" => 50 } ], has_more: false })
+      page1 = success({data: [{"id" => "ch_2", "created" => 200}, {"id" => "ch_1", "created" => 100}],
+                        has_more: true})
+      page2 = success({data: [{"id" => "ch_0", "created" => 50}], has_more: false})
       requests = []
-      allow(http).to receive(:request) { |req| requests << req.uri.to_s; requests.size == 1 ? page1 : page2 }
+      allow(http).to receive(:request) { |req|
+        requests << req.uri.to_s
+        (requests.size == 1) ? page1 : page2
+      }
 
       yielded = []
       client.list_charges(created_after: 42) { |charge| yielded << charge["id"] }
@@ -41,7 +44,7 @@ RSpec.describe StripeClient do
     it "sends the bearer token" do
       allow(http).to receive(:request) do |req|
         expect(req["Authorization"]).to eq("Bearer rk_test_123")
-        success({ data: [], has_more: false })
+        success({data: [], has_more: false})
       end
 
       client.list_charges { |_c| }
@@ -62,7 +65,7 @@ RSpec.describe StripeClient do
 
   describe "#verify!" do
     it "returns true when the key is accepted" do
-      allow(http).to receive(:request).and_return(success({ data: [] }))
+      allow(http).to receive(:request).and_return(success({data: []}))
 
       expect(client.verify!).to be(true)
     end
@@ -73,10 +76,10 @@ RSpec.describe StripeClient do
       allow(http).to receive(:request) do |req|
         expect(req.uri.to_s).to include("/charges/ch_1")
         expect(req.uri.to_s).to include("expand%5B%5D=customer")
-        success({ "id" => "ch_1" })
+        success({"id" => "ch_1"})
       end
 
-      expect(client.get_charge("ch_1")).to eq({ "id" => "ch_1" })
+      expect(client.get_charge("ch_1")).to eq({"id" => "ch_1"})
     end
   end
 end

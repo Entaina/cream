@@ -95,7 +95,7 @@ RSpec.describe "People", type: :request do
   end
 
   describe "PATCH /people/:id (inline edit)" do
-    let(:turbo_headers) { { "Accept" => "text/vnd.turbo-stream.html" } }
+    let(:turbo_headers) { {"Accept" => "text/vnd.turbo-stream.html"} }
 
     before do
       allow(WebhookDeliveryJob).to receive(:perform_later)
@@ -109,7 +109,7 @@ RSpec.describe "People", type: :request do
       person = create_person!(workspace, company: company, first_name: "Pat")
 
       patch person_path(person),
-        params: { inline_edit: "company_id", person: { company_id: other.id } },
+        params: {inline_edit: "company_id", person: {company_id: other.id}},
         headers: turbo_headers
 
       expect(response).to have_http_status(:ok)
@@ -126,7 +126,7 @@ RSpec.describe "People", type: :request do
       teammate = users(:two)
 
       patch person_path(person),
-        params: { inline_edit: "owner_id", person: { owner_id: teammate.id } },
+        params: {inline_edit: "owner_id", person: {owner_id: teammate.id}},
         headers: turbo_headers
 
       expect(response).to have_http_status(:ok)
@@ -141,7 +141,7 @@ RSpec.describe "People", type: :request do
       person = create_person!(workspace, company: company, owner: member)
 
       patch person_path(person),
-        params: { inline_edit: "owner_id", person: { owner_id: "" } },
+        params: {inline_edit: "owner_id", person: {owner_id: ""}},
         headers: turbo_headers
 
       expect(response).to have_http_status(:ok)
@@ -157,7 +157,7 @@ RSpec.describe "People", type: :request do
 
       expect {
         patch person_path(person),
-          params: { inline_edit: "company_id", person: { company_id: foreign.id } },
+          params: {inline_edit: "company_id", person: {company_id: foreign.id}},
           headers: turbo_headers
       }.not_to change { person.reload.company_id }
 
@@ -172,7 +172,7 @@ RSpec.describe "People", type: :request do
 
       expect {
         patch person_path(person),
-          params: { inline_edit: "owner_id", person: { owner_id: outsider.id } },
+          params: {inline_edit: "owner_id", person: {owner_id: outsider.id}},
           headers: turbo_headers
       }.not_to change { person.reload.owner_id }
 
@@ -193,11 +193,11 @@ RSpec.describe "People", type: :request do
       get person_path(person)
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include("Add deal")
-      expect(response.body).to include("New deal")
+      expect(response.body).to include(I18n.t("records.add_deal"))
+      expect(response.body).to include(I18n.t("people.quick_deal.title"))
       expect(response.body).to include(ActionView::RecordIdentifier.dom_id(person, :quick_deal_form))
       expect(response.body).to include('selected="selected" value="' + other.id.to_s + '"')
-      expect(response.body).to include("No deals yet.")
+      expect(response.body).to include(I18n.t("people.show.deals_empty"))
     end
 
     describe "deal visibility" do
@@ -209,14 +209,14 @@ RSpec.describe "People", type: :request do
 
       def sign_in_to_workspace!(user)
         sign_in_as(user)
-        patch switch_workspace_path, params: { workspace_id: workspace.id }
+        patch switch_workspace_path, params: {workspace_id: workspace.id}
       end
 
       it "limits a salesperson to owned and shared deals" do
-        create_deal!(workspace, pipeline: pipeline, company: company, contacts: [ person ], owner: salesperson, name: "Own person deal")
-        shared_deal = create_deal!(workspace, pipeline: pipeline, company: company, contacts: [ person ], owner: admin, name: "Shared person deal")
+        create_deal!(workspace, pipeline: pipeline, company: company, contacts: [person], owner: salesperson, name: "Own person deal")
+        shared_deal = create_deal!(workspace, pipeline: pipeline, company: company, contacts: [person], owner: admin, name: "Shared person deal")
         shared_deal.deal_accesses.create!(user: salesperson)
-        create_deal!(workspace, pipeline: pipeline, company: company, contacts: [ person ], owner: admin, name: "Hidden person deal")
+        create_deal!(workspace, pipeline: pipeline, company: company, contacts: [person], owner: admin, name: "Hidden person deal")
         sign_in_to_workspace!(salesperson)
 
         get person_path(person)
@@ -231,7 +231,7 @@ RSpec.describe "People", type: :request do
         before { workspace.update!(salespeople_can_view_all_deals: true) }
 
         it "allows a salesperson to see all person deals" do
-          create_deal!(workspace, pipeline: pipeline, company: company, contacts: [ person ], owner: admin, name: "Other person deal")
+          create_deal!(workspace, pipeline: pipeline, company: company, contacts: [person], owner: admin, name: "Other person deal")
           sign_in_to_workspace!(salesperson)
 
           get person_path(person)
@@ -251,8 +251,8 @@ RSpec.describe "People", type: :request do
       before { sign_in_as(member) }
 
       it "lists deals ordered by created_at descending with stage and products" do
-        older = create_deal!(workspace, pipeline: pipeline, company: company, contacts: [ person ], name: "Older deal")
-        newer = create_deal!(workspace, pipeline: pipeline, company: company, contacts: [ person ], name: "Newer deal")
+        older = create_deal!(workspace, pipeline: pipeline, company: company, contacts: [person], name: "Older deal")
+        newer = create_deal!(workspace, pipeline: pipeline, company: company, contacts: [person], name: "Newer deal")
         older.update_column(:created_at, Time.zone.local(2025, 1, 10, 12))
         newer.update_column(:created_at, Time.zone.local(2025, 6, 10, 12))
         newer.deal_products.create!(product: product_a, quantity: 1)
@@ -267,12 +267,12 @@ RSpec.describe "People", type: :request do
       end
 
       it "filters deals by product when product_id is given" do
-        deal_a = create_deal!(workspace, pipeline: pipeline, company: company, contacts: [ person ], name: "Alpha deal")
-        deal_b = create_deal!(workspace, pipeline: pipeline, company: company, contacts: [ person ], name: "Beta deal")
+        deal_a = create_deal!(workspace, pipeline: pipeline, company: company, contacts: [person], name: "Alpha deal")
+        deal_b = create_deal!(workspace, pipeline: pipeline, company: company, contacts: [person], name: "Beta deal")
         deal_a.deal_products.create!(product: product_a, quantity: 1)
         deal_b.deal_products.create!(product: product_b, quantity: 1)
 
-        get person_path(person), params: { product_id: product_a.id }
+        get person_path(person), params: {product_id: product_a.id}
 
         expect(response).to have_http_status(:ok)
         expect(response.body).to include("Alpha deal")
@@ -309,10 +309,10 @@ RSpec.describe "People", type: :request do
         get person_path(person)
 
         expect(response).to have_http_status(:ok)
-        expect(response.body).to include("Campañas enviadas")
+        expect(response.body).to include(I18n.t("people.show.campaigns"))
         expect(response.body).to include("Welcome series")
         expect(response.body).to include("Hola desde Welcome")
-        expect(response.body).to include("Ver más")
+        expect(response.body).to include(I18n.t("people.show.view_more"))
         expect(response.body).to include(campaign_path(campaign))
       end
 
@@ -337,7 +337,7 @@ RSpec.describe "People", type: :request do
         expect(preview).not_to include("Campaign 0")
         expect(full_list).to include("Campaign 0")
         expect(full_list).to include("Campaign 5")
-        expect(response.body).to include("Ver más (6)")
+        expect(response.body).to include(I18n.t("people.show.view_more_count", count: 6))
       end
 
       it "shows expanded delivery events in the full list" do
@@ -348,7 +348,7 @@ RSpec.describe "People", type: :request do
         get person_path(person)
 
         full_list = Nokogiri::HTML(response.body).at('[data-person-campaigns="full"]').text
-        expect(full_list).to include("Abierto")
+        expect(full_list).to include(I18n.t("marketing.email_events.open"))
       end
 
       it "omits transactional mail and sends without a campaign" do
@@ -396,7 +396,7 @@ RSpec.describe "People", type: :request do
         get person_path(person)
 
         expect(response).to have_http_status(:ok)
-        expect(response.body).not_to include("Campañas enviadas")
+        expect(response.body).not_to include(I18n.t("people.show.campaigns"))
       end
 
       it "shows campaign name without an admin link for a salesperson" do
@@ -404,7 +404,7 @@ RSpec.describe "People", type: :request do
         create_campaign_message!(person, campaign: campaign, subject: "Sales visible subject")
         sign_out
         sign_in_as(users(:two))
-        patch switch_workspace_path, params: { workspace_id: workspace.id }
+        patch switch_workspace_path, params: {workspace_id: workspace.id}
 
         get person_path(person)
 
@@ -442,7 +442,7 @@ RSpec.describe "People", type: :request do
       company = create_company!(workspace)
 
       post people_path(format: :json), params: {
-        person: { first_name: "Ana", company_id: company.id, source: "team_member" }
+        person: {first_name: "Ana", company_id: company.id, source: "team_member"}
       }, as: :json
 
       expect(response).to have_http_status(:unprocessable_entity)

@@ -11,7 +11,7 @@ RSpec.describe "Sidebar navigation", type: :request do
 
   def sign_in_and_switch(user)
     sign_in_as(user)
-    patch switch_workspace_path, params: { workspace_id: workspace.id }
+    patch switch_workspace_path, params: {workspace_id: workspace.id}
   end
 
   describe "grouped menu structure" do

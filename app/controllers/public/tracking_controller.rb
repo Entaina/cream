@@ -15,7 +15,7 @@ module Public
       return head :not_found unless workspace
 
       anonymous_id = params[:anonymous_id].presence || cookies[:cream_aid].presence || SecureRandom.uuid
-      cookies[:cream_aid] = { value: anonymous_id, expires: 1.year.from_now, httponly: true, same_site: :lax }
+      cookies[:cream_aid] = {value: anonymous_id, expires: 1.year.from_now, httponly: true, same_site: :lax}
 
       person = identify_person(workspace, anonymous_id)
       PageView.record!(
@@ -26,16 +26,16 @@ module Public
         utm: params.permit(:utm_source, :utm_medium, :utm_campaign, :utm_term, :utm_content).to_h,
         session_id: params[:session_id],
         person: person,
-        metadata: { "user_agent" => request.user_agent, "ip" => request.remote_ip }
+        metadata: {"user_agent" => request.user_agent, "ip" => request.remote_ip}
       )
-      Marketing::ScoringEngine.apply_event!(person: person, event: "page_view", metadata: { "url" => params[:url] }) if person
+      Marketing::ScoringEngine.apply_event!(person: person, event: "page_view", metadata: {"url" => params[:url]}) if person
       head :ok
     end
 
     def script
       return head :not_found unless CreamFeatures.enabled?(:web_tracking)
 
-      render js: render_to_string(partial: "public/tracking/cream", formats: [ :js ]), content_type: "application/javascript"
+      render js: render_to_string(partial: "public/tracking/cream", formats: [:js]), content_type: "application/javascript"
     end
 
     private

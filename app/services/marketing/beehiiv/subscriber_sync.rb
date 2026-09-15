@@ -76,7 +76,7 @@ module Marketing
 
       def lock_email!(email)
         ActiveRecord::Base.connection.execute(
-          ActiveRecord::Base.sanitize_sql_array([ "SELECT pg_advisory_xact_lock(hashtext(?))", "beehiiv:#{@workspace.id}:#{email}" ])
+          ActiveRecord::Base.sanitize_sql_array(["SELECT pg_advisory_xact_lock(hashtext(?))", "beehiiv:#{@workspace.id}:#{email}"])
         )
       end
 
@@ -98,10 +98,10 @@ module Marketing
         fields = @record[:custom_fields] || {}
         first = fields["First Name"].presence || fields["first_name"].presence
         last = fields["Last Name"].presence || fields["last_name"].presence
-        return [ first, last ] if first.present?
+        return [first, last] if first.present?
 
         local = @record[:email].to_s.split("@").first.to_s
-        [ local.presence || "Suscriptor", last ]
+        [local.presence || "Suscriptor", last]
       end
 
       def apply_subscription_state!(person)
@@ -144,7 +144,7 @@ module Marketing
             workspace: @workspace,
             address: person.email,
             reason: "hard_bounce",
-            metadata: { "source" => @source, "beehiiv_subscription_id" => @record[:id] }.compact
+            metadata: {"source" => @source, "beehiiv_subscription_id" => @record[:id]}.compact
           )
         end
       end

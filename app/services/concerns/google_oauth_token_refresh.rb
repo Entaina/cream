@@ -62,7 +62,7 @@ module GoogleOauthTokenRefresh
     Net::HTTP.start(uri.host, uri.port, use_ssl: true, open_timeout: TIMEOUT, read_timeout: TIMEOUT, write_timeout: TIMEOUT) do |http|
       http.request(request)
     end
-  rescue Net::OpenTimeout, Net::ReadTimeout => e
+  rescue Net::OpenTimeout, Net::ReadTimeout
     raise GoogleCalendar::Error, "Google Calendar no respondió a tiempo. Inténtalo de nuevo en unos minutos."
   end
 end

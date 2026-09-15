@@ -9,6 +9,6 @@ class CreateLeadFormTemplates < ActiveRecord::Migration[8.1]
       t.timestamps
     end
 
-    add_index :lead_form_templates, [ :workspace_id, :path ], unique: true
+    add_index :lead_form_templates, [:workspace_id, :path], unique: true
   end
 end

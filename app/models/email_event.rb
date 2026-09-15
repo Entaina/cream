@@ -3,7 +3,7 @@ class EmailEvent < ApplicationRecord
 
   belongs_to :email_message
 
-  validates :event_type, inclusion: { in: EVENT_TYPES }
+  validates :event_type, inclusion: {in: EVENT_TYPES}
   validates :occurred_at, presence: true
 
   after_create :sync_message_counters
@@ -29,12 +29,12 @@ class EmailEvent < ApplicationRecord
     when "bounce"
       return unless hard_bounce?
 
-      EmailSuppression.suppress!(workspace: workspace, address: address, reason: "hard_bounce", metadata: { "email_event_id" => id })
+      EmailSuppression.suppress!(workspace: workspace, address: address, reason: "hard_bounce", metadata: {"email_event_id" => id})
     when "spam"
-      EmailSuppression.suppress!(workspace: workspace, address: address, reason: "spam_complaint", metadata: { "email_event_id" => id })
+      EmailSuppression.suppress!(workspace: workspace, address: address, reason: "spam_complaint", metadata: {"email_event_id" => id})
     when "unsub"
       Marketing::ConsentService.unsubscribe_all!(person: person, source: "webhook_unsub") if person
-      EmailSuppression.suppress!(workspace: workspace, address: address, reason: "unsubscribe", metadata: { "email_event_id" => id })
+      EmailSuppression.suppress!(workspace: workspace, address: address, reason: "unsubscribe", metadata: {"email_event_id" => id})
     end
   end
 

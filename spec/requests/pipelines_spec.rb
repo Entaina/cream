@@ -10,11 +10,11 @@ RSpec.describe "Pipelines", type: :request do
       sign_in_as(member)
 
       expect {
-        post pipelines_path, params: { pipeline: { name: "Sales", default_pipeline: "1",
-          pipeline_stages_attributes: {
-            "0" => { name: "New", color: "hoki", probability: 10 },
-            "1" => { name: "Closed", color: "green", probability: 100, won: "1", closed: "1" }
-          } } }
+        post pipelines_path, params: {pipeline: {name: "Sales", default_pipeline: "1",
+                                                 pipeline_stages_attributes: {
+                                                   "0" => {name: "New", color: "hoki", probability: 10},
+                                                   "1" => {name: "Closed", color: "green", probability: 100, won: "1", closed: "1"}
+                                                 }}}
       }.to change(Pipeline, :count).by(1).and change(PipelineStage, :count).by(2)
 
       expect(response).to redirect_to(pipelines_path)
@@ -55,7 +55,7 @@ RSpec.describe "Pipelines", type: :request do
             when qualified.id then 2
             else stage.position
             end
-            [ i.to_s, {
+            [i.to_s, {
               id: stage.id,
               name: stage.name,
               color: stage.color,
@@ -63,7 +63,7 @@ RSpec.describe "Pipelines", type: :request do
               position: position,
               won: stage.won ? "1" : "0",
               closed: stage.closed ? "1" : "0"
-            } ]
+            }]
           }
         }
       }
@@ -78,10 +78,10 @@ RSpec.describe "Pipelines", type: :request do
       sign_in_as(member)
       pipeline = Pipeline.create_default!(workspaces(:one))
       stages = pipeline.pipeline_stages.ordered.to_a
-      new_order = [ stages[2].id, stages[0].id, stages[1].id ] + stages.drop(3).map(&:id)
+      new_order = [stages[2].id, stages[0].id, stages[1].id] + stages.drop(3).map(&:id)
 
       patch reorder_stages_pipeline_path(pipeline),
-        params: { stage_ids: new_order },
+        params: {stage_ids: new_order},
         as: :json
 
       expect(response).to have_http_status(:ok)
@@ -93,7 +93,7 @@ RSpec.describe "Pipelines", type: :request do
       pipeline = Pipeline.create_default!(workspaces(:one))
 
       patch reorder_stages_pipeline_path(pipeline),
-        params: { stage_ids: [ pipeline.pipeline_stages.ordered.first.id ] },
+        params: {stage_ids: [pipeline.pipeline_stages.ordered.first.id]},
         as: :json
 
       expect(response).to have_http_status(:unprocessable_entity)
@@ -105,7 +105,7 @@ RSpec.describe "Pipelines", type: :request do
       sign_in_as(member)
 
       expect {
-        post pipelines_path, params: { pipeline: { name: "Empty" } }
+        post pipelines_path, params: {pipeline: {name: "Empty"}}
       }.not_to change(Pipeline, :count)
     end
   end

@@ -12,6 +12,6 @@ class CreateStageTriggers < ActiveRecord::Migration[8.0]
 
       t.timestamps
     end
-    add_index :stage_triggers, [ :pipeline_stage_id, :position ]
+    add_index :stage_triggers, [:pipeline_stage_id, :position]
   end
 end

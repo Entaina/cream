@@ -3,13 +3,13 @@ module Api
     class DealsController < BaseController
       def index
         deals = policy_scope(current_workspace.deals).includes(:company, :pipeline_stage, :contacts,
-          deal_products: [ :product, :edition ])
+          deal_products: [:product, :edition])
         deals = deals.search(params[:q]) if params[:q].present?
         render json: deals.map { |deal| deal_json(deal) }
       end
 
       def show
-        deal = policy_scope(current_workspace.deals).includes(deal_products: [ :product, :edition ]).find(params[:id])
+        deal = policy_scope(current_workspace.deals).includes(deal_products: [:product, :edition]).find(params[:id])
         authorize deal
         render json: deal_json(deal)
       end
@@ -26,15 +26,15 @@ module Api
           email_message = create_email_for!(deal) if nested_email_requested?
         end
         deliver_email!(email_message) if email_message
-        json_opts = { notes: notes }
+        json_opts = {notes: notes}
         json_opts[:email_message] = email_message if nested_email_requested?
         render json: deal_json(deal.reload, **json_opts), status: :created
       rescue ActiveRecord::RecordInvalid => e
-        render json: { errors: e.record.errors.full_messages }, status: :unprocessable_entity
+        render json: {errors: e.record.errors.full_messages}, status: :unprocessable_entity
       rescue Api::DealEmailCreator::InvalidAttachment => e
-        render json: { errors: [ e.message ] }, status: :unprocessable_entity
+        render json: {errors: [e.message]}, status: :unprocessable_entity
       rescue Api::DealEmailCreator::RecordEmailDisabled => e
-        render json: { errors: [ e.message ] }, status: :unprocessable_entity
+        render json: {errors: [e.message]}, status: :unprocessable_entity
       end
 
       def update
@@ -47,7 +47,7 @@ module Api
           deal.move_to_stage!(new_stage) if new_stage
           render json: deal_json(deal.reload)
         else
-          render json: { errors: deal.errors.full_messages }, status: :unprocessable_entity
+          render json: {errors: deal.errors.full_messages}, status: :unprocessable_entity
         end
       end
 
@@ -66,7 +66,7 @@ module Api
           :name, :company_id, :pipeline_id, :pipeline_stage_id, :value, :currency, :probability, :expected_close_date,
           contact_ids: [],
           tasks_attributes: %i[title due_on],
-          deal_products_attributes: [ :id, :product_id, :edition_id, :edition_name, :quantity, :unit_price, :_destroy ]
+          deal_products_attributes: [:id, :product_id, :edition_id, :edition_name, :quantity, :unit_price, :_destroy]
         )
         permitted[:contact_ids] = resolve_contact_ids(permitted[:contact_ids]) if raw.key?(:contact_ids)
         if raw.key?(:deal_products_attributes)

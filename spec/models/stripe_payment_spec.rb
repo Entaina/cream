@@ -36,27 +36,27 @@ RSpec.describe StripePayment, type: :model do
   describe "payload helpers" do
     it "summarizes card payments with brand and last4" do
       payment = create_payment!(payload: {
-        "payment_method_details" => { "type" => "card", "card" => { "brand" => "mastercard", "last4" => "4806" } }
+        "payment_method_details" => {"type" => "card", "card" => {"brand" => "mastercard", "last4" => "4806"}}
       })
       expect(payment.payment_method_summary).to eq("Mastercard ···4806")
     end
 
     it "humanizes non-card payment methods" do
-      payment = create_payment!(payload: { "payment_method_details" => { "type" => "sepa_debit", "sepa_debit" => {} } })
+      payment = create_payment!(payload: {"payment_method_details" => {"type" => "sepa_debit", "sepa_debit" => {}}})
       expect(payment.payment_method_summary).to eq("Sepa debit")
     end
 
     it "reads phone and address with customer fallback" do
       payment = create_payment!(payload: {
-        "billing_details" => { "address" => {}, "phone" => nil },
-        "customer" => { "phone" => "+34600111222", "address" => { "city" => "Zaragoza", "country" => "ES" } }
+        "billing_details" => {"address" => {}, "phone" => nil},
+        "customer" => {"phone" => "+34600111222", "address" => {"city" => "Zaragoza", "country" => "ES"}}
       })
       expect(payment.customer_phone).to eq("+34600111222")
       expect(payment.billing_address).to eq("Zaragoza, ES")
     end
 
     it "flags partial refunds" do
-      payment = create_payment!(payload: { "amount_refunded" => 5000 })
+      payment = create_payment!(payload: {"amount_refunded" => 5000})
       expect(payment.partially_refunded?).to be(true)
       expect(payment.amount_refunded_decimal).to eq(50.0)
     end

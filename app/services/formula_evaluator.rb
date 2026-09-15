@@ -12,7 +12,7 @@ class FormulaEvaluator
     return nil unless substituted.match?(SAFE_EXPRESSION)
 
     result = SafeArithmetic.new(substituted).result
-    result.is_a?(Numeric) && result.finite? ? result : nil
+    (result.is_a?(Numeric) && result.finite?) ? result : nil
   rescue SafeArithmetic::Error, ZeroDivisionError
     nil
   end
@@ -63,7 +63,7 @@ class FormulaEvaluator
       value = term
       while peek == "+" || peek == "-"
         op = consume
-        value = op == "+" ? value + term : value - term
+        value = (op == "+") ? value + term : value - term
       end
       value
     end
@@ -72,15 +72,17 @@ class FormulaEvaluator
       value = factor
       while peek == "*" || peek == "/"
         op = consume
-        value = op == "*" ? value * factor : value / factor
+        value = (op == "*") ? value * factor : value / factor
       end
       value
     end
 
     def factor
       case (tok = peek)
-      when "+" then consume; factor
-      when "-" then consume; -factor
+      when "+" then consume
+                    factor
+      when "-" then consume
+                    -factor
       when "("
         consume
         value = expression

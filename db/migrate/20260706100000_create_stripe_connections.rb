@@ -1,7 +1,7 @@
 class CreateStripeConnections < ActiveRecord::Migration[8.0]
   def change
     create_table :stripe_connections do |t|
-      t.references :workspace, null: false, foreign_key: true, index: { unique: true }
+      t.references :workspace, null: false, foreign_key: true, index: {unique: true}
       t.references :user, null: false, foreign_key: true
       t.text :api_key
       t.string :account_label

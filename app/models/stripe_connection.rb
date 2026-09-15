@@ -5,7 +5,7 @@ class StripeConnection < ApplicationRecord
   has_many :stripe_payments, dependent: :destroy
 
   validates :workspace_id, uniqueness: true
-  validates :api_key, format: { with: /\A(sk|rk)_[A-Za-z0-9_]+\z/, message: "must be a Stripe secret or restricted key (sk_… / rk_…)" },
+  validates :api_key, format: {with: /\A(sk|rk)_[A-Za-z0-9_]+\z/, message: "must be a Stripe secret or restricted key (sk_… / rk_…)"},
     allow_blank: true
 
   def connected? = api_key.present?

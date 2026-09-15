@@ -20,8 +20,8 @@ module Marketing
     def self.tracking_url_options
       base = ENV.fetch("CREAM_APP_URL", "http://example.com")
       uri = URI.parse(base)
-      options = { host: uri.host, protocol: uri.scheme }
-      options[:port] = uri.port unless uri.port.in?([ uri.default_port, 80, 443 ])
+      options = {host: uri.host, protocol: uri.scheme}
+      options[:port] = uri.port unless uri.port.in?([uri.default_port, 80, 443])
       options
     end
 
@@ -30,7 +30,7 @@ module Marketing
 
       uri = URI.parse(url)
       params = URI.decode_www_form(uri.query.to_s)
-      campaign.utm_params.each { |key, value| params << [ key, value ] if value.present? }
+      campaign.utm_params.each { |key, value| params << [key, value] if value.present? }
       uri.query = URI.encode_www_form(params) if params.any?
       uri.to_s
     rescue URI::InvalidURIError

@@ -54,7 +54,7 @@ module Ai
           annual_revenue: @record.annual_revenue,
           description: @record.description,
           people_count: @record.people.size,
-          open_deals_count: @record.deals.joins(:pipeline_stage).where(pipeline_stages: { closed: false }).count
+          open_deals_count: @record.deals.joins(:pipeline_stage).where(pipeline_stages: {closed: false}).count
         }.compact
       when Deal
         {
@@ -67,7 +67,7 @@ module Ai
           company: @record.company&.name,
           contacts: @record.contacts.map(&:display_name),
           products: @record.deal_products.includes(:product).map { |line|
-            { name: line.product.name, quantity: line.quantity, subtotal: line.subtotal.to_f }
+            {name: line.product.name, quantity: line.quantity, subtotal: line.subtotal.to_f}
           }.presence
         }.compact
       else
@@ -78,10 +78,10 @@ module Ai
     def related_content
       {
         notes: @record.notes.includes(:user).order(created_at: :desc).limit(LIMITS[:notes]).map { |note|
-          { title: note.title, body: truncate(note.body), author: note.user.name, at: note.created_at.iso8601 }.compact
+          {title: note.title, body: truncate(note.body), author: note.user.name, at: note.created_at.iso8601}.compact
         },
         comments: @record.comments.includes(:user).top_level.recent_first.limit(LIMITS[:comments]).map { |comment|
-          { body: truncate(comment.body), author: comment.user.name, at: comment.created_at.iso8601 }
+          {body: truncate(comment.body), author: comment.user.name, at: comment.created_at.iso8601}
         },
         emails: @record.email_messages.recent_first.limit(LIMITS[:emails]).map { |message|
           {

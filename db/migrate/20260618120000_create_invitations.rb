@@ -5,7 +5,7 @@ class CreateInvitations < ActiveRecord::Migration[8.1]
       t.string :email_address, null: false
       t.string :role, null: false, default: "member"
       t.string :token_digest, null: false
-      t.references :invited_by, null: false, foreign_key: { to_table: :users }
+      t.references :invited_by, null: false, foreign_key: {to_table: :users}
       t.datetime :accepted_at
       t.datetime :expires_at, null: false
 

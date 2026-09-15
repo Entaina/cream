@@ -58,7 +58,7 @@ RSpec.describe Marketing::Beehiiv::PushService do
       allow(client).to receive(:create_subscription).with(
         email: person.email,
         reactivate_existing: false
-      ).and_return("data" => { "id" => "sub_new" })
+      ).and_return("data" => {"id" => "sub_new"})
 
       subscription = EmailSubscription.create!(
         workspace: workspace,
@@ -87,7 +87,7 @@ RSpec.describe Marketing::Beehiiv::PushService do
       expect(client).to receive(:create_subscription).with(
         email: person.email,
         reactivate_existing: true
-      ).and_return("data" => { "id" => "sub_reactivated" })
+      ).and_return("data" => {"id" => "sub_reactivated"})
       expect(client).not_to receive(:find_subscription_by_email)
 
       service.subscribe!(person: person, reactivate: true)

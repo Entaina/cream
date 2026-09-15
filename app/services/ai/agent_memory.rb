@@ -15,7 +15,7 @@ module Ai
 
     def context_for(query)
       @memory.retrieve(query.to_s)
-    rescue StandardError
+    rescue
       ""
     end
 

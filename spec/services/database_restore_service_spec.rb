@@ -32,7 +32,7 @@ RSpec.describe DatabaseRestoreService do
   it "restores the latest backup for the environment when no file name is given" do
     older = backup_file("cream_backup_test_2026-06-01.dump")
     newer = backup_file("cream_backup_test_2026-07-01.dump")
-    allow(storage).to receive(:list_backups).and_return([ older, newer ])
+    allow(storage).to receive(:list_backups).and_return([older, newer])
 
     result = service.call
 
@@ -65,9 +65,9 @@ RSpec.describe DatabaseRestoreService do
   end
 
   it "raises when pg_restore fails" do
-    allow(storage).to receive(:list_backups).and_return([ backup_file("cream_backup_test_2026-07-01.dump") ])
+    allow(storage).to receive(:list_backups).and_return([backup_file("cream_backup_test_2026-07-01.dump")])
     allow(service).to receive(:run_pg_restore).and_call_original
-    allow(Open3).to receive(:capture3).and_return([ "", "restore failed", instance_double(Process::Status, success?: false, exitstatus: 1) ])
+    allow(Open3).to receive(:capture3).and_return(["", "restore failed", instance_double(Process::Status, success?: false, exitstatus: 1)])
 
     expect { service.call }.to raise_error(DatabaseRestoreService::Error, /pg_restore failed/)
   end

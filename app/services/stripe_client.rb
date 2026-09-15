@@ -22,12 +22,12 @@ class StripeClient
   # oldest first, following Stripe's cursor pagination. Charges come with the
   # full Customer object expanded (fallback email/phone/address for matching).
   def list_charges(created_after: nil)
-    params = { "limit" => PAGE_LIMIT, "expand[]" => "data.customer" }
+    params = {"limit" => PAGE_LIMIT, "expand[]" => "data.customer"}
     params["created[gt]"] = created_after.to_i if created_after.present?
     starting_after = nil
 
     MAX_PAGES.times do
-      page = get_json("/charges", params.merge({ "starting_after" => starting_after }.compact))
+      page = get_json("/charges", params.merge({"starting_after" => starting_after}.compact))
       data = Array(page["data"])
       # Stripe lists newest first; yield oldest first so the cursor advances safely.
       data.reverse_each { |charge| yield charge }
@@ -39,13 +39,13 @@ class StripeClient
 
   # Cheap credentials check used by the settings form before saving a key.
   def verify!
-    get_json("/charges", { "limit" => 1 })
+    get_json("/charges", {"limit" => 1})
     true
   end
 
   # Single charge with the customer expanded (used to backfill payloads).
   def get_charge(charge_id)
-    get_json("/charges/#{charge_id}", { "expand[]" => "customer" })
+    get_json("/charges/#{charge_id}", {"expand[]" => "customer"})
   end
 
   private

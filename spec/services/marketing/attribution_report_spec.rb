@@ -9,13 +9,13 @@ RSpec.describe Marketing::AttributionReport do
   let(:lead_form) { create_lead_form!(workspace, user: member, pipeline: pipeline) }
 
   def create_submission!(person:, utm_source:)
-    deal = create_deal!(workspace, pipeline: pipeline, company: person.company, contacts: [ person ])
+    deal = create_deal!(workspace, pipeline: pipeline, company: person.company, contacts: [person])
     workspace.lead_submissions.create!(
       lead_form: lead_form,
       deal: deal,
       person: person,
-      data: { "email" => person.email },
-      metadata: { "utm_source" => utm_source }
+      data: {"email" => person.email},
+      metadata: {"utm_source" => utm_source}
     )
   end
 

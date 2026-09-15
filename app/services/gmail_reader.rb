@@ -81,7 +81,7 @@ class GmailReader
   private
 
   def build_query(after)
-    parts = [ "-in:sent" ]
+    parts = ["-in:sent"]
     parts << "after:#{after.to_i}" if after.present?
     parts.join(" ")
   end
@@ -107,7 +107,7 @@ class GmailReader
   end
 
   def metadata_headers_query
-    URI.encode_www_form(METADATA_HEADERS.map { |header| [ "metadataHeaders", header ] })
+    URI.encode_www_form(METADATA_HEADERS.map { |header| ["metadataHeaders", header] })
   end
 
   def parse_full(data)

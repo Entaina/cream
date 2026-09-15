@@ -1,335 +1,338 @@
+---
 es:
-  date:
-    formats:
-      default: "%d/%m/%Y"
-      short: "%d de %b"
-      long: "%A, %d de %B de %Y"
-    day_names:
-      - domingo
-      - lunes
-      - martes
-      - miércoles
-      - jueves
-      - viernes
-      - sábado
-    abbr_day_names:
-      - dom
-      - lun
-      - mar
-      - mié
-      - jue
-      - vie
-      - sáb
-    month_names:
-      - ~
-      - enero
-      - febrero
-      - marzo
-      - abril
-      - mayo
-      - junio
-      - julio
-      - agosto
-      - septiembre
-      - octubre
-      - noviembre
-      - diciembre
-    abbr_month_names:
-      - ~
-      - ene
-      - feb
-      - mar
-      - abr
-      - may
-      - jun
-      - jul
-      - ago
-      - sep
-      - oct
-      - nov
-      - dic
-  time:
-    formats:
-      default: "%d/%m/%Y %H:%M"
-      short: "%d %b %Y"
-      long: "%A, %d de %B de %Y"
-  datetime:
-    distance_in_words:
-      x_seconds:
-        one: "1 segundo"
-        other: "%{count} segundos"
-      x_minutes:
-        one: "1 minuto"
-        other: "%{count} minutos"
-      x_hours:
-        one: "1 hora"
-        other: "%{count} horas"
-      x_days:
-        one: "1 día"
-        other: "%{count} días"
-      x_months:
-        one: "1 mes"
-        other: "%{count} meses"
-      x_years:
-        one: "1 año"
-        other: "%{count} años"
-      about_x_hours:
-        one: "alrededor de 1 hora"
-        other: "alrededor de %{count} horas"
-      about_x_months:
-        one: "alrededor de 1 mes"
-        other: "alrededor de %{count} meses"
-      over_x_years:
-        one: "más de 1 año"
-        other: "más de %{count} años"
-      almost_x_years:
-        one: "casi 1 año"
-        other: "casi %{count} años"
-      less_than_x_minutes:
-        one: "menos de un minuto"
-        other: "menos de %{count} minutos"
-      half_a_minute: "medio minuto"
-      less_than_x_seconds:
-        one: "menos de 1 segundo"
-        other: "menos de %{count} segundos"
-
-  nav:
-    search: "Buscar..."
-    notifications: "Notificaciones"
-    menu: "Menú"
-    customize_menu: "Personalizar menú"
-    sign_out: "Cerrar sesión"
-    language: "Idioma"
-    groups:
-      marketing: "Marketing"
-      settings: "Configuración"
-      profile: "Mi perfil"
-    dashboard: "Panel"
-    people: "Personas"
-    companies: "Empresas"
-    deals: "Oportunidades"
-    tasks: "Tareas"
-    team: "Equipo"
-    products: "Productos"
-    pipelines: "Pipelines"
-    custom_fields: "Campos personalizados"
-    profile: "Perfil"
-    workspace_settings: "Ajustes"
-    api_tokens: "Tokens de API"
-    lists: "Mis listas"
-    features:
-      reports: "Informes"
-      email_templates: "Plantillas"
-      gmail_sync: "Gmail"
-      automations: "Automatizaciones"
-      alerts: "Alertas"
-      slack_integrations: "Slack"
-      webhooks: "Webhooks"
-      stripe_payments: "Stripe"
-      lead_forms: "Formularios"
-      calendar_booking: "Reservas"
-      marketing_consent: "Suscripciones"
-      marketing_campaigns: "Campañas"
-      marketing_segments: "Segmentos"
-      marketing_attribution: "Atribución"
-      journeys: "Recorridos"
-      lead_scoring: "Puntuación de leads"
-      mql_pool: "MQLs"
-
-  auth:
-    sign_in:
-      title: "Inicia sesión en cream"
-      subtitle: "El CRM que tu equipo disfrutará."
-      email: "Email"
-      password: "Contraseña"
-      submit: "Iniciar sesión"
-      forgot_password: "¿Olvidaste la contraseña?"
-      create_account: "Crear cuenta"
-      or: "o"
-    registration:
-      title: "Crea tu cuenta"
-      subtitle: "Empieza a gestionar relaciones en minutos."
-      name: "Nombre"
-      workspace_name: "Nombre del workspace"
-      password_confirmation: "Confirmar contraseña"
-      submit: "Crear cuenta"
-      already_have_account: "¿Ya tienes cuenta?"
-      sign_in: "Iniciar sesión"
-    google: "Continuar con Google"
-    password_reset:
-      title: "¿Olvidaste tu contraseña?"
-      email_placeholder: "Introduce tu email"
-      submit: "Enviar instrucciones"
-      update_title: "Actualiza tu contraseña"
-      new_password_placeholder: "Nueva contraseña"
-      confirm_placeholder: "Repite la contraseña"
-      save: "Guardar"
-    invitation:
-      accept_title: "Aceptar invitación"
-      join_workspace: "Unirte a %{workspace}"
-      invited_as: "%{inviter} te invitó como %{role}."
-      signed_in_as: "Sesión iniciada como %{email}."
-      accept: "Aceptar invitación"
-      email_mismatch_html: "Has iniciado sesión como <strong>%{current}</strong>, pero la invitación se envió a <strong>%{invited}</strong>."
-      sign_out_and_use_invited: "Cerrar sesión y usar el email invitado"
-      existing_account_html: "Ya existe una cuenta para <strong>%{email}</strong>. Inicia sesión para aceptar."
-      sign_in_and_accept: "Iniciar sesión y aceptar"
-      create_to_join_html: "Crea tu cuenta para unirte a <strong>%{workspace}</strong>."
-      create_and_accept: "Crear cuenta y aceptar"
-      already_accepted_title: "Invitación ya aceptada"
-      already_accepted_body: "Esta invitación a %{workspace} ya se ha utilizado."
-      expired_title: "Invitación caducada"
-      expired_body: "Esta invitación a %{workspace} ha caducado. Pide a un administrador que envíe una nueva."
-      sign_in: "Iniciar sesión"
-    flashes:
-      try_again_later: "Inténtalo de nuevo más tarde."
-      invalid_credentials: "Prueba con otro email o contraseña."
-      joined_workspace: "Te has unido a %{workspace}."
-      welcome_workspace: "¡Bienvenido a %{workspace}!"
-      password_reset_sent: "Instrucciones enviadas (si existe un usuario con ese email)."
-      password_reset: "Contraseña restablecida."
-      passwords_did_not_match: "Las contraseñas no coinciden."
-      password_reset_invalid: "El enlace de restablecimiento no es válido o ha caducado."
-      not_authorized: "No tienes permiso para realizar esta acción."
-      invitation_invalid: "El enlace de invitación no es válido."
-      sign_in_with_invited_email: "Inicia sesión con %{email} para aceptar esta invitación."
-      invitation_accept_failed: "No se pudo aceptar la invitación."
-
-  profile:
-    title: "Perfil"
-    intro_html: "Preferencias personales en <strong>%{workspace}</strong>."
-    personal_data: "Datos personales"
-    name: "Nombre"
-    name_hint: "Se muestra en el menú lateral, menciones y actividad del equipo."
-    email: "Email"
-    save: "Guardar"
-    preferences: "Preferencias"
-    default_pipeline: "Pipeline predeterminado"
-    default_pipeline_hint: "Se seleccionará al iniciar sesión y al abrir el add-on de Gmail."
-    sales_director_briefing: "Mostrar briefing del director de ventas en el dashboard"
-    sales_director_hint_html: "Preferencia personal en este workspace. El administrador debe tenerlo activado en %{team_link}."
-    sales_director_team: "Equipo"
-    sales_director_requires_ai: "Requiere configurar <code>CREAM_AI_API_KEY</code> en el servidor."
-    alerts: "Alertas"
-    alerts_intro: "Elige cómo quieres recibir las alertas, los envíos de formularios y las reservas de calendario en este workspace."
-    alert_in_app: "Notificación in-app (campana)"
-    alert_email: "Email"
-    alerts_channels_hint: "Si desactivas ambos canales, no recibirás alertas, avisos de formularios ni de reservas."
-    locale: "Idioma"
-    locale_hint: "Idioma de la interfaz de Cream."
-    locales:
-      es: "Español"
-      en: "English"
-    flashes:
-      name_updated: "Nombre actualizado."
-      preferences_updated: "Preferencias actualizadas."
-
-  shared:
-    notes:
-      title: "Notas"
-      title_placeholder: "Título de la nota (opcional)"
-      body_placeholder: "Escribe una nota..."
-      add: "Añadir nota"
-      delete_confirm: "¿Eliminar esta nota?"
-      delete: "Eliminar nota"
-    tasks:
-      title: "Tareas"
-      open_count:
-        one: "(%{count} abierta)"
-        other: "(%{count} abiertas)"
-      placeholder: "Añadir una tarea..."
-      add: "Añadir"
-      edit: "Editar tarea"
-      delete: "Eliminar tarea"
-      delete_confirm: "¿Eliminar esta tarea?"
-      edit_title: "Editar tarea"
-      title_label: "Título"
-      due_date: "Fecha límite"
-      assignee: "Asignado a"
-      unassigned: "Sin asignar"
-      cancel: "Cancelar"
-      save: "Guardar"
-    comments:
-      title: "Comentarios"
-      placeholder: "Añade un comentario... usa @nombre para mencionar al equipo"
-      add: "Añadir comentario"
-      delete: "Eliminar comentario"
-      delete_confirm: "¿Eliminar este comentario?"
-    attachments:
-      title: "Adjuntos"
-      upload: "Subir"
-      remove_confirm: "¿Eliminar este archivo?"
-    timeline:
-      title: "Actividad"
-      empty: "Sin actividad todavía."
-      ago: "hace %{time}"
-    email:
-      title: "Enviar email"
-      insert_template: "Insertar plantilla…"
-      no_templates: "No hay plantillas disponibles"
-      create_templates_html: "%{link} para reutilizarlas al redactar correos."
-      create_templates_link: "Crear plantillas"
-      to: "Para"
-      subject: "Asunto"
-      body_placeholder: "Cuerpo del mensaje..."
-      attachments: "Adjuntos"
-      attachments_hint: "Desmarca los que no quieras enviar."
-      send_later: "Enviar más tarde"
-      follow_up: "Seguimiento"
-      follow_up_options:
-        none: "Sin recordatorio"
-        two_days: "en 2 días"
-        three_days: "en 3 días"
-        one_week: "en 1 semana"
-        two_weeks: "en 2 semanas"
-      send: "Enviar email"
-    pagination:
-      aria_label: "Paginación"
-      range_html: "<span class=\"font-medium text-ink\">%{from}</span>–<span class=\"font-medium text-ink\">%{to}</span> de <span class=\"font-medium text-ink\">%{count}</span>"
-      previous: "Anterior"
-      next: "Siguiente"
-      page_of: "Página %{page} de %{pages}"
-    record_picker:
-      search_placeholder: "Escribe para buscar…"
-      no_results: "Sin resultados"
-      create: '+ Crear "%{name}"'
-    someone: "Alguien"
-    empty_value: "—"
-
   activities:
-    created: "%{actor} creó este registro"
-    updated: "%{actor} actualizó %{fields}"
-    updated_record: "el registro"
-    note_added: "%{actor} añadió una nota"
-    comment_added: "%{actor} añadió un comentario"
+    ai_task_created: '%{actor} creó la tarea sugerida por IA "%{title}"'
     attachment_added: "%{actor} adjuntó %{filename}"
-    email_opened: '%{to} abrió "%{subject}"'
-    email_sent: '%{actor} envió "%{subject}" a %{to}'
-    email_clicked: 'Enlace pulsado en "%{subject}"'
-    email_replied: '%{from} respondió a "%{subject}"'
-    task_completed: '%{actor} completó la tarea "%{title}"'
-    stage_changed: "%{actor} movió el deal de %{from} a %{to}"
-    pipeline_changed: "%{actor} movió el deal al pipeline %{to}"
+    comment_added: "%{actor} añadió un comentario"
     contact_added: "%{actor} añadió a %{contact} como contacto"
     contact_removed: "%{actor} eliminó a %{contact} como contacto"
     contacts_updated: "%{actor} actualizó contactos (%{contact})"
+    created: "%{actor} creó este registro"
+    email_clicked: Enlace pulsado en "%{subject}"
+    email_opened: '%{to} abrió "%{subject}"'
+    email_replied: '%{from} respondió a "%{subject}"'
+    email_sent: '%{actor} envió "%{subject}" a %{to}'
+    generic: "%{actor} %{action}"
     merged_companies: "%{actor} fusionó %{names} en este registro"
     merged_people: "%{actor} fusionó %{names} en este registro"
+    note_added: "%{actor} añadió una nota"
+    payment_received: "%{actor} vinculó un pago de Stripe de %{amount}"
+    payment_received_from: " de %{email}"
+    pipeline_changed: "%{actor} movió el deal al pipeline %{to}"
     product_added: "%{actor} añadió la línea de producto %{product}"
     product_removed: "%{actor} eliminó la línea de producto %{product}"
     product_updated: "%{actor} actualizó la línea de producto %{product}"
     products_updated: "%{actor} actualizó productos (%{product})"
-    ai_task_created: '%{actor} creó la tarea sugerida por IA "%{title}"'
-    payment_received: "%{actor} vinculó un pago de Stripe de %{amount}"
-    payment_received_from: " de %{email}"
-    generic: "%{actor} %{action}"
-
-  editions:
-    from: "Desde %{date}"
-    until: "Hasta %{date}"
-
+    stage_changed: "%{actor} movió el deal de %{from} a %{to}"
+    task_completed: '%{actor} completó la tarea "%{title}"'
+    updated: "%{actor} actualizó %{fields}"
+    updated_record: el registro
+  auth:
+    flashes:
+      invalid_credentials: Prueba con otro email o contraseña.
+      invitation_accept_failed: No se pudo aceptar la invitación.
+      invitation_invalid: El enlace de invitación no es válido.
+      joined_workspace: Te has unido a %{workspace}.
+      not_authorized: No tienes permiso para realizar esta acción.
+      password_reset: Contraseña restablecida.
+      password_reset_invalid: El enlace de restablecimiento no es válido o ha caducado.
+      password_reset_sent: Instrucciones enviadas (si existe un usuario con ese email).
+      passwords_did_not_match: Las contraseñas no coinciden.
+      sign_in_with_invited_email: Inicia sesión con %{email} para aceptar esta invitación.
+      try_again_later: Inténtalo de nuevo más tarde.
+      welcome_workspace: "¡Bienvenido a %{workspace}!"
+    google: Continuar con Google
+    invitation:
+      accept: Aceptar invitación
+      accept_title: Aceptar invitación
+      already_accepted_body: Esta invitación a %{workspace} ya se ha utilizado.
+      already_accepted_title: Invitación ya aceptada
+      create_and_accept: Crear cuenta y aceptar
+      create_to_join_html: Crea tu cuenta para unirte a <strong>%{workspace}</strong>.
+      email_mismatch_html: Has iniciado sesión como <strong>%{current}</strong>, pero
+        la invitación se envió a <strong>%{invited}</strong>.
+      existing_account_html: Ya existe una cuenta para <strong>%{email}</strong>.
+        Inicia sesión para aceptar.
+      expired_body: Esta invitación a %{workspace} ha caducado. Pide a un administrador
+        que envíe una nueva.
+      expired_title: Invitación caducada
+      invited_as: "%{inviter} te invitó como %{role}."
+      join_workspace: Unirte a %{workspace}
+      sign_in: Iniciar sesión
+      sign_in_and_accept: Iniciar sesión y aceptar
+      sign_out_and_use_invited: Cerrar sesión y usar el email invitado
+      signed_in_as: Sesión iniciada como %{email}.
+    password_reset:
+      confirm_placeholder: Repite la contraseña
+      email_placeholder: Introduce tu email
+      new_password_placeholder: Nueva contraseña
+      save: Guardar
+      submit: Enviar instrucciones
+      title: "¿Olvidaste tu contraseña?"
+      update_title: Actualiza tu contraseña
+    registration:
+      already_have_account: "¿Ya tienes cuenta?"
+      name: Nombre
+      password_confirmation: Confirmar contraseña
+      sign_in: Iniciar sesión
+      submit: Crear cuenta
+      subtitle: Empieza a gestionar relaciones en minutos.
+      title: Crea tu cuenta
+      workspace_name: Nombre del workspace
+    sign_in:
+      create_account: Crear cuenta
+      email: Email
+      forgot_password: "¿Olvidaste la contraseña?"
+      or: o
+      password: Contraseña
+      submit: Iniciar sesión
+      subtitle: El CRM que tu equipo disfrutará.
+      title: Inicia sesión en cream
+  date:
+    abbr_day_names:
+    - dom
+    - lun
+    - mar
+    - mié
+    - jue
+    - vie
+    - sáb
+    abbr_month_names:
+    -
+    - ene
+    - feb
+    - mar
+    - abr
+    - may
+    - jun
+    - jul
+    - ago
+    - sep
+    - oct
+    - nov
+    - dic
+    day_names:
+    - domingo
+    - lunes
+    - martes
+    - miércoles
+    - jueves
+    - viernes
+    - sábado
+    formats:
+      default: "%d/%m/%Y"
+      long: "%A, %d de %B de %Y"
+      short: "%d de %b"
+    month_names:
+    -
+    - enero
+    - febrero
+    - marzo
+    - abril
+    - mayo
+    - junio
+    - julio
+    - agosto
+    - septiembre
+    - octubre
+    - noviembre
+    - diciembre
+  datetime:
+    distance_in_words:
+      about_x_hours:
+        one: alrededor de 1 hora
+        other: alrededor de %{count} horas
+      about_x_months:
+        one: alrededor de 1 mes
+        other: alrededor de %{count} meses
+      almost_x_years:
+        one: casi 1 año
+        other: casi %{count} años
+      half_a_minute: medio minuto
+      less_than_x_minutes:
+        one: menos de un minuto
+        other: menos de %{count} minutos
+      less_than_x_seconds:
+        one: menos de 1 segundo
+        other: menos de %{count} segundos
+      over_x_years:
+        one: más de 1 año
+        other: más de %{count} años
+      x_days:
+        one: 1 día
+        other: "%{count} días"
+      x_hours:
+        one: 1 hora
+        other: "%{count} horas"
+      x_minutes:
+        one: 1 minuto
+        other: "%{count} minutos"
+      x_months:
+        one: 1 mes
+        other: "%{count} meses"
+      x_seconds:
+        one: 1 segundo
+        other: "%{count} segundos"
+      x_years:
+        one: 1 año
+        other: "%{count} años"
   deal_versions:
     created: "%{actor} creó este deal"
-    updated: "%{actor} actualizó %{fields}"
-    updated_deal: "el deal"
     destroyed: "%{actor} eliminó este deal"
+    updated: "%{actor} actualizó %{fields}"
+    updated_deal: el deal
+  editions:
+    from: Desde %{date}
+    until: Hasta %{date}
+  nav:
+    api_tokens: Tokens de API
+    companies: Empresas
+    custom_fields: Campos personalizados
+    customize_menu: Personalizar menú
+    dashboard: Panel
+    deals: Oportunidades
+    features:
+      alerts: Alertas
+      automations: Automatizaciones
+      calendar_booking: Reservas
+      email_templates: Plantillas
+      gmail_sync: Gmail
+      journeys: Recorridos
+      lead_forms: Formularios
+      lead_scoring: Puntuación de leads
+      marketing_attribution: Atribución
+      marketing_campaigns: Campañas
+      marketing_consent: Suscripciones
+      marketing_segments: Segmentos
+      mql_pool: MQLs
+      reports: Informes
+      slack_integrations: Slack
+      stripe_payments: Stripe
+      webhooks: Webhooks
+    groups:
+      marketing: Marketing
+      profile: Mi perfil
+      settings: Configuración
+    language: Idioma
+    lists: Mis listas
+    menu: Menú
+    notifications: Notificaciones
+    people: Personas
+    pipelines: Pipelines
+    products: Productos
+    profile: Perfil
+    search: Buscar...
+    sign_out: Cerrar sesión
+    tasks: Tareas
+    team: Equipo
+    workspace_settings: Ajustes
+  profile:
+    alert_email: Email
+    alert_in_app: Notificación in-app (campana)
+    alerts: Alertas
+    alerts_channels_hint: Si desactivas ambos canales, no recibirás alertas, avisos
+      de formularios ni de reservas.
+    alerts_intro: Elige cómo quieres recibir las alertas, los envíos de formularios
+      y las reservas de calendario en este workspace.
+    default_pipeline: Pipeline predeterminado
+    default_pipeline_hint: Se seleccionará al iniciar sesión y al abrir el add-on
+      de Gmail.
+    email: Email
+    flashes:
+      name_updated: Nombre actualizado.
+      preferences_updated: Preferencias actualizadas.
+    intro_html: Preferencias personales en <strong>%{workspace}</strong>.
+    locale: Idioma
+    locale_hint: Idioma de la interfaz de Cream.
+    locales:
+      en: English
+      es: Español
+    name: Nombre
+    name_hint: Se muestra en el menú lateral, menciones y actividad del equipo.
+    personal_data: Datos personales
+    preferences: Preferencias
+    sales_director_briefing: Mostrar briefing del director de ventas en el dashboard
+    sales_director_hint_html: Preferencia personal en este workspace. El administrador
+      debe tenerlo activado en %{team_link}.
+    sales_director_requires_ai: Requiere configurar <code>CREAM_AI_API_KEY</code>
+      en el servidor.
+    sales_director_team: Equipo
+    save: Guardar
+    title: Perfil
+  shared:
+    attachments:
+      remove_confirm: "¿Eliminar este archivo?"
+      title: Adjuntos
+      upload: Subir
+    comments:
+      add: Añadir comentario
+      delete: Eliminar comentario
+      delete_confirm: "¿Eliminar este comentario?"
+      placeholder: Añade un comentario... usa @nombre para mencionar al equipo
+      title: Comentarios
+    email:
+      attachments: Adjuntos
+      attachments_hint: Desmarca los que no quieras enviar.
+      body_placeholder: Cuerpo del mensaje...
+      create_templates_html: "%{link} para reutilizarlas al redactar correos."
+      create_templates_link: Crear plantillas
+      follow_up: Seguimiento
+      follow_up_options:
+        none: Sin recordatorio
+        one_week: en 1 semana
+        three_days: en 3 días
+        two_days: en 2 días
+        two_weeks: en 2 semanas
+      insert_template: Insertar plantilla…
+      no_templates: No hay plantillas disponibles
+      send: Enviar email
+      send_later: Enviar más tarde
+      subject: Asunto
+      title: Enviar email
+      to: Para
+    empty_value: "—"
+    notes:
+      add: Añadir nota
+      body_placeholder: Escribe una nota...
+      delete: Eliminar nota
+      delete_confirm: "¿Eliminar esta nota?"
+      title: Notas
+      title_placeholder: Título de la nota (opcional)
+    pagination:
+      aria_label: Paginación
+      next: Siguiente
+      page_of: Página %{page} de %{pages}
+      previous: Anterior
+      range_html: <span class="font-medium text-ink">%{from}</span>–<span class="font-medium
+        text-ink">%{to}</span> de <span class="font-medium text-ink">%{count}</span>
+    record_picker:
+      create: + Crear "%{name}"
+      no_results: Sin resultados
+      search_placeholder: Escribe para buscar…
+    someone: Alguien
+    tasks:
+      add: Añadir
+      assignee: Asignado a
+      cancel: Cancelar
+      delete: Eliminar tarea
+      delete_confirm: "¿Eliminar esta tarea?"
+      due_date: Fecha límite
+      edit: Editar tarea
+      edit_title: Editar tarea
+      open_count:
+        one: "(%{count} abierta)"
+        other: "(%{count} abiertas)"
+      placeholder: Añadir una tarea...
+      save: Guardar
+      title: Tareas
+      title_label: Título
+      unassigned: Sin asignar
+    timeline:
+      ago: hace %{time}
+      empty: Sin actividad todavía.
+      title: Actividad
+  time:
+    formats:
+      default: "%d/%m/%Y %H:%M"
+      long: "%A, %d de %B de %Y"
+      short: "%d %b %Y"

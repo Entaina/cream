@@ -33,7 +33,7 @@ class RecordMailer < ApplicationMailer
   def marketing_headers(message)
     client = Marketing::Esp::Client.for(message)
     client.send(:headers)
-  rescue StandardError
+  rescue
     {}
   end
 

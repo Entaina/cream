@@ -58,8 +58,8 @@ RSpec.describe "Dashboard active pipeline", type: :request do
         briefing_date: Date.current,
         summary: "Pipeline estable con riesgos puntuales",
         items: [
-          { "priority" => "urgent", "text" => "Llamar a ACME hoy", "owner_id" => member.id },
-          { "priority" => "important", "text" => "Preparar propuesta para Beta" }
+          {"priority" => "urgent", "text" => "Llamar a ACME hoy", "owner_id" => member.id},
+          {"priority" => "important", "text" => "Preparar propuesta para Beta"}
         ],
         wins: [],
         misses: [],
@@ -89,8 +89,8 @@ RSpec.describe "Dashboard active pipeline", type: :request do
         briefing_date: Date.current,
         summary: "Pipeline estable con riesgos puntuales",
         items: [
-          { "priority" => "urgent", "text" => "Llamar a ACME hoy", "owner_id" => member.id },
-          { "priority" => "important", "text" => "Preparar propuesta para Beta" }
+          {"priority" => "urgent", "text" => "Llamar a ACME hoy", "owner_id" => member.id},
+          {"priority" => "important", "text" => "Preparar propuesta para Beta"}
         ],
         wins: [],
         misses: [],
@@ -111,18 +111,18 @@ RSpec.describe "Dashboard active pipeline", type: :request do
         user: member,
         briefing_date: Date.current,
         summary: "Hoy debes cerrar ACME",
-        items: [ { "priority" => "urgent", "text" => "Llama a ACME antes del mediodía" } ],
-        wins: [ "Ganaste el deal Beta la semana pasada" ],
-        misses: [ "Dejaste vencer la tarea con Gamma" ],
+        items: [{"priority" => "urgent", "text" => "Llama a ACME antes del mediodía"}],
+        wins: ["Ganaste el deal Beta la semana pasada"],
+        misses: ["Dejaste vencer la tarea con Gamma"],
         generated_at: Time.current
       )
       workspace.sales_briefings.create!(
         user: users(:two),
         briefing_date: Date.current,
         summary: "Briefing de otro usuario",
-        items: [ { "priority" => "urgent", "text" => "No deberías ver esto" } ],
-        wins: [ "Secreto" ],
-        misses: [ "Privado" ],
+        items: [{"priority" => "urgent", "text" => "No deberías ver esto"}],
+        wins: ["Secreto"],
+        misses: ["Privado"],
         generated_at: Time.current
       )
 
@@ -179,7 +179,7 @@ RSpec.describe "Dashboard active pipeline", type: :request do
       memberships(:one_member).update!(current_pipeline: pipeline)
 
       sign_in_as(salesperson)
-      patch switch_workspace_path, params: { workspace_id: workspace.id }
+      patch switch_workspace_path, params: {workspace_id: workspace.id}
       get root_path
 
       expect(response).to have_http_status(:ok)
@@ -225,7 +225,7 @@ RSpec.describe "Dashboard active pipeline", type: :request do
       expect(response).to have_http_status(:ok)
       expect(response.body).to include('title="Ventas: 1"')
       expect(response.body).to include('title="Partners: 1"')
-      expect(response.body.scan(/>Lead</).size).to eq(1)
+      expect(response.body.scan(">Lead<").size).to eq(1)
     end
   end
 
@@ -241,7 +241,7 @@ RSpec.describe "Dashboard active pipeline", type: :request do
     it "shows closed stages when closed=1" do
       membership.update!(current_pipeline: pipeline)
 
-      get root_path, params: { closed: "1" }
+      get root_path, params: {closed: "1"}
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include(">Won</span>")

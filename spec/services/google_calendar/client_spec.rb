@@ -21,8 +21,8 @@ RSpec.describe GoogleCalendar::Client do
     it "returns writable and readable calendars from Google" do
       body = {
         items: [
-          { id: "primary@gmail.com", summary: "Principal", primary: true, accessRole: "owner" },
-          { id: "team@group.calendar.google.com", summary: "Equipo", accessRole: "reader" }
+          {id: "primary@gmail.com", summary: "Principal", primary: true, accessRole: "owner"},
+          {id: "team@group.calendar.google.com", summary: "Equipo", accessRole: "reader"}
         ]
       }.to_json
       response = instance_double(Net::HTTPSuccess, body: body, is_a?: true)

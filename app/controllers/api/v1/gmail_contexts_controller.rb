@@ -40,7 +40,7 @@ module Api
           name: pipeline.name,
           default: pipeline.default_pipeline?,
           stages: pipeline.pipeline_stages.map do |stage|
-            { id: stage.id, name: stage.name, closed: stage.closed? }
+            {id: stage.id, name: stage.name, closed: stage.closed?}
           end
         }
       end

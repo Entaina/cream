@@ -37,7 +37,7 @@ module GoogleCalendar
       end
 
       @code = :api_error
-      @message = "#{@operation} falló (#{@http_code}): #{error['message'].presence || @body.truncate(200)}"
+      @message = "#{@operation} falló (#{@http_code}): #{error["message"].presence || @body.truncate(200)}"
     rescue JSON::ParserError
       @code = :api_error
       @message = "#{@operation} falló (#{@http_code}): #{@body.truncate(200)}"

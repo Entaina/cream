@@ -9,8 +9,8 @@ class PipelineStage < ApplicationRecord
   has_many :stage_conditions, dependent: :destroy
 
   validates :name, presence: true
-  validates :color, inclusion: { in: COLORS }
-  validates :probability, numericality: { only_integer: true, in: 0..100 }
+  validates :color, inclusion: {in: COLORS}
+  validates :probability, numericality: {only_integer: true, in: 0..100}
 
   scope :ordered, -> { order(:position, :id) }
   scope :ordered_across_pipelines, -> {

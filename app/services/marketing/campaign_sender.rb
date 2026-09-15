@@ -44,7 +44,7 @@ module Marketing
         sleep 0.1
       end
 
-      stats = { "sent" => sent, "skipped" => skipped, "failed" => failed }
+      stats = {"sent" => sent, "skipped" => skipped, "failed" => failed}
       stats["last_error"] = last_error if last_error.present?
 
       if sent.zero? && failed.positive?
@@ -66,7 +66,7 @@ module Marketing
     end
 
     def mark_empty_failure!
-      @campaign_send.mark_failed!(stats: { "sent" => 0, "skipped" => 0, "failed" => 0, "last_error" => "missing_email_content" })
+      @campaign_send.mark_failed!(stats: {"sent" => 0, "skipped" => 0, "failed" => 0, "last_error" => "missing_email_content"})
       @campaign.update!(status: "draft")
     end
 
@@ -90,8 +90,8 @@ module Marketing
     end
 
     def recipient_entries_for(person)
-      addresses = [ person.email, *person.person_emails.map(&:address) ].map(&:presence).compact.uniq
-      addresses.map { |address| [ person, address ] }
+      addresses = [person.email, *person.person_emails.map(&:address)].map(&:presence).compact.uniq
+      addresses.map { |address| [person, address] }
     end
 
     def deliver_to(person, email)
@@ -102,7 +102,7 @@ module Marketing
       subject, body = if variant
         email_content.render_custom_for(person, subject: variant.subject, body: variant.body)
       else
-        [ email_content.render_subject_for(person), email_content.render_for(person) ]
+        [email_content.render_subject_for(person), email_content.render_for(person)]
       end
 
       message = @workspace.email_messages.create!(
@@ -123,9 +123,9 @@ module Marketing
         return :failed
       end
 
-      Marketing::ScoringEngine.apply_event!(person: person, event: "email_sent", metadata: { "campaign_id" => @campaign.id })
+      Marketing::ScoringEngine.apply_event!(person: person, event: "email_sent", metadata: {"campaign_id" => @campaign.id})
       :sent
-    rescue StandardError => e
+    rescue => e
       @last_error = e.message
       :failed
     end

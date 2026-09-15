@@ -21,7 +21,7 @@ class WebhookDeliveryJob < ApplicationJob
       response_body: response.body.to_s.truncate(1000),
       status: response.is_a?(Net::HTTPSuccess) ? "delivered" : "failed"
     )
-  rescue StandardError => e
+  rescue => e
     delivery&.update!(status: "failed", response_body: e.message)
   end
 

@@ -14,7 +14,7 @@ RSpec.describe "Editions", type: :request do
 
       expect {
         post product_editions_path(product), params: {
-          edition: { name: "Barcelona 2026", starts_on: "2026-09-01", ends_on: "2026-12-15" }
+          edition: {name: "Barcelona 2026", starts_on: "2026-09-01", ends_on: "2026-12-15"}
         }
       }.to change(product.editions, :count).by(1)
 
@@ -28,8 +28,8 @@ RSpec.describe "Editions", type: :request do
     it "creates an edition via JSON for the record picker" do
       sign_in_as(member)
 
-      post product_editions_path(product, format: :json), params: { edition: { name: "Online 2026" } },
-        headers: { "Accept" => "application/json" }
+      post product_editions_path(product, format: :json), params: {edition: {name: "Online 2026"}},
+        headers: {"Accept" => "application/json"}
 
       expect(response).to have_http_status(:created)
       body = response.parsed_body
@@ -41,8 +41,8 @@ RSpec.describe "Editions", type: :request do
       sign_in_as(member)
       product.editions.create!(name: "Duplicate")
 
-      post product_editions_path(product, format: :json), params: { edition: { name: "duplicate" } },
-        headers: { "Accept" => "application/json" }
+      post product_editions_path(product, format: :json), params: {edition: {name: "duplicate"}},
+        headers: {"Accept" => "application/json"}
 
       expect(response).to have_http_status(:unprocessable_entity)
       expect(response.parsed_body["errors"]).to be_present
@@ -50,7 +50,7 @@ RSpec.describe "Editions", type: :request do
 
     it "denies users without workspace membership" do
       sign_in_as(outsider)
-      post product_editions_path(product), params: { edition: { name: "Blocked" } }
+      post product_editions_path(product), params: {edition: {name: "Blocked"}}
       expect(response).to redirect_to(root_path)
     end
   end
@@ -65,8 +65,8 @@ RSpec.describe "Editions", type: :request do
       )
       product.editions.create!(name: "Barcelona 2027")
 
-      get picker_product_editions_path(product, format: :json), params: { q: "madrid" },
-        headers: { "Accept" => "application/json" }
+      get picker_product_editions_path(product, format: :json), params: {q: "madrid"},
+        headers: {"Accept" => "application/json"}
 
       expect(response).to have_http_status(:success)
       results = response.parsed_body
@@ -81,8 +81,8 @@ RSpec.describe "Editions", type: :request do
       other_product = workspace.products.create!(name: "Other", price: 50)
       other_product.editions.create!(name: "Secret cohort")
 
-      get picker_product_editions_path(product, format: :json), params: { q: "secret" },
-        headers: { "Accept" => "application/json" }
+      get picker_product_editions_path(product, format: :json), params: {q: "secret"},
+        headers: {"Accept" => "application/json"}
 
       expect(response.parsed_body).to eq([])
     end
@@ -94,7 +94,7 @@ RSpec.describe "Editions", type: :request do
       edition = product.editions.create!(name: "Madrid 2026")
 
       patch product_edition_path(product, edition), params: {
-        edition: { starts_on: "2026-04-01", ends_on: "2026-07-01" }
+        edition: {starts_on: "2026-04-01", ends_on: "2026-07-01"}
       }
 
       expect(response).to redirect_to(edit_product_path(product))

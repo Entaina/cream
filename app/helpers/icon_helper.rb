@@ -59,7 +59,7 @@ module IconHelper
 
   def icon(name, classes: "size-4", stroke: 1.75)
     paths = ICONS.fetch(name.to_sym)
-    paths = [ paths ] unless paths.is_a?(Array)
+    paths = [paths] unless paths.is_a?(Array)
     tag.svg(viewBox: "0 0 24 24", fill: "none", stroke: "currentColor",
       "stroke-width": stroke, "stroke-linecap": "round", "stroke-linejoin": "round",
       class: classes, "aria-hidden": true) do

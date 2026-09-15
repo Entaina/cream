@@ -1,5 +1,6 @@
 class BookingPagesController < ApplicationController
   include RequiresFeature
+
   requires_feature :calendar_booking
 
   before_action :set_booking_page, only: %i[edit update destroy]
@@ -61,16 +62,16 @@ class BookingPagesController < ApplicationController
     host = current_workspace.users.find(params[:host_id])
     connection = current_workspace.calendar_connections.find_by(user: host)
     unless connection&.connected?
-      render json: { error: "not_connected" }, status: :unprocessable_entity
+      render json: {error: "not_connected"}, status: :unprocessable_entity
       return
     end
     if (message = connection.missing_scopes_message)
-      render json: { error: "insufficient_scopes", message: message }, status: :unprocessable_entity
+      render json: {error: "insufficient_scopes", message: message}, status: :unprocessable_entity
       return
     end
 
     items = GoogleCalendar::Client.new(connection).list_calendars
-    render json: { calendars: items }
+    render json: {calendars: items}
   rescue GoogleCalendar::Error => e
     render json: calendar_error_json(e), status: :service_unavailable
   end
@@ -96,14 +97,14 @@ class BookingPagesController < ApplicationController
   end
 
   def load_host_calendars(connection)
-    return { calendars: [], error: nil } unless connection&.connected?
+    return {calendars: [], error: nil} unless connection&.connected?
     if (message = connection.missing_scopes_message)
-      return { calendars: [], error: { code: :insufficient_scopes, message: message } }
+      return {calendars: [], error: {code: :insufficient_scopes, message: message}}
     end
 
-    { calendars: GoogleCalendar::Client.new(connection).list_calendars, error: nil }
+    {calendars: GoogleCalendar::Client.new(connection).list_calendars, error: nil}
   rescue GoogleCalendar::Error => e
-    { calendars: [], error: { code: e.code, message: e.message, help_url: e.help_url } }
+    {calendars: [], error: {code: e.code, message: e.message, help_url: e.help_url}}
   end
 
   def apply_default_calendar_ids!
@@ -111,7 +112,7 @@ class BookingPagesController < ApplicationController
     return if @available_calendars.blank?
 
     primary = @available_calendars.find { |calendar| calendar[:primary] }
-    @booking_page.calendar_ids = [ primary&.dig(:id) || @available_calendars.first[:id] ]
+    @booking_page.calendar_ids = [primary&.dig(:id) || @available_calendars.first[:id]]
   end
 
   def sync_calendar_ids_with_available!
@@ -127,7 +128,7 @@ class BookingPagesController < ApplicationController
     end
 
     synced = ids.select { |id| available_ids.include?(id) }
-    @booking_page.calendar_ids = synced.presence || [ @available_calendars.find { |c| c[:primary] }&.dig(:id) || available_ids.first ]
+    @booking_page.calendar_ids = synced.presence || [@available_calendars.find { |c| c[:primary] }&.dig(:id) || available_ids.first]
   end
 
   def booking_page_params
@@ -139,7 +140,7 @@ class BookingPagesController < ApplicationController
         :id, :slug, :color, :duration_minutes, :location_type, :location_address,
         :buffer_before_minutes, :buffer_after_minutes, :slot_increment_minutes,
         :min_notice_hours, :reminder_minutes_before, :email_template_id, :visible, :position, :weekly_hours, :_destroy,
-        { name_i18n: {}, description_i18n: {} }
+        {name_i18n: {}, description_i18n: {}}
       ]
     ).tap do |permitted|
       permitted[:calendar_ids] = Array(permitted[:calendar_ids]).map(&:to_s).reject(&:blank?)

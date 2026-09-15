@@ -81,7 +81,7 @@ RSpec.describe "Lead form templates", type: :request do
 
       post preview_lead_form_template_path(template), params: {
         _method: "patch",
-        lead_form_template: { body: template.body }
+        lead_form_template: {body: template.body}
       }
 
       expect(response).to have_http_status(:not_found)
@@ -118,7 +118,7 @@ RSpec.describe "Lead form templates", type: :request do
       template = workspace.lead_form_templates.find_by!(path: "public/lead_forms/contacto")
 
       post preview_lead_form_template_path(template), params: {
-        lead_form_template: { body: "<div class=\"mx-auto max-w-xl\"><h1>Borrador</h1>{% form_open %}{% form_close %}</div>" }
+        lead_form_template: {body: "<div class=\"mx-auto max-w-xl\"><h1>Borrador</h1>{% form_open %}{% form_close %}</div>"}
       }
 
       expect(response).to have_http_status(:ok)
@@ -147,7 +147,7 @@ RSpec.describe "Lead form templates", type: :request do
       )
 
       patch lead_form_template_path(template), params: {
-        lead_form_template: { body: "<p>new</p>" }
+        lead_form_template: {body: "<p>new</p>"}
       }
 
       expect(response).to redirect_to(lead_form_templates_path)
@@ -179,7 +179,7 @@ RSpec.describe "Lead form templates", type: :request do
   describe "non-admin access" do
     before do
       sign_in_as(salesperson)
-      patch switch_workspace_path, params: { workspace_id: workspace.id }
+      patch switch_workspace_path, params: {workspace_id: workspace.id}
     end
 
     it "forbids listing templates" do

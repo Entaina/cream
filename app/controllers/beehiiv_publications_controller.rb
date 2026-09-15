@@ -1,5 +1,6 @@
 class BeehiivPublicationsController < ApplicationController
   include RequiresFeature
+
   requires_feature :marketing_consent
 
   def create

@@ -17,7 +17,7 @@ RSpec.describe Marketing::ConsentService do
 
   describe ".propagate_subscription_fields!" do
     it "subscribes to newsletter when the configured field is checked" do
-      params = { "newsletter_opt_in" => "1" }
+      params = {"newsletter_opt_in" => "1"}
 
       described_class.propagate_subscription_fields!(
         person: person,
@@ -33,7 +33,7 @@ RSpec.describe Marketing::ConsentService do
 
     it "subscribes to general via legacy marketing_consent field" do
       mql_form = create_lead_form!(workspace, user: users(:one), destination: "mql")
-      params = { "marketing_consent" => "1" }
+      params = {"marketing_consent" => "1"}
 
       described_class.propagate_subscription_fields!(
         person: person,
@@ -54,7 +54,7 @@ RSpec.describe Marketing::ConsentService do
         destination: "mql",
         marketing_consent_text: "Sí, quiero novedades"
       )
-      params = { "marketing_consent" => "1" }
+      params = {"marketing_consent" => "1"}
 
       described_class.propagate_subscription_fields!(
         person: person,
@@ -76,7 +76,7 @@ RSpec.describe Marketing::ConsentService do
         described_class.propagate_subscription_fields!(
           person: person,
           workspace: workspace,
-          params: { "newsletter_opt_in" => "1" },
+          params: {"newsletter_opt_in" => "1"},
           request: request,
           lead_form: lead_form
         )
@@ -115,7 +115,7 @@ RSpec.describe Marketing::ConsentService do
       described_class.propagate_subscription_fields!(
         person: person,
         workspace: workspace,
-        params: { "subscribe_all" => "1" },
+        params: {"subscribe_all" => "1"},
         request: request,
         lead_form: lead_form
       )
@@ -128,7 +128,7 @@ RSpec.describe Marketing::ConsentService do
       described_class.propagate_subscription_fields!(
         person: person,
         workspace: workspace,
-        params: { "subscribe_all" => "1", "newsletter_opt_in" => "1" },
+        params: {"subscribe_all" => "1", "newsletter_opt_in" => "1"},
         request: request,
         lead_form: lead_form
       )
@@ -144,7 +144,7 @@ RSpec.describe Marketing::ConsentService do
       described_class.propagate_subscription_fields!(
         person: person,
         workspace: workspace,
-        params: { "subscribe_all" => "1" },
+        params: {"subscribe_all" => "1"},
         request: request,
         lead_form: lead_form
       )
@@ -160,7 +160,7 @@ RSpec.describe Marketing::ConsentService do
       described_class.propagate_subscription_fields!(
         person: person,
         workspace: workspace,
-        params: { "newsletter_opt_in" => "1" },
+        params: {"newsletter_opt_in" => "1"},
         request: request,
         lead_form: lead_form
       )
@@ -174,7 +174,7 @@ RSpec.describe Marketing::ConsentService do
       described_class.propagate_subscription_fields!(
         person: person,
         workspace: workspace,
-        params: { "subscribe_all" => "1", "subscribe_all_exclude_slugs" => "events" },
+        params: {"subscribe_all" => "1", "subscribe_all_exclude_slugs" => "events"},
         request: request,
         lead_form: lead_form
       )
@@ -189,7 +189,7 @@ RSpec.describe Marketing::ConsentService do
         described_class.propagate_subscription_fields!(
           person: person,
           workspace: workspace,
-          params: { "subscribe_all" => "1" },
+          params: {"subscribe_all" => "1"},
           request: request,
           lead_form: lead_form
         )

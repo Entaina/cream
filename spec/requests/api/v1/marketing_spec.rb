@@ -7,9 +7,9 @@ RSpec.describe "Api::V1::Marketing", type: :request do
   let(:salesperson) { users(:two) }
   let(:workspace) { workspaces(:one) }
   let(:token) { admin.api_tokens.create!(name: "API", workspace: workspace) }
-  let(:headers) { { "Authorization" => "Bearer #{token.plaintext_token}" } }
+  let(:headers) { {"Authorization" => "Bearer #{token.plaintext_token}"} }
   let(:sales_headers) do
-    { "Authorization" => "Bearer #{salesperson.api_tokens.create!(name: 'Sales', workspace: workspace).plaintext_token}" }
+    {"Authorization" => "Bearer #{salesperson.api_tokens.create!(name: "Sales", workspace: workspace).plaintext_token}"}
   end
 
   before do
@@ -130,7 +130,7 @@ RSpec.describe "Api::V1::Marketing", type: :request do
       segment = workspace.segments.create!(name: "All", record_type: "Person", user: admin, filters: {})
 
       post "/api/v1/marketing/campaigns/#{campaign.id}/sends",
-        params: { campaign_send: { segment_id: segment.id } },
+        params: {campaign_send: {segment_id: segment.id}},
         headers: headers,
         as: :json
 
@@ -154,7 +154,7 @@ RSpec.describe "Api::V1::Marketing", type: :request do
       type = workspace.subscription_types.find_by!(slug: "newsletter")
 
       patch "/api/v1/people/#{person.id}/subscription",
-        params: { subscription: { subscription_type_id: type.id, action: "subscribe" } },
+        params: {subscription: {subscription_type_id: type.id, action: "subscribe"}},
         headers: headers,
         as: :json
 

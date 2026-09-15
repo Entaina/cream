@@ -75,7 +75,7 @@ module Ai
         assistant_message: briefing.summary.to_s
       )
       memory.consolidate_later
-    rescue StandardError => e
+    rescue => e
       Rails.logger.warn("[PersonalSalesDirector] memory: #{e.class}: #{e.message}")
     end
 
@@ -106,7 +106,7 @@ module Ai
         text = item["text"].to_s.strip
         next if text.blank?
 
-        normalized = { "priority" => priority, "text" => text }
+        normalized = {"priority" => priority, "text" => text}
         record_type = item["record_type"].to_s.presence
         if record_type.in?(SalesBriefing::RECORD_TYPES)
           normalized["record_type"] = record_type
@@ -145,7 +145,7 @@ module Ai
         {
           workspace: @workspace.name,
           briefing_date: @briefing_date.iso8601,
-          user: { id: @user.id, name: @user.name },
+          user: {id: @user.id, name: @user.name},
           open_deals: open_deals,
           overdue_tasks: overdue_tasks,
           pending_tasks: pending_tasks,
@@ -199,7 +199,7 @@ module Ai
       end
 
       def recent_closed_deals
-        @workspace.deals.joins(:pipeline_stage).where(owner: @user, pipeline_stages: { closed: true })
+        @workspace.deals.joins(:pipeline_stage).where(owner: @user, pipeline_stages: {closed: true})
           .includes(:pipeline_stage, :owner)
           .where("deals.updated_at >= ?", @cutoff.beginning_of_day)
           .order(updated_at: :desc)

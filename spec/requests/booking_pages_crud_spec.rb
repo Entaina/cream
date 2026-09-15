@@ -21,11 +21,11 @@ RSpec.describe "Booking pages CRUD", type: :request do
         host: user,
         pipeline: pipeline,
         timezone: "Europe/Madrid",
-        calendar_ids: [ "primary" ]
+        calendar_ids: ["primary"]
       )
       page.event_types.build(
         slug: "video",
-        name_i18n: { "es" => "Video", "en" => "Video" },
+        name_i18n: {"es" => "Video", "en" => "Video"},
         duration_minutes: 30,
         location_type: "google_meet",
         weekly_hours: BookingEventType::DEFAULT_WEEKLY_HOURS,
@@ -41,7 +41,7 @@ RSpec.describe "Booking pages CRUD", type: :request do
     let!(:reunion_type) do
       booking_page.event_types.create!(
         slug: "reunion",
-        name_i18n: { "es" => "Reunión", "en" => "Meeting" },
+        name_i18n: {"es" => "Reunión", "en" => "Meeting"},
         duration_minutes: 60,
         location_type: "physical",
         weekly_hours: BookingEventType::DEFAULT_WEEKLY_HOURS,
@@ -62,7 +62,7 @@ RSpec.describe "Booking pages CRUD", type: :request do
           timezone: "Europe/Madrid",
           booking_window_days: 60,
           active: true,
-          calendar_ids: [ "primary" ],
+          calendar_ids: ["primary"],
           event_types_attributes: {
             "0" => {
               id: video_type.id,
@@ -77,8 +77,8 @@ RSpec.describe "Booking pages CRUD", type: :request do
               visible: "1",
               position: 0,
               weekly_hours: BookingEventType::DEFAULT_WEEKLY_HOURS.to_json,
-              name_i18n: { es: "Video", en: "Video" },
-              description_i18n: { es: "", en: "" },
+              name_i18n: {es: "Video", en: "Video"},
+              description_i18n: {es: "", en: ""},
               _destroy: "1"
             },
             "1" => {
@@ -94,8 +94,8 @@ RSpec.describe "Booking pages CRUD", type: :request do
               visible: "1",
               position: 1,
               weekly_hours: BookingEventType::DEFAULT_WEEKLY_HOURS.to_json,
-              name_i18n: { es: "Reunión", en: "Meeting" },
-              description_i18n: { es: "", en: "" }
+              name_i18n: {es: "Reunión", en: "Meeting"},
+              description_i18n: {es: "", en: ""}
             },
             "2" => {
               slug: "consultoria",
@@ -109,8 +109,8 @@ RSpec.describe "Booking pages CRUD", type: :request do
               visible: "1",
               position: 2,
               weekly_hours: BookingEventType::DEFAULT_WEEKLY_HOURS.to_json,
-              name_i18n: { es: "Consultoría", en: "Consulting" },
-              description_i18n: { es: "Sesión de consultoría.", en: "Consulting session." }
+              name_i18n: {es: "Consultoría", en: "Consulting"},
+              description_i18n: {es: "Sesión de consultoría.", en: "Consulting session."}
             }
           }
         }
@@ -119,7 +119,7 @@ RSpec.describe "Booking pages CRUD", type: :request do
       expect(response).to redirect_to(booking_pages_path)
       booking_page.reload
       slugs = booking_page.event_types.order(:position).pluck(:slug)
-      expect(slugs).to eq([ "reunion", "consultoria" ])
+      expect(slugs).to eq(["reunion", "consultoria"])
     end
 
     it "persists custom weekly hours" do
@@ -132,7 +132,7 @@ RSpec.describe "Booking pages CRUD", type: :request do
           timezone: "Europe/Madrid",
           booking_window_days: 60,
           active: true,
-          calendar_ids: [ "primary" ],
+          calendar_ids: ["primary"],
           event_types_attributes: {
             "0" => {
               id: video_type.id,
@@ -147,7 +147,7 @@ RSpec.describe "Booking pages CRUD", type: :request do
               visible: "1",
               position: 0,
               weekly_hours: {
-                monday: [ [ "09:00", "12:00" ] ],
+                monday: [["09:00", "12:00"]],
                 tuesday: [],
                 wednesday: [],
                 thursday: [],
@@ -155,15 +155,15 @@ RSpec.describe "Booking pages CRUD", type: :request do
                 saturday: [],
                 sunday: []
               }.to_json,
-              name_i18n: { es: "Video", en: "Video" },
-              description_i18n: { es: "", en: "" }
+              name_i18n: {es: "Video", en: "Video"},
+              description_i18n: {es: "", en: ""}
             }
           }
         }
       }
 
       expect(response).to redirect_to(booking_pages_path)
-      expect(video_type.reload.weekly_hours["monday"]).to eq([ [ "09:00", "12:00" ] ])
+      expect(video_type.reload.weekly_hours["monday"]).to eq([["09:00", "12:00"]])
       expect(video_type.weekly_hours["tuesday"]).to eq([])
     end
 
@@ -184,7 +184,7 @@ RSpec.describe "Booking pages CRUD", type: :request do
           timezone: "Europe/Madrid",
           booking_window_days: 60,
           active: true,
-          calendar_ids: [ "primary" ],
+          calendar_ids: ["primary"],
           event_types_attributes: {
             "0" => {
               id: video_type.id,
@@ -200,8 +200,8 @@ RSpec.describe "Booking pages CRUD", type: :request do
               visible: "1",
               position: 0,
               weekly_hours: BookingEventType::DEFAULT_WEEKLY_HOURS.to_json,
-              name_i18n: { es: "Video", en: "Video" },
-              description_i18n: { es: "", en: "" }
+              name_i18n: {es: "Video", en: "Video"},
+              description_i18n: {es: "", en: ""}
             }
           }
         }

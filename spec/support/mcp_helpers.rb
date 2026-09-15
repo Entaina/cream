@@ -1,8 +1,8 @@
 module McpHelpers
   def call_tool(name, arguments, id: 99, token: plaintext)
     post mcp_url,
-      params: { jsonrpc: "2.0", id: id, method: "tools/call",
-                params: { name: name, arguments: arguments } },
+      params: {jsonrpc: "2.0", id: id, method: "tools/call",
+               params: {name: name, arguments: arguments}},
       as: :json, headers: mcp_headers(token)
 
     expect(response).to have_http_status(:success)
@@ -11,8 +11,8 @@ module McpHelpers
 
   def call_tool_raw(name, arguments, id: 99, token: plaintext)
     post mcp_url,
-      params: { jsonrpc: "2.0", id: id, method: "tools/call",
-                params: { name: name, arguments: arguments } },
+      params: {jsonrpc: "2.0", id: id, method: "tools/call",
+               params: {name: name, arguments: arguments}},
       as: :json, headers: mcp_headers(token)
 
     response
@@ -39,13 +39,13 @@ module McpHelpers
       params: {
         protocolVersion: MCP::Configuration::LATEST_STABLE_PROTOCOL_VERSION,
         capabilities: {},
-        clientInfo: { name: "test", version: "1.0" }
+        clientInfo: {name: "test", version: "1.0"}
       }
     }
   end
 
   def tools_list_payload
-    { jsonrpc: "2.0", id: 2, method: "tools/list", params: {} }
+    {jsonrpc: "2.0", id: 2, method: "tools/list", params: {}}
   end
 
   def api_token_for(user, workspace)

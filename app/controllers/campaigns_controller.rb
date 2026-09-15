@@ -1,5 +1,6 @@
 class CampaignsController < ApplicationController
   include RequiresFeature
+
   requires_feature :marketing_campaigns
   before_action :set_campaign, only: %i[show edit update destroy send_campaign send_test cancel_send mark_winner send_winner_rest recipient_count]
 
@@ -101,7 +102,7 @@ class CampaignsController < ApplicationController
     subject, body = if variant
       email_content.render_custom_for(person, subject: variant[:subject], body: variant[:body])
     else
-      [ email_content.render_subject_for(person), email_content.render_for(person) ]
+      [email_content.render_subject_for(person), email_content.render_for(person)]
     end
 
     message = current_workspace.email_messages.create!(
@@ -115,7 +116,7 @@ class CampaignsController < ApplicationController
     )
     Marketing::Esp::Client.for(message).deliver!
     redirect_to @campaign, notice: "Email de prueba enviado a #{current_user.email_address}."
-  rescue StandardError => e
+  rescue => e
     redirect_to @campaign, alert: "No se pudo enviar la prueba: #{e.message}"
   end
 
@@ -165,8 +166,8 @@ class CampaignsController < ApplicationController
   def recipient_count
     authorize @campaign, :show?
     segment = current_workspace.segments.find(params[:segment_id])
-    count = segment.record_type == "Person" ? segment.resolve(current_workspace.people).count : 0
-    render json: { count: count }
+    count = (segment.record_type == "Person") ? segment.resolve(current_workspace.people).count : 0
+    render json: {count: count}
   end
 
   private

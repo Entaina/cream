@@ -6,7 +6,7 @@ class StageTriggerRun < ApplicationRecord
   belongs_to :deal
   belongs_to :user, optional: true
 
-  validates :status, inclusion: { in: STATUSES }
+  validates :status, inclusion: {in: STATUSES}
 
   scope :recent_first, -> { order(created_at: :desc) }
   scope :with_panel, -> { where.not(panel_markdown: nil) }

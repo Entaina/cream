@@ -1,5 +1,6 @@
 class GmailConnectionsController < ApplicationController
   include RequiresFeature
+
   requires_feature :gmail_sync
 
   helper_method :gmail_auth_url
@@ -70,7 +71,7 @@ class GmailConnectionsController < ApplicationController
 
     case mode.to_sym
     when :send
-      { scope: base_scope }.to_query
+      {scope: base_scope}.to_query
     when :send_receive
       {
         scope: "#{base_scope},#{GmailConnection::METADATA_SCOPE}",

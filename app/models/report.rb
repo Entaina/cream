@@ -4,7 +4,7 @@ class Report < ApplicationRecord
   VALUE_METRICS = %w[sum_value avg_value].freeze
   RANGES = %w[all month quarter year].freeze
   SCHEDULES = %w[none daily weekly monthly].freeze
-  SCHEDULE_INTERVALS = { "daily" => 1.day, "weekly" => 1.week, "monthly" => 1.month }.freeze
+  SCHEDULE_INTERVALS = {"daily" => 1.day, "weekly" => 1.week, "monthly" => 1.month}.freeze
 
   # Group-by dimensions available per record type.
   DIMENSIONS = {
@@ -20,10 +20,10 @@ class Report < ApplicationRecord
   belongs_to :pipeline, optional: true
 
   validates :name, :record_type, :metric, :group_by, :date_range, presence: true
-  validates :record_type, inclusion: { in: RECORD_TYPES }
-  validates :metric, inclusion: { in: METRICS }
-  validates :date_range, inclusion: { in: RANGES }
-  validates :schedule, inclusion: { in: SCHEDULES }
+  validates :record_type, inclusion: {in: RECORD_TYPES}
+  validates :metric, inclusion: {in: METRICS}
+  validates :date_range, inclusion: {in: RANGES}
+  validates :schedule, inclusion: {in: SCHEDULES}
   validate :group_by_valid_for_type
   validate :metric_valid_for_type
   validate :pipeline_valid_for_type
@@ -43,7 +43,7 @@ class Report < ApplicationRecord
   end
 
   def config_params
-    { record_type: record_type, metric: metric, group_by: group_by, date_range: date_range, pipeline_id: pipeline_id }
+    {record_type: record_type, metric: metric, group_by: group_by, date_range: date_range, pipeline_id: pipeline_id}
   end
 
   def value_metric? = VALUE_METRICS.include?(metric)

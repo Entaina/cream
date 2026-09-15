@@ -1,5 +1,6 @@
 class AutomationsController < ApplicationController
   include RequiresFeature
+
   requires_feature :automations
   before_action :set_automation, only: %i[edit update destroy]
 

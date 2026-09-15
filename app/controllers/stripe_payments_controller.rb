@@ -1,5 +1,6 @@
 class StripePaymentsController < ApplicationController
   include RequiresFeature
+
   requires_feature :stripe_payments
 
   helper_method :index_query_params
@@ -62,6 +63,6 @@ class StripePaymentsController < ApplicationController
 
   # Minimal counterpart of ViewScoped#index_query_params so shared/_pagination works.
   def index_query_params(overrides = {})
-    { status: params[:status], q: params[:q] }.merge(overrides).compact_blank
+    {status: params[:status], q: params[:q]}.merge(overrides).compact_blank
   end
 end

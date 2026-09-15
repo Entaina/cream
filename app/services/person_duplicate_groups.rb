@@ -3,7 +3,7 @@ class PersonDuplicateGroups
   Group = Data.define(:email, :people) do
     def company_label
       names = people.map { |person| person.company.name }.uniq.sort
-      names.size == 1 ? names.first : names.join(", ")
+      (names.size == 1) ? names.first : names.join(", ")
     end
   end
 
@@ -32,7 +32,7 @@ class PersonDuplicateGroups
         .to_a
 
       Group.new(email: normalized_email, people: people)
-    end.sort_by { |group| [ group.company_label, group.email ] }
+    end.sort_by { |group| [group.company_label, group.email] }
   end
 
   private

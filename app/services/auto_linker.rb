@@ -1,6 +1,6 @@
 class AutoLinker
   URL_PATTERN = %r{https?://[^\s<>"']+}i
-  TRAILING_PUNCTUATION = /[.,;:!?\)\]]+\z/
+  TRAILING_PUNCTUATION = /[.,;:!?)\]]+\z/
 
   def self.render_html(text)
     return "" if text.blank?
@@ -28,7 +28,7 @@ class AutoLinker
 
   def self.split_trailing_punctuation(url)
     trailing = url[TRAILING_PUNCTUATION] || ""
-    [ url.sub(TRAILING_PUNCTUATION, ""), trailing ]
+    [url.sub(TRAILING_PUNCTUATION, ""), trailing]
   end
   private_class_method :link_for, :escape_html, :split_trailing_punctuation
 end

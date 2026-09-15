@@ -4,7 +4,7 @@ class CreateApiTokens < ActiveRecord::Migration[8.1]
       t.references :user, null: false, foreign_key: true
       t.references :workspace, null: false, foreign_key: true
       t.string :name, null: false
-      t.string :token_digest, null: false, index: { unique: true }
+      t.string :token_digest, null: false, index: {unique: true}
       t.datetime :last_used_at
       t.timestamps
     end

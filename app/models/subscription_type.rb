@@ -37,11 +37,11 @@ class SubscriptionType < ApplicationRecord
   ].freeze
 
   validates :name, :slug, presence: true
-  validates :slug, uniqueness: { scope: :workspace_id }, format: { with: /\A[a-z0-9_-]+\z/ }
+  validates :slug, uniqueness: {scope: :workspace_id}, format: {with: /\A[a-z0-9_-]+\z/}
   validates :consent_field_key,
-            format: { with: LeadForm::FIELD_KEY_FORMAT },
-            uniqueness: { scope: :workspace_id },
-            allow_nil: true
+    format: {with: LeadForm::FIELD_KEY_FORMAT},
+    uniqueness: {scope: :workspace_id},
+    allow_nil: true
   validate :consent_field_key_not_reserved
 
   scope :active, -> { where(active: true) }

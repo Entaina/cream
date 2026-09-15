@@ -9,7 +9,7 @@ RSpec.describe "Inline company creation", type: :request do
     sign_in_as(member)
 
     expect {
-      post companies_path(format: :json), params: { company: { name: "Globex" } }
+      post companies_path(format: :json), params: {company: {name: "Globex"}}
     }.to change(workspaces(:one).companies, :count).by(1)
 
     expect(response).to have_http_status(:created)
@@ -20,7 +20,7 @@ RSpec.describe "Inline company creation", type: :request do
 
   it "returns errors as JSON when invalid" do
     sign_in_as(member)
-    post companies_path(format: :json), params: { company: { name: "" } }
+    post companies_path(format: :json), params: {company: {name: ""}}
     expect(response).to have_http_status(:unprocessable_entity)
     expect(JSON.parse(response.body)["errors"]).to be_present
   end
@@ -31,10 +31,10 @@ RSpec.describe "Inline company creation", type: :request do
 
     get new_deal_path
     expect(response.body).to include('data-controller="record-picker"')
-    expect(response.body).to include('data-record-picker-create-url-value')
+    expect(response.body).to include("data-record-picker-create-url-value")
 
     get new_person_path
     expect(response.body).to include('data-controller="record-picker"')
-    expect(response.body).to include('data-record-picker-create-url-value')
+    expect(response.body).to include("data-record-picker-create-url-value")
   end
 end

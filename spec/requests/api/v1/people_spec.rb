@@ -9,7 +9,7 @@ RSpec.describe "Api::V1::People", type: :request do
     token = user.api_tokens.create!(name: "Test", workspace: workspace)
     person = create_person!(workspace)
 
-    get "/api/v1/people", headers: { "Authorization" => "Bearer #{token.plaintext_token}" }
+    get "/api/v1/people", headers: {"Authorization" => "Bearer #{token.plaintext_token}"}
 
     expect(response).to have_http_status(:success)
     body = response.parsed_body
@@ -30,12 +30,12 @@ RSpec.describe "Api::V1::People", type: :request do
     create_person!(workspace, company: company, email: "bob@example.com", first_name: "Bob")
 
     get "/api/v1/people",
-      params: { email: "Ana@Example.com" },
-      headers: { "Authorization" => "Bearer #{token.plaintext_token}" }
+      params: {email: "Ana@Example.com"},
+      headers: {"Authorization" => "Bearer #{token.plaintext_token}"}
 
     expect(response).to have_http_status(:success)
     body = response.parsed_body
-    expect(body.map { |person| person["id"] }).to eq([ match.id ])
+    expect(body.map { |person| person["id"] }).to eq([match.id])
   end
 
   it "filters people by exact secondary email" do
@@ -48,11 +48,11 @@ RSpec.describe "Api::V1::People", type: :request do
     create_person!(workspace, company: company, email: "other@example.com", first_name: "Other")
 
     get "/api/v1/people",
-      params: { email: "alias@example.com" },
-      headers: { "Authorization" => "Bearer #{token.plaintext_token}" }
+      params: {email: "alias@example.com"},
+      headers: {"Authorization" => "Bearer #{token.plaintext_token}"}
 
     expect(response).to have_http_status(:success)
     body = response.parsed_body
-    expect(body.map { |person| person["id"] }).to eq([ match.id ])
+    expect(body.map { |person| person["id"] }).to eq([match.id])
   end
 end

@@ -5,7 +5,7 @@ module Ai
     def deal_snapshot(deal, briefing_date:)
       pending_tasks = deal.tasks.reject(&:completed?)
       pending_with_due = pending_tasks.select { |task| task.due_on.present? }
-        .sort_by { |task| [ task.due_on, task.id ] }
+        .sort_by { |task| [task.due_on, task.id] }
       next_task = pending_with_due.first
       has_scheduled_next_action = pending_tasks.any? { |task| task.due_on.present? && task.due_on > briefing_date }
 

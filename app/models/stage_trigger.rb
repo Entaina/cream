@@ -7,10 +7,10 @@ class StageTrigger < ApplicationRecord
   has_many :runs, class_name: "StageTriggerRun", dependent: :destroy
 
   validates :name, presence: true
-  validates :execution_mode, inclusion: { in: EXECUTION_MODES }
+  validates :execution_mode, inclusion: {in: EXECUTION_MODES}
   validates :instructions, presence: true, if: :llm?
   validates :native_function, presence: true,
-    inclusion: { in: ->(_) { StageTriggers::NativeRegistry.keys } }, if: :native?
+    inclusion: {in: ->(_) { StageTriggers::NativeRegistry.keys }}, if: :native?
   validate :stage_belongs_to_workspace
   validate :required_native_params_present, if: :native?
 
@@ -23,7 +23,7 @@ class StageTrigger < ApplicationRecord
   def native? = execution_mode == "native"
 
   def registry_entry
-    return nil unless native? && StageTriggers::NativeRegistry.keys.include?(native_function)
+    return nil unless native? && StageTriggers::NativeRegistry.key?(native_function)
 
     StageTriggers::NativeRegistry.fetch(native_function)
   end

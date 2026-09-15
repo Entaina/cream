@@ -32,10 +32,10 @@ class Person < ApplicationRecord
   accepts_nested_attributes_for :person_emails, allow_destroy: true,
     reject_if: ->(attrs) { attrs[:address].blank? && attrs[:id].blank? }
 
-  validates :lifecycle_stage, inclusion: { in: LIFECYCLE_STAGES }
+  validates :lifecycle_stage, inclusion: {in: LIFECYCLE_STAGES}
   validates :first_name, presence: true, unless: -> { last_name.present? }
-  validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }, allow_blank: true
-  validates :source, inclusion: { in: SOURCES.keys }, allow_blank: true
+  validates :email, format: {with: URI::MailTo::EMAIL_REGEXP}, allow_blank: true
+  validates :source, inclusion: {in: SOURCES.keys}, allow_blank: true
   validates :brought_by_id, presence: true, if: -> { source == "team_member" }
   validate :brought_by_in_workspace, if: -> { brought_by_id.present? }
   validate :at_most_one_primary_email
@@ -72,18 +72,18 @@ class Person < ApplicationRecord
   end
 
   def relationships_for_display
-    outgoing = outgoing_relationships.includes(:to_person).map { |relationship| [ relationship, self ] }
-    incoming = incoming_relationships.includes(:from_person).map { |relationship| [ relationship, self ] }
+    outgoing = outgoing_relationships.includes(:to_person).map { |relationship| [relationship, self] }
+    incoming = incoming_relationships.includes(:from_person).map { |relationship| [relationship, self] }
     (outgoing + incoming).sort_by { |relationship, viewer| relationship.other_person(viewer).display_name.downcase }
   end
 
   def display_name
-    [ first_name, last_name ].reject(&:blank?).join(" ").presence || email
+    [first_name, last_name].reject(&:blank?).join(" ").presence || email
   end
   alias_method :full_name, :display_name
 
   def initials
-    [ first_name, last_name ].reject(&:blank?).first(2).map { |w| w[0] }.join.upcase.presence || "?"
+    [first_name, last_name].reject(&:blank?).first(2).map { |w| w[0] }.join.upcase.presence || "?"
   end
 
   def primary_email_record

@@ -1,5 +1,6 @@
 class ScoringRulesController < ApplicationController
   include RequiresFeature
+
   requires_feature :lead_scoring
   requires_workspace_feature :lead_scoring
   before_action :set_scoring_rule, only: %i[edit update destroy]
@@ -56,7 +57,7 @@ class ScoringRulesController < ApplicationController
   end
 
   def scoring_rule_params
-    permitted = params.require(:scoring_rule).permit(:name, :event_type, :points, :decay_days, :active, conditions: [ :field, :operator, :compare_value ])
+    permitted = params.require(:scoring_rule).permit(:name, :event_type, :points, :decay_days, :active, conditions: [:field, :operator, :compare_value])
     conditions = Array(permitted[:conditions]).map(&:to_h).reject { |row| row["field"].blank? }
     permitted.merge(conditions: conditions)
   end

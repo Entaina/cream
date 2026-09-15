@@ -1,6 +1,7 @@
 module People
   class LeadSubmissionsController < ApplicationController
     include RequiresFeature
+
     requires_feature :lead_forms
 
     before_action :set_person

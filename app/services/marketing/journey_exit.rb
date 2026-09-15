@@ -23,7 +23,7 @@ module Marketing
 
       person.deals.open_deals
         .joins(:deal_products)
-        .exists?(deal_products: { product_id: journey.product_id })
+        .exists?(deal_products: {product_id: journey.product_id})
     end
 
     def self.applicable_journeys(workspace, product)

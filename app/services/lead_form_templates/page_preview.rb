@@ -36,7 +36,7 @@ module LeadFormTemplates
 
       OverridingSource.new(
         workspace: @workspace,
-        overrides: { @template.path => @body_override }
+        overrides: {@template.path => @body_override}
       )
     end
 
@@ -68,7 +68,7 @@ module LeadFormTemplates
       product ||= @workspace.products.find_by(id: lead_form.product_id) if lead_form.product_id.present?
       product ||= sample_product
       open_editions = product ? lead_form.open_editions_for(product).to_a : []
-      [ product, open_editions ]
+      [product, open_editions]
     end
 
     def sample_product

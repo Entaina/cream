@@ -83,8 +83,7 @@ RSpec.describe Ai::ContextualAgent do
   end
 
   it "returns a Result with reply and pending actions" do
-    pending = []
-    allow(client).to receive(:chat_with_tools).and_yield("create_task", { "title" => "Llamar" }).and_return("Propongo crear tarea")
+    allow(client).to receive(:chat_with_tools).and_yield("create_task", {"title" => "Llamar"}).and_return("Propongo crear tarea")
 
     result = build_agent(record: company, message: "Crea una tarea").call
 
@@ -109,10 +108,10 @@ RSpec.describe Ai::ContextualAgent do
     result = Okm::DriveClient::SearchResult.new(
       id: "f1", name: "Contexto de Cliente.md", mime_type: "text/markdown", parent_id: "p1"
     )
-    allow(drive).to receive(:search).with("Acme Corp").and_return([ result ])
+    allow(drive).to receive(:search).with("Acme Corp").and_return([result])
     allow(drive).to receive(:read_file).with("f1").and_return("Contexto del cliente Acme")
     statuses = []
-    allow(client).to receive(:chat_with_tools).and_yield("search_okm", { "query" => "ventas" }).and_return("ok")
+    allow(client).to receive(:chat_with_tools).and_yield("search_okm", {"query" => "ventas"}).and_return("ok")
 
     build_agent(
       record: company,

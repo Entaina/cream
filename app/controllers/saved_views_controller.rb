@@ -60,12 +60,12 @@ class SavedViewsController < ApplicationController
     case record_type
     when "Person" then people_path
     when "Company" then companies_path
-    when "Deal" then saved_view_surface == "table" ? deals_path : board_deals_path
+    when "Deal" then (saved_view_surface == "table") ? deals_path : board_deals_path
     else root_path
     end
   end
 
   def saved_view_surface
-    params[:surface] == "table" ? "table" : nil
+    (params[:surface] == "table") ? "table" : nil
   end
 end

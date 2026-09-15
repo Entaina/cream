@@ -3,7 +3,7 @@ class SlackIntegration < ApplicationRecord
 
   belongs_to :workspace
 
-  validates :webhook_url, presence: true, format: { with: URI::DEFAULT_PARSER.make_regexp(%w[http https]) }
+  validates :webhook_url, presence: true, format: {with: URI::DEFAULT_PARSER.make_regexp(%w[http https])}
   validate :notify_events_allowed
 
   scope :active, -> { where(active: true) }
@@ -14,6 +14,6 @@ class SlackIntegration < ApplicationRecord
     invalid = Array(notify_events) - NOTIFY_EVENTS
     return if invalid.empty?
 
-    errors.add(:notify_events, "contain invalid values: #{invalid.join(', ')}")
+    errors.add(:notify_events, "contain invalid values: #{invalid.join(", ")}")
   end
 end

@@ -7,7 +7,7 @@ RSpec.describe "Notifications", type: :request do
 
   it "lists notifications for the signed-in user" do
     sign_in_as(member)
-    patch switch_workspace_path, params: { workspace_id: workspaces(:one).id }
+    patch switch_workspace_path, params: {workspace_id: workspaces(:one).id}
 
     get notifications_path
 
@@ -18,7 +18,7 @@ RSpec.describe "Notifications", type: :request do
   it "does not duplicate task_overdue notifications after marking one as read" do
     workspace = workspaces(:one)
     sign_in_as(member)
-    patch switch_workspace_path, params: { workspace_id: workspace.id }
+    patch switch_workspace_path, params: {workspace_id: workspace.id}
 
     person = create_person!(workspace)
     person.tasks.create!(
@@ -35,7 +35,7 @@ RSpec.describe "Notifications", type: :request do
 
     notification = member.notifications.find_by!(kind: "task_overdue", body: "Overdue follow-up")
 
-    patch notification_path(notification), headers: { "HTTP_REFERER" => notifications_url }
+    patch notification_path(notification), headers: {"HTTP_REFERER" => notifications_url}
 
     expect {
       get notifications_path

@@ -44,7 +44,7 @@ RSpec.describe Marketing::Esp::MailjetAdapter do
     allow(request).to receive(:[]=)
     allow(request).to receive(:body=)
     allow(http).to receive(:request).and_return(
-      success_response("Messages" => [ { "To" => [ { "MessageID" => 99 } ] } ])
+      success_response("Messages" => [{"To" => [{"MessageID" => 99}]}])
     )
 
     expect(described_class.new(message).deliver!).to be(true)

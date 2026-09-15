@@ -78,7 +78,7 @@ class LeadFormSubmissionProcessor
         request: request,
         lead_form: lead_form,
         privacy_policy_version: submission.privacy_policy_version,
-        extra_metadata: { "lead_submission_id" => submission.id }
+        extra_metadata: {"lead_submission_id" => submission.id}
       )
       person.update!(lifecycle_stage: "lead") if person.lifecycle_stage == "subscriber"
       assign_campaign_from_utm!(submission)
@@ -143,7 +143,7 @@ class LeadFormSubmissionProcessor
     end
     return tracked if tracked.any?
 
-    [ submission.created_at ]
+    [submission.created_at]
   end
 
   def find_or_create_person!(lock_email: false)
@@ -153,7 +153,7 @@ class LeadFormSubmissionProcessor
     lock_mql_email!(email) if lock_email && email.present?
 
     existing = workspace.people.with_email(email).first
-    return [ existing, false ] if existing
+    return [existing, false] if existing
 
     person = workspace.people.create!(
       email: params["email"].to_s.strip,
@@ -165,12 +165,12 @@ class LeadFormSubmissionProcessor
       source: "web_form",
       owner: lead_form.responsible
     )
-    [ person, true ]
+    [person, true]
   end
 
   def lock_mql_email!(email)
     ActiveRecord::Base.connection.execute(
-      ActiveRecord::Base.sanitize_sql_array([ "SELECT pg_advisory_xact_lock(hashtext(?))", "mql:#{workspace.id}:#{email}" ])
+      ActiveRecord::Base.sanitize_sql_array(["SELECT pg_advisory_xact_lock(hashtext(?))", "mql:#{workspace.id}:#{email}"])
     )
   end
 
@@ -229,7 +229,7 @@ class LeadFormSubmissionProcessor
     name = params["company_name"].to_s.strip.presence || "Empresa sin nombre"
     fiscal_information = params["company_cif"].to_s.strip.presence
     employee_range = params["employee_range"].to_s.strip.presence
-    attrs = { name:, fiscal_information:, owner: lead_form.responsible }
+    attrs = {name:, fiscal_information:, owner: lead_form.responsible}
     attrs[:employee_range] = employee_range if employee_range.present? && Company::EMPLOYEE_RANGES.include?(employee_range)
     workspace.companies.create!(attrs)
   end
@@ -241,10 +241,10 @@ class LeadFormSubmissionProcessor
     if existing
       existing.update!(company: company) if existing.company_id != company.id
       advance_stage!(existing, pipeline)
-      return [ existing, false ]
+      return [existing, false]
     end
 
-    [ create_deal!(person:, company:, pipeline:), true ]
+    [create_deal!(person:, company:, pipeline:), true]
   end
 
   def advance_stage!(deal, pipeline)
@@ -260,16 +260,16 @@ class LeadFormSubmissionProcessor
   def create_deal!(person:, company:, pipeline: nil)
     pipeline ||= lead_form.resolve_pipeline(help_type: params["help_type"])
     stage = lead_form.resolve_stage(for_pipeline: pipeline)
-    deal_name = [ person.display_name, lead_form.name ].compact.join(" — ")
-    deal_name = "#{deal_name} (#{lead_form.help_type_label(params['help_type'])})" if params["help_type"].present?
+    deal_name = [person.display_name, lead_form.name].compact.join(" — ")
+    deal_name = "#{deal_name} (#{lead_form.help_type_label(params["help_type"])})" if params["help_type"].present?
     workspace.deals.create!(
       name: deal_name,
       company: company,
       pipeline: pipeline,
       pipeline_stage: stage,
       owner: lead_form.responsible,
-      contacts: [ person ],
-      tasks: [ Task.new(first_task_attributes) ]
+      contacts: [person],
+      tasks: [Task.new(first_task_attributes)]
     )
   end
 
@@ -331,7 +331,7 @@ class LeadFormSubmissionProcessor
         )
       ).merge(
         "last_submitted_at" => now,
-        "submissions_at" => [ now ],
+        "submissions_at" => [now],
         "capture_destination" => capture_destination
       )
     )
@@ -352,7 +352,7 @@ class LeadFormSubmissionProcessor
       request: request,
       lead_form: lead_form,
       privacy_policy_version: submission.privacy_policy_version,
-      extra_metadata: { "lead_submission_id" => submission.id }
+      extra_metadata: {"lead_submission_id" => submission.id}
     )
   end
 
@@ -368,7 +368,7 @@ class LeadFormSubmissionProcessor
       lead_submission: submission,
       description: "Lead form «#{lead_form.name}»",
       occurred_at: Time.current,
-      metadata: { "lead_form_id" => lead_form.id, "lead_form_slug" => lead_form.slug }
+      metadata: {"lead_form_id" => lead_form.id, "lead_form_slug" => lead_form.slug}
     )
   end
 
@@ -390,7 +390,7 @@ class LeadFormSubmissionProcessor
 
   def submission_data
     consent_keys = LeadForm.consent_field_keys_for(workspace)
-    boolean_consent_keys = consent_keys + [ Marketing::ConsentService::SUBSCRIBE_ALL_FIELD_KEY ]
+    boolean_consent_keys = consent_keys + [Marketing::ConsentService::SUBSCRIBE_ALL_FIELD_KEY]
     excluded = LeadForm::METADATA_FIELDS + [
       LeadForm::HONEYPOT_FIELD, LeadForm::TIMESTAMP_FIELD, "gdpr_consent", "_submission_key", "privacy_policy_hash",
       "subscribe_all_label"

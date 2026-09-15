@@ -10,6 +10,6 @@ class Note < ApplicationRecord
   private
 
   def track_on_record
-    notable.track_activity("note_added", user: user, metadata: { note_id: id, title: title }) if notable.respond_to?(:track_activity)
+    notable.track_activity("note_added", user: user, metadata: {note_id: id, title: title}) if notable.respond_to?(:track_activity)
   end
 end

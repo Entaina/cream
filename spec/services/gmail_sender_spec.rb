@@ -23,7 +23,7 @@ RSpec.describe GmailSender do
   end
 
   it "sends a message through the Gmail API and returns ids" do
-    allow(http_double).to receive(:request).and_return(success({ id: "gm1", threadId: "gt1" }))
+    allow(http_double).to receive(:request).and_return(success({id: "gm1", threadId: "gt1"}))
 
     result = described_class.new(connection).send_email(to: "x@y.com", subject: "Hi", html: "<p>hi</p>")
 
@@ -33,7 +33,7 @@ RSpec.describe GmailSender do
   end
 
   it "uses a provided RFC822 Message-ID" do
-    allow(http_double).to receive(:request).and_return(success({ id: "gm1", threadId: "gt1" }))
+    allow(http_double).to receive(:request).and_return(success({id: "gm1", threadId: "gt1"}))
 
     result = described_class.new(connection).send_email(
       to: "x@y.com", subject: "Hi", html: "<p>hi</p>", rfc822_message_id: "<fixed@cream.test>"
@@ -44,9 +44,9 @@ RSpec.describe GmailSender do
 
   it "refreshes an expired access token before sending" do
     connection.update!(expires_at: 1.hour.ago)
-    refresh = success({ access_token: "new-token", expires_in: 3600 }.to_json)
+    refresh = success({access_token: "new-token", expires_in: 3600}.to_json)
 
-    allow(http_double).to receive(:request).and_return(refresh, success({ id: "gm1", threadId: "gt1" }))
+    allow(http_double).to receive(:request).and_return(refresh, success({id: "gm1", threadId: "gt1"}))
 
     described_class.new(connection).send_email(to: "x@y.com", subject: "Hi", html: "<p>hi</p>")
 
@@ -73,10 +73,10 @@ RSpec.describe GmailSender do
     captured_body = nil
     allow(http_double).to receive(:request) do |request|
       captured_body = JSON.parse(request.body)
-      success({ id: "gm1", threadId: "gt1" })
+      success({id: "gm1", threadId: "gt1"})
     end
 
-    attachments = [ { filename: "doc.pdf", content_type: "application/pdf", content: "%PDF-1.4" } ]
+    attachments = [{filename: "doc.pdf", content_type: "application/pdf", content: "%PDF-1.4"}]
     described_class.new(connection).send_email(
       to: "x@y.com", subject: "Hi", html: "<p>hi</p>", attachments: attachments
     )

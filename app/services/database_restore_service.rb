@@ -14,7 +14,7 @@ class DatabaseRestoreService
   def call(file_name: nil)
     backup = file_name.present? ? find_by_name!(file_name) : latest_backup!
 
-    Tempfile.create([ "cream_restore_", ".dump" ]) do |tempfile|
+    Tempfile.create(["cream_restore_", ".dump"]) do |tempfile|
       @storage.download(backup.id, tempfile.path)
       run_pg_restore(tempfile.path)
     end
@@ -44,7 +44,7 @@ class DatabaseRestoreService
 
   def run_pg_restore(input_path)
     configuration = @db_config.configuration_hash
-    env = { "PGPASSWORD" => configuration[:password].to_s }
+    env = {"PGPASSWORD" => configuration[:password].to_s}
     command = [
       "pg_restore",
       "--clean",

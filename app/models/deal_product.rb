@@ -9,8 +9,8 @@ class DealProduct < ApplicationRecord
   # and created on the fly when it doesn't exist yet.
   attr_accessor :edition_name
 
-  validates :quantity, numericality: { only_integer: true, greater_than: 0 }
-  validates :unit_price, numericality: { greater_than_or_equal_to: 0 }
+  validates :quantity, numericality: {only_integer: true, greater_than: 0}
+  validates :unit_price, numericality: {greater_than_or_equal_to: 0}
   validate :edition_belongs_to_product
 
   # On creation the unit price is taken from the catalogue, unless one was
@@ -75,7 +75,7 @@ class DealProduct < ApplicationRecord
       quantity: quantity,
       unit_price: unit_price.to_s
     }
-    meta[:changes] = changes.transform_values { |(from, to)| [ from.to_s, to.to_s ] } if changes
+    meta[:changes] = changes.transform_values { |(from, to)| [from.to_s, to.to_s] } if changes
     meta
   end
 end

@@ -22,11 +22,11 @@ module LeadFormTemplates
           "requires_collects_company" => with_company_names.include?(field.name) && !base_names.include?(field.name),
           "requires_open_editions" => field.name == "edition_id" && !with_company_names.include?("edition_id"),
           "requires_product" => field.name == "product_id" && !with_company_names.include?("product_id"),
-          "dynamic_allowed_values" => (field.name == "edition_id" ? "open_editions" : nil)
+          "dynamic_allowed_values" => ((field.name == "edition_id") ? "open_editions" : nil)
         )
       end
 
-      { "fields" => fields }
+      {"fields" => fields}
     end
 
     private
@@ -40,7 +40,7 @@ module LeadFormTemplates
         template: @template,
         lead_form: stub_lead_form(collects_company: collects_company),
         product: with_product ? stub_product : nil,
-        open_editions: with_product ? [ stub_edition ] : []
+        open_editions: with_product ? [stub_edition] : []
       )
       HtmlSchema.parse(html).fields
     end

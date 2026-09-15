@@ -7,15 +7,15 @@ RSpec.describe Ai::BriefingNextAction do
         {
           id: 10,
           has_scheduled_next_action: true,
-          next_action: { id: 501, title: "Llamada", due_on: "2026-08-17", status: "scheduled" }
+          next_action: {id: 501, title: "Llamada", due_on: "2026-08-17", status: "scheduled"}
         }
       ]
     end
 
     it "drops parallel action items for deals with a scheduled next action" do
       items = [
-        { "priority" => "urgent", "text" => "Reactivar Delta Furniture hoy", "record_type" => "Deal", "record_id" => 10 },
-        { "priority" => "important", "text" => "Revisar forecast", "record_type" => nil, "record_id" => nil }
+        {"priority" => "urgent", "text" => "Reactivar Delta Furniture hoy", "record_type" => "Deal", "record_id" => 10},
+        {"priority" => "important", "text" => "Revisar forecast", "record_type" => nil, "record_id" => nil}
       ]
 
       filtered = described_class.filter_items(items, open_deals)
@@ -26,7 +26,7 @@ RSpec.describe Ai::BriefingNextAction do
 
     it "keeps reschedule suggestions for protected deals" do
       items = [
-        { "priority" => "important", "text" => "Adelantar la llamada con Delta Furniture", "record_type" => "Deal", "record_id" => 10 }
+        {"priority" => "important", "text" => "Adelantar la llamada con Delta Furniture", "record_type" => "Deal", "record_id" => 10}
       ]
 
       filtered = described_class.filter_items(items, open_deals)
@@ -36,7 +36,7 @@ RSpec.describe Ai::BriefingNextAction do
 
     it "drops task items tied to the scheduled next action" do
       items = [
-        { "priority" => "urgent", "text" => "Hacer seguimiento hoy", "record_type" => "Task", "record_id" => 501 }
+        {"priority" => "urgent", "text" => "Hacer seguimiento hoy", "record_type" => "Task", "record_id" => 501}
       ]
 
       filtered = described_class.filter_items(items, open_deals)

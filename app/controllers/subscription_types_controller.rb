@@ -1,5 +1,6 @@
 class SubscriptionTypesController < ApplicationController
   include RequiresFeature
+
   requires_feature :marketing_consent
   before_action :set_subscription_type, only: %i[edit update destroy]
 

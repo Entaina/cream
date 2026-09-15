@@ -20,7 +20,7 @@ RSpec.describe "Record AI", type: :request do
       allow(client).to receive(:chat).and_return({
         summary: "Active contact",
         risks: [],
-        next_steps: [ "Follow up" ],
+        next_steps: ["Follow up"],
         missing_data: []
       }.to_json)
 
@@ -43,7 +43,7 @@ RSpec.describe "Record AI", type: :request do
     it "creates a task and logs AI activity" do
       expect {
         post record_ai_create_task_path(record_type: "people", record_id: person.id),
-          params: { title: "Call Alex", due_on: Date.current + 2, reason: "Suggested by AI" },
+          params: {title: "Call Alex", due_on: Date.current + 2, reason: "Suggested by AI"},
           as: :json
       }.to change { person.tasks.count }.by(1)
 
@@ -54,10 +54,10 @@ RSpec.describe "Record AI", type: :request do
 
   describe "POST /ai/people/:id/draft_email" do
     it "returns a draft subject and body" do
-      allow(client).to receive(:chat).and_return({ subject: "Hello", body: "Checking in" }.to_json)
+      allow(client).to receive(:chat).and_return({subject: "Hello", body: "Checking in"}.to_json)
 
       post record_ai_draft_email_path(record_type: "people", record_id: person.id),
-        params: { goal: "Follow up" },
+        params: {goal: "Follow up"},
         as: :json
 
       expect(response).to have_http_status(:success)

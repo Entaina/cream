@@ -28,7 +28,7 @@ RSpec.describe "ApiTokens", type: :request do
   describe "POST /api_tokens" do
     it "creates a token" do
       expect {
-        post api_tokens_path, params: { name: "My client" }
+        post api_tokens_path, params: {name: "My client"}
       }.to change { user.api_tokens.count }.by(1)
 
       expect(response).to redirect_to(api_tokens_path)

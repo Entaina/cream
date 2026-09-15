@@ -16,7 +16,7 @@ RSpec.describe "AiSearch", type: :request do
     person = create_person!(workspace, company: companies(:acme))
     person.tasks.create!(title: "Late", due_on: Date.current - 1, workspace: workspace, user: user, assignee: user)
 
-    get ai_search_path, params: { q: "overdue tasks" }
+    get ai_search_path, params: {q: "overdue tasks"}
 
     expect(response).to have_http_status(:success)
     expect(response.body).to include("Late")

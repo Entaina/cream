@@ -78,7 +78,7 @@ module LeadFormTemplates
       checkbox_id = "lead_#{name}"
       required_attr = required ? ' required="required"' : ""
       submitted = submitted_value(name)
-      checked_attr = submitted.present? && submitted.to_s == value.to_s ? ' checked="checked"' : ""
+      checked_attr = (submitted.present? && submitted.to_s == value.to_s) ? ' checked="checked"' : ""
       <<~HTML.squish
         <label class="flex items-start gap-2.5 text-sm text-ink-soft cursor-pointer">
           <input type="hidden" name="lead[#{name}]" value="#{unchecked_value}" autocomplete="off" />
@@ -96,7 +96,7 @@ module LeadFormTemplates
         checked_attr = checked ? ' checked="checked"' : ""
         <<~HTML
           <label class="cursor-pointer">
-            <input type="radio" name="lead[#{name}]" value="#{edition.id}" required="#{required ? "required" : nil}" class="peer sr-only"#{checked_attr} />
+            <input type="radio" name="lead[#{name}]" value="#{edition.id}" required="#{"required" if required}" class="peer sr-only"#{checked_attr} />
             <span class="inline-flex items-center rounded-lg px-4 py-2 text-sm font-medium ring-1 ring-line-strong bg-canvas-raised text-ink-soft transition-colors peer-checked:bg-accent peer-checked:text-on-dark peer-checked:ring-accent hover:bg-canvas-soft peer-checked:hover:bg-accent-dark">
               #{ERB::Util.html_escape(edition.display_name)}
             </span>
@@ -132,13 +132,13 @@ module LeadFormTemplates
       lines << hidden_input("lead_form_slug", lead_form.slug)
       lines << hidden_input("lead_form_name", lead_form.name)
       lines << hidden_input("product_id", product.id) if product&.persisted?
-      lines << hidden_input("source_page", @params[:source_page], data: { lead_form_target: "sourcePage" })
-      lines << hidden_input("referrer", nil, data: { lead_form_target: "referrer" })
+      lines << hidden_input("source_page", @params[:source_page], data: {lead_form_target: "sourcePage"})
+      lines << hidden_input("referrer", nil, data: {lead_form_target: "referrer"})
       %w[utm_source utm_medium utm_campaign utm_term utm_content].each do |key|
-        lines << hidden_input(key, @params[key], data: { lead_form_target: key.camelize(:lower) })
+        lines << hidden_input(key, @params[key], data: {lead_form_target: key.camelize(:lower)})
       end
       lead_form.hidden_field_keys.each do |key|
-        lines << hidden_input(key, @params[key], data: { lead_form_param: key })
+        lines << hidden_input(key, @params[key], data: {lead_form_param: key})
       end
       lines.join
     end
@@ -181,9 +181,9 @@ module LeadFormTemplates
           label, value = entry.split("|", 2).map(&:strip)
           next if label.blank? || value.blank?
 
-          [ label, value ]
+          [label, value]
         else
-          [ entry, entry ]
+          [entry, entry]
         end
       end
     end
@@ -220,7 +220,7 @@ module LeadFormTemplates
       html = ""
       html << %(<option value="">#{ERB::Util.html_escape(blank)}</option>) if blank.present?
       pairs.each do |label, value|
-        selected_attr = selected.to_s == value.to_s ? ' selected="selected"' : ""
+        selected_attr = (selected.to_s == value.to_s) ? ' selected="selected"' : ""
         html << %(<option value="#{ERB::Util.html_escape(value)}"#{selected_attr}>#{ERB::Util.html_escape(label)}</option>)
       end
       html
@@ -228,7 +228,7 @@ module LeadFormTemplates
 
     def collection_options(collection_key, selected:)
       resolve_collection(collection_key).map do |item|
-        selected_attr = selected.to_s == item.id.to_s ? ' selected="selected"' : ""
+        selected_attr = (selected.to_s == item.id.to_s) ? ' selected="selected"' : ""
         %(<option value="#{item.id}"#{selected_attr}>#{ERB::Util.html_escape(item.display_name)}</option>)
       end.join
     end

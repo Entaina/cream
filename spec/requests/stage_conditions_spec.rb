@@ -11,8 +11,8 @@ RSpec.describe "StageConditions", type: :request do
   before { sign_in_as(member) }
 
   def create_condition(**attrs)
-    workspace.stage_conditions.create!({ pipeline_stage: stage, field: "value",
-      operator: "gt", compare_value: "1000" }.merge(attrs))
+    workspace.stage_conditions.create!({pipeline_stage: stage, field: "value",
+                                        operator: "gt", compare_value: "1000"}.merge(attrs))
   end
 
   it "lists the conditions of a stage" do
@@ -25,7 +25,7 @@ RSpec.describe "StageConditions", type: :request do
   it "creates a condition" do
     expect {
       post pipeline_stage_stage_conditions_path(stage), params: {
-        stage_condition: { field: "value", operator: "gt", compare_value: "1000", active: "1" }
+        stage_condition: {field: "value", operator: "gt", compare_value: "1000", active: "1"}
       }
     }.to change(StageCondition, :count).by(1)
 
@@ -36,14 +36,14 @@ RSpec.describe "StageConditions", type: :request do
 
   it "rejects an invalid condition" do
     post pipeline_stage_stage_conditions_path(stage), params: {
-      stage_condition: { field: "value", operator: "gt", compare_value: "" }
+      stage_condition: {field: "value", operator: "gt", compare_value: ""}
     }
     expect(response).to have_http_status(:unprocessable_content)
   end
 
   it "updates and destroys a condition" do
     condition = create_condition
-    patch stage_condition_path(condition), params: { stage_condition: { compare_value: "2000" } }
+    patch stage_condition_path(condition), params: {stage_condition: {compare_value: "2000"}}
     expect(condition.reload.compare_value).to eq("2000")
 
     expect { delete stage_condition_path(condition) }.to change(StageCondition, :count).by(-1)

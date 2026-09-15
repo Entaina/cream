@@ -23,7 +23,7 @@ RSpec.describe TurnstileVerifier do
     end
 
     it "is true when Cloudflare confirms the token" do
-      stub_cloudflare_response({ "success" => true })
+      stub_cloudflare_response({"success" => true})
 
       expect(described_class.valid?(token: "ok-token", ip: "203.0.113.1")).to be(true)
       expect(Net::HTTP).to have_received(:post_form).with(
@@ -33,7 +33,7 @@ RSpec.describe TurnstileVerifier do
     end
 
     it "is false when Cloudflare rejects the token" do
-      stub_cloudflare_response({ "success" => false })
+      stub_cloudflare_response({"success" => false})
 
       expect(described_class.valid?(token: "bad-token")).to be(false)
     end

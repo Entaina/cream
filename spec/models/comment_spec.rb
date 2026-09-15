@@ -7,7 +7,7 @@ RSpec.describe Comment, type: :model do
     workspace = workspaces(:one)
     person = create_person!(workspace)
     author = users(:one)
-    member = users(:two)
+    users(:two)
 
     expect {
       Comment.create!(

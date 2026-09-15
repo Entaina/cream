@@ -26,7 +26,7 @@ class ListFilters
     return scope if industry.blank?
 
     if industry.to_s == NONE
-      scope.where(industry: [ nil, "" ])
+      scope.where(industry: [nil, ""])
     else
       scope.where(industry: industry)
     end

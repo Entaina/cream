@@ -8,13 +8,13 @@ RSpec.describe "Api::V1::DealNotes", type: :request do
   let!(:pipeline) { Pipeline.create_default!(workspace) }
   let(:deal) { create_deal!(workspace, pipeline: pipeline) }
   let(:token) { user.api_tokens.create!(name: "Test", workspace: workspace) }
-  let(:headers) { { "Authorization" => "Bearer #{token.plaintext_token}" } }
+  let(:headers) { {"Authorization" => "Bearer #{token.plaintext_token}"} }
 
   describe "POST /api/v1/deals/:deal_id/notes" do
     it "creates a note on an existing deal" do
       expect {
         post "/api/v1/deals/#{deal.id}/notes",
-          params: { note: { title: "Follow-up", body: "Call next week" } },
+          params: {note: {title: "Follow-up", body: "Call next week"}},
           headers: headers
       }.to change(Note, :count).by(1)
 
@@ -33,7 +33,7 @@ RSpec.describe "Api::V1::DealNotes", type: :request do
     it "returns validation errors for an invalid note" do
       expect {
         post "/api/v1/deals/#{deal.id}/notes",
-          params: { note: { body: "" } },
+          params: {note: {body: ""}},
           headers: headers
       }.not_to change(Note, :count)
 
@@ -46,7 +46,7 @@ RSpec.describe "Api::V1::DealNotes", type: :request do
 
       expect {
         post "/api/v1/deals/#{foreign_deal.id}/notes",
-          params: { note: { body: "Nope" } },
+          params: {note: {body: "Nope"}},
           headers: headers
       }.not_to change(Note, :count)
 

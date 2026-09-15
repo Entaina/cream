@@ -4,7 +4,7 @@ namespace :cream do
     task run: :environment do
       key_path = ENV["GOOGLE_DRIVE_SERVICE_ACCOUNT_KEY_PATH"]
       unless key_path.present? && File.file?(key_path) &&
-             ENV["GOOGLE_DRIVE_BACKUP_FOLDER_ID"].present?
+          ENV["GOOGLE_DRIVE_BACKUP_FOLDER_ID"].present?
         abort "Google Drive backup is not configured (GOOGLE_DRIVE_SERVICE_ACCOUNT_KEY_PATH must point to an existing file and GOOGLE_DRIVE_BACKUP_FOLDER_ID is required)."
       end
 
@@ -20,10 +20,10 @@ namespace :cream do
     end
 
     desc "Restore a database backup from Google Drive (latest for this env, or a specific file name)"
-    task :restore, [ :file_name ] => :environment do |_task, args|
+    task :restore, [:file_name] => :environment do |_task, args|
       key_path = ENV["GOOGLE_DRIVE_SERVICE_ACCOUNT_KEY_PATH"]
       unless key_path.present? && File.file?(key_path) &&
-             ENV["GOOGLE_DRIVE_BACKUP_FOLDER_ID"].present?
+          ENV["GOOGLE_DRIVE_BACKUP_FOLDER_ID"].present?
         abort "Google Drive backup is not configured (GOOGLE_DRIVE_SERVICE_ACCOUNT_KEY_PATH must point to an existing file and GOOGLE_DRIVE_BACKUP_FOLDER_ID is required)."
       end
 

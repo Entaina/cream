@@ -21,8 +21,8 @@ class EmailMessage < ApplicationRecord
   has_many_attached :attachments
 
   validates :to_address, :subject, :body, presence: true
-  validates :record_type, inclusion: { in: RECORD_TYPES }
-  validates :direction, inclusion: { in: DIRECTIONS }
+  validates :record_type, inclusion: {in: RECORD_TYPES}
+  validates :direction, inclusion: {in: DIRECTIONS}
   validate :to_address_format
   validate :attachments_within_limits
 
@@ -78,9 +78,9 @@ class EmailMessage < ApplicationRecord
     return if inbound?
 
     update!(opened_at: Time.current, status: "opened")
-    record.track_activity("email_opened", user: user, metadata: { subject: subject, to: to_address }) if record.respond_to?(:track_activity)
+    record.track_activity("email_opened", user: user, metadata: {subject: subject, to: to_address}) if record.respond_to?(:track_activity)
     person = workspace.people.with_email(to_address).first
-    Marketing::ScoringEngine.apply_event!(person: person, event: "email_opened", metadata: { "email_message_id" => id }) if person
+    Marketing::ScoringEngine.apply_event!(person: person, event: "email_opened", metadata: {"email_message_id" => id}) if person
     NotificationService.notify_email_opened(message: self) if CreamFeatures.enabled?(:notifications)
   end
 
@@ -92,7 +92,7 @@ class EmailMessage < ApplicationRecord
     record.track_activity(
       "email_sent",
       user: user,
-      metadata: { subject: subject, to: to_address, email_message_id: id }
+      metadata: {subject: subject, to: to_address, email_message_id: id}
     )
     Ai::AutomationHooks.after_email_sent(message: self)
   end
@@ -102,9 +102,9 @@ class EmailMessage < ApplicationRecord
     return if inbound?
 
     increment!(:clicks_count)
-    record.track_activity("email_clicked", user: user, metadata: { subject: subject }) if record.respond_to?(:track_activity)
+    record.track_activity("email_clicked", user: user, metadata: {subject: subject}) if record.respond_to?(:track_activity)
     person = workspace.people.with_email(to_address).first
-    Marketing::ScoringEngine.apply_event!(person: person, event: "email_clicked", metadata: { "email_message_id" => id }) if person
+    Marketing::ScoringEngine.apply_event!(person: person, event: "email_clicked", metadata: {"email_message_id" => id}) if person
     Marketing::JourneyTrigger.enqueue_email_clicked!(person: person) if person
   end
 
@@ -133,7 +133,7 @@ class EmailMessage < ApplicationRecord
   end
 
   def sent_activity_recorded?
-    record.activities.exists?([ "action = ? AND metadata->>'email_message_id' = ?", "email_sent", id.to_s ])
+    record.activities.exists?(["action = ? AND metadata->>'email_message_id' = ?", "email_sent", id.to_s])
   end
 
   def attachments_within_limits

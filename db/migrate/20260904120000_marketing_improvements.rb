@@ -9,7 +9,7 @@ class MarketingImprovements < ActiveRecord::Migration[8.1]
 
     add_column :people, :lead_score_decayed_at, :datetime
 
-    add_index :journey_enrollments, [ :state, :next_run_at ], name: "idx_journey_enrollments_due"
+    add_index :journey_enrollments, [:state, :next_run_at], name: "idx_journey_enrollments_due"
     add_index :email_events, :occurred_at
   end
 end

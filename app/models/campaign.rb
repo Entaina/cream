@@ -11,8 +11,8 @@ class Campaign < ApplicationRecord
   has_many :deals, dependent: :nullify
 
   validates :name, presence: true
-  validates :status, inclusion: { in: STATUSES }
-  validates :email_body_editor, inclusion: { in: EmailTemplate::BODY_EDITORS }
+  validates :status, inclusion: {in: STATUSES}
+  validates :email_body_editor, inclusion: {in: EmailTemplate::BODY_EDITORS}
 
   scope :ordered, -> { order(created_at: :desc, id: :desc) }
 

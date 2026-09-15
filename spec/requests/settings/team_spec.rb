@@ -10,7 +10,7 @@ RSpec.describe "Settings::Team", type: :request do
 
   before do
     sign_in_as(admin)
-    patch switch_workspace_path, params: { workspace_id: workspace.id }
+    patch switch_workspace_path, params: {workspace_id: workspace.id}
   end
 
   describe "GET /settings/team" do
@@ -32,7 +32,7 @@ RSpec.describe "Settings::Team", type: :request do
 
     it "hides management controls from members" do
       sign_in_as(member)
-      patch switch_workspace_path, params: { workspace_id: workspace.id }
+      patch switch_workspace_path, params: {workspace_id: workspace.id}
 
       get settings_team_path
 
@@ -45,7 +45,7 @@ RSpec.describe "Settings::Team", type: :request do
     end
 
     it "filters members by name or email" do
-      get settings_team_path, params: { q: "User One" }
+      get settings_team_path, params: {q: "User One"}
 
       expect(response).to have_http_status(:success)
       expect(response.body).to include(admin.name)
@@ -58,7 +58,7 @@ RSpec.describe "Settings::Team", type: :request do
         workspace.memberships.create!(user: user, role: "salesperson")
       end
 
-      get settings_team_path, params: { page: 2 }
+      get settings_team_path, params: {page: 2}
 
       expect(response).to have_http_status(:success)
       expect(response.body).to include("Página 2 de")
@@ -74,7 +74,7 @@ RSpec.describe "Settings::Team", type: :request do
 
     it "hides Settings from non-admins" do
       sign_in_as(member)
-      patch switch_workspace_path, params: { workspace_id: workspace.id }
+      patch switch_workspace_path, params: {workspace_id: workspace.id}
 
       get root_path
 

@@ -7,11 +7,11 @@ RSpec.describe "Api::V1::Tasks", type: :request do
   let(:workspace) { workspaces(:one) }
   let(:company) { create_company!(workspace) }
   let(:token) { user.api_tokens.create!(name: "Test", workspace: workspace) }
-  let(:headers) { { "Authorization" => "Bearer #{token.plaintext_token}" } }
+  let(:headers) { {"Authorization" => "Bearer #{token.plaintext_token}"} }
 
   def create_task!(**attrs)
     workspace.tasks.create!(
-      { title: "Follow up", user: user, assignee: user, taskable: company }.merge(attrs)
+      {title: "Follow up", user: user, assignee: user, taskable: company}.merge(attrs)
     )
   end
 
@@ -76,7 +76,7 @@ RSpec.describe "Api::V1::Tasks", type: :request do
 
     it "creates a completed task without side effects" do
       post "/api/v1/tasks",
-        params: { task: { title: "Done on create", completed: true } },
+        params: {task: {title: "Done on create", completed: true}},
         headers: headers
 
       expect(response).to have_http_status(:created)
@@ -92,7 +92,7 @@ RSpec.describe "Api::V1::Tasks", type: :request do
       task = create_task!
 
       patch "/api/v1/tasks/#{task.id}",
-        params: { task: { title: "Updated title" } },
+        params: {task: {title: "Updated title"}},
         headers: headers
 
       expect(response).to have_http_status(:success)
@@ -106,7 +106,7 @@ RSpec.describe "Api::V1::Tasks", type: :request do
       task = create_task!
 
       expect {
-        patch "/api/v1/tasks/#{task.id}", params: { task: { completed: true } }, headers: headers
+        patch "/api/v1/tasks/#{task.id}", params: {task: {completed: true}}, headers: headers
       }.to change { company.activities.where(action: "task_completed").count }.by(1)
 
       body = response.parsed_body
@@ -117,7 +117,7 @@ RSpec.describe "Api::V1::Tasks", type: :request do
     it "reopens a completed task" do
       task = create_task!(completed_at: 1.hour.ago)
 
-      patch "/api/v1/tasks/#{task.id}", params: { task: { completed: false } }, headers: headers
+      patch "/api/v1/tasks/#{task.id}", params: {task: {completed: false}}, headers: headers
 
       expect(response).to have_http_status(:success)
       expect(response.parsed_body["completed"]).to be(false)

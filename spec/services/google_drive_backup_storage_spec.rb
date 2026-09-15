@@ -18,7 +18,7 @@ RSpec.describe GoogleDriveBackupStorage do
 
       expect(result).to eq(uploaded)
       expect(drive_service).to have_received(:create_file).with(
-        an_object_having_attributes(name: "cream_backup_test_2026-07-02.dump", parents: [ "folder123" ]),
+        an_object_having_attributes(name: "cream_backup_test_2026-07-02.dump", parents: ["folder123"]),
         supports_all_drives: true,
         upload_source: "/tmp/backup.dump",
         content_type: "application/octet-stream"
@@ -40,7 +40,7 @@ RSpec.describe GoogleDriveBackupStorage do
         name: "notes.txt",
         created_time: Time.zone.parse("2026-06-01 02:00:00")
       )
-      response = instance_double(Google::Apis::DriveV3::FileList, files: [ backup, other ])
+      response = instance_double(Google::Apis::DriveV3::FileList, files: [backup, other])
       allow(drive_service).to receive(:list_files).and_return(response)
 
       files = storage.list_backups
@@ -93,7 +93,7 @@ RSpec.describe GoogleDriveBackupStorage do
         name: "cream_backup_production_2026-07-01.dump",
         created_time: Time.zone.parse("2026-07-01 02:00:00")
       )
-      response = instance_double(Google::Apis::DriveV3::FileList, files: [ backup ])
+      response = instance_double(Google::Apis::DriveV3::FileList, files: [backup])
       allow(drive_service).to receive(:list_files).and_return(response)
 
       result = storage.find_by_name("cream_backup_production_2026-07-01.dump")

@@ -6,7 +6,7 @@ module Api
 
         def feature_unavailable!(flag)
           label = CreamFeatures.entry(flag).label
-          render json: { error: "#{label} is not available yet." }, status: :not_found
+          render json: {error: "#{label} is not available yet."}, status: :not_found
         end
 
         def list_limit

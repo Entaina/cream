@@ -17,8 +17,8 @@ class SavedView < ApplicationRecord
   belongs_to :user
 
   validates :name, presence: true
-  validates :record_type, inclusion: { in: RECORD_TYPES }
-  validates :direction, inclusion: { in: %w[asc desc] }
+  validates :record_type, inclusion: {in: RECORD_TYPES}
+  validates :direction, inclusion: {in: %w[asc desc]}
 
   scope :for_type, ->(record_type) { where(record_type: record_type) }
   scope :ordered, -> { order(:position, :name) }
@@ -55,7 +55,7 @@ class SavedView < ApplicationRecord
   end
 
   def to_query_params
-    { view: id }
+    {view: id}
   end
 
   def records_path(helpers = Rails.application.routes.url_helpers, surface: nil)

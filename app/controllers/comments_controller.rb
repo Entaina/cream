@@ -1,5 +1,6 @@
 class CommentsController < ApplicationController
   include RequiresFeature
+
   requires_feature :comments
   def create
     commentable = find_commentable
@@ -11,7 +12,7 @@ class CommentsController < ApplicationController
         WebhookDispatcher.dispatch(
           workspace: current_workspace,
           event: "comment.created",
-          payload: { comment_id: @comment.id, record_type: commentable.class.name, record_id: commentable.id }
+          payload: {comment_id: @comment.id, record_type: commentable.class.name, record_id: commentable.id}
         )
       end
       redirect_to polymorphic_path(commentable), notice: "Comment added."

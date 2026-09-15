@@ -1,286 +1,289 @@
+---
 en:
-  time:
-    formats:
-      default: "%m/%d/%Y %I:%M %p"
-      short: "%b %d, %Y"
-      long: "%A, %B %d, %Y"
-  datetime:
-    distance_in_words:
-      x_seconds:
-        one: "1 second"
-        other: "%{count} seconds"
-      x_minutes:
-        one: "1 minute"
-        other: "%{count} minutes"
-      x_hours:
-        one: "1 hour"
-        other: "%{count} hours"
-      x_days:
-        one: "1 day"
-        other: "%{count} days"
-      x_months:
-        one: "1 month"
-        other: "%{count} months"
-      x_years:
-        one: "1 year"
-        other: "%{count} years"
-      about_x_hours:
-        one: "about 1 hour"
-        other: "about %{count} hours"
-      about_x_months:
-        one: "about 1 month"
-        other: "about %{count} months"
-      over_x_years:
-        one: "over 1 year"
-        other: "over %{count} years"
-      almost_x_years:
-        one: "almost 1 year"
-        other: "almost %{count} years"
-      less_than_x_minutes:
-        one: "less than a minute"
-        other: "less than %{count} minutes"
-      half_a_minute: "half a minute"
-      less_than_x_seconds:
-        one: "less than 1 second"
-        other: "less than %{count} seconds"
-
-  nav:
-    search: "Search..."
-    notifications: "Notifications"
-    menu: "Menu"
-    customize_menu: "Customize menu"
-    sign_out: "Sign out"
-    language: "Language"
-    groups:
-      marketing: "Marketing"
-      settings: "Settings"
-      profile: "My profile"
-    dashboard: "Dashboard"
-    people: "People"
-    companies: "Companies"
-    deals: "Deals"
-    tasks: "Tasks"
-    team: "Team"
-    products: "Products"
-    pipelines: "Pipelines"
-    custom_fields: "Custom fields"
-    profile: "Profile"
-    workspace_settings: "Settings"
-    api_tokens: "API tokens"
-    lists: "My lists"
-    features:
-      reports: "Reports"
-      email_templates: "Templates"
-      gmail_sync: "Gmail"
-      automations: "Automations"
-      alerts: "Alerts"
-      slack_integrations: "Slack"
-      webhooks: "Webhooks"
-      stripe_payments: "Stripe"
-      lead_forms: "Lead forms"
-      calendar_booking: "Bookings"
-      marketing_consent: "Subscriptions"
-      marketing_campaigns: "Campaigns"
-      marketing_segments: "Segments"
-      marketing_attribution: "Attribution"
-      journeys: "Journeys"
-      lead_scoring: "Lead scoring"
-      mql_pool: "MQLs"
-
-  auth:
-    sign_in:
-      title: "Sign in to cream"
-      subtitle: "The CRM your team will love."
-      email: "Email"
-      password: "Password"
-      submit: "Sign in"
-      forgot_password: "Forgot password?"
-      create_account: "Create account"
-      or: "or"
-    registration:
-      title: "Create your account"
-      subtitle: "Start managing relationships in minutes."
-      name: "Name"
-      workspace_name: "Workspace name"
-      password_confirmation: "Confirm password"
-      submit: "Create account"
-      already_have_account: "Already have an account?"
-      sign_in: "Sign in"
-    google: "Continue with Google"
-    password_reset:
-      title: "Forgot your password?"
-      email_placeholder: "Enter your email address"
-      submit: "Email reset instructions"
-      update_title: "Update your password"
-      new_password_placeholder: "Enter new password"
-      confirm_placeholder: "Repeat new password"
-      save: "Save"
-    invitation:
-      accept_title: "Accept invitation"
-      join_workspace: "Join %{workspace}"
-      invited_as: "%{inviter} invited you as a %{role}."
-      signed_in_as: "Signed in as %{email}."
-      accept: "Accept invitation"
-      email_mismatch_html: "You are signed in as <strong>%{current}</strong>, but this invitation was sent to <strong>%{invited}</strong>."
-      sign_out_and_use_invited: "Sign out and use the invited email"
-      existing_account_html: "An account already exists for <strong>%{email}</strong>. Sign in to accept."
-      sign_in_and_accept: "Sign in and accept"
-      create_to_join_html: "Create your account to join <strong>%{workspace}</strong>."
-      create_and_accept: "Create account and accept"
-      already_accepted_title: "Invitation already accepted"
-      already_accepted_body: "This invitation to %{workspace} has already been used."
-      expired_title: "Invitation expired"
-      expired_body: "This invitation to %{workspace} has expired. Ask a workspace admin to send a new one."
-      sign_in: "Sign in"
-    flashes:
-      try_again_later: "Try again later."
-      invalid_credentials: "Try another email address or password."
-      joined_workspace: "You joined %{workspace}."
-      welcome_workspace: "Welcome to %{workspace}!"
-      password_reset_sent: "Password reset instructions sent (if user with that email address exists)."
-      password_reset: "Password has been reset."
-      passwords_did_not_match: "Passwords did not match."
-      password_reset_invalid: "Password reset link is invalid or has expired."
-      not_authorized: "You are not authorized to perform this action."
-      invitation_invalid: "Invitation link is invalid."
-      sign_in_with_invited_email: "Sign in with %{email} to accept this invitation."
-      invitation_accept_failed: "Could not accept invitation."
-
-  profile:
-    title: "Profile"
-    intro_html: "Personal preferences in <strong>%{workspace}</strong>."
-    personal_data: "Personal data"
-    name: "Name"
-    name_hint: "Shown in the sidebar, mentions and team activity."
-    email: "Email"
-    save: "Save"
-    preferences: "Preferences"
-    default_pipeline: "Default pipeline"
-    default_pipeline_hint: "Selected when you sign in and when opening the Gmail add-on."
-    sales_director_briefing: "Show sales director briefing on the dashboard"
-    sales_director_hint_html: "Personal preference in this workspace. The admin must enable it in %{team_link}."
-    sales_director_team: "Team"
-    sales_director_requires_ai: "Requires configuring <code>CREAM_AI_API_KEY</code> on the server."
-    alerts: "Alerts"
-    alerts_intro: "Choose how you receive alerts, form submissions and calendar bookings in this workspace."
-    alert_in_app: "In-app notification (bell)"
-    alert_email: "Email"
-    alerts_channels_hint: "If you disable both channels, you will not receive alerts, form or booking notifications."
-    locale: "Language"
-    locale_hint: "Interface language for Cream."
-    locales:
-      es: "Español"
-      en: "English"
-    flashes:
-      name_updated: "Name updated."
-      preferences_updated: "Preferences updated."
-
-  shared:
-    notes:
-      title: "Notes"
-      title_placeholder: "Note title (optional)"
-      body_placeholder: "Write a note..."
-      add: "Add note"
-      delete_confirm: "Delete this note?"
-      delete: "Delete note"
-    tasks:
-      title: "Tasks"
-      open_count:
-        one: "(%{count} open)"
-        other: "(%{count} open)"
-      placeholder: "Add a task..."
-      add: "Add"
-      edit: "Edit task"
-      delete: "Delete task"
-      delete_confirm: "Delete this task?"
-      edit_title: "Edit task"
-      title_label: "Title"
-      due_date: "Due date"
-      assignee: "Assignee"
-      unassigned: "Unassigned"
-      cancel: "Cancel"
-      save: "Save"
-    comments:
-      title: "Comments"
-      placeholder: "Add a comment... use @name to mention teammates"
-      add: "Add comment"
-      delete: "Delete comment"
-      delete_confirm: "Delete this comment?"
-    attachments:
-      title: "Attachments"
-      upload: "Upload"
-      remove_confirm: "Remove this file?"
-    timeline:
-      title: "Activity"
-      empty: "No activity yet."
-      ago: "%{time} ago"
-    email:
-      title: "Send email"
-      insert_template: "Insert template…"
-      no_templates: "No templates available"
-      create_templates_html: "%{link} to reuse when composing emails."
-      create_templates_link: "Create templates"
-      to: "To"
-      subject: "Subject"
-      body_placeholder: "Message body..."
-      attachments: "Attachments"
-      attachments_hint: "Uncheck any you do not want to send."
-      send_later: "Send later"
-      follow_up: "Follow up"
-      follow_up_options:
-        none: "No reminder"
-        two_days: "in 2 days"
-        three_days: "in 3 days"
-        one_week: "in 1 week"
-        two_weeks: "in 2 weeks"
-      send: "Send email"
-    pagination:
-      aria_label: "Pagination"
-      range_html: "<span class=\"font-medium text-ink\">%{from}</span>–<span class=\"font-medium text-ink\">%{to}</span> of <span class=\"font-medium text-ink\">%{count}</span>"
-      previous: "Previous"
-      next: "Next"
-      page_of: "Page %{page} of %{pages}"
-    record_picker:
-      search_placeholder: "Type to search…"
-      no_results: "No results"
-      create: '+ Create "%{name}"'
-    someone: "Someone"
-    empty_value: "—"
-
-  editions:
-    from: "From %{date}"
-    until: "Until %{date}"
-
   activities:
-    created: "%{actor} created this record"
-    updated: "%{actor} updated %{fields}"
-    updated_record: "the record"
-    note_added: "%{actor} added a note"
+    ai_task_created: '%{actor} created the AI-suggested task "%{title}"'
+    attachment_added: "%{actor} attached %{filename}"
     comment_added: "%{actor} added a comment"
-    attachment_added: '%{actor} attached %{filename}'
-    email_opened: '%{to} opened "%{subject}"'
-    email_sent: '%{actor} sent "%{subject}" to %{to}'
-    email_clicked: 'Link clicked in "%{subject}"'
-    email_replied: '%{from} replied to "%{subject}"'
-    task_completed: '%{actor} completed the task "%{title}"'
-    stage_changed: "%{actor} moved the deal from %{from} to %{to}"
-    pipeline_changed: "%{actor} moved the deal to the %{to} pipeline"
     contact_added: "%{actor} added %{contact} as a contact"
     contact_removed: "%{actor} removed %{contact} as a contact"
     contacts_updated: "%{actor} updated contacts (%{contact})"
+    created: "%{actor} created this record"
+    email_clicked: Link clicked in "%{subject}"
+    email_opened: '%{to} opened "%{subject}"'
+    email_replied: '%{from} replied to "%{subject}"'
+    email_sent: '%{actor} sent "%{subject}" to %{to}'
+    generic: "%{actor} %{action}"
     merged_companies: "%{actor} merged %{names} into this record"
     merged_people: "%{actor} merged %{names} into this record"
+    note_added: "%{actor} added a note"
+    payment_received: "%{actor} linked a Stripe payment of %{amount}"
+    payment_received_from: " from %{email}"
+    pipeline_changed: "%{actor} moved the deal to the %{to} pipeline"
     product_added: "%{actor} added product line %{product}"
     product_removed: "%{actor} removed product line %{product}"
     product_updated: "%{actor} updated product line %{product}"
     products_updated: "%{actor} updated products (%{product})"
-    ai_task_created: '%{actor} created the AI-suggested task "%{title}"'
-    payment_received: "%{actor} linked a Stripe payment of %{amount}"
-    payment_received_from: " from %{email}"
-    generic: "%{actor} %{action}"
-
+    stage_changed: "%{actor} moved the deal from %{from} to %{to}"
+    task_completed: '%{actor} completed the task "%{title}"'
+    updated: "%{actor} updated %{fields}"
+    updated_record: the record
+  auth:
+    flashes:
+      invalid_credentials: Try another email address or password.
+      invitation_accept_failed: Could not accept invitation.
+      invitation_invalid: Invitation link is invalid.
+      joined_workspace: You joined %{workspace}.
+      not_authorized: You are not authorized to perform this action.
+      password_reset: Password has been reset.
+      password_reset_invalid: Password reset link is invalid or has expired.
+      password_reset_sent: Password reset instructions sent (if user with that email
+        address exists).
+      passwords_did_not_match: Passwords did not match.
+      sign_in_with_invited_email: Sign in with %{email} to accept this invitation.
+      try_again_later: Try again later.
+      welcome_workspace: Welcome to %{workspace}!
+    google: Continue with Google
+    invitation:
+      accept: Accept invitation
+      accept_title: Accept invitation
+      already_accepted_body: This invitation to %{workspace} has already been used.
+      already_accepted_title: Invitation already accepted
+      create_and_accept: Create account and accept
+      create_to_join_html: Create your account to join <strong>%{workspace}</strong>.
+      email_mismatch_html: You are signed in as <strong>%{current}</strong>, but this
+        invitation was sent to <strong>%{invited}</strong>.
+      existing_account_html: An account already exists for <strong>%{email}</strong>.
+        Sign in to accept.
+      expired_body: This invitation to %{workspace} has expired. Ask a workspace admin
+        to send a new one.
+      expired_title: Invitation expired
+      invited_as: "%{inviter} invited you as a %{role}."
+      join_workspace: Join %{workspace}
+      sign_in: Sign in
+      sign_in_and_accept: Sign in and accept
+      sign_out_and_use_invited: Sign out and use the invited email
+      signed_in_as: Signed in as %{email}.
+    password_reset:
+      confirm_placeholder: Repeat new password
+      email_placeholder: Enter your email address
+      new_password_placeholder: Enter new password
+      save: Save
+      submit: Email reset instructions
+      title: Forgot your password?
+      update_title: Update your password
+    registration:
+      already_have_account: Already have an account?
+      name: Name
+      password_confirmation: Confirm password
+      sign_in: Sign in
+      submit: Create account
+      subtitle: Start managing relationships in minutes.
+      title: Create your account
+      workspace_name: Workspace name
+    sign_in:
+      create_account: Create account
+      email: Email
+      forgot_password: Forgot password?
+      or: or
+      password: Password
+      submit: Sign in
+      subtitle: The CRM your team will love.
+      title: Sign in to cream
+  datetime:
+    distance_in_words:
+      about_x_hours:
+        one: about 1 hour
+        other: about %{count} hours
+      about_x_months:
+        one: about 1 month
+        other: about %{count} months
+      almost_x_years:
+        one: almost 1 year
+        other: almost %{count} years
+      half_a_minute: half a minute
+      less_than_x_minutes:
+        one: less than a minute
+        other: less than %{count} minutes
+      less_than_x_seconds:
+        one: less than 1 second
+        other: less than %{count} seconds
+      over_x_years:
+        one: over 1 year
+        other: over %{count} years
+      x_days:
+        one: 1 day
+        other: "%{count} days"
+      x_hours:
+        one: 1 hour
+        other: "%{count} hours"
+      x_minutes:
+        one: 1 minute
+        other: "%{count} minutes"
+      x_months:
+        one: 1 month
+        other: "%{count} months"
+      x_seconds:
+        one: 1 second
+        other: "%{count} seconds"
+      x_years:
+        one: 1 year
+        other: "%{count} years"
   deal_versions:
     created: "%{actor} created this deal"
-    updated: "%{actor} updated %{fields}"
-    updated_deal: "the deal"
     destroyed: "%{actor} deleted this deal"
+    updated: "%{actor} updated %{fields}"
+    updated_deal: the deal
+  editions:
+    from: From %{date}
+    until: Until %{date}
+  nav:
+    api_tokens: API tokens
+    companies: Companies
+    custom_fields: Custom fields
+    customize_menu: Customize menu
+    dashboard: Dashboard
+    deals: Deals
+    features:
+      alerts: Alerts
+      automations: Automations
+      calendar_booking: Bookings
+      email_templates: Templates
+      gmail_sync: Gmail
+      journeys: Journeys
+      lead_forms: Lead forms
+      lead_scoring: Lead scoring
+      marketing_attribution: Attribution
+      marketing_campaigns: Campaigns
+      marketing_consent: Subscriptions
+      marketing_segments: Segments
+      mql_pool: MQLs
+      reports: Reports
+      slack_integrations: Slack
+      stripe_payments: Stripe
+      webhooks: Webhooks
+    groups:
+      marketing: Marketing
+      profile: My profile
+      settings: Settings
+    language: Language
+    lists: My lists
+    menu: Menu
+    notifications: Notifications
+    people: People
+    pipelines: Pipelines
+    products: Products
+    profile: Profile
+    search: Search...
+    sign_out: Sign out
+    tasks: Tasks
+    team: Team
+    workspace_settings: Settings
+  profile:
+    alert_email: Email
+    alert_in_app: In-app notification (bell)
+    alerts: Alerts
+    alerts_channels_hint: If you disable both channels, you will not receive alerts,
+      form or booking notifications.
+    alerts_intro: Choose how you receive alerts, form submissions and calendar bookings
+      in this workspace.
+    default_pipeline: Default pipeline
+    default_pipeline_hint: Selected when you sign in and when opening the Gmail add-on.
+    email: Email
+    flashes:
+      name_updated: Name updated.
+      preferences_updated: Preferences updated.
+    intro_html: Personal preferences in <strong>%{workspace}</strong>.
+    locale: Language
+    locale_hint: Interface language for Cream.
+    locales:
+      en: English
+      es: Español
+    name: Name
+    name_hint: Shown in the sidebar, mentions and team activity.
+    personal_data: Personal data
+    preferences: Preferences
+    sales_director_briefing: Show sales director briefing on the dashboard
+    sales_director_hint_html: Personal preference in this workspace. The admin must
+      enable it in %{team_link}.
+    sales_director_requires_ai: Requires configuring <code>CREAM_AI_API_KEY</code>
+      on the server.
+    sales_director_team: Team
+    save: Save
+    title: Profile
+  shared:
+    attachments:
+      remove_confirm: Remove this file?
+      title: Attachments
+      upload: Upload
+    comments:
+      add: Add comment
+      delete: Delete comment
+      delete_confirm: Delete this comment?
+      placeholder: Add a comment... use @name to mention teammates
+      title: Comments
+    email:
+      attachments: Attachments
+      attachments_hint: Uncheck any you do not want to send.
+      body_placeholder: Message body...
+      create_templates_html: "%{link} to reuse when composing emails."
+      create_templates_link: Create templates
+      follow_up: Follow up
+      follow_up_options:
+        none: No reminder
+        one_week: in 1 week
+        three_days: in 3 days
+        two_days: in 2 days
+        two_weeks: in 2 weeks
+      insert_template: Insert template…
+      no_templates: No templates available
+      send: Send email
+      send_later: Send later
+      subject: Subject
+      title: Send email
+      to: To
+    empty_value: "—"
+    notes:
+      add: Add note
+      body_placeholder: Write a note...
+      delete: Delete note
+      delete_confirm: Delete this note?
+      title: Notes
+      title_placeholder: Note title (optional)
+    pagination:
+      aria_label: Pagination
+      next: Next
+      page_of: Page %{page} of %{pages}
+      previous: Previous
+      range_html: <span class="font-medium text-ink">%{from}</span>–<span class="font-medium
+        text-ink">%{to}</span> of <span class="font-medium text-ink">%{count}</span>
+    record_picker:
+      create: + Create "%{name}"
+      no_results: No results
+      search_placeholder: Type to search…
+    someone: Someone
+    tasks:
+      add: Add
+      assignee: Assignee
+      cancel: Cancel
+      delete: Delete task
+      delete_confirm: Delete this task?
+      due_date: Due date
+      edit: Edit task
+      edit_title: Edit task
+      open_count:
+        one: "(%{count} open)"
+        other: "(%{count} open)"
+      placeholder: Add a task...
+      save: Save
+      title: Tasks
+      title_label: Title
+      unassigned: Unassigned
+    timeline:
+      ago: "%{time} ago"
+      empty: No activity yet.
+      title: Activity
+  time:
+    formats:
+      default: "%m/%d/%Y %I:%M %p"
+      long: "%A, %B %d, %Y"
+      short: "%b %d, %Y"

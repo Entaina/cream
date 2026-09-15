@@ -35,7 +35,7 @@ RSpec.describe EmailTemplatePreview do
         subject: "Hi {first_name}",
         body: "Hello {name}",
         layout: nil,
-        extra_tokens: { "first_name" => "Alex", "name" => "Alex Example" }
+        extra_tokens: {"first_name" => "Alex", "name" => "Alex Example"}
       )
 
       expect(subject).to eq("Hi Alex")
@@ -48,7 +48,7 @@ RSpec.describe EmailTemplatePreview do
       _subject, body = described_class.render_layout(
         body: "<div class=\"wrap\">{{ content }} — {company}</div>",
         sample_content: "<p>Hola {first_name}</p>",
-        extra_tokens: { "company" => "Example Inc." }
+        extra_tokens: {"company" => "Example Inc."}
       )
 
       expect(body).to include("Hola María")
@@ -61,7 +61,7 @@ RSpec.describe EmailTemplatePreview do
       subject, body = described_class.render_email(
         subject: "Follow up {first_name}",
         body: "<p>Hi {name} from {company}</p>",
-        extra_tokens: { "first_name" => "Jo", "name" => "Jo Lee", "company" => "Beta" }
+        extra_tokens: {"first_name" => "Jo", "name" => "Jo Lee", "company" => "Beta"}
       )
 
       expect(subject).to eq("Follow up Jo")

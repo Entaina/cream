@@ -24,7 +24,7 @@ module Cream
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
 
-    config.action_mailer.preview_paths = [ Rails.root.join("spec/mailers/previews") ]
+    config.action_mailer.preview_paths = [Rails.root.join("spec/mailers/previews")]
 
     config.i18n.available_locales = %i[es en]
     config.i18n.default_locale = :es

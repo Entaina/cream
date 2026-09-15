@@ -1,6 +1,6 @@
 namespace :lead_form_templates do
   desc "Import public lead form views from the repository into a workspace (idempotent)"
-  task :import, [ :workspace_id ] => :environment do |_task, args|
+  task :import, [:workspace_id] => :environment do |_task, args|
     workspace_id = args[:workspace_id].presence
     abort "Usage: rake lead_form_templates:import[WORKSPACE_ID]" if workspace_id.blank?
 

@@ -9,7 +9,7 @@ class Journey < ApplicationRecord
   has_many :enrollments, class_name: "JourneyEnrollment", dependent: :destroy
 
   validates :name, :entry_trigger, presence: true
-  validates :entry_trigger, inclusion: { in: ENTRY_TRIGGERS }
+  validates :entry_trigger, inclusion: {in: ENTRY_TRIGGERS}
   validate :product_required_when_stop_on_open_deal
   validate :product_belongs_to_workspace
 

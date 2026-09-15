@@ -15,7 +15,7 @@ class BookingPage < ApplicationRecord
   accepts_nested_attributes_for :event_types, allow_destroy: true, reject_if: :all_blank_event_type?
 
   validates :name, :slug, presence: true
-  validates :slug, uniqueness: true, format: { with: /\A[a-z0-9-]+\z/ }
+  validates :slug, uniqueness: true, format: {with: /\A[a-z0-9-]+\z/}
   validate :associations_belong_to_workspace
   validate :calendar_ids_selected
   validate :event_types_present

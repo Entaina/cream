@@ -47,7 +47,7 @@ class EmailTemplatePreview
       rendered_sample = Marketing::LiquidRenderer.render(sample_content, record: record, extra_tokens: merged)
     end
     [
-      "Layout: #{layout.name || 'Vista previa'}",
+      "Layout: #{layout.name || "Vista previa"}",
       layout.render_with(rendered_sample, record: record, extra_tokens: merged)
     ]
   end

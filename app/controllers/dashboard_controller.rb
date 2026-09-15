@@ -28,7 +28,7 @@ class DashboardController < ApplicationController
     @all_pipelines_chart = current_pipeline.nil?
     if @all_pipelines_chart
       @stage_chart_groups = helpers.stage_chart_groups(@stages, @deals_by_stage)
-      @stage_chart_max = [ @stage_chart_groups.map { |group| group[:total] }.max || 0, 1 ].max
+      @stage_chart_max = [@stage_chart_groups.map { |group| group[:total] }.max || 0, 1].max
     end
     if current_membership&.sales_director_briefing_visible?
       @sales_briefing = current_workspace.sales_briefings.team.find_by(briefing_date: Date.current)

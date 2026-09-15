@@ -34,7 +34,7 @@ class DealPolicy < WorkspaceRecordPolicy
       return base if workspace.salespeople_can_view_all_deals? || workspace.salespeople_can_edit_all_deals?
 
       base.where(owner_id: user.id)
-          .or(base.where(id: DealAccess.where(user_id: user).select(:deal_id)))
+        .or(base.where(id: DealAccess.where(user_id: user).select(:deal_id)))
     end
   end
 end

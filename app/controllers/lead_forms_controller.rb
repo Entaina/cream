@@ -1,5 +1,6 @@
 class LeadFormsController < ApplicationController
   include RequiresFeature
+
   requires_feature :lead_forms
   before_action :set_lead_form, only: %i[show edit update destroy]
 

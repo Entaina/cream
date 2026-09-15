@@ -41,10 +41,10 @@ module Marketing
         metadata[@field.delete_prefix("metadata.")]
       elsif @field.start_with?("person.")
         person.public_send(@field.delete_prefix("person."))
-      else
-        person.public_send(@field) if person.respond_to?(@field)
+      elsif person.respond_to?(@field)
+        person.public_send(@field)
       end
-    rescue StandardError
+    rescue
       nil
     end
 

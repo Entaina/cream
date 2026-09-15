@@ -14,10 +14,10 @@ class Booking < ApplicationRecord
   belongs_to :campaign, optional: true
 
   validates :first_name, :last_name, :email, :starts_at, :ends_at, :timezone, presence: true
-  validates :first_name, :last_name, length: { minimum: 2 }
-  validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }
-  validates :message, length: { maximum: 500 }, allow_blank: true
-  validates :status, inclusion: { in: STATUSES }
+  validates :first_name, :last_name, length: {minimum: 2}
+  validates :email, format: {with: URI::MailTo::EMAIL_REGEXP}
+  validates :message, length: {maximum: 500}, allow_blank: true
+  validates :status, inclusion: {in: STATUSES}
   validate :guest_emails_valid
 
   scope :confirmed, -> { where(status: "confirmed") }
@@ -36,11 +36,11 @@ class Booking < ApplicationRecord
   end
 
   def display_name
-    [ first_name, last_name ].compact.join(" ")
+    [first_name, last_name].compact.join(" ")
   end
 
   def all_attendee_emails
-    [ email, *guest_emails ].map { |value| value.to_s.strip.downcase }.uniq
+    [email, *guest_emails].map { |value| value.to_s.strip.downcase }.uniq
   end
 
   def confirmation_payload(locale: I18n.locale)

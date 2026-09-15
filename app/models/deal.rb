@@ -3,7 +3,7 @@ class Deal < ApplicationRecord
 
   attr_accessor :duplicating
 
-  has_paper_trail meta: { workspace_id: :workspace_id }
+  has_paper_trail meta: {workspace_id: :workspace_id}
 
   belongs_to :company
   belongs_to :partner, class_name: "Company", optional: true
@@ -31,8 +31,8 @@ class Deal < ApplicationRecord
     reject_if: ->(attrs) { attrs[:title].blank? && attrs[:due_on].blank? }
 
   validates :name, presence: true
-  validates :value, numericality: { greater_than_or_equal_to: 0 }
-  validates :probability, numericality: { in: 0..100 }, allow_nil: true
+  validates :value, numericality: {greater_than_or_equal_to: 0}
+  validates :probability, numericality: {in: 0..100}, allow_nil: true
   validate :stage_belongs_to_pipeline
   validate :stage_entry_conditions_met, if: -> { persisted? && will_save_change_to_pipeline_stage_id? }
   validate :contacts_belong_to_company
@@ -50,13 +50,13 @@ class Deal < ApplicationRecord
         q: "%#{sanitize_sql_like(q)}%"
       )
   }
-  scope :open_deals, -> { joins(:pipeline_stage).where(pipeline_stages: { closed: false }) }
-  scope :won, -> { joins(:pipeline_stage).where(pipeline_stages: { won: true }) }
+  scope :open_deals, -> { joins(:pipeline_stage).where(pipeline_stages: {closed: false}) }
+  scope :won, -> { joins(:pipeline_stage).where(pipeline_stages: {won: true}) }
   # Deals a payment can reasonably belong to: anything not lost (open or won).
   scope :linkable, -> { joins(:pipeline_stage).where("pipeline_stages.closed = false OR pipeline_stages.won = true") }
   scope :by_stage, ->(stage_id) { where(pipeline_stage_id: stage_id).order(:position, :id) }
   scope :sorted_by_stage_order, ->(direction = :asc) {
-    dir = direction.to_s == "desc" ? "DESC" : "ASC"
+    dir = (direction.to_s == "desc") ? "DESC" : "ASC"
     joins(:pipeline_stage).order(Arel.sql("pipeline_stages.position #{dir}, deals.position #{dir}, deals.id #{dir}"))
   }
 
@@ -72,8 +72,8 @@ class Deal < ApplicationRecord
 
     if filters[:product_id].present? || filters[:edition_id].present?
       scope = scope.joins(:deal_products)
-      scope = scope.where(deal_products: { product_id: filters[:product_id] }) if filters[:product_id].present?
-      scope = scope.where(deal_products: { edition_id: filters[:edition_id] }) if filters[:edition_id].present?
+      scope = scope.where(deal_products: {product_id: filters[:product_id]}) if filters[:product_id].present?
+      scope = scope.where(deal_products: {edition_id: filters[:edition_id]}) if filters[:edition_id].present?
       scope = scope.distinct
     end
 
@@ -85,9 +85,7 @@ class Deal < ApplicationRecord
     end
 
     scope = ListFilters.apply_owner(scope, filters[:owner_id]) if filters[:owner_id].present?
-    scope = ListFilters.apply_created_at(scope, filters)
-
-    scope
+    ListFilters.apply_created_at(scope, filters)
   end
 
   def stage_label = pipeline_stage&.name
@@ -102,7 +100,7 @@ class Deal < ApplicationRecord
 
   def next_pending_task
     pending = tasks.select { |t| t.completed_at.nil? }
-    pending.min_by { |t| [ t.due_on ? 0 : 1, t.due_on || Date.new(9999, 12, 31), t.id ] }
+    pending.min_by { |t| [t.due_on ? 0 : 1, t.due_on || Date.new(9999, 12, 31), t.id] }
   end
 
   def pending_task_indicator_status
@@ -126,19 +124,19 @@ class Deal < ApplicationRecord
     update!(pipeline_stage: target, pipeline: target.pipeline,
       position: position || (workspace.deals.where(pipeline_stage_id: target.id).maximum(:position) || 0) + 1)
     reposition_in_stage!(target, position) unless position.nil?
-    track_activity("stage_changed", metadata: { from: old_stage&.name, to: target.name }) if old_stage != target
+    track_activity("stage_changed", metadata: {from: old_stage&.name, to: target.name}) if old_stage != target
     if old_stage != target
       if old_pipeline.id != target.pipeline_id
-        track_activity("pipeline_changed", metadata: { from: old_pipeline.name, to: target.pipeline.name })
+        track_activity("pipeline_changed", metadata: {from: old_pipeline.name, to: target.pipeline.name})
       end
       if CreamFeatures.enabled?(:webhooks)
         WebhookDispatcher.dispatch(
           workspace: workspace,
           event: "deal.stage_changed",
-          payload: { deal_id: id, from: old_stage&.name, to: target.name, workspace_id: workspace_id }
+          payload: {deal_id: id, from: old_stage&.name, to: target.name, workspace_id: workspace_id}
         )
       end
-      run_automations("deal.stage_changed", metadata: { "to" => target.name })
+      run_automations("deal.stage_changed", metadata: {"to" => target.name})
       StageTriggers::Dispatcher.call(deal: self, stage: target, user: Current.user) if CreamFeatures.enabled?(:stage_triggers)
       if CreamFeatures.enabled?(:slack_integrations)
         SlackNotifier.notify(workspace: workspace, event: "deal.stage_changed", message: "Deal #{name} moved to #{target.name}")
@@ -155,7 +153,7 @@ class Deal < ApplicationRecord
     first = target.first_stage
     update!(pipeline: target, pipeline_stage: first,
       position: (workspace.deals.where(pipeline_stage_id: first.id).maximum(:position) || 0) + 1)
-    track_activity("pipeline_changed", metadata: { from: old_pipeline&.name, to: target.name })
+    track_activity("pipeline_changed", metadata: {from: old_pipeline&.name, to: target.name})
   end
 
   # Recompute the deal value as the sum of its product line subtotals.
@@ -195,8 +193,8 @@ class Deal < ApplicationRecord
 
   def reposition_in_stage!(target, index)
     ids = workspace.deals.where(pipeline_stage_id: target.id)
-                         .where.not(id: id).order(:position, :id).pluck(:id)
-    ids.insert([ index, ids.size ].min, id)
+      .where.not(id: id).order(:position, :id).pluck(:id)
+    ids.insert([index, ids.size].min, id)
     ids.each_with_index { |deal_id, i| workspace.deals.where(id: deal_id).update_all(position: i) }
   end
 
@@ -241,11 +239,11 @@ class Deal < ApplicationRecord
   def contacts_belong_to_company
     return if company.nil?
 
-    allowed = [ company_id, partner_id ].compact
+    allowed = [company_id, partner_id].compact
     outsiders = live_contacts.reject { |person| allowed.include?(person.company_id) }
     return if outsiders.empty?
 
-    names = [ company&.name, partner&.name ].compact.join(" or ")
+    names = [company&.name, partner&.name].compact.join(" or ")
     errors.add(:base, "Every contact must belong to #{names}")
   end
 

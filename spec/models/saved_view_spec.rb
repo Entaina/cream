@@ -37,7 +37,7 @@ RSpec.describe SavedView do
     it "orders by position then name within a workspace" do
       names = described_class.where(workspace: workspace).for_type("Person").ordered.pluck(:name)
 
-      expect(names).to eq([ "Gold tier", "All at Acme", "Member private" ])
+      expect(names).to eq(["Gold tier", "All at Acme", "Member private"])
     end
   end
 
@@ -66,7 +66,7 @@ RSpec.describe SavedView do
     it "includes filters, sort and direction" do
       view = saved_views(:person_gold)
 
-      expect(view.to_filter_hash).to include("cf" => { "customer_tier" => "Gold" }, "sort" => "first_name", "dir" => "asc")
+      expect(view.to_filter_hash).to include("cf" => {"customer_tier" => "Gold"}, "sort" => "first_name", "dir" => "asc")
     end
   end
 
@@ -164,7 +164,7 @@ RSpec.describe SavedView do
         user: user,
         record_type: "Person",
         name: "Owned by me",
-        filters: { "owner_id" => user.id.to_s }
+        filters: {"owner_id" => user.id.to_s}
       )
 
       expect(view.resolve(workspace.people)).to contain_exactly(owned)
@@ -179,7 +179,7 @@ RSpec.describe SavedView do
 
     it "applies product, edition and first contact filters" do
       contact = create_person!(workspace, company: company, first_contact_on: Date.new(2026, 1, 10))
-      match = create_deal!(workspace, pipeline: pipeline, name: "Match", company: company, contacts: [ contact ])
+      match = create_deal!(workspace, pipeline: pipeline, name: "Match", company: company, contacts: [contact])
       match.deal_products.create!(product: product, edition: edition, quantity: 1)
       create_deal!(workspace, pipeline: pipeline, name: "Other", company: company)
 

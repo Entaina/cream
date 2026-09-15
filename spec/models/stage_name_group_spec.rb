@@ -12,7 +12,7 @@ RSpec.describe StageNameGroup do
 
     groups = described_class.group(stages)
 
-    expect(groups.map(&:name)).to eq([ "Lead", "Qualified", "Proposal", "Negotiation", "Won", "Lost" ])
+    expect(groups.map(&:name)).to eq(["Lead", "Qualified", "Proposal", "Negotiation", "Won", "Lost"])
     expect(groups.first.stages.map(&:pipeline).map(&:name)).to contain_exactly(pipeline.name, other.name)
   end
 
@@ -26,10 +26,10 @@ RSpec.describe StageNameGroup do
 
     grouper = described_class.new(workspace.pipeline_stages.ordered_across_pipelines.to_a)
     group = grouper.groups.first
-    segments = grouper.segments_for(group, { lead_default.id => 1, lead_other.id => 2 })
+    segments = grouper.segments_for(group, {lead_default.id => 1, lead_other.id => 2})
 
-    expect(segments.map(&:pipeline_name)).to eq([ pipeline.name, other.name ])
-    expect(segments.map(&:value)).to eq([ 1, 2 ])
+    expect(segments.map(&:pipeline_name)).to eq([pipeline.name, other.name])
+    expect(segments.map(&:value)).to eq([1, 2])
     expect(segments.first.color).to eq("bg-hoki-600 dark:bg-hoki-400")
     expect(segments.second.color).to eq("bg-copperfield-600 dark:bg-copperfield-400")
   end

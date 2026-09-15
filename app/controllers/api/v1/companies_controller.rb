@@ -20,7 +20,7 @@ module Api
         if company.save
           render json: company_json(company), status: :created
         else
-          render json: { errors: company.errors.full_messages }, status: :unprocessable_entity
+          render json: {errors: company.errors.full_messages}, status: :unprocessable_entity
         end
       end
 
@@ -31,7 +31,7 @@ module Api
         if company.update(company_params)
           render json: company_json(company)
         else
-          render json: { errors: company.errors.full_messages }, status: :unprocessable_entity
+          render json: {errors: company.errors.full_messages}, status: :unprocessable_entity
         end
       end
 

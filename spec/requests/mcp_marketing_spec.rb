@@ -28,20 +28,22 @@ RSpec.describe "Mcp marketing tools", type: :request do
     SubscriptionType.ensure_defaults!(other_workspace)
   end
 
-  MARKETING_TOOL_NAMES = %w[
-    list_mqls get_person_marketing list_product_interests list_subscription_types
-    list_campaigns get_campaign list_segments get_segment list_journeys get_journey
-    list_scoring_rules get_attribution list_email_templates list_lead_forms
-    create_product_interest convert_mql_to_sql set_subscription enroll_in_journey
-    send_campaign cancel_campaign_send
-  ].freeze
+  let(:marketing_tool_names) do
+    %w[
+      list_mqls get_person_marketing list_product_interests list_subscription_types
+      list_campaigns get_campaign list_segments get_segment list_journeys get_journey
+      list_scoring_rules get_attribution list_email_templates list_lead_forms
+      create_product_interest convert_mql_to_sql set_subscription enroll_in_journey
+      send_campaign cancel_campaign_send
+    ]
+  end
 
   describe "tools/list" do
     it "includes marketing tools" do
       post mcp_url, params: tools_list_payload, as: :json, headers: mcp_headers(plaintext)
 
       names = JSON.parse(response.body).dig("result", "tools").map { |t| t["name"] }
-      expect(names).to include(*MARKETING_TOOL_NAMES)
+      expect(names).to include(*marketing_tool_names)
     end
   end
 
@@ -94,10 +96,10 @@ RSpec.describe "Mcp marketing tools", type: :request do
 
     it "forbids salespeople from enrolling in journeys" do
       journey = workspace.journeys.create!(name: "Flow", entry_trigger: "manual", active: true)
-      journey.steps.create!(position: 0, step_type: "wait", config: { "days" => 1 })
+      journey.steps.create!(position: 0, step_type: "wait", config: {"days" => 1})
       person = create_person!(workspace, email: "enroll@example.com")
 
-      result = mcp_tool_error("enroll_in_journey", { journey_id: journey.id, person_id: person.id }, token: sales_token)
+      result = mcp_tool_error("enroll_in_journey", {journey_id: journey.id, person_id: person.id}, token: sales_token)
 
       expect(result["error"]).to eq("not_found")
     end
@@ -139,8 +141,8 @@ RSpec.describe "Mcp marketing tools", type: :request do
     end
 
     it "returns conflict when multiple open deals exist for the product" do
-      first = create_deal!(workspace, pipeline: pipeline, company: person.company, contacts: [ person ], name: "Deal A")
-      second = create_deal!(workspace, pipeline: pipeline, company: person.company, contacts: [ person ], name: "Deal B")
+      first = create_deal!(workspace, pipeline: pipeline, company: person.company, contacts: [person], name: "Deal A")
+      second = create_deal!(workspace, pipeline: pipeline, company: person.company, contacts: [person], name: "Deal B")
       first.deal_products.create!(product: product, quantity: 1)
       second.deal_products.create!(product: product, quantity: 1)
 
@@ -210,7 +212,7 @@ RSpec.describe "Mcp marketing tools", type: :request do
         person: person, subscription_type: type, source: "spec", legal_basis: "consent"
       )
 
-      result = call_tool("get_person_marketing", { person_id: person.id })
+      result = call_tool("get_person_marketing", {person_id: person.id})
 
       expect(result["person_id"]).to eq(person.id)
       expect(result["lead_score"]).to eq(42)

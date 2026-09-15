@@ -31,7 +31,7 @@ RSpec.describe Ai::Client do
 
   it "returns assistant content from output_text" do
     stub_configuration
-    payload = { output_text: '{"summary":"Hello"}' }
+    payload = {output_text: '{"summary":"Hello"}'}
     allow(http_double).to receive(:request).and_return(success(payload))
 
     result = described_class.new.chat(system: "sys", user: "hello", json: true)
@@ -47,7 +47,7 @@ RSpec.describe Ai::Client do
           type: "message",
           role: "assistant",
           content: [
-            { type: "output_text", text: '{"summary":"From output"}' }
+            {type: "output_text", text: '{"summary":"From output"}'}
           ]
         }
       ]
@@ -67,7 +67,7 @@ RSpec.describe Ai::Client do
           type: "message",
           role: "assistant",
           content: [
-            { type: "output_refusal", refusal: "Not allowed" }
+            {type: "output_refusal", refusal: "Not allowed"}
           ]
         }
       ]
@@ -100,7 +100,7 @@ RSpec.describe Ai::Client do
     expect(http).to receive(:request) do |request|
       body = JSON.parse(request.body)
       expect(body).not_to have_key("temperature")
-      success({ output_text: "ok" })
+      success({output_text: "ok"})
     end
 
     described_class.new.chat(system: "sys", user: "hello")
@@ -114,7 +114,7 @@ RSpec.describe Ai::Client do
       body = JSON.parse(request.body)
       expect(body["input"]).to include("JSON")
       expect(body.dig("text", "format", "type")).to eq("json_object")
-      success({ output_text: '{"summary":"ok"}' })
+      success({output_text: '{"summary":"ok"}'})
     end
 
     described_class.new.chat(system: "sys", user: "Analyze this", json: true)

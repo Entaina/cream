@@ -39,7 +39,7 @@ class GmailSyncService
     return after unless pending.exists?
 
     oldest_pending = pending.minimum(:created_at)
-    [ after, oldest_pending - 1.hour ].min
+    [after, oldest_pending - 1.hour].min
   end
 
   def known_outbound
@@ -90,7 +90,7 @@ class GmailSyncService
   end
 
   def referenced_ids(metadata)
-    text = [ metadata.references, metadata.in_reply_to ].compact.join(" ")
+    text = [metadata.references, metadata.in_reply_to].compact.join(" ")
     text.scan(/<[^>]+>/).map { |token| normalize_message_id(token) }
   end
 
@@ -110,7 +110,7 @@ class GmailSyncService
       record.track_activity(
         "email_replied",
         user: outbound.user,
-        metadata: { subject: outbound.subject, from: metadata.from }.compact
+        metadata: {subject: outbound.subject, from: metadata.from}.compact
       )
     end
     NotificationService.notify_email_replied(message: outbound) if CreamFeatures.enabled?(:notifications)

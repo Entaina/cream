@@ -22,8 +22,8 @@ RSpec.describe "Person emails", type: :request do
         patch person_path(person), params: {
           person: {
             person_emails_attributes: {
-              "0" => { id: primary_record.id, address: "primary@example.com", primary: "1" },
-              "1" => { address: "secondary@example.com", primary: "0" }
+              "0" => {id: primary_record.id, address: "primary@example.com", primary: "1"},
+              "1" => {address: "secondary@example.com", primary: "0"}
             }
           }
         }
@@ -45,8 +45,8 @@ RSpec.describe "Person emails", type: :request do
       patch person_path(person), params: {
         person: {
           person_emails_attributes: {
-            "0" => { id: primary_record.id, address: "primary@example.com", primary: "0" },
-            "1" => { id: secondary.id, address: "secondary@example.com", primary: "1" }
+            "0" => {id: primary_record.id, address: "primary@example.com", primary: "0"},
+            "1" => {id: secondary.id, address: "secondary@example.com", primary: "1"}
           }
         }
       }
@@ -69,8 +69,8 @@ RSpec.describe "Person emails", type: :request do
         patch person_path(person), params: {
           person: {
             person_emails_attributes: {
-              "0" => { id: primary_record.id, address: "primary@example.com", primary: "1" },
-              "1" => { id: secondary.id, address: "secondary@example.com", primary: "0", _destroy: "1" }
+              "0" => {id: primary_record.id, address: "primary@example.com", primary: "1"},
+              "1" => {id: secondary.id, address: "secondary@example.com", primary: "0", _destroy: "1"}
             }
           }
         }
@@ -78,7 +78,7 @@ RSpec.describe "Person emails", type: :request do
 
       expect(response).to redirect_to(person)
       person.reload
-      expect(person.person_emails.pluck(:address)).to eq([ "primary@example.com" ])
+      expect(person.person_emails.pluck(:address)).to eq(["primary@example.com"])
     end
   end
 

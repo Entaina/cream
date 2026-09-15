@@ -31,7 +31,7 @@ RSpec.describe RecordPickerComponent, type: :component do
     )
 
     expect(page).to have_css('[data-controller="record-picker"]')
-    expect(page).to have_css('[data-record-picker-records-value]')
+    expect(page).to have_css("[data-record-picker-records-value]")
     expect(page).to have_css('[data-record-picker-create-url-value="/companies.json"]')
     expect(page).to have_css('input[data-record-picker-target="input"][value="Acme Corp"]')
     expect(rendered_content).to include('name="person[company_id]"')

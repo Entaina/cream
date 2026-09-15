@@ -6,7 +6,7 @@ RSpec.describe "Api::V1::Products", type: :request do
   let(:user) { users(:one) }
   let(:workspace) { workspaces(:one) }
   let(:token) { user.api_tokens.create!(name: "Test", workspace: workspace) }
-  let(:headers) { { "Authorization" => "Bearer #{token.plaintext_token}" } }
+  let(:headers) { {"Authorization" => "Bearer #{token.plaintext_token}"} }
 
   let!(:product) do
     workspace.products.create!(name: "Premium", price: 1200, description: "Annual plan", segment: "b2b")
@@ -23,7 +23,7 @@ RSpec.describe "Api::V1::Products", type: :request do
 
       expect(response).to have_http_status(:success)
       body = response.parsed_body
-      expect(body.map { |entry| entry["name"] }).to eq([ "Premium", "Starter" ])
+      expect(body.map { |entry| entry["name"] }).to eq(["Premium", "Starter"])
 
       premium = body.first
       expect(premium).to include(
@@ -46,17 +46,17 @@ RSpec.describe "Api::V1::Products", type: :request do
     it "filters by search query" do
       workspace.products.create!(name: "Starter", price: 300)
 
-      get "/api/v1/products", params: { q: "premium" }, headers: headers
+      get "/api/v1/products", params: {q: "premium"}, headers: headers
 
-      expect(response.parsed_body.map { |entry| entry["name"] }).to eq([ "Premium" ])
+      expect(response.parsed_body.map { |entry| entry["name"] }).to eq(["Premium"])
     end
 
     it "filters by segment" do
       workspace.products.create!(name: "Consumer", price: 100, segment: "b2c")
 
-      get "/api/v1/products", params: { segment: "b2b" }, headers: headers
+      get "/api/v1/products", params: {segment: "b2b"}, headers: headers
 
-      expect(response.parsed_body.map { |entry| entry["name"] }).to eq([ "Premium" ])
+      expect(response.parsed_body.map { |entry| entry["name"] }).to eq(["Premium"])
     end
   end
 

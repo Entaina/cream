@@ -3,10 +3,10 @@
 # Canonical sidebar structure: groups, item keys, and order merging.
 module SidebarMenu
   GROUPS = {
-    daily: { label: nil, collapsible: false, admin_only: false },
-    marketing: { label: :marketing, collapsible: true, admin_only: false },
-    settings: { label: :settings, collapsible: true, admin_only: true },
-    profile: { label: :profile, collapsible: true, admin_only: false }
+    daily: {label: nil, collapsible: false, admin_only: false},
+    marketing: {label: :marketing, collapsible: true, admin_only: false},
+    settings: {label: :settings, collapsible: true, admin_only: true},
+    profile: {label: :profile, collapsible: true, admin_only: false}
   }.freeze
 
   CANONICAL_KEYS_BY_GROUP = {
@@ -47,8 +47,8 @@ module SidebarMenu
       next if meta[:admin_only] && !admin
 
       label = meta[:label] ? I18n.t("nav.groups.#{meta[:label]}") : nil
-      { key: key, label: label, collapsible: meta[:collapsible], admin_only: meta[:admin_only],
-        keys: CANONICAL_KEYS_BY_GROUP[key] & default_keys(admin: admin) }
+      {key: key, label: label, collapsible: meta[:collapsible], admin_only: meta[:admin_only],
+       keys: CANONICAL_KEYS_BY_GROUP[key] & default_keys(admin: admin)}
     end
   end
 end

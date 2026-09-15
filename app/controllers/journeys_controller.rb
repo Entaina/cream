@@ -1,5 +1,6 @@
 class JourneysController < ApplicationController
   include RequiresFeature
+
   requires_feature :journeys
   before_action :set_journey, only: %i[show edit update destroy enroll toggle_active]
 
@@ -110,7 +111,7 @@ class JourneysController < ApplicationController
     params.require(:journey).permit(
       :name, :active, :entry_trigger, :max_reenrollments, :product_id, :stop_on_open_deal,
       entry_config: {},
-      steps_attributes: [ :id, :position, :step_type, :active, :_destroy, config: {} ]
+      steps_attributes: [:id, :position, :step_type, :active, :_destroy, config: {}]
     )
   end
 end

@@ -8,7 +8,7 @@ RSpec.describe "Companies merge", type: :request do
 
   before do
     sign_in_as(member)
-    patch switch_workspace_path, params: { workspace_id: workspace.id }
+    patch switch_workspace_path, params: {workspace_id: workspace.id}
   end
 
   describe "GET /companies/duplicates" do
@@ -30,7 +30,7 @@ RSpec.describe "Companies merge", type: :request do
       primary = create_company!(workspace, name: "Mapfre")
       secondary = create_company!(workspace, name: "Mapfre España")
 
-      get merge_company_path(primary, secondary_ids: [ secondary.id ])
+      get merge_company_path(primary, secondary_ids: [secondary.id])
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include("Mapfre")
@@ -45,7 +45,7 @@ RSpec.describe "Companies merge", type: :request do
       person = create_person!(workspace, company: secondary, email: "pat@mapfre.com")
 
       expect {
-        post merge_company_path(primary), params: { secondary_ids: [ secondary.id ] }
+        post merge_company_path(primary), params: {secondary_ids: [secondary.id]}
       }.to change(Company, :count).by(-1)
 
       expect(response).to redirect_to(company_path(primary))
@@ -58,7 +58,7 @@ RSpec.describe "Companies merge", type: :request do
     it "rejects merging without selected companies" do
       primary = create_company!(workspace, name: "Mapfre")
 
-      post merge_company_path(primary), params: { secondary_ids: [] }
+      post merge_company_path(primary), params: {secondary_ids: []}
 
       expect(response).to have_http_status(:unprocessable_entity)
       expect(response.body).to include("Select at least one company to merge")
@@ -68,7 +68,7 @@ RSpec.describe "Companies merge", type: :request do
       primary = create_company!(workspace, name: "Mapfre")
       unrelated = create_company!(workspace, name: "Unrelated Corp")
 
-      post merge_company_path(primary), params: { secondary_ids: [ unrelated.id ] }
+      post merge_company_path(primary), params: {secondary_ids: [unrelated.id]}
 
       expect(response).to have_http_status(:unprocessable_entity)
       expect(Company.exists?(unrelated.id)).to be(true)

@@ -22,7 +22,7 @@ RSpec.describe "Tasks", type: :request do
 
   def sign_in_to_workspace!(user)
     sign_in_as(user)
-    patch switch_workspace_path, params: { workspace_id: workspace.id }
+    patch switch_workspace_path, params: {workspace_id: workspace.id}
   end
 
   describe "GET /tasks" do
@@ -117,10 +117,10 @@ RSpec.describe "Tasks", type: :request do
 
       expect {
         post tasks_path, params: {
-          task: { title: "Follow up call", due_on: (Date.current + 2).to_s },
+          task: {title: "Follow up call", due_on: (Date.current + 2).to_s},
           taskable_type: "Deal",
           taskable_id: deal.id
-        }, headers: { "HTTP_REFERER" => deal_url(deal) }
+        }, headers: {"HTTP_REFERER" => deal_url(deal)}
       }.to change { deal.tasks.count }.by(1)
 
       expect(response).to redirect_to(deal_url(deal))
@@ -134,10 +134,10 @@ RSpec.describe "Tasks", type: :request do
 
       expect {
         post tasks_path, params: {
-          task: { title: "Call today", due_on: Date.current.to_s },
+          task: {title: "Call today", due_on: Date.current.to_s},
           taskable_type: "Deal",
           taskable_id: deal.id
-        }, headers: { "HTTP_REFERER" => deal_url(deal) }
+        }, headers: {"HTTP_REFERER" => deal_url(deal)}
       }.to change { deal.tasks.count }.by(1)
 
       expect(deal.tasks.order(:id).last.due_on).to eq(Date.current)
@@ -148,10 +148,10 @@ RSpec.describe "Tasks", type: :request do
       mentioned = users(:two)
 
       post tasks_path, params: {
-        task: { title: "Please review @two", due_on: (Date.current + 2).to_s },
+        task: {title: "Please review @two", due_on: (Date.current + 2).to_s},
         taskable_type: "Deal",
         taskable_id: deal.id
-      }, headers: { "HTTP_REFERER" => deal_url(deal) }
+      }, headers: {"HTTP_REFERER" => deal_url(deal)}
 
       task = deal.tasks.order(:id).last
       expect(task.assignee).to eq(mentioned)
@@ -175,8 +175,8 @@ RSpec.describe "Tasks", type: :request do
       new_due = Date.current + 5
 
       patch task_path(task), params: {
-        task: { title: "Updated title", due_on: new_due.to_s, assignee_id: assignee.id }
-      }, headers: { "HTTP_REFERER" => tasks_url }
+        task: {title: "Updated title", due_on: new_due.to_s, assignee_id: assignee.id}
+      }, headers: {"HTTP_REFERER" => tasks_url}
 
       expect(response).to redirect_to(tasks_url)
       task.reload

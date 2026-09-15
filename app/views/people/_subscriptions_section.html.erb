@@ -7,7 +7,7 @@
   <div class="px-1 py-1.5">
     <div class="flex items-center gap-2 w-32 shrink-0 text-sm text-ink-faint mb-2">
       <%= icon :mail, classes: "size-3.5" %>
-      Suscripciones
+      <%= t("people.show.subscriptions") %>
     </div>
 
     <div class="space-y-2 pl-0">
@@ -20,15 +20,15 @@
           <%= button_to toggle_subscription_person_path(person, subscription_type_id: type.id),
                 method: :patch,
                 class: "btn-ghost text-xs py-0.5",
-                form: { data: { turbo_confirm: status == "subscribed" ? "¿Dar de baja a #{person.display_name} de «#{type.name}»?" : "¿Suscribir a #{person.display_name} a «#{type.name}»?" } } do %>
-            <%= status == "subscribed" ? "Dar de baja" : "Suscribir" %>
+                form: { data: { turbo_confirm: status == "subscribed" ? t("people.show.unsubscribe_confirm", name: person.display_name, type: type.name) : t("people.show.subscribe_confirm", name: person.display_name, type: type.name) } } do %>
+            <%= status == "subscribed" ? t("people.show.unsubscribe") : t("people.show.subscribe") %>
           <% end %>
         </div>
       <% end %>
     </div>
 
     <div class="mt-3 pt-2 border-t border-line/60" data-controller="clipboard">
-      <p class="text-sm text-ink-faint mb-1">Centro de preferencias</p>
+      <p class="text-sm text-ink-faint mb-1"><%= t("people.show.preferences_center") %></p>
       <div class="relative">
         <input type="text" readonly value="<%= prefs_url %>"
               class="input w-full text-xs font-mono bg-canvas-sunken pr-24 cursor-default"
@@ -36,9 +36,9 @@
         <div class="absolute top-1.5 right-1.5 flex items-center gap-1">
           <span data-clipboard-target="feedback"
                 class="hidden rounded-md bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700 dark:bg-green-950 dark:text-green-300"
-                role="status" aria-live="polite">Copiado</span>
+                role="status" aria-live="polite"><%= t("people.show.copied") %></span>
           <button type="button" class="rounded-md p-1.5 text-ink-faint hover:text-ink hover:bg-canvas-raised"
-                title="Copiar URL" aria-label="Copiar URL"
+                title="<%= t("people.show.copy_url") %>" aria-label="<%= t("people.show.copy_url") %>"
                 data-action="clipboard#copy" data-clipboard-target="button">
             <span data-clipboard-target="copyIcon"><%= icon :copy, classes: "size-4" %></span>
             <span data-clipboard-target="copiedIcon" class="hidden"><%= icon :check, classes: "size-4" %></span>

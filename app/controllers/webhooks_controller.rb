@@ -1,5 +1,6 @@
 class WebhooksController < ApplicationController
   include RequiresFeature
+
   requires_feature :webhooks
   requires_workspace_feature :webhooks
   before_action :set_webhook, only: %i[edit update destroy]
@@ -10,7 +11,7 @@ class WebhooksController < ApplicationController
   end
 
   def new
-    @webhook = current_workspace.webhooks.new(user: current_user, events: [ Webhook::EVENTS.first ])
+    @webhook = current_workspace.webhooks.new(user: current_user, events: [Webhook::EVENTS.first])
     authorize @webhook
   end
 

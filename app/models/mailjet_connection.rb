@@ -7,7 +7,7 @@ class MailjetConnection < ApplicationRecord
   validates :workspace_id, uniqueness: true
   validates :webhook_token, presence: true, uniqueness: true
   validates :api_key, :secret_key, :from_email, presence: true
-  validates :from_email, format: { with: URI::MailTo::EMAIL_REGEXP }
+  validates :from_email, format: {with: URI::MailTo::EMAIL_REGEXP}
 
   def connected? = api_key.present? && secret_key.present?
 

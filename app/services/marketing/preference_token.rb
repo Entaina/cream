@@ -3,7 +3,7 @@ module Marketing
     PURPOSE = "marketing_preference".freeze
 
     def self.generate(person:)
-      payload = { "person_id" => person.id, "workspace_id" => person.workspace_id, "email" => person.email }
+      payload = {"person_id" => person.id, "workspace_id" => person.workspace_id, "email" => person.email}
       verifier.generate(payload)
     end
 

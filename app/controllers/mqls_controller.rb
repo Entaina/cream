@@ -1,5 +1,6 @@
 class MqlsController < ApplicationController
   include RequiresFeature
+
   requires_feature :mql_pool
   skip_after_action :verify_policy_scoped
 
@@ -44,8 +45,8 @@ class MqlsController < ApplicationController
   def apply_mql_sorting(scope)
     sort_param = params[:sort].to_s
     column = SORTABLE.include?(sort_param) ? sort_param : "lead_score"
-    direction = params[:dir] == "asc" ? :asc : :desc
-    scope.order(column => direction, updated_at: :desc)
+    direction = (params[:dir] == "asc") ? :asc : :desc
+    scope.order(column => direction, :updated_at => :desc)
   end
 
   def mql_filters
@@ -57,7 +58,7 @@ class MqlsController < ApplicationController
     ).to_h.stringify_keys
 
     raw["marketing_eligible"] = true
-    raw["open_deal"] ||= params[:view] == "no_open_deal" ? "no" : "any"
+    raw["open_deal"] ||= (params[:view] == "no_open_deal") ? "no" : "any"
     raw["open_deal_product_id"] = params[:product_id] if params[:product_id].present?
     raw
   end
@@ -75,7 +76,7 @@ class MqlsController < ApplicationController
 
     deals = policy_scope(current_workspace.deals).open_deals
       .joins(:deal_contacts)
-      .where(deal_contacts: { person_id: person_ids })
+      .where(deal_contacts: {person_id: person_ids})
       .includes(:pipeline, :deal_contacts, deal_products: :product)
 
     result = Hash.new { |hash, key| hash[key] = [] }
@@ -98,7 +99,7 @@ class MqlsController < ApplicationController
           form = rows.first.lead_form
           next if form.nil?
 
-          { form: form, count: rows.size, first_at: rows.map(&:created_at).min, last_at: rows.map(&:created_at).max, latest: rows.max_by(&:created_at) }
+          {form: form, count: rows.size, first_at: rows.map(&:created_at).min, last_at: rows.map(&:created_at).max, latest: rows.max_by(&:created_at)}
         end
       end
   end

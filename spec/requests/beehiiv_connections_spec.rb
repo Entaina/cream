@@ -66,7 +66,7 @@ RSpec.describe "Beehiiv connections", type: :request do
 
     it "is admin-only" do
       sign_in_as(member)
-      patch switch_workspace_path, params: { workspace_id: workspace.id }
+      patch switch_workspace_path, params: {workspace_id: workspace.id}
 
       expect {
         post beehiiv_connection_path, params: connection_params

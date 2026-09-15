@@ -13,21 +13,21 @@ module CreamMcp
   EMAIL_ATTACHMENT_SCHEMA = {
     type: "object",
     properties: {
-      filename: { type: "string" },
-      content: { type: "string", description: "Base64-encoded file content" },
-      content_type: { type: "string", description: "Optional MIME type" }
+      filename: {type: "string"},
+      content: {type: "string", description: "Base64-encoded file content"},
+      content_type: {type: "string", description: "Optional MIME type"}
     },
-    required: [ "filename", "content" ]
+    required: ["filename", "content"]
   }.freeze
   DEAL_EMAIL_SCHEMA = {
     type: "object",
     properties: {
-      to_address: { type: "string", description: "Recipient email; defaults to the deal's first contact" },
-      subject: { type: "string" },
-      body: { type: "string" },
-      attachments: { type: "array", items: EMAIL_ATTACHMENT_SCHEMA }
+      to_address: {type: "string", description: "Recipient email; defaults to the deal's first contact"},
+      subject: {type: "string"},
+      body: {type: "string"},
+      attachments: {type: "array", items: EMAIL_ATTACHMENT_SCHEMA}
     },
-    required: [ "subject", "body" ]
+    required: ["subject", "body"]
   }.freeze
 
   def self.server_for(user:, workspace:)
@@ -37,7 +37,7 @@ module CreamMcp
       version: "1.0.0",
       instructions: server_instructions(workspace),
       tools: tools,
-      server_context: { user: user, workspace: workspace }
+      server_context: {user: user, workspace: workspace}
     )
   end
 
@@ -66,7 +66,7 @@ module CreamMcp
   end
 
   def self.tools
-    [ SEARCH, LIST_PEOPLE, LIST_COMPANIES, LIST_DEALS, GET_RECORD,
+    [SEARCH, LIST_PEOPLE, LIST_COMPANIES, LIST_DEALS, GET_RECORD,
       LIST_PRODUCTS, LIST_TASKS, LIST_MY_TASKS, LIST_EMAILS, GET_EMAIL, LIST_ACTIVITY, LIST_PAYMENTS, LIST_PIPELINES,
       CREATE_PERSON, CREATE_COMPANY, CREATE_DEAL,
       UPDATE_PERSON, UPDATE_COMPANY, UPDATE_DEAL, UPDATE_DEAL_STAGE,
@@ -76,11 +76,11 @@ module CreamMcp
       LIST_CUSTOM_FIELDS, SET_CUSTOM_FIELDS, GET_DEAL_HISTORY,
       RECENT_CHANGES, SALES_FORECAST,
       SUMMARIZE_RECORD, SUGGEST_NEXT_STEPS, DRAFT_EMAIL, NATURAL_LANGUAGE_SEARCH, ENRICH_RECORD,
-      *Marketing.tools ]
+      *Marketing.tools]
   end
 
   def self.respond_with(payload)
-    MCP::Tool::Response.new([ { type: "text", text: JSON.generate(payload) } ])
+    MCP::Tool::Response.new([{type: "text", text: JSON.generate(payload)}])
   end
 
   def self.list_limit(args, default = DEFAULT_LIST_LIMIT)
@@ -109,7 +109,7 @@ module CreamMcp
   end
 
   def self.record_ref_json(record)
-    { type: record.class.name.downcase, id: record.id, name: record.display_name, url: record_url(record) }.compact
+    {type: record.class.name.downcase, id: record.id, name: record.display_name, url: record_url(record)}.compact
   end
 
   def self.task_url(task)
@@ -123,33 +123,33 @@ module CreamMcp
   end
 
   def self.person_json(p)
-    { id: p.id, type: "person", name: p.display_name, email: p.email, phone: p.phone,
+    {id: p.id, type: "person", name: p.display_name, email: p.email, phone: p.phone,
      job_title: p.job_title, location: p.location, company_id: p.company_id,
      company: p.company&.name, owner: p.owner&.name, url: record_url(p),
      lifecycle_stage: p.lifecycle_stage, lead_score: p.lead_score,
      custom_fields: custom_fields_json(p),
-     created_at: p.created_at.iso8601, updated_at: p.updated_at.iso8601 }.compact
+     created_at: p.created_at.iso8601, updated_at: p.updated_at.iso8601}.compact
   end
 
   def self.company_json(c)
-    { id: c.id, type: "company", name: c.name, domain: c.domain, industry: c.industry,
+    {id: c.id, type: "company", name: c.name, domain: c.domain, industry: c.industry,
      employees: c.employee_range, location: c.location, annual_revenue: c.annual_revenue,
      fiscal_information: c.fiscal_information,
      owner: c.owner&.name, people_count: c.people.size, url: record_url(c),
      custom_fields: custom_fields_json(c),
-     created_at: c.created_at.iso8601, updated_at: c.updated_at.iso8601 }.compact
+     created_at: c.created_at.iso8601, updated_at: c.updated_at.iso8601}.compact
   end
 
   def self.deal_json(d)
     line_items = d.association(:deal_products).loaded? ? d.deal_products : d.deal_products.includes(:product, :edition)
-    { id: d.id, type: "deal", name: d.name, pipeline: d.pipeline&.name, stage: d.stage_label,
+    {id: d.id, type: "deal", name: d.name, pipeline: d.pipeline&.name, stage: d.stage_label,
      value: d.value.to_f, currency: d.currency, probability: d.probability,
-     products: line_items.map { |lp| { line_item_id: lp.id, product_id: lp.product_id, name: lp.product.name, edition: lp.edition&.name, quantity: lp.quantity, unit_price: lp.unit_price.to_f, subtotal: lp.subtotal.to_f }.compact }.presence,
+     products: line_items.map { |lp| {line_item_id: lp.id, product_id: lp.product_id, name: lp.product.name, edition: lp.edition&.name, quantity: lp.quantity, unit_price: lp.unit_price.to_f, subtotal: lp.subtotal.to_f}.compact }.presence,
      expected_close_date: d.expected_close_date&.iso8601,
      company_id: d.company_id, company: d.company&.name, company_url: record_url(d.company),
      contacts: d.contacts.map { |p| record_ref_json(p) }.presence, owner: d.owner&.name, url: record_url(d),
      custom_fields: custom_fields_json(d),
-     created_at: d.created_at.iso8601, updated_at: d.updated_at.iso8601 }.compact
+     created_at: d.created_at.iso8601, updated_at: d.updated_at.iso8601}.compact
   end
 
   def self.custom_fields_json(record)
@@ -157,42 +157,42 @@ module CreamMcp
   end
 
   def self.custom_field_definition_json(field)
-    { key: field.key, name: field.name, type: field.field_type,
-     required: field.required, options: field.options.presence }.compact
+    {key: field.key, name: field.name, type: field.field_type,
+     required: field.required, options: field.options.presence}.compact
   end
 
   def self.task_json(t)
-    { id: t.id, title: t.title, due_on: t.due_on&.iso8601, completed: t.completed?,
+    {id: t.id, title: t.title, due_on: t.due_on&.iso8601, completed: t.completed?,
      completed_at: t.completed_at&.iso8601,
      overdue: t.overdue?, assignee: t.assignee&.name, url: task_url(t),
      record: t.taskable && record_ref_json(t.taskable),
-     created_at: t.created_at.iso8601, updated_at: t.updated_at.iso8601 }.compact
+     created_at: t.created_at.iso8601, updated_at: t.updated_at.iso8601}.compact
   end
 
   def self.product_json(p)
-    { id: p.id, name: p.name, price: p.price.to_f, description: p.description }.compact
+    {id: p.id, name: p.name, price: p.price.to_f, description: p.description}.compact
   end
 
   def self.payment_json(p)
-    { id: p.id, amount: p.amount_decimal, currency: p.currency.upcase,
-      status: p.status, customer_name: p.customer_name, customer_email: p.customer_email,
-      description: p.description, paid_at: p.paid_at.iso8601,
-      refunded: p.refunded, partially_refunded: p.partially_refunded?,
-      amount_refunded: (p.amount_refunded_decimal if p.partially_refunded?),
-      payment_method: p.payment_method_summary, receipt_url: p.receipt_url,
-      livemode: p.livemode, match_confidence: p.match_confidence,
-      deal: p.deal && record_ref_json(p.deal),
-      suggested_deal: p.suggested_deal && record_ref_json(p.suggested_deal),
-      suggested_person: p.suggested_person && record_ref_json(p.suggested_person),
-      stripe_charge_id: p.stripe_charge_id }.compact
+    {id: p.id, amount: p.amount_decimal, currency: p.currency.upcase,
+     status: p.status, customer_name: p.customer_name, customer_email: p.customer_email,
+     description: p.description, paid_at: p.paid_at.iso8601,
+     refunded: p.refunded, partially_refunded: p.partially_refunded?,
+     amount_refunded: (p.amount_refunded_decimal if p.partially_refunded?),
+     payment_method: p.payment_method_summary, receipt_url: p.receipt_url,
+     livemode: p.livemode, match_confidence: p.match_confidence,
+     deal: p.deal && record_ref_json(p.deal),
+     suggested_deal: p.suggested_deal && record_ref_json(p.suggested_deal),
+     suggested_person: p.suggested_person && record_ref_json(p.suggested_person),
+     stripe_charge_id: p.stripe_charge_id}.compact
   end
 
   def self.email_json(e)
-    { id: e.id, subject: e.subject, to: e.to_address, status: e.status,
+    {id: e.id, subject: e.subject, to: e.to_address, status: e.status,
      record: e.record && record_ref_json(e.record),
      opened: e.opened?, replied: e.replied?, awaiting_follow_up: e.awaiting_follow_up?,
      follow_up_at: e.follow_up_at&.iso8601, scheduled_at: e.scheduled_at&.iso8601,
-     clicks: e.clicks_count, created_at: e.created_at.iso8601 }.compact
+     clicks: e.clicks_count, created_at: e.created_at.iso8601}.compact
   end
 
   def self.email_detail_json(e)
@@ -200,20 +200,20 @@ module CreamMcp
       direction: e.direction, from: e.from_address, body: e.body,
       in_reply_to_id: e.in_reply_to_id,
       replies: e.replies.recent_first.map { |r|
-        { id: r.id, direction: r.direction, from: r.from_address, subject: r.subject, created_at: r.created_at.iso8601 }.compact
+        {id: r.id, direction: r.direction, from: r.from_address, subject: r.subject, created_at: r.created_at.iso8601}.compact
       }.presence
     ).compact
   end
 
   def self.comment_json(c)
-    { id: c.id, body: c.body, author: c.user.name, parent_id: c.parent_id,
-     created_at: c.created_at.iso8601 }.compact
+    {id: c.id, body: c.body, author: c.user.name, parent_id: c.parent_id,
+     created_at: c.created_at.iso8601}.compact
   end
 
   def self.event_email_json(e)
-    { id: e.id, direction: e.direction, from: e.from_address, subject: e.subject,
+    {id: e.id, direction: e.direction, from: e.from_address, subject: e.subject,
      record: e.record && record_ref_json(e.record),
-     created_at: e.created_at.iso8601 }.compact
+     created_at: e.created_at.iso8601}.compact
   end
 
   def self.deal_probability(deal)
@@ -225,9 +225,9 @@ module CreamMcp
   end
 
   def self.activity_json(a)
-    { action: a.action, by: a.user&.name, at: a.created_at.iso8601,
+    {action: a.action, by: a.user&.name, at: a.created_at.iso8601,
      subject: activity_subject_json(a),
-     details: a.metadata.presence }.compact
+     details: a.metadata.presence}.compact
   end
 
   def self.activity_subject_json(activity)
@@ -237,21 +237,21 @@ module CreamMcp
     if subject.is_a?(Person) || subject.is_a?(Company) || subject.is_a?(Deal)
       record_ref_json(subject)
     else
-      { type: activity.subject_type.downcase, id: activity.subject_id, name: subject.display_name }
+      {type: activity.subject_type.downcase, id: activity.subject_id, name: subject.display_name}
     end
   end
 
   def self.deal_version_json(version, users_by_id = {})
     actor = version.whodunnit.present? ? users_by_id[version.whodunnit.to_i] : nil
-    { kind: "version", event: version.event, by: actor&.name || "Someone", at: version.created_at.iso8601,
-     changes: version.changeset.transform_values { |pair| { from: pair[0], to: pair[1] } }.presence }.compact
+    {kind: "version", event: version.event, by: actor&.name || "Someone", at: version.created_at.iso8601,
+     changes: version.changeset.transform_values { |pair| {from: pair[0], to: pair[1]} }.presence}.compact
   end
 
   def self.pipeline_json(pl)
-    { id: pl.id, name: pl.name, default: pl.default_pipeline,
+    {id: pl.id, name: pl.name, default: pl.default_pipeline,
      stages: pl.pipeline_stages.ordered.map { |s|
-       { id: s.id, name: s.name, probability: s.probability, won: s.won, closed: s.closed }
-     } }
+       {id: s.id, name: s.name, probability: s.probability, won: s.won, closed: s.closed}
+     }}
   end
 
   def self.cream_context(server_context)
@@ -292,31 +292,31 @@ module CreamMcp
   end
 
   def self.ai_unavailable_response
-    MCP::Tool::Response.new([ { type: "text", text: JSON.generate({
+    MCP::Tool::Response.new([{type: "text", text: JSON.generate({
       error: "ai_unavailable",
       message: "AI assistant is disabled or CREAM_AI_API_KEY is not configured"
-    }) } ])
+    })}])
   end
 
   def self.payments_unavailable_response
-    MCP::Tool::Response.new([ { type: "text", text: JSON.generate({
+    MCP::Tool::Response.new([{type: "text", text: JSON.generate({
       error: "payments_unavailable",
       message: "Stripe payments feature is disabled"
-    }) } ])
+    })}])
   end
 
   def self.comments_unavailable_response
-    MCP::Tool::Response.new([ { type: "text", text: JSON.generate({
+    MCP::Tool::Response.new([{type: "text", text: JSON.generate({
       error: "comments_unavailable",
       message: "Comments feature is disabled"
-    }) } ])
+    })}])
   end
 
   def self.feature_unavailable_response(flag)
-    MCP::Tool::Response.new([ { type: "text", text: JSON.generate({
+    MCP::Tool::Response.new([{type: "text", text: JSON.generate({
       error: "feature_unavailable",
       message: "Feature #{flag} is disabled"
-    }) } ])
+    })}])
   end
 
   def self.arg(args, key)
@@ -360,7 +360,7 @@ module CreamMcp
   end
 
   def self.error_response(error, message)
-    MCP::Tool::Response.new([ { type: "text", text: JSON.generate({ error: error, message: message }) } ])
+    MCP::Tool::Response.new([{type: "text", text: JSON.generate({error: error, message: message})}])
   end
 
   def self.record_search_scope(workspace, type, query)
@@ -418,7 +418,7 @@ module CreamMcp
     when Company
       deals_scope.where(company_id: record.id).open_deals.order(:name)
     when Person
-      deals_scope.joins(:contacts).where(people: { id: record.id }).open_deals.distinct.order(:name)
+      deals_scope.joins(:contacts).where(people: {id: record.id}).open_deals.distinct.order(:name)
     else
       Deal.none
     end
@@ -439,7 +439,7 @@ module CreamMcp
       remaining -= tasks.size
       next if tasks.empty?
 
-      { deal: record_ref_json(deal), tasks: tasks.map { |t| task_json(t) } }
+      {deal: record_ref_json(deal), tasks: tasks.map { |t| task_json(t) }}
     end
   end
 
@@ -453,9 +453,9 @@ module CreamMcp
   SEARCH = MCP::Tool.define(
     name: "search_records",
     description: "Search people, companies and deals by name, email, domain, industry or title.",
-    input_schema: { type: "object",
-                   properties: { query: { type: "string", description: "Search text" } },
-                   required: [ "query" ] }
+    input_schema: {type: "object",
+                   properties: {query: {type: "string", description: "Search text"}},
+                   required: ["query"]}
   ) do |server_context:, **args|
     CreamMcp.with_authorization(server_context) do
       ctx = CreamMcp.pundit_context(server_context)
@@ -473,10 +473,10 @@ module CreamMcp
   LIST_PEOPLE = MCP::Tool.define(
     name: "list_people",
     description: "List people in the workspace, optionally filtered by company or free-text query.",
-    input_schema: { type: "object",
-                   properties: { query: { type: "string" },
-                                company_id: { type: "integer" },
-                                limit: { type: "integer", description: "Max results (default 25)" } } }
+    input_schema: {type: "object",
+                   properties: {query: {type: "string"},
+                                company_id: {type: "integer"},
+                                limit: {type: "integer", description: "Max results (default 25)"}}}
   ) do |server_context:, **args|
     CreamMcp.with_authorization(server_context) do
       ctx = CreamMcp.pundit_context(server_context)
@@ -491,10 +491,10 @@ module CreamMcp
   LIST_COMPANIES = MCP::Tool.define(
     name: "list_companies",
     description: "List companies in the workspace, optionally filtered by industry or free-text query.",
-    input_schema: { type: "object",
-                   properties: { query: { type: "string" },
-                                industry: { type: "string" },
-                                limit: { type: "integer", description: "Max results (default 25)" } } }
+    input_schema: {type: "object",
+                   properties: {query: {type: "string"},
+                                industry: {type: "string"},
+                                limit: {type: "integer", description: "Max results (default 25)"}}}
   ) do |server_context:, **args|
     CreamMcp.with_authorization(server_context) do
       ctx = CreamMcp.pundit_context(server_context)
@@ -509,17 +509,17 @@ module CreamMcp
   LIST_DEALS = MCP::Tool.define(
     name: "list_deals",
     description: "List deals, optionally filtered by pipeline stage name (e.g. Lead, Won) or free-text query.",
-    input_schema: { type: "object",
-                   properties: { stage: { type: "string", description: "Pipeline stage name to filter by" },
-                                query: { type: "string" },
-                                limit: { type: "integer", description: "Max results (default 25)" } } }
+    input_schema: {type: "object",
+                   properties: {stage: {type: "string", description: "Pipeline stage name to filter by"},
+                                query: {type: "string"},
+                                limit: {type: "integer", description: "Max results (default 25)"}}}
   ) do |server_context:, **args|
     CreamMcp.with_authorization(server_context) do
       ctx = CreamMcp.pundit_context(server_context)
       CreamMcp.authorize!(ctx, ctx.workspace, :search?)
       scope = CreamMcp.policy_scope(ctx, ctx.workspace.deals)
         .includes(:company, :contacts, :owner, :pipeline, :pipeline_stage, custom_field_values: :custom_field,
-                  deal_products: [ :product, :edition ])
+          deal_products: [:product, :edition])
         .order(created_at: :desc)
       scope = scope.search(CreamMcp.arg(args, "query")) if CreamMcp.arg(args, "query").present?
       scope = scope.joins(:pipeline_stage).where("pipeline_stages.name ILIKE ?", CreamMcp.arg(args, "stage")) if CreamMcp.arg(args, "stage").present?
@@ -531,10 +531,10 @@ module CreamMcp
     name: "get_record",
     description: "Get details of a person, company or deal: attributes, recent notes, tasks (up to 20) and activity. " \
                  "For full lists use list_people, list_deals or list_tasks.",
-    input_schema: { type: "object",
-                   properties: { record_type: { type: "string", enum: RECORD_TYPES },
-                                record_id: { type: "integer" } },
-                   required: [ "record_type", "record_id" ] }
+    input_schema: {type: "object",
+                   properties: {record_type: {type: "string", enum: RECORD_TYPES},
+                                record_id: {type: "integer"}},
+                   required: ["record_type", "record_id"]}
   ) do |server_context:, **args|
     CreamMcp.with_authorization(server_context) do
       pundit_ctx = CreamMcp.pundit_context(server_context)
@@ -554,12 +554,12 @@ module CreamMcp
       CreamMcp.respond_with(
         base.merge(
           notes: record.notes.includes(:user).order(created_at: :desc).limit(10).map { |n|
-            { id: n.id, title: n.title, body: n.body, author: n.user.name, created_at: n.created_at.iso8601 }.compact
+            {id: n.id, title: n.title, body: n.body, author: n.user.name, created_at: n.created_at.iso8601}.compact
           },
           comments: comments,
           tasks: record.tasks.due_order.limit(20).map { |t| CreamMcp.task_json(t) },
           recent_activity: record.activities.includes(:user).recent_first.limit(10).map { |a|
-            { action: a.action, by: a.user&.name, at: a.created_at.iso8601, details: a.metadata.presence }.compact
+            {action: a.action, by: a.user&.name, at: a.created_at.iso8601, details: a.metadata.presence}.compact
           }
         ).compact
       )
@@ -569,14 +569,14 @@ module CreamMcp
   CREATE_PERSON = MCP::Tool.define(
     name: "create_person",
     description: "Create a person (contact). Provide at least a first or last name.",
-    input_schema: { type: "object",
-                   properties: { first_name: { type: "string" }, last_name: { type: "string" },
-                                email: { type: "string" }, phone: { type: "string" },
-                                job_title: { type: "string" }, location: { type: "string" },
-                                company_id: { type: "integer", description: "Existing company id (required — a person belongs to a company)" },
-                                description: { type: "string" },
-                                custom_fields: { type: "object", description: "Workspace-defined custom fields keyed by field key (see list_custom_fields)" } },
-                   required: [ "first_name", "company_id" ] }
+    input_schema: {type: "object",
+                   properties: {first_name: {type: "string"}, last_name: {type: "string"},
+                                email: {type: "string"}, phone: {type: "string"},
+                                job_title: {type: "string"}, location: {type: "string"},
+                                company_id: {type: "integer", description: "Existing company id (required — a person belongs to a company)"},
+                                description: {type: "string"},
+                                custom_fields: {type: "object", description: "Workspace-defined custom fields keyed by field key (see list_custom_fields)"}},
+                   required: ["first_name", "company_id"]}
   ) do |server_context:, **args|
     CreamMcp.with_authorization(server_context) do
       pundit_ctx = CreamMcp.pundit_context(server_context)
@@ -595,16 +595,16 @@ module CreamMcp
   CREATE_COMPANY = MCP::Tool.define(
     name: "create_company",
     description: "Create a company.",
-    input_schema: { type: "object",
-                   properties: { name: { type: "string" }, domain: { type: "string" },
-                                industry: { type: "string" },
-                                employee_range: { type: "string", enum: Company::EMPLOYEE_RANGES },
-                                location: { type: "string" }, annual_revenue: { type: "integer" },
-                                description: { type: "string" },
-                                fiscal_information: { type: "string",
-                                  description: "Razon social, CIF/NIF, direccion fiscal, IBAN (texto libre)" },
-                                custom_fields: { type: "object", description: "Workspace-defined custom fields keyed by field key (see list_custom_fields)" } },
-                   required: [ "name" ] }
+    input_schema: {type: "object",
+                   properties: {name: {type: "string"}, domain: {type: "string"},
+                                industry: {type: "string"},
+                                employee_range: {type: "string", enum: Company::EMPLOYEE_RANGES},
+                                location: {type: "string"}, annual_revenue: {type: "integer"},
+                                description: {type: "string"},
+                                fiscal_information: {type: "string",
+                                                     description: "Razon social, CIF/NIF, direccion fiscal, IBAN (texto libre)"},
+                                custom_fields: {type: "object", description: "Workspace-defined custom fields keyed by field key (see list_custom_fields)"}},
+                   required: ["name"]}
   ) do |server_context:, **args|
     CreamMcp.with_authorization(server_context) do
       pundit_ctx = CreamMcp.pundit_context(server_context)
@@ -626,22 +626,22 @@ module CreamMcp
     description: "Create a deal. A deal belongs to a company and needs a next action (a task with a future due date). " \
                  "Contacts are optional but, when provided, must belong to the company. " \
                  "Optionally send an email to a contact in the same request (requires record_email).",
-    input_schema: { type: "object",
-                   properties: { name: { type: "string" },
-                                company_id: { type: "integer", description: "Company the deal belongs to" },
-                                person_ids: { type: "array", items: { type: "integer" },
-                                             description: "Optional contact person ids — must belong to the company when provided" },
-                                next_action_title: { type: "string", description: "The next action to take on this deal" },
-                                next_action_due_on: { type: "string", description: "Due date for the next action, ISO (YYYY-MM-DD), in the future" },
-                                value: { type: "number" },
-                                currency: { type: "string", enum: %w[EUR USD] },
-                                pipeline: { type: "string", description: "Pipeline name (defaults to the workspace default)" },
-                                stage: { type: "string", description: "Pipeline stage name (defaults to the first stage)" },
-                                probability: { type: "integer", minimum: 0, maximum: 100 },
-                                expected_close_date: { type: "string", description: "ISO date (YYYY-MM-DD)" },
-                                custom_fields: { type: "object", description: "Workspace-defined custom fields keyed by field key (see list_custom_fields)" },
-                                email: DEAL_EMAIL_SCHEMA.merge(description: "Optional email to send after the deal is created") },
-                   required: [ "name", "company_id", "next_action_title", "next_action_due_on" ] }
+    input_schema: {type: "object",
+                   properties: {name: {type: "string"},
+                                company_id: {type: "integer", description: "Company the deal belongs to"},
+                                person_ids: {type: "array", items: {type: "integer"},
+                                             description: "Optional contact person ids — must belong to the company when provided"},
+                                next_action_title: {type: "string", description: "The next action to take on this deal"},
+                                next_action_due_on: {type: "string", description: "Due date for the next action, ISO (YYYY-MM-DD), in the future"},
+                                value: {type: "number"},
+                                currency: {type: "string", enum: %w[EUR USD]},
+                                pipeline: {type: "string", description: "Pipeline name (defaults to the workspace default)"},
+                                stage: {type: "string", description: "Pipeline stage name (defaults to the first stage)"},
+                                probability: {type: "integer", minimum: 0, maximum: 100},
+                                expected_close_date: {type: "string", description: "ISO date (YYYY-MM-DD)"},
+                                custom_fields: {type: "object", description: "Workspace-defined custom fields keyed by field key (see list_custom_fields)"},
+                                email: DEAL_EMAIL_SCHEMA.merge(description: "Optional email to send after the deal is created")},
+                   required: ["name", "company_id", "next_action_title", "next_action_due_on"]}
   ) do |server_context:, **args|
     CreamMcp.with_authorization(server_context) do
       pundit_ctx = CreamMcp.pundit_context(server_context)
@@ -678,7 +678,7 @@ module CreamMcp
       end
       email_creator.deliver(email_message) if email_message
 
-      payload = { created: CreamMcp.deal_json(deal) }
+      payload = {created: CreamMcp.deal_json(deal)}
       payload[:email] = Api::DealEmailCreator.json(email_message) if email_message
       CreamMcp.respond_with(payload)
     rescue Api::DealEmailCreator::InvalidAttachment => e
@@ -690,14 +690,14 @@ module CreamMcp
     name: "update_person",
     description: "Update a person's fields. Only the fields provided are changed; pass an empty string to clear one. " \
                  "Use set_custom_fields for custom fields.",
-    input_schema: { type: "object",
-                   properties: { person_id: { type: "integer" },
-                                first_name: { type: "string" }, last_name: { type: "string" },
-                                email: { type: "string" }, phone: { type: "string" },
-                                job_title: { type: "string" }, location: { type: "string" },
-                                linkedin_url: { type: "string" }, description: { type: "string" },
-                                company_id: { type: "integer", description: "Move the person to another existing company" } },
-                   required: [ "person_id" ] }
+    input_schema: {type: "object",
+                   properties: {person_id: {type: "integer"},
+                                first_name: {type: "string"}, last_name: {type: "string"},
+                                email: {type: "string"}, phone: {type: "string"},
+                                job_title: {type: "string"}, location: {type: "string"},
+                                linkedin_url: {type: "string"}, description: {type: "string"},
+                                company_id: {type: "integer", description: "Move the person to another existing company"}},
+                   required: ["person_id"]}
   ) do |server_context:, **args|
     CreamMcp.with_authorization(server_context) do
       ctx = CreamMcp.pundit_context(server_context)
@@ -713,16 +713,16 @@ module CreamMcp
     name: "update_company",
     description: "Update a company's fields. Only the fields provided are changed; pass an empty string to clear one. " \
                  "Use set_custom_fields for custom fields.",
-    input_schema: { type: "object",
-                   properties: { company_id: { type: "integer" },
-                                name: { type: "string" }, domain: { type: "string" },
-                                industry: { type: "string" },
-                                employee_range: { type: "string", enum: Company::EMPLOYEE_RANGES },
-                                location: { type: "string" }, annual_revenue: { type: "integer" },
-                                description: { type: "string" },
-                                fiscal_information: { type: "string",
-                                  description: "Razon social, CIF/NIF, direccion fiscal, IBAN (texto libre)" } },
-                   required: [ "company_id" ] }
+    input_schema: {type: "object",
+                   properties: {company_id: {type: "integer"},
+                                name: {type: "string"}, domain: {type: "string"},
+                                industry: {type: "string"},
+                                employee_range: {type: "string", enum: Company::EMPLOYEE_RANGES},
+                                location: {type: "string"}, annual_revenue: {type: "integer"},
+                                description: {type: "string"},
+                                fiscal_information: {type: "string",
+                                                     description: "Razon social, CIF/NIF, direccion fiscal, IBAN (texto libre)"}},
+                   required: ["company_id"]}
   ) do |server_context:, **args|
     CreamMcp.with_authorization(server_context) do
       ctx = CreamMcp.pundit_context(server_context)
@@ -740,19 +740,19 @@ module CreamMcp
                  "contacts (they must belong to the deal's company). pipeline moves the deal to another pipeline " \
                  "(landing on its first stage unless stage is also given); stage moves it within its pipeline — " \
                  "both are logged in the activity timeline. Use set_custom_fields for custom fields.",
-    input_schema: { type: "object",
-                   properties: { deal_id: { type: "integer" },
-                                name: { type: "string" },
-                                value: { type: "number", description: "Deal value; note it is recalculated from product line subtotals whenever the deal's line items change" },
-                                currency: { type: "string", enum: %w[EUR USD] },
-                                probability: { type: "integer", minimum: 0, maximum: 100 },
-                                expected_close_date: { type: "string", description: "ISO date (YYYY-MM-DD)" },
-                                company_id: { type: "integer", description: "Move the deal to another existing company" },
-                                person_ids: { type: "array", items: { type: "integer" },
-                                             description: "Replaces the deal's contacts — must belong to the deal's company" },
-                                pipeline: { type: "string", description: "Target pipeline name" },
-                                stage: { type: "string", description: "Target stage name within the (possibly new) pipeline" } },
-                   required: [ "deal_id" ] }
+    input_schema: {type: "object",
+                   properties: {deal_id: {type: "integer"},
+                                name: {type: "string"},
+                                value: {type: "number", description: "Deal value; note it is recalculated from product line subtotals whenever the deal's line items change"},
+                                currency: {type: "string", enum: %w[EUR USD]},
+                                probability: {type: "integer", minimum: 0, maximum: 100},
+                                expected_close_date: {type: "string", description: "ISO date (YYYY-MM-DD)"},
+                                company_id: {type: "integer", description: "Move the deal to another existing company"},
+                                person_ids: {type: "array", items: {type: "integer"},
+                                             description: "Replaces the deal's contacts — must belong to the deal's company"},
+                                pipeline: {type: "string", description: "Target pipeline name"},
+                                stage: {type: "string", description: "Target stage name within the (possibly new) pipeline"}},
+                   required: ["deal_id"]}
   ) do |server_context:, **args|
     CreamMcp.with_authorization(server_context) do
       ctx = CreamMcp.pundit_context(server_context)
@@ -780,10 +780,10 @@ module CreamMcp
   UPDATE_DEAL_STAGE = MCP::Tool.define(
     name: "update_deal_stage",
     description: "Move a deal to another stage of its pipeline, by stage name (logged in the activity timeline).",
-    input_schema: { type: "object",
-                   properties: { deal_id: { type: "integer" },
-                                stage: { type: "string", description: "Target stage name within the deal's pipeline" } },
-                   required: [ "deal_id", "stage" ] }
+    input_schema: {type: "object",
+                   properties: {deal_id: {type: "integer"},
+                                stage: {type: "string", description: "Target stage name within the deal's pipeline"}},
+                   required: ["deal_id", "stage"]}
   ) do |server_context:, **args|
     CreamMcp.with_authorization(server_context) do
       pundit_ctx = CreamMcp.pundit_context(server_context)
@@ -798,7 +798,7 @@ module CreamMcp
     name: "list_person_duplicates",
     description: "List groups of people that share the same email address in the workspace. " \
                  "Use this to find merge candidates before calling merge_person.",
-    input_schema: { type: "object", properties: {} }
+    input_schema: {type: "object", properties: {}}
   ) do |server_context:, **_args|
     CreamMcp.with_authorization(server_context) do
       ctx = CreamMcp.pundit_context(server_context)
@@ -818,7 +818,7 @@ module CreamMcp
     name: "list_company_duplicates",
     description: "List groups of companies that likely represent the same organization " \
                  "(same domain or similar name). Use before calling merge_company.",
-    input_schema: { type: "object", properties: {} }
+    input_schema: {type: "object", properties: {}}
   ) do |server_context:, **_args|
     CreamMcp.with_authorization(server_context) do
       ctx = CreamMcp.pundit_context(server_context)
@@ -837,18 +837,18 @@ module CreamMcp
     name: "merge_person",
     description: "Merge duplicate people into a primary contact. Secondary records are permanently deleted " \
                  "after their notes, tasks, deal links and other data are moved to the primary.",
-    input_schema: { type: "object",
-                   properties: { primary_id: { type: "integer", description: "The contact to keep" },
-                                secondary_ids: { type: "array", items: { type: "integer" },
-                                                 description: "Contact ids to merge into the primary (at least one)" } },
-                   required: [ "primary_id", "secondary_ids" ] }
+    input_schema: {type: "object",
+                   properties: {primary_id: {type: "integer", description: "The contact to keep"},
+                                secondary_ids: {type: "array", items: {type: "integer"},
+                                                description: "Contact ids to merge into the primary (at least one)"}},
+                   required: ["primary_id", "secondary_ids"]}
   ) do |server_context:, **args|
     CreamMcp.with_authorization(server_context) do
       ctx = CreamMcp.pundit_context(server_context)
       ws = ctx.workspace
       primary = ws.people.find(CreamMcp.arg(args, "primary_id"))
       CreamMcp.authorize!(ctx, primary, :merge?)
-      secondary_ids = Array(CreamMcp.arg(args, "secondary_ids")).map(&:to_i).uniq - [ primary.id ]
+      secondary_ids = Array(CreamMcp.arg(args, "secondary_ids")).map(&:to_i).uniq - [primary.id]
       secondaries = secondary_ids.filter_map { |id| ws.people.find_by(id: id) }
       if secondaries.size != secondary_ids.size
         missing = secondary_ids - secondaries.map(&:id)
@@ -866,18 +866,18 @@ module CreamMcp
     name: "merge_company",
     description: "Merge duplicate companies into a primary company. Secondary records are permanently deleted " \
                  "after their people, deals, notes and other data are moved to the primary.",
-    input_schema: { type: "object",
-                   properties: { primary_id: { type: "integer", description: "The company to keep" },
-                                secondary_ids: { type: "array", items: { type: "integer" },
-                                                 description: "Company ids to merge into the primary (at least one)" } },
-                   required: [ "primary_id", "secondary_ids" ] }
+    input_schema: {type: "object",
+                   properties: {primary_id: {type: "integer", description: "The company to keep"},
+                                secondary_ids: {type: "array", items: {type: "integer"},
+                                                description: "Company ids to merge into the primary (at least one)"}},
+                   required: ["primary_id", "secondary_ids"]}
   ) do |server_context:, **args|
     CreamMcp.with_authorization(server_context) do
       ctx = CreamMcp.pundit_context(server_context)
       ws = ctx.workspace
       primary = ws.companies.find(CreamMcp.arg(args, "primary_id"))
       CreamMcp.authorize!(ctx, primary, :merge?)
-      secondary_ids = Array(CreamMcp.arg(args, "secondary_ids")).map(&:to_i).uniq - [ primary.id ]
+      secondary_ids = Array(CreamMcp.arg(args, "secondary_ids")).map(&:to_i).uniq - [primary.id]
       secondaries = secondary_ids.filter_map { |id| ws.companies.find_by(id: id) }
       if secondaries.size != secondary_ids.size
         missing = secondary_ids - secondaries.map(&:id)
@@ -895,16 +895,16 @@ module CreamMcp
     name: "delete_record",
     description: "Permanently delete a person, company or deal. This cannot be undone. " \
                  "Deleting a company also deletes all of its people and deals.",
-    input_schema: { type: "object",
-                   properties: { record_type: { type: "string", enum: RECORD_TYPES },
-                                record_id: { type: "integer" } },
-                   required: [ "record_type", "record_id" ] }
+    input_schema: {type: "object",
+                   properties: {record_type: {type: "string", enum: RECORD_TYPES},
+                                record_id: {type: "integer"}},
+                   required: ["record_type", "record_id"]}
   ) do |server_context:, **args|
     CreamMcp.with_authorization(server_context) do
       ctx = CreamMcp.pundit_context(server_context)
       record = CreamMcp.find_record(ctx.workspace, CreamMcp.arg(args, "record_type"), CreamMcp.arg(args, "record_id"))
       CreamMcp.authorize!(ctx, record, :destroy?)
-      deleted = { type: record.class.name.downcase, id: record.id, name: record.display_name }
+      deleted = {type: record.class.name.downcase, id: record.id, name: record.display_name}
       record.destroy!
       CreamMcp.respond_with(deleted: deleted)
     end
@@ -913,12 +913,12 @@ module CreamMcp
   ADD_NOTE = MCP::Tool.define(
     name: "add_note",
     description: "Add a note to a person, company or deal.",
-    input_schema: { type: "object",
-                   properties: { record_type: { type: "string", enum: RECORD_TYPES },
-                                record_id: { type: "integer" },
-                                title: { type: "string" },
-                                body: { type: "string" } },
-                   required: [ "record_type", "record_id", "body" ] }
+    input_schema: {type: "object",
+                   properties: {record_type: {type: "string", enum: RECORD_TYPES},
+                                record_id: {type: "integer"},
+                                title: {type: "string"},
+                                body: {type: "string"}},
+                   required: ["record_type", "record_id", "body"]}
   ) do |server_context:, **args|
     CreamMcp.with_authorization(server_context) do
       pundit_ctx = CreamMcp.pundit_context(server_context)
@@ -928,8 +928,8 @@ module CreamMcp
         title: CreamMcp.arg(args, "title"), body: CreamMcp.arg(args, "body"))
       CreamMcp.authorize!(pundit_ctx, note, :create?)
       note.save!
-      CreamMcp.respond_with(created: { id: note.id, title: note.title, body: note.body,
-                                      record: CreamMcp.record_ref_json(record) })
+      CreamMcp.respond_with(created: {id: note.id, title: note.title, body: note.body,
+                                      record: CreamMcp.record_ref_json(record)})
     end
   end
 
@@ -937,13 +937,13 @@ module CreamMcp
     name: "send_deal_email",
     description: "Send a tracked email from a deal to a contact. Delivery uses Gmail when connected, otherwise SMTP. " \
                  "If to_address is omitted, the deal's first contact is used. Attachments are Base64-encoded.",
-    input_schema: { type: "object",
-                   properties: { deal_id: { type: "integer" },
-                                to_address: { type: "string", description: "Recipient email; defaults to the deal's first contact" },
-                                subject: { type: "string" },
-                                body: { type: "string" },
-                                attachments: { type: "array", items: EMAIL_ATTACHMENT_SCHEMA } },
-                   required: [ "deal_id", "subject", "body" ] }
+    input_schema: {type: "object",
+                   properties: {deal_id: {type: "integer"},
+                                to_address: {type: "string", description: "Recipient email; defaults to the deal's first contact"},
+                                subject: {type: "string"},
+                                body: {type: "string"},
+                                attachments: {type: "array", items: EMAIL_ATTACHMENT_SCHEMA}},
+                   required: ["deal_id", "subject", "body"]}
   ) do |server_context:, **args|
     return CreamMcp.feature_unavailable_response(:record_email) unless CreamFeatures.enabled?(:record_email)
 
@@ -971,12 +971,12 @@ module CreamMcp
     description: "Add a comment to the internal discussion thread of a person, company or deal. " \
                  "Mention teammates with @Their Name to notify them. " \
                  "Pass parent_comment_id to reply to an existing comment (ids come from get_record).",
-    input_schema: { type: "object",
-                   properties: { record_type: { type: "string", enum: RECORD_TYPES },
-                                record_id: { type: "integer" },
-                                body: { type: "string" },
-                                parent_comment_id: { type: "integer", description: "Optional comment id to reply to" } },
-                   required: [ "record_type", "record_id", "body" ] }
+    input_schema: {type: "object",
+                   properties: {record_type: {type: "string", enum: RECORD_TYPES},
+                                record_id: {type: "integer"},
+                                body: {type: "string"},
+                                parent_comment_id: {type: "integer", description: "Optional comment id to reply to"}},
+                   required: ["record_type", "record_id", "body"]}
   ) do |server_context:, **args|
     return CreamMcp.comments_unavailable_response unless CreamFeatures.enabled?(:comments)
 
@@ -994,7 +994,7 @@ module CreamMcp
         WebhookDispatcher.dispatch(
           workspace: ws,
           event: "comment.created",
-          payload: { comment_id: comment.id, record_type: record.class.name, record_id: record.id }
+          payload: {comment_id: comment.id, record_type: record.class.name, record_id: record.id}
         )
       end
       CreamMcp.respond_with(created: CreamMcp.comment_json(comment).merge(
@@ -1006,12 +1006,12 @@ module CreamMcp
   CREATE_TASK = MCP::Tool.define(
     name: "create_task",
     description: "Create a task, optionally linked to a person, company or deal.",
-    input_schema: { type: "object",
-                   properties: { title: { type: "string" },
-                                due_on: { type: "string", description: "ISO date (YYYY-MM-DD)" },
-                                record_type: { type: "string", enum: RECORD_TYPES },
-                                record_id: { type: "integer" } },
-                   required: [ "title" ] }
+    input_schema: {type: "object",
+                   properties: {title: {type: "string"},
+                                due_on: {type: "string", description: "ISO date (YYYY-MM-DD)"},
+                                record_type: {type: "string", enum: RECORD_TYPES},
+                                record_id: {type: "integer"}},
+                   required: ["title"]}
   ) do |server_context:, **args|
     CreamMcp.with_authorization(server_context) do
       pundit_ctx = CreamMcp.pundit_context(server_context)
@@ -1030,9 +1030,9 @@ module CreamMcp
   COMPLETE_TASK = MCP::Tool.define(
     name: "complete_task",
     description: "Mark a task as completed (or reopen it if already completed).",
-    input_schema: { type: "object",
-                   properties: { task_id: { type: "integer" } },
-                   required: [ "task_id" ] }
+    input_schema: {type: "object",
+                   properties: {task_id: {type: "integer"}},
+                   required: ["task_id"]}
   ) do |server_context:, **args|
     CreamMcp.with_authorization(server_context) do
       pundit_ctx = CreamMcp.pundit_context(server_context)
@@ -1046,7 +1046,7 @@ module CreamMcp
   PIPELINE_SUMMARY = MCP::Tool.define(
     name: "pipeline_summary",
     description: "Pipeline overview: deal count and total value per stage, plus open/won totals.",
-    input_schema: { type: "object", properties: {} }
+    input_schema: {type: "object", properties: {}}
   ) do |server_context:, **_args|
     CreamMcp.with_authorization(server_context) do
       pundit_ctx = CreamMcp.pundit_context(server_context)
@@ -1057,8 +1057,8 @@ module CreamMcp
       counts = deals.group(:pipeline_stage_id).count
       values = deals.group(:pipeline_stage_id).sum(:value)
       stages = ws.pipeline_stages.ordered.to_h do |stage|
-        [ stage.name, { count: counts[stage.id] || 0, total_value: (values[stage.id] || 0).to_f,
-                      probability: stage.probability } ]
+        [stage.name, {count: counts[stage.id] || 0, total_value: (values[stage.id] || 0).to_f,
+                      probability: stage.probability}]
       end
       CreamMcp.respond_with(
         stages: stages,
@@ -1073,9 +1073,9 @@ module CreamMcp
     name: "list_custom_fields",
     description: "List the workspace's custom field definitions (key, type, options, required) grouped by record type. " \
                  "Use this to know which custom fields can be set on people, companies and deals.",
-    input_schema: { type: "object",
-                   properties: { record_type: { type: "string", enum: RECORD_TYPES,
-                                                description: "Optional: restrict to one record type" } } }
+    input_schema: {type: "object",
+                   properties: {record_type: {type: "string", enum: RECORD_TYPES,
+                                              description: "Optional: restrict to one record type"}}}
   ) do |server_context:, **args|
     CreamMcp.with_authorization(server_context) do
       ctx = CreamMcp.pundit_context(server_context)
@@ -1094,11 +1094,11 @@ module CreamMcp
     name: "set_custom_fields",
     description: "Set custom field values on an existing person, company or deal. " \
                  "Pass values keyed by field key (see list_custom_fields). A blank value clears the field.",
-    input_schema: { type: "object",
-                   properties: { record_type: { type: "string", enum: RECORD_TYPES },
-                                record_id: { type: "integer" },
-                                custom_fields: { type: "object", description: "Field values keyed by field key" } },
-                   required: [ "record_type", "record_id", "custom_fields" ] }
+    input_schema: {type: "object",
+                   properties: {record_type: {type: "string", enum: RECORD_TYPES},
+                                record_id: {type: "integer"},
+                                custom_fields: {type: "object", description: "Field values keyed by field key"}},
+                   required: ["record_type", "record_id", "custom_fields"]}
   ) do |server_context:, **args|
     CreamMcp.with_authorization(server_context) do
       pundit_ctx = CreamMcp.pundit_context(server_context)
@@ -1119,9 +1119,9 @@ module CreamMcp
   LIST_PRODUCTS = MCP::Tool.define(
     name: "list_products",
     description: "List catalogue products, optionally filtered by a free-text query (name or description).",
-    input_schema: { type: "object",
-                   properties: { query: { type: "string" },
-                                limit: { type: "integer", description: "Max results (default 25)" } } }
+    input_schema: {type: "object",
+                   properties: {query: {type: "string"},
+                                limit: {type: "integer", description: "Max results (default 25)"}}}
   ) do |server_context:, **args|
     CreamMcp.with_authorization(server_context) do
       ctx = CreamMcp.pundit_context(server_context)
@@ -1138,15 +1138,15 @@ module CreamMcp
                  "assignee_query for any workspace member), or by the person/company/deal they are linked to " \
                  "(record_type with record_id or record_query). For companies and people, also returns open_deal_tasks " \
                  "(tasks on their open deals, grouped by deal).",
-    input_schema: { type: "object",
-                   properties: { status: { type: "string", enum: %w[pending completed overdue] },
-                                mine: { type: "boolean", description: "Only tasks assigned to the current user" },
-                                assignee_id: { type: "integer", description: "Tasks assigned to this workspace user id" },
-                                assignee_query: { type: "string", description: "Tasks assigned to a workspace user matched by name or email" },
-                                record_type: { type: "string", enum: RECORD_TYPES },
-                                record_id: { type: "integer" },
-                                record_query: { type: "string", description: "Match the linked record by name (use with record_type)" },
-                                limit: { type: "integer", description: "Max results (default 25)" } } }
+    input_schema: {type: "object",
+                   properties: {status: {type: "string", enum: %w[pending completed overdue]},
+                                mine: {type: "boolean", description: "Only tasks assigned to the current user"},
+                                assignee_id: {type: "integer", description: "Tasks assigned to this workspace user id"},
+                                assignee_query: {type: "string", description: "Tasks assigned to a workspace user matched by name or email"},
+                                record_type: {type: "string", enum: RECORD_TYPES},
+                                record_id: {type: "integer"},
+                                record_query: {type: "string", description: "Match the linked record by name (use with record_type)"},
+                                limit: {type: "integer", description: "Max results (default 25)"}}}
   ) do |server_context:, **args|
     CreamMcp.with_authorization(server_context) do
       ctx = CreamMcp.pundit_context(server_context)
@@ -1179,7 +1179,7 @@ module CreamMcp
         payload = if record.is_a?(Company) || record.is_a?(Person)
           CreamMcp.record_tasks_payload(scope, record, deals_scope, limit: limit)
         else
-          { tasks: scope.where(taskable: record).limit(limit).map { |t| CreamMcp.task_json(t) } }
+          {tasks: scope.where(taskable: record).limit(limit).map { |t| CreamMcp.task_json(t) }}
         end
         CreamMcp.respond_with(payload)
       else
@@ -1195,11 +1195,11 @@ module CreamMcp
     description: "List tasks assigned to you. Use for questions like overdue tasks, tasks due today, or both. " \
                  "Returns title and url for each task. Prefer this over list_tasks, natural_language_search or get_record " \
                  "for personal task queries.",
-    input_schema: { type: "object",
-                   properties: { scope: { type: "string",
-                                            enum: %w[today_or_overdue today overdue pending],
-                                            description: "Filter: today_or_overdue (default), today, overdue, or all pending" },
-                                limit: { type: "integer", description: "Max results (default 50, max 100)" } } }
+    input_schema: {type: "object",
+                   properties: {scope: {type: "string",
+                                        enum: %w[today_or_overdue today overdue pending],
+                                        description: "Filter: today_or_overdue (default), today, overdue, or all pending"},
+                                limit: {type: "integer", description: "Max results (default 50, max 100)"}}}
   ) do |server_context:, **args|
     CreamMcp.with_authorization(server_context, tool: "list_my_tasks") do
       ctx = CreamMcp.pundit_context(server_context)
@@ -1209,11 +1209,11 @@ module CreamMcp
         .where(assignee: ctx.user)
         .includes(:assignee, :taskable)
         .due_order
-      case CreamMcp.arg(args, "scope").presence || "today_or_overdue"
-      when "today" then scope = scope.due_today
-      when "overdue" then scope = scope.overdue
-      when "pending" then scope = scope
-      else scope = scope.due_today_or_overdue
+      scope = case CreamMcp.arg(args, "scope").presence || "today_or_overdue"
+      when "today" then scope.due_today
+      when "overdue" then scope.overdue
+      when "pending" then scope
+      else scope.due_today_or_overdue
       end
       CreamMcp.respond_with(
         tasks: scope.limit(CreamMcp.list_limit(args, MY_TASKS_DEFAULT_LIMIT)).map { |t| CreamMcp.task_json(t) }
@@ -1225,12 +1225,12 @@ module CreamMcp
     name: "list_emails",
     description: "List emails (read-only): most recent first. Filter by the linked person/company/deal, " \
                  "by status (sent/scheduled/opened/failed), or only those awaiting a follow-up.",
-    input_schema: { type: "object",
-                   properties: { record_type: { type: "string", enum: RECORD_TYPES },
-                                record_id: { type: "integer" },
-                                status: { type: "string" },
-                                awaiting_follow_up: { type: "boolean", description: "Only sent emails with a pending follow-up and no reply yet" },
-                                limit: { type: "integer", description: "Max results (default 25)" } } }
+    input_schema: {type: "object",
+                   properties: {record_type: {type: "string", enum: RECORD_TYPES},
+                                record_id: {type: "integer"},
+                                status: {type: "string"},
+                                awaiting_follow_up: {type: "boolean", description: "Only sent emails with a pending follow-up and no reply yet"},
+                                limit: {type: "integer", description: "Max results (default 25)"}}}
   ) do |server_context:, **args|
     CreamMcp.with_authorization(server_context) do
       ctx = CreamMcp.pundit_context(server_context)
@@ -1250,9 +1250,9 @@ module CreamMcp
     name: "get_email",
     description: "Get the full detail of a single email, including its body, direction (inbound/outbound) " \
                  "and any replies linked to it. Email ids come from list_emails.",
-    input_schema: { type: "object",
-                   properties: { email_id: { type: "integer" } },
-                   required: [ "email_id" ] }
+    input_schema: {type: "object",
+                   properties: {email_id: {type: "integer"}},
+                   required: ["email_id"]}
   ) do |server_context:, **args|
     CreamMcp.with_authorization(server_context) do
       ctx = CreamMcp.pundit_context(server_context)
@@ -1265,10 +1265,10 @@ module CreamMcp
   LIST_ACTIVITY = MCP::Tool.define(
     name: "list_activity",
     description: "Workspace activity timeline (most recent first), optionally scoped to a single person, company or deal.",
-    input_schema: { type: "object",
-                   properties: { record_type: { type: "string", enum: RECORD_TYPES },
-                                record_id: { type: "integer" },
-                                limit: { type: "integer", description: "Max results (default 25)" } } }
+    input_schema: {type: "object",
+                   properties: {record_type: {type: "string", enum: RECORD_TYPES},
+                                record_id: {type: "integer"},
+                                limit: {type: "integer", description: "Max results (default 25)"}}}
   ) do |server_context:, **args|
     CreamMcp.with_authorization(server_context) do
       ctx = CreamMcp.pundit_context(server_context)
@@ -1287,11 +1287,11 @@ module CreamMcp
     description: "List Stripe payments imported into the workspace (read-only). " \
                  "Filter by status (pending_review/matched/ignored), free-text (customer/email/description) " \
                  "or the linked deal. Amounts are in the payment currency (not cents).",
-    input_schema: { type: "object",
-                   properties: { status: { type: "string", enum: StripePayment::STATUSES },
-                                query: { type: "string" },
-                                deal_id: { type: "integer", description: "Only payments matched to this deal" },
-                                limit: { type: "integer", description: "Max results (default 25)" } } }
+    input_schema: {type: "object",
+                   properties: {status: {type: "string", enum: StripePayment::STATUSES},
+                                query: {type: "string"},
+                                deal_id: {type: "integer", description: "Only payments matched to this deal"},
+                                limit: {type: "integer", description: "Max results (default 25)"}}}
   ) do |server_context:, **args|
     return CreamMcp.payments_unavailable_response unless CreamFeatures.enabled?(:stripe_payments)
 
@@ -1311,7 +1311,7 @@ module CreamMcp
     name: "list_pipelines",
     description: "List the workspace's pipelines and their ordered stages (name, probability, won/closed flags). " \
                  "Use this to discover valid stage names for create_deal and update_deal_stage.",
-    input_schema: { type: "object", properties: {} }
+    input_schema: {type: "object", properties: {}}
   ) do |server_context:, **_args|
     CreamMcp.with_authorization(server_context) do
       ctx = CreamMcp.pundit_context(server_context)
@@ -1324,11 +1324,11 @@ module CreamMcp
   CREATE_PRODUCT = MCP::Tool.define(
     name: "create_product",
     description: "Add a product to the catalogue.",
-    input_schema: { type: "object",
-                   properties: { name: { type: "string" },
-                                price: { type: "number" },
-                                description: { type: "string" } },
-                   required: [ "name" ] }
+    input_schema: {type: "object",
+                   properties: {name: {type: "string"},
+                                price: {type: "number"},
+                                description: {type: "string"}},
+                   required: ["name"]}
   ) do |server_context:, **args|
     CreamMcp.with_authorization(server_context) do
       ctx = CreamMcp.pundit_context(server_context)
@@ -1342,12 +1342,12 @@ module CreamMcp
   UPDATE_PRODUCT = MCP::Tool.define(
     name: "update_product",
     description: "Update a catalogue product's name, price or description.",
-    input_schema: { type: "object",
-                   properties: { product_id: { type: "integer" },
-                                name: { type: "string" },
-                                price: { type: "number" },
-                                description: { type: "string" } },
-                   required: [ "product_id" ] }
+    input_schema: {type: "object",
+                   properties: {product_id: {type: "integer"},
+                                name: {type: "string"},
+                                price: {type: "number"},
+                                description: {type: "string"}},
+                   required: ["product_id"]}
   ) do |server_context:, **args|
     CreamMcp.with_authorization(server_context) do
       ctx = CreamMcp.pundit_context(server_context)
@@ -1363,20 +1363,20 @@ module CreamMcp
     description: "Add a product line item to a deal. The unit price defaults to the catalogue price unless given. " \
                  "An optional edition names a product variant (created in the workspace if new). " \
                  "The deal's value is recalculated automatically from its line subtotals.",
-    input_schema: { type: "object",
-                   properties: { deal_id: { type: "integer" },
-                                product_id: { type: "integer" },
-                                quantity: { type: "integer", minimum: 1 },
-                                unit_price: { type: "number", description: "Optional override; defaults to the catalogue price" },
-                                edition: { type: "string", description: "Optional edition/variant name (created in the workspace if it doesn't exist yet)" } },
-                   required: [ "deal_id", "product_id", "quantity" ] }
+    input_schema: {type: "object",
+                   properties: {deal_id: {type: "integer"},
+                                product_id: {type: "integer"},
+                                quantity: {type: "integer", minimum: 1},
+                                unit_price: {type: "number", description: "Optional override; defaults to the catalogue price"},
+                                edition: {type: "string", description: "Optional edition/variant name (created in the workspace if it doesn't exist yet)"}},
+                   required: ["deal_id", "product_id", "quantity"]}
   ) do |server_context:, **args|
     CreamMcp.with_authorization(server_context) do
       ctx = CreamMcp.pundit_context(server_context)
       deal = ctx.workspace.deals.find(CreamMcp.arg(args, "deal_id"))
       CreamMcp.authorize!(ctx, deal, :update?)
       product = ctx.workspace.products.find(CreamMcp.arg(args, "product_id"))
-      line = { product: product, quantity: CreamMcp.arg(args, "quantity") }
+      line = {product: product, quantity: CreamMcp.arg(args, "quantity")}
         .merge(CreamMcp.picked(args, "unit_price"))
       line[:edition_name] = CreamMcp.arg(args, "edition") if CreamMcp.arg(args, "edition").present?
       deal.deal_products.create!(line)
@@ -1389,13 +1389,13 @@ module CreamMcp
     description: "Update an existing product line item on a deal: its quantity, unit price and/or edition. " \
                  "Pass an empty edition to clear it. The deal's value is recalculated automatically. " \
                  "Line item ids come from get_record on the deal.",
-    input_schema: { type: "object",
-                   properties: { deal_id: { type: "integer" },
-                                line_item_id: { type: "integer", description: "Id of the deal's product line item to update" },
-                                quantity: { type: "integer", minimum: 1 },
-                                unit_price: { type: "number" },
-                                edition: { type: "string", description: "Edition/variant name (created if new); pass an empty string to clear it" } },
-                   required: [ "deal_id", "line_item_id" ] }
+    input_schema: {type: "object",
+                   properties: {deal_id: {type: "integer"},
+                                line_item_id: {type: "integer", description: "Id of the deal's product line item to update"},
+                                quantity: {type: "integer", minimum: 1},
+                                unit_price: {type: "number"},
+                                edition: {type: "string", description: "Edition/variant name (created if new); pass an empty string to clear it"}},
+                   required: ["deal_id", "line_item_id"]}
   ) do |server_context:, **args|
     CreamMcp.with_authorization(server_context) do
       ctx = CreamMcp.pundit_context(server_context)
@@ -1412,11 +1412,11 @@ module CreamMcp
   UPDATE_TASK = MCP::Tool.define(
     name: "update_task",
     description: "Update a task's title or due date. Use complete_task to toggle completion.",
-    input_schema: { type: "object",
-                   properties: { task_id: { type: "integer" },
-                                title: { type: "string" },
-                                due_on: { type: "string", description: "ISO date (YYYY-MM-DD)" } },
-                   required: [ "task_id" ] }
+    input_schema: {type: "object",
+                   properties: {task_id: {type: "integer"},
+                                title: {type: "string"},
+                                due_on: {type: "string", description: "ISO date (YYYY-MM-DD)"}},
+                   required: ["task_id"]}
   ) do |server_context:, **args|
     CreamMcp.with_authorization(server_context) do
       ctx = CreamMcp.pundit_context(server_context)
@@ -1432,10 +1432,10 @@ module CreamMcp
     description: "Full audit timeline for a deal: PaperTrail field-change versions plus " \
                  "domain activities (notes, comments, stage/pipeline moves, contacts/products " \
                  "changes, email opens/clicks, task completions), most recent first.",
-    input_schema: { type: "object",
-                   properties: { deal_id: { type: "integer" },
-                                limit: { type: "integer", description: "Max entries (default 50)" } },
-                   required: [ "deal_id" ] }
+    input_schema: {type: "object",
+                   properties: {deal_id: {type: "integer"},
+                                limit: {type: "integer", description: "Max entries (default 50)"}},
+                   required: ["deal_id"]}
   ) do |server_context:, **args|
     CreamMcp.with_authorization(server_context) do
       pundit_ctx = CreamMcp.pundit_context(server_context)
@@ -1444,7 +1444,7 @@ module CreamMcp
       CreamMcp.authorize!(pundit_ctx, deal, :show?)
 
       limit = CreamMcp.list_limit(args, 50)
-      versions = deal.versions.where(workspace_id: [ ws.id, nil ]).order(created_at: :desc, id: :desc).limit(limit)
+      versions = deal.versions.where(workspace_id: [ws.id, nil]).order(created_at: :desc, id: :desc).limit(limit)
       activities = deal.activities.includes(:user)
         .where(workspace: ws, action: DealVersionsController::ACTIVITY_ACTIONS)
         .recent_first
@@ -1452,9 +1452,9 @@ module CreamMcp
 
       users_by_id = User.where(id: versions.map(&:whodunnit).compact.map(&:to_i)).index_by(&:id)
 
-      timeline = (versions.map { |v| [ v.created_at.to_i, v.id, CreamMcp.deal_version_json(v, users_by_id) ] } +
-                  activities.map { |a| [ a.created_at.to_i, a.id, { kind: "activity" }.merge(CreamMcp.activity_json(a)) ] })
-        .sort_by { |ts, tie, _| [ -ts, -tie ] }
+      timeline = (versions.map { |v| [v.created_at.to_i, v.id, CreamMcp.deal_version_json(v, users_by_id)] } +
+                  activities.map { |a| [a.created_at.to_i, a.id, {kind: "activity"}.merge(CreamMcp.activity_json(a))] })
+        .sort_by { |ts, tie, _| [-ts, -tie] }
         .first(limit)
         .map(&:last)
 
@@ -1467,10 +1467,10 @@ module CreamMcp
     description: "What happened recently in the workspace: new deals, companies and people, " \
                  "inbound emails received, significant changes (stage moves, contacts/products, " \
                  "notes, completed tasks) and headline metrics. Read-only, most recent first.",
-    input_schema: { type: "object",
-                   properties: { days: { type: "integer", description: "Look-back window in days (default 7)" },
-                                limit: { type: "integer", description: "Max items per section (default 20)" },
-                                include_metrics: { type: "boolean", description: "Include headline counts (default false)" } } }
+    input_schema: {type: "object",
+                   properties: {days: {type: "integer", description: "Look-back window in days (default 7)"},
+                                limit: {type: "integer", description: "Max items per section (default 20)"},
+                                include_metrics: {type: "boolean", description: "Include headline counts (default false)"}}}
   ) do |server_context:, **args|
     CreamMcp.with_authorization(server_context) do
       pundit_ctx = CreamMcp.pundit_context(server_context)
@@ -1543,9 +1543,9 @@ module CreamMcp
     name: "sales_forecast",
     description: "Sales forecast: open pipeline weighted by win probability, grouped by expected " \
                  "close month, plus deals closing soon, overdue (past close date, still open) and won totals.",
-    input_schema: { type: "object",
-                   properties: { pipeline: { type: "string", description: "Optional pipeline name to filter by" },
-                                months: { type: "integer", description: "Forecast horizon in months (default 6)" } } }
+    input_schema: {type: "object",
+                   properties: {pipeline: {type: "string", description: "Optional pipeline name to filter by"},
+                                months: {type: "integer", description: "Forecast horizon in months (default 6)"}}}
   ) do |server_context:, **args|
     CreamMcp.with_authorization(server_context) do
       pundit_ctx = CreamMcp.pundit_context(server_context)
@@ -1586,8 +1586,8 @@ module CreamMcp
         }
       end
 
-      deal_includes = [ :pipeline, :pipeline_stage, :company, :contacts, :owner,
-                        { custom_field_values: :custom_field, deal_products: [ :product, :edition ] } ]
+      deal_includes = [:pipeline, :pipeline_stage, :company, :contacts, :owner,
+        {custom_field_values: :custom_field, deal_products: [:product, :edition]}]
       closing_soon = open_scope.where(expected_close_date: today..(today + 30))
         .includes(deal_includes).limit(25)
       overdue = open_scope.where("deals.expected_close_date < ?", today)
@@ -1615,10 +1615,10 @@ module CreamMcp
   SUMMARIZE_RECORD = MCP::Tool.define(
     name: "summarize_record",
     description: "Generate an AI summary of a person, company or deal with risks, next steps and missing data.",
-    input_schema: { type: "object",
-                   properties: { record_type: { type: "string", enum: RECORD_TYPES },
-                                record_id: { type: "integer" } },
-                   required: [ "record_type", "record_id" ] }
+    input_schema: {type: "object",
+                   properties: {record_type: {type: "string", enum: RECORD_TYPES},
+                                record_id: {type: "integer"}},
+                   required: ["record_type", "record_id"]}
   ) do |server_context:, **args|
     return CreamMcp.ai_unavailable_response unless CreamMcp.ai_assistant_enabled?
 
@@ -1635,10 +1635,10 @@ module CreamMcp
   SUGGEST_NEXT_STEPS = MCP::Tool.define(
     name: "suggest_next_steps",
     description: "Suggest actionable next steps for a CRM record, including optional task suggestions.",
-    input_schema: { type: "object",
-                   properties: { record_type: { type: "string", enum: RECORD_TYPES },
-                                record_id: { type: "integer" } },
-                   required: [ "record_type", "record_id" ] }
+    input_schema: {type: "object",
+                   properties: {record_type: {type: "string", enum: RECORD_TYPES},
+                                record_id: {type: "integer"}},
+                   required: ["record_type", "record_id"]}
   ) do |server_context:, **args|
     return CreamMcp.ai_unavailable_response unless CreamMcp.ai_assistant_enabled?
 
@@ -1660,11 +1660,11 @@ module CreamMcp
   DRAFT_EMAIL = MCP::Tool.define(
     name: "draft_email",
     description: "Draft a follow-up email for a person, company or deal using CRM context.",
-    input_schema: { type: "object",
-                   properties: { record_type: { type: "string", enum: RECORD_TYPES },
-                                record_id: { type: "integer" },
-                                goal: { type: "string", description: "Optional goal for the email draft" } },
-                   required: [ "record_type", "record_id" ] }
+    input_schema: {type: "object",
+                   properties: {record_type: {type: "string", enum: RECORD_TYPES},
+                                record_id: {type: "integer"},
+                                goal: {type: "string", description: "Optional goal for the email draft"}},
+                   required: ["record_type", "record_id"]}
   ) do |server_context:, **args|
     return CreamMcp.ai_unavailable_response unless CreamMcp.ai_assistant_enabled?
 
@@ -1685,9 +1685,9 @@ module CreamMcp
   NATURAL_LANGUAGE_SEARCH = MCP::Tool.define(
     name: "natural_language_search",
     description: "Search the CRM using natural-language phrases such as stalled deals, overdue tasks or pending follow up.",
-    input_schema: { type: "object",
-                   properties: { query: { type: "string" } },
-                   required: [ "query" ] }
+    input_schema: {type: "object",
+                   properties: {query: {type: "string"}},
+                   required: ["query"]}
   ) do |server_context:, **args|
     return CreamMcp.ai_unavailable_response unless CreamFeatures.enabled?(:ai_assistant)
 
@@ -1724,10 +1724,10 @@ module CreamMcp
   ENRICH_RECORD = MCP::Tool.define(
     name: "enrich_record",
     description: "Suggest missing or improvable field values for a record using existing CRM context only.",
-    input_schema: { type: "object",
-                   properties: { record_type: { type: "string", enum: RECORD_TYPES },
-                                record_id: { type: "integer" } },
-                   required: [ "record_type", "record_id" ] }
+    input_schema: {type: "object",
+                   properties: {record_type: {type: "string", enum: RECORD_TYPES},
+                                record_id: {type: "integer"}},
+                   required: ["record_type", "record_id"]}
   ) do |server_context:, **args|
     unless CreamFeatures.enabled?(:ai_enrichment) && CreamMcp.ai_assistant_enabled?
       return CreamMcp.ai_unavailable_response

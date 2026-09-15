@@ -1,6 +1,7 @@
 class RecordEmailsController < ApplicationController
   include RequiresFeature
   include EmailPreviewActions
+
   requires_feature :record_email
 
   def preview

@@ -9,9 +9,9 @@ class StripePayment < ApplicationRecord
   belongs_to :suggested_person, class_name: "Person", optional: true
   belongs_to :matched_by, class_name: "User", optional: true
 
-  validates :stripe_charge_id, presence: true, uniqueness: { scope: :workspace_id }
-  validates :status, inclusion: { in: STATUSES }
-  validates :match_confidence, inclusion: { in: CONFIDENCES }, allow_nil: true
+  validates :stripe_charge_id, presence: true, uniqueness: {scope: :workspace_id}
+  validates :status, inclusion: {in: STATUSES}
+  validates :match_confidence, inclusion: {in: CONFIDENCES}, allow_nil: true
 
   scope :pending_review, -> { where(status: "pending_review") }
   scope :matched, -> { where(status: "matched") }
@@ -66,8 +66,8 @@ class StripePayment < ApplicationRecord
   def billing_address
     address = payload.dig("billing_details", "address").presence&.compact_blank.presence ||
       expanded_customer["address"] || {}
-    [ address["line1"], address["line2"], address["postal_code"], address["city"],
-      address["state"], address["country"] ].compact_blank.join(", ").presence
+    [address["line1"], address["line2"], address["postal_code"], address["city"],
+      address["state"], address["country"]].compact_blank.join(", ").presence
   end
 
   def risk_outcome

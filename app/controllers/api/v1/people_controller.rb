@@ -21,7 +21,7 @@ module Api
         if person.save
           render json: person_json(person), status: :created
         else
-          render json: { errors: person.errors.full_messages }, status: :unprocessable_entity
+          render json: {errors: person.errors.full_messages}, status: :unprocessable_entity
         end
       end
 
@@ -32,7 +32,7 @@ module Api
         if person.update(person_params)
           render json: person_json(person)
         else
-          render json: { errors: person.errors.full_messages }, status: :unprocessable_entity
+          render json: {errors: person.errors.full_messages}, status: :unprocessable_entity
         end
       end
 
@@ -72,7 +72,7 @@ module Api
           )
           subscription = EmailSubscription.find_by(person: person, subscription_type: type)
         else
-          return render json: { error: "action must be subscribe or unsubscribe" }, status: :unprocessable_entity
+          return render json: {error: "action must be subscribe or unsubscribe"}, status: :unprocessable_entity
         end
 
         render json: {
@@ -85,7 +85,7 @@ module Api
 
       def feature_unavailable!(flag)
         label = CreamFeatures.entry(flag).label
-        render json: { error: "#{label} is not available yet." }, status: :not_found
+        render json: {error: "#{label} is not available yet."}, status: :not_found
       end
 
       def subscription_params
@@ -94,7 +94,7 @@ module Api
 
       def person_params
         params.require(:person).permit(:first_name, :last_name, :email, :phone, :job_title, :location, :company_id,
-          person_emails_attributes: [ :id, :address, :primary, :_destroy ])
+          person_emails_attributes: [:id, :address, :primary, :_destroy])
       end
 
       def person_json(person)
@@ -103,7 +103,7 @@ module Api
           first_name: person.first_name,
           last_name: person.last_name,
           email: person.email,
-          emails: person.person_emails.ordered.map { |record| { address: record.address, primary: record.primary? } },
+          emails: person.person_emails.ordered.map { |record| {address: record.address, primary: record.primary?} },
           company_id: person.company_id,
           company: person.company&.name,
           created_at: person.created_at.iso8601,

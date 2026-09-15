@@ -73,11 +73,11 @@ module Marketing
 
       if @filters["opened_email_days"].present?
         days = @filters["opened_email_days"].to_i
-        scope = scope.joins(:email_messages).where(email_messages: { opened_at: days.days.ago.. })
+        scope = scope.joins(:email_messages).where(email_messages: {opened_at: days.days.ago..})
       end
       if @filters["submitted_form_slug"].present?
         scope = scope.joins(lead_submissions: :lead_form)
-          .where(lead_forms: { slug: @filters["submitted_form_slug"] })
+          .where(lead_forms: {slug: @filters["submitted_form_slug"]})
       end
       if @filters["visited_url"].present?
         pattern = "%#{ActiveRecord::Base.sanitize_sql_like(@filters["visited_url"])}%"
@@ -88,7 +88,7 @@ module Marketing
 
     def apply_behavior_filters(scope)
       return scope unless @record_type == "Person"
-      return scope unless @filters["exclude_suppressed"].in?([ true, "true", "1", 1 ])
+      return scope unless @filters["exclude_suppressed"].in?([true, "true", "1", 1])
 
       suppressed = @workspace.email_suppressions.pluck(:address)
       return scope if suppressed.empty?
@@ -125,7 +125,7 @@ module Marketing
       case status
       when "subscribed", "pending", "unsubscribed"
         scope.joins(:email_subscriptions)
-          .where(email_subscriptions: { subscription_type_id: type.id, status: status })
+          .where(email_subscriptions: {subscription_type_id: type.id, status: status})
       when "missing"
         subscribed_ids = EmailSubscription.where(subscription_type_id: type.id).select(:person_id)
         scope.where.not(id: subscribed_ids)
@@ -136,7 +136,7 @@ module Marketing
 
     def apply_open_deal_filter(scope)
       open_deal = @filters["open_deal"].presence || "any"
-      return scope unless open_deal.in?(OPEN_DEAL_VALUES - [ "any" ])
+      return scope unless open_deal.in?(OPEN_DEAL_VALUES - ["any"])
 
       product_id = @filters["open_deal_product_id"].presence
       open_person_ids = open_deal_person_ids(product_id: product_id)
@@ -151,7 +151,7 @@ module Marketing
     def open_deal_person_ids(product_id: nil)
       deals = (@deal_scope || @workspace.deals).open_deals
       if product_id.present?
-        deals = deals.joins(:deal_products).where(deal_products: { product_id: product_id })
+        deals = deals.joins(:deal_products).where(deal_products: {product_id: product_id})
       end
       DealContact.where(deal_id: deals.select(:id)).select(:person_id)
     end
@@ -170,7 +170,7 @@ module Marketing
       product_id = @filters["dealt_product_id"].presence
       return scope if product_id.blank?
 
-      deal_ids = @workspace.deals.joins(:deal_products).where(deal_products: { product_id: product_id }).select(:id)
+      deal_ids = @workspace.deals.joins(:deal_products).where(deal_products: {product_id: product_id}).select(:id)
       scope.where(id: DealContact.where(deal_id: deal_ids).select(:person_id))
     end
 
@@ -181,7 +181,7 @@ module Marketing
 
       submissions = LeadSubmission.where(workspace: @workspace)
       submissions = submissions.where(lead_form_id: form_id) if form_id.present?
-      if destination.in?(CAPTURE_DESTINATIONS - [ "any" ])
+      if destination.in?(CAPTURE_DESTINATIONS - ["any"])
         submissions = submissions.where(capture_destination: destination)
       end
       if @filters["submitted_from"].present?
@@ -200,7 +200,7 @@ module Marketing
     end
 
     def truthy?(value)
-      value.in?([ true, "true", "1", 1 ])
+      value.in?([true, "true", "1", 1])
     end
   end
 end

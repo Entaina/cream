@@ -58,7 +58,7 @@ RSpec.describe Ai::SalesDirector do
 
     allow(client).to receive(:chat).and_return({
       summary: "Nuevo resumen",
-      items: [ { priority: "urgent", text: "Actualizar forecast" } ]
+      items: [{priority: "urgent", text: "Actualizar forecast"}]
     }.to_json)
 
     briefing = described_class.new(workspace: workspace, client: client).call

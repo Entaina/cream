@@ -5,7 +5,7 @@ class RelationalConstraints < ActiveRecord::Migration[8.1]
       t.references :person, null: false, foreign_key: true
       t.timestamps
     end
-    add_index :deal_contacts, [ :deal_id, :person_id ], unique: true
+    add_index :deal_contacts, [:deal_id, :person_id], unique: true
 
     # Backfill the join from the old single primary contact.
     execute(<<~SQL)

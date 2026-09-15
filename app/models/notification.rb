@@ -5,7 +5,7 @@ class Notification < ApplicationRecord
   belongs_to :user
   belongs_to :actor, class_name: "User", optional: true
 
-  validates :kind, inclusion: { in: KINDS }
+  validates :kind, inclusion: {in: KINDS}
   validates :title, presence: true
 
   scope :unread, -> { where(read_at: nil) }

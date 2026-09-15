@@ -14,7 +14,7 @@ class CreateCalendarBooking < ActiveRecord::Migration[8.1]
 
     create_table :booking_pages do |t|
       t.references :workspace, null: false, foreign_key: true
-      t.references :host, null: false, foreign_key: { to_table: :users }
+      t.references :host, null: false, foreign_key: {to_table: :users}
       t.references :pipeline, null: false, foreign_key: true
       t.string :name, null: false
       t.string :slug, null: false
@@ -22,7 +22,7 @@ class CreateCalendarBooking < ActiveRecord::Migration[8.1]
       t.string :avatar_url
       t.string :logo_url
       t.string :timezone, null: false, default: "Europe/Madrid"
-      t.jsonb :calendar_ids, null: false, default: [ "primary" ]
+      t.jsonb :calendar_ids, null: false, default: ["primary"]
       t.integer :booking_window_days, null: false, default: 60
       t.boolean :active, null: false, default: true
       t.timestamps

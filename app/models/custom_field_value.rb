@@ -3,7 +3,7 @@ class CustomFieldValue < ApplicationRecord
   belongs_to :workspace
   belongs_to :record, polymorphic: true
 
-  validates :custom_field_id, uniqueness: { scope: %i[record_type record_id] }
+  validates :custom_field_id, uniqueness: {scope: %i[record_type record_id]}
 
   def typed_value
     raw = value

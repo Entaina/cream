@@ -9,7 +9,7 @@ class CampaignSend < ApplicationRecord
   belongs_to :subscription_type, optional: true
   has_many :campaign_variants, dependent: :destroy
 
-  validates :status, inclusion: { in: STATUSES }
+  validates :status, inclusion: {in: STATUSES}
 
   def mark_started!
     update!(status: "sending", started_at: Time.current)

@@ -10,6 +10,6 @@ class CreateSalesBriefings < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_index :sales_briefings, [ :workspace_id, :briefing_date ], unique: true
+    add_index :sales_briefings, [:workspace_id, :briefing_date], unique: true
   end
 end

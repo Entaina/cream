@@ -10,7 +10,7 @@ RSpec.describe "Settings::CustomFields", type: :request do
 
   before do
     sign_in_as(admin)
-    patch switch_workspace_path, params: { workspace_id: workspace.id }
+    patch switch_workspace_path, params: {workspace_id: workspace.id}
     workspace.update!(custom_fields_enabled: true)
   end
 
@@ -38,11 +38,11 @@ RSpec.describe "Settings::CustomFields", type: :request do
 
     it "forbids members from creating fields" do
       sign_in_as(member)
-      patch switch_workspace_path, params: { workspace_id: workspace.id }
+      patch switch_workspace_path, params: {workspace_id: workspace.id}
 
       expect {
         post settings_custom_fields_path, params: {
-          custom_field: { name: "Blocked", record_type: "Person", field_type: "text" }
+          custom_field: {name: "Blocked", record_type: "Person", field_type: "text"}
         }
       }.not_to change(CustomField, :count)
 
@@ -53,7 +53,7 @@ RSpec.describe "Settings::CustomFields", type: :request do
   describe "PATCH /settings/custom_fields/:id" do
     it "updates a field for admins" do
       patch settings_custom_field_path(field), params: {
-        custom_field: { name: "Tier", field_type: "select", options_text: "Bronze\nGold", required: true }
+        custom_field: {name: "Tier", field_type: "select", options_text: "Bronze\nGold", required: true}
       }
 
       expect(response).to redirect_to(settings_custom_fields_path)

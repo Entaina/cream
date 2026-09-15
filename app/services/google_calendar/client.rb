@@ -32,7 +32,7 @@ module GoogleCalendar
         timeMin: time_min.iso8601,
         timeMax: time_max.iso8601,
         timeZone: timezone,
-        items: calendar_ids.map { |calendar_id| { id: calendar_id } }
+        items: calendar_ids.map { |calendar_id| {id: calendar_id} }
       }
       response = post_json(URI("#{BASE_URI}/freeBusy"), payload, bearer: bearer)
       raise Error.from_response("consultar disponibilidad", response) unless response.is_a?(Net::HTTPSuccess)
@@ -90,7 +90,7 @@ module GoogleCalendar
           primary: item["primary"] == true,
           writable: access_role.in?(%w[owner writer])
         }
-      end.sort_by { |item| [ item[:primary] ? 0 : 1, item[:summary].downcase ] }
+      end.sort_by { |item| [item[:primary] ? 0 : 1, item[:summary].downcase] }
     end
   end
 end

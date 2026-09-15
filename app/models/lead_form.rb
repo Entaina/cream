@@ -46,12 +46,12 @@ class LeadForm < ApplicationRecord
   has_many :lead_submissions, dependent: :restrict_with_error
 
   validates :name, :slug, :template_key, presence: true
-  validates :destination, inclusion: { in: DESTINATIONS }
+  validates :destination, inclusion: {in: DESTINATIONS}
   validates :first_task_title, presence: true, if: :deal_destination?
-  validates :slug, uniqueness: true, format: { with: /\A[a-z0-9-]+\z/ }
-  validates :template_key, inclusion: { in: ->(form) { form.class.available_template_keys(workspace: form.workspace) } }
-  validates :first_task_due_days, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
-  validates :success_redirect_url, format: { with: URI::DEFAULT_PARSER.make_regexp(%w[http https]) }, allow_blank: true
+  validates :slug, uniqueness: true, format: {with: /\A[a-z0-9-]+\z/}
+  validates :template_key, inclusion: {in: ->(form) { form.class.available_template_keys(workspace: form.workspace) }}
+  validates :first_task_due_days, numericality: {only_integer: true, greater_than_or_equal_to: 0}
+  validates :success_redirect_url, format: {with: URI::DEFAULT_PARSER.make_regexp(%w[http https])}, allow_blank: true
   validate :associations_belong_to_workspace
   validate :pipeline_routes_belong_to_workspace
   validate :pipeline_route_keys_are_valid
@@ -183,7 +183,7 @@ class LeadForm < ApplicationRecord
 
   def self.field_key?(key)
     key = key.to_s
-    return true if key.in?([ HONEYPOT_FIELD, TIMESTAMP_FIELD ])
+    return true if key.in?([HONEYPOT_FIELD, TIMESTAMP_FIELD])
 
     key.match?(FIELD_KEY_FORMAT)
   end

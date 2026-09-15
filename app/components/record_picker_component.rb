@@ -7,11 +7,11 @@ class RecordPickerComponent < ViewComponent::Base
   INLINE_LIMIT = 200
 
   attr_reader :form, :attribute, :label, :scope, :search_url, :create_url, :create_param,
-              :selected_name, :required, :hidden_data, :name_method, :hint_method, :disabled
+    :selected_name, :required, :hidden_data, :name_method, :hint_method, :disabled
 
   def initialize(form:, attribute:, label:, scope:, search_url:, create_url: nil, create_param: nil,
-                 selected_name: nil, required: false, hidden_data: {}, name_method: :name, hint_method: nil,
-                 disabled: false)
+    selected_name: nil, required: false, hidden_data: {}, name_method: :name, hint_method: nil,
+    disabled: false)
     @form = form
     @attribute = attribute
     @label = label
@@ -47,7 +47,7 @@ class RecordPickerComponent < ViewComponent::Base
   private
 
   def record_payload(record)
-    hint = hint_method && record.respond_to?(hint_method) ? record.public_send(hint_method) : nil
-    { id: record.id, name: record.public_send(name_method), hint: hint.presence }
+    hint = (hint_method && record.respond_to?(hint_method)) ? record.public_send(hint_method) : nil
+    {id: record.id, name: record.public_send(name_method), hint: hint.presence}
   end
 end

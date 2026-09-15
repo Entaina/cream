@@ -10,7 +10,7 @@ RSpec.describe "Locale preferences", type: :request do
       it "persists the #{locale} locale for the current user" do
         sign_in_as(member)
 
-        patch locale_preference_path, params: { locale: locale }, as: :json
+        patch locale_preference_path, params: {locale: locale}, as: :json
 
         expect(response).to have_http_status(:ok)
         expect(member.reload.locale).to eq(locale)
@@ -19,7 +19,7 @@ RSpec.describe "Locale preferences", type: :request do
     end
 
     it "sets the guest cookie without authentication" do
-      patch locale_preference_path, params: { locale: "en" }, as: :json
+      patch locale_preference_path, params: {locale: "en"}, as: :json
 
       expect(response).to have_http_status(:ok)
       expect(cookies[:locale]).to eq("en")
@@ -29,7 +29,7 @@ RSpec.describe "Locale preferences", type: :request do
       sign_in_as(member)
       member.update!(locale: "es")
 
-      patch locale_preference_path, params: { locale: "fr" }, as: :json
+      patch locale_preference_path, params: {locale: "fr"}, as: :json
 
       expect(response).to have_http_status(:unprocessable_entity)
       expect(member.reload.locale).to eq("es")
@@ -71,16 +71,16 @@ RSpec.describe "Locale preferences", type: :request do
 
     it "restores the profile locale after signing in again" do
       sign_in_as(member)
-      patch switch_workspace_path, params: { workspace_id: workspace.id }
+      patch switch_workspace_path, params: {workspace_id: workspace.id}
       member.update!(locale: "es")
 
-      patch settings_profile_path, params: { user: { name: member.name, locale: "en" } }
+      patch settings_profile_path, params: {user: {name: member.name, locale: "en"}}
       expect(member.reload.locale).to eq("en")
 
       delete session_path
       cookies.delete(:locale)
 
-      post session_path, params: { email_address: member.email_address, password: "password" }
+      post session_path, params: {email_address: member.email_address, password: "password"}
       follow_redirect!
 
       expect(response.body).to include("Search...")

@@ -13,11 +13,11 @@ RSpec.describe BookingCanceller, type: :service do
       host: user,
       pipeline: pipeline,
       timezone: "Europe/Madrid",
-      calendar_ids: [ "primary@gmail.com" ]
+      calendar_ids: ["primary@gmail.com"]
     )
     page.event_types.build(
       slug: "video",
-      name_i18n: { "es" => "Online" },
+      name_i18n: {"es" => "Online"},
       duration_minutes: 30,
       location_type: "google_meet",
       weekly_hours: BookingEventType::DEFAULT_WEEKLY_HOURS,

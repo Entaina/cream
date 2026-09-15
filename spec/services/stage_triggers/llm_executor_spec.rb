@@ -37,13 +37,14 @@ RSpec.describe StageTriggers::LlmExecutor do
       expect(input).to include(deal.pipeline_stage.name)
       expect(tools.map { |t| t[:name] }).to contain_exactly(
         "get_deal_context", "get_company_context", "get_contact_context",
-        "show_toast", "show_alert", "show_confirm", "show_deal_panel")
+        "show_toast", "show_alert", "show_confirm", "show_deal_panel"
+      )
       true
     end
   end
 
   it "answers read tools with record context and logs them in the transcript" do
-    stub_llm([ [ "get_deal_context", {} ], [ "get_company_context", {} ] ])
+    stub_llm([["get_deal_context", {}], ["get_company_context", {}]])
     executor.call
 
     entries = run.reload.transcript
@@ -53,8 +54,8 @@ RSpec.describe StageTriggers::LlmExecutor do
   end
 
   it "delegates UI tools to the emitter" do
-    stub_llm([ [ "show_toast", { "message" => "Hola", "kind" => "success" } ],
-               [ "show_deal_panel", { "markdown" => "# Hi" } ] ])
+    stub_llm([["show_toast", {"message" => "Hola", "kind" => "success"}],
+      ["show_deal_panel", {"markdown" => "# Hi"}]])
     executor.call
 
     expect(ui).to have_received(:show_toast).with(message: "Hola", kind: "success")
@@ -65,7 +66,7 @@ RSpec.describe StageTriggers::LlmExecutor do
     allow(ui).to receive(:show_confirm).and_raise(ArgumentError, "follow_up_url must be an internal path starting with /")
     results = []
     allow(client).to receive(:chat_with_tools) do |**_kwargs, &block|
-      results << block.call("show_confirm", { "message" => "x", "follow_up_type" => "visit", "follow_up_url" => "https://evil" })
+      results << block.call("show_confirm", {"message" => "x", "follow_up_type" => "visit", "follow_up_url" => "https://evil"})
       "done"
     end
 
@@ -79,7 +80,7 @@ RSpec.describe StageTriggers::LlmExecutor do
     stranger = create_person!(workspace)
     results = []
     allow(client).to receive(:chat_with_tools) do |**_kwargs, &block|
-      results << block.call("get_contact_context", { "person_id" => stranger.id })
+      results << block.call("get_contact_context", {"person_id" => stranger.id})
       "done"
     end
 
@@ -91,13 +92,13 @@ RSpec.describe StageTriggers::LlmExecutor do
   it "does not mutate CRM data when the model calls every tool" do
     real_ui = StageTriggers::UiEmitter.new(user: nil, deal: deal, run: run)
     exec = described_class.new(trigger: trigger, deal: deal, user: nil, ui: real_ui, run: run, client: client)
-    stub_llm([ [ "get_deal_context", {} ], [ "get_company_context", {} ], [ "get_contact_context", {} ],
-               [ "show_toast", { "message" => "x" } ], [ "show_alert", { "message" => "x" } ],
-               [ "show_confirm", { "message" => "x", "follow_up_type" => "toast", "follow_up_message" => "y" } ],
-               [ "show_deal_panel", { "markdown" => "z" } ] ])
+    stub_llm([["get_deal_context", {}], ["get_company_context", {}], ["get_contact_context", {}],
+      ["show_toast", {"message" => "x"}], ["show_alert", {"message" => "x"}],
+      ["show_confirm", {"message" => "x", "follow_up_type" => "toast", "follow_up_message" => "y"}],
+      ["show_deal_panel", {"markdown" => "z"}]])
 
     deal # fuerza la creación previa
-    counts = -> { [ Deal.count, Task.count, Note.count, Person.count, Company.count, Activity.count ] }
+    counts = -> { [Deal.count, Task.count, Note.count, Person.count, Company.count, Activity.count] }
 
     expect { exec.call }.not_to change(&counts)
   end

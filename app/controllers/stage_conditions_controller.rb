@@ -1,5 +1,6 @@
 class StageConditionsController < ApplicationController
   include RequiresFeature
+
   requires_feature :stage_conditions
   before_action :set_stage, only: %i[index new create]
   before_action :set_stage_condition, only: %i[edit update destroy]

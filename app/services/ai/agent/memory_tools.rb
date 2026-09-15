@@ -10,10 +10,10 @@ module Ai
           parameters: {
             type: "object",
             properties: {
-              content: { type: "string", description: "Fact to remember" },
-              category: { type: "string", description: "Category (default: general)" }
+              content: {type: "string", description: "Fact to remember"},
+              category: {type: "string", description: "Category (default: general)"}
             },
-            required: [ "content" ],
+            required: ["content"],
             additionalProperties: false
           }
         },
@@ -24,9 +24,9 @@ module Ai
           parameters: {
             type: "object",
             properties: {
-              query: { type: "string", description: "What to recall" }
+              query: {type: "string", description: "What to recall"}
             },
-            required: [ "query" ],
+            required: ["query"],
             additionalProperties: false
           }
         }
@@ -49,7 +49,6 @@ module Ai
         case name
         when "remember" then execute_remember(args)
         when "recall" then execute_recall(args)
-        else nil
         end
       end
 

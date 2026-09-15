@@ -19,13 +19,13 @@ class AddProductToEditions < ActiveRecord::Migration[8.1]
     end
     MigrationEdition.where(product_id: nil).delete_all
     change_column_null :editions, :product_id, false
-    add_index :editions, [ :product_id, :name ], unique: true
+    add_index :editions, [:product_id, :name], unique: true
   end
 
   def down
     remove_index :editions, name: "index_editions_on_product_id_and_name"
     change_column_null :editions, :product_id, true
-    add_index :editions, [ :workspace_id, :name ], unique: true
+    add_index :editions, [:workspace_id, :name], unique: true
     remove_reference :editions, :product, foreign_key: true
   end
 

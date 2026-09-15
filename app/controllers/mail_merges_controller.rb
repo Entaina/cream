@@ -1,5 +1,6 @@
 class MailMergesController < ApplicationController
   include RequiresFeature
+
   requires_feature :mail_merge
 
   RECORD_TYPES = List::RECORD_TYPES
@@ -41,7 +42,7 @@ class MailMergesController < ApplicationController
   def recipients_count
     authorize current_workspace, :mail_merge?
     recipients = resolve_recipients
-    render json: { count: recipients.record_ids.size, record_type: recipients.record_type }
+    render json: {count: recipients.record_ids.size, record_type: recipients.record_type}
   end
 
   private

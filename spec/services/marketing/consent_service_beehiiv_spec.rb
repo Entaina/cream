@@ -19,7 +19,7 @@ RSpec.describe Marketing::ConsentService, "Beehiiv push" do
 
     expect {
       described_class.subscribe!(person: person, subscription_type: type, source: "crm_admin", legal_basis: "consent")
-    }.to have_enqueued_job(BeehiivPushJob).with(publication.id, person.id, "subscribe", { "reactivate" => false })
+    }.to have_enqueued_job(BeehiivPushJob).with(publication.id, person.id, "subscribe", {"reactivate" => false})
   end
 
   it "does not enqueue Beehiiv push for inbound Beehiiv sync" do

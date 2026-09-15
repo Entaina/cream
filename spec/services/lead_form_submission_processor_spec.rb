@@ -205,7 +205,7 @@ RSpec.describe LeadFormSubmissionProcessor do
   it "routes contacto deals to the pipeline configured for the help type" do
     cursos = pipeline.duplicate(name: "Cursos")
     cursos.save!
-    lead_form.update!(pipeline_routes: { "curso" => cursos.id })
+    lead_form.update!(pipeline_routes: {"curso" => cursos.id})
 
     result = submit(contacto_lead_params("help_type" => "curso"))
 
@@ -231,7 +231,7 @@ RSpec.describe LeadFormSubmissionProcessor do
   it "reuses an open deal in the target pipeline and creates a new submission and task" do
     company = create_company!(workspace, name: "Acme SL")
     person = create_person!(workspace, company: company, email: "lead@example.com", first_name: "Existente", last_name: "")
-    existing_deal = create_deal!(workspace, pipeline: pipeline, company: company, contacts: [ person ], name: "Existing deal")
+    existing_deal = create_deal!(workspace, pipeline: pipeline, company: company, contacts: [person], name: "Existing deal")
     existing_deal.tasks.create!(
       title: "Tarea previa",
       due_on: Date.current,
@@ -244,8 +244,8 @@ RSpec.describe LeadFormSubmissionProcessor do
       lead_form: lead_form,
       deal: existing_deal,
       person: person,
-      data: { "email" => "lead@example.com", "how_heard" => "evento" },
-      metadata: { "lead_form_slug" => lead_form.slug, "submissions_at" => [ 1.day.ago.iso8601 ] }
+      data: {"email" => "lead@example.com", "how_heard" => "evento"},
+      metadata: {"lead_form_slug" => lead_form.slug, "submissions_at" => [1.day.ago.iso8601]}
     )
 
     expect {
@@ -267,7 +267,7 @@ RSpec.describe LeadFormSubmissionProcessor do
     company = create_company!(workspace)
     person = create_person!(workspace, company: company, email: "lead@example.com")
     won_stage = pipeline.pipeline_stages.find_by!(name: "Won")
-    create_deal!(workspace, pipeline: pipeline, company: company, contacts: [ person ], stage: won_stage)
+    create_deal!(workspace, pipeline: pipeline, company: company, contacts: [person], stage: won_stage)
 
     expect {
       submit(contacto_lead_params("how_heard" => "otro"))
@@ -280,7 +280,7 @@ RSpec.describe LeadFormSubmissionProcessor do
     other_pipeline.save!
     company = create_company!(workspace)
     person = create_person!(workspace, company: company, email: "lead@example.com")
-    create_deal!(workspace, pipeline: other_pipeline, company: company, contacts: [ person ])
+    create_deal!(workspace, pipeline: other_pipeline, company: company, contacts: [person])
 
     result = submit(contacto_lead_params("how_heard" => "otro"))
 
@@ -292,7 +292,7 @@ RSpec.describe LeadFormSubmissionProcessor do
     stub_const("LeadForm::MAX_SUBMISSIONS_PER_EMAIL_PER_DAY", 1)
     company = create_company!(workspace)
     person = create_person!(workspace, company: company, email: "lead@example.com")
-    create_deal!(workspace, pipeline: pipeline, company: company, contacts: [ person ])
+    create_deal!(workspace, pipeline: pipeline, company: company, contacts: [person])
 
     expect(submit(contacto_lead_params)).to be_present
 
@@ -323,7 +323,7 @@ RSpec.describe LeadFormSubmissionProcessor do
     submit(contacto_lead_params("cream_aid" => anonymous_id))
 
     person = Person.order(:id).last
-    expect(workspace.page_views.where(anonymous_id: anonymous_id).pluck(:person_id)).to eq([ person.id ])
+    expect(workspace.page_views.where(anonymous_id: anonymous_id).pluck(:person_id)).to eq([person.id])
   end
 
   it "finds company by name when collecting company data" do
@@ -362,7 +362,7 @@ RSpec.describe LeadFormSubmissionProcessor do
     lead_form.update!(pipeline_stage: qualified_stage)
     company = create_company!(workspace)
     person = create_person!(workspace, company: company, email: "lead@example.com")
-    existing_deal = create_deal!(workspace, pipeline: pipeline, company: company, contacts: [ person ], stage: pipeline.first_stage)
+    existing_deal = create_deal!(workspace, pipeline: pipeline, company: company, contacts: [person], stage: pipeline.first_stage)
 
     expect {
       result = submit(contacto_lead_params("how_heard" => "otro"))
@@ -375,7 +375,7 @@ RSpec.describe LeadFormSubmissionProcessor do
     lead_form.update!(pipeline_stage: qualified_stage)
     company = create_company!(workspace)
     person = create_person!(workspace, company: company, email: "lead@example.com")
-    existing_deal = create_deal!(workspace, pipeline: pipeline, company: company, contacts: [ person ], stage: proposal_stage)
+    existing_deal = create_deal!(workspace, pipeline: pipeline, company: company, contacts: [person], stage: proposal_stage)
 
     result = submit(contacto_lead_params("how_heard" => "otro"))
 
@@ -393,7 +393,7 @@ RSpec.describe LeadFormSubmissionProcessor do
     )
     company = create_company!(workspace)
     person = create_person!(workspace, company: company, email: "lead@example.com")
-    existing_deal = create_deal!(workspace, pipeline: pipeline, company: company, contacts: [ person ], stage: pipeline.first_stage, value: 0)
+    existing_deal = create_deal!(workspace, pipeline: pipeline, company: company, contacts: [person], stage: pipeline.first_stage, value: 0)
 
     result = submit(contacto_lead_params("how_heard" => "otro"))
 
@@ -434,7 +434,7 @@ RSpec.describe LeadFormSubmissionProcessor do
   it "uses the first stage of a routed pipeline when the configured stage belongs to the default pipeline" do
     cursos = pipeline.duplicate(name: "Cursos")
     cursos.save!
-    lead_form.update!(pipeline_stage: qualified_stage, pipeline_routes: { "curso" => cursos.id })
+    lead_form.update!(pipeline_stage: qualified_stage, pipeline_routes: {"curso" => cursos.id})
 
     result = submit(contacto_lead_params("help_type" => "curso"))
 
@@ -509,7 +509,7 @@ RSpec.describe LeadFormSubmissionProcessor do
     it "does not duplicate the same product and edition when reusing an open deal" do
       company = create_company!(workspace)
       person = create_person!(workspace, company: company, email: "lead@example.com")
-      existing_deal = create_deal!(workspace, pipeline: pipeline, company: company, contacts: [ person ])
+      existing_deal = create_deal!(workspace, pipeline: pipeline, company: company, contacts: [person])
       existing_deal.deal_products.create!(product: product, edition: edition, quantity: 1)
 
       expect {
@@ -522,7 +522,7 @@ RSpec.describe LeadFormSubmissionProcessor do
       other_edition = product.editions.create!(name: "Abril 2026", starts_on: Date.current + 90.days, ends_on: Date.current + 120.days)
       company = create_company!(workspace)
       person = create_person!(workspace, company: company, email: "lead@example.com")
-      existing_deal = create_deal!(workspace, pipeline: pipeline, company: company, contacts: [ person ])
+      existing_deal = create_deal!(workspace, pipeline: pipeline, company: company, contacts: [person])
       line = existing_deal.deal_products.create!(product: product, edition: edition, quantity: 1)
 
       expect {
@@ -538,7 +538,7 @@ RSpec.describe LeadFormSubmissionProcessor do
       other_edition = other_product.editions.create!(name: "Junio 2026", starts_on: Date.current + 30.days, ends_on: Date.current + 60.days)
       company = create_company!(workspace)
       person = create_person!(workspace, company: company, email: "lead@example.com")
-      existing_deal = create_deal!(workspace, pipeline: pipeline, company: company, contacts: [ person ])
+      existing_deal = create_deal!(workspace, pipeline: pipeline, company: company, contacts: [person])
       existing_deal.deal_products.create!(product: product, edition: edition, quantity: 1)
 
       expect {
@@ -594,7 +594,7 @@ RSpec.describe LeadFormSubmissionProcessor do
         expect(result.deal).to be_present
       }.to change(Person, :count).by(1)
         .and change(EmailSubscription, :count).by(1)
-        .and have_enqueued_job(BeehiivPushJob).with(publication.id, kind_of(Integer), "subscribe", { "reactivate" => false })
+        .and have_enqueued_job(BeehiivPushJob).with(publication.id, kind_of(Integer), "subscribe", {"reactivate" => false})
 
       newsletter = workspace.subscription_types.find_by!(slug: "newsletter")
       person = Person.find_by!(email: "lead@example.com")

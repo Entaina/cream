@@ -9,10 +9,10 @@ RSpec.describe Marketing::JourneyRunner do
     workspace.journeys.create!(name: "Wait test", entry_trigger: "manual", active: true, max_reenrollments: 0)
   end
   let!(:wait_step) do
-    journey.steps.create!(position: 0, step_type: "wait", active: true, config: { "minutes" => 5 })
+    journey.steps.create!(position: 0, step_type: "wait", active: true, config: {"minutes" => 5})
   end
   let!(:next_step) do
-    journey.steps.create!(position: 1, step_type: "adjust_score", active: true, config: { "points" => 5 })
+    journey.steps.create!(position: 1, step_type: "adjust_score", active: true, config: {"points" => 5})
   end
   let(:enrollment) do
     JourneyEnrollment.create!(
@@ -57,7 +57,7 @@ RSpec.describe Marketing::JourneyRunner do
       )
     end
     let!(:after_email_step) do
-      email_journey.steps.create!(position: 1, step_type: "wait", active: true, config: { "minutes" => 1 })
+      email_journey.steps.create!(position: 1, step_type: "wait", active: true, config: {"minutes" => 1})
     end
     let(:email_enrollment) do
       JourneyEnrollment.create!(

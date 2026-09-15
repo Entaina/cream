@@ -51,7 +51,7 @@ class Workspace < ApplicationRecord
   has_many :lead_submissions, dependent: :destroy
   has_many :calendar_connections, dependent: :destroy
   has_many :booking_pages, dependent: :destroy
-    has_many :bookings, dependent: :destroy
+  has_many :bookings, dependent: :destroy
   has_many :subscription_types, dependent: :destroy
   has_many :email_subscriptions, dependent: :destroy
   has_many :email_suppressions, dependent: :destroy
@@ -67,7 +67,7 @@ class Workspace < ApplicationRecord
   has_many :privacy_policy_versions, dependent: :destroy
 
   validates :name, presence: true
-  validates :slug, presence: true, uniqueness: true, format: { with: /\A[a-z0-9-]+\z/ }
+  validates :slug, presence: true, uniqueness: true, format: {with: /\A[a-z0-9-]+\z/}
   validate :okm_service_account_key_format, if: -> { okm_service_account_key.present? }
 
   scope :sales_director_enabled, -> { where(sales_director_enabled: true) }

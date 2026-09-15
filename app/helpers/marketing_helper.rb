@@ -127,7 +127,7 @@ module MarketingHelper
     when "missing" then "hoki"
     else "chicago"
     end
-    badge(SUBSCRIPTION_STATUS_LABELS.fetch(status.to_s, status), color: color)
+    badge(t("marketing.subscription_statuses.#{status}", default: SUBSCRIPTION_STATUS_LABELS.fetch(status.to_s, status.to_s)), color: color)
   end
 
   def campaign_engagement_badge(message)
@@ -138,32 +138,32 @@ module MarketingHelper
     when "failed" then "red"
     else "chicago"
     end
-    badge(CAMPAIGN_ENGAGEMENT_LABELS.fetch(engagement, engagement), color: color)
+    badge(t("marketing.campaign_engagement.#{engagement}", default: CAMPAIGN_ENGAGEMENT_LABELS.fetch(engagement, engagement)), color: color)
   end
 
   def email_event_label(event_type)
-    EMAIL_EVENT_LABELS.fetch(event_type.to_s, event_type.to_s.humanize)
+    t("marketing.email_events.#{event_type}", default: EMAIL_EVENT_LABELS.fetch(event_type.to_s, event_type.to_s.humanize))
   end
 
   def describe_segment_filters(filters)
     filters = filters.to_h.stringify_keys
     parts = []
-    parts << "búsqueda «#{filters['q']}»" if filters["q"].present?
-    parts << "ciclo #{filters['lifecycle_stage']}" if filters["lifecycle_stage"].present?
-    parts << "email contiene «#{filters['email_contains']}»" if filters["email_contains"].present?
+    parts << "búsqueda «#{filters["q"]}»" if filters["q"].present?
+    parts << "ciclo #{filters["lifecycle_stage"]}" if filters["lifecycle_stage"].present?
+    parts << "email contiene «#{filters["email_contains"]}»" if filters["email_contains"].present?
     if filters["lead_score_min"].present? || filters["lead_score_max"].present?
-      parts << "puntuación #{filters['lead_score_min'] || '…'}-#{filters['lead_score_max'] || '…'}"
+      parts << "puntuación #{filters["lead_score_min"] || "…"}-#{filters["lead_score_max"] || "…"}"
     end
-    parts << "abrió email (#{filters['opened_email_days']} días)" if filters["opened_email_days"].present?
-    parts << "formulario «#{filters['submitted_form_slug']}»" if filters["submitted_form_slug"].present?
-    parts << "visitó URL «#{filters['visited_url']}»" if filters["visited_url"].present?
-    parts << "sin suprimidos" if filters["exclude_suppressed"].in?([ true, "true", "1", 1 ])
-    parts << "oportunidad abierta: #{filters['open_deal']}" if filters["open_deal"].present? && filters["open_deal"] != "any"
-    parts << "sin oportunidad en producto #{filters['open_deal_product_id']}" if filters["open_deal_product_id"].present?
-    parts << "interés producto #{filters['interest_product_id']}" if filters["interest_product_id"].present?
-    parts << "historial producto #{filters['dealt_product_id']}" if filters["dealt_product_id"].present?
-    parts << "formulario #{filters['lead_form_id']}" if filters["lead_form_id"].present?
-    parts << "destino #{filters['capture_destination']}" if filters["capture_destination"].present? && filters["capture_destination"] != "any"
+    parts << "abrió email (#{filters["opened_email_days"]} días)" if filters["opened_email_days"].present?
+    parts << "formulario «#{filters["submitted_form_slug"]}»" if filters["submitted_form_slug"].present?
+    parts << "visitó URL «#{filters["visited_url"]}»" if filters["visited_url"].present?
+    parts << "sin suprimidos" if filters["exclude_suppressed"].in?([true, "true", "1", 1])
+    parts << "oportunidad abierta: #{filters["open_deal"]}" if filters["open_deal"].present? && filters["open_deal"] != "any"
+    parts << "sin oportunidad en producto #{filters["open_deal_product_id"]}" if filters["open_deal_product_id"].present?
+    parts << "interés producto #{filters["interest_product_id"]}" if filters["interest_product_id"].present?
+    parts << "historial producto #{filters["dealt_product_id"]}" if filters["dealt_product_id"].present?
+    parts << "formulario #{filters["lead_form_id"]}" if filters["lead_form_id"].present?
+    parts << "destino #{filters["capture_destination"]}" if filters["capture_destination"].present? && filters["capture_destination"] != "any"
     parts.presence&.join("; ") || "Sin filtros"
   end
 
@@ -176,21 +176,21 @@ module MarketingHelper
         "Enviar «#{label}»"
       else
         template = workspace.email_templates.find_by(id: config["email_template_id"])
-        "Enviar «#{template&.name || 'plantilla'}»"
+        "Enviar «#{template&.name || "plantilla"}»"
       end
     when "wait"
-      "Esperar #{config['minutes'] || 1} min"
+      "Esperar #{config["minutes"] || 1} min"
     when "create_task"
-      "Tarea: #{config['title'].presence || 'sin título'}"
+      "Tarea: #{config["title"].presence || "sin título"}"
     when "adjust_score"
-      "#{config['points'].to_i >= 0 ? '+' : ''}#{config['points']} pts"
+      "#{"+" if config["points"].to_i >= 0}#{config["points"]} pts"
     when "add_to_segment"
       list = workspace.lists.find_by(id: config["list_id"])
-      "Añadir a lista «#{list&.name || '…'}»"
+      "Añadir a lista «#{list&.name || "…"}»"
     when "branch"
-      "Condición → paso #{config['true_step_id'] || 'siguiente'} / #{config['false_step_id'] || 'siguiente'}"
+      "Condición → paso #{config["true_step_id"] || "siguiente"} / #{config["false_step_id"] || "siguiente"}"
     when "set_field"
-      "#{config['field']}: #{config['value']}"
+      "#{config["field"]}: #{config["value"]}"
     when "notify"
       "Notificar usuario"
     else

@@ -32,7 +32,7 @@ module Api
             ::Marketing::SegmentWatcher.sync_person!(person)
             render json: ::Marketing::ApiPresenter.product_interest_json(interest), status: :created
           else
-            render json: { errors: interest.errors.full_messages }, status: :unprocessable_entity
+            render json: {errors: interest.errors.full_messages}, status: :unprocessable_entity
           end
         end
 

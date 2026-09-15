@@ -4,7 +4,7 @@ class JourneyStep < ApplicationRecord
   belongs_to :journey, inverse_of: :steps
   has_many :enrollments, class_name: "JourneyEnrollment", foreign_key: :current_step_id, dependent: :nullify, inverse_of: :current_step
 
-  validates :step_type, inclusion: { in: STEP_TYPES }
+  validates :step_type, inclusion: {in: STEP_TYPES}
   validates :position, presence: true
 
   scope :active, -> { where(active: true) }

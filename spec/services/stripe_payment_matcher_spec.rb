@@ -25,14 +25,14 @@ RSpec.describe StripePaymentMatcher do
   def person_with_deal(email: "pat@example.com", value: 500, currency: "EUR", stage: nil)
     company = create_company!(workspace)
     person = create_person!(workspace, company: company, email: email)
-    deal = create_deal!(workspace, company: company, contacts: [ person ],
+    deal = create_deal!(workspace, company: company, contacts: [person],
       value: value, currency: currency, stage: stage)
-    [ person, deal ]
+    [person, deal]
   end
 
   it "matches high via cream_deal_id metadata" do
     _person, deal = person_with_deal
-    result = described_class.new(build_payment(metadata: { "cream_deal_id" => deal.id.to_s },
+    result = described_class.new(build_payment(metadata: {"cream_deal_id" => deal.id.to_s},
       customer_email: nil)).call
 
     expect(result.deal).to eq(deal)
@@ -43,7 +43,7 @@ RSpec.describe StripePaymentMatcher do
     other_pipeline = Pipeline.create_default!(workspaces(:two))
     foreign = create_deal!(workspaces(:two), pipeline: other_pipeline)
 
-    result = described_class.new(build_payment(metadata: { "cream_deal_id" => foreign.id.to_s },
+    result = described_class.new(build_payment(metadata: {"cream_deal_id" => foreign.id.to_s},
       customer_email: nil)).call
 
     expect(result.deal).to be_nil
@@ -80,7 +80,7 @@ RSpec.describe StripePaymentMatcher do
 
   it "returns low with several candidate deals" do
     person, _deal = person_with_deal(value: 100)
-    create_deal!(workspace, company: person.company, contacts: [ person ], value: 200)
+    create_deal!(workspace, company: person.company, contacts: [person], value: 200)
 
     result = described_class.new(build_payment).call
 
@@ -102,7 +102,7 @@ RSpec.describe StripePaymentMatcher do
   it "prefers the open deal when open and won both match the amount" do
     won = pipeline.pipeline_stages.find_by!(name: "Won")
     person, open_deal = person_with_deal(value: 500)
-    create_deal!(workspace, company: person.company, contacts: [ person ], value: 500, stage: won)
+    create_deal!(workspace, company: person.company, contacts: [person], value: 500, stage: won)
 
     result = described_class.new(build_payment).call
 

@@ -1,7 +1,7 @@
 <section class="record-card">
   <div class="record-card-heading">
-    <h2 class="record-section-title">People <span class="record-count"><%= @people.size %></span></h2>
-    <%= link_to new_person_path(company_id: @company.id), class: "btn-ghost" do %><%= icon :plus, classes: "size-4" %> Add person<% end %>
+    <h2 class="record-section-title"><%= t("records.tabs.people") %> <span class="record-count"><%= @people.size %></span></h2>
+    <%= link_to new_person_path(company_id: @company.id), class: "btn-ghost" do %><%= icon :plus, classes: "size-4" %> <%= t("records.add_person") %><% end %>
   </div>
   <% if @people.any? %>
     <ul class="space-y-1">
@@ -19,6 +19,6 @@
       <% end %>
     </ul>
   <% else %>
-    <p class="text-sm text-ink-soft">No people linked to this company yet.</p>
+    <p class="text-sm text-ink-soft"><%= t("companies.show.people_empty") %></p>
   <% end %>
 </section>

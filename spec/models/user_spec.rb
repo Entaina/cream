@@ -63,7 +63,7 @@ RSpec.describe User, type: :model do
 
     it "merges saved order with newly added default keys" do
       user = User.create!(name: "Prefs User", email_address: "prefs2@example.com", password: "password")
-      user.update!(sidebar_prefs: { "order" => %w[tasks dashboard], "hidden" => %w[api_tokens] })
+      user.update!(sidebar_prefs: {"order" => %w[tasks dashboard], "hidden" => %w[api_tokens]})
 
       expect(user.sidebar_order.first(2)).to eq(%w[tasks dashboard])
       expect(user.sidebar_order).to include(*User.sidebar_default_keys)
@@ -72,7 +72,7 @@ RSpec.describe User, type: :model do
 
     it "drops orphan keys such as mail_merge when merging order" do
       user = User.create!(name: "Prefs User", email_address: "prefs4@example.com", password: "password")
-      user.update!(sidebar_prefs: { "order" => %w[mail_merge tasks dashboard], "hidden" => %w[mail_merge] })
+      user.update!(sidebar_prefs: {"order" => %w[mail_merge tasks dashboard], "hidden" => %w[mail_merge]})
 
       expect(user.sidebar_order).not_to include("mail_merge")
       expect(user.sidebar_hidden).not_to include("mail_merge")

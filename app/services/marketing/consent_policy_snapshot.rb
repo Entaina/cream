@@ -3,7 +3,7 @@ module Marketing
     def self.digest(policy_html:, statement_html:)
       policy_norm = normalize_html(policy_html)
       statement_norm = normalize_html(statement_html)
-      Digest::SHA256.hexdigest([ policy_norm, statement_norm ].join("\x00"))
+      Digest::SHA256.hexdigest([policy_norm, statement_norm].join("\x00"))
     end
 
     def self.capture(workspace:, policy_html:, statement_html:, policy_path: PrivacyPolicyVersion::POLICY_PATH)

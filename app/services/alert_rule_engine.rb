@@ -40,11 +40,11 @@ class AlertRuleEngine
     case rule.trigger_field
     when "edition_ends_on"
       scope.joins(deal_products: :edition)
-        .where.not(editions: { ends_on: nil })
+        .where.not(editions: {ends_on: nil})
         .where("editions.ends_on + ?::integer <= ?", offset, Date.current)
     when "edition_starts_on"
       scope.joins(deal_products: :edition)
-        .where.not(editions: { starts_on: nil })
+        .where.not(editions: {starts_on: nil})
         .where("editions.starts_on + ?::integer <= ?", offset, Date.current)
     when "deal_expected_close_date"
       scope.where.not(expected_close_date: nil)
@@ -64,9 +64,9 @@ class AlertRuleEngine
       membership = workspace.memberships.find_by(user_id: deal.owner_id)
       return [] unless deal.owner && membership
 
-      [ [ deal.owner, membership ] ]
+      [[deal.owner, membership]]
     when "admins"
-      workspace.memberships.admins.includes(:user).map { |membership| [ membership.user, membership ] }
+      workspace.memberships.admins.includes(:user).map { |membership| [membership.user, membership] }
     else
       []
     end

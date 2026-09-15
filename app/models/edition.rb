@@ -6,7 +6,7 @@ class Edition < ApplicationRecord
   before_validation :set_workspace_from_product, on: :create
 
   validates :name, presence: true,
-    uniqueness: { scope: :product_id, case_sensitive: false }
+    uniqueness: {scope: :product_id, case_sensitive: false}
 
   before_validation :strip_name
   validate :ends_on_not_before_starts_on

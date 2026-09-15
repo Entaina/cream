@@ -9,7 +9,7 @@ RSpec.describe "Invitations", type: :request do
 
   before do
     sign_in_as(admin)
-    patch switch_workspace_path, params: { workspace_id: workspace.id }
+    patch switch_workspace_path, params: {workspace_id: workspace.id}
     allow(InvitationMailer).to receive_message_chain(:invite, :deliver_later)
   end
 
@@ -17,7 +17,7 @@ RSpec.describe "Invitations", type: :request do
     it "creates an invitation as admin" do
       expect {
         post invitations_path, params: {
-          invitation: { email_address: "newperson@example.com", role: "salesperson" }
+          invitation: {email_address: "newperson@example.com", role: "salesperson"}
         }
       }.to change(Invitation, :count).by(1)
 
@@ -27,11 +27,11 @@ RSpec.describe "Invitations", type: :request do
 
     it "forbids members from creating invitations" do
       sign_in_as(member)
-      patch switch_workspace_path, params: { workspace_id: workspace.id }
+      patch switch_workspace_path, params: {workspace_id: workspace.id}
 
       expect {
         post invitations_path, params: {
-          invitation: { email_address: "blocked@example.com", role: "salesperson" }
+          invitation: {email_address: "blocked@example.com", role: "salesperson"}
         }
       }.not_to change(Invitation, :count)
 

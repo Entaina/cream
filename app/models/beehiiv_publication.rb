@@ -10,10 +10,10 @@ class BeehiivPublication < ApplicationRecord
 
   before_validation :assign_webhook_token, on: :create
 
-  validates :publication_id, presence: true, format: { with: /\Apub_[0-9a-fA-F\-]+\z/ }
+  validates :publication_id, presence: true, format: {with: /\Apub_[0-9a-fA-F-]+\z/}
   validates :webhook_token, presence: true, uniqueness: true
-  validates :publication_id, uniqueness: { scope: :beehiiv_connection_id }
-  validates :subscription_type_id, uniqueness: { scope: :beehiiv_connection_id }
+  validates :publication_id, uniqueness: {scope: :beehiiv_connection_id}
+  validates :subscription_type_id, uniqueness: {scope: :beehiiv_connection_id}
   validate :subscription_type_in_workspace
 
   def webhook_url

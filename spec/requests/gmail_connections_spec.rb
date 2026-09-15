@@ -75,7 +75,7 @@ RSpec.describe "Gmail connections", type: :request do
         }
       )
 
-      get "/auth/google_gmail/callback", params: { gmail_mode: "full" }
+      get "/auth/google_gmail/callback", params: {gmail_mode: "full"}
 
       connection = workspace.gmail_connections.find_by(user: user)
       expect(connection.can_read_body?).to be(true)
@@ -98,7 +98,7 @@ RSpec.describe "Gmail connections", type: :request do
         }
       )
 
-      get "/auth/google_gmail/callback", params: { gmail_mode: "full" }
+      get "/auth/google_gmail/callback", params: {gmail_mode: "full"}
 
       connection = workspace.gmail_connections.find_by(user: user)
       expect(connection.scopes).not_to include(GmailConnection::METADATA_SCOPE)
@@ -120,7 +120,7 @@ RSpec.describe "Gmail connections", type: :request do
         granted_scopes: send_only_scopes
       )
 
-      patch gmail_connection_path, params: { gmail_connection: { send_enabled: "1" } }
+      patch gmail_connection_path, params: {gmail_connection: {send_enabled: "1"}}
 
       expect(workspace.gmail_connections.find_by(user: user).send_enabled).to be(true)
     end
@@ -131,7 +131,7 @@ RSpec.describe "Gmail connections", type: :request do
         granted_scopes: send_and_metadata_scopes
       )
 
-      patch gmail_connection_path, params: { gmail_connection: { sync_enabled: "1" } }
+      patch gmail_connection_path, params: {gmail_connection: {sync_enabled: "1"}}
 
       expect(workspace.gmail_connections.find_by(user: user).sync_enabled).to be(true)
     end
@@ -142,7 +142,7 @@ RSpec.describe "Gmail connections", type: :request do
         granted_scopes: send_only_scopes
       )
 
-      patch gmail_connection_path, params: { gmail_connection: { sync_enabled: "1" } }
+      patch gmail_connection_path, params: {gmail_connection: {sync_enabled: "1"}}
 
       connection = workspace.gmail_connections.find_by(user: user)
       expect(connection.sync_enabled).to be(false)

@@ -1,5 +1,6 @@
 class ImportsController < ApplicationController
   include RequiresFeature
+
   requires_feature :csv_import_export
   RECORD_TYPES = %w[Person Company Deal].freeze
 

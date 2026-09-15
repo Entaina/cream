@@ -16,7 +16,7 @@ RSpec.describe "Email previews", type: :request do
         subject: "Hi {first_name}",
         body: "<p>Hello {name}</p>",
         email_layout_id: layout.id,
-        preview_tokens: { first_name: "Pat", name: "Pat Smith" }
+        preview_tokens: {first_name: "Pat", name: "Pat Smith"}
       }
 
       expect(response).to have_http_status(:ok)
@@ -29,7 +29,7 @@ RSpec.describe "Email previews", type: :request do
       post preview_email_templates_path, params: {
         subject: "Hi {first_name}",
         body: "<p>Hello {first_name}</p>",
-        preview_tokens: { first_name: "Pat", admin: "true" }
+        preview_tokens: {first_name: "Pat", admin: "true"}
       }
 
       expect(response).to have_http_status(:ok)
@@ -43,7 +43,7 @@ RSpec.describe "Email previews", type: :request do
       post preview_email_layouts_path, params: {
         body: "<html><body><header>Logo</header>{{ content }}</body></html>",
         sample_content: "<p>Hola {first_name}</p>",
-        preview_tokens: { first_name: "Lee" }
+        preview_tokens: {first_name: "Lee"}
       }
 
       expect(response).to have_http_status(:ok)

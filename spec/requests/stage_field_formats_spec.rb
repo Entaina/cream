@@ -11,8 +11,8 @@ RSpec.describe "StageFieldFormats", type: :request do
   before { sign_in_as(member) }
 
   def create_format(**attrs)
-    workspace.stage_field_formats.create!({ pipeline_stage: stage, field: "value",
-      operator: "eq", compare_value: "0", display_text: "guest" }.merge(attrs))
+    workspace.stage_field_formats.create!({pipeline_stage: stage, field: "value",
+                                           operator: "eq", compare_value: "0", display_text: "guest"}.merge(attrs))
   end
 
   it "lists the formats of a stage" do
@@ -25,8 +25,8 @@ RSpec.describe "StageFieldFormats", type: :request do
   it "creates a format" do
     expect {
       post pipeline_stage_stage_field_formats_path(stage), params: {
-        stage_field_format: { field: "value", operator: "eq", compare_value: "0",
-                              display_text: "guest", active: "1" }
+        stage_field_format: {field: "value", operator: "eq", compare_value: "0",
+                             display_text: "guest", active: "1"}
       }
     }.to change(StageFieldFormat, :count).by(1)
 
@@ -37,14 +37,14 @@ RSpec.describe "StageFieldFormats", type: :request do
 
   it "rejects an invalid format" do
     post pipeline_stage_stage_field_formats_path(stage), params: {
-      stage_field_format: { field: "value", operator: "eq", compare_value: "0", display_text: "" }
+      stage_field_format: {field: "value", operator: "eq", compare_value: "0", display_text: ""}
     }
     expect(response).to have_http_status(:unprocessable_content)
   end
 
   it "updates and destroys a format" do
     format = create_format
-    patch stage_field_format_path(format), params: { stage_field_format: { display_text: "invitado" } }
+    patch stage_field_format_path(format), params: {stage_field_format: {display_text: "invitado"}}
     expect(format.reload.display_text).to eq("invitado")
 
     expect { delete stage_field_format_path(format) }.to change(StageFieldFormat, :count).by(-1)
@@ -76,8 +76,8 @@ RSpec.describe "StageFieldFormats", type: :request do
 
     it "refreshes the value when moving stages from the show page" do
       target = pipeline.pipeline_stages.find_by(name: "Qualified")
-      patch move_deal_path(deal), params: { pipeline_stage_id: target.id, source: "show" },
-        headers: { "Accept" => "text/vnd.turbo-stream.html" }
+      patch move_deal_path(deal), params: {pipeline_stage_id: target.id, source: "show"},
+        headers: {"Accept" => "text/vnd.turbo-stream.html"}
 
       expect(response.body).to include("deal_value_display_#{deal.id}")
       expect(response.body).not_to include("guest") # Qualified has no format rule
@@ -85,8 +85,8 @@ RSpec.describe "StageFieldFormats", type: :request do
 
     it "refreshes the card value when moving on the board" do
       target = pipeline.pipeline_stages.find_by(name: "Qualified")
-      patch move_deal_path(deal), params: { pipeline_stage_id: target.id },
-        headers: { "Accept" => "text/vnd.turbo-stream.html" }
+      patch move_deal_path(deal), params: {pipeline_stage_id: target.id},
+        headers: {"Accept" => "text/vnd.turbo-stream.html"}
 
       expect(response.body).to include("deal_card_value_#{deal.id}")
     end

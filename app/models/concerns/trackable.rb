@@ -27,6 +27,6 @@ module Trackable
     changes = saved_changes.except(*TRACKED_IGNORE, *tracked_ignored_attributes)
     return if changes.empty?
 
-    track_activity("updated", metadata: { changes: changes.transform_values { |(from, to)| [ from.to_s, to.to_s ] } })
+    track_activity("updated", metadata: {changes: changes.transform_values { |(from, to)| [from.to_s, to.to_s] }})
   end
 end

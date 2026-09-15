@@ -12,7 +12,7 @@ RSpec.describe "Deal product lines", type: :request do
   it "adds a product line and recomputes the deal value" do
     sign_in_as(member)
 
-    post deal_line_items_path(deal), params: { deal_product: { product_id: product.id, quantity: 3 } }
+    post deal_line_items_path(deal), params: {deal_product: {product_id: product.id, quantity: 3}}
 
     expect(response).to redirect_to(deal_path(deal))
     expect(deal.reload.value).to eq(300)
@@ -23,7 +23,7 @@ RSpec.describe "Deal product lines", type: :request do
     edition = product.editions.create!(name: "Madrid 2026")
 
     post deal_line_items_path(deal), params: {
-      deal_product: { product_id: product.id, quantity: 1, edition_id: edition.id }
+      deal_product: {product_id: product.id, quantity: 1, edition_id: edition.id}
     }
 
     line = deal.deal_products.last
@@ -36,7 +36,7 @@ RSpec.describe "Deal product lines", type: :request do
     edition = product.editions.create!(name: "Madrid 2026")
     line = deal.deal_products.create!(product: product, quantity: 1)
 
-    patch deal_line_item_path(deal, line), params: { deal_product: { edition_id: edition.id } }
+    patch deal_line_item_path(deal, line), params: {deal_product: {edition_id: edition.id}}
 
     expect(line.reload.edition).to eq(edition)
     expect(response).to redirect_to(deal_path(deal))

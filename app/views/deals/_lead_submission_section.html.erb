@@ -1,5 +1,5 @@
 <div class="card p-4">
-  <h3 class="text-sm font-semibold uppercase tracking-wider text-ink-faint mb-3">Formularios de origen</h3>
+  <h3 class="text-sm font-semibold uppercase tracking-wider text-ink-faint mb-3"><%= t("deals.show.source_forms") %></h3>
   <div class="space-y-2">
     <% deal.lead_submissions.includes(:lead_form, :person, :privacy_policy_version).order(created_at: :desc).each do |submission| %>
       <div class="border border-line rounded-lg overflow-hidden bg-canvas-raised"
@@ -17,14 +17,14 @@
               <span class="text-xs text-ink-faint"><%= l(submission.created_at, format: :short) %></span>
             </div>
           </div>
-          <%= link_to "Ver consentimiento", person_lead_submission_path(submission.person, submission), class: "text-accent text-xs hover:underline shrink-0" %>
+          <%= link_to t("deals.show.view_consent"), person_lead_submission_path(submission.person, submission), class: "text-accent text-xs hover:underline shrink-0" %>
         </div>
 
         <div data-collapse-target="panel" class="hidden border-t border-line p-4 space-y-3 bg-canvas">
           <%= render "lead_submissions/consent_accepted", submission: submission %>
           <div class="divide-y divide-line/60">
             <% submission.data.each do |key, value| %>
-              <% display_value = value.is_a?(TrueClass) || value.is_a?(FalseClass) ? (value ? "Sí" : "No") : value %>
+              <% display_value = value.is_a?(TrueClass) || value.is_a?(FalseClass) ? t(value ? "records.boolean.yes" : "records.boolean.no") : value %>
               <%= render "shared/attribute", label: key.humanize, icon_name: :mail, value: display_value %>
             <% end %>
             <% %w[lead_form_name lead_form_slug source_page referrer utm_source utm_medium utm_campaign utm_term utm_content ip user_agent].each do |key| %>

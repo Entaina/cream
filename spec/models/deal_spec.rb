@@ -11,8 +11,8 @@ RSpec.describe Deal, type: :model do
     company = create_company!(workspace)
     actor = workspace.users.first
     created = workspace.deals.create!(name: "No stage given", company: company,
-      contacts: [ create_person!(workspace, company: company) ],
-      tasks: [ Task.new(title: "Next", due_on: Date.current + 1, workspace: workspace, user: actor, assignee: actor) ])
+      contacts: [create_person!(workspace, company: company)],
+      tasks: [Task.new(title: "Next", due_on: Date.current + 1, workspace: workspace, user: actor, assignee: actor)])
 
     expect(created.pipeline).to eq(pipeline)
     expect(created.stage_label).to eq("Lead")
@@ -80,7 +80,7 @@ RSpec.describe Deal, type: :model do
     third.move_to_stage!(stage, position: 0)
 
     ordered = workspace.deals.by_stage(stage.id).pluck(:name)
-    expect(ordered).to eq([ "Third", "First", "Second" ])
+    expect(ordered).to eq(["Third", "First", "Second"])
     expect(third.reload.position).to eq(0)
     expect(first.reload.position).to eq(1)
     expect(second.reload.position).to eq(2)
@@ -88,7 +88,7 @@ RSpec.describe Deal, type: :model do
 
   it "moves to a stage in another pipeline by id and logs pipeline_changed" do
     other = workspace.pipelines.create!(name: "Partners", position: 1,
-      pipeline_stages: [ PipelineStage.new(name: "New lead", color: "hoki", probability: 5, position: 0, workspace: workspace) ])
+      pipeline_stages: [PipelineStage.new(name: "New lead", color: "hoki", probability: 5, position: 0, workspace: workspace)])
     target_stage = other.first_stage
 
     expect { deal.move_to_stage!(target_stage.id) }
@@ -98,7 +98,7 @@ RSpec.describe Deal, type: :model do
   end
 
   it "does not move to a same-named stage in another pipeline when using the stage name" do
-    other = pipeline.duplicate(name: "Partners").tap(&:save!)
+    pipeline.duplicate(name: "Partners").tap(&:save!)
     qualified = pipeline.pipeline_stages.find_by!(name: "Qualified")
     deal.move_to_stage!(qualified)
 
@@ -107,7 +107,7 @@ RSpec.describe Deal, type: :model do
 
   it "moves to another pipeline landing on its initial stage" do
     other = workspace.pipelines.create!(name: "Partners", position: 1,
-      pipeline_stages: [ PipelineStage.new(name: "New lead", color: "hoki", probability: 5, position: 0, workspace: workspace) ])
+      pipeline_stages: [PipelineStage.new(name: "New lead", color: "hoki", probability: 5, position: 0, workspace: workspace)])
     deal.move_to_stage!(pipeline.pipeline_stages.find_by(name: "Proposal").id)
 
     expect { deal.move_to_pipeline!(other) }.to change { deal.reload.pipeline }.from(pipeline).to(other)
@@ -168,9 +168,9 @@ RSpec.describe Deal, type: :model do
     let(:edition_2026) { product_a.editions.create!(name: "2026") }
 
     def deal_with_line(name:, stage: lead_stage, product: product_a, edition: edition_2025, contact_date: Date.new(2026, 1, 15))
-      line_edition = edition&.product_id == product.id ? edition : product.editions.find_or_create_by!(name: edition&.name || "2025")
+      line_edition = (edition&.product_id == product.id) ? edition : product.editions.find_or_create_by!(name: edition&.name || "2025")
       contact = create_person!(workspace, company: company, first_contact_on: contact_date)
-      deal = create_deal!(workspace, pipeline: pipeline, stage: stage, name: name, company: company, contacts: [ contact ])
+      deal = create_deal!(workspace, pipeline: pipeline, stage: stage, name: name, company: company, contacts: [contact])
       deal.deal_products.create!(product: product, edition: line_edition, quantity: 1)
       deal
     end
@@ -243,15 +243,15 @@ RSpec.describe Deal, type: :model do
     it "allows a deal with only a company and a future task" do
       deal = workspace.deals.new(name: "X", pipeline: pipeline, pipeline_stage: pipeline.first_stage,
         company: company,
-        tasks: [ Task.new(title: "t", due_on: Date.current + 1, workspace: workspace, user: actor, assignee: actor) ])
+        tasks: [Task.new(title: "t", due_on: Date.current + 1, workspace: workspace, user: actor, assignee: actor)])
       expect(deal).to be_valid
     end
 
     it "rejects a contact from another company" do
       outsider = create_person!(workspace, company: create_company!(workspace))
       deal = workspace.deals.new(name: "X", pipeline: pipeline, pipeline_stage: pipeline.first_stage,
-        company: company, contacts: [ outsider ],
-        tasks: [ Task.new(title: "t", due_on: Date.current + 1, workspace: workspace, user: actor, assignee: actor) ])
+        company: company, contacts: [outsider],
+        tasks: [Task.new(title: "t", due_on: Date.current + 1, workspace: workspace, user: actor, assignee: actor)])
       expect(deal).not_to be_valid
       expect(deal.errors[:base].join).to match(/must belong to/)
     end
@@ -260,8 +260,8 @@ RSpec.describe Deal, type: :model do
       partner = create_company!(workspace, name: "Avantis Group")
       partner_contact = create_person!(workspace, company: partner, first_name: "Laura")
       deal = workspace.deals.new(name: "Asisa offer", pipeline: pipeline, pipeline_stage: pipeline.first_stage,
-        company: company, partner: partner, contacts: [ partner_contact ],
-        tasks: [ Task.new(title: "t", due_on: Date.current + 1, workspace: workspace, user: actor, assignee: actor) ])
+        company: company, partner: partner, contacts: [partner_contact],
+        tasks: [Task.new(title: "t", due_on: Date.current + 1, workspace: workspace, user: actor, assignee: actor)])
       expect(deal).to be_valid
     end
 
@@ -270,8 +270,8 @@ RSpec.describe Deal, type: :model do
       client_contact = create_person!(workspace, company: company, first_name: "Client")
       partner_contact = create_person!(workspace, company: partner, first_name: "Partner")
       deal = workspace.deals.new(name: "Mixed contacts", pipeline: pipeline, pipeline_stage: pipeline.first_stage,
-        company: company, partner: partner, contacts: [ client_contact, partner_contact ],
-        tasks: [ Task.new(title: "t", due_on: Date.current + 1, workspace: workspace, user: actor, assignee: actor) ])
+        company: company, partner: partner, contacts: [client_contact, partner_contact],
+        tasks: [Task.new(title: "t", due_on: Date.current + 1, workspace: workspace, user: actor, assignee: actor)])
       expect(deal).to be_valid
     end
 
@@ -279,8 +279,8 @@ RSpec.describe Deal, type: :model do
       partner = create_company!(workspace, name: "Avantis Group")
       outsider = create_person!(workspace, company: create_company!(workspace, name: "Other Co"))
       deal = workspace.deals.new(name: "X", pipeline: pipeline, pipeline_stage: pipeline.first_stage,
-        company: company, partner: partner, contacts: [ outsider ],
-        tasks: [ Task.new(title: "t", due_on: Date.current + 1, workspace: workspace, user: actor, assignee: actor) ])
+        company: company, partner: partner, contacts: [outsider],
+        tasks: [Task.new(title: "t", due_on: Date.current + 1, workspace: workspace, user: actor, assignee: actor)])
       expect(deal).not_to be_valid
       expect(deal.errors[:base].join).to match(/must belong to/)
     end
@@ -288,7 +288,7 @@ RSpec.describe Deal, type: :model do
     it "rejects the partner being the same as the client company" do
       deal = workspace.deals.new(name: "X", pipeline: pipeline, pipeline_stage: pipeline.first_stage,
         company: company, partner: company,
-        tasks: [ Task.new(title: "t", due_on: Date.current + 1, workspace: workspace, user: actor, assignee: actor) ])
+        tasks: [Task.new(title: "t", due_on: Date.current + 1, workspace: workspace, user: actor, assignee: actor)])
       expect(deal).not_to be_valid
       expect(deal.errors[:partner].join).to match(/different from the client company/)
     end
@@ -296,14 +296,14 @@ RSpec.describe Deal, type: :model do
     it "allows a next action due today" do
       deal = workspace.deals.new(name: "X", pipeline: pipeline, pipeline_stage: pipeline.first_stage,
         company: company,
-        tasks: [ Task.new(title: "t", due_on: Date.current, workspace: workspace, user: actor, assignee: actor) ])
+        tasks: [Task.new(title: "t", due_on: Date.current, workspace: workspace, user: actor, assignee: actor)])
       expect(deal).to be_valid
     end
 
     it "rejects a past-due task as the next action" do
       deal = workspace.deals.new(name: "X", pipeline: pipeline, pipeline_stage: pipeline.first_stage,
-        company: company, contacts: [ create_person!(workspace, company: company) ],
-        tasks: [ Task.new(title: "t", due_on: Date.current - 1, workspace: workspace, user: actor, assignee: actor) ])
+        company: company, contacts: [create_person!(workspace, company: company)],
+        tasks: [Task.new(title: "t", due_on: Date.current - 1, workspace: workspace, user: actor, assignee: actor)])
       expect(deal).not_to be_valid
       expect(deal.errors[:base].join).to match(/next action/)
     end
@@ -316,7 +316,7 @@ RSpec.describe Deal, type: :model do
     let(:source) do
       partner = create_company!(workspace, name: "Avantis Group")
       create_deal!(workspace, pipeline: pipeline,
-        name: "ACME renewal", company: company, partner: partner, contacts: [ contact ],
+        name: "ACME renewal", company: company, partner: partner, contacts: [contact],
         value: 12_000, currency: "USD", probability: 60,
         expected_close_date: Date.current + 30, owner: actor)
     end
@@ -328,7 +328,7 @@ RSpec.describe Deal, type: :model do
       source.tasks.create!(title: "Done task", due_on: Date.current + 5, completed_at: Time.current,
         workspace: workspace, user: actor, assignee: actor)
       field = workspace.custom_fields.create!(record_type: "Deal", name: "Segment", field_type: "text")
-      source.update!(custom_fields: { field.key => "Enterprise" })
+      source.update!(custom_fields: {field.key => "Enterprise"})
       product = workspace.products.create!(name: "Plan Pro", price: 500)
       source.deal_products.create!(product: product, quantity: 2)
     end

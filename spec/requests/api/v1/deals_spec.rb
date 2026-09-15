@@ -9,7 +9,7 @@ RSpec.describe "Api::V1::Deals", type: :request do
   let(:company) { create_company!(workspace) }
   let(:deal) { create_deal!(workspace, pipeline: pipeline) }
   let(:token) { user.api_tokens.create!(name: "Test", workspace: workspace) }
-  let(:headers) { { "Authorization" => "Bearer #{token.plaintext_token}" } }
+  let(:headers) { {"Authorization" => "Bearer #{token.plaintext_token}"} }
   let(:json_headers) { headers.merge("CONTENT_TYPE" => "application/json", "ACCEPT" => "application/json") }
 
   def valid_create_params(**extra)
@@ -19,7 +19,7 @@ RSpec.describe "Api::V1::Deals", type: :request do
         company_id: company.id,
         pipeline_id: pipeline.id,
         pipeline_stage_id: pipeline.first_stage.id,
-        tasks_attributes: [ { title: "Follow up", due_on: Date.current + 3 } ]
+        tasks_attributes: [{title: "Follow up", due_on: Date.current + 3}]
       }
     }.deep_merge(extra)
   end
@@ -34,7 +34,7 @@ RSpec.describe "Api::V1::Deals", type: :request do
           params: valid_create_params(
             deal: {
               deal_products_attributes: [
-                { product_id: product.id, edition_id: edition.id, quantity: 2 }
+                {product_id: product.id, edition_id: edition.id, quantity: 2}
               ]
             }
           ),
@@ -67,7 +67,7 @@ RSpec.describe "Api::V1::Deals", type: :request do
         params: valid_create_params(
           deal: {
             deal_products_attributes: [
-              { product_id: product.id, edition_name: "Madrid 2026", quantity: 1 }
+              {product_id: product.id, edition_name: "Madrid 2026", quantity: 1}
             ]
           }
         ),
@@ -84,7 +84,7 @@ RSpec.describe "Api::V1::Deals", type: :request do
 
       post "/api/v1/deals",
         params: valid_create_params(
-          deal: { deal_products_attributes: [ { product_id: outsider.id, quantity: 1 } ] }
+          deal: {deal_products_attributes: [{product_id: outsider.id, quantity: 1}]}
         ),
         headers: json_headers,
         as: :json
@@ -101,7 +101,7 @@ RSpec.describe "Api::V1::Deals", type: :request do
         params: valid_create_params(
           deal: {
             deal_products_attributes: [
-              { product_id: product.id, edition_id: edition.id, quantity: 1 }
+              {product_id: product.id, edition_id: edition.id, quantity: 1}
             ]
           }
         ),
@@ -115,13 +115,13 @@ RSpec.describe "Api::V1::Deals", type: :request do
       contact = create_person!(workspace, company: company, first_name: "Jane", last_name: "Doe")
 
       post "/api/v1/deals",
-        params: valid_create_params(deal: { contact_ids: [ contact.id ] }),
+        params: valid_create_params(deal: {contact_ids: [contact.id]}),
         headers: headers
 
       expect(response).to have_http_status(:created)
       created_deal = workspace.deals.find(response.parsed_body["id"])
       expect(created_deal.contacts).to contain_exactly(contact)
-      expect(response.parsed_body["contact_ids"]).to eq([ contact.id ])
+      expect(response.parsed_body["contact_ids"]).to eq([contact.id])
     end
 
     it "returns not found when a contact id is outside the workspace" do
@@ -129,7 +129,7 @@ RSpec.describe "Api::V1::Deals", type: :request do
       outsider = create_person!(other_workspace, first_name: "Other")
 
       post "/api/v1/deals",
-        params: valid_create_params(deal: { contact_ids: [ outsider.id ] }),
+        params: valid_create_params(deal: {contact_ids: [outsider.id]}),
         headers: headers
 
       expect(response).to have_http_status(:not_found)
@@ -140,7 +140,7 @@ RSpec.describe "Api::V1::Deals", type: :request do
       outsider = create_person!(workspace, company: other_company)
 
       post "/api/v1/deals",
-        params: valid_create_params(deal: { contact_ids: [ outsider.id ] }),
+        params: valid_create_params(deal: {contact_ids: [outsider.id]}),
         headers: headers
 
       expect(response).to have_http_status(:unprocessable_entity)
@@ -150,7 +150,7 @@ RSpec.describe "Api::V1::Deals", type: :request do
     it "creates a deal with nested notes" do
       expect {
         post "/api/v1/deals",
-          params: valid_create_params(notes: [ { title: "Kickoff", body: "Met at conference" } ]),
+          params: valid_create_params(notes: [{title: "Kickoff", body: "Met at conference"}]),
           headers: headers
       }.to change(Deal, :count).by(1).and change(Note, :count).by(1)
 
@@ -174,7 +174,7 @@ RSpec.describe "Api::V1::Deals", type: :request do
     it "rolls back the deal when a nested note is invalid" do
       expect {
         post "/api/v1/deals",
-          params: valid_create_params(notes: [ { body: "" } ]),
+          params: valid_create_params(notes: [{body: ""}]),
           headers: headers
       }.not_to change(Deal, :count)
 
@@ -196,12 +196,12 @@ RSpec.describe "Api::V1::Deals", type: :request do
         expect {
           post "/api/v1/deals",
             params: valid_create_params(
-              deal: { contact_ids: [ contact.id ] },
+              deal: {contact_ids: [contact.id]},
               email: {
                 subject: "Welcome",
                 body: "Thanks for joining.",
                 attachments: [
-                  { filename: "informe.pdf", content_type: "application/pdf", content: pdf_content }
+                  {filename: "informe.pdf", content_type: "application/pdf", content: pdf_content}
                 ]
               }
             ),
@@ -220,7 +220,7 @@ RSpec.describe "Api::V1::Deals", type: :request do
           "to_address" => "contact@example.com",
           "subject" => "Welcome",
           "via_gmail" => false,
-          "attachments" => [ "informe.pdf" ]
+          "attachments" => ["informe.pdf"]
         )
         expect(message.attachments.count).to eq(1)
         expect(message.attachments.first.download).to eq("%PDF-1.4 fake report")
@@ -242,8 +242,8 @@ RSpec.describe "Api::V1::Deals", type: :request do
         expect {
           post "/api/v1/deals",
             params: valid_create_params(
-              deal: { contact_ids: [ contact.id ] },
-              email: { to_address: "lead@example.com", subject: "Hi", body: "Hello" }
+              deal: {contact_ids: [contact.id]},
+              email: {to_address: "lead@example.com", subject: "Hi", body: "Hello"}
             ),
             headers: json_headers,
             as: :json
@@ -258,7 +258,7 @@ RSpec.describe "Api::V1::Deals", type: :request do
         expect {
           post "/api/v1/deals",
             params: valid_create_params(
-              email: { to_address: "bad", subject: "Hi", body: "Hello" }
+              email: {to_address: "bad", subject: "Hi", body: "Hello"}
             ),
             headers: json_headers,
             as: :json
@@ -276,7 +276,7 @@ RSpec.describe "Api::V1::Deals", type: :request do
                 to_address: "lead@example.com",
                 subject: "Hi",
                 body: "Hello",
-                attachments: [ { filename: "informe.pdf", content: "not-base64!!!" } ]
+                attachments: [{filename: "informe.pdf", content: "not-base64!!!"}]
               }
             ),
             headers: json_headers,
@@ -297,11 +297,11 @@ RSpec.describe "Api::V1::Deals", type: :request do
         expect {
           post "/api/v1/deals",
             params: valid_create_params(
-              deal: { contact_ids: [ contact.id ] },
+              deal: {contact_ids: [contact.id]},
               email: {
                 subject: "Welcome",
                 body: "Thanks for joining.",
-                attachments: [ uploaded_file ]
+                attachments: [uploaded_file]
               }
             ),
             headers: headers
@@ -313,7 +313,7 @@ RSpec.describe "Api::V1::Deals", type: :request do
         message = created_deal.email_messages.sole
 
         expect(response).to have_http_status(:created)
-        expect(response.parsed_body["email"]["attachments"]).to eq([ "informe.pdf" ])
+        expect(response.parsed_body["email"]["attachments"]).to eq(["informe.pdf"])
         expect(message.attachments.first.download).to eq("%PDF-1.4 fake report")
       end
 
@@ -323,7 +323,7 @@ RSpec.describe "Api::V1::Deals", type: :request do
         expect {
           post "/api/v1/deals",
             params: valid_create_params(
-              email: { to_address: "lead@example.com", subject: "Hi", body: "Hello" }
+              email: {to_address: "lead@example.com", subject: "Hi", body: "Hello"}
             ),
             headers: json_headers,
             as: :json
@@ -340,7 +340,7 @@ RSpec.describe "Api::V1::Deals", type: :request do
       target = pipeline.pipeline_stages.find_by(name: "Won")
 
       expect {
-        patch "/api/v1/deals/#{deal.id}", params: { deal: { pipeline_stage_id: target.id } }, headers: headers
+        patch "/api/v1/deals/#{deal.id}", params: {deal: {pipeline_stage_id: target.id}}, headers: headers
       }.to change { deal.activities.where(action: "stage_changed").count }.by(1)
 
       expect(response).to have_http_status(:success)
@@ -356,8 +356,8 @@ RSpec.describe "Api::V1::Deals", type: :request do
       patch "/api/v1/deals/#{deal.id}", params: {
         deal: {
           deal_products_attributes: [
-            { id: line.id, quantity: 3 },
-            { product_id: addon.id, quantity: 1 }
+            {id: line.id, quantity: 3},
+            {product_id: addon.id, quantity: 1}
           ]
         }
       }, headers: json_headers, as: :json
@@ -378,7 +378,7 @@ RSpec.describe "Api::V1::Deals", type: :request do
       line = deal.deal_products.create!(product: product, quantity: 1)
 
       patch "/api/v1/deals/#{deal.id}", params: {
-        deal: { deal_products_attributes: [ { id: line.id, _destroy: true } ] }
+        deal: {deal_products_attributes: [{id: line.id, _destroy: true}]}
       }, headers: json_headers, as: :json
 
       expect(response).to have_http_status(:success)
@@ -389,16 +389,16 @@ RSpec.describe "Api::V1::Deals", type: :request do
     it "updates contacts" do
       contact = create_person!(workspace, company: deal.company)
 
-      patch "/api/v1/deals/#{deal.id}", params: { deal: { contact_ids: [ contact.id ] } }, headers: headers
+      patch "/api/v1/deals/#{deal.id}", params: {deal: {contact_ids: [contact.id]}}, headers: headers
 
       expect(response).to have_http_status(:success)
       expect(deal.reload.contacts).to contain_exactly(contact)
-      expect(response.parsed_body["contact_ids"]).to eq([ contact.id ])
+      expect(response.parsed_body["contact_ids"]).to eq([contact.id])
     end
 
     it "updates plain fields without logging a stage change" do
       expect {
-        patch "/api/v1/deals/#{deal.id}", params: { deal: { name: "Via API" } }, headers: headers
+        patch "/api/v1/deals/#{deal.id}", params: {deal: {name: "Via API"}}, headers: headers
       }.not_to change { deal.activities.where(action: "stage_changed").count }
 
       expect(deal.reload.name).to eq("Via API")

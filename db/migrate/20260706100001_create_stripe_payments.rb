@@ -16,16 +16,16 @@ class CreateStripePayments < ActiveRecord::Migration[8.0]
       t.boolean :livemode, null: false, default: true
       t.string :status, null: false, default: "pending_review"
       t.references :deal, foreign_key: true
-      t.references :suggested_deal, foreign_key: { to_table: :deals }
-      t.references :suggested_person, foreign_key: { to_table: :people }
+      t.references :suggested_deal, foreign_key: {to_table: :deals}
+      t.references :suggested_person, foreign_key: {to_table: :people}
       t.string :match_confidence
-      t.references :matched_by, foreign_key: { to_table: :users }
+      t.references :matched_by, foreign_key: {to_table: :users}
       t.datetime :matched_at
 
       t.timestamps
     end
-    add_index :stripe_payments, [ :workspace_id, :stripe_charge_id ], unique: true
-    add_index :stripe_payments, [ :workspace_id, :status ]
+    add_index :stripe_payments, [:workspace_id, :stripe_charge_id], unique: true
+    add_index :stripe_payments, [:workspace_id, :status]
     add_index :stripe_payments, :customer_email
   end
 end

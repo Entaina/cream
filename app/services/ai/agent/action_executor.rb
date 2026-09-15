@@ -42,7 +42,7 @@ module Ai
         )
         authorize!(task, :create?)
         task.save!
-        Result.new(success: true, message: "Tarea creada: #{task.title}", data: { id: task.id, title: task.title })
+        Result.new(success: true, message: "Tarea creada: #{task.title}", data: {id: task.id, title: task.title})
       end
 
       def execute_add_note(args)
@@ -55,7 +55,7 @@ module Ai
         )
         authorize!(note, :create?)
         note.save!
-        Result.new(success: true, message: "Nota añadida en #{record.display_name}", data: { id: note.id })
+        Result.new(success: true, message: "Nota añadida en #{record.display_name}", data: {id: note.id})
       end
 
       def execute_update_record(args)
@@ -63,14 +63,14 @@ module Ai
         authorize!(record, :update?)
         fields = args["fields"] || {}
         apply_record_update!(record, fields)
-        Result.new(success: true, message: "Registro actualizado: #{record.display_name}", data: { id: record.id })
+        Result.new(success: true, message: "Registro actualizado: #{record.display_name}", data: {id: record.id})
       end
 
       def execute_update_deal_stage(args)
         deal = @ctx.workspace.deals.find(args["deal_id"])
         authorize!(deal, :move?)
         deal.move_to_stage!(args["stage"])
-        Result.new(success: true, message: "Deal movido a «#{args["stage"]}»", data: { id: deal.id, stage: deal.stage_label })
+        Result.new(success: true, message: "Deal movido a «#{args["stage"]}»", data: {id: deal.id, stage: deal.stage_label})
       end
 
       def execute_complete_task(args)
@@ -78,7 +78,7 @@ module Ai
         authorize!(task, :toggle?)
         task.toggle_completed!
         status = task.completed? ? "completada" : "reabierta"
-        Result.new(success: true, message: "Tarea #{status}: #{task.title}", data: { id: task.id, completed: task.completed? })
+        Result.new(success: true, message: "Tarea #{status}: #{task.title}", data: {id: task.id, completed: task.completed?})
       end
 
       def apply_record_update!(record, fields)

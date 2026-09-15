@@ -20,7 +20,7 @@ Rails.application.configure do
   if Rails.root.join("tmp/caching-dev.txt").exist?
     config.action_controller.perform_caching = true
     config.action_controller.enable_fragment_cache_logging = true
-    config.public_file_server.headers = { "cache-control" => "public, max-age=#{2.days.to_i}" }
+    config.public_file_server.headers = {"cache-control" => "public, max-age=#{2.days.to_i}"}
   else
     config.action_controller.perform_caching = false
   end
@@ -42,7 +42,7 @@ Rails.application.configure do
   # Set localhost to be used by links generated in mailer templates.
   app_host = ENV.fetch("CREAM_APP_URL", "http://localhost:3030").sub(%r{\Ahttps?://}, "").split("/").first
   app_host, app_port = app_host.split(":", 2)
-  config.action_mailer.default_url_options = { host: app_host, port: app_port.presence || ENV.fetch("PORT", 3000), protocol: "http" }
+  config.action_mailer.default_url_options = {host: app_host, port: app_port.presence || ENV.fetch("PORT", 3000), protocol: "http"}
 
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log

@@ -8,7 +8,7 @@ RSpec.describe "Api::V1::DealEmails", type: :request do
   let!(:pipeline) { Pipeline.create_default!(workspace) }
   let(:deal) { create_deal!(workspace, pipeline: pipeline) }
   let(:token) { user.api_tokens.create!(name: "Test", workspace: workspace) }
-  let(:headers) { { "Authorization" => "Bearer #{token.plaintext_token}" } }
+  let(:headers) { {"Authorization" => "Bearer #{token.plaintext_token}"} }
 
   let(:valid_params) do
     {
@@ -88,10 +88,10 @@ RSpec.describe "Api::V1::DealEmails", type: :request do
     it "defaults the recipient to the deal's first contact when to_address is omitted" do
       company = create_company!(workspace)
       contact = create_person!(workspace, company: company, email: "contact@example.com")
-      deal_with_contact = create_deal!(workspace, pipeline: pipeline, company: company, contacts: [ contact ])
+      deal_with_contact = create_deal!(workspace, pipeline: pipeline, company: company, contacts: [contact])
 
       post "/api/v1/deals/#{deal_with_contact.id}/emails",
-        params: { email: { subject: "Hi", body: "Hello" } },
+        params: {email: {subject: "Hi", body: "Hello"}},
         headers: headers
 
       expect(response).to have_http_status(:created)
@@ -101,7 +101,7 @@ RSpec.describe "Api::V1::DealEmails", type: :request do
     it "returns validation errors for invalid email params" do
       expect {
         post "/api/v1/deals/#{deal.id}/emails",
-          params: { email: { to_address: "bad", subject: "Hi", body: "Hello" } },
+          params: {email: {to_address: "bad", subject: "Hi", body: "Hello"}},
           headers: headers
       }.not_to change(EmailMessage, :count)
 
@@ -133,7 +133,7 @@ RSpec.describe "Api::V1::DealEmails", type: :request do
             subject: "Tu informe",
             body: "Adjuntamos tu informe.",
             attachments: [
-              { filename: "informe.pdf", content_type: "application/pdf", content: pdf_content }
+              {filename: "informe.pdf", content_type: "application/pdf", content: pdf_content}
             ]
           }
         }
@@ -148,7 +148,7 @@ RSpec.describe "Api::V1::DealEmails", type: :request do
         expect(message.attachments.count).to eq(1)
         expect(message.attachments.first.filename.to_s).to eq("informe.pdf")
         expect(message.attachments.first.download).to eq("%PDF-1.4 fake report")
-        expect(response.parsed_body["attachments"]).to eq([ "informe.pdf" ])
+        expect(response.parsed_body["attachments"]).to eq(["informe.pdf"])
       end
 
       it "rejects invalid Base64 content with 422" do
@@ -157,7 +157,7 @@ RSpec.describe "Api::V1::DealEmails", type: :request do
             to_address: "lead@example.com",
             subject: "Hi",
             body: "Hello",
-            attachments: [ { filename: "informe.pdf", content: "not-base64!!!" } ]
+            attachments: [{filename: "informe.pdf", content: "not-base64!!!"}]
           }
         }
 
@@ -171,10 +171,10 @@ RSpec.describe "Api::V1::DealEmails", type: :request do
 
       it "rejects more attachments than the allowed maximum with 422" do
         too_many = Array.new(EmailMessage::MAX_ATTACHMENTS + 1) do |i|
-          { filename: "f#{i}.txt", content: Base64.strict_encode64("x") }
+          {filename: "f#{i}.txt", content: Base64.strict_encode64("x")}
         end
         params = {
-          email: { to_address: "lead@example.com", subject: "Hi", body: "Hello", attachments: too_many }
+          email: {to_address: "lead@example.com", subject: "Hi", body: "Hello", attachments: too_many}
         }
 
         expect {
@@ -190,7 +190,7 @@ RSpec.describe "Api::V1::DealEmails", type: :request do
             to_address: "lead@example.com",
             subject: "Hi",
             body: "Hello",
-            attachments: [ "just-a-string" ]
+            attachments: ["just-a-string"]
           }
         }
 
@@ -207,7 +207,7 @@ RSpec.describe "Api::V1::DealEmails", type: :request do
             to_address: "lead@example.com",
             subject: "Hi",
             body: "Hello",
-            attachments: [ { filename: "informe.pdf" } ]
+            attachments: [{filename: "informe.pdf"}]
           }
         }
 
@@ -238,7 +238,7 @@ RSpec.describe "Api::V1::DealEmails", type: :request do
             to_address: "lead@example.com",
             subject: "Tu informe",
             body: "Adjuntamos tu informe.",
-            attachments: [ uploaded_file ]
+            attachments: [uploaded_file]
           }
         }
 
@@ -252,7 +252,7 @@ RSpec.describe "Api::V1::DealEmails", type: :request do
         expect(message.attachments.count).to eq(1)
         expect(message.attachments.first.filename.to_s).to eq("informe.pdf")
         expect(message.attachments.first.download).to eq("%PDF-1.4 fake report")
-        expect(response.parsed_body["attachments"]).to eq([ "informe.pdf" ])
+        expect(response.parsed_body["attachments"]).to eq(["informe.pdf"])
       end
     end
 

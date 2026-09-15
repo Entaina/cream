@@ -4,8 +4,8 @@ class ScoringRule < ApplicationRecord
   belongs_to :workspace
 
   validates :name, presence: true
-  validates :points, numericality: { only_integer: true }
-  validates :event_type, inclusion: { in: EVENT_TYPES }, allow_blank: true
+  validates :points, numericality: {only_integer: true}
+  validates :event_type, inclusion: {in: EVENT_TYPES}, allow_blank: true
 
   scope :active, -> { where(active: true) }
   scope :ordered, -> { order(:name, :id) }

@@ -26,7 +26,7 @@ RSpec.describe "Public email preferences", type: :request do
     it "updates subscriptions" do
       newsletter = workspace.subscription_types.find_by!(slug: "newsletter")
 
-      patch public_email_preferences_path(token: token), params: { subscription_type_ids: [ newsletter.id ] }
+      patch public_email_preferences_path(token: token), params: {subscription_type_ids: [newsletter.id]}
 
       expect(response).to redirect_to(public_email_preferences_path(token: token))
       subscription = EmailSubscription.find_by!(person: person, subscription_type: newsletter)
@@ -44,7 +44,7 @@ RSpec.describe "Public email preferences", type: :request do
         legal_basis: "consent"
       )
 
-      post public_email_unsubscribe_path(token: token), params: { type: "newsletter" }
+      post public_email_unsubscribe_path(token: token), params: {type: "newsletter"}
 
       expect(response).to have_http_status(:ok)
       subscription = EmailSubscription.find_by!(person: person, subscription_type: newsletter)
@@ -61,7 +61,7 @@ RSpec.describe "Public email preferences", type: :request do
         legal_basis: "consent"
       )
 
-      post public_email_unsubscribe_path(token: token), params: { all: "1" }
+      post public_email_unsubscribe_path(token: token), params: {all: "1"}
 
       expect(response).to have_http_status(:ok)
       expect(EmailSuppression.suppressed?(workspace, person.email)).to be(true)

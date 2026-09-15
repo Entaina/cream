@@ -15,7 +15,7 @@ RSpec.describe "Person relationships", type: :request do
     it "creates a directed relationship from the current person" do
       expect {
         post person_relationships_path(alice), params: {
-          person_relationship: { to_person_id: bob.id, relationship_type: "invited" }
+          person_relationship: {to_person_id: bob.id, relationship_type: "invited"}
         }
       }.to change(PersonRelationship, :count).by(1)
 
@@ -28,7 +28,7 @@ RSpec.describe "Person relationships", type: :request do
 
     it "shows the inverse label on the other person's profile" do
       post person_relationships_path(alice), params: {
-        person_relationship: { to_person_id: bob.id, relationship_type: "invited" }
+        person_relationship: {to_person_id: bob.id, relationship_type: "invited"}
       }
 
       get person_path(bob)
@@ -40,7 +40,7 @@ RSpec.describe "Person relationships", type: :request do
 
     it "rejects creating a relationship with the same person" do
       post person_relationships_path(alice), params: {
-        person_relationship: { to_person_id: alice.id, relationship_type: "invited" }
+        person_relationship: {to_person_id: alice.id, relationship_type: "invited"}
       }
 
       expect(response).to redirect_to(person_path(alice))
@@ -53,7 +53,7 @@ RSpec.describe "Person relationships", type: :request do
       outsider = create_person!(other_workspace, company: create_company!(other_workspace))
 
       post person_relationships_path(alice), params: {
-        person_relationship: { to_person_id: outsider.id, relationship_type: "invited" }
+        person_relationship: {to_person_id: outsider.id, relationship_type: "invited"}
       }
 
       expect(response).to have_http_status(:not_found)

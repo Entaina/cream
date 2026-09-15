@@ -47,7 +47,7 @@ RSpec.describe StageTriggers::NativeRegistry do
       allow(ui).to receive(:show_toast)
 
       described_class.handler_for("show_toast").call(deal: deal, user: user, trigger: trigger, ui: ui,
-        params: { "message" => "Pide el NIF", "kind" => "warning" })
+        params: {"message" => "Pide el NIF", "kind" => "warning"})
 
       expect(ui).to have_received(:show_toast).with(message: "Pide el NIF", kind: "warning")
     end
@@ -56,7 +56,7 @@ RSpec.describe StageTriggers::NativeRegistry do
       allow(ui).to receive(:show_toast)
 
       described_class.handler_for("show_toast").call(deal: deal, user: user, trigger: trigger, ui: ui,
-        params: { "message" => "Hola" })
+        params: {"message" => "Hola"})
 
       expect(ui).to have_received(:show_toast).with(message: "Hola", kind: "info")
     end

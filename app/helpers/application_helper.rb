@@ -64,11 +64,11 @@ module ApplicationHelper
     colors = AVATAR_COLORS[record.id.to_i % AVATAR_COLORS.size]
     initials = record.respond_to?(:initials) ? record.initials : record.display_name.to_s[0..1].upcase
     shape = record.is_a?(Company) ? "rounded-md" : "rounded-full"
-    tag.span(initials, class: [ "inline-flex items-center justify-center font-semibold shrink-0 select-none", shape, size, text, *colors ])
+    tag.span(initials, class: ["inline-flex items-center justify-center font-semibold shrink-0 select-none", shape, size, text, *colors])
   end
 
   def badge(label, color: "chicago")
-    tag.span(label, class: [ "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset whitespace-nowrap", BADGE_COLORS.fetch(color, BADGE_COLORS["chicago"]) ])
+    tag.span(label, class: ["inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset whitespace-nowrap", BADGE_COLORS.fetch(color, BADGE_COLORS["chicago"])])
   end
 
   def stage_column_classes(color)
@@ -90,11 +90,11 @@ module ApplicationHelper
     return unless task
 
     status = deal.pending_task_indicator_status
-    color = status == :overdue ? "text-danger" : "text-hoki-600 dark:text-hoki-300"
+    color = (status == :overdue) ? "text-danger" : "text-hoki-600 dark:text-hoki-300"
     pending_count = deal.tasks.count { |t| t.completed_at.nil? }
     label = deal_task_tooltip_label(task, extra_count: pending_count - 1)
 
-    tag.span(class: "relative group shrink-0 #{color}", title: label, aria: { label: label }) do
+    tag.span(class: "relative group shrink-0 #{color}", title: label, aria: {label: label}) do
       safe_join([
         icon(:check_circle, classes: "size-3.5"),
         deal_task_tooltip(task, extra_count: pending_count - 1)
@@ -103,7 +103,7 @@ module ApplicationHelper
   end
 
   def deal_task_tooltip_label(task, extra_count: 0)
-    parts = [ task.title ]
+    parts = [task.title]
     parts << l(task.due_on, format: :short) if task.due_on
     parts << task.assignee.name if task.assignee
     label = parts.join(" · ")
@@ -122,12 +122,12 @@ module ApplicationHelper
           safe_join([
             (if task.due_on
                tag.span(class: "text-xs flex items-center gap-1 #{task.overdue? ? "text-danger" : "text-ink-faint"}") do
-                 safe_join([ icon(:calendar, classes: "size-3"), l(task.due_on, format: :short) ])
+                 safe_join([icon(:calendar, classes: "size-3"), l(task.due_on, format: :short)])
                end
              end),
             (if task.assignee
                tag.span(class: "flex items-center gap-1 text-xs text-ink-faint min-w-0") do
-                 safe_join([ avatar(task.assignee, size: "size-4", text: "text-2xs"), tag.span(class: "truncate") { task.assignee.name } ])
+                 safe_join([avatar(task.assignee, size: "size-4", text: "text-2xs"), tag.span(class: "truncate") { task.assignee.name }])
                end
              end)
           ].compact)
@@ -149,7 +149,7 @@ module ApplicationHelper
         tag.button(
           type: "button",
           class: "inline-flex text-ink-faint hover:text-ink-soft focus:outline-none focus-visible:text-ink",
-          aria: { label: label }
+          aria: {label: label}
         ) { icon(:info, classes: "size-4") },
         tag.span(
           class: "pointer-events-none absolute z-10 right-0 top-full mt-1 #{width} invisible opacity-0 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100 transition-opacity rounded-lg border border-line bg-canvas-raised shadow-md p-2.5 text-left text-xs text-ink-faint font-normal leading-relaxed",
@@ -162,7 +162,7 @@ module ApplicationHelper
   def stage_filter_options(pipelines, include_closed: false)
     pipelines.map do |pipeline|
       stages = pipeline.pipeline_stages.select { |s| include_closed || !s.closed? }
-      [ pipeline.name, stages.map { |s| [ s.name, s.id ] } ]
+      [pipeline.name, stages.map { |s| [s.name, s.id] }]
     end
   end
 
@@ -172,7 +172,7 @@ module ApplicationHelper
 
   def stage_summary_dom_id(stage_or_name)
     name = stage_or_name.is_a?(PipelineStage) ? stage_or_name.name : stage_or_name.to_s
-    "stage_summary_#{name.parameterize(separator: '_')}"
+    "stage_summary_#{name.parameterize(separator: "_")}"
   end
 
   def pipeline_bar_color(pipeline_position)
@@ -218,7 +218,7 @@ module ApplicationHelper
       end
       link_to url_for(index_query_params(sort: column, dir: next_dir)),
         class: "group inline-flex items-center gap-1 hover:text-ink" do
-        safe_join([ label, arrow ].compact)
+        safe_join([label, arrow].compact)
       end
     else
       active = params[:sort] == column.to_s
@@ -228,7 +228,7 @@ module ApplicationHelper
       end
       link_to url_for(request.query_parameters.merge(sort: column, dir: next_dir)),
         class: "group inline-flex items-center gap-1 hover:text-ink" do
-        safe_join([ label, arrow ].compact)
+        safe_join([label, arrow].compact)
       end
     end
   end
@@ -286,7 +286,7 @@ module ApplicationHelper
     when "ai_task_created" then t("activities.ai_task_created", actor: actor, title: activity.metadata["title"])
     when "payment_received"
       amount = number_to_currency(activity.metadata["amount"],
-        unit: activity.metadata["currency"] == "EUR" ? "€" : activity.metadata["currency"],
+        unit: (activity.metadata["currency"] == "EUR") ? "€" : activity.metadata["currency"],
         precision: 2, delimiter: ".", separator: ",", format: "%n %u")
       suffix = activity.metadata["customer_email"].present? ? t("activities.payment_received_from", email: activity.metadata["customer_email"]) : ""
       t("activities.payment_received", actor: actor, amount: "#{amount}#{suffix}")
@@ -321,7 +321,7 @@ module ApplicationHelper
   end
 
   def record_icon_for(type)
-    { "Person" => :users, "Company" => :building, "Deal" => :banknote }.fetch(type.to_s, :note)
+    {"Person" => :users, "Company" => :building, "Deal" => :banknote}.fetch(type.to_s, :note)
   end
 
   def sidebar_saved_views_for(record_type)
@@ -444,7 +444,7 @@ module ApplicationHelper
   end
 
   def sidebar_nav_item(key, label, path, icon_name, active, children = nil, group: nil)
-    { key: key, label: label, path: path, icon: icon_name, active: active, children: children, group: group }
+    {key: key, label: label, path: path, icon: icon_name, active: active, children: children, group: group}
   end
 
   def saved_views_index_path(record_type, view: nil, clear_filters: nil, surface: nil)
@@ -459,7 +459,7 @@ module ApplicationHelper
   end
 
   def deal_saved_view_path(query = {}, surface: nil)
-    surface == "table" ? deals_path(query) : board_deals_path(query)
+    (surface == "table") ? deals_path(query) : board_deals_path(query)
   end
 
   def custom_field_value_display(field, value)
@@ -487,7 +487,7 @@ module ApplicationHelper
       return nil unless referenced
 
       link_to(record_path_for(referenced), class: "inline-flex items-center gap-1.5 text-accent hover:underline") do
-        safe_join([ avatar(referenced, size: "size-4", text: "text-2xs"), referenced.public_send(field.reference_label_method) ])
+        safe_join([avatar(referenced, size: "size-4", text: "text-2xs"), referenced.public_send(field.reference_label_method)])
       end
     else
       value.to_s
@@ -513,7 +513,7 @@ module ApplicationHelper
 
   def mention_users_data
     current_workspace.users.order(:name).map do |user|
-      { handle: user.email_address.split("@").first, name: user.name }
+      {handle: user.email_address.split("@").first, name: user.name}
     end
   end
 
@@ -533,7 +533,7 @@ module ApplicationHelper
         form.text_field(field, **options, class: input_class, data: input_data),
         tag.ul(
           class: "hidden absolute left-0 right-0 top-full z-50 mt-1 max-h-48 overflow-y-auto rounded-md border border-line bg-canvas shadow-sm",
-          data: { mention_target: "menu" },
+          data: {mention_target: "menu"},
           role: "listbox"
         )
       ])
@@ -562,7 +562,7 @@ module ApplicationHelper
   def feature_enabled?(key)
     return current_workspace.feature_enabled?(key) if current_workspace
 
-    key.to_sym == :custom_fields ? false : CreamFeatures.enabled?(key)
+    (key.to_sym == :custom_fields) ? false : CreamFeatures.enabled?(key)
   end
 
   def sales_director_enabled?
@@ -573,7 +573,7 @@ module ApplicationHelper
     feature_enabled?(:okm_chat) &&
       Ai::Configuration.configured? &&
       current_workspace&.okm_configured? &&
-      current_workspace&.okm_chat_enabled?
+      current_workspace.okm_chat_enabled?
   end
 
   def okm_chat_context(record = nil)

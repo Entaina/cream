@@ -15,8 +15,8 @@ RSpec.describe "Automations", type: :request do
           automation: {
             name: "Won deals → task", trigger_event: "deal.stage_changed",
             action_type: "create_task", active: "1",
-            condition_keys: [ "to", "" ], condition_values: [ "Won", "" ],
-            action_params: { title: "Celebrate", due_on: "2026-07-01" }
+            condition_keys: ["to", ""], condition_values: ["Won", ""],
+            action_params: {title: "Celebrate", due_on: "2026-07-01"}
           }
         }
       }.to change(Automation, :count).by(1)
@@ -29,12 +29,12 @@ RSpec.describe "Automations", type: :request do
 
     it "updates trigger_conditions, dropping rows with a blank key" do
       automation = workspace.automations.create!(name: "A", trigger_event: "record.created",
-        action_type: "create_task", trigger_conditions: { "old" => "x" })
+        action_type: "create_task", trigger_conditions: {"old" => "x"})
 
       patch automation_path(automation), params: {
         automation: {
           name: "A", trigger_event: "record.created", action_type: "create_task",
-          condition_keys: [ "industry", "" ], condition_values: [ "SaaS", "ignored" ]
+          condition_keys: ["industry", ""], condition_values: ["SaaS", "ignored"]
         }
       }
 
@@ -58,7 +58,7 @@ RSpec.describe "Automations", type: :request do
     it "blocks the controller and redirects to root" do
       expect {
         post automations_path, params: {
-          automation: { name: "X", trigger_event: "record.created", action_type: "create_task" }
+          automation: {name: "X", trigger_event: "record.created", action_type: "create_task"}
         }
       }.not_to change(Automation, :count)
 

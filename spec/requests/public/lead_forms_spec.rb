@@ -313,7 +313,7 @@ RSpec.describe "Public lead forms", type: :request do
     it "silently accepts honeypot submissions" do
       expect {
         post public_lead_form_path(lead_form.slug), params: {
-          lead: contacto_lead_params(email: "bot@example.com", LeadForm::HONEYPOT_FIELD => "spam")
+          lead: contacto_lead_params(:email => "bot@example.com", LeadForm::HONEYPOT_FIELD => "spam")
         }
       }.not_to change(Deal, :count)
 
@@ -345,7 +345,7 @@ RSpec.describe "Public lead forms", type: :request do
 
       expect {
         post public_lead_form_path(lead_form.slug), params: {
-          lead: contacto_lead_params, "cf-turnstile-response" => "bad-token"
+          :lead => contacto_lead_params, "cf-turnstile-response" => "bad-token"
         }
       }.not_to change(Deal, :count)
 

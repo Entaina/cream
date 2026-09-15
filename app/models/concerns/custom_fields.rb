@@ -27,7 +27,7 @@ module CustomFields
         matches = CustomFieldValue.where(custom_field_id: field.id, record_type: name)
         matches =
           if field.multi?
-            matches.where("value @> ?::jsonb", [ raw ].to_json)
+            matches.where("value @> ?::jsonb", [raw].to_json)
           else
             matches.where("value = ?::jsonb", field.cast(raw).to_json)
           end
@@ -78,12 +78,12 @@ module CustomFields
   end
 
   def custom_fields=(hash)
-    if hash.nil?
-      @custom_fields_input = {}
+    @custom_fields_input = if hash.nil?
+      {}
     elsif hash.respond_to?(:to_unsafe_h)
-      @custom_fields_input = hash.to_unsafe_h.stringify_keys
+      hash.to_unsafe_h.stringify_keys
     else
-      @custom_fields_input = hash.to_h.stringify_keys
+      hash.to_h.stringify_keys
     end
 
     # Ensure save runs callbacks when only custom fields change.
@@ -122,7 +122,7 @@ module CustomFields
 
       if stored.nil?
         if existing
-          changes[field.name] = [ existing.typed_value.to_s, "" ]
+          changes[field.name] = [existing.typed_value.to_s, ""]
           existing.destroy!
         end
         next
@@ -132,15 +132,15 @@ module CustomFields
         old_display = existing.typed_value.to_s
         if existing.value != stored
           existing.update!(value: stored)
-          changes[field.name] = [ old_display, cast.to_s ]
+          changes[field.name] = [old_display, cast.to_s]
         end
       else
         custom_field_values.create!(custom_field: field, workspace: workspace, value: stored)
-        changes[field.name] = [ "", cast.to_s ]
+        changes[field.name] = ["", cast.to_s]
       end
     end
 
-    track_activity("updated", metadata: { changes: changes.transform_values { |(from, to)| [ from, to ] } }) if changes.any?
+    track_activity("updated", metadata: {changes: changes.transform_values { |(from, to)| [from, to] }}) if changes.any?
     @custom_fields_input = nil
   end
 

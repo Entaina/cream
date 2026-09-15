@@ -46,7 +46,7 @@ RSpec.describe Marketing::MqlToSqlConverter do
   end
 
   it "links to an existing open deal for the same product" do
-    existing = create_deal!(workspace, pipeline: pipeline, company: person.company, contacts: [ person ])
+    existing = create_deal!(workspace, pipeline: pipeline, company: person.company, contacts: [person])
     existing.deal_products.create!(product: product, quantity: 1)
 
     result = described_class.call(
@@ -65,8 +65,8 @@ RSpec.describe Marketing::MqlToSqlConverter do
   end
 
   it "conflicts when multiple visible open deals exist" do
-    first = create_deal!(workspace, pipeline: pipeline, company: person.company, contacts: [ person ], name: "Deal A")
-    second = create_deal!(workspace, pipeline: pipeline, company: person.company, contacts: [ person ], name: "Deal B")
+    first = create_deal!(workspace, pipeline: pipeline, company: person.company, contacts: [person], name: "Deal A")
+    second = create_deal!(workspace, pipeline: pipeline, company: person.company, contacts: [person], name: "Deal B")
     first.deal_products.create!(product: product, quantity: 1)
     second.deal_products.create!(product: product, quantity: 1)
 
@@ -85,8 +85,8 @@ RSpec.describe Marketing::MqlToSqlConverter do
   end
 
   it "links to a selected open deal when several exist" do
-    first = create_deal!(workspace, pipeline: pipeline, company: person.company, contacts: [ person ], name: "Deal A")
-    second = create_deal!(workspace, pipeline: pipeline, company: person.company, contacts: [ person ], name: "Deal B")
+    first = create_deal!(workspace, pipeline: pipeline, company: person.company, contacts: [person], name: "Deal A")
+    second = create_deal!(workspace, pipeline: pipeline, company: person.company, contacts: [person], name: "Deal B")
     first.deal_products.create!(product: product, quantity: 1)
     second.deal_products.create!(product: product, quantity: 1)
 

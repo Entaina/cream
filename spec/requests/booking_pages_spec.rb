@@ -23,18 +23,18 @@ RSpec.describe "Booking pages calendars", type: :request do
     )
     allow(GoogleCalendar::Client).to receive(:new).and_return(
       instance_double(GoogleCalendar::Client, list_calendars: [
-        { id: "primary@gmail.com", summary: "Principal", primary: true, writable: true }
+        {id: "primary@gmail.com", summary: "Principal", primary: true, writable: true}
       ])
     )
 
-    get calendars_booking_pages_path, params: { host_id: user.id }
+    get calendars_booking_pages_path, params: {host_id: user.id}
 
     expect(response).to have_http_status(:ok)
     expect(response.parsed_body["calendars"].first["summary"]).to eq("Principal")
   end
 
   it "returns error when host is not connected" do
-    get calendars_booking_pages_path, params: { host_id: user.id }
+    get calendars_booking_pages_path, params: {host_id: user.id}
 
     expect(response).to have_http_status(:unprocessable_entity)
     expect(response.parsed_body["error"]).to eq("not_connected")

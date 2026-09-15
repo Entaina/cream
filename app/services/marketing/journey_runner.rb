@@ -97,7 +97,7 @@ module Marketing
 
     def adjust_score!
       delta = step.config["points"].to_i
-      person.update!(lead_score: [ person.lead_score + delta, 0 ].max)
+      person.update!(lead_score: [person.lead_score + delta, 0].max)
       move_next!
     end
 
@@ -175,7 +175,7 @@ module Marketing
     def record_skipped_step!(step_type, reason:)
       metadata = enrollment.metadata.to_h
       skipped = Array(metadata["skipped_steps"])
-      skipped << { "step_type" => step_type, "reason" => reason, "at" => Time.current.iso8601 }
+      skipped << {"step_type" => step_type, "reason" => reason, "at" => Time.current.iso8601}
       enrollment.update!(metadata: metadata.merge("skipped_steps" => skipped))
     end
 

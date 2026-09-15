@@ -22,7 +22,7 @@ module Ai
         Marketing::ScoringEngine.apply_event!(
           person: person,
           event: "deal_created",
-          metadata: { "deal_id" => deal.id, "value" => deal.value }
+          metadata: {"deal_id" => deal.id, "value" => deal.value}
         )
       end
     end

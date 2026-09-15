@@ -1,5 +1,6 @@
 class SegmentsController < ApplicationController
   include RequiresFeature
+
   requires_feature :marketing_segments
   before_action :set_segment, only: %i[show edit update destroy preview]
 
@@ -10,7 +11,7 @@ class SegmentsController < ApplicationController
 
   def show
     authorize @segment
-    base = @segment.record_type == "Person" ? current_workspace.people : current_workspace.public_send(@segment.record_type.tableize)
+    base = (@segment.record_type == "Person") ? current_workspace.people : current_workspace.public_send(@segment.record_type.tableize)
     @members = @segment.resolve(base.includes(:company))
     @count = @members.count
     @pagy, @members = pagy(:offset, @members, limit: 25) if @segment.record_type == "Person"
@@ -52,7 +53,7 @@ class SegmentsController < ApplicationController
 
   def preview
     authorize @segment, :show?
-    render json: { count: @segment.resolve.count }
+    render json: {count: @segment.resolve.count}
   end
 
   private

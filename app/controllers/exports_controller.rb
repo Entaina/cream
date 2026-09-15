@@ -1,5 +1,6 @@
 class ExportsController < ApplicationController
   include RequiresFeature
+
   requires_feature :csv_import_export
   include ViewScoped
 

@@ -62,7 +62,7 @@ RSpec.describe "Sales briefings", type: :request do
     workspace.sales_briefings.create!(
       briefing_date: Date.current,
       summary: "Briefing existente",
-      items: [ { "priority" => "urgent", "text" => "Llamar a ACME" } ],
+      items: [{"priority" => "urgent", "text" => "Llamar a ACME"}],
       wins: [],
       misses: [],
       generated_at: Time.current
@@ -90,7 +90,7 @@ RSpec.describe "Sales briefings", type: :request do
     workspace.sales_briefings.create!(
       briefing_date: Date.current,
       summary: "Briefing existente",
-      items: [ { "priority" => "urgent", "text" => "Llamar a ACME" } ],
+      items: [{"priority" => "urgent", "text" => "Llamar a ACME"}],
       wins: [],
       misses: [],
       generated_at: Time.current

@@ -19,7 +19,7 @@ class StripeSyncService
       next unless charge["status"] == "succeeded" && charge["paid"]
 
       import_charge!(charge)
-      max_created = [ max_created, charge["created"].to_i ].max
+      max_created = [max_created, charge["created"].to_i].max
     end
 
     @connection.update!(

@@ -8,7 +8,7 @@ class CreateEmailLayouts < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_reference :email_templates, :email_layout, foreign_key: { on_delete: :nullify }
+    add_reference :email_templates, :email_layout, foreign_key: {on_delete: :nullify}
     add_column :email_templates, :body_editor, :string, null: false, default: "quill"
   end
 end

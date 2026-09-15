@@ -1,5 +1,6 @@
 class StripeConnectionsController < ApplicationController
   include RequiresFeature
+
   requires_feature :stripe_payments
 
   def show

@@ -1,7 +1,7 @@
 <section class="record-card">
   <div class="record-card-heading">
-    <h2 class="record-section-title">Deals <span class="record-count"><%= @deals.size %></span></h2>
-    <%= link_to new_deal_path(company_id: @company.id), class: "btn-ghost" do %><%= icon :plus, classes: "size-4" %> Add deal<% end %>
+    <h2 class="record-section-title"><%= t("records.tabs.deals") %> <span class="record-count"><%= @deals.size %></span></h2>
+    <%= link_to new_deal_path(company_id: @company.id), class: "btn-ghost" do %><%= icon :plus, classes: "size-4" %> <%= t("records.add_deal") %><% end %>
   </div>
   <% if @deals.any? %>
     <ul class="space-y-1">
@@ -21,6 +21,6 @@
       <% end %>
     </ul>
   <% else %>
-    <p class="text-sm text-ink-faint px-2">No deals yet.</p>
+    <p class="text-sm text-ink-faint px-2"><%= t("companies.show.deals_empty") %></p>
   <% end %>
 </section>

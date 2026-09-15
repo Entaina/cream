@@ -1,5 +1,6 @@
 class SlackIntegrationsController < ApplicationController
   include RequiresFeature
+
   requires_feature :slack_integrations
   before_action :set_integration, only: %i[edit update destroy]
 
@@ -9,7 +10,7 @@ class SlackIntegrationsController < ApplicationController
   end
 
   def new
-    @integration = current_workspace.slack_integrations.new(notify_events: [ SlackIntegration::NOTIFY_EVENTS.first ])
+    @integration = current_workspace.slack_integrations.new(notify_events: [SlackIntegration::NOTIFY_EVENTS.first])
     authorize @integration
   end
 

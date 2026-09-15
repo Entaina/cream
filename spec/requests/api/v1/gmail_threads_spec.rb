@@ -8,7 +8,7 @@ RSpec.describe "Api::V1::GmailThreads", type: :request do
   let!(:pipeline) { Pipeline.create_default!(workspace) }
   let(:company) { companies(:acme) }
   let(:token) { user.api_tokens.create!(name: "Test", workspace: workspace) }
-  let(:headers) { { "Authorization" => "Bearer #{token.plaintext_token}" } }
+  let(:headers) { {"Authorization" => "Bearer #{token.plaintext_token}"} }
 
   let(:thread_payload) do
     {
@@ -49,8 +49,8 @@ RSpec.describe "Api::V1::GmailThreads", type: :request do
       post "/api/v1/gmail/threads/status",
         params: {
           gmail_thread_id: "thread-abc",
-          rfc822_message_ids: [ "<msg-1@mail.example.com>" ],
-          participant_emails: [ "client@example.com", user.email_address ]
+          rfc822_message_ids: ["<msg-1@mail.example.com>"],
+          participant_emails: ["client@example.com", user.email_address]
         },
         headers: headers,
         as: :json
@@ -62,13 +62,13 @@ RSpec.describe "Api::V1::GmailThreads", type: :request do
 
     it "suggests deals whose contacts match thread participants" do
       person = create_person!(workspace, company: company, email: "client@example.com")
-      suggested = create_deal!(workspace, company: company, contacts: [ person ], name: "Suggested opp")
+      suggested = create_deal!(workspace, company: company, contacts: [person], name: "Suggested opp")
 
       post "/api/v1/gmail/threads/status",
         params: {
           gmail_thread_id: "thread-new",
           rfc822_message_ids: [],
-          participant_emails: [ "client@example.com" ]
+          participant_emails: ["client@example.com"]
         },
         headers: headers,
         as: :json
@@ -80,7 +80,7 @@ RSpec.describe "Api::V1::GmailThreads", type: :request do
 
     it "returns 401 without auth" do
       post "/api/v1/gmail/threads/status",
-        params: { gmail_thread_id: "thread-abc" },
+        params: {gmail_thread_id: "thread-abc"},
         as: :json
 
       expect(response).to have_http_status(:unauthorized)
@@ -99,7 +99,7 @@ RSpec.describe "Api::V1::GmailThreads", type: :request do
 
       expect {
         post "/api/v1/gmail/threads/link",
-          params: { deal_id: deal.id, thread: thread_payload },
+          params: {deal_id: deal.id, thread: thread_payload},
           headers: headers,
           as: :json
       }.to change { deal.email_messages.count }.by(1)
@@ -117,7 +117,7 @@ RSpec.describe "Api::V1::GmailThreads", type: :request do
       expect {
         post "/api/v1/gmail/threads/link",
           params: {
-            new_deal: { name: "From Gmail thread", pipeline_stage_id: selected_stage.id },
+            new_deal: {name: "From Gmail thread", pipeline_stage_id: selected_stage.id},
             thread: thread_payload
           },
           headers: headers,
@@ -141,7 +141,7 @@ RSpec.describe "Api::V1::GmailThreads", type: :request do
       foreign = create_deal!(workspaces(:two))
 
       post "/api/v1/gmail/threads/link",
-        params: { deal_id: foreign.id, thread: thread_payload },
+        params: {deal_id: foreign.id, thread: thread_payload},
         headers: headers,
         as: :json
 
@@ -166,12 +166,12 @@ RSpec.describe "Api::V1::GmailThreads", type: :request do
         scopes: "api",
         expires_in: 2.hours
       )
-      { "Authorization" => "Bearer #{access_token.plaintext_token}" }
+      {"Authorization" => "Bearer #{access_token.plaintext_token}"}
     end
 
     it "accepts a doorkeeper access token with scope api" do
       post "/api/v1/gmail/threads/status",
-        params: { gmail_thread_id: "thread-abc", rfc822_message_ids: [], participant_emails: [] },
+        params: {gmail_thread_id: "thread-abc", rfc822_message_ids: [], participant_emails: []},
         headers: oauth_headers,
         as: :json
 
@@ -187,8 +187,8 @@ RSpec.describe "Api::V1::GmailThreads", type: :request do
       )
 
       post "/api/v1/gmail/threads/status",
-        params: { gmail_thread_id: "thread-abc" },
-        headers: { "Authorization" => "Bearer #{access_token.plaintext_token}" },
+        params: {gmail_thread_id: "thread-abc"},
+        headers: {"Authorization" => "Bearer #{access_token.plaintext_token}"},
         as: :json
 
       expect(response).to have_http_status(:unauthorized)
@@ -196,7 +196,7 @@ RSpec.describe "Api::V1::GmailThreads", type: :request do
 
     it "still accepts cream_ api tokens" do
       post "/api/v1/gmail/threads/status",
-        params: { gmail_thread_id: "thread-abc", rfc822_message_ids: [], participant_emails: [] },
+        params: {gmail_thread_id: "thread-abc", rfc822_message_ids: [], participant_emails: []},
         headers: headers,
         as: :json
 

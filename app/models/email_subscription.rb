@@ -5,7 +5,7 @@ class EmailSubscription < ApplicationRecord
   belongs_to :person
   belongs_to :subscription_type
 
-  validates :status, inclusion: { in: STATUSES }
+  validates :status, inclusion: {in: STATUSES}
 
   scope :subscribed, -> { where(status: "subscribed") }
 

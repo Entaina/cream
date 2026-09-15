@@ -1,6 +1,7 @@
 module People
   class InterestConversionsController < ApplicationController
     include RequiresFeature
+
     requires_feature :mql_pool
 
     before_action :set_person

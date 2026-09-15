@@ -11,8 +11,8 @@ RSpec.describe Ai::RecordEnricher do
     allow(client).to receive(:chat).and_return({
       summary: "Company profile can be improved",
       suggestions: [
-        { field: "industry", current: nil, suggested: "Software", reason: "Mentioned in notes" },
-        { field: "invalid_field", current: nil, suggested: "X", reason: "ignored" }
+        {field: "industry", current: nil, suggested: "Software", reason: "Mentioned in notes"},
+        {field: "invalid_field", current: nil, suggested: "X", reason: "ignored"}
       ]
     }.to_json)
 

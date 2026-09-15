@@ -16,6 +16,6 @@ class CreateStageTriggerRuns < ActiveRecord::Migration[8.0]
 
       t.timestamps
     end
-    add_index :stage_trigger_runs, [ :deal_id, :created_at ]
+    add_index :stage_trigger_runs, [:deal_id, :created_at]
   end
 end

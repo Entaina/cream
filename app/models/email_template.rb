@@ -9,7 +9,7 @@ class EmailTemplate < ApplicationRecord
   has_many_attached :attachments
 
   validates :name, :body, presence: true
-  validates :body_editor, inclusion: { in: BODY_EDITORS }
+  validates :body_editor, inclusion: {in: BODY_EDITORS}
   validate :attachments_within_limits
 
   scope :visible_to, ->(user) {
@@ -59,7 +59,7 @@ class EmailTemplate < ApplicationRecord
     else
       render_for(record, extra_tokens:)
     end
-    [ rendered_subject, rendered_body ]
+    [rendered_subject, rendered_body]
   end
 
   def render_string(text, record, extra_tokens = {})
@@ -74,8 +74,6 @@ class EmailTemplate < ApplicationRecord
     body.to_s.include?("{%") || body.to_s.include?("{{")
   end
 
-  private
-
   def self.template_value(record, token)
     case token
     when "first_name" then record.try(:first_name)
@@ -86,6 +84,9 @@ class EmailTemplate < ApplicationRecord
     else "{#{token}}"
     end.to_s
   end
+  private_class_method :template_value
+
+  private
 
   def render_body(record, extra_tokens)
     text = body

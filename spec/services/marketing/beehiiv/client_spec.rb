@@ -41,7 +41,7 @@ RSpec.describe Marketing::Beehiiv::Client do
     allow(request).to receive(:[]=)
     allow(request).to receive(:body=) { |value| captured_body = value }
     allow(http).to receive(:request).and_return(
-      success_response("data" => { "id" => "sub_new" })
+      success_response("data" => {"id" => "sub_new"})
     )
 
     response = client.create_subscription(email: "new@example.com", reactivate_existing: true)

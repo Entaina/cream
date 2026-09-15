@@ -59,7 +59,7 @@ class OkmChatsController < ApplicationController
     action = Ai::Agent::PendingAction.from_verified(action_params[:token])
 
     unless action.workspace_id == current_workspace.id && action.user_id == current_user.id
-      return render json: { error: "Invalid action token." }, status: :forbidden
+      return render json: {error: "Invalid action token."}, status: :forbidden
     end
 
     authorize current_workspace, :show?
@@ -67,12 +67,12 @@ class OkmChatsController < ApplicationController
     result = Ai::Agent::ActionExecutor.new(workspace: current_workspace, user: current_user).execute(action)
 
     if result.success
-      render json: { success: true, message: result.message, data: result.data }
+      render json: {success: true, message: result.message, data: result.data}
     else
-      render json: { success: false, message: result.message }, status: :unprocessable_entity
+      render json: {success: false, message: result.message}, status: :unprocessable_entity
     end
   rescue ActiveSupport::MessageVerifier::InvalidSignature
-    render json: { error: "Invalid or expired action token." }, status: :unprocessable_entity
+    render json: {error: "Invalid or expired action token."}, status: :unprocessable_entity
   end
 
   private
@@ -80,7 +80,7 @@ class OkmChatsController < ApplicationController
   def ensure_okm_chat_workspace!
     return if current_workspace&.okm_chat_enabled? && current_workspace.okm_configured?
 
-    render json: { error: "OKM chat is not available for this workspace." }, status: :not_found
+    render json: {error: "OKM chat is not available for this workspace."}, status: :not_found
   end
 
   def resolve_record
@@ -92,7 +92,7 @@ class OkmChatsController < ApplicationController
   end
 
   def chat_params
-    params.permit(:message, :session_id, history: [ :role, :content ])
+    params.permit(:message, :session_id, history: [:role, :content])
   end
 
   def action_params

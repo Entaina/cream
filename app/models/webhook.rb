@@ -8,7 +8,7 @@ class Webhook < ApplicationRecord
   belongs_to :user
   has_many :webhook_deliveries, dependent: :destroy
 
-  validates :url, presence: true, format: { with: URI::DEFAULT_PARSER.make_regexp(%w[http https]) }
+  validates :url, presence: true, format: {with: URI::DEFAULT_PARSER.make_regexp(%w[http https])}
   validate :events_allowed
 
   scope :active, -> { where(active: true) }
@@ -19,6 +19,6 @@ class Webhook < ApplicationRecord
     invalid = Array(events) - EVENTS
     return if invalid.empty?
 
-    errors.add(:events, "contain invalid values: #{invalid.join(', ')}")
+    errors.add(:events, "contain invalid values: #{invalid.join(", ")}")
   end
 end

@@ -27,6 +27,6 @@ class RecordAttachment < ApplicationRecord
   def track_on_record
     return unless attachable.respond_to?(:track_activity)
 
-    attachable.track_activity("attachment_added", user: user, metadata: { filename: display_name })
+    attachable.track_activity("attachment_added", user: user, metadata: {filename: display_name})
   end
 end

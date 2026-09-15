@@ -9,7 +9,7 @@ class CreateMarketingHub < ActiveRecord::Migration[8.1]
       t.boolean :active, null: false, default: true
       t.timestamps
     end
-    add_index :subscription_types, [ :workspace_id, :slug ], unique: true
+    add_index :subscription_types, [:workspace_id, :slug], unique: true
 
     create_table :email_subscriptions do |t|
       t.references :workspace, null: false, foreign_key: true
@@ -23,7 +23,7 @@ class CreateMarketingHub < ActiveRecord::Migration[8.1]
       t.jsonb :metadata, null: false, default: {}
       t.timestamps
     end
-    add_index :email_subscriptions, [ :person_id, :subscription_type_id ], unique: true, name: "idx_email_subscriptions_person_type"
+    add_index :email_subscriptions, [:person_id, :subscription_type_id], unique: true, name: "idx_email_subscriptions_person_type"
 
     create_table :email_suppressions do |t|
       t.references :workspace, null: false, foreign_key: true
@@ -32,7 +32,7 @@ class CreateMarketingHub < ActiveRecord::Migration[8.1]
       t.jsonb :metadata, null: false, default: {}
       t.timestamps
     end
-    add_index :email_suppressions, [ :workspace_id, :address ], unique: true
+    add_index :email_suppressions, [:workspace_id, :address], unique: true
 
     create_table :email_events do |t|
       t.references :email_message, null: false, foreign_key: true
@@ -42,7 +42,7 @@ class CreateMarketingHub < ActiveRecord::Migration[8.1]
       t.jsonb :payload, null: false, default: {}
       t.timestamps
     end
-    add_index :email_events, [ :email_message_id, :event_type, :occurred_at ], name: "idx_email_events_message_type_at"
+    add_index :email_events, [:email_message_id, :event_type, :occurred_at], name: "idx_email_events_message_type_at"
 
     create_table :campaigns do |t|
       t.references :workspace, null: false, foreign_key: true
@@ -110,20 +110,20 @@ class CreateMarketingHub < ActiveRecord::Migration[8.1]
       t.boolean :active, null: false, default: true
       t.timestamps
     end
-    add_index :journey_steps, [ :journey_id, :position ]
+    add_index :journey_steps, [:journey_id, :position]
 
     create_table :journey_enrollments do |t|
       t.references :workspace, null: false, foreign_key: true
       t.references :journey, null: false, foreign_key: true
       t.references :person, null: false, foreign_key: true
-      t.references :current_step, foreign_key: { to_table: :journey_steps }
+      t.references :current_step, foreign_key: {to_table: :journey_steps}
       t.string :state, null: false, default: "active"
       t.datetime :next_run_at
       t.datetime :enrolled_at, null: false
       t.jsonb :metadata, null: false, default: {}
       t.timestamps
     end
-    add_index :journey_enrollments, [ :journey_id, :person_id, :state ], name: "idx_journey_enrollments_journey_person_state"
+    add_index :journey_enrollments, [:journey_id, :person_id, :state], name: "idx_journey_enrollments_journey_person_state"
 
     create_table :scoring_rules do |t|
       t.references :workspace, null: false, foreign_key: true
@@ -152,12 +152,12 @@ class CreateMarketingHub < ActiveRecord::Migration[8.1]
       t.jsonb :metadata, null: false, default: {}
       t.timestamps
     end
-    add_index :page_views, [ :workspace_id, :anonymous_id, :occurred_at ], name: "idx_page_views_workspace_anon_at"
-    add_index :page_views, [ :workspace_id, :person_id, :occurred_at ], name: "idx_page_views_workspace_person_at"
+    add_index :page_views, [:workspace_id, :anonymous_id, :occurred_at], name: "idx_page_views_workspace_anon_at"
+    add_index :page_views, [:workspace_id, :person_id, :occurred_at], name: "idx_page_views_workspace_person_at"
 
     add_column :people, :lead_score, :integer, null: false, default: 0
     add_column :people, :lifecycle_stage, :string, null: false, default: "subscriber"
-    add_index :people, [ :workspace_id, :lifecycle_stage ]
+    add_index :people, [:workspace_id, :lifecycle_stage]
 
     add_reference :email_messages, :campaign, foreign_key: true
     add_reference :lead_submissions, :campaign, foreign_key: true
@@ -165,7 +165,7 @@ class CreateMarketingHub < ActiveRecord::Migration[8.1]
     add_reference :deals, :campaign, foreign_key: true
 
     add_column :lead_form_templates, :page_slug, :string
-    add_index :lead_form_templates, [ :workspace_id, :page_slug ], unique: true, where: "page_slug IS NOT NULL"
+    add_index :lead_form_templates, [:workspace_id, :page_slug], unique: true, where: "page_slug IS NOT NULL"
     add_column :email_messages, :marketing_send, :boolean, null: false, default: false
   end
 end

@@ -16,7 +16,7 @@ class DatabaseBackupService
     backup_date = Date.current
     file_name = backup_filename(backup_date)
 
-    Tempfile.create([ "cream_backup_#{@environment}_", ".dump" ]) do |tempfile|
+    Tempfile.create(["cream_backup_#{@environment}_", ".dump"]) do |tempfile|
       run_pg_dump(tempfile.path)
       @storage.upload(tempfile.path, name: file_name)
     end
@@ -34,7 +34,7 @@ class DatabaseBackupService
 
   def run_pg_dump(output_path)
     configuration = @db_config.configuration_hash
-    env = { "PGPASSWORD" => configuration[:password].to_s }
+    env = {"PGPASSWORD" => configuration[:password].to_s}
     command = [
       "pg_dump",
       "-Fc",

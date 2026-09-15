@@ -6,7 +6,7 @@ module StageTriggers
       run.start!
       ui = UiEmitter.new(user: user, deal: deal, run: run)
       if trigger.native?
-        run.transcript << { "type" => "native_call", "function" => trigger.native_function }
+        run.transcript << {"type" => "native_call", "function" => trigger.native_function}
         run.save!
         NativeRegistry.handler_for(trigger.native_function)
           .call(deal: deal, user: user, trigger: trigger, ui: ui, params: trigger.native_params)
@@ -14,7 +14,7 @@ module StageTriggers
         LlmExecutor.new(trigger: trigger, deal: deal, user: user, ui: ui, run: run).call
       end
       run.succeed!
-    rescue StandardError => e
+    rescue => e
       Rails.logger.error("StageTrigger #{trigger.id} failed on deal #{deal.id}: #{e.class} #{e.message}")
       run.fail!("#{e.class}: #{e.message}")
     end

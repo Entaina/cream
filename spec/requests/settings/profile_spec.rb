@@ -19,7 +19,7 @@ RSpec.describe "Settings::Profile", type: :request do
   describe "GET /settings/profile" do
     it "shows personal data and the sales director preference for admins" do
       sign_in_as(admin)
-      patch switch_workspace_path, params: { workspace_id: workspace.id }
+      patch switch_workspace_path, params: {workspace_id: workspace.id}
 
       get settings_profile_path
 
@@ -33,7 +33,7 @@ RSpec.describe "Settings::Profile", type: :request do
 
     it "shows the sales director preference for members" do
       sign_in_as(member)
-      patch switch_workspace_path, params: { workspace_id: workspace.id }
+      patch switch_workspace_path, params: {workspace_id: workspace.id}
 
       get settings_profile_path
 
@@ -44,7 +44,7 @@ RSpec.describe "Settings::Profile", type: :request do
     it "still shows the pipeline preference when sales director is disabled" do
       workspace.update!(sales_director_enabled: false)
       sign_in_as(admin)
-      patch switch_workspace_path, params: { workspace_id: workspace.id }
+      patch switch_workspace_path, params: {workspace_id: workspace.id}
 
       get settings_profile_path
 
@@ -58,9 +58,9 @@ RSpec.describe "Settings::Profile", type: :request do
   describe "PATCH /settings/profile" do
     it "allows users to update their name" do
       sign_in_as(member)
-      patch switch_workspace_path, params: { workspace_id: workspace.id }
+      patch switch_workspace_path, params: {workspace_id: workspace.id}
 
-      patch settings_profile_path, params: { user: { name: "Nuevo Nombre" } }
+      patch settings_profile_path, params: {user: {name: "Nuevo Nombre"}}
 
       expect(response).to redirect_to(settings_profile_path)
       expect(flash[:notice]).to eq(I18n.t("profile.flashes.name_updated"))
@@ -69,10 +69,10 @@ RSpec.describe "Settings::Profile", type: :request do
 
     it "allows users to update their locale" do
       sign_in_as(member)
-      patch switch_workspace_path, params: { workspace_id: workspace.id }
+      patch switch_workspace_path, params: {workspace_id: workspace.id}
       member.update!(locale: "es")
 
-      patch settings_profile_path, params: { user: { name: member.name, locale: "en" } }
+      patch settings_profile_path, params: {user: {name: member.name, locale: "en"}}
 
       expect(response).to redirect_to(settings_profile_path)
       expect(flash[:notice]).to eq(I18n.t("profile.flashes.name_updated"))
@@ -82,10 +82,10 @@ RSpec.describe "Settings::Profile", type: :request do
 
     it "rejects a blank name" do
       sign_in_as(member)
-      patch switch_workspace_path, params: { workspace_id: workspace.id }
+      patch switch_workspace_path, params: {workspace_id: workspace.id}
       original_name = member.name
 
-      patch settings_profile_path, params: { user: { name: "" } }
+      patch settings_profile_path, params: {user: {name: ""}}
 
       expect(response).to redirect_to(settings_profile_path)
       expect(flash[:alert]).to be_present
@@ -94,9 +94,9 @@ RSpec.describe "Settings::Profile", type: :request do
 
     it "allows members to disable the sales director briefing" do
       sign_in_as(member)
-      patch switch_workspace_path, params: { workspace_id: workspace.id }
+      patch switch_workspace_path, params: {workspace_id: workspace.id}
 
-      patch settings_profile_path, params: { membership: { sales_director_briefing_enabled: false } }
+      patch settings_profile_path, params: {membership: {sales_director_briefing_enabled: false}}
 
       expect(response).to redirect_to(settings_profile_path)
       expect(memberships(:one_member).reload.sales_director_briefing_enabled?).to be(false)
@@ -104,9 +104,9 @@ RSpec.describe "Settings::Profile", type: :request do
 
     it "allows admins to update their own preference" do
       sign_in_as(admin)
-      patch switch_workspace_path, params: { workspace_id: workspace.id }
+      patch switch_workspace_path, params: {workspace_id: workspace.id}
 
-      patch settings_profile_path, params: { membership: { sales_director_briefing_enabled: false } }
+      patch settings_profile_path, params: {membership: {sales_director_briefing_enabled: false}}
 
       expect(response).to redirect_to(settings_profile_path)
       expect(membership.reload.sales_director_briefing_enabled?).to be(false)
@@ -115,9 +115,9 @@ RSpec.describe "Settings::Profile", type: :request do
     it "allows users to choose their default pipeline for the workspace" do
       other_pipeline = pipeline.duplicate(name: "Partners").tap(&:save!)
       sign_in_as(admin)
-      patch switch_workspace_path, params: { workspace_id: workspace.id }
+      patch switch_workspace_path, params: {workspace_id: workspace.id}
 
-      patch settings_profile_path, params: { membership: { current_pipeline_id: other_pipeline.id } }
+      patch settings_profile_path, params: {membership: {current_pipeline_id: other_pipeline.id}}
 
       expect(response).to redirect_to(settings_profile_path)
       expect(membership.reload.current_pipeline).to eq(other_pipeline)
@@ -126,9 +126,9 @@ RSpec.describe "Settings::Profile", type: :request do
     it "rejects a default pipeline from another workspace" do
       foreign_pipeline = Pipeline.create_default!(workspaces(:two))
       sign_in_as(admin)
-      patch switch_workspace_path, params: { workspace_id: workspace.id }
+      patch switch_workspace_path, params: {workspace_id: workspace.id}
 
-      patch settings_profile_path, params: { membership: { current_pipeline_id: foreign_pipeline.id } }
+      patch settings_profile_path, params: {membership: {current_pipeline_id: foreign_pipeline.id}}
 
       expect(response).to redirect_to(settings_profile_path)
       expect(membership.reload.current_pipeline).not_to eq(foreign_pipeline)

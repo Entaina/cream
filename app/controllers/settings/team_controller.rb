@@ -7,7 +7,7 @@ module Settings
     helper_method :index_query_params
 
     def show
-      authorize [ :settings, :team ]
+      authorize [:settings, :team]
 
       @admin = pundit_user.admin?
       memberships = policy_scope(Membership)
@@ -26,7 +26,7 @@ module Settings
     private
 
     def index_query_params(overrides = {})
-      { q: params[:q] }.merge(overrides).compact_blank
+      {q: params[:q]}.merge(overrides).compact_blank
     end
   end
 end

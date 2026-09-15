@@ -9,11 +9,11 @@ module BookingPagesExample
   WEEKLY_HOURS = BookingEventType::DEFAULT_WEEKLY_HOURS
 
   FORMATION_WEEKLY_HOURS = {
-    "monday" => [ [ "10:00", "14:00" ] ],
-    "tuesday" => [ [ "10:00", "14:00" ] ],
-    "wednesday" => [ [ "10:00", "14:00" ] ],
-    "thursday" => [ [ "10:00", "14:00" ] ],
-    "friday" => [ [ "10:00", "14:00" ] ],
+    "monday" => [["10:00", "14:00"]],
+    "tuesday" => [["10:00", "14:00"]],
+    "wednesday" => [["10:00", "14:00"]],
+    "thursday" => [["10:00", "14:00"]],
+    "friday" => [["10:00", "14:00"]],
     "saturday" => [],
     "sunday" => []
   }.freeze
@@ -24,15 +24,15 @@ module BookingPagesExample
     welcome_message: "Elige cuándo quedar conmigo. Recibirás la invitación de calendario por email.",
     timezone: "Europe/Madrid",
     booking_window_days: 60,
-    calendar_ids: [ "primary" ],
+    calendar_ids: ["primary"],
     active: true
   }.freeze
 
   EVENT_TYPES = [
     {
       slug: "sesion-formacion",
-      name_i18n: { "es" => "Formación", "en" => "Training session" },
-      description_i18n: { "es" => "Sesión de formación presencial.", "en" => "In-person training session." },
+      name_i18n: {"es" => "Formación", "en" => "Training session"},
+      description_i18n: {"es" => "Sesión de formación presencial.", "en" => "In-person training session."},
       duration_minutes: 240,
       color: "copperfield",
       location_type: "physical",
@@ -47,7 +47,7 @@ module BookingPagesExample
     },
     {
       slug: "video",
-      name_i18n: { "es" => "Reunión On-line", "en" => "Online meeting" },
+      name_i18n: {"es" => "Reunión On-line", "en" => "Online meeting"},
       description_i18n: {
         "es" => "Salvo que acordemos lo contrario nos vemos en el enlace de Google Meet que recibirás en la invitación de calendario.",
         "en" => "Unless we agree otherwise, we'll meet on the Google Meet link included in your calendar invitation."
@@ -65,7 +65,7 @@ module BookingPagesExample
     },
     {
       slug: "reunion",
-      name_i18n: { "es" => "Reunión presencial", "en" => "In-person meeting" },
+      name_i18n: {"es" => "Reunión presencial", "en" => "In-person meeting"},
       description_i18n: {
         "es" => "Para tener una reunión presencial, luego acordamos dónde nos vemos.",
         "en" => "For an in-person meeting, we'll agree on where to meet."
@@ -84,8 +84,8 @@ module BookingPagesExample
     },
     {
       slug: "comidas",
-      name_i18n: { "es" => "Comida", "en" => "Lunch" },
-      description_i18n: { "es" => "Coordinaremos el lugar.", "en" => "We'll coordinate the location." },
+      name_i18n: {"es" => "Comida", "en" => "Lunch"},
+      description_i18n: {"es" => "Coordinaremos el lugar.", "en" => "We'll coordinate the location."},
       duration_minutes: 90,
       color: "chicago",
       location_type: "to_be_decided",

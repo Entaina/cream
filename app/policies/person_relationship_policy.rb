@@ -11,7 +11,7 @@ class PersonRelationshipPolicy < ApplicationPolicy
     def resolve
       return scope.none unless member?
 
-      scope.joins(:from_person).where(people: { workspace_id: workspace.id })
+      scope.joins(:from_person).where(people: {workspace_id: workspace.id})
     end
   end
 end

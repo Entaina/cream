@@ -33,7 +33,7 @@ module LeadFormTemplates
         record.save!
       end
 
-      { created: created, updated: updated, total: @workspace.lead_form_templates.count }
+      {created: created, updated: updated, total: @workspace.lead_form_templates.count}
     end
 
     private

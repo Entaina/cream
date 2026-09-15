@@ -1,5 +1,6 @@
 class MailjetConnectionsController < ApplicationController
   include RequiresFeature
+
   requires_feature :marketing_campaigns
 
   def create

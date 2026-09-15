@@ -1,5 +1,6 @@
 class CalendarConnectionsController < ApplicationController
   include RequiresFeature
+
   requires_feature :calendar_booking
 
   helper_method :calendar_auth_url
@@ -26,7 +27,7 @@ class CalendarConnectionsController < ApplicationController
 
   def calendar_auth_query
     {
-      scope: ([ "email", "profile" ] + CalendarConnection::OAUTH_SCOPES).join(","),
+      scope: (["email", "profile"] + CalendarConnection::OAUTH_SCOPES).join(","),
       calendar_mode: "1",
       prompt: "consent"
     }.to_query

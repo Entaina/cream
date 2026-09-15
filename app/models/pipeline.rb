@@ -1,12 +1,12 @@
 class Pipeline < ApplicationRecord
   # Stages every workspace starts with (the classic sales funnel + probabilities).
   DEFAULT_STAGES = [
-    { name: "Lead", color: "chicago", probability: 10 },
-    { name: "Qualified", color: "hoki", probability: 25 },
-    { name: "Proposal", color: "copperfield", probability: 50 },
-    { name: "Negotiation", color: "golden", probability: 75 },
-    { name: "Won", color: "green", probability: 100, won: true, closed: true },
-    { name: "Lost", color: "red", probability: 0, closed: true }
+    {name: "Lead", color: "chicago", probability: 10},
+    {name: "Qualified", color: "hoki", probability: 25},
+    {name: "Proposal", color: "copperfield", probability: 50},
+    {name: "Negotiation", color: "golden", probability: 75},
+    {name: "Won", color: "green", probability: 100, won: true, closed: true},
+    {name: "Lost", color: "red", probability: 0, closed: true}
   ].freeze
 
   CARD_FIELDS = {
@@ -91,7 +91,7 @@ class Pipeline < ApplicationRecord
 
   def renumber_stages
     pipeline_stages.reject(&:marked_for_destruction?)
-      .sort_by { |stage| [ stage.position.to_i, stage.id.to_i ] }
+      .sort_by { |stage| [stage.position.to_i, stage.id.to_i] }
       .each_with_index { |stage, i| stage.position = i }
   end
 

@@ -26,14 +26,14 @@ RSpec.describe StripeSyncService do
     {
       "id" => id, "status" => "succeeded", "paid" => true,
       "amount" => amount, "currency" => "eur", "created" => created,
-      "billing_details" => { "email" => email, "name" => "Pat Doe" },
+      "billing_details" => {"email" => email, "name" => "Pat Doe"},
       "customer" => "cus_1", "description" => "Course", "metadata" => {},
       "refunded" => false, "livemode" => false
     }.merge(attrs)
   end
 
   it "imports succeeded charges and advances the cursor" do
-    client = client_with([ charge(id: "ch_1", created: 100), charge(id: "ch_2", created: 200) ])
+    client = client_with([charge(id: "ch_1", created: 100), charge(id: "ch_2", created: 200)])
 
     expect(described_class.new(connection: connection, client: client).sync!).to be(true)
 
@@ -49,8 +49,8 @@ RSpec.describe StripeSyncService do
   end
 
   it "stores the full charge payload and falls back to the expanded customer email" do
-    client = client_with([ charge(id: "ch_1", created: 100, email: nil,
-      "customer" => { "id" => "cus_9", "email" => "fallback@example.com", "name" => "Cust Name" }) ])
+    client = client_with([charge(:id => "ch_1", :created => 100, :email => nil,
+      "customer" => {"id" => "cus_9", "email" => "fallback@example.com", "name" => "Cust Name"})])
 
     described_class.new(connection: connection, client: client).sync!
 
@@ -61,7 +61,7 @@ RSpec.describe StripeSyncService do
   end
 
   it "skips non-succeeded charges" do
-    client = client_with([ charge(id: "ch_fail", created: 100, "status" => "failed", "paid" => false) ])
+    client = client_with([charge(:id => "ch_fail", :created => 100, "status" => "failed", "paid" => false)])
 
     described_class.new(connection: connection, client: client).sync!
 
@@ -69,7 +69,7 @@ RSpec.describe StripeSyncService do
   end
 
   it "is idempotent and never overwrites user decisions" do
-    client = client_with([ charge(id: "ch_1", created: 100) ])
+    client = client_with([charge(id: "ch_1", created: 100)])
     service = described_class.new(connection: connection, client: client)
     service.sync!
 
@@ -87,9 +87,9 @@ RSpec.describe StripeSyncService do
     Pipeline.create_default!(workspace)
     company = create_company!(workspace)
     person = create_person!(workspace, company: company, email: "pat@example.com")
-    deal = create_deal!(workspace, company: company, contacts: [ person ], value: 500)
+    deal = create_deal!(workspace, company: company, contacts: [person], value: 500)
 
-    client = client_with([ charge(id: "ch_1", created: 100) ])
+    client = client_with([charge(id: "ch_1", created: 100)])
     described_class.new(connection: connection, client: client).sync!
 
     payment = workspace.stripe_payments.find_by!(stripe_charge_id: "ch_1")
@@ -99,7 +99,7 @@ RSpec.describe StripeSyncService do
   end
 
   it "refreshes stale suggestions of pending payments on later syncs" do
-    client = client_with([ charge(id: "ch_1", created: 100) ])
+    client = client_with([charge(id: "ch_1", created: 100)])
     described_class.new(connection: connection, client: client).sync!
     payment = workspace.stripe_payments.find_by!(stripe_charge_id: "ch_1")
     expect(payment.match_confidence).to eq("none")
@@ -107,7 +107,7 @@ RSpec.describe StripeSyncService do
     Pipeline.create_default!(workspace)
     company = create_company!(workspace)
     person = create_person!(workspace, company: company, email: "pat@example.com")
-    create_deal!(workspace, company: company, contacts: [ person ], value: 500)
+    create_deal!(workspace, company: company, contacts: [person], value: 500)
 
     described_class.new(connection: connection, client: client).sync!
 
@@ -116,7 +116,7 @@ RSpec.describe StripeSyncService do
 
   it "syncs manually even when auto-import is disabled" do
     connection.update!(sync_enabled: false)
-    client = client_with([ charge(id: "ch_1", created: 100) ])
+    client = client_with([charge(id: "ch_1", created: 100)])
 
     expect(described_class.new(connection: connection, client: client).sync!).to be(true)
     expect(workspace.stripe_payments.count).to eq(1)
@@ -135,8 +135,8 @@ RSpec.describe StripeSyncService do
       client = client_with([])
       allow(client).to receive(:get_charge).with("ch_old").and_return(
         "id" => "ch_old", "receipt_url" => "https://stripe/r/1", "refunded" => true,
-        "billing_details" => { "email" => "pat@example.com", "name" => "Pat Doe" },
-        "customer" => { "id" => "cus_1" }
+        "billing_details" => {"email" => "pat@example.com", "name" => "Pat Doe"},
+        "customer" => {"id" => "cus_1"}
       )
 
       described_class.new(connection: connection, client: client).sync!
@@ -152,11 +152,11 @@ RSpec.describe StripeSyncService do
       Pipeline.create_default!(workspace)
       company = create_company!(workspace)
       person = create_person!(workspace, company: company, email: "pat@example.com")
-      deal = create_deal!(workspace, company: company, contacts: [ person ], value: 500)
+      deal = create_deal!(workspace, company: company, contacts: [person], value: 500)
       payment = legacy_payment!
       client = client_with([])
       allow(client).to receive(:get_charge).and_return(
-        "id" => "ch_old", "billing_details" => { "email" => "pat@example.com" }
+        "id" => "ch_old", "billing_details" => {"email" => "pat@example.com"}
       )
 
       described_class.new(connection: connection, client: client).sync!

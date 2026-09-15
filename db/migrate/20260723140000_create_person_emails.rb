@@ -8,8 +8,8 @@ class CreatePersonEmails < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_index :person_emails, [ :workspace_id, :address ]
-    add_index :person_emails, [ :person_id, :primary ]
+    add_index :person_emails, [:workspace_id, :address]
+    add_index :person_emails, [:person_id, :primary]
 
     execute <<~SQL.squish
       INSERT INTO person_emails (person_id, workspace_id, address, "primary", created_at, updated_at)

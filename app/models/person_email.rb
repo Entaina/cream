@@ -2,7 +2,7 @@ class PersonEmail < ApplicationRecord
   belongs_to :person
   belongs_to :workspace
 
-  validates :address, presence: true, format: { with: URI::MailTo::EMAIL_REGEXP }
+  validates :address, presence: true, format: {with: URI::MailTo::EMAIL_REGEXP}
   validate :address_unique_for_person
   validate :person_belongs_to_workspace
 

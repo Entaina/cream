@@ -22,22 +22,22 @@ module BookingPagesHelper
   }.freeze
 
   def booking_timezone_options(selected)
-    zones = ([ selected ] + BOOKING_TIMEZONES).compact.uniq
+    zones = ([selected] + BOOKING_TIMEZONES).compact.uniq
     options_for_select(
-      zones.to_h { |zone| [ zone.tr("_", " "), zone ] },
+      zones.to_h { |zone| [zone.tr("_", " "), zone] },
       selected
     )
   end
 
   def booking_location_type_options
     BookingEventType::LOCATION_TYPES.to_h do |type|
-      [ BookingEventType.location_type_label(type), type ]
+      [BookingEventType.location_type_label(type), type]
     end
   end
 
   def booking_color_options
     BookingEventType::COLORS.to_h do |color|
-      [ BookingEventType.color_label(color), color ]
+      [BookingEventType.color_label(color), color]
     end
   end
 

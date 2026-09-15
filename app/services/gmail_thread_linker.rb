@@ -31,7 +31,7 @@ class GmailThreadLinker
     }
   end
 
-  def link(deal_id: nil, new_deal: nil, thread:)
+  def link(thread:, deal_id: nil, new_deal: nil)
     deal = resolve_deal(deal_id: deal_id, new_deal: new_deal, thread: thread)
     imported = import_messages!(deal: deal, thread: thread)
     deal.track_activity(
@@ -69,7 +69,7 @@ class GmailThreadLinker
     return [] if person_ids.empty?
 
     @workspace.deals.joins(:deal_contacts)
-      .where(deal_contacts: { person_id: person_ids })
+      .where(deal_contacts: {person_id: person_ids})
       .includes(:company, :pipeline_stage)
       .distinct
       .order(updated_at: :desc)
@@ -93,7 +93,7 @@ class GmailThreadLinker
       pipeline: pipeline_stage.pipeline,
       pipeline_stage: pipeline_stage,
       owner: @user,
-      contacts: [ person ],
+      contacts: [person],
       tasks: [
         Task.new(
           title: "Next action",
@@ -174,7 +174,7 @@ class GmailThreadLinker
         user: @user,
         record: deal,
         direction: direction,
-        status: direction == "outbound" ? "sent" : "received",
+        status: (direction == "outbound") ? "sent" : "received",
         from_address: EmailAddressParser.extract(attrs[:from]) || attrs[:from].to_s,
         to_address: first_recipient(attrs[:to]) || "unknown@example.com",
         subject: attrs[:subject].presence || "(no subject)",
@@ -251,6 +251,6 @@ class GmailThreadLinker
     base = ENV["CREAM_APP_URL"].presence
     return nil unless base
 
-    "#{base.chomp('/')}/deals/#{deal.id}"
+    "#{base.chomp("/")}/deals/#{deal.id}"
   end
 end

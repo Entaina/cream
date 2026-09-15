@@ -54,36 +54,41 @@ module StageTriggers
 
     def tool_definitions
       [
-        { type: "function", name: "get_deal_context",
-          description: "Devuelve el contexto completo del deal: campos, valor, productos, contactos, tareas, notas y actividad reciente.",
-          parameters: { type: "object", properties: {}, additionalProperties: false } },
-        { type: "function", name: "get_company_context",
-          description: "Devuelve el contexto de la empresa asociada al deal.",
-          parameters: { type: "object", properties: {}, additionalProperties: false } },
-        { type: "function", name: "get_contact_context",
-          description: "Devuelve el contexto de un contacto del deal. Sin person_id usa el primer contacto.",
-          parameters: { type: "object", additionalProperties: false, properties: {
-            person_id: { type: "integer", description: "Id de un contacto del deal" } } } },
-        { type: "function", name: "show_toast",
-          description: "Muestra una notificación breve y no bloqueante en el navegador del usuario.",
-          parameters: { type: "object", additionalProperties: false, required: [ "message" ], properties: {
-            message: { type: "string" },
-            kind: { type: "string", enum: %w[info success warning] } } } },
-        { type: "function", name: "show_alert",
-          description: "Muestra un diálogo modal informativo que el usuario debe cerrar.",
-          parameters: { type: "object", additionalProperties: false, required: [ "message" ], properties: {
-            message: { type: "string" }, title: { type: "string" } } } },
-        { type: "function", name: "show_confirm",
-          description: "Muestra un diálogo de confirmación. Si el usuario acepta se ejecuta el seguimiento: visit navega a una ruta interna (follow_up_url debe empezar por /), toast muestra follow_up_message.",
-          parameters: { type: "object", additionalProperties: false, required: %w[message follow_up_type], properties: {
-            message: { type: "string" }, title: { type: "string" },
-            follow_up_type: { type: "string", enum: %w[visit toast] },
-            follow_up_url: { type: "string", description: "Ruta interna, p.ej. /deals/123" },
-            follow_up_message: { type: "string" } } } },
-        { type: "function", name: "show_deal_panel",
-          description: "Muestra un panel persistente dentro de la página del deal. Admite markdown.",
-          parameters: { type: "object", additionalProperties: false, required: [ "markdown" ], properties: {
-            markdown: { type: "string" }, title: { type: "string" } } } }
+        {type: "function", name: "get_deal_context",
+         description: "Devuelve el contexto completo del deal: campos, valor, productos, contactos, tareas, notas y actividad reciente.",
+         parameters: {type: "object", properties: {}, additionalProperties: false}},
+        {type: "function", name: "get_company_context",
+         description: "Devuelve el contexto de la empresa asociada al deal.",
+         parameters: {type: "object", properties: {}, additionalProperties: false}},
+        {type: "function", name: "get_contact_context",
+         description: "Devuelve el contexto de un contacto del deal. Sin person_id usa el primer contacto.",
+         parameters: {type: "object", additionalProperties: false, properties: {
+           person_id: {type: "integer", description: "Id de un contacto del deal"}
+         }}},
+        {type: "function", name: "show_toast",
+         description: "Muestra una notificación breve y no bloqueante en el navegador del usuario.",
+         parameters: {type: "object", additionalProperties: false, required: ["message"], properties: {
+           message: {type: "string"},
+           kind: {type: "string", enum: %w[info success warning]}
+         }}},
+        {type: "function", name: "show_alert",
+         description: "Muestra un diálogo modal informativo que el usuario debe cerrar.",
+         parameters: {type: "object", additionalProperties: false, required: ["message"], properties: {
+           message: {type: "string"}, title: {type: "string"}
+         }}},
+        {type: "function", name: "show_confirm",
+         description: "Muestra un diálogo de confirmación. Si el usuario acepta se ejecuta el seguimiento: visit navega a una ruta interna (follow_up_url debe empezar por /), toast muestra follow_up_message.",
+         parameters: {type: "object", additionalProperties: false, required: %w[message follow_up_type], properties: {
+           message: {type: "string"}, title: {type: "string"},
+           follow_up_type: {type: "string", enum: %w[visit toast]},
+           follow_up_url: {type: "string", description: "Ruta interna, p.ej. /deals/123"},
+           follow_up_message: {type: "string"}
+         }}},
+        {type: "function", name: "show_deal_panel",
+         description: "Muestra un panel persistente dentro de la página del deal. Admite markdown.",
+         parameters: {type: "object", additionalProperties: false, required: ["markdown"], properties: {
+           markdown: {type: "string"}, title: {type: "string"}
+         }}}
       ]
     end
 

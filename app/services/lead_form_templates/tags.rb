@@ -200,7 +200,7 @@ module LeadFormTemplates
         return "" if active_types.empty?
 
         label = @attributes["label"].presence ||
-                Marketing::ConsentService.subscribe_all_default_label(active_types)
+          Marketing::ConsentService.subscribe_all_default_label(active_types)
         field_key = Marketing::ConsentService::SUBSCRIBE_ALL_FIELD_KEY
 
         checkbox = renderer(context).render(
@@ -239,9 +239,9 @@ module LeadFormTemplates
         return "" if field_key.blank?
 
         label = @attributes["label"].presence ||
-                primary_consent_label(lead_form, subscription_type) ||
-                subscription_type.default_consent_label.presence ||
-                subscription_type.name
+          primary_consent_label(lead_form, subscription_type) ||
+          subscription_type.default_consent_label.presence ||
+          subscription_type.name
 
         renderer(context).render(
           type: "checkbox",

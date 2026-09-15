@@ -79,7 +79,7 @@ module Api
       raise InvalidAttachment, "attachment #{filename} exceeds #{EmailMessage::MAX_ATTACHMENT_SIZE / 1.megabyte} MB" if file.size > EmailMessage::MAX_ATTACHMENT_SIZE
 
       file.rewind if file.respond_to?(:rewind)
-      options = { io: file.tempfile, filename: filename }
+      options = {io: file.tempfile, filename: filename}
       options[:content_type] = file.content_type if file.content_type.present?
       message.attachments.attach(options)
     end
@@ -94,7 +94,7 @@ module Api
       raise InvalidAttachment, "attachment filename and content are required" if filename.blank? || content.blank?
       raise InvalidAttachment, "attachment #{filename} exceeds #{EmailMessage::MAX_ATTACHMENT_SIZE / 1.megabyte} MB" if oversized?(content)
 
-      options = { io: StringIO.new(decode_base64(content, filename)), filename: filename }
+      options = {io: StringIO.new(decode_base64(content, filename)), filename: filename}
       options[:content_type] = raw[:content_type] if raw[:content_type].present?
       message.attachments.attach(options)
     end

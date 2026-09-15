@@ -25,12 +25,12 @@ class Task < ApplicationRecord
       update!(completed_at: nil)
     else
       update!(completed_at: Time.current)
-      taskable.track_activity("task_completed", metadata: { task_id: id, title: title }) if taskable.respond_to?(:track_activity)
+      taskable.track_activity("task_completed", metadata: {task_id: id, title: title}) if taskable.respond_to?(:track_activity)
       if CreamFeatures.enabled?(:webhooks)
-        WebhookDispatcher.dispatch(workspace: workspace, event: "task.completed", payload: { task_id: id, title: title })
+        WebhookDispatcher.dispatch(workspace: workspace, event: "task.completed", payload: {task_id: id, title: title})
       end
       if CreamFeatures.enabled?(:automations) && taskable
-        AutomationJob.perform_later("task.completed", taskable, { "title" => title })
+        AutomationJob.perform_later("task.completed", taskable, {"title" => title})
       end
     end
   end

@@ -15,12 +15,12 @@ RSpec.describe "Person workspace", type: :request do
     get person_path(person)
 
     expect(response).to have_http_status(:ok)
-    expect(document.at_css('#record-panel-activity')['hidden']).to be_nil
-    expect(document.at_css('#record-panel-information')['hidden']).not_to be_nil
+    expect(document.at_css("#record-panel-activity")["hidden"]).to be_nil
+    expect(document.at_css("#record-panel-information")["hidden"]).not_to be_nil
     expect(document.css('dialog[data-record-workspace-target="composer"][open]')).to be_empty
     expect(document.css('dialog form[action="/notes"]')).not_to be_empty
-    expect(document.css('h1').map(&:text)).to include(person.display_name)
-    expect(document.at_css('.record-menu').text).to include("Merge duplicates", "Delete contact")
+    expect(document.css("h1").map(&:text)).to include(person.display_name)
+    expect(document.at_css(".record-menu").text).to include(I18n.t("people.show.merge"), I18n.t("people.show.delete"))
   end
 
   it "shows pending tasks by urgency and keeps completed tasks collapsed" do
@@ -30,20 +30,20 @@ RSpec.describe "Person workspace", type: :request do
 
     get person_path(person)
 
-    panel = document.at_css('#record-panel-activity')
+    panel = document.at_css("#record-panel-activity")
     expect(panel.text.index(overdue.title)).to be < panel.text.index(future.title)
-    completed = panel.css('details').find { |details| details.at_css('summary')&.text&.include?("Completed tasks") }
-    expect(completed['open']).to be_nil
+    completed = panel.css("details").find { |details| details.at_css("summary")&.text&.include?(I18n.t("records.completed_tasks", count: 1)) }
+    expect(completed["open"]).to be_nil
     expect(completed.text).to include("Finished task")
   end
 
   it "renders the selected section on a direct visit and defaults invalid tabs to activity" do
     get person_path(person, tab: "information")
-    expect(document.at_css('#record-panel-information')['hidden']).to be_nil
-    expect(document.at_css('#record-tab-information')['aria-selected']).to eq("true")
+    expect(document.at_css("#record-panel-information")["hidden"]).to be_nil
+    expect(document.at_css("#record-tab-information")["aria-selected"]).to eq("true")
 
     get person_path(person, tab: "unknown")
-    expect(document.at_css('#record-panel-activity')['hidden']).to be_nil
+    expect(document.at_css("#record-panel-activity")["hidden"]).to be_nil
   end
 
   it "edits a single block without replacing the rest of the contact" do
@@ -51,18 +51,18 @@ RSpec.describe "Person workspace", type: :request do
     expect(document.at_css('[name="person[owner_id]"]')).to be_present
     expect(document.at_css('[name="person[first_name]"]')).to be_nil
 
-    patch person_path(person), params: { section: "management", person: { owner_id: users(:two).id } }
+    patch person_path(person), params: {section: "management", person: {owner_id: users(:two).id}}
     expect(response).to redirect_to(person_path(person, tab: "information"))
     expect(person.reload.owner).to eq(users(:two))
     expect(person.first_name).to eq("Ada")
   end
 
   it "keeps the block and submitted values when validation fails" do
-    patch person_path(person), params: { section: "contact", person: { first_name: "", last_name: "", phone: "123456" } }
+    patch person_path(person), params: {section: "contact", person: {first_name: "", last_name: "", phone: "123456"}}
 
     expect(response).to have_http_status(:unprocessable_entity)
     expect(document.at_css('[role="alert"]').text).to include("First name")
-    expect(document.at_css('[name="person[phone]"]')['value']).to eq("123456")
+    expect(document.at_css('[name="person[phone]"]')["value"]).to eq("123456")
     expect(document.at_css('[name="person[owner_id]"]')).to be_nil
   end
 
@@ -72,9 +72,9 @@ RSpec.describe "Person workspace", type: :request do
 
     get person_path(person, tab: "files")
 
-    expect(document.at_css('#record-tab-files')).to be_nil
+    expect(document.at_css("#record-tab-files")).to be_nil
     expect(document.at_css('dialog[data-composer="email"]')).to be_nil
     expect(document.at_css('dialog[data-composer="comment"]')).to be_nil
-    expect(document.at_css('#record-panel-activity')['hidden']).to be_nil
+    expect(document.at_css("#record-panel-activity")["hidden"]).to be_nil
   end
 end

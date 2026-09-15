@@ -8,7 +8,7 @@ RSpec.describe Ai::EmailDrafter do
   let(:client) { instance_double(Ai::Client) }
 
   it "returns subject and body" do
-    allow(client).to receive(:chat).and_return({ subject: "Quick follow-up", body: "Hi Alex," }.to_json)
+    allow(client).to receive(:chat).and_return({subject: "Quick follow-up", body: "Hi Alex,"}.to_json)
 
     result = described_class.new(record: person, goal: "Follow up after demo", client: client).call
 

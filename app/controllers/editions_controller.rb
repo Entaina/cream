@@ -9,7 +9,7 @@ class EditionsController < ApplicationController
       .ordered
       .limit(10)
     render json: editions.map { |edition|
-      { id: edition.id, name: edition.name, hint: edition.date_range_label }
+      {id: edition.id, name: edition.name, hint: edition.date_range_label}
     }
   end
 
@@ -30,7 +30,7 @@ class EditionsController < ApplicationController
     else
       respond_to do |format|
         format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: { errors: @edition.errors.full_messages }, status: :unprocessable_entity }
+        format.json { render json: {errors: @edition.errors.full_messages}, status: :unprocessable_entity }
       end
     end
   end
@@ -72,6 +72,6 @@ class EditionsController < ApplicationController
   end
 
   def edition_json(edition)
-    { id: edition.id, name: edition.name, hint: edition.date_range_label }
+    {id: edition.id, name: edition.name, hint: edition.date_range_label}
   end
 end

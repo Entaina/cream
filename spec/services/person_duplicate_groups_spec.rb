@@ -14,7 +14,7 @@ RSpec.describe PersonDuplicateGroups do
 
     matching = groups.find { |group| group.email == "pat@acme.com" }
     expect(matching.company_label).to eq(company.name)
-    expect(matching.people).to eq([ first, second ])
+    expect(matching.people).to eq([first, second])
   end
 
   it "does not group people with blank emails" do
@@ -36,7 +36,7 @@ RSpec.describe PersonDuplicateGroups do
     expect(groups.size).to eq(1)
     expect(groups.first.email).to eq("shared@example.com")
     expect(groups.first.company_label).to eq("Alpha, Beta")
-    expect(groups.first.people).to eq([ first, second ])
+    expect(groups.first.people).to eq([first, second])
   end
 
   it "returns multiple groups ordered by company label and email" do
@@ -50,6 +50,6 @@ RSpec.describe PersonDuplicateGroups do
     groups = described_class.call(workspace)
 
     expect(groups.size).to eq(2)
-    expect(groups.map(&:email)).to eq([ "dup@alpha.com", "dup@beta.com" ])
+    expect(groups.map(&:email)).to eq(["dup@alpha.com", "dup@beta.com"])
   end
 end

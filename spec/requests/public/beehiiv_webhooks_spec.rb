@@ -24,7 +24,7 @@ RSpec.describe "Public Beehiiv webhooks", type: :request do
 
     post public_beehiiv_webhook_path(token: publication.webhook_token),
       params: payload,
-      headers: { "CONTENT_TYPE" => "application/json" }
+      headers: {"CONTENT_TYPE" => "application/json"}
 
     expect(response).to have_http_status(:ok)
 
@@ -36,8 +36,8 @@ RSpec.describe "Public Beehiiv webhooks", type: :request do
 
   it "rejects unknown tokens" do
     post public_beehiiv_webhook_path(token: "unknown"),
-      params: { event_type: "subscription.created", data: {} }.to_json,
-      headers: { "CONTENT_TYPE" => "application/json" }
+      params: {event_type: "subscription.created", data: {}}.to_json,
+      headers: {"CONTENT_TYPE" => "application/json"}
 
     expect(response).to have_http_status(:unauthorized)
   end

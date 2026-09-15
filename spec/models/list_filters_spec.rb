@@ -25,7 +25,7 @@ RSpec.describe ListFilters do
       tagged = workspace.companies.create!(name: "SaaS Co", industry: "SaaS")
 
       result = described_class.apply_industry(
-        workspace.companies.where(id: [ blank.id, tagged.id ]),
+        workspace.companies.where(id: [blank.id, tagged.id]),
         described_class::NONE
       )
 

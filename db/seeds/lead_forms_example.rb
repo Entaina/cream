@@ -154,7 +154,7 @@ module LeadFormsExample
 
   def self.ensure_pipelines!(workspace)
     default = Pipeline.default_for(workspace) || Pipeline.create_default!(workspace)
-    routes = { "Proyectos" => default }
+    routes = {"Proyectos" => default}
 
     %w[Formación Consultoría].each do |name|
       routes[name] = workspace.pipelines.find_by(name: name) || duplicate_pipeline!(default, name: name)

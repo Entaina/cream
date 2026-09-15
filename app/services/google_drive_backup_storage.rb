@@ -23,7 +23,7 @@ class GoogleDriveBackupStorage
   end
 
   def upload(path, name:)
-    metadata = Google::Apis::DriveV3::File.new(name: name, parents: [ folder_id ])
+    metadata = Google::Apis::DriveV3::File.new(name: name, parents: [folder_id])
     @drive_service.create_file(
       metadata,
       supports_all_drives: true,

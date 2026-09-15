@@ -15,8 +15,8 @@ RSpec.describe AlertCondition, type: :model do
   let(:deal) { create_deal!(workspace, pipeline: pipeline, stage: pipeline.first_stage) }
 
   def build_condition(**attrs)
-    workspace.alert_conditions.new({ alert_rule: rule, field: "value",
-      operator: "gt", compare_value: "1000" }.merge(attrs))
+    workspace.alert_conditions.new({alert_rule: rule, field: "value",
+                                    operator: "gt", compare_value: "1000"}.merge(attrs))
   end
 
   describe "validations" do

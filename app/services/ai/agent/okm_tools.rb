@@ -10,9 +10,9 @@ module Ai
           parameters: {
             type: "object",
             properties: {
-              query: { type: "string", description: "Search terms (company name, person, topic, product)" }
+              query: {type: "string", description: "Search terms (company name, person, topic, product)"}
             },
-            required: [ "query" ],
+            required: ["query"],
             additionalProperties: false
           }
         },
@@ -23,9 +23,9 @@ module Ai
           parameters: {
             type: "object",
             properties: {
-              folder_id: { type: "string", description: "Google Drive folder ID" }
+              folder_id: {type: "string", description: "Google Drive folder ID"}
             },
-            required: [ "folder_id" ],
+            required: ["folder_id"],
             additionalProperties: false
           }
         },
@@ -36,9 +36,9 @@ module Ai
           parameters: {
             type: "object",
             properties: {
-              file_id: { type: "string", description: "Google Drive file ID" }
+              file_id: {type: "string", description: "Google Drive file ID"}
             },
-            required: [ "file_id" ],
+            required: ["file_id"],
             additionalProperties: false
           }
         }
@@ -61,7 +61,6 @@ module Ai
         when "search_okm" then execute_search(args)
         when "list_okm_folder" then execute_list_folder(args)
         when "read_okm_file" then execute_read_file(args)
-        else nil
         end
       end
 
@@ -128,11 +127,11 @@ module Ai
       def record_prefetch_terms(record)
         case record
         when Company
-          [ record.name, record.domain ]
+          [record.name, record.domain]
         when Person
-          [ record.company&.name, record.display_name ]
+          [record.company&.name, record.display_name]
         when Deal
-          [ record.company&.name ]
+          [record.company&.name]
         else
           []
         end
@@ -144,7 +143,7 @@ module Ai
       end
 
       def format_entry(entry)
-        kind = entry.mime_type == Okm::DriveClient::GOOGLE_FOLDER_MIME ? "folder" : "file"
+        kind = (entry.mime_type == Okm::DriveClient::GOOGLE_FOLDER_MIME) ? "folder" : "file"
         parent = entry.parent_id ? " parent=#{entry.parent_id}" : ""
         "#{kind} id=#{entry.id} name=#{entry.name} mime=#{entry.mime_type}#{parent}"
       end

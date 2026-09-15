@@ -13,7 +13,7 @@ RSpec.describe Ai::SalesDirectorResearch do
       session_id: "briefing:2026-07-09"
     )
   end
-  let(:registry) { instance_double(Ai::Agent::ToolRegistry, definitions: [ { name: "search_records" } ]) }
+  let(:registry) { instance_double(Ai::Agent::ToolRegistry, definitions: [{name: "search_records"}]) }
   let(:okm_service_account_key) do
     {
       "type" => "service_account",
@@ -39,7 +39,7 @@ RSpec.describe Ai::SalesDirectorResearch do
       workspace: workspace,
       user: user,
       briefing_date: Date.new(2026, 7, 9),
-      prefetch_terms: [ "Acme Corp" ],
+      prefetch_terms: ["Acme Corp"],
       memory_scope: Ai::AgentMemory::TEAM_SCOPE,
       client: client,
       memory: memory

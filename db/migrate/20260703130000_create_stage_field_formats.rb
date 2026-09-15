@@ -12,6 +12,6 @@ class CreateStageFieldFormats < ActiveRecord::Migration[8.0]
 
       t.timestamps
     end
-    add_index :stage_field_formats, [ :pipeline_stage_id, :field ]
+    add_index :stage_field_formats, [:pipeline_stage_id, :field]
   end
 end

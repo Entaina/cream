@@ -23,7 +23,7 @@ module Api
         if task.save
           render json: task_json(task), status: :created
         else
-          render json: { errors: task.errors.full_messages }, status: :unprocessable_entity
+          render json: {errors: task.errors.full_messages}, status: :unprocessable_entity
         end
       end
 
@@ -41,7 +41,7 @@ module Api
           apply_completed_on_update(task, completed_flag) unless completed_flag.nil?
           render json: task_json(task.reload)
         else
-          render json: { errors: task.errors.full_messages }, status: :unprocessable_entity
+          render json: {errors: task.errors.full_messages}, status: :unprocessable_entity
         end
       end
 

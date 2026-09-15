@@ -19,7 +19,7 @@ class CompaniesController < ApplicationController
     @companies = @companies.merge(Company.apply_custom_field_filters(current_workspace, filter_value(:cf)))
     @companies = apply_sorting(@companies, sortable: SORTABLE, default_column: "name")
     @pagy, @companies = pagy(:offset, @companies)
-    @industries = current_workspace.companies.distinct.where.not(industry: [ nil, "" ]).order(:industry).pluck(:industry)
+    @industries = current_workspace.companies.distinct.where.not(industry: [nil, ""]).order(:industry).pluck(:industry)
     @owners = current_workspace.users.order(:name)
     @custom_fields = current_workspace.custom_fields.where(record_type: "Company").ordered
     @duplicate_group_count = CompanyDuplicateGroups.call(current_workspace).size
@@ -34,7 +34,7 @@ class CompaniesController < ApplicationController
       .order(:name)
       .limit(10)
     render json: companies.map { |company|
-      { id: company.id, name: company.name, hint: company.domain }
+      {id: company.id, name: company.name, hint: company.domain}
     }
   end
 
@@ -71,12 +71,12 @@ class CompaniesController < ApplicationController
     if @company.save
       respond_to do |format|
         format.html { redirect_to @company, notice: "Company created." }
-        format.json { render json: { id: @company.id, name: @company.name }, status: :created }
+        format.json { render json: {id: @company.id, name: @company.name}, status: :created }
       end
     else
       respond_to do |format|
         format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: { errors: @company.errors.full_messages }, status: :unprocessable_entity }
+        format.json { render json: {errors: @company.errors.full_messages}, status: :unprocessable_entity }
       end
     end
   end
@@ -110,7 +110,7 @@ class CompaniesController < ApplicationController
     load_merge_candidates
 
     if request.post?
-      @selected_secondary_ids = merge_params[:secondary_ids].to_a.map(&:to_i).uniq - [ @company.id ]
+      @selected_secondary_ids = merge_params[:secondary_ids].to_a.map(&:to_i).uniq - [@company.id]
       secondaries = @merge_candidates.select { |candidate| @selected_secondary_ids.include?(candidate.id) }
 
       if secondaries.empty?
@@ -121,7 +121,7 @@ class CompaniesController < ApplicationController
       CompanyMerger.call(primary: @company, secondaries: secondaries, user: current_user)
       redirect_to @company, notice: "Merged #{secondaries.size} duplicate #{"company".pluralize(secondaries.size)} into #{@company.name}.", status: :see_other
     else
-      @selected_secondary_ids = Array(params[:secondary_ids]).map(&:to_i).uniq - [ @company.id ]
+      @selected_secondary_ids = Array(params[:secondary_ids]).map(&:to_i).uniq - [@company.id]
     end
   rescue CompanyMerger::Error => e
     flash.now[:alert] = e.message
@@ -142,7 +142,7 @@ class CompaniesController < ApplicationController
     duplicate_groups = CompanyDuplicateGroups.call(current_workspace)
       .select { |group| group.companies.any? { |company| company.id == @company.id } }
 
-    candidate_ids = duplicate_groups.flat_map(&:companies).map(&:id).uniq - [ @company.id ]
+    candidate_ids = duplicate_groups.flat_map(&:companies).map(&:id).uniq - [@company.id]
     @merge_candidates = policy_scope(current_workspace.companies)
       .where(id: candidate_ids)
       .includes(:owner, :people, :deals)

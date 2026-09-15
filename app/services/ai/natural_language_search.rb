@@ -110,8 +110,8 @@ module Ai
         return nil if name.blank? || name.match?(OVERDUE_WORD) || name.match?(TODAY_WORD)
 
         return tasks_for_record_query("company", name) ||
-          tasks_for_record_query("person", name) ||
-          tasks_for_assignee_query(name)
+            tasks_for_record_query("person", name) ||
+            tasks_for_assignee_query(name)
       end
 
       nil
@@ -154,7 +154,7 @@ module Ai
       when Company
         @deals_scope.where(company_id: record.id).open_deals.order(:name).to_a
       when Person
-        @deals_scope.joins(:contacts).where(people: { id: record.id }).open_deals.distinct.order(:name).to_a
+        @deals_scope.joins(:contacts).where(people: {id: record.id}).open_deals.distinct.order(:name).to_a
       else
         []
       end
@@ -174,7 +174,7 @@ module Ai
         remaining -= tasks.size
         next if tasks.empty?
 
-        { deal: deal, tasks: tasks }
+        {deal: deal, tasks: tasks}
       end
     end
 
@@ -188,7 +188,7 @@ module Ai
 
     def stalled_deals
       deals = @deals_scope.includes(:company, :pipeline_stage).joins(:pipeline_stage)
-        .where(pipeline_stages: { closed: false })
+        .where(pipeline_stages: {closed: false})
         .limit(STALLED_DEAL_LIMIT)
         .select { |deal| deal.magic_column_value(:days_in_stage).to_i >= 7 }
 

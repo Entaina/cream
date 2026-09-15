@@ -37,7 +37,7 @@ RSpec.describe "Stripe connections", type: :request do
       sign_in_as(admin)
 
       expect {
-        post stripe_connection_path, params: { stripe_connection: { api_key: "rk_test_abc", account_label: "Main" } }
+        post stripe_connection_path, params: {stripe_connection: {api_key: "rk_test_abc", account_label: "Main"}}
       }.to have_enqueued_job(StripeSyncJob)
 
       expect(response).to redirect_to(stripe_connection_path)
@@ -51,7 +51,7 @@ RSpec.describe "Stripe connections", type: :request do
         .and_return(instance_double(StripeClient).tap { |c| allow(c).to receive(:verify!).and_raise(StripeClient::AuthenticationError) })
       sign_in_as(admin)
 
-      post stripe_connection_path, params: { stripe_connection: { api_key: "rk_test_bad" } }
+      post stripe_connection_path, params: {stripe_connection: {api_key: "rk_test_bad"}}
 
       expect(response).to have_http_status(:unprocessable_entity)
       expect(workspace.stripe_connections.count).to eq(0)
@@ -60,7 +60,7 @@ RSpec.describe "Stripe connections", type: :request do
     it "is admin-only" do
       sign_in_as(member)
 
-      post stripe_connection_path, params: { stripe_connection: { api_key: "rk_test_abc" } }
+      post stripe_connection_path, params: {stripe_connection: {api_key: "rk_test_abc"}}
 
       expect(response).to redirect_to(root_path)
       expect(workspace.stripe_connections.count).to eq(0)
@@ -72,7 +72,7 @@ RSpec.describe "Stripe connections", type: :request do
       workspace.stripe_connections.create!(user: admin, api_key: "rk_test_abc")
       sign_in_as(admin)
 
-      patch stripe_connection_path, params: { stripe_connection: { api_key: "", sync_enabled: "1" } }
+      patch stripe_connection_path, params: {stripe_connection: {api_key: "", sync_enabled: "1"}}
 
       connection = workspace.stripe_connections.sole
       expect(connection.api_key).to eq("rk_test_abc")

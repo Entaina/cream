@@ -2,7 +2,7 @@
      data-controller="deal-stage-celebration"
      data-action="turbo:submit-end->deal-stage-celebration#onSubmitEnd">
   <h3 class="text-sm font-semibold uppercase tracking-wider text-ink-faint mb-2">
-    Move to stage <span class="font-normal normal-case">· <%= deal.pipeline.name %></span>
+    <%= t("deals.show.move_to_stage") %> <span class="font-normal normal-case">· <%= deal.pipeline.name %></span>
   </h3>
   <div class="flex flex-wrap gap-1.5">
     <% deal.pipeline.pipeline_stages.ordered.each do |stage| %>

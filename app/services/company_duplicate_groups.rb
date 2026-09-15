@@ -22,7 +22,7 @@ class CompanyDuplicateGroups
       next unless reason
 
       union_find.union(first.id, second.id)
-      pair_key = [ first.id, second.id ].sort
+      pair_key = [first.id, second.id].sort
       reasons_by_pair[pair_key] ||= reason
     end
 
@@ -30,7 +30,7 @@ class CompanyDuplicateGroups
     grouped_ids = union_find.groups.values.select { |ids| ids.size > 1 }
 
     grouped_ids.map do |ids|
-      group_companies = ids.map { |id| companies_by_id[id] }.sort_by { |company| [ company.created_at, company.id ] }
+      group_companies = ids.map { |id| companies_by_id[id] }.sort_by { |company| [company.created_at, company.id] }
       reason = group_reason(ids, reasons_by_pair)
       Group.new(reason: reason, companies: group_companies)
     end.sort_by { |group| group.companies.first.name }
@@ -58,7 +58,7 @@ class CompanyDuplicateGroups
 
   def group_reason(ids, reasons_by_pair)
     matching_reasons = ids.combination(2).filter_map do |left_id, right_id|
-      reasons_by_pair[[ left_id, right_id ].sort]
+      reasons_by_pair[[left_id, right_id].sort]
     end.uniq
 
     matching_reasons.sort.join(" · ").presence || "Possible duplicate"

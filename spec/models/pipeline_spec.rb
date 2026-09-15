@@ -34,8 +34,8 @@ RSpec.describe Pipeline, type: :model do
 
       expect(copy.name).to eq("Ventas (copy)")
       expect(copy).not_to be_default_pipeline
-      expect(copy.pipeline_stages.ordered.map { |s| [ s.name, s.probability, s.color, s.won, s.closed ] })
-        .to eq(source.pipeline_stages.ordered.map { |s| [ s.name, s.probability, s.color, s.won, s.closed ] })
+      expect(copy.pipeline_stages.ordered.map { |s| [s.name, s.probability, s.color, s.won, s.closed] })
+        .to eq(source.pipeline_stages.ordered.map { |s| [s.name, s.probability, s.color, s.won, s.closed] })
       expect(copy.deals).to be_empty
     end
 
@@ -76,7 +76,7 @@ RSpec.describe Pipeline, type: :model do
     it "updates positions to match the given id list" do
       pipeline = Pipeline.create_default!(workspace)
       stages = pipeline.pipeline_stages.ordered.to_a
-      new_order = [ stages[3].id, stages[0].id, stages[1].id, stages[2].id, stages[4].id, stages[5].id ]
+      new_order = [stages[3].id, stages[0].id, stages[1].id, stages[2].id, stages[4].id, stages[5].id]
 
       expect(pipeline.reorder_stages!(new_order)).to be(true)
       expect(pipeline.pipeline_stages.ordered.pluck(:id)).to eq(new_order)
@@ -85,7 +85,7 @@ RSpec.describe Pipeline, type: :model do
     it "returns false when the id list is incomplete" do
       pipeline = Pipeline.create_default!(workspace)
 
-      expect(pipeline.reorder_stages!([ pipeline.first_stage.id ])).to be(false)
+      expect(pipeline.reorder_stages!([pipeline.first_stage.id])).to be(false)
     end
   end
 end

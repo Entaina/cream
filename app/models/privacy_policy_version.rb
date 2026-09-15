@@ -6,7 +6,7 @@ class PrivacyPolicyVersion < ApplicationRecord
   has_many :lead_submissions, dependent: :nullify
 
   validates :content_hash, :policy_path, :policy_content, :statement_content, presence: true
-  validates :content_hash, uniqueness: { scope: :workspace_id }
+  validates :content_hash, uniqueness: {scope: :workspace_id}
   validate :immutable_content, on: :update
 
   def self.find_by_hash!(workspace, hash)

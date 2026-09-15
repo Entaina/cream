@@ -65,6 +65,6 @@ class ProductsController < ApplicationController
   def sort_clause
     column = SORTABLE.include?(params[:sort]) ? params[:sort] : "name"
     direction = (params[:dir] == "desc") ? :desc : :asc
-    { column => direction }
+    {column => direction}
   end
 end

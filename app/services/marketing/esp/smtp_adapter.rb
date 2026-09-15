@@ -5,8 +5,8 @@ module Marketing
         RecordMailer.tracked_email(message: message).deliver_now
         record_event!("delivered")
         true
-      rescue StandardError => e
-        record_event!("blocked", payload: { "error" => e.message })
+      rescue => e
+        record_event!("blocked", payload: {"error" => e.message})
         false
       end
 

@@ -1,7 +1,7 @@
 <section class="card">
   <div class="flex items-center justify-between px-4 py-3 border-b border-line">
     <h2 class="text-base font-semibold flex items-center gap-2">
-      <%= icon :briefcase, classes: "size-4 text-ink-faint" %> Products
+      <%= icon :briefcase, classes: "size-4 text-ink-faint" %> <%= t("deals.show.products") %>
     </h2>
     <span class="text-base text-ink-soft tabular-nums font-medium"><%= money(deal.value, deal.currency) %></span>
   </div>
@@ -11,11 +11,11 @@
     <table class="table-base">
       <thead>
         <tr>
-          <th>Product</th>
-          <th class="w-48">Edition</th>
-          <th class="w-20">Qty</th>
-          <th class="w-32">Unit price</th>
-          <th class="w-28">Subtotal</th>
+          <th><%= t("deals.show.product") %></th>
+          <th class="w-48"><%= t("deals.show.edition") %></th>
+          <th class="w-20"><%= t("deals.show.quantity") %></th>
+          <th class="w-32"><%= t("deals.show.unit_price") %></th>
+          <th class="w-28"><%= t("deals.show.subtotal") %></th>
           <th class="w-10"></th>
         </tr>
       </thead>
@@ -38,7 +38,7 @@
             <td class="text-ink-soft tabular-nums"><%= money(line.subtotal, deal.currency) %></td>
             <td>
               <%= button_to deal_line_item_path(deal, line), method: :delete, class: "text-ink-faint hover:text-danger p-1",
-                    form: { data: { turbo_confirm: "Remove #{line.product.name}?" } } do %>
+                    form: { data: { turbo_confirm: t("deals.show.remove_product", name: line.product.name) } } do %>
                 <%= icon :trash, classes: "size-3.5" %>
               <% end %>
             </td>
@@ -48,7 +48,7 @@
     </table>
     </div>
   <% else %>
-    <p class="px-4 py-3 text-base text-ink-faint">No products yet. Add one below.</p>
+    <p class="px-4 py-3 text-base text-ink-faint"><%= t("deals.show.no_products") %></p>
   <% end %>
 
   <div class="px-4 py-3 border-t border-line">
@@ -61,9 +61,9 @@
               product_edition_picker_create_url_template_value: product_editions_path(product_id: "__PRODUCT_ID__", format: :json)
             } do |f| %>
         <div class="flex-1 min-w-40">
-          <%= f.label :product_id, "Add product", class: "label" %>
+          <%= f.label :product_id, t("deals.show.add_product"), class: "label" %>
           <%= f.collection_select :product_id, products, :id, ->(p) { "#{p.name} — #{money(p.price)}" },
-                { prompt: "Select a product" }, class: "input", required: true,
+                { prompt: t("deals.show.select_product") }, class: "input", required: true,
                 data: {
                   product_edition_picker_target: "productSelect",
                   action: "change->product-edition-picker#productChanged"
@@ -73,14 +73,14 @@
           <%= render "edition_picker", form: f, managed: true %>
         </div>
         <div class="w-20">
-          <%= f.label :quantity, "Qty", class: "label" %>
+          <%= f.label :quantity, t("deals.show.quantity"), class: "label" %>
           <%= f.number_field :quantity, value: 1, min: 1, step: 1, class: "input" %>
         </div>
-        <%= f.submit "Add", class: "btn-primary" %>
+        <%= f.submit t("records.add"), class: "btn-primary" %>
       <% end %>
     <% else %>
       <p class="text-base text-ink-faint">
-        No products in the catalogue. <%= link_to "Create one", new_product_path, class: "text-accent hover:underline" %>.
+        <%= t("deals.show.no_catalogue_html", link: link_to(t("deals.show.create_one"), new_product_path, class: "text-accent hover:underline")) %>
       </p>
     <% end %>
   </div>

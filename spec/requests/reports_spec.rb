@@ -85,7 +85,7 @@ RSpec.describe "Reports", type: :request do
       create_deal!(workspace, pipeline: pipeline, stage: won_stage, name: "Won deal")
 
       get reports_path(record_type: "Deal", metric: "count", group_by: "stage",
-            pipeline_id: pipeline.id, closed: "1")
+        pipeline_id: pipeline.id, closed: "1")
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include("Won</span>")
@@ -111,7 +111,7 @@ RSpec.describe "Reports", type: :request do
       report = workspace.reports.create!(user: member, name: "R", record_type: "Deal",
         metric: "count", group_by: "stage", date_range: "all")
 
-      patch report_path(report), params: { report: { schedule: "weekly" } }
+      patch report_path(report), params: {report: {schedule: "weekly"}}
 
       expect(report.reload.schedule).to eq("weekly")
       expect(response).to redirect_to(reports_path)
@@ -124,8 +124,8 @@ RSpec.describe "Reports", type: :request do
 
       expect {
         post reports_path, params: {
-          report: { name: "Pipeline by stage", record_type: "Deal", metric: "count", group_by: "stage",
-                    date_range: "all", pipeline_id: pipeline.id }
+          report: {name: "Pipeline by stage", record_type: "Deal", metric: "count", group_by: "stage",
+                   date_range: "all", pipeline_id: pipeline.id}
         }
       }.to change(Report, :count).by(1)
 
@@ -139,8 +139,8 @@ RSpec.describe "Reports", type: :request do
 
       expect {
         post reports_path, params: {
-          report: { name: "Bad", record_type: "Person", metric: "count", group_by: "owner",
-                    date_range: "all", pipeline_id: pipeline.id }
+          report: {name: "Bad", record_type: "Person", metric: "count", group_by: "owner",
+                   date_range: "all", pipeline_id: pipeline.id}
         }
       }.not_to change(Report, :count)
     end
@@ -148,7 +148,7 @@ RSpec.describe "Reports", type: :request do
     it "rejects a metric not valid for the record type" do
       expect {
         post reports_path, params: {
-          report: { name: "Bad", record_type: "Person", metric: "sum_value", group_by: "owner", date_range: "all" }
+          report: {name: "Bad", record_type: "Person", metric: "sum_value", group_by: "owner", date_range: "all"}
         }
       }.not_to change(Report, :count)
     end

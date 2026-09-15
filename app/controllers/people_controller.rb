@@ -43,14 +43,14 @@ class PeopleController < ApplicationController
     authorize @person
     deals_scope = policy_scope(current_workspace.deals)
       .joins(:contacts)
-      .where(people: { id: @person.id })
+      .where(people: {id: @person.id})
       .distinct
     @deal_product_options = current_workspace.products
       .where(id: DealProduct.where(deal_id: deals_scope.select(:id)).select(:product_id))
       .order(:name)
     @deal_product_id = params[:product_id].presence
     deals = if @deal_product_id
-      deals_scope.joins(:deal_products).where(deal_products: { product_id: @deal_product_id }).distinct
+      deals_scope.joins(:deal_products).where(deal_products: {product_id: @deal_product_id}).distinct
     else
       deals_scope
     end
@@ -89,12 +89,12 @@ class PeopleController < ApplicationController
     if @person.save
       respond_to do |format|
         format.html { redirect_to @person, notice: "Person created." }
-        format.json { render json: { id: @person.id, name: @person.display_name }, status: :created }
+        format.json { render json: {id: @person.id, name: @person.display_name}, status: :created }
       end
     else
       respond_to do |format|
         format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: { errors: @person.errors.full_messages }, status: :unprocessable_entity }
+        format.json { render json: {errors: @person.errors.full_messages}, status: :unprocessable_entity }
       end
     end
   end
@@ -134,7 +134,7 @@ class PeopleController < ApplicationController
     load_merge_candidates
 
     if request.post?
-      @selected_secondary_ids = merge_params[:secondary_ids].to_a.map(&:to_i).uniq - [ @person.id ]
+      @selected_secondary_ids = merge_params[:secondary_ids].to_a.map(&:to_i).uniq - [@person.id]
       secondaries = policy_scope(current_workspace.people)
         .where(id: @selected_secondary_ids)
         .includes(:owner, :deals, :company, :person_emails)
@@ -148,7 +148,7 @@ class PeopleController < ApplicationController
       PersonMerger.call(primary: @person, secondaries: secondaries, user: current_user)
       redirect_to @person, notice: "Merged #{secondaries.size} duplicate #{"contact".pluralize(secondaries.size)} into #{@person.display_name}.", status: :see_other
     else
-      @selected_secondary_ids = Array(params[:secondary_ids]).map(&:to_i).uniq - [ @person.id ]
+      @selected_secondary_ids = Array(params[:secondary_ids]).map(&:to_i).uniq - [@person.id]
     end
   rescue PersonMerger::Error => e
     flash.now[:alert] = e.message
@@ -212,7 +212,7 @@ class PeopleController < ApplicationController
     {
       id: person.id,
       name: person.display_name,
-      hint: [ person.company&.name, person.email ].compact_blank.join(" · ").presence
+      hint: [person.company&.name, person.email].compact_blank.join(" · ").presence
     }
   end
 
@@ -220,7 +220,7 @@ class PeopleController < ApplicationController
     params.require(:person).permit(:first_name, :last_name, :email, :phone, :job_title, :location,
       :linkedin_url, :twitter_url, :description, :company_id, :owner_id, :source, :first_contact_on, :brought_by_id,
       custom_fields: {},
-      person_emails_attributes: [ :id, :address, :primary, :_destroy ])
+      person_emails_attributes: [:id, :address, :primary, :_destroy])
   end
 
   INLINE_EDIT_FIELDS = %w[company_id owner_id].freeze
@@ -246,7 +246,7 @@ class PeopleController < ApplicationController
           render turbo_stream: turbo_stream.replace(
             inline_cell_dom_id,
             partial: "people/inline_edit_cell",
-            locals: { person: @person, field: inline_field, editing: false }
+            locals: {person: @person, field: inline_field, editing: false}
           )
         end
         format.html { redirect_to people_path, notice: "Person updated." }
@@ -279,13 +279,13 @@ class PeopleController < ApplicationController
       raise ActiveRecord::RecordNotFound if company_id.blank?
 
       company = current_workspace.companies.find(company_id)
-      { company_id: company.id }
+      {company_id: company.id}
     when "owner_id"
       owner_id = raw[:owner_id]
-      return { owner_id: nil } if owner_id.blank?
+      return {owner_id: nil} if owner_id.blank?
 
       owner = current_workspace.users.find(owner_id)
-      { owner_id: owner.id }
+      {owner_id: owner.id}
     else
       raise ActionController::ParameterMissing, :inline_edit
     end

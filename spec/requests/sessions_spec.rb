@@ -15,7 +15,7 @@ RSpec.describe "Sessions", type: :request do
 
   describe "POST /session" do
     it "signs in with valid credentials" do
-      post session_path, params: { email_address: user.email_address, password: "password" }
+      post session_path, params: {email_address: user.email_address, password: "password"}
 
       expect(response).to redirect_to(root_path)
       expect(cookies[:session_id]).to be_present
@@ -27,7 +27,7 @@ RSpec.describe "Sessions", type: :request do
       preferred_pipeline = pipeline.duplicate(name: "Partners").tap(&:save!)
       memberships(:one_one).update!(current_pipeline: preferred_pipeline)
 
-      post session_path, params: { email_address: user.email_address, password: "password" }
+      post session_path, params: {email_address: user.email_address, password: "password"}
       follow_redirect!
 
       selected_option = Nokogiri::HTML(response.body).at_css("select[name='pipeline_id'] option[selected]")
@@ -35,7 +35,7 @@ RSpec.describe "Sessions", type: :request do
     end
 
     it "rejects invalid credentials" do
-      post session_path, params: { email_address: user.email_address, password: "wrong" }
+      post session_path, params: {email_address: user.email_address, password: "wrong"}
 
       expect(response).to redirect_to(new_session_path)
       expect(cookies[:session_id]).to be_nil

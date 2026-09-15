@@ -28,8 +28,8 @@ RSpec.describe Ai::PersonalSalesDirector do
           record_id: 42
         }
       ],
-      wins: [ "Cerraste el deal Beta a tiempo" ],
-      misses: [ "Dejaste vencer la tarea de seguimiento con Gamma; reprograma hoy" ]
+      wins: ["Cerraste el deal Beta a tiempo"],
+      misses: ["Dejaste vencer la tarea de seguimiento con Gamma; reprograma hoy"]
     }.to_json)
 
     briefing = described_class.new(workspace: workspace, user: user, client: client).call
@@ -38,7 +38,7 @@ RSpec.describe Ai::PersonalSalesDirector do
     expect(briefing.user).to eq(user)
     expect(briefing.summary).to include("priorizar")
     expect(briefing.urgent_items.first["text"]).to include("ACME")
-    expect(briefing.wins).to eq([ "Cerraste el deal Beta a tiempo" ])
+    expect(briefing.wins).to eq(["Cerraste el deal Beta a tiempo"])
     expect(briefing.misses.first).to include("Gamma")
     expect(client).to have_received(:chat) do |**args|
       expect(args[:user]).to include("Investigación OKM, CRM y memoria")
@@ -59,8 +59,8 @@ RSpec.describe Ai::PersonalSalesDirector do
 
     allow(client).to receive(:chat).and_return({
       summary: "Nuevo resumen personal",
-      items: [ { priority: "important", text: "Prepara propuesta" } ],
-      wins: [ "Buen avance" ],
+      items: [{priority: "important", text: "Prepara propuesta"}],
+      wins: ["Buen avance"],
       misses: []
     }.to_json)
 

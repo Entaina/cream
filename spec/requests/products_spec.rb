@@ -29,7 +29,7 @@ RSpec.describe "Products", type: :request do
       sign_in_as(member)
 
       expect {
-        post products_path, params: { product: { name: "Onboarding", price: 2500, segment: "b2b" } }
+        post products_path, params: {product: {name: "Onboarding", price: 2500, segment: "b2b"}}
       }.to change(workspaces(:one).products, :count).by(1)
 
       expect(response).to redirect_to(products_path)
@@ -57,7 +57,7 @@ RSpec.describe "Products", type: :request do
       workspaces(:one).products.create!(name: "Enterprise", price: 1000, segment: "b2b")
       workspaces(:one).products.create!(name: "Consumer", price: 500, segment: "b2c")
 
-      get products_path, params: { segment: "b2b" }
+      get products_path, params: {segment: "b2b"}
 
       expect(response).to have_http_status(:success)
       expect(response.body).to include("Enterprise")

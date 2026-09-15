@@ -4,10 +4,10 @@ class AddConsentFieldsToSubscriptionTypes < ActiveRecord::Migration[8.0]
     add_column :subscription_types, :default_consent_label, :text
 
     add_index :subscription_types,
-              [ :workspace_id, :consent_field_key ],
-              unique: true,
-              where: "consent_field_key IS NOT NULL",
-              name: "index_subscription_types_on_workspace_consent_field_key"
+      [:workspace_id, :consent_field_key],
+      unique: true,
+      where: "consent_field_key IS NOT NULL",
+      name: "index_subscription_types_on_workspace_consent_field_key"
 
     reversible do |dir|
       dir.up do

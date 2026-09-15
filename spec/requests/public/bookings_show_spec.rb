@@ -13,12 +13,12 @@ RSpec.describe "Public booking page", type: :request do
       host: user,
       pipeline: pipeline,
       timezone: "Europe/Madrid",
-      calendar_ids: [ "primary" ],
+      calendar_ids: ["primary"],
       active: true
     )
     page.event_types.build(
       slug: "video",
-      name_i18n: { "es" => "Online" },
+      name_i18n: {"es" => "Online"},
       duration_minutes: 30,
       location_type: "google_meet",
       weekly_hours: BookingEventType::DEFAULT_WEEKLY_HOURS,

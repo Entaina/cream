@@ -8,7 +8,7 @@ module Marketing
 
       def deliver!
         unless connection&.connected?
-          record_event!("blocked", payload: { "error" => "Mailjet is not configured for this workspace" })
+          record_event!("blocked", payload: {"error" => "Mailjet is not configured for this workspace"})
           return false
         end
 
@@ -20,11 +20,11 @@ module Marketing
           record_event!("delivered", payload: JSON.parse(response.body))
           true
         else
-          record_event!("blocked", payload: { "status" => response.code, "body" => response.body })
+          record_event!("blocked", payload: {"status" => response.code, "body" => response.body})
           false
         end
-      rescue StandardError => e
-        record_event!("blocked", payload: { "error" => e.message })
+      rescue => e
+        record_event!("blocked", payload: {"error" => e.message})
         false
       end
 
@@ -47,8 +47,8 @@ module Marketing
         {
           Messages: [
             {
-              From: { Email: connection.from_email, Name: from_name },
-              To: [ { Email: message.to_address } ],
+              From: {Email: connection.from_email, Name: from_name},
+              To: [{Email: message.to_address}],
               Subject: message.subject,
               HTMLPart: rendered_body,
               CustomID: message.id.to_s,

@@ -11,7 +11,7 @@ RSpec.describe "Stripe payments", type: :request do
   end
 
   def create_payment!(workspace_override = workspace, **attrs)
-    conn = workspace_override == workspace ? connection :
+    conn = (workspace_override == workspace) ? connection :
       workspace_override.stripe_connections.create!(user: users(:two), api_key: "rk_test_456")
     workspace_override.stripe_payments.create!({
       stripe_connection: conn,
@@ -46,9 +46,9 @@ RSpec.describe "Stripe payments", type: :request do
     it "renders the payment detail with payload-derived info" do
       payment = create_payment!(payload: {
         "id" => "ch_x", "receipt_url" => "https://pay.stripe.com/receipts/xyz",
-        "payment_method_details" => { "type" => "card", "card" => { "brand" => "visa", "last4" => "4242" } },
+        "payment_method_details" => {"type" => "card", "card" => {"brand" => "visa", "last4" => "4242"}},
         "metadata" => {}
-      }, metadata: { "pedido" => "A-17" })
+      }, metadata: {"pedido" => "A-17"})
       sign_in_as(user)
 
       get stripe_payment_path(payment)
@@ -137,9 +137,9 @@ RSpec.describe "Stripe payments", type: :request do
       post deals_path, params: {
         stripe_payment_id: payment.id,
         deal: {
-          name: "From payment", company_id: company.id, contact_ids: [ person.id ],
+          name: "From payment", company_id: company.id, contact_ids: [person.id],
           pipeline_id: pipeline.id, pipeline_stage_id: pipeline.first_stage.id,
-          tasks_attributes: [ { title: "Follow up", due_on: Date.current + 3 } ]
+          tasks_attributes: [{title: "Follow up", due_on: Date.current + 3}]
         }
       }
 

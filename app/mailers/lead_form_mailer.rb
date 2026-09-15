@@ -20,7 +20,7 @@ class LeadFormMailer < ApplicationMailer
     descriptor = lead_name.to_s
     descriptor += " (#{company_name})" if lead_name && company_name
 
-    [ "Nuevo lead", @lead_form.name, descriptor.presence ].compact.join(" · ")
+    ["Nuevo lead", @lead_form.name, descriptor.presence].compact.join(" · ")
   end
 
   def mailjet_workspace = @lead_form.workspace

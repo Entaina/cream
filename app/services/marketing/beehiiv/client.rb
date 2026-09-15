@@ -17,7 +17,7 @@ module Marketing
       end
 
       def list_subscriptions(cursor: nil, limit: 100, status: "all", email: nil, expand: [])
-        params = { limit: limit, status: status }
+        params = {limit: limit, status: status}
         params[:cursor] = cursor if cursor.present?
         params[:email] = email if email.present?
         params["expand[]"] = expand if expand.any?
@@ -26,7 +26,7 @@ module Marketing
       end
 
       def find_subscription_by_email(email)
-        response = list_subscriptions(email: email, limit: 1, expand: [ "custom_fields" ])
+        response = list_subscriptions(email: email, limit: 1, expand: ["custom_fields"])
         response.fetch("data", []).first
       end
 
@@ -45,7 +45,7 @@ module Marketing
       def unsubscribe(subscription_id:)
         put(
           "/publications/#{@publication.publication_id}/subscriptions/#{subscription_id}",
-          { unsubscribe: true }
+          {unsubscribe: true}
         )
       end
 
@@ -75,7 +75,7 @@ module Marketing
           http.open_timeout = 10
           http.read_timeout = 30
 
-          request_class = { get: Net::HTTP::Get, post: Net::HTTP::Post, put: Net::HTTP::Put }.fetch(method)
+          request_class = {get: Net::HTTP::Get, post: Net::HTTP::Post, put: Net::HTTP::Put}.fetch(method)
           request = request_class.new(uri)
           request["Authorization"] = "Bearer #{@connection.api_key}"
           request["Content-Type"] = "application/json"

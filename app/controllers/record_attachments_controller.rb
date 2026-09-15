@@ -1,5 +1,6 @@
 class RecordAttachmentsController < ApplicationController
   include RequiresFeature
+
   requires_feature :attachments
   def create
     attachable = find_attachable

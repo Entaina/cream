@@ -26,12 +26,12 @@ module LeadFormTemplateHelper
   end
 
   def submission_schema_user_fields(template)
-    system_keys = LeadForm::METADATA_FIELDS + [ LeadForm::HONEYPOT_FIELD, LeadForm::TIMESTAMP_FIELD ]
+    system_keys = LeadForm::METADATA_FIELDS + [LeadForm::HONEYPOT_FIELD, LeadForm::TIMESTAMP_FIELD]
     submission_schema_fields(template).reject { |field| system_keys.include?(field["name"]) }
   end
 
   def submission_schema_system_fields(template)
-    system_keys = LeadForm::METADATA_FIELDS + [ LeadForm::HONEYPOT_FIELD, LeadForm::TIMESTAMP_FIELD ]
+    system_keys = LeadForm::METADATA_FIELDS + [LeadForm::HONEYPOT_FIELD, LeadForm::TIMESTAMP_FIELD]
     submission_schema_fields(template).select { |field| system_keys.include?(field["name"]) }
   end
 
@@ -65,5 +65,4 @@ module LeadFormTemplateHelper
       "#{values.first(3).join(", ")} +#{values.size - 3} más"
     end
   end
-
 end

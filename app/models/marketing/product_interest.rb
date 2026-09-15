@@ -13,12 +13,12 @@ module Marketing
     belongs_to :converted_by, class_name: "User", optional: true
     belongs_to :lead_submission, optional: true
 
-    validates :status, inclusion: { in: STATUSES }
-    validates :source_kind, inclusion: { in: SOURCE_KINDS }
+    validates :status, inclusion: {in: STATUSES}
+    validates :source_kind, inclusion: {in: SOURCE_KINDS}
     validates :description, presence: true
     validates :occurred_at, presence: true
     validates :dismissal_reason, presence: true, if: -> { status == "dismissed" }
-    validates :lead_submission_id, uniqueness: { scope: :product_id }, allow_nil: true
+    validates :lead_submission_id, uniqueness: {scope: :product_id}, allow_nil: true
     validate :references_belong_to_workspace
     validate :converted_fields_consistent
 

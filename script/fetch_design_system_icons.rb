@@ -23,7 +23,7 @@ service = Google::Apis::DriveV3::DriveService.new
 service.authorization = credentials
 
 entries = []
-queue = [ [ DESIGN_SYSTEM_FOLDER_ID, "" ] ]
+queue = [[DESIGN_SYSTEM_FOLDER_ID, ""]]
 
 until queue.empty?
   folder_id, prefix = queue.shift
@@ -42,9 +42,9 @@ until queue.empty?
     Array(response.files).each do |file|
       path = prefix.empty? ? file.name : "#{prefix}/#{file.name}"
       if file.mime_type == "application/vnd.google-apps.folder"
-        queue << [ file.id, path ]
+        queue << [file.id, path]
       elsif IMAGE_MIMES.include?(file.mime_type) || file.name.match?(IMAGE_EXT)
-        entries << { path: path, id: file.id, mime_type: file.mime_type, name: file.name }
+        entries << {path: path, id: file.id, mime_type: file.mime_type, name: file.name}
       end
     end
 

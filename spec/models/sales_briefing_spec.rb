@@ -27,22 +27,22 @@ RSpec.describe SalesBriefing, type: :model do
 
   it "allows a personal briefing alongside the team briefing for the same date" do
     build_briefing.save!
-    personal = build_briefing(user: user, summary: "Para ti", wins: [ "Deal ganado" ], misses: [ "Tarea vencida" ])
+    personal = build_briefing(user: user, summary: "Para ti", wins: ["Deal ganado"], misses: ["Tarea vencida"])
 
     expect(personal).to be_valid
     expect(personal.save).to be(true)
   end
 
   it "requires a unique personal briefing per user and date" do
-    build_briefing(user: user, wins: [ "Buen cierre" ]).save!
-    duplicate = build_briefing(user: user, wins: [ "Otro acierto" ])
+    build_briefing(user: user, wins: ["Buen cierre"]).save!
+    duplicate = build_briefing(user: user, wins: ["Otro acierto"])
 
     expect(duplicate).not_to be_valid
     expect(duplicate.errors[:briefing_date]).to be_present
   end
 
   it "validates item priorities and text" do
-    briefing = build_briefing(items: [ { "priority" => "urgent", "text" => "Llamar al cliente" } ])
+    briefing = build_briefing(items: [{"priority" => "urgent", "text" => "Llamar al cliente"}])
 
     expect(briefing).to be_valid
     expect(briefing.urgent_items.size).to eq(1)
@@ -50,19 +50,19 @@ RSpec.describe SalesBriefing, type: :model do
   end
 
   it "rejects invalid item priorities" do
-    briefing = build_briefing(items: [ { "priority" => "critical", "text" => "Hacer algo" } ])
+    briefing = build_briefing(items: [{"priority" => "critical", "text" => "Hacer algo"}])
 
     expect(briefing).not_to be_valid
   end
 
   it "validates wins and misses as string arrays for personal briefings" do
-    briefing = build_briefing(user: user, wins: [ "Buen trabajo" ], misses: [ "Retrasaste el follow-up" ])
+    briefing = build_briefing(user: user, wins: ["Buen trabajo"], misses: ["Retrasaste el follow-up"])
 
     expect(briefing).to be_valid
   end
 
   it "requires team briefings to keep wins and misses empty" do
-    briefing = build_briefing(wins: [ "No permitido" ])
+    briefing = build_briefing(wins: ["No permitido"])
 
     expect(briefing).not_to be_valid
     expect(briefing.errors[:wins]).to be_present
@@ -71,7 +71,7 @@ RSpec.describe SalesBriefing, type: :model do
   it "scopes team and personal briefings" do
     team = build_briefing
     team.save!
-    personal = build_briefing(user: user, wins: [ "Acierto" ])
+    personal = build_briefing(user: user, wins: ["Acierto"])
     personal.save!
 
     expect(workspace.sales_briefings.team).to contain_exactly(team)
@@ -83,8 +83,8 @@ RSpec.describe SalesBriefing, type: :model do
     foreign_deal = create_deal!(workspaces(:two))
 
     briefing = build_briefing(items: [
-      { "priority" => "urgent", "text" => "Seguimiento", "record_type" => "Deal", "record_id" => deal.id },
-      { "priority" => "important", "text" => "Ignorar", "record_type" => "Deal", "record_id" => foreign_deal.id }
+      {"priority" => "urgent", "text" => "Seguimiento", "record_type" => "Deal", "record_id" => deal.id},
+      {"priority" => "important", "text" => "Ignorar", "record_type" => "Deal", "record_id" => foreign_deal.id}
     ])
     briefing.save!
 

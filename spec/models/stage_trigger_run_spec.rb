@@ -12,7 +12,7 @@ RSpec.describe StageTriggerRun, type: :model do
   end
 
   def create_run(**attrs)
-    trigger.runs.create!({ workspace: workspace, deal: deal }.merge(attrs))
+    trigger.runs.create!({workspace: workspace, deal: deal}.merge(attrs))
   end
 
   it "walks the status lifecycle and measures duration" do

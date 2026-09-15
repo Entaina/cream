@@ -3,5 +3,5 @@ class AlertDelivery < ApplicationRecord
   belongs_to :deal
   belongs_to :user
 
-  validates :deal_id, uniqueness: { scope: %i[alert_rule_id user_id] }
+  validates :deal_id, uniqueness: {scope: %i[alert_rule_id user_id]}
 end

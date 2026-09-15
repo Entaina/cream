@@ -18,10 +18,10 @@ module Marketing
       end
       return if delta.zero?
 
-      new_score = [ person.lead_score + delta, 0 ].max
+      new_score = [person.lead_score + delta, 0].max
       person.update!(lead_score: new_score, lead_score_decayed_at: nil)
       maybe_transition_lifecycle!(person)
-      person.track_activity("score_changed", metadata: { "delta" => delta, "score" => new_score, "event" => event }) if person.respond_to?(:track_activity)
+      person.track_activity("score_changed", metadata: {"delta" => delta, "score" => new_score, "event" => event}) if person.respond_to?(:track_activity)
     end
 
     def self.recalculate!(workspace)
@@ -48,7 +48,7 @@ module Marketing
       end
 
       decay_total = applicable.sum(&:points) / 2
-      [ person.lead_score - decay_total, 0 ].max.tap do |decayed|
+      [person.lead_score - decay_total, 0].max.tap do |decayed|
         person.update_column(:lead_score_decayed_at, Time.current) if decayed != person.lead_score
       end
     end
@@ -60,7 +60,7 @@ module Marketing
 
       previous = person.lifecycle_stage
       person.update!(lifecycle_stage: target)
-      person.track_activity("lifecycle_changed", metadata: { "from" => previous, "to" => target }) if person.respond_to?(:track_activity)
+      person.track_activity("lifecycle_changed", metadata: {"from" => previous, "to" => target}) if person.respond_to?(:track_activity)
       JourneyTrigger.enqueue_lifecycle_changed!(person: person, from: previous, to: target)
     end
 

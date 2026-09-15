@@ -12,19 +12,19 @@ module Settings
     before_action :set_custom_field, only: %i[edit update destroy]
 
     def index
-      authorize [ :settings, CustomField ]
-      @fields_by_type = policy_scope([ :settings, CustomField ]).ordered.group_by(&:record_type)
+      authorize [:settings, CustomField]
+      @fields_by_type = policy_scope([:settings, CustomField]).ordered.group_by(&:record_type)
       @admin = pundit_user.admin?
     end
 
     def new
       @custom_field = current_workspace.custom_fields.new(record_type: params[:record_type] || "Person")
-      authorize [ :settings, @custom_field ]
+      authorize [:settings, @custom_field]
     end
 
     def create
       @custom_field = current_workspace.custom_fields.new(custom_field_params)
-      authorize [ :settings, @custom_field ]
+      authorize [:settings, @custom_field]
 
       if @custom_field.save
         redirect_to settings_custom_fields_path, notice: "Custom field created."
@@ -34,11 +34,11 @@ module Settings
     end
 
     def edit
-      authorize [ :settings, @custom_field ]
+      authorize [:settings, @custom_field]
     end
 
     def update
-      authorize [ :settings, @custom_field ]
+      authorize [:settings, @custom_field]
 
       if @custom_field.update(custom_field_params)
         redirect_to settings_custom_fields_path, notice: "Custom field updated."
@@ -48,7 +48,7 @@ module Settings
     end
 
     def destroy
-      authorize [ :settings, @custom_field ]
+      authorize [:settings, @custom_field]
       @custom_field.destroy
       redirect_to settings_custom_fields_path, notice: "Custom field deleted.", status: :see_other
     end
@@ -56,7 +56,7 @@ module Settings
     private
 
     def set_custom_field
-      @custom_field = policy_scope([ :settings, CustomField ]).find(params[:id])
+      @custom_field = policy_scope([:settings, CustomField]).find(params[:id])
     end
 
     def custom_field_params

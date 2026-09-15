@@ -5,11 +5,11 @@ module Settings
     after_action :verify_authorized, only: %i[show update]
 
     def show
-      authorize [ :settings, :profile ]
+      authorize [:settings, :profile]
     end
 
     def update
-      authorize [ :settings, :profile ]
+      authorize [:settings, :profile]
 
       if params[:user].present?
         update_name

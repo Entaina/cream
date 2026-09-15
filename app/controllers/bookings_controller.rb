@@ -1,5 +1,6 @@
 class BookingsController < ApplicationController
   include RequiresFeature
+
   requires_feature :calendar_booking
 
   before_action :set_booking, only: %i[cancel]

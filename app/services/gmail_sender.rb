@@ -26,7 +26,7 @@ class GmailSender
     bearer = ensure_access_token!(@connection)
 
     raw = Base64.urlsafe_encode64(build_mime(to: to, subject: subject, html: html, message_id: rfc822_message_id, attachments: attachments))
-    response = post_json(SEND_URI, { raw: raw }, bearer: bearer)
+    response = post_json(SEND_URI, {raw: raw}, bearer: bearer)
     raise Error, "send failed (#{response.code}): #{response.body}" unless response.is_a?(Net::HTTPSuccess)
 
     data = JSON.parse(response.body)

@@ -79,7 +79,7 @@ module Ai
         assistant_message: briefing.summary.to_s
       )
       memory.consolidate_later
-    rescue StandardError => e
+    rescue => e
       Rails.logger.warn("[SalesDirector] memory: #{e.class}: #{e.message}")
     end
 
@@ -157,7 +157,7 @@ module Ai
       private
 
       def team_members
-        @workspace.users.map { |user| { id: user.id, name: user.name } }
+        @workspace.users.map { |user| {id: user.id, name: user.name} }
       end
 
       def pipeline_summary
@@ -204,7 +204,7 @@ module Ai
 
       def recent_closed_deals
         cutoff = @briefing_date - 7.days
-        @workspace.deals.joins(:pipeline_stage).where(pipeline_stages: { closed: true })
+        @workspace.deals.joins(:pipeline_stage).where(pipeline_stages: {closed: true})
           .includes(:pipeline_stage, :owner)
           .where("deals.updated_at >= ?", cutoff.beginning_of_day)
           .order(updated_at: :desc)

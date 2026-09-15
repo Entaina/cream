@@ -4,9 +4,9 @@ class EmailSuppression < ApplicationRecord
   belongs_to :workspace
 
   validates :address, :reason, presence: true
-  validates :address, format: { with: URI::MailTo::EMAIL_REGEXP }
-  validates :reason, inclusion: { in: REASONS }
-  validates :address, uniqueness: { scope: :workspace_id, case_sensitive: false }
+  validates :address, format: {with: URI::MailTo::EMAIL_REGEXP}
+  validates :reason, inclusion: {in: REASONS}
+  validates :address, uniqueness: {scope: :workspace_id, case_sensitive: false}
 
   before_validation :normalize_address
 

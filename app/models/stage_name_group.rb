@@ -22,13 +22,13 @@ class StageNameGroup
       if existing
         existing.stages << stage
       else
-        result << Group.new(name: stage.name, stages: [ stage ])
+        result << Group.new(name: stage.name, stages: [stage])
       end
     end
   end
 
   def segments_for(group, counts_by_stage_id)
-    group.stages.sort_by { |stage| [ stage.pipeline.position, stage.pipeline.id ] }.map do |stage|
+    group.stages.sort_by { |stage| [stage.pipeline.position, stage.pipeline.id] }.map do |stage|
       Segment.new(
         stage_id: stage.id,
         pipeline_name: stage.pipeline.name,

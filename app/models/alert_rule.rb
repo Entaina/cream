@@ -21,8 +21,8 @@ class AlertRule < ApplicationRecord
     reject_if: ->(attrs) { attrs[:field].blank? }
 
   validates :name, :trigger_field, :recipient, presence: true
-  validates :trigger_field, inclusion: { in: TRIGGER_FIELDS }
-  validates :recipient, inclusion: { in: RECIPIENTS }
+  validates :trigger_field, inclusion: {in: TRIGGER_FIELDS}
+  validates :recipient, inclusion: {in: RECIPIENTS}
 
   scope :active, -> { where(active: true) }
 

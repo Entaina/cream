@@ -9,12 +9,12 @@ RSpec.describe Marketing::FilterResolver do
     company = create_company!(workspace)
     person_with_deal = create_person!(workspace, email: "with-deal@example.com", company: company)
     person_without = create_person!(workspace, email: "without@example.com")
-    create_deal!(workspace, company: company, contacts: [ person_with_deal ])
+    create_deal!(workspace, company: company, contacts: [person_with_deal])
 
     resolver = described_class.new(
       workspace: workspace,
       record_type: "Person",
-      filters: { "open_deal" => "no" }
+      filters: {"open_deal" => "no"}
     )
 
     expect(resolver.resolve(workspace.people)).to contain_exactly(person_without)
@@ -35,7 +35,7 @@ RSpec.describe Marketing::FilterResolver do
     resolver = described_class.new(
       workspace: workspace,
       record_type: "Person",
-      filters: { "interest_product_id" => product.id, "interest_status" => "pending" }
+      filters: {"interest_product_id" => product.id, "interest_status" => "pending"}
     )
 
     expect(resolver.resolve(workspace.people)).to contain_exactly(person)
@@ -53,7 +53,7 @@ RSpec.describe Marketing::FilterResolver do
     resolver = described_class.new(
       workspace: workspace,
       record_type: "Person",
-      filters: { "visited_url" => "pricing" }
+      filters: {"visited_url" => "pricing"}
     )
 
     expect(resolver.resolve(workspace.people)).to contain_exactly(person)

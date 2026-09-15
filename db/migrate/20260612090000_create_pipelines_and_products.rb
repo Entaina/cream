@@ -1,12 +1,12 @@
 class CreatePipelinesAndProducts < ActiveRecord::Migration[8.1]
   # Default stages migrated from the old Deal::STAGES enum, with sales probabilities.
   DEFAULT_STAGES = [
-    { key: "lead", name: "Lead", color: "chicago", probability: 10, won: false, closed: false },
-    { key: "qualified", name: "Qualified", color: "hoki", probability: 25, won: false, closed: false },
-    { key: "proposal", name: "Proposal", color: "copperfield", probability: 50, won: false, closed: false },
-    { key: "negotiation", name: "Negotiation", color: "golden", probability: 75, won: false, closed: false },
-    { key: "won", name: "Won", color: "green", probability: 100, won: true, closed: true },
-    { key: "lost", name: "Lost", color: "red", probability: 0, won: false, closed: true }
+    {key: "lead", name: "Lead", color: "chicago", probability: 10, won: false, closed: false},
+    {key: "qualified", name: "Qualified", color: "hoki", probability: 25, won: false, closed: false},
+    {key: "proposal", name: "Proposal", color: "copperfield", probability: 50, won: false, closed: false},
+    {key: "negotiation", name: "Negotiation", color: "golden", probability: 75, won: false, closed: false},
+    {key: "won", name: "Won", color: "green", probability: 100, won: true, closed: true},
+    {key: "lost", name: "Lost", color: "red", probability: 0, won: false, closed: true}
   ].freeze
 
   def up
@@ -29,7 +29,7 @@ class CreatePipelinesAndProducts < ActiveRecord::Migration[8.1]
       t.boolean :closed, null: false, default: false
       t.timestamps
     end
-    add_index :pipeline_stages, [ :pipeline_id, :position ]
+    add_index :pipeline_stages, [:pipeline_id, :position]
 
     create_table :products do |t|
       t.references :workspace, null: false, foreign_key: true
@@ -38,7 +38,7 @@ class CreatePipelinesAndProducts < ActiveRecord::Migration[8.1]
       t.decimal :price, precision: 14, scale: 2, null: false, default: 0
       t.timestamps
     end
-    add_index :products, [ :workspace_id, :name ]
+    add_index :products, [:workspace_id, :name]
 
     create_table :deal_products do |t|
       t.references :deal, null: false, foreign_key: true
@@ -83,8 +83,8 @@ class CreatePipelinesAndProducts < ActiveRecord::Migration[8.1]
     change_column_null :deals, :pipeline_id, false
     change_column_null :deals, :pipeline_stage_id, false
 
-    remove_index :deals, column: [ :workspace_id, :stage, :position ], if_exists: true
-    add_index :deals, [ :workspace_id, :pipeline_stage_id, :position ]
+    remove_index :deals, column: [:workspace_id, :stage, :position], if_exists: true
+    add_index :deals, [:workspace_id, :pipeline_stage_id, :position]
     remove_column :deals, :stage
   end
 
@@ -98,7 +98,7 @@ class CreatePipelinesAndProducts < ActiveRecord::Migration[8.1]
         WHERE d.pipeline_stage_id = ps.id AND ps.name = #{quote(stage[:name])}
       SQL
     end
-    add_index :deals, [ :workspace_id, :stage, :position ]
+    add_index :deals, [:workspace_id, :stage, :position]
 
     remove_reference :deals, :pipeline_stage, foreign_key: true
     remove_reference :deals, :pipeline, foreign_key: true

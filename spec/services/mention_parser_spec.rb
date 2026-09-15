@@ -10,7 +10,7 @@ RSpec.describe MentionParser do
     it "finds users by email prefix handle" do
       users = described_class.users_from("Please review @two", workspace: workspace)
 
-      expect(users).to eq([ member ])
+      expect(users).to eq([member])
     end
   end
 

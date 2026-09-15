@@ -53,7 +53,7 @@ RSpec.describe "OKM chat", type: :request do
   it "streams status updates, reply, session and confirm_action events" do
     pending = Ai::Agent::PendingAction.new(
       tool: "create_task",
-      args: { "title" => "Llamar" },
+      args: {"title" => "Llamar"},
       description: "Crear tarea «Llamar»",
       workspace_id: workspace.id,
       user_id: user.id
@@ -61,7 +61,7 @@ RSpec.describe "OKM chat", type: :request do
     allow(chat_agent).to receive(:call).and_return(
       Ai::ContextualAgent::Result.new(
         reply: "Propongo crear la tarea.",
-        pending_actions: [ pending ],
+        pending_actions: [pending],
         session_id: "sess-test"
       )
     )
@@ -69,11 +69,11 @@ RSpec.describe "OKM chat", type: :request do
     post okm_chat_path,
       params: {
         message: "Crea una tarea",
-        history: [ { role: "user", content: "Hola" } ],
+        history: [{role: "user", content: "Hola"}],
         record_type: "companies",
         record_id: company.id
       },
-      headers: { "Accept" => "application/x-ndjson" },
+      headers: {"Accept" => "application/x-ndjson"},
       as: :json
 
     expect(response).to have_http_status(:success)
@@ -88,8 +88,8 @@ RSpec.describe "OKM chat", type: :request do
 
   it "works without record context" do
     post okm_chat_path,
-      params: { message: "Háblame de Example" },
-      headers: { "Accept" => "application/x-ndjson" },
+      params: {message: "Háblame de Example"},
+      headers: {"Accept" => "application/x-ndjson"},
       as: :json
 
     expect(response).to have_http_status(:success)
@@ -101,13 +101,13 @@ RSpec.describe "OKM chat", type: :request do
   it "executes a confirmed action with a valid token" do
     action = Ai::Agent::PendingAction.new(
       tool: "add_note",
-      args: { "record_type" => "company", "record_id" => company.id, "body" => "Nota confirmada" },
+      args: {"record_type" => "company", "record_id" => company.id, "body" => "Nota confirmada"},
       description: "Añadir nota",
       workspace_id: workspace.id,
       user_id: user.id
     )
 
-    post okm_chat_actions_path, params: { token: action.sign }, as: :json
+    post okm_chat_actions_path, params: {token: action.sign}, as: :json
 
     expect(response).to have_http_status(:success)
     expect(response.parsed_body["success"]).to be(true)
@@ -118,13 +118,13 @@ RSpec.describe "OKM chat", type: :request do
     other_user = users(:two)
     action = Ai::Agent::PendingAction.new(
       tool: "add_note",
-      args: { "record_type" => "company", "record_id" => company.id, "body" => "Hack" },
+      args: {"record_type" => "company", "record_id" => company.id, "body" => "Hack"},
       description: "Añadir nota",
       workspace_id: workspace.id,
       user_id: other_user.id
     )
 
-    post okm_chat_actions_path, params: { token: action.sign }, as: :json
+    post okm_chat_actions_path, params: {token: action.sign}, as: :json
 
     expect(response).to have_http_status(:forbidden)
   end
@@ -132,7 +132,7 @@ RSpec.describe "OKM chat", type: :request do
   it "returns 404 when the feature is disabled globally" do
     allow(CreamFeatures).to receive(:enabled?).with(:okm_chat).and_return(false)
 
-    post okm_chat_path, params: { message: "Hola" }, as: :json
+    post okm_chat_path, params: {message: "Hola"}, as: :json
 
     expect(response).to have_http_status(:not_found)
   end
@@ -140,15 +140,15 @@ RSpec.describe "OKM chat", type: :request do
   it "returns 404 when OKM chat is disabled for the workspace" do
     workspace.update!(okm_chat_enabled: false)
 
-    post okm_chat_path, params: { message: "Hola" }, as: :json
+    post okm_chat_path, params: {message: "Hola"}, as: :json
 
     expect(response).to have_http_status(:not_found)
   end
 
   it "returns 404 for a record outside the current workspace" do
     post okm_chat_path,
-      params: { message: "Hola", record_type: "companies", record_id: other_company.id },
-      headers: { "Accept" => "application/x-ndjson" },
+      params: {message: "Hola", record_type: "companies", record_id: other_company.id},
+      headers: {"Accept" => "application/x-ndjson"},
       as: :json
 
     expect(response).to have_http_status(:not_found)

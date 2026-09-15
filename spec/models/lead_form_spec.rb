@@ -51,26 +51,26 @@ RSpec.describe LeadForm, type: :model do
     it "zips keys and pipeline ids into a hash" do
       routes = described_class.build_pipeline_routes_from_form(
         %w[curso otro],
-        [ 10, 20 ]
+        [10, 20]
       )
 
-      expect(routes).to eq({ "curso" => 10, "otro" => 20 })
+      expect(routes).to eq({"curso" => 10, "otro" => 20})
     end
 
     it "skips blank keys or pipeline ids" do
       routes = described_class.build_pipeline_routes_from_form(
-        [ "curso", "", "otro" ],
-        [ 10, 20, "" ]
+        ["curso", "", "otro"],
+        [10, 20, ""]
       )
 
-      expect(routes).to eq({ "curso" => 10 })
+      expect(routes).to eq({"curso" => 10})
     end
   end
 
   describe "pipeline_routes validation" do
     it "rejects invalid route keys" do
       form = create_lead_form!(workspace, user: member)
-      form.pipeline_routes = { "Invalid-Key" => form.pipeline_id }
+      form.pipeline_routes = {"Invalid-Key" => form.pipeline_id}
 
       expect(form).not_to be_valid
       expect(form.errors[:pipeline_routes]).to include("invalid key: Invalid-Key")

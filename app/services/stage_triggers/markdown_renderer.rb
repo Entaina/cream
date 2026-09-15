@@ -10,7 +10,7 @@ module StageTriggers
       return "" if markdown.blank?
 
       renderer = Redcarpet::Render::HTML.new(filter_html: true,
-        link_attributes: { rel: "noopener noreferrer", target: "_blank" })
+        link_attributes: {rel: "noopener noreferrer", target: "_blank"})
       html = Redcarpet::Markdown.new(renderer, autolink: true, tables: false).render(markdown)
       ActionController::Base.helpers.sanitize(html, tags: ALLOWED_TAGS, attributes: ALLOWED_ATTRIBUTES)
     end

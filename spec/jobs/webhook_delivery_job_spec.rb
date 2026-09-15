@@ -8,7 +8,7 @@ RSpec.describe WebhookDeliveryJob, type: :job do
       workspace: workspaces(:one),
       user: users(:one),
       url: "https://example.com/hook",
-      events: [ "record.created" ]
+      events: ["record.created"]
     )
 
     response = instance_double(Net::HTTPSuccess, code: "200", body: "ok", is_a?: true)
@@ -17,7 +17,7 @@ RSpec.describe WebhookDeliveryJob, type: :job do
     allow(Net::HTTP).to receive(:start).and_yield(http)
     allow(http).to receive(:request).and_return(response)
 
-    described_class.perform_now(webhook.id, "record.created", { id: 1 })
+    described_class.perform_now(webhook.id, "record.created", {id: 1})
 
     expect(WebhookDelivery.last.status).to eq("delivered")
   end

@@ -13,7 +13,7 @@ RSpec.describe "Comments", type: :request do
       post comments_path, params: {
         commentable_type: "Person",
         commentable_id: person.id,
-        comment: { body: "Looks good" }
+        comment: {body: "Looks good"}
       }
     }.to change(Comment, :count).by(1)
 

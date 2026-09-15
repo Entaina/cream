@@ -25,15 +25,15 @@ class ReportDrillDown
   end
 
   def group_filter
-    case [ record_type, @config[:group_by] ]
-    when [ "Deal", "stage" ]
-      { stage: @row.key }
-    when [ "Deal", "owner" ], [ "Person", "owner" ], [ "Company", "owner" ]
-      { owner_id: @row.key.nil? ? ListFilters::NONE : @row.key }
-    when [ "Person", "company" ]
-      { company_id: @row.key.nil? ? ListFilters::NONE : @row.key }
-    when [ "Company", "industry" ]
-      { industry: @row.key.blank? ? ListFilters::NONE : @row.key }
+    case [record_type, @config[:group_by]]
+    when ["Deal", "stage"]
+      {stage: @row.key}
+    when ["Deal", "owner"], ["Person", "owner"], ["Company", "owner"]
+      {owner_id: @row.key.nil? ? ListFilters::NONE : @row.key}
+    when ["Person", "company"]
+      {company_id: @row.key.nil? ? ListFilters::NONE : @row.key}
+    when ["Company", "industry"]
+      {industry: @row.key.blank? ? ListFilters::NONE : @row.key}
     else
       {}
     end
@@ -43,14 +43,14 @@ class ReportDrillDown
     return {} unless @row.key
 
     month_start = @row.key.to_date.beginning_of_month
-    { created_from: month_start, created_to: month_start.end_of_month }
+    {created_from: month_start, created_to: month_start.end_of_month}
   end
 
   def date_range_filter
     start = range_start
     return {} unless start
 
-    { created_from: start.to_date }
+    {created_from: start.to_date}
   end
 
   def range_start

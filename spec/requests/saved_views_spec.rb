@@ -10,7 +10,7 @@ RSpec.describe "SavedViews", type: :request do
 
   before do
     sign_in_as(admin)
-    patch switch_workspace_path, params: { workspace_id: workspace.id }
+    patch switch_workspace_path, params: {workspace_id: workspace.id}
   end
 
   describe "POST /saved_views" do
@@ -20,7 +20,7 @@ RSpec.describe "SavedViews", type: :request do
           record_type: "Person",
           q: "ann",
           company_id: company.id,
-          saved_view: { name: "Acme search", shared: "0" }
+          saved_view: {name: "Acme search", shared: "0"}
         }
       }.to change(SavedView, :count).by(1)
 
@@ -35,7 +35,7 @@ RSpec.describe "SavedViews", type: :request do
         post saved_views_path, params: {
           record_type: "Person",
           company_id: company.id,
-          saved_view: { name: "Delta" }
+          saved_view: {name: "Delta"}
         }
       }.to change(SavedView, :count).by(1)
 
@@ -49,7 +49,7 @@ RSpec.describe "SavedViews", type: :request do
       post saved_views_path, params: {
         record_type: "Deal",
         q: "alpha",
-        saved_view: { name: "Board default", shared: "0" }
+        saved_view: {name: "Board default", shared: "0"}
       }
 
       view = SavedView.order(:id).last
@@ -62,7 +62,7 @@ RSpec.describe "SavedViews", type: :request do
         record_type: "Deal",
         q: "beta",
         surface: "table",
-        saved_view: { name: "Table surface", shared: "0" }
+        saved_view: {name: "Table surface", shared: "0"}
       }
 
       view = SavedView.order(:id).last
@@ -88,7 +88,7 @@ RSpec.describe "SavedViews", type: :request do
       view = saved_views(:person_gold)
 
       patch saved_view_path(view), params: {
-        saved_view: { name: "Renamed", shared: "1" }
+        saved_view: {name: "Renamed", shared: "1"}
       }
 
       expect(response).to redirect_to(people_path(view: view.id))
@@ -102,7 +102,7 @@ RSpec.describe "SavedViews", type: :request do
         user: admin,
         record_type: "Deal",
         name: "Deal view",
-        filters: { "q" => "old" }
+        filters: {"q" => "old"}
       )
 
       patch saved_view_path(view), params: {
@@ -121,7 +121,7 @@ RSpec.describe "SavedViews", type: :request do
         user: admin,
         record_type: "Deal",
         name: "Deal table view",
-        filters: { "q" => "old" }
+        filters: {"q" => "old"}
       )
 
       patch saved_view_path(view), params: {
@@ -136,10 +136,10 @@ RSpec.describe "SavedViews", type: :request do
 
     it "forbids members from updating another user's personal view" do
       sign_in_as(member)
-      patch switch_workspace_path, params: { workspace_id: workspace.id }
+      patch switch_workspace_path, params: {workspace_id: workspace.id}
       view = saved_views(:person_gold)
 
-      patch saved_view_path(view), params: { saved_view: { name: "Blocked" } }
+      patch saved_view_path(view), params: {saved_view: {name: "Blocked"}}
 
       expect(response).to redirect_to(root_path)
       expect(view.reload.name).to eq("Gold tier")
@@ -180,7 +180,7 @@ RSpec.describe "SavedViews", type: :request do
         filters: {}
       )
 
-      delete saved_view_path(view), params: { surface: "table" }
+      delete saved_view_path(view), params: {surface: "table"}
 
       expect(response).to redirect_to(deals_path)
     end
@@ -189,9 +189,9 @@ RSpec.describe "SavedViews", type: :request do
   describe "GET /people?view=:id" do
     it "applies the saved view filters" do
       gold = create_person!(workspace, company: company, first_name: "Goldie")
-      gold.update!(custom_fields: { "customer_tier" => "Gold" })
+      gold.update!(custom_fields: {"customer_tier" => "Gold"})
       silver = create_person!(workspace, company: company, first_name: "Silvia")
-      silver.update!(custom_fields: { "customer_tier" => "Silver" })
+      silver.update!(custom_fields: {"customer_tier" => "Silver"})
       view = saved_views(:person_gold)
 
       get people_path(view: view.id)
@@ -204,7 +204,7 @@ RSpec.describe "SavedViews", type: :request do
 
     it "shows shared views to other members" do
       sign_in_as(member)
-      patch switch_workspace_path, params: { workspace_id: workspace.id }
+      patch switch_workspace_path, params: {workspace_id: workspace.id}
       view = saved_views(:person_shared)
 
       get people_path(view: view.id)

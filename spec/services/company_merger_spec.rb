@@ -19,10 +19,10 @@ RSpec.describe CompanyMerger do
     primary = create_company!(workspace, name: "Mapfre")
     secondary = create_company!(workspace, name: "Mapfre España")
     person = create_person!(workspace, company: secondary, email: "pat@mapfre.com")
-    deal = create_deal!(workspace, company: secondary, contacts: [ person ])
+    deal = create_deal!(workspace, company: secondary, contacts: [person])
     note = secondary.notes.create!(body: "Met at conference", user: user, workspace: workspace)
 
-    result = merge(primary: primary, secondaries: [ secondary ])
+    result = merge(primary: primary, secondaries: [secondary])
 
     expect(result).to eq(primary)
     expect(Company.exists?(secondary.id)).to be(false)
@@ -37,10 +37,10 @@ RSpec.describe CompanyMerger do
     primary_person = create_person!(workspace, company: primary, first_name: "Primary", email: "pat@mapfre.com")
     secondary_person = create_person!(workspace, company: secondary, first_name: "Secondary", email: "pat@mapfre.com")
 
-    merge(primary: primary, secondaries: [ secondary ])
+    merge(primary: primary, secondaries: [secondary])
 
     expect(Person.exists?(secondary_person.id)).to be(false)
-    expect(primary.people.pluck(:email)).to eq([ "pat@mapfre.com" ])
+    expect(primary.people.pluck(:email)).to eq(["pat@mapfre.com"])
     expect(primary_person.reload.first_name).to eq("Primary")
   end
 
@@ -51,7 +51,7 @@ RSpec.describe CompanyMerger do
     list.list_entries.create!(record: primary)
     list.list_entries.create!(record: secondary)
 
-    merge(primary: primary, secondaries: [ secondary ])
+    merge(primary: primary, secondaries: [secondary])
 
     expect(ListEntry.where(list_id: list.id, record_type: "Company", record_id: primary.id).count).to eq(1)
     expect(ListEntry.where(record_id: secondary.id)).to be_empty
@@ -62,7 +62,7 @@ RSpec.describe CompanyMerger do
     primary = workspace.companies.create!(name: "Mapfre", domain: "mapfre.com")
     secondary = workspace.companies.create!(name: "Mapfre España", industry: "Insurance", location: "Madrid")
 
-    merge(primary: primary, secondaries: [ secondary ])
+    merge(primary: primary, secondaries: [secondary])
 
     primary.reload
     expect(primary.domain).to eq("mapfre.com")
@@ -74,10 +74,10 @@ RSpec.describe CompanyMerger do
     field = workspace.custom_fields.create!(record_type: "Company", name: "Tier", field_type: "text")
     primary = create_company!(workspace, name: "Mapfre")
     secondary = create_company!(workspace, name: "Mapfre España")
-    primary.update!(custom_fields: { field.key => "Gold" })
-    secondary.update!(custom_fields: { field.key => "Silver" })
+    primary.update!(custom_fields: {field.key => "Gold"})
+    secondary.update!(custom_fields: {field.key => "Silver"})
 
-    merge(primary: primary, secondaries: [ secondary ])
+    merge(primary: primary, secondaries: [secondary])
 
     expect(primary.reload.custom_fields_hash[field.key]).to eq("Gold")
   end
@@ -86,9 +86,9 @@ RSpec.describe CompanyMerger do
     field = workspace.custom_fields.create!(record_type: "Company", name: "Region", field_type: "text")
     primary = create_company!(workspace, name: "Mapfre")
     secondary = create_company!(workspace, name: "Mapfre España")
-    secondary.update!(custom_fields: { field.key => "EMEA" })
+    secondary.update!(custom_fields: {field.key => "EMEA"})
 
-    merge(primary: primary, secondaries: [ secondary ])
+    merge(primary: primary, secondaries: [secondary])
 
     expect(primary.reload.custom_fields_hash[field.key]).to eq("EMEA")
   end
@@ -99,9 +99,9 @@ RSpec.describe CompanyMerger do
     primary = create_company!(workspace, name: "Mapfre")
     secondary = create_company!(workspace, name: "Mapfre España")
     deal = create_deal!(workspace, company: primary)
-    deal.update!(custom_fields: { field.key => secondary.id })
+    deal.update!(custom_fields: {field.key => secondary.id})
 
-    merge(primary: primary, secondaries: [ secondary ])
+    merge(primary: primary, secondaries: [secondary])
 
     expect(deal.reload.custom_fields_hash[field.key]).to eq(primary.id)
   end
@@ -112,7 +112,7 @@ RSpec.describe CompanyMerger do
     secondary = other_workspace.companies.create!(name: "Mapfre España")
 
     expect {
-      merge(primary: primary, secondaries: [ secondary ])
+      merge(primary: primary, secondaries: [secondary])
     }.to raise_error(CompanyMerger::Error, /same workspace/)
   end
 
@@ -121,7 +121,7 @@ RSpec.describe CompanyMerger do
     secondary = create_company!(workspace, name: "Mapfre España")
 
     expect {
-      merge(primary: primary, secondaries: [ secondary ])
+      merge(primary: primary, secondaries: [secondary])
     }.to change { primary.activities.where(action: "merged").count }.by(1)
 
     activity = primary.activities.where(action: "merged").last

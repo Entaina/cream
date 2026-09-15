@@ -1,5 +1,6 @@
 class AlertRulesController < ApplicationController
   include RequiresFeature
+
   requires_feature :alerts
   before_action :set_alert_rule, only: %i[edit update destroy]
 

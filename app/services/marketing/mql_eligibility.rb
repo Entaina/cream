@@ -3,7 +3,7 @@ module Marketing
     def self.scope(workspace:, subscription_type_id: nil)
       return workspace.people.none unless CreamFeatures.enabled?(:marketing_consent)
 
-      base = workspace.people.where.not(email: [ nil, "" ])
+      base = workspace.people.where.not(email: [nil, ""])
       subscribed_person_ids = subscribed_person_ids_for(workspace, subscription_type_id)
       return workspace.people.none unless subscribed_person_ids
 

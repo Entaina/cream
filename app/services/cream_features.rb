@@ -9,7 +9,7 @@ module CreamFeatures
       menu: true,
       label: "Reports",
       status: :ready,
-      blockers: [ "MVP builder (metric/dimension/range, save); no CSV export or scheduled reports yet" ],
+      blockers: ["MVP builder (metric/dimension/range, save); no CSV export or scheduled reports yet"],
       enable_steps: []
     },
     mail_merge: {
@@ -17,7 +17,7 @@ module CreamFeatures
       menu: false,
       label: "Mail merge",
       status: :ready,
-      blockers: [ "Removed from sidebar; segments replace manual ID mail merge" ],
+      blockers: ["Removed from sidebar; segments replace manual ID mail merge"],
       enable_steps: []
     },
     email_templates: {
@@ -71,7 +71,7 @@ module CreamFeatures
       menu: true,
       label: "Automations",
       status: :ready,
-      blockers: [ "notify_slack action is a no-op until slack_integrations is enabled (gated in AutomationEngine)" ],
+      blockers: ["notify_slack action is a no-op until slack_integrations is enabled (gated in AutomationEngine)"],
       enable_steps: []
     },
     alerts: {
@@ -87,8 +87,8 @@ module CreamFeatures
       menu: true,
       label: "Slack",
       status: :partial,
-      blockers: [ "Only fires on deal stage change; not on mentions or overdue tasks" ],
-      enable_steps: [ "Wire NotificationService events to SlackNotifier", "Set enabled: true" ]
+      blockers: ["Only fires on deal stage change; not on mentions or overdue tasks"],
+      enable_steps: ["Wire NotificationService events to SlackNotifier", "Set enabled: true"]
     },
     webhooks: {
       enabled: true,
@@ -135,8 +135,8 @@ module CreamFeatures
       menu: false,
       label: "Magic columns",
       status: :ready,
-      blockers: [ "Table index only; not on kanban board" ],
-      enable_steps: [ "Add magic columns to deals board cards" ]
+      blockers: ["Table index only; not on kanban board"],
+      enable_steps: ["Add magic columns to deals board cards"]
     },
     formula_fields: {
       enabled: true,
@@ -167,7 +167,7 @@ module CreamFeatures
       menu: false,
       label: "AI Assistant",
       status: :ready,
-      blockers: [ "Requires CREAM_AI_API_KEY and the OpenAI Responses API (or compatible endpoint)" ],
+      blockers: ["Requires CREAM_AI_API_KEY and the OpenAI Responses API (or compatible endpoint)"],
       enable_steps: []
     },
     ai_enrichment: {
@@ -175,7 +175,7 @@ module CreamFeatures
       menu: false,
       label: "AI enrichment",
       status: :partial,
-      blockers: [ "Suggestions from existing CRM context only; no external data sources yet" ],
+      blockers: ["Suggestions from existing CRM context only; no external data sources yet"],
       enable_steps: []
     },
     ai_automations: {
@@ -183,8 +183,8 @@ module CreamFeatures
       menu: false,
       label: "AI automations",
       status: :placeholder,
-      blockers: [ "Proactive AI hooks in AutomationEngine not wired yet" ],
-      enable_steps: [ "Add AI automation actions", "Set enabled: true" ]
+      blockers: ["Proactive AI hooks in AutomationEngine not wired yet"],
+      enable_steps: ["Add AI automation actions", "Set enabled: true"]
     },
     sales_director: {
       enabled: true,
@@ -212,7 +212,7 @@ module CreamFeatures
       menu: false,
       label: "Stage triggers",
       status: :ready,
-      blockers: [ "LLM mode requires CREAM_AI_API_KEY (native functions work without it)" ],
+      blockers: ["LLM mode requires CREAM_AI_API_KEY (native functions work without it)"],
       enable_steps: []
     },
     stage_field_formats: {
@@ -236,7 +236,7 @@ module CreamFeatures
       menu: true,
       label: "Stripe",
       status: :ready,
-      blockers: [ "Import-only (no webhooks); refunded is a snapshot at import time" ],
+      blockers: ["Import-only (no webhooks); refunded is a snapshot at import time"],
       enable_steps: []
     },
     lead_forms: {

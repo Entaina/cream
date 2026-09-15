@@ -2,7 +2,7 @@ class CreateCrmSchema < ActiveRecord::Migration[8.1]
   def change
     create_table :workspaces do |t|
       t.string :name, null: false
-      t.string :slug, null: false, index: { unique: true }
+      t.string :slug, null: false, index: {unique: true}
       t.timestamps
     end
 
@@ -11,7 +11,7 @@ class CreateCrmSchema < ActiveRecord::Migration[8.1]
       t.references :user, null: false, foreign_key: true
       t.string :role, null: false, default: "member"
       t.timestamps
-      t.index [ :workspace_id, :user_id ], unique: true
+      t.index [:workspace_id, :user_id], unique: true
     end
 
     create_table :companies do |t|
@@ -25,10 +25,10 @@ class CreateCrmSchema < ActiveRecord::Migration[8.1]
       t.string :linkedin_url
       t.string :twitter_url
       t.bigint :annual_revenue
-      t.references :owner, foreign_key: { to_table: :users }
+      t.references :owner, foreign_key: {to_table: :users}
       t.timestamps
-      t.index [ :workspace_id, :name ]
-      t.index [ :workspace_id, :domain ]
+      t.index [:workspace_id, :name]
+      t.index [:workspace_id, :domain]
     end
 
     create_table :people do |t|
@@ -43,10 +43,10 @@ class CreateCrmSchema < ActiveRecord::Migration[8.1]
       t.string :twitter_url
       t.text :description
       t.references :company, foreign_key: true
-      t.references :owner, foreign_key: { to_table: :users }
+      t.references :owner, foreign_key: {to_table: :users}
       t.timestamps
-      t.index [ :workspace_id, :email ]
-      t.index [ :workspace_id, :last_name, :first_name ]
+      t.index [:workspace_id, :email]
+      t.index [:workspace_id, :last_name, :first_name]
     end
 
     create_table :deals do |t|
@@ -60,9 +60,9 @@ class CreateCrmSchema < ActiveRecord::Migration[8.1]
       t.integer :position, null: false, default: 0
       t.references :company, foreign_key: true
       t.references :person, foreign_key: true
-      t.references :owner, foreign_key: { to_table: :users }
+      t.references :owner, foreign_key: {to_table: :users}
       t.timestamps
-      t.index [ :workspace_id, :stage, :position ]
+      t.index [:workspace_id, :stage, :position]
     end
 
     create_table :notes do |t|
@@ -77,13 +77,13 @@ class CreateCrmSchema < ActiveRecord::Migration[8.1]
     create_table :tasks do |t|
       t.references :workspace, null: false, foreign_key: true
       t.references :taskable, polymorphic: true
-      t.references :assignee, foreign_key: { to_table: :users }
+      t.references :assignee, foreign_key: {to_table: :users}
       t.references :user, null: false, foreign_key: true
       t.string :title, null: false
       t.date :due_on
       t.datetime :completed_at
       t.timestamps
-      t.index [ :workspace_id, :completed_at ]
+      t.index [:workspace_id, :completed_at]
     end
 
     create_table :lists do |t|
@@ -99,7 +99,7 @@ class CreateCrmSchema < ActiveRecord::Migration[8.1]
       t.references :record, polymorphic: true, null: false
       t.integer :position, null: false, default: 0
       t.timestamps
-      t.index [ :list_id, :record_type, :record_id ], unique: true
+      t.index [:list_id, :record_type, :record_id], unique: true
     end
 
     create_table :activities do |t|
@@ -109,7 +109,7 @@ class CreateCrmSchema < ActiveRecord::Migration[8.1]
       t.string :action, null: false
       t.jsonb :metadata, null: false, default: {}
       t.timestamps
-      t.index [ :workspace_id, :created_at ]
+      t.index [:workspace_id, :created_at]
     end
   end
 end

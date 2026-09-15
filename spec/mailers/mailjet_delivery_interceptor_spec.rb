@@ -47,7 +47,7 @@ RSpec.describe MailjetDeliveryInterceptor do
     expect(mail.delivery_method.settings[:user_name]).to eq("api-key-xxxx")
     expect(mail.delivery_method.settings[:password]).to eq("secret-yyyy")
     expect(mail.delivery_method.settings[:address]).to eq("in-v3.mailjet.com")
-    expect(mail.from).to eq([ "noreply@example.com" ])
+    expect(mail.from).to eq(["noreply@example.com"])
     expect(mail.header[described_class::HEADER]).to be_nil
   end
 

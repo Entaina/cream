@@ -11,8 +11,8 @@ class Membership < ApplicationRecord
   belongs_to :user
   belongs_to :current_pipeline, class_name: "Pipeline", optional: true
 
-  validates :role, inclusion: { in: ROLES }
-  validates :user_id, uniqueness: { scope: :workspace_id }
+  validates :role, inclusion: {in: ROLES}
+  validates :user_id, uniqueness: {scope: :workspace_id}
   validate :current_pipeline_belongs_to_workspace
 
   before_create :set_default_current_pipeline
@@ -67,7 +67,7 @@ class Membership < ApplicationRecord
   end
 
   def sales_briefing_regenerations_remaining
-    [ SALES_BRIEFING_DAILY_REGENERATIONS_LIMIT - sales_briefing_regenerations_today, 0 ].max
+    [SALES_BRIEFING_DAILY_REGENERATIONS_LIMIT - sales_briefing_regenerations_today, 0].max
   end
 
   def record_sales_briefing_regeneration!

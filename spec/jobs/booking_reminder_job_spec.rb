@@ -14,11 +14,11 @@ RSpec.describe BookingReminderJob, type: :job do
       host: user,
       pipeline: pipeline,
       timezone: "Europe/Madrid",
-      calendar_ids: [ "primary" ]
+      calendar_ids: ["primary"]
     )
     page.event_types.build(
       slug: "video",
-      name_i18n: { "es" => "Online" },
+      name_i18n: {"es" => "Online"},
       duration_minutes: 30,
       location_type: "google_meet",
       weekly_hours: BookingEventType::DEFAULT_WEEKLY_HOURS,
@@ -53,7 +53,7 @@ RSpec.describe BookingReminderJob, type: :job do
       .to change { ActionMailer::Base.deliveries.size }.by(1)
 
     mail = ActionMailer::Base.deliveries.last
-    expect(mail.to).to eq([ "ana@example.com" ])
+    expect(mail.to).to eq(["ana@example.com"])
     expect(mail.subject).to include("Online")
   end
 

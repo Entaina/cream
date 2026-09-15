@@ -37,13 +37,13 @@ RSpec.describe GmailSyncService do
   it "marks a reply matched by thread id" do
     message = outbound_message
     metadata = GmailReader::Metadata.new(
-      id: "in-1", thread_id: "thread-1", label_ids: [ "INBOX" ],
+      id: "in-1", thread_id: "thread-1", label_ids: ["INBOX"],
       from: "Alex <alex@example.com>", subject: "Re: Proposal",
       in_reply_to: nil, references: nil, message_id: "<reply@example.com>",
       internal_date: 1.hour.ago.to_i * 1000
     )
 
-    allow(reader).to receive(:get_thread_metadata).with("thread-1").and_return([ metadata ])
+    allow(reader).to receive(:get_thread_metadata).with("thread-1").and_return([metadata])
     allow(reader).to receive(:list_recent_message_ids).and_return([])
 
     expect {
@@ -58,7 +58,7 @@ RSpec.describe GmailSyncService do
   it "marks a reply matched by In-Reply-To when thread id differs" do
     message = outbound_message(gmail_thread_id: "other-thread")
     metadata = GmailReader::Metadata.new(
-      id: "in-2", thread_id: "thread-2", label_ids: [ "INBOX" ],
+      id: "in-2", thread_id: "thread-2", label_ids: ["INBOX"],
       from: "Alex <alex@example.com>", subject: "Re: Proposal",
       in_reply_to: "<orig@cream.test>", references: "<orig@cream.test>",
       message_id: "<reply2@example.com>",
@@ -66,7 +66,7 @@ RSpec.describe GmailSyncService do
     )
 
     allow(reader).to receive(:get_thread_metadata).with("other-thread").and_return([])
-    allow(reader).to receive(:list_recent_message_ids).and_return([ "in-2" ])
+    allow(reader).to receive(:list_recent_message_ids).and_return(["in-2"])
     allow(reader).to receive(:get_metadata).with("in-2").and_return(metadata)
 
     described_class.new(connection: connection, reader: reader).sync!
@@ -77,13 +77,13 @@ RSpec.describe GmailSyncService do
   it "does not mark messages sent by the connected account" do
     message = outbound_message
     metadata = GmailReader::Metadata.new(
-      id: "sent-1", thread_id: "thread-1", label_ids: [ "SENT" ],
+      id: "sent-1", thread_id: "thread-1", label_ids: ["SENT"],
       from: "me@gmail.com", subject: "Proposal",
       in_reply_to: nil, references: nil, message_id: "<sent@cream.test>",
       internal_date: 1.hour.ago.to_i * 1000
     )
 
-    allow(reader).to receive(:get_thread_metadata).with("thread-1").and_return([ metadata ])
+    allow(reader).to receive(:get_thread_metadata).with("thread-1").and_return([metadata])
     allow(reader).to receive(:list_recent_message_ids).and_return([])
 
     described_class.new(connection: connection, reader: reader).sync!
@@ -130,7 +130,7 @@ RSpec.describe GmailSyncService do
       GmailReader::FullMessage.new(
         id: "in-full",
         thread_id: "thread-1",
-        label_ids: [ "INBOX" ],
+        label_ids: ["INBOX"],
         from: "Alex <alex@example.com>",
         subject: "Re: Proposal",
         snippet: "Thanks!",
@@ -144,13 +144,13 @@ RSpec.describe GmailSyncService do
     it "creates an inbound email with body when readonly scope is granted" do
       outbound = outbound_message
       metadata = GmailReader::Metadata.new(
-        id: "in-full", thread_id: "thread-1", label_ids: [ "INBOX" ],
+        id: "in-full", thread_id: "thread-1", label_ids: ["INBOX"],
         from: "Alex <alex@example.com>", subject: "Re: Proposal",
         in_reply_to: nil, references: nil, message_id: "<reply@example.com>",
         internal_date: 1.hour.ago.to_i * 1000
       )
 
-      allow(reader).to receive(:get_thread_metadata).with("thread-1").and_return([ metadata ])
+      allow(reader).to receive(:get_thread_metadata).with("thread-1").and_return([metadata])
       allow(reader).to receive(:list_recent_message_ids).and_return([])
       allow(reader).to receive(:get_full).with("in-full").and_return(full_message)
 
@@ -168,13 +168,13 @@ RSpec.describe GmailSyncService do
     it "does not duplicate inbound messages on repeated sync" do
       outbound_message
       metadata = GmailReader::Metadata.new(
-        id: "in-full", thread_id: "thread-1", label_ids: [ "INBOX" ],
+        id: "in-full", thread_id: "thread-1", label_ids: ["INBOX"],
         from: "Alex <alex@example.com>", subject: "Re: Proposal",
         in_reply_to: nil, references: nil, message_id: "<reply@example.com>",
         internal_date: 1.hour.ago.to_i * 1000
       )
 
-      allow(reader).to receive(:get_thread_metadata).with("thread-1").and_return([ metadata ])
+      allow(reader).to receive(:get_thread_metadata).with("thread-1").and_return([metadata])
       allow(reader).to receive(:list_recent_message_ids).and_return([])
       allow(reader).to receive(:get_full).with("in-full").and_return(full_message)
 
@@ -186,13 +186,13 @@ RSpec.describe GmailSyncService do
     it "does not create inbound messages without readonly scope" do
       outbound_message
       metadata = GmailReader::Metadata.new(
-        id: "in-full", thread_id: "thread-1", label_ids: [ "INBOX" ],
+        id: "in-full", thread_id: "thread-1", label_ids: ["INBOX"],
         from: "Alex <alex@example.com>", subject: "Re: Proposal",
         in_reply_to: nil, references: nil, message_id: "<reply@example.com>",
         internal_date: 1.hour.ago.to_i * 1000
       )
 
-      allow(reader).to receive(:get_thread_metadata).with("thread-1").and_return([ metadata ])
+      allow(reader).to receive(:get_thread_metadata).with("thread-1").and_return([metadata])
       allow(reader).to receive(:list_recent_message_ids).and_return([])
       allow(reader).to receive(:get_full)
 

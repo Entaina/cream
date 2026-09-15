@@ -13,11 +13,11 @@ module RequiresFeature
         label = self.class.workspace_feature_label(feature_key)
         message = "#{label} is not available in this workspace."
         if is_a?(ActionController::API)
-          render json: { error: message }, status: :not_found
+          render json: {error: message}, status: :not_found
         else
           respond_to do |format|
             format.html { redirect_to root_path, alert: message }
-            format.json { render json: { error: message }, status: :not_found }
+            format.json { render json: {error: message}, status: :not_found }
             format.any { head :not_found }
           end
         end
@@ -41,11 +41,11 @@ module RequiresFeature
         label = CreamFeatures.entry(feature_key).label
         message = "#{label} is not available yet."
         if is_a?(ActionController::API)
-          render json: { error: message }, status: :not_found
+          render json: {error: message}, status: :not_found
         else
           respond_to do |format|
             format.html { redirect_to root_path, alert: message }
-            format.json { render json: { error: message }, status: :not_found }
+            format.json { render json: {error: message}, status: :not_found }
             format.any { head :not_found }
           end
         end

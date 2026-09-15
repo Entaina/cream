@@ -16,13 +16,13 @@ class SalesDirectorBriefingJob < ApplicationJob
     workspace.memberships.where(sales_director_briefing_enabled: true).includes(:user).find_each do |membership|
       generate_personal_for(workspace, membership.user)
     end
-  rescue StandardError => e
+  rescue => e
     Rails.logger.error("[SalesDirectorBriefingJob] workspace=#{workspace.id}: #{e.class}: #{e.message}")
   end
 
   def generate_personal_for(workspace, user)
     Ai::PersonalSalesDirector.new(workspace: workspace, user: user).call
-  rescue StandardError => e
+  rescue => e
     Rails.logger.error("[SalesDirectorBriefingJob] workspace=#{workspace.id} user=#{user.id}: #{e.class}: #{e.message}")
   end
 end

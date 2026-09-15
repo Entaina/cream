@@ -52,12 +52,12 @@ module Public
         )
         render json: availability_payload(result)
       else
-        render json: { error: "month or date required" }, status: :bad_request
+        render json: {error: "month or date required"}, status: :bad_request
       end
     rescue ActiveRecord::RecordNotFound
-      render json: { error: "event type not found" }, status: :not_found
+      render json: {error: "event type not found"}, status: :not_found
     rescue ArgumentError => e
-      render json: { error: e.message }, status: :bad_request
+      render json: {error: e.message}, status: :bad_request
     end
 
     def book
@@ -72,13 +72,13 @@ module Public
         )
         render json: result.booking.confirmation_payload(locale: resolved_locale), status: :created
       rescue BookingCreator::Conflict => e
-        render json: { error: e.message }, status: :conflict
+        render json: {error: e.message}, status: :conflict
       rescue BookingCreator::ValidationError => e
-        render json: { error: e.message }, status: :bad_request
+        render json: {error: e.message}, status: :bad_request
       rescue GoogleCalendar::Error => e
-        render json: { error: e.message }, status: :service_unavailable
+        render json: {error: e.message}, status: :service_unavailable
       rescue ActiveRecord::RecordNotFound
-        render json: { error: I18n.t("booking.errors.event_type_not_found") }, status: :not_found
+        render json: {error: I18n.t("booking.errors.event_type_not_found")}, status: :not_found
       end
     end
 
@@ -99,7 +99,7 @@ module Public
       unless @calendar_client
         connection = @booking_page.calendar_connection
         error = connection&.missing_scopes_message || "calendar not connected"
-        render json: { error: "not_connected", message: error }, status: :service_unavailable
+        render json: {error: "not_connected", message: error}, status: :service_unavailable
         throw :abort
       end
     end
@@ -164,7 +164,7 @@ module Public
         starts_at: starts_at.iso8601,
         ends_at: ends_at.iso8601,
         timezone: timezone,
-        attendee_name: [ booking_params["first_name"], booking_params["last_name"] ].compact.join(" ").strip,
+        attendee_name: [booking_params["first_name"], booking_params["last_name"]].compact.join(" ").strip,
         attendee_email: booking_params["email"],
         guest_emails: Array(booking_params["guests"]).compact,
         location_type: event_type.location_type,
@@ -182,7 +182,7 @@ module Public
     def render_rate_limited
       response.set_header("Retry-After", "60")
       I18n.with_locale(resolved_locale) do
-        render json: { error: I18n.t("booking.errors.rate_limited") }, status: :too_many_requests
+        render json: {error: I18n.t("booking.errors.rate_limited")}, status: :too_many_requests
       end
     end
 

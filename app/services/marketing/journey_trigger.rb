@@ -1,11 +1,11 @@
 module Marketing
   class JourneyTrigger
     def self.enqueue_lead_form_submitted!(person:, lead_form:)
-      trigger!("lead_form_submitted", person: person, config_match: { "lead_form_id" => lead_form.id })
+      trigger!("lead_form_submitted", person: person, config_match: {"lead_form_id" => lead_form.id})
     end
 
     def self.enqueue_booking_created!(person:, booking:)
-      trigger!("booking_created", person: person, config_match: { "booking_page_id" => booking.booking_page_id })
+      trigger!("booking_created", person: person, config_match: {"booking_page_id" => booking.booking_page_id})
     end
 
     def self.enqueue_email_clicked!(person:)
@@ -13,11 +13,11 @@ module Marketing
     end
 
     def self.enqueue_lifecycle_changed!(person:, from:, to:)
-      trigger!("lifecycle_changed", person: person, config_match: { "from" => from, "to" => to })
+      trigger!("lifecycle_changed", person: person, config_match: {"from" => from, "to" => to})
     end
 
     def self.enqueue_segment_entry!(person:, segment:)
-      trigger!("segment_entry", person: person, config_match: { "segment_id" => segment.id })
+      trigger!("segment_entry", person: person, config_match: {"segment_id" => segment.id})
     end
 
     ENROLL_OUTCOMES = %i[enrolled blocked max_reenrollments no_steps inactive feature_disabled].freeze

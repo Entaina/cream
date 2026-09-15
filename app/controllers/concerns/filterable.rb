@@ -77,7 +77,7 @@ module Filterable
   end
 
   def page_only_params?(filtered)
-    filtered.keys == [ "page" ]
+    filtered.keys == ["page"]
   end
 
   def handle_page_only_request(filtered)

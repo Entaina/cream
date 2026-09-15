@@ -58,7 +58,7 @@ RSpec.describe EmailHelper, type: :helper do
 
   describe "#email_body_preview" do
     it "strips tags before truncating" do
-      preview = helper.email_body_preview('<p><strong>Hello</strong> world</p>', length: 20)
+      preview = helper.email_body_preview("<p><strong>Hello</strong> world</p>", length: 20)
 
       expect(preview).to eq("Hello world")
     end

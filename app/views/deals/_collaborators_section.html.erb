@@ -1,7 +1,7 @@
 <%# locals: (deal:) %>
 <section>
   <h3 class="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-ink-faint mb-2">
-    <%= icon :users, classes: "size-3.5" %> Colaboradores
+    <%= icon :users, classes: "size-3.5" %> <%= t("deals.show.collaborators") %>
     <span class="text-ink-faint font-normal normal-case tracking-normal">(<%= deal.collaborators.size %>)</span>
   </h3>
 
@@ -12,14 +12,14 @@
     <% if available_users.any? %>
       <%= form_with url: deal_deal_accesses_path(deal), class: "card p-3 mb-3 flex flex-wrap items-end gap-2" do %>
         <div class="flex-1 min-w-[12rem]">
-          <label for="deal_access_user_id_<%= deal.id %>" class="block text-sm font-medium text-ink-soft mb-1">Añadir colaborador</label>
+          <label for="deal_access_user_id_<%= deal.id %>" class="block text-sm font-medium text-ink-soft mb-1"><%= t("deals.show.add_collaborator") %></label>
           <%= select_tag :user_id,
                 options_from_collection_for_select(available_users, :id, :name),
                 id: "deal_access_user_id_#{deal.id}",
                 class: "input w-full",
                 required: true %>
         </div>
-        <%= submit_tag "Añadir", class: "btn-secondary" %>
+        <%= submit_tag t("deals.show.add"), class: "btn-secondary" %>
       <% end %>
     <% end %>
   <% end %>
@@ -36,7 +36,7 @@
           <% if policy(deal).manage_collaborators? %>
             <%= button_to deal_deal_access_path(deal, access), method: :delete,
                   class: "text-ink-faint hover:text-danger p-1.5 rounded-md hover:bg-danger-soft",
-                  title: "Quitar colaborador" do %>
+                  title: t("deals.show.remove_collaborator") do %>
               <%= icon :trash, classes: "size-4" %>
             <% end %>
           <% end %>
@@ -44,8 +44,8 @@
       <% end %>
     </ul>
   <% elsif !policy(deal).manage_collaborators? %>
-    <p class="text-sm text-ink-faint">No hay colaboradores en este deal.</p>
+    <p class="text-sm text-ink-faint"><%= t("deals.show.no_collaborators") %></p>
   <% else %>
-    <p class="text-sm text-ink-faint">Añade vendedores que puedan ver y editar este deal.</p>
+    <p class="text-sm text-ink-faint"><%= t("deals.show.collaborators_hint") %></p>
   <% end %>
 </section>

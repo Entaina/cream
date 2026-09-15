@@ -8,8 +8,8 @@ RSpec.describe StageTrigger, type: :model do
   let(:stage) { pipeline.first_stage }
 
   def build_trigger(**attrs)
-    workspace.stage_triggers.new({ name: "Trigger", pipeline_stage: stage,
-      execution_mode: "llm", instructions: "Do something" }.merge(attrs))
+    workspace.stage_triggers.new({name: "Trigger", pipeline_stage: stage,
+                                  execution_mode: "llm", instructions: "Do something"}.merge(attrs))
   end
 
   it "is valid in llm mode with instructions" do
@@ -52,19 +52,19 @@ RSpec.describe StageTrigger, type: :model do
       expect(trigger).not_to be_valid
       expect(trigger.errors[:native_params].join).to include("Texto")
 
-      trigger.native_params = { "message" => "Hola" }
+      trigger.native_params = {"message" => "Hola"}
       expect(trigger).to be_valid
     end
 
     it "prunes params not declared by the selected function" do
-      trigger = toast_trigger(native_params: { "message" => "Hola", "evil" => "x" })
+      trigger = toast_trigger(native_params: {"message" => "Hola", "evil" => "x"})
       trigger.valid?
       expect(trigger.native_params).to eq("message" => "Hola")
     end
 
     it "clears params for functions without params" do
       trigger = build_trigger(execution_mode: "native", instructions: nil,
-        native_function: "won_celebration", native_params: { "message" => "sobra" })
+        native_function: "won_celebration", native_params: {"message" => "sobra"})
       expect(trigger).to be_valid
       expect(trigger.native_params).to eq({})
     end
@@ -82,7 +82,7 @@ RSpec.describe StageTrigger, type: :model do
     first = build_trigger(name: "A", position: 0).tap(&:save!)
     inactive = build_trigger(name: "C", position: 2, active: false).tap(&:save!)
 
-    expect(stage.stage_triggers.active.ordered).to eq([ first, second ])
-    expect(stage.stage_triggers.ordered).to eq([ first, second, inactive ])
+    expect(stage.stage_triggers.active.ordered).to eq([first, second])
+    expect(stage.stage_triggers.ordered).to eq([first, second, inactive])
   end
 end

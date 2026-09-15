@@ -28,7 +28,7 @@ class BookingSubmissionProcessor
   def find_or_create_person!
     email = @params["email"].to_s.strip.downcase
     existing = @workspace.people.with_email(email).first
-    return [ existing, false ] if existing
+    return [existing, false] if existing
 
     person = @workspace.people.create!(
       email: @params["email"].to_s.strip,
@@ -39,7 +39,7 @@ class BookingSubmissionProcessor
       source: "booking",
       owner: @booking_page.host
     )
-    [ person, true ]
+    [person, true]
   end
 
   def find_or_create_deal!(person:, company:)
@@ -61,14 +61,14 @@ class BookingSubmissionProcessor
   def create_deal!(person:, company:, pipeline: nil, stage: nil)
     pipeline ||= @booking_page.pipeline
     stage ||= pipeline.first_stage
-    deal_name = [ person.display_name, @event_type.localized_name, @booking_page.name ].compact.join(" — ")
+    deal_name = [person.display_name, @event_type.localized_name, @booking_page.name].compact.join(" — ")
     @workspace.deals.create!(
       name: deal_name,
       company: company,
       pipeline: pipeline,
       pipeline_stage: stage,
       owner: @booking_page.host,
-      contacts: [ person ],
+      contacts: [person],
       tasks: [
         Task.new(
           title: "Preparar reunión reservada",

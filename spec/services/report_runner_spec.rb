@@ -119,8 +119,8 @@ RSpec.describe ReportRunner do
       lead_form: lead_form,
       person: person,
       deal: create_deal!(workspace, pipeline: pipeline),
-      data: { "email" => person.email },
-      metadata: { "utm_source" => "google" }
+      data: {"email" => person.email},
+      metadata: {"utm_source" => "google"}
     )
 
     result = run(metric: "count", group_by: "utm_source", record_type: "LeadSubmission")

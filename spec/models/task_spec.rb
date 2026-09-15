@@ -51,7 +51,7 @@ RSpec.describe Task, type: :model do
     sooner = workspace.tasks.create!(title: "Sooner", user: author, taskable: deal, due_on: Date.current + 1)
     no_due = workspace.tasks.create!(title: "No due", user: author, taskable: deal)
 
-    expect(deal.tasks.where(id: [ later.id, sooner.id, no_due.id ]).due_order_desc).to eq([ later, sooner, no_due ])
+    expect(deal.tasks.where(id: [later.id, sooner.id, no_due.id]).due_order_desc).to eq([later, sooner, no_due])
   end
 
   it "reassigns when the title changes to include a mention" do

@@ -18,8 +18,8 @@ class StageFieldFormat < ApplicationRecord
   belongs_to :pipeline_stage
   has_one :pipeline, through: :pipeline_stage
 
-  validates :field, inclusion: { in: FIELDS.keys }
-  validates :operator, inclusion: { in: OPERATORS.keys }
+  validates :field, inclusion: {in: FIELDS.keys}
+  validates :operator, inclusion: {in: OPERATORS.keys}
   validates :display_text, presence: true
   validates :compare_value, presence: true, unless: :blank_operator?
   validate :stage_belongs_to_workspace

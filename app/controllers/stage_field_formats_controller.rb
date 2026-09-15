@@ -1,5 +1,6 @@
 class StageFieldFormatsController < ApplicationController
   include RequiresFeature
+
   requires_feature :stage_field_formats
   before_action :set_stage, only: %i[index new create]
   before_action :set_stage_field_format, only: %i[edit update destroy]

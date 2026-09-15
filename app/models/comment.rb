@@ -31,7 +31,7 @@ class Comment < ApplicationRecord
   def track_on_record
     return unless commentable.respond_to?(:track_activity)
 
-    commentable.track_activity("comment_added", user: user, metadata: { comment_id: id })
+    commentable.track_activity("comment_added", user: user, metadata: {comment_id: id})
   end
 
   def notify_mentions

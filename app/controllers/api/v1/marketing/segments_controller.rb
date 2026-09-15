@@ -16,7 +16,7 @@ module Api
 
           members = nil
           if ActiveModel::Type::Boolean.new.cast(params[:include_members])
-            base = segment.record_type == "Person" ? current_workspace.people : current_workspace.public_send(segment.record_type.tableize)
+            base = (segment.record_type == "Person") ? current_workspace.people : current_workspace.public_send(segment.record_type.tableize)
             members = segment.resolve(base.includes(:company)).limit(25).to_a
           end
 

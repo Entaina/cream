@@ -11,7 +11,7 @@ RSpec.describe "Mcp", type: :request do
   describe "POST /mcp" do
     it "returns 401 without token" do
       post mcp_url, params: initialize_payload, as: :json,
-        headers: { "Accept" => "application/json" }
+        headers: {"Accept" => "application/json"}
 
       expect(response).to have_http_status(:unauthorized)
       expect(response.headers["WWW-Authenticate"]).to include("resource_metadata=")
@@ -26,7 +26,7 @@ RSpec.describe "Mcp", type: :request do
     end
 
     it "returns 405 for GET" do
-      get mcp_url, headers: { "Authorization" => "Bearer #{plaintext}" }
+      get mcp_url, headers: {"Authorization" => "Bearer #{plaintext}"}
 
       expect(response).to have_http_status(:method_not_allowed)
     end
@@ -82,7 +82,7 @@ RSpec.describe "Mcp", type: :request do
       person.tasks.create!(title: "Late", due_on: Date.current - 2, workspace: workspace, user: user, assignee: user)
       person.tasks.create!(title: "Future", due_on: Date.current + 5, workspace: workspace, user: user, assignee: user)
 
-      result = call_tool("list_tasks", { status: "overdue" })
+      result = call_tool("list_tasks", {status: "overdue"})
 
       titles = result["tasks"].map { |t| t["title"] }
       expect(titles).to include("Late")
@@ -122,7 +122,7 @@ RSpec.describe "Mcp", type: :request do
         person.tasks.create!(title: "Task #{i}", due_on: Date.current - i, workspace: workspace, user: user, assignee: user)
       end
 
-      result = call_tool("list_my_tasks", { scope: "overdue", limit: 2 })
+      result = call_tool("list_my_tasks", {scope: "overdue", limit: 2})
 
       expect(result["tasks"].size).to eq(2)
       expect(result["tasks"].all? { |t| t["overdue"] }).to be(true)
@@ -134,7 +134,7 @@ RSpec.describe "Mcp", type: :request do
       company.tasks.create!(title: "Acme task", due_on: Date.current, workspace: workspace, user: user, assignee: user)
       other_company.tasks.create!(title: "Other task", due_on: Date.current, workspace: workspace, user: user, assignee: user)
 
-      result = call_tool("list_tasks", { record_type: "company", record_query: "Acme" })
+      result = call_tool("list_tasks", {record_type: "company", record_query: "Acme"})
 
       titles = result["tasks"].map { |t| t["title"] }
       expect(titles).to include("Acme task")
@@ -151,7 +151,7 @@ RSpec.describe "Mcp", type: :request do
       closed_deal.tasks.create!(title: "Won deal task", due_on: Date.current, workspace: workspace, user: user, assignee: user)
       company.tasks.create!(title: "Acme task", due_on: Date.current, workspace: workspace, user: user, assignee: user)
 
-      result = call_tool("list_tasks", { record_type: "company", record_query: "Acme" })
+      result = call_tool("list_tasks", {record_type: "company", record_query: "Acme"})
 
       expect(result["tasks"].map { |t| t["title"] }).to include("Acme task")
       deal_titles = result["open_deal_tasks"].flat_map { |group| group["tasks"].map { |t| t["title"] } }
@@ -167,7 +167,7 @@ RSpec.describe "Mcp", type: :request do
       person.tasks.create!(title: "Jane task", due_on: Date.current, workspace: workspace, user: user, assignee: user)
       other_person.tasks.create!(title: "John task", due_on: Date.current, workspace: workspace, user: user, assignee: user)
 
-      result = call_tool("list_tasks", { record_type: "person", record_id: person.id })
+      result = call_tool("list_tasks", {record_type: "person", record_id: person.id})
 
       titles = result["tasks"].map { |t| t["title"] }
       expect(titles).to include("Jane task")
@@ -178,11 +178,11 @@ RSpec.describe "Mcp", type: :request do
       company = companies(:acme)
       person = create_person!(workspace, company: company, first_name: "Jane", last_name: "Doe")
       pipeline = Pipeline.default_for(workspace) || Pipeline.create_default!(workspace)
-      open_deal = create_deal!(workspace, pipeline: pipeline, company: company, contacts: [ person ], name: "Jane opp")
+      open_deal = create_deal!(workspace, pipeline: pipeline, company: company, contacts: [person], name: "Jane opp")
       open_deal.tasks.create!(title: "Deal task for Jane", due_on: Date.current, workspace: workspace, user: user, assignee: user)
       person.tasks.create!(title: "Jane task", due_on: Date.current, workspace: workspace, user: user, assignee: user)
 
-      result = call_tool("list_tasks", { record_type: "person", record_id: person.id })
+      result = call_tool("list_tasks", {record_type: "person", record_id: person.id})
 
       expect(result["tasks"].map { |t| t["title"] }).to include("Jane task")
       deal_titles = result["open_deal_tasks"].flat_map { |group| group["tasks"].map { |t| t["title"] } }
@@ -198,7 +198,7 @@ RSpec.describe "Mcp", type: :request do
       person.tasks.create!(title: "Mine", due_on: Date.current, workspace: workspace, user: user, assignee: user)
       person.tasks.create!(title: "Theirs", due_on: Date.current, workspace: workspace, user: other_user, assignee: other_user)
 
-      result = call_tool("list_tasks", { assignee_query: "User Two" })
+      result = call_tool("list_tasks", {assignee_query: "User Two"})
 
       titles = result["tasks"].map { |t| t["title"] }
       expect(titles).to include("Theirs")
@@ -209,7 +209,7 @@ RSpec.describe "Mcp", type: :request do
       workspace.companies.create!(name: "Acme East")
       workspace.companies.create!(name: "Acme West")
 
-      result = call_tool("list_tasks", { record_type: "company", record_query: "Acme" })
+      result = call_tool("list_tasks", {record_type: "company", record_query: "Acme"})
 
       expect(result["error"]).to eq("invalid_argument")
       expect(result["message"]).to include("Multiple company")
@@ -218,12 +218,12 @@ RSpec.describe "Mcp", type: :request do
     it "includes urls for people, companies and deals" do
       company = companies(:acme)
       person = create_person!(workspace, company: company, first_name: "Url", last_name: "Person")
-      deal = create_deal!(workspace, company: company, name: "Url Deal", contacts: [ person ])
+      deal = create_deal!(workspace, company: company, name: "Url Deal", contacts: [person])
 
       original_url = ENV["CREAM_APP_URL"]
       ENV["CREAM_APP_URL"] = "https://cream.test"
       begin
-        people = call_tool("list_people", { company_id: company.id })
+        people = call_tool("list_people", {company_id: company.id})
         person_json = people["people"].find { |p| p["id"] == person.id }
         expect(person_json["url"]).to eq("https://cream.test/people/#{person.id}")
 
@@ -231,17 +231,17 @@ RSpec.describe "Mcp", type: :request do
         company_json = companies["companies"].find { |c| c["id"] == company.id }
         expect(company_json["url"]).to eq("https://cream.test/companies/#{company.id}")
 
-        deals = call_tool("list_deals", { query: "Url Deal" })
+        deals = call_tool("list_deals", {query: "Url Deal"})
         deal_json = deals["deals"].first
         expect(deal_json["url"]).to eq("https://cream.test/deals/#{deal.id}")
         expect(deal_json["company_url"]).to eq("https://cream.test/companies/#{company.id}")
         expect(deal_json["contacts"].first["url"]).to eq("https://cream.test/people/#{person.id}")
 
-        search = call_tool("search_records", { query: "Url" })
+        search = call_tool("search_records", {query: "Url"})
         searched_person = search["people"].find { |p| p["id"] == person.id }
         expect(searched_person["url"]).to eq("https://cream.test/people/#{person.id}")
 
-        record = call_tool("get_record", { record_type: "deal", record_id: deal.id })
+        record = call_tool("get_record", {record_type: "deal", record_id: deal.id})
         expect(record["url"]).to eq("https://cream.test/deals/#{deal.id}")
         expect(record["contacts"].first["url"]).to eq("https://cream.test/people/#{person.id}")
       ensure
@@ -279,7 +279,7 @@ RSpec.describe "Mcp", type: :request do
         paid_at: Time.current
       )
 
-      result = call_tool("list_payments", { status: "pending_review" })
+      result = call_tool("list_payments", {status: "pending_review"})
 
       emails = result["payments"].map { |p| p["customer_email"] }
       expect(emails).to include("mine@example.com")
@@ -296,11 +296,11 @@ RSpec.describe "Mcp", type: :request do
       allow(client).to receive(:chat).and_return({
         summary: "Helpful contact",
         risks: [],
-        next_steps: [ "Follow up" ],
+        next_steps: ["Follow up"],
         missing_data: []
       }.to_json)
 
-      result = call_tool("summarize_record", { record_type: "person", record_id: person.id })
+      result = call_tool("summarize_record", {record_type: "person", record_id: person.id})
 
       expect(result["summary"]).to eq("Helpful contact")
     end
@@ -311,7 +311,7 @@ RSpec.describe "Mcp", type: :request do
       allow(CreamFeatures).to receive(:enabled?).with(:ai_assistant).and_return(true)
       allow(Ai::Configuration).to receive(:configured?).and_return(false)
 
-      result = call_tool("summarize_record", { record_type: "person", record_id: person.id })
+      result = call_tool("summarize_record", {record_type: "person", record_id: person.id})
 
       expect(result["error"]).to eq("ai_unavailable")
     end
@@ -319,10 +319,10 @@ RSpec.describe "Mcp", type: :request do
     it "adds a product line to a deal and recalculates its value" do
       deal = create_deal!(workspace)
 
-      create_result = call_tool("create_product", { name: "Service", price: 100 })
+      create_result = call_tool("create_product", {name: "Service", price: 100})
       product_id = create_result["created"]["id"]
 
-      result = call_tool("add_deal_product", { deal_id: deal.id, product_id: product_id, quantity: 3 })
+      result = call_tool("add_deal_product", {deal_id: deal.id, product_id: product_id, quantity: 3})
 
       expect(result.dig("updated", "value")).to eq(300.0)
       expect(deal.reload.value.to_f).to eq(300.0)
@@ -330,10 +330,10 @@ RSpec.describe "Mcp", type: :request do
 
     it "adds a product line with an edition and exposes it on the deal" do
       deal = create_deal!(workspace)
-      product_id = call_tool("create_product", { name: "Service", price: 100 }).dig("created", "id")
+      product_id = call_tool("create_product", {name: "Service", price: 100}).dig("created", "id")
 
       result = call_tool("add_deal_product",
-        { deal_id: deal.id, product_id: product_id, quantity: 1, edition: "Pro" })
+        {deal_id: deal.id, product_id: product_id, quantity: 1, edition: "Pro"})
 
       line = result.dig("updated", "products").first
       expect(line["edition"]).to eq("Pro")
@@ -343,13 +343,13 @@ RSpec.describe "Mcp", type: :request do
 
     it "updates an existing product line's quantity, price and edition" do
       deal = create_deal!(workspace)
-      product_id = call_tool("create_product", { name: "Service", price: 100 }).dig("created", "id")
+      product_id = call_tool("create_product", {name: "Service", price: 100}).dig("created", "id")
       added = call_tool("add_deal_product",
-        { deal_id: deal.id, product_id: product_id, quantity: 1, edition: "Basic" })
+        {deal_id: deal.id, product_id: product_id, quantity: 1, edition: "Basic"})
       line_item_id = added.dig("updated", "products").first["line_item_id"]
 
       result = call_tool("update_deal_product",
-        { deal_id: deal.id, line_item_id: line_item_id, quantity: 2, unit_price: 150, edition: "Pro" })
+        {deal_id: deal.id, line_item_id: line_item_id, quantity: 2, unit_price: 150, edition: "Pro"})
 
       line = result.dig("updated", "products").first
       expect(line["quantity"]).to eq(2)
@@ -361,13 +361,13 @@ RSpec.describe "Mcp", type: :request do
 
     it "clears a product line's edition when passed an empty string" do
       deal = create_deal!(workspace)
-      product_id = call_tool("create_product", { name: "Service", price: 100 }).dig("created", "id")
+      product_id = call_tool("create_product", {name: "Service", price: 100}).dig("created", "id")
       added = call_tool("add_deal_product",
-        { deal_id: deal.id, product_id: product_id, quantity: 1, edition: "Pro" })
+        {deal_id: deal.id, product_id: product_id, quantity: 1, edition: "Pro"})
       line_item_id = added.dig("updated", "products").first["line_item_id"]
 
       result = call_tool("update_deal_product",
-        { deal_id: deal.id, line_item_id: line_item_id, edition: "" })
+        {deal_id: deal.id, line_item_id: line_item_id, edition: ""})
 
       expect(result.dig("updated", "products").first).not_to have_key("edition")
       expect(deal.reload.deal_products.first.edition).to be_nil
@@ -377,7 +377,7 @@ RSpec.describe "Mcp", type: :request do
       person = create_person!(workspace, first_name: "Ana", job_title: "CTO")
 
       result = call_tool("update_person",
-        { person_id: person.id, email: "ana@example.com", job_title: "" })
+        {person_id: person.id, email: "ana@example.com", job_title: ""})
 
       expect(result.dig("updated", "email")).to eq("ana@example.com")
       person.reload
@@ -418,9 +418,9 @@ RSpec.describe "Mcp", type: :request do
       secondary = create_person!(workspace, company: company, first_name: "Secondary", email: "dup@acme.com", phone: "600111222")
 
       expect {
-        result = call_tool("merge_person", { primary_id: primary.id, secondary_ids: [ secondary.id ] })
+        result = call_tool("merge_person", {primary_id: primary.id, secondary_ids: [secondary.id]})
         expect(result.dig("merged", "id")).to eq(primary.id)
-        expect(result["merged_ids"]).to eq([ secondary.id ])
+        expect(result["merged_ids"]).to eq([secondary.id])
       }.to change(Person, :count).by(-1)
 
       expect(Person.exists?(secondary.id)).to be(false)
@@ -432,9 +432,9 @@ RSpec.describe "Mcp", type: :request do
       secondary = workspace.companies.create!(name: "ACME", domain: "acme.com", industry: "Tech")
 
       expect {
-        result = call_tool("merge_company", { primary_id: primary.id, secondary_ids: [ secondary.id ] })
+        result = call_tool("merge_company", {primary_id: primary.id, secondary_ids: [secondary.id]})
         expect(result.dig("merged", "id")).to eq(primary.id)
-        expect(result["merged_ids"]).to eq([ secondary.id ])
+        expect(result["merged_ids"]).to eq([secondary.id])
       }.to change(Company, :count).by(-1)
 
       expect(Company.exists?(secondary.id)).to be(false)
@@ -444,7 +444,7 @@ RSpec.describe "Mcp", type: :request do
     it "returns a merge error when no secondaries are selected" do
       person = create_person!(workspace, email: "solo@acme.com")
 
-      result = call_tool("merge_person", { primary_id: person.id, secondary_ids: [] })
+      result = call_tool("merge_person", {primary_id: person.id, secondary_ids: []})
 
       expect(result["error"]).to eq("merge_error")
       expect(result["message"]).to include("Select at least one contact")
@@ -458,9 +458,9 @@ RSpec.describe "Mcp", type: :request do
 
       expect {
         post mcp_url,
-          params: { jsonrpc: "2.0", id: 99, method: "tools/call",
-                    params: { name: "merge_person",
-                              arguments: { primary_id: primary.id, secondary_ids: [ foreign.id ] } } },
+          params: {jsonrpc: "2.0", id: 99, method: "tools/call",
+                   params: {name: "merge_person",
+                            arguments: {primary_id: primary.id, secondary_ids: [foreign.id]}}},
           as: :json, headers: mcp_headers(plaintext)
       }.not_to change(Person, :count)
 
@@ -473,7 +473,7 @@ RSpec.describe "Mcp", type: :request do
     it "deletes a person" do
       person = create_person!(workspace, first_name: "ToDelete")
 
-      result = call_tool("delete_record", { record_type: "person", record_id: person.id })
+      result = call_tool("delete_record", {record_type: "person", record_id: person.id})
 
       expect(result.dig("deleted", "type")).to eq("person")
       expect(result.dig("deleted", "id")).to eq(person.id)
@@ -483,7 +483,7 @@ RSpec.describe "Mcp", type: :request do
     it "deletes a deal" do
       deal = create_deal!(workspace)
 
-      result = call_tool("delete_record", { record_type: "deal", record_id: deal.id })
+      result = call_tool("delete_record", {record_type: "deal", record_id: deal.id})
 
       expect(result.dig("deleted", "type")).to eq("deal")
       expect(Deal.exists?(deal.id)).to be(false)
@@ -492,9 +492,9 @@ RSpec.describe "Mcp", type: :request do
     it "deletes a company and its people and deals" do
       company = create_company!(workspace, name: "Gone Co")
       person = create_person!(workspace, company: company)
-      deal = create_deal!(workspace, company: company, contacts: [ person ])
+      deal = create_deal!(workspace, company: company, contacts: [person])
 
-      result = call_tool("delete_record", { record_type: "company", record_id: company.id })
+      result = call_tool("delete_record", {record_type: "company", record_id: company.id})
 
       expect(result.dig("deleted", "name")).to eq("Gone Co")
       expect(Company.exists?(company.id)).to be(false)
@@ -506,7 +506,7 @@ RSpec.describe "Mcp", type: :request do
       company = create_company!(workspace)
 
       result = call_tool("update_company",
-        { company_id: company.id, industry: "Education", annual_revenue: 500_000 })
+        {company_id: company.id, industry: "Education", annual_revenue: 500_000})
 
       expect(result.dig("updated", "industry")).to eq("Education")
       expect(company.reload.annual_revenue).to eq(500_000)
@@ -516,11 +516,11 @@ RSpec.describe "Mcp", type: :request do
       company = create_company!(workspace, name: "Fiscal Co")
       company.update!(fiscal_information: "Example S.L.\nCIF B12345678\nIBAN ES12 3456 7890")
 
-      list_result = call_tool("list_companies", { query: "Fiscal Co" })
+      list_result = call_tool("list_companies", {query: "Fiscal Co"})
       listed = list_result["companies"].find { |c| c["id"] == company.id }
       expect(listed["fiscal_information"]).to include("CIF B12345678")
 
-      record = call_tool("get_record", { record_type: "company", record_id: company.id })
+      record = call_tool("get_record", {record_type: "company", record_id: company.id})
       expect(record["fiscal_information"]).to include("IBAN ES12 3456 7890")
     end
 
@@ -547,23 +547,23 @@ RSpec.describe "Mcp", type: :request do
       new_contact = create_person!(workspace, company: deal.company, first_name: "Nuevo")
 
       result = call_tool("update_deal",
-        { deal_id: deal.id, value: 900, expected_close_date: (Date.current + 30).iso8601,
-          person_ids: [ new_contact.id ] })
+        {deal_id: deal.id, value: 900, expected_close_date: (Date.current + 30).iso8601,
+         person_ids: [new_contact.id]})
 
       expect(result.dig("updated", "value")).to eq(900.0)
       deal.reload
       expect(deal.expected_close_date).to eq(Date.current + 30)
-      expect(deal.contacts).to eq([ new_contact ])
+      expect(deal.contacts).to eq([new_contact])
     end
 
     it "moves a deal to another stage and pipeline through update_deal" do
       deal = create_deal!(workspace)
-      other = workspace.pipelines.create!(name: "Ventas B", pipeline_stages_attributes: [
-        { name: "Entrada", position: 1, workspace: workspace },
-        { name: "Cierre", position: 2, workspace: workspace }
+      workspace.pipelines.create!(name: "Ventas B", pipeline_stages_attributes: [
+        {name: "Entrada", position: 1, workspace: workspace},
+        {name: "Cierre", position: 2, workspace: workspace}
       ])
 
-      result = call_tool("update_deal", { deal_id: deal.id, pipeline: "ventas b", stage: "Cierre" })
+      result = call_tool("update_deal", {deal_id: deal.id, pipeline: "ventas b", stage: "Cierre"})
 
       expect(result.dig("updated", "pipeline")).to eq("Ventas B")
       expect(result.dig("updated", "stage")).to eq("Cierre")
@@ -578,7 +578,7 @@ RSpec.describe "Mcp", type: :request do
       deal = create_deal!(workspace, pipeline: pipeline, stage: cobro)
       won = pipeline.pipeline_stages.find_by!(name: "Won")
 
-      result = call_tool("update_deal_stage", { deal_id: deal.id, stage: "won" })
+      result = call_tool("update_deal_stage", {deal_id: deal.id, stage: "won"})
 
       expect(result.dig("updated", "stage")).to eq("Won")
       expect(deal.reload.pipeline_stage).to eq(won)
@@ -593,7 +593,7 @@ RSpec.describe "Mcp", type: :request do
         operator: "present", compare_value: nil)
       deal = create_deal!(workspace, pipeline: pipeline, stage: cobro)
 
-      result = call_tool("update_deal_stage", { deal_id: deal.id, stage: "Won" })
+      result = call_tool("update_deal_stage", {deal_id: deal.id, stage: "Won"})
 
       expect(result["error"]).to eq("validation_error")
       expect(result["message"]).to include("No se puede pasar a «Won»")
@@ -603,7 +603,7 @@ RSpec.describe "Mcp", type: :request do
     it "returns not_found when the target stage name is unknown" do
       deal = create_deal!(workspace)
 
-      result = call_tool("update_deal_stage", { deal_id: deal.id, stage: "No Existe" })
+      result = call_tool("update_deal_stage", {deal_id: deal.id, stage: "No Existe"})
 
       expect(result["error"]).to eq("not_found")
       expect(result["message"]).to include("Unknown pipeline stage: No Existe")
@@ -613,12 +613,12 @@ RSpec.describe "Mcp", type: :request do
       deal = create_deal!(workspace)
 
       created = call_tool("add_comment",
-        { record_type: "deal", record_id: deal.id, body: "Cliente pide descuento" })
+        {record_type: "deal", record_id: deal.id, body: "Cliente pide descuento"})
 
       expect(created.dig("created", "body")).to eq("Cliente pide descuento")
       expect(deal.reload.comments.count).to eq(1)
 
-      result = call_tool("get_record", { record_type: "deal", record_id: deal.id })
+      result = call_tool("get_record", {record_type: "deal", record_id: deal.id})
 
       expect(result["comments"].map { |c| c["body"] }).to include("Cliente pide descuento")
     end
@@ -628,10 +628,10 @@ RSpec.describe "Mcp", type: :request do
       parent = deal.comments.create!(workspace: workspace, user: user, body: "Primera")
 
       result = call_tool("add_comment",
-        { record_type: "deal", record_id: deal.id, body: "Respuesta", parent_comment_id: parent.id })
+        {record_type: "deal", record_id: deal.id, body: "Respuesta", parent_comment_id: parent.id})
 
       expect(result.dig("created", "parent_id")).to eq(parent.id)
-      expect(parent.reload.replies.map(&:body)).to eq([ "Respuesta" ])
+      expect(parent.reload.replies.map(&:body)).to eq(["Respuesta"])
     end
 
     it "returns the full email body with get_email" do
@@ -641,7 +641,7 @@ RSpec.describe "Mcp", type: :request do
         subject: "Re: proposal", body: "Nos encaja el precio. ¿Firmamos el jueves?"
       )
 
-      result = call_tool("get_email", { email_id: email.id })
+      result = call_tool("get_email", {email_id: email.id})
 
       expect(result.dig("email", "body")).to eq("Nos encaja el precio. ¿Firmamos el jueves?")
       expect(result.dig("email", "direction")).to eq("inbound")
@@ -656,8 +656,8 @@ RSpec.describe "Mcp", type: :request do
       )
 
       post mcp_url,
-        params: { jsonrpc: "2.0", id: 99, method: "tools/call",
-                  params: { name: "get_email", arguments: { email_id: foreign.id } } },
+        params: {jsonrpc: "2.0", id: 99, method: "tools/call",
+                 params: {name: "get_email", arguments: {email_id: foreign.id}}},
         as: :json, headers: mcp_headers(plaintext)
 
       expect(response).to have_http_status(:success)
@@ -690,7 +690,7 @@ RSpec.describe "Mcp", type: :request do
       pipeline = Pipeline.default_for(workspace) || Pipeline.create_default!(workspace)
       company = create_company!(workspace)
       contact = create_person!(workspace, company: company, email: "contact@example.com")
-      deal = create_deal!(workspace, pipeline: pipeline, company: company, contacts: [ contact ])
+      deal = create_deal!(workspace, pipeline: pipeline, company: company, contacts: [contact])
       allow(CreamFeatures).to receive(:enabled?).and_call_original
       allow(CreamFeatures).to receive(:enabled?).with(:record_email).and_return(true)
       allow(CreamFeatures).to receive(:enabled?).with(:gmail_sync).and_return(false)
@@ -718,14 +718,14 @@ RSpec.describe "Mcp", type: :request do
         subject: "Tu informe",
         body: "Adjuntamos tu informe.",
         attachments: [
-          { filename: "informe.pdf", content_type: "application/pdf", content: pdf_content }
+          {filename: "informe.pdf", content_type: "application/pdf", content: pdf_content}
         ]
       })
 
       message = EmailMessage.order(:id).last
       expect(message.attachments.count).to eq(1)
       expect(message.attachments.first.filename.to_s).to eq("informe.pdf")
-      expect(result.dig("sent", "attachments")).to eq([ "informe.pdf" ])
+      expect(result.dig("sent", "attachments")).to eq(["informe.pdf"])
     end
 
     it "returns feature_unavailable from send_deal_email when record_email is disabled" do
@@ -755,7 +755,7 @@ RSpec.describe "Mcp", type: :request do
           to_address: "lead@example.com",
           subject: "Hi",
           body: "Hello",
-          attachments: [ { filename: "informe.pdf", content: "not-base64!!!" } ]
+          attachments: [{filename: "informe.pdf", content: "not-base64!!!"}]
         })
 
         expect(result["error"]).to eq("invalid_attachment")
@@ -763,7 +763,7 @@ RSpec.describe "Mcp", type: :request do
     end
 
     it "creates a deal with an optional email via create_deal" do
-      pipeline = Pipeline.default_for(workspace) || Pipeline.create_default!(workspace)
+      Pipeline.default_for(workspace) || Pipeline.create_default!(workspace)
       company = create_company!(workspace)
       contact = create_person!(workspace, company: company, email: "contact@example.com")
       allow(CreamFeatures).to receive(:enabled?).and_call_original
@@ -774,7 +774,7 @@ RSpec.describe "Mcp", type: :request do
         result = call_tool("create_deal", {
           name: "New opp",
           company_id: company.id,
-          person_ids: [ contact.id ],
+          person_ids: [contact.id],
           next_action_title: "Follow up",
           next_action_due_on: (Date.current + 7).iso8601,
           email: {
@@ -802,7 +802,7 @@ RSpec.describe "Mcp", type: :request do
           company_id: company.id,
           next_action_title: "Follow up",
           next_action_due_on: (Date.current + 7).iso8601,
-          email: { subject: "Hi", body: "Hello" }
+          email: {subject: "Hi", body: "Hello"}
         })
 
         expect(result["error"]).to eq("feature_unavailable")
@@ -816,9 +816,9 @@ RSpec.describe "Mcp", type: :request do
         from_address: "client@example.com", to_address: "me@example.com",
         subject: "Re: proposal", body: "Looks good"
       )
-      deal.track_activity("stage_changed", user: user, metadata: { from: "Lead", to: "Qualified" })
+      deal.track_activity("stage_changed", user: user, metadata: {from: "Lead", to: "Qualified"})
 
-      result = call_tool("recent_changes", { days: 7, include_metrics: true })
+      result = call_tool("recent_changes", {days: 7, include_metrics: true})
 
       expect(result["window_days"]).to eq(7)
       expect(result["new_deals"].map { |d| d["name"] }).to include("Fresh deal")
@@ -833,7 +833,7 @@ RSpec.describe "Mcp", type: :request do
       other_workspace = workspaces(:two)
       create_deal!(other_workspace, name: "Hidden deal")
 
-      result = call_tool("recent_changes", { days: 7 })
+      result = call_tool("recent_changes", {days: 7})
 
       names = result["new_deals"].map { |d| d["name"] }
       expect(names).to include("Visible deal")
@@ -844,7 +844,7 @@ RSpec.describe "Mcp", type: :request do
       deal = create_deal!(workspace, name: "Old deal")
       deal.update_column(:created_at, 10.days.ago)
 
-      result = call_tool("recent_changes", { days: 1, include_metrics: true })
+      result = call_tool("recent_changes", {days: 1, include_metrics: true})
 
       expect(result["new_deals"].map { |d| d["name"] }).not_to include("Old deal")
       expect(result.dig("metrics", "deals_created")).to eq(0)
@@ -862,7 +862,7 @@ RSpec.describe "Mcp", type: :request do
       won_deal = create_deal!(workspace, name: "Closed won", value: 2000, stage: open_stage)
       won_deal.move_to_stage!(won_stage)
 
-      result = call_tool("sales_forecast", { months: 3 })
+      result = call_tool("sales_forecast", {months: 3})
 
       expect(result.dig("totals", "open_deal_count")).to be >= 2
       expect(result.dig("totals", "weighted_pipeline_value")).to be > 0
@@ -880,7 +880,7 @@ RSpec.describe "Mcp", type: :request do
       deal.update!(name: "Renamed deal")
       Note.create!(workspace: workspace, notable: deal, user: user, body: "Follow-up call notes")
 
-      result = call_tool("get_deal_history", { deal_id: deal.id })
+      result = call_tool("get_deal_history", {deal_id: deal.id})
 
       expect(result.dig("deal", "id")).to eq(deal.id)
       version_entry = result["timeline"].find { |e| e["kind"] == "version" && e["event"] == "update" }
@@ -898,9 +898,9 @@ RSpec.describe "Mcp", type: :request do
       post mcp_url,
         params: {
           jsonrpc: "2.0", id: 10, method: "tools/call",
-          params: { name: "set_custom_fields", arguments: {
-            record_type: "company", record_id: company.id, custom_fields: { field.key => "Gold" }
-          } }
+          params: {name: "set_custom_fields", arguments: {
+            record_type: "company", record_id: company.id, custom_fields: {field.key => "Gold"}
+          }}
         },
         as: :json, headers: mcp_headers(plaintext)
 
@@ -910,7 +910,7 @@ RSpec.describe "Mcp", type: :request do
       post mcp_url,
         params: {
           jsonrpc: "2.0", id: 11, method: "tools/call",
-          params: { name: "get_record", arguments: { record_type: "company", record_id: company.id } }
+          params: {name: "get_record", arguments: {record_type: "company", record_id: company.id}}
         },
         as: :json, headers: mcp_headers(plaintext)
 
@@ -928,7 +928,7 @@ RSpec.describe "Mcp", type: :request do
           jsonrpc: "2.0",
           id: 3,
           method: "tools/call",
-          params: { name: "list_people", arguments: {} }
+          params: {name: "list_people", arguments: {}}
         },
         as: :json,
         headers: mcp_headers(plaintext)
@@ -949,7 +949,7 @@ RSpec.describe "Mcp", type: :request do
           jsonrpc: "2.0",
           id: 4,
           method: "tools/call",
-          params: { name: "list_people", arguments: {} }
+          params: {name: "list_people", arguments: {}}
         },
         as: :json,
         headers: mcp_headers(plaintext)
@@ -981,5 +981,4 @@ RSpec.describe "Mcp", type: :request do
       expect(JSON.parse(response.body).dig("result", "serverInfo", "name")).to eq("cream")
     end
   end
-
 end

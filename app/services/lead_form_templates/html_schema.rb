@@ -182,7 +182,7 @@ module LeadFormTemplates
       when "checkbox"
         hidden = nodes.find { |node| node["type"] == "hidden" }&.[]("value")
         checked = nodes.find { |node| node["type"] == "checkbox" }&.[]("value") || "1"
-        [ hidden, checked ].compact_blank.uniq.presence
+        [hidden, checked].compact_blank.uniq.presence
       end
     end
 
@@ -202,7 +202,7 @@ module LeadFormTemplates
       end
 
       if field.allowed_values.present? && !field.allowed_values.include?(value.to_s)
-        errors.add(error_attribute(field.name), "#{field.name.tr('_', ' ')} is invalid")
+        errors.add(error_attribute(field.name), "#{field.name.tr("_", " ")} is invalid")
       end
     end
 

@@ -6,8 +6,8 @@ class List < ApplicationRecord
   has_many :list_entries, -> { order(:position, :id) }, dependent: :destroy
 
   validates :name, presence: true
-  validates :record_type, inclusion: { in: RECORD_TYPES }
-  validates :color, inclusion: { in: COLORS }
+  validates :record_type, inclusion: {in: RECORD_TYPES}
+  validates :color, inclusion: {in: COLORS}
 
   attribute :color, default: "hoki"
 

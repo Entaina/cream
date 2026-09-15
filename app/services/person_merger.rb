@@ -50,7 +50,7 @@ class PersonMerger
     raise Error, "Select at least one contact to merge." if secondaries.empty?
     raise Error, "Cannot merge a contact into itself." if secondaries.include?(primary)
 
-    ([ primary ] + secondaries).each do |person|
+    ([primary] + secondaries).each do |person|
       raise Error, "All contacts must belong to the same workspace." if person.workspace_id != primary.workspace_id
     end
   end
@@ -67,14 +67,14 @@ class PersonMerger
       end
     end
 
-    dates = ([ primary.first_contact_on ] + secondaries.map(&:first_contact_on)).compact
+    dates = ([primary.first_contact_on] + secondaries.map(&:first_contact_on)).compact
     primary.first_contact_on = dates.min if dates.any?
   end
 
   def merge_person_emails!
     secondaries.each do |secondary|
       secondary_email_addresses(secondary).each do |address|
-        next if primary.person_emails.exists?([ "LOWER(TRIM(address)) = ?", address ])
+        next if primary.person_emails.exists?(["LOWER(TRIM(address)) = ?", address])
 
         primary.add_email!(address, primary: false)
       end
@@ -208,7 +208,7 @@ class PersonMerger
   def track_merge!
     primary.track_activity("merged", user: user, metadata: {
       merged_people: secondaries.map { |person|
-        { "id" => person.id, "name" => person.display_name, "email" => person.email }
+        {"id" => person.id, "name" => person.display_name, "email" => person.email}
       }
     })
   end

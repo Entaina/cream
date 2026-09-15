@@ -14,7 +14,7 @@ RSpec.describe GmailReader do
   def http_double
     http = instance_double(Net::HTTP)
     allow(Net::HTTP).to receive(:start).and_yield(http)
-    tokeninfo = instance_double(Net::HTTPResponse, body: { scope: GmailConnection::METADATA_SCOPE }.to_json)
+    tokeninfo = instance_double(Net::HTTPResponse, body: {scope: GmailConnection::METADATA_SCOPE}.to_json)
     allow(http).to receive(:get).and_return(tokeninfo)
     http
   end
@@ -27,7 +27,7 @@ RSpec.describe GmailReader do
 
   it "lists recent message ids without search query when metadata scope is granted" do
     http = http_double
-    list_response = success({ messages: [ { id: "m1" }, { id: "m2" } ] })
+    list_response = success({messages: [{id: "m1"}, {id: "m2"}]})
     allow(http).to receive(:request).and_return(list_response)
 
     ids = described_class.new(connection).list_recent_message_ids(after: 1.hour.ago)
@@ -43,9 +43,9 @@ RSpec.describe GmailReader do
     )
     http = instance_double(Net::HTTP)
     allow(Net::HTTP).to receive(:start).and_yield(http)
-    tokeninfo = instance_double(Net::HTTPResponse, body: { scope: GmailConnection::READONLY_SCOPE }.to_json)
+    tokeninfo = instance_double(Net::HTTPResponse, body: {scope: GmailConnection::READONLY_SCOPE}.to_json)
     allow(http).to receive(:get).and_return(tokeninfo)
-    list_response = success({ messages: [ { id: "m1" } ] })
+    list_response = success({messages: [{id: "m1"}]})
     allow(http).to receive(:request).and_return(list_response)
 
     ids = described_class.new(readonly_connection).list_recent_message_ids(after: 1.hour.ago)
@@ -60,11 +60,11 @@ RSpec.describe GmailReader do
           id: "m1",
           threadId: "t1",
           internalDate: 1.hour.ago.to_i * 1000,
-          labelIds: [ "INBOX" ],
+          labelIds: ["INBOX"],
           payload: {
             headers: [
-              { name: "From", value: "Alex <alex@example.com>" },
-              { name: "Subject", value: "Re: Hi" }
+              {name: "From", value: "Alex <alex@example.com>"},
+              {name: "Subject", value: "Re: Hi"}
             ]
           }
         }
@@ -84,13 +84,13 @@ RSpec.describe GmailReader do
       id: "m1",
       threadId: "t1",
       internalDate: 1.hour.ago.to_i * 1000,
-      labelIds: [ "INBOX" ],
+      labelIds: ["INBOX"],
       payload: {
         headers: [
-          { name: "From", value: "Alex <alex@example.com>" },
-          { name: "Subject", value: "Re: Hi" },
-          { name: "In-Reply-To", value: "<orig@cream.test>" },
-          { name: "References", value: "<orig@cream.test>" }
+          {name: "From", value: "Alex <alex@example.com>"},
+          {name: "Subject", value: "Re: Hi"},
+          {name: "In-Reply-To", value: "<orig@cream.test>"},
+          {name: "References", value: "<orig@cream.test>"}
         ]
       }
     }
@@ -108,14 +108,14 @@ RSpec.describe GmailReader do
     payload = {
       id: "m2",
       threadId: "t2",
-      labelIds: [ "INBOX" ],
+      labelIds: ["INBOX"],
       snippet: "Thanks for",
       payload: {
         mimeType: "text/plain",
-        body: { data: plain },
+        body: {data: plain},
         headers: [
-          { name: "From", value: "Alex <alex@example.com>" },
-          { name: "Subject", value: "Re: Hi" }
+          {name: "From", value: "Alex <alex@example.com>"},
+          {name: "Subject", value: "Re: Hi"}
         ]
       }
     }
@@ -131,12 +131,12 @@ RSpec.describe GmailReader do
     payload = {
       id: "m3",
       threadId: "t3",
-      labelIds: [ "INBOX" ],
+      labelIds: ["INBOX"],
       snippet: "Short preview",
       payload: {
         mimeType: "text/plain",
         body: {},
-        headers: [ { name: "Subject", value: "Re: Hi" } ]
+        headers: [{name: "Subject", value: "Re: Hi"}]
       }
     }
     allow(http_double).to receive(:request).and_return(success(payload))

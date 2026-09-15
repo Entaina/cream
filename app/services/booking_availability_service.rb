@@ -33,7 +33,7 @@ class BookingAvailabilityService
 
     days = (month_start..month_end).map do |date|
       available = day_has_slots?(date, busy)
-      { date: date.iso8601, available: available }
+      {date: date.iso8601, available: available}
     end
 
     Result.new(days:, slots: nil, warning: @calendar_warning)
@@ -69,7 +69,7 @@ class BookingAvailabilityService
   end
 
   def slots_for_date(date, busy)
-    weekday = BookingEventType::WEEKDAYS[date.wday == 0 ? 6 : date.wday - 1]
+    weekday = BookingEventType::WEEKDAYS[(date.wday == 0) ? 6 : date.wday - 1]
     windows = @event_type.hours_for_weekday(weekday)
     return [] if windows.blank?
 

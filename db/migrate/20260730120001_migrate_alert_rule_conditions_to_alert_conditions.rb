@@ -50,7 +50,7 @@ class MigrateAlertRuleConditionsToAlertConditions < ActiveRecord::Migration[8.0]
       next unless legacy_key
 
       rule = condition.alert_rule
-      rule.conditions = Array(rule.conditions) + [ legacy_key ]
+      rule.conditions = Array(rule.conditions) + [legacy_key]
       rule.save!(validate: false)
     end
 

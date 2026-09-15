@@ -10,6 +10,6 @@ class MarketingGapClosure < ActiveRecord::Migration[8.1]
       t.datetime :entered_at, null: false
       t.timestamps
     end
-    add_index :segment_memberships, [ :segment_id, :person_id ], unique: true
+    add_index :segment_memberships, [:segment_id, :person_id], unique: true
   end
 end

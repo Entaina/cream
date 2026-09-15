@@ -6,7 +6,7 @@ class JourneyEnrollment < ApplicationRecord
   belongs_to :person
   belongs_to :current_step, class_name: "JourneyStep", optional: true
 
-  validates :state, inclusion: { in: STATES }
+  validates :state, inclusion: {in: STATES}
 
   scope :due, -> { where(state: %w[active waiting]).where("next_run_at IS NULL OR next_run_at <= ?", Time.current) }
 

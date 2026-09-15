@@ -22,7 +22,7 @@ class TurnstileVerifier
       "remoteip" => ip
     )
     JSON.parse(response.body)["success"] == true
-  rescue StandardError => e
+  rescue => e
     # Fail open: an outage at Cloudflare must not block legitimate leads.
     Rails.logger.warn("Turnstile verification failed: #{e.class} #{e.message}")
     true

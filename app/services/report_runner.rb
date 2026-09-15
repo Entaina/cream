@@ -38,10 +38,10 @@ class ReportRunner
 
   def run
     grouped = aggregate(grouped_scope)
-    if all_pipelines_stage_grouping?
-      rows = build_all_pipelines_stage_rows(grouped)
+    rows = if all_pipelines_stage_grouping?
+      build_all_pipelines_stage_rows(grouped)
     else
-      rows = grouped.map { |key, value|
+      grouped.map { |key, value|
         Row.new(key: key, label: label_for(key), value: value.to_f.round(2), color: color_for(key), segments: nil)
       }
     end
@@ -118,7 +118,7 @@ class ReportRunner
 
   # Months are kept in chronological order; everything else is ranked by value.
   def sort_rows(rows)
-    @group_by == "month" ? rows : rows.sort_by { |row| -row.value }
+    (@group_by == "month") ? rows : rows.sort_by { |row| -row.value }
   end
 
   def label_for(key)

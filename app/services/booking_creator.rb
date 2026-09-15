@@ -131,7 +131,7 @@ class BookingCreator
     )
     attach_template_files(message, template)
     SendViaGmailJob.perform_later(message.id)
-  rescue StandardError => e
+  rescue => e
     Rails.logger.error("Booking confirmation email failed for Booking##{booking.id}: #{e.class}: #{e.message}")
   end
 
@@ -202,25 +202,25 @@ class BookingCreator
 
   def create_google_event!(starts_at:, ends_at:)
     calendar_id = @booking_page.event_calendar_id
-    summary = "#{@event_type.localized_name} — #{@params['first_name']} #{@params['last_name']}".strip
+    summary = "#{@event_type.localized_name} — #{@params["first_name"]} #{@params["last_name"]}".strip
     description_lines = []
     description_lines << @params["message"] if @params["message"].present?
-    description_lines << "Tel: #{@params['phone']}" if @params["phone"].present?
+    description_lines << "Tel: #{@params["phone"]}" if @params["phone"].present?
     description_lines << "Reservado via Cream"
 
     event = {
       summary: summary,
       description: description_lines.join("\n\n"),
-      start: { dateTime: starts_at.iso8601, timeZone: @timezone.name },
-      end: { dateTime: ends_at.iso8601, timeZone: @timezone.name },
-      attendees: normalized_guests.map { |email| { email: } }.prepend({ email: normalized_email })
+      start: {dateTime: starts_at.iso8601, timeZone: @timezone.name},
+      end: {dateTime: ends_at.iso8601, timeZone: @timezone.name},
+      attendees: normalized_guests.map { |email| {email:} }.prepend({email: normalized_email})
     }
 
     if @event_type.google_meet?
       event[:conferenceData] = {
         createRequest: {
           requestId: SecureRandom.uuid,
-          conferenceSolutionKey: { type: "hangoutsMeet" }
+          conferenceSolutionKey: {type: "hangoutsMeet"}
         }
       }
     elsif @event_type.location_address.present?

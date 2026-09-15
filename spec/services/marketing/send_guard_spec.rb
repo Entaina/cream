@@ -42,10 +42,10 @@ RSpec.describe Marketing::SendGuard do
 
     filtered = described_class.filter_addresses(
       workspace: workspace,
-      addresses: [ person.email, "blocked@example.com" ],
+      addresses: [person.email, "blocked@example.com"],
       subscription_type: newsletter_type
     )
 
-    expect(filtered).to eq([ person.email ])
+    expect(filtered).to eq([person.email])
   end
 end

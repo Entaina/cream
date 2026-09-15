@@ -1,7 +1,7 @@
 class AddCurrentPipelineToMemberships < ActiveRecord::Migration[8.1]
   def up
     add_reference :memberships, :current_pipeline, null: true,
-      foreign_key: { to_table: :pipelines, on_delete: :nullify }
+      foreign_key: {to_table: :pipelines, on_delete: :nullify}
 
     say_with_time "Backfill membership current pipelines" do
       Membership.reset_column_information
@@ -14,6 +14,6 @@ class AddCurrentPipelineToMemberships < ActiveRecord::Migration[8.1]
 
   def down
     remove_reference :memberships, :current_pipeline,
-      foreign_key: { to_table: :pipelines }
+      foreign_key: {to_table: :pipelines}
   end
 end

@@ -126,7 +126,7 @@ Rails.application.routes.draw do
   post "okm_chat", to: "okm_chats#create", as: :okm_chat
   post "okm_chat/actions", to: "okm_chats#execute_action", as: :okm_chat_actions
 
-  scope "ai/:record_type/:record_id", constraints: { record_type: /people|companies|deals/ } do
+  scope "ai/:record_type/:record_id", constraints: {record_type: /people|companies|deals/} do
     post "summary", to: "record_ai#summary", as: :record_ai_summary
     post "draft_email", to: "record_ai#draft_email", as: :record_ai_draft_email
     post "next_steps", to: "record_ai#next_steps", as: :record_ai_next_steps

@@ -25,9 +25,9 @@ class MqlManagement < ActiveRecord::Migration[8.0]
       t.references :workspace, null: false, foreign_key: true
       t.references :person, null: false, foreign_key: true
       t.references :product, null: false, foreign_key: true
-      t.references :recorded_by, foreign_key: { to_table: :users }
+      t.references :recorded_by, foreign_key: {to_table: :users}
       t.references :deal, foreign_key: true
-      t.references :converted_by, foreign_key: { to_table: :users }
+      t.references :converted_by, foreign_key: {to_table: :users}
       t.references :lead_submission, foreign_key: true
       t.string :status, null: false, default: "pending"
       t.string :source_kind, null: false, default: "manual"

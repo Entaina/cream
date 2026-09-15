@@ -1,6 +1,7 @@
 class EmailLayoutsController < ApplicationController
   include RequiresFeature
   include EmailPreviewActions
+
   requires_feature :email_templates
   before_action :set_layout, only: %i[edit update destroy]
 

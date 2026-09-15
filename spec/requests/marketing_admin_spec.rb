@@ -19,7 +19,7 @@ RSpec.describe "Marketing admin access", type: :request do
       sign_in_as(admin)
 
       expect {
-        post campaigns_path, params: { campaign: { name: "Q1 launch", status: "draft" } }
+        post campaigns_path, params: {campaign: {name: "Q1 launch", status: "draft"}}
       }.to change(Campaign, :count).by(1)
 
       expect(response).to redirect_to(Campaign.last)
@@ -27,10 +27,10 @@ RSpec.describe "Marketing admin access", type: :request do
 
     it "blocks salespeople from creating campaigns" do
       sign_in_as(salesperson)
-      patch switch_workspace_path, params: { workspace_id: workspace.id }
+      patch switch_workspace_path, params: {workspace_id: workspace.id}
 
       expect {
-        post campaigns_path, params: { campaign: { name: "Blocked", status: "draft" } }
+        post campaigns_path, params: {campaign: {name: "Blocked", status: "draft"}}
       }.not_to change(Campaign, :count)
 
       expect(response).to redirect_to(root_path)
@@ -47,7 +47,7 @@ RSpec.describe "Marketing admin access", type: :request do
             name: "Welcome",
             entry_trigger: "manual",
             steps_attributes: {
-              "0" => { position: "0", step_type: "wait", config: { minutes: "5" } }
+              "0" => {position: "0", step_type: "wait", config: {minutes: "5"}}
             }
           }
         }
@@ -58,11 +58,11 @@ RSpec.describe "Marketing admin access", type: :request do
 
     it "blocks salespeople from creating journeys" do
       sign_in_as(salesperson)
-      patch switch_workspace_path, params: { workspace_id: workspace.id }
+      patch switch_workspace_path, params: {workspace_id: workspace.id}
 
       expect {
         post journeys_path, params: {
-          journey: { name: "Blocked", entry_trigger: "manual" }
+          journey: {name: "Blocked", entry_trigger: "manual"}
         }
       }.not_to change(Journey, :count)
 
@@ -81,7 +81,7 @@ RSpec.describe "Marketing admin access", type: :request do
 
     it "blocks salespeople from listing segments" do
       sign_in_as(salesperson)
-      patch switch_workspace_path, params: { workspace_id: workspace.id }
+      patch switch_workspace_path, params: {workspace_id: workspace.id}
 
       get segments_path
 
@@ -93,7 +93,7 @@ RSpec.describe "Marketing admin access", type: :request do
 
       expect {
         post segments_path, params: {
-          segment: { name: "Hot leads", record_type: "Person", filters: {} }
+          segment: {name: "Hot leads", record_type: "Person", filters: {}}
         }
       }.to change(Segment, :count).by(1)
 
@@ -102,11 +102,11 @@ RSpec.describe "Marketing admin access", type: :request do
 
     it "blocks salespeople from creating segments" do
       sign_in_as(salesperson)
-      patch switch_workspace_path, params: { workspace_id: workspace.id }
+      patch switch_workspace_path, params: {workspace_id: workspace.id}
 
       expect {
         post segments_path, params: {
-          segment: { name: "Blocked", record_type: "Person", filters: {} }
+          segment: {name: "Blocked", record_type: "Person", filters: {}}
         }
       }.not_to change(Segment, :count)
 

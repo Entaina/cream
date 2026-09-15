@@ -21,13 +21,13 @@ class RecordActivityFeed
       @scopes << activities
     end
 
-    @pages = [ (@scopes.sum(&:count).to_f / PAGE_SIZE).ceil, 1 ].max
+    @pages = [(@scopes.sum(&:count).to_f / PAGE_SIZE).ceil, 1].max
     @page = page.to_i.clamp(1, @pages)
   end
 
   def entries
     @entries ||= @scopes.flat_map { |scope| scope.reorder(created_at: :desc, id: :desc).limit(page * PAGE_SIZE).to_a }
-      .sort_by { |entry| [ entry.created_at, entry.class.name, entry.id ] }.reverse
+      .sort_by { |entry| [entry.created_at, entry.class.name, entry.id] }.reverse
       .slice((page - 1) * PAGE_SIZE, PAGE_SIZE) || []
   end
 end

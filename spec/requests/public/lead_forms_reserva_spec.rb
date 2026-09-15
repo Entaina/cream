@@ -47,7 +47,7 @@ RSpec.describe "Public lead form Reserva", type: :request do
 
     it "allows overriding the product via query param" do
       other_product = workspace.products.create!(name: "Otro curso", price: 500)
-      other_edition = other_product.editions.create!(name: "Septiembre 2026", starts_on: Date.current + 60.days)
+      other_product.editions.create!(name: "Septiembre 2026", starts_on: Date.current + 60.days)
 
       get public_lead_form_path(lead_form.slug, product_id: other_product.id)
 

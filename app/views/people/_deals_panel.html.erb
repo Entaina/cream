@@ -1,12 +1,12 @@
     <div class="record-card">
       <div class="flex items-center justify-between gap-2 mb-1.5">
-        <h3 class="text-sm font-semibold uppercase tracking-wider text-ink-faint">Deals</h3>
+        <h3 class="text-sm font-semibold uppercase tracking-wider text-ink-faint"><%= t("records.tabs.deals") %></h3>
         <% if @deal_product_options.many? %>
           <%= form_with url: person_path(@person), method: :get, class: "shrink-0" do %>
             <%= hidden_field_tag :tab, "deals" %>
             <%= select_tag :product_id,
                   options_from_collection_for_select(@deal_product_options, :id, :name, @deal_product_id),
-                  include_blank: "All products", class: "input text-xs py-1 w-36",
+                  include_blank: t("people.show.all_products"), class: "input text-xs py-1 w-36",
                   onchange: "this.form.requestSubmit()" %>
           <% end %>
         <% end %>
@@ -29,7 +29,6 @@
           <% end %>
         </ul>
       <% else %>
-        <p class="text-sm text-ink-faint px-2">No deals yet.</p>
+        <p class="text-sm text-ink-faint px-2"><%= t("people.show.deals_empty") %></p>
       <% end %>
     </div>
-

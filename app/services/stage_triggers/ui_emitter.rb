@@ -19,7 +19,7 @@ module StageTriggers
       return unless @user
 
       Turbo::StreamsChannel.broadcast_append_to(@user, :ui, target: "toasts",
-        partial: "shared/toast", locals: { message: message, kind: kind })
+        partial: "shared/toast", locals: {message: message, kind: kind})
     end
 
     def show_alert(message:, title: nil)
@@ -27,7 +27,7 @@ module StageTriggers
       return unless @user
 
       Turbo::StreamsChannel.broadcast_action_to(@user, :ui, action: "stage_trigger_alert",
-        target: "toasts", attributes: { message: message, title: title }.compact)
+        target: "toasts", attributes: {message: message, title: title}.compact)
     end
 
     def show_confirm(message:, follow_up_type:, follow_up_url: nil, follow_up_message: nil, title: nil)
@@ -55,13 +55,13 @@ module StageTriggers
       return unless @user
 
       Turbo::StreamsChannel.broadcast_update_to(@user, :ui, target: "deal_trigger_panel_#{@deal.id}",
-        partial: "deals/trigger_panel", locals: { deal: @deal, run: @run })
+        partial: "deals/trigger_panel", locals: {deal: @deal, run: @run})
     end
 
     private
 
     def record(action, **params)
-      @run.ui_actions << { "action" => action, "params" => params.compact.stringify_keys, "at" => Time.current.iso8601 }
+      @run.ui_actions << {"action" => action, "params" => params.compact.stringify_keys, "at" => Time.current.iso8601}
       @run.save!
     end
   end

@@ -30,12 +30,12 @@ class DealVersionsController < ApplicationController
   end
 
   def scoped_versions
-    @deal.versions.where(workspace_id: [ current_workspace.id, nil ])
+    @deal.versions.where(workspace_id: [current_workspace.id, nil])
   end
 
   def build_audit_timeline(versions, activities)
-    entries = versions.map { |v| { kind: :version, record: v, at: v.created_at, tie: v.id } }
-    entries += activities.map { |a| { kind: :activity, record: a, at: a.created_at, tie: a.id } }
-    entries.sort_by { |e| [ -e[:at].to_i, -e[:tie] ] }
+    entries = versions.map { |v| {kind: :version, record: v, at: v.created_at, tie: v.id} }
+    entries += activities.map { |a| {kind: :activity, record: a, at: a.created_at, tie: a.id} }
+    entries.sort_by { |e| [-e[:at].to_i, -e[:tie]] }
   end
 end

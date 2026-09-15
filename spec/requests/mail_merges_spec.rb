@@ -39,10 +39,10 @@ RSpec.describe "Mail merges", type: :request do
       create_person!(workspace, company: create_company!(workspace, name: "Other Inc"))
       view = saved_views(:person_shared) # filters company_id = acme
 
-      post mail_merge_path, params: { source: "view:#{view.id}", subject: "Hi", body: "Hello" }
+      post mail_merge_path, params: {source: "view:#{view.id}", subject: "Hi", body: "Hello"}
 
       expect(MailMergeJob).to have_been_enqueued.with(
-        workspace.id, member.id, "Person", [ at_acme.id.to_s ], "Hi", "Hello", nil
+        workspace.id, member.id, "Person", [at_acme.id.to_s], "Hi", "Hello", nil
       )
     end
   end
@@ -55,10 +55,10 @@ RSpec.describe "Mail merges", type: :request do
       list = workspace.lists.create!(name: "Targets", record_type: "Person")
       list.list_entries.create!(record: person)
 
-      post mail_merge_path, params: { source: "list:#{list.id}", subject: "Hi", body: "Hello" }
+      post mail_merge_path, params: {source: "list:#{list.id}", subject: "Hi", body: "Hello"}
 
       expect(MailMergeJob).to have_been_enqueued.with(
-        workspace.id, member.id, "Person", [ person.id.to_s ], "Hi", "Hello", nil
+        workspace.id, member.id, "Person", [person.id.to_s], "Hi", "Hello", nil
       )
     end
   end
@@ -67,7 +67,7 @@ RSpec.describe "Mail merges", type: :request do
     include_context "with mail merge enabled"
 
     it "does not enqueue and redirects with an alert" do
-      post mail_merge_path, params: { source: "manual", record_type: "Person", record_ids: "" }
+      post mail_merge_path, params: {source: "manual", record_type: "Person", record_ids: ""}
 
       expect(MailMergeJob).not_to have_been_enqueued
       expect(response).to redirect_to(mail_merge_path(record_type: "Person"))
@@ -90,7 +90,7 @@ RSpec.describe "Mail merges", type: :request do
 
   describe "when mail_merge is disabled" do
     it "blocks the action and redirects to root" do
-      post mail_merge_path, params: { source: "manual", record_type: "Person", record_ids: "1" }
+      post mail_merge_path, params: {source: "manual", record_type: "Person", record_ids: "1"}
 
       expect(MailMergeJob).not_to have_been_enqueued
       expect(response).to redirect_to(root_path)

@@ -7,18 +7,18 @@ RSpec.describe "Api::V1::Pipelines", type: :request do
   let(:workspace) { workspaces(:one) }
   let!(:pipeline) { Pipeline.create_default!(workspace) }
   let(:token) { user.api_tokens.create!(name: "Test", workspace: workspace) }
-  let(:headers) { { "Authorization" => "Bearer #{token.plaintext_token}" } }
+  let(:headers) { {"Authorization" => "Bearer #{token.plaintext_token}"} }
 
   describe "GET /api/v1/pipelines" do
     it "lists pipelines with ordered stages" do
       partners = workspace.pipelines.create!(name: "Partners", position: 1,
-        pipeline_stages: [ PipelineStage.new(name: "Lead", position: 0, workspace: workspace) ])
+        pipeline_stages: [PipelineStage.new(name: "Lead", position: 0, workspace: workspace)])
 
       get "/api/v1/pipelines", headers: headers
 
       expect(response).to have_http_status(:success)
       body = response.parsed_body
-      expect(body.map { |entry| entry["id"] }).to eq([ pipeline.id, partners.id ])
+      expect(body.map { |entry| entry["id"] }).to eq([pipeline.id, partners.id])
 
       sales = body.first
       expect(sales).to include(

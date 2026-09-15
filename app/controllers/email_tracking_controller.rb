@@ -6,7 +6,7 @@ class EmailTrackingController < ApplicationController
 
   def open
     message = EmailMessage.find_by(tracking_token: params[:token])
-    message&.track_open! if message
+    message&.track_open!
     send_data transparent_gif, type: "image/gif", disposition: "inline"
   end
 
@@ -30,7 +30,7 @@ class EmailTrackingController < ApplicationController
     return redirect_to root_path if url.blank?
 
     uri = URI.parse(url)
-    unless uri.scheme&.downcase.in?(%w[http https])
+    unless uri.scheme&.downcase&.in?(%w[http https])
       return redirect_to root_path
     end
 

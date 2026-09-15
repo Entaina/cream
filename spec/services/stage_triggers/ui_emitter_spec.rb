@@ -25,7 +25,7 @@ RSpec.describe StageTriggers::UiEmitter do
 
     expect(Turbo::StreamsChannel).to have_received(:broadcast_append_to)
       .with(user, :ui, target: "toasts", partial: "shared/toast",
-        locals: { message: "Hola", kind: "success" })
+        locals: {message: "Hola", kind: "success"})
     expect(run.reload.ui_actions.last).to include("action" => "show_toast")
   end
 
@@ -33,7 +33,7 @@ RSpec.describe StageTriggers::UiEmitter do
     emitter.show_toast(message: "Hola", kind: "explosive")
 
     expect(Turbo::StreamsChannel).to have_received(:broadcast_append_to)
-      .with(user, :ui, hash_including(locals: { message: "Hola", kind: "info" }))
+      .with(user, :ui, hash_including(locals: {message: "Hola", kind: "info"}))
   end
 
   it "broadcasts alerts as a custom stream action" do
@@ -41,7 +41,7 @@ RSpec.describe StageTriggers::UiEmitter do
 
     expect(Turbo::StreamsChannel).to have_received(:broadcast_action_to)
       .with(user, :ui, action: "stage_trigger_alert", target: "toasts",
-        attributes: { message: "Ojo", title: "Aviso" })
+        attributes: {message: "Ojo", title: "Aviso"})
   end
 
   it "broadcasts confirms with their client-side follow-up" do
@@ -71,7 +71,7 @@ RSpec.describe StageTriggers::UiEmitter do
     expect(run.panel_title).to eq("Resumen")
     expect(Turbo::StreamsChannel).to have_received(:broadcast_update_to)
       .with(user, :ui, target: "deal_trigger_panel_#{deal.id}",
-        partial: "deals/trigger_panel", locals: { deal: deal, run: run })
+        partial: "deals/trigger_panel", locals: {deal: deal, run: run})
   end
 
   context "without a user (MCP/API path)" do

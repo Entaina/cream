@@ -6,9 +6,9 @@ class CustomField < ApplicationRecord
   has_many :custom_field_values, dependent: :destroy
 
   validates :name, :field_type, :record_type, :key, presence: true
-  validates :field_type, inclusion: { in: FIELD_TYPES }
-  validates :record_type, inclusion: { in: RECORD_TYPES }
-  validates :key, uniqueness: { scope: %i[workspace_id record_type] }
+  validates :field_type, inclusion: {in: FIELD_TYPES}
+  validates :record_type, inclusion: {in: RECORD_TYPES}
+  validates :key, uniqueness: {scope: %i[workspace_id record_type]}
   validate :options_present_for_select_types
   validate :formula_expression_present_for_formula
   validate :reference_type_present_for_record_reference
@@ -38,7 +38,7 @@ class CustomField < ApplicationRecord
   end
 
   def reference_label_method
-    reference_type == "Person" ? :display_name : :name
+    (reference_type == "Person") ? :display_name : :name
   end
 
   def cast(raw)

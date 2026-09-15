@@ -2,7 +2,7 @@ class CampaignVariant < ApplicationRecord
   belongs_to :campaign_send
 
   validates :name, :subject, :body, presence: true
-  validates :weight, numericality: { greater_than: 0, less_than_or_equal_to: 100 }
+  validates :weight, numericality: {greater_than: 0, less_than_or_equal_to: 100}
 
   def self.pick_for_email(variants, email)
     return nil if variants.blank?

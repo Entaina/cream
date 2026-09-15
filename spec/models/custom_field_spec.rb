@@ -34,10 +34,10 @@ RSpec.describe CustomField do
       expect(field.cast("0")).to be false
 
       number = described_class.new(field_type: "number")
-      expect(number.cast("42")).to eq(BigDecimal("42"))
+      expect(number.cast("42")).to eq(BigDecimal(42))
 
       multi = described_class.new(field_type: "multi_select")
-      expect(multi.cast([ " A ", "", "B" ])).to eq(%w[A B])
+      expect(multi.cast([" A ", "", "B"])).to eq(%w[A B])
 
       reference = described_class.new(field_type: "record_reference")
       expect(reference.cast("42")).to eq(42)

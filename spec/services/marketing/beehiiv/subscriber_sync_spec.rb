@@ -19,8 +19,8 @@ RSpec.describe Marketing::Beehiiv::SubscriberSync do
       "status" => "active",
       "utm_source" => "Twitter",
       "custom_fields" => [
-        { "name" => "First Name", "value" => "Ada" },
-        { "name" => "Last Name", "value" => "Lovelace" }
+        {"name" => "First Name", "value" => "Ada"},
+        {"name" => "Last Name", "value" => "Lovelace"}
       ]
     }
 
@@ -42,7 +42,7 @@ RSpec.describe Marketing::Beehiiv::SubscriberSync do
 
     described_class.apply!(
       publication: publication,
-      record: { "id" => "sub_pending", "email" => person.email, "status" => "pending" },
+      record: {"id" => "sub_pending", "email" => person.email, "status" => "pending"},
       source: "beehiiv:sync"
     )
 
@@ -56,7 +56,7 @@ RSpec.describe Marketing::Beehiiv::SubscriberSync do
 
     described_class.apply!(
       publication: publication,
-      record: { "id" => "sub_invalid", "email" => person.email, "status" => "invalid" },
+      record: {"id" => "sub_invalid", "email" => person.email, "status" => "invalid"},
       source: "beehiiv:sync"
     )
 

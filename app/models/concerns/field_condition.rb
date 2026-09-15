@@ -44,17 +44,17 @@ module FieldCondition
   }.freeze
 
   FIELD_GROUPS = [
-    { key: :deal, label: "Deal", prefix: nil, record_type: "Deal", natives: DEAL_FIELDS },
-    { key: :deal_cf, label: "Campos adicionales del deal", prefix: "cf", record_type: "Deal", natives: {} },
-    { key: :company, label: "Empresa", prefix: nil, record_type: "Company", natives: COMPANY_FIELDS },
-    { key: :company_cf, label: "Campos adicionales de la empresa", prefix: "company.cf", record_type: "Company", natives: {} },
-    { key: :person, label: "Contacto", prefix: nil, record_type: "Person", natives: PERSON_FIELDS },
-    { key: :person_cf, label: "Campos adicionales del contacto", prefix: "person.cf", record_type: "Person", natives: {} }
+    {key: :deal, label: "Deal", prefix: nil, record_type: "Deal", natives: DEAL_FIELDS},
+    {key: :deal_cf, label: "Campos adicionales del deal", prefix: "cf", record_type: "Deal", natives: {}},
+    {key: :company, label: "Empresa", prefix: nil, record_type: "Company", natives: COMPANY_FIELDS},
+    {key: :company_cf, label: "Campos adicionales de la empresa", prefix: "company.cf", record_type: "Company", natives: {}},
+    {key: :person, label: "Contacto", prefix: nil, record_type: "Person", natives: PERSON_FIELDS},
+    {key: :person_cf, label: "Campos adicionales del contacto", prefix: "person.cf", record_type: "Person", natives: {}}
   ].freeze
 
   included do
     validates :field, presence: true
-    validates :operator, inclusion: { in: OPERATORS.keys }
+    validates :operator, inclusion: {in: OPERATORS.keys}
     validates :compare_value, presence: true, unless: :blank_or_present_operator?
     validate :field_allowed_in_workspace
 
@@ -69,10 +69,10 @@ module FieldCondition
 
     def field_options(workspace)
       FIELD_GROUPS.filter_map do |group|
-        options = field_keys_for_group(workspace, group).map { |key| [ field_label_for(workspace, key), key ] }
+        options = field_keys_for_group(workspace, group).map { |key| [field_label_for(workspace, key), key] }
         next if options.empty?
 
-        [ group[:label], options ]
+        [group[:label], options]
       end
     end
 
@@ -143,19 +143,19 @@ module FieldCondition
   def raw_values(deal)
     case field
     when /\Acf:(.+)\z/
-      [ deal.custom_fields_hash[Regexp.last_match(1)] ]
+      [deal.custom_fields_hash[Regexp.last_match(1)]]
     when /\Acompany\.cf:(.+)\z/
-      [ deal.company&.custom_fields_hash&.[](Regexp.last_match(1)) ]
+      [deal.company&.custom_fields_hash&.[](Regexp.last_match(1))]
     when /\Aperson\.cf:(.+)\z/
       key = Regexp.last_match(1)
       deal.contacts.map { |person| person.custom_fields_hash[key] }
     when /\Acompany\.(.+)\z/
-      [ deal.company&.public_send(Regexp.last_match(1)) ]
+      [deal.company&.public_send(Regexp.last_match(1))]
     when /\Aperson\.(.+)\z/
       attr = Regexp.last_match(1)
       deal.contacts.map { |person| person.public_send(attr) }
     else
-      [ deal.public_send(field) ]
+      [deal.public_send(field)]
     end
   end
 
@@ -225,11 +225,11 @@ module FieldCondition
   end
 
   def cast_compare_value_as_date
-    custom_field_definition&.field_type == "date" ? custom_field_definition.cast(compare_value) : Date.parse(compare_value.to_s)
+    (custom_field_definition&.field_type == "date") ? custom_field_definition.cast(compare_value) : Date.parse(compare_value.to_s)
   end
 
   def cast_compare_value_as_decimal
-    custom_field_definition&.field_type.in?(%w[number currency]) ?
+    custom_field_definition&.field_type&.in?(%w[number currency]) ?
       custom_field_definition.cast(compare_value) : compare_value.to_d
   end
 
@@ -240,7 +240,7 @@ module FieldCondition
 
   def numeric_field?
     field.in?(%w[value probability company.annual_revenue]) ||
-      custom_field_definition&.field_type.in?(%w[number currency])
+      custom_field_definition&.field_type&.in?(%w[number currency])
   end
 
   def field_allowed_in_workspace

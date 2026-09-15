@@ -74,7 +74,7 @@ class ApplicationController < ActionController::Base
   end
 
   def info_for_paper_trail
-    { workspace_id: Current.workspace&.id }
+    {workspace_id: Current.workspace&.id}
   end
 
   def pagy_redirect_to_last_page(exception)

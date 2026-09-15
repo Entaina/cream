@@ -23,12 +23,12 @@ RSpec.describe Public::BookingApiController, type: :request do
       pipeline: pipeline,
       welcome_message: "Bienvenido",
       timezone: "Europe/Madrid",
-      calendar_ids: [ "primary" ]
+      calendar_ids: ["primary"]
     )
     page.event_types.build(
       slug: "video",
-      name_i18n: { "es" => "Reunión On-line", "en" => "Online meeting" },
-      description_i18n: { "es" => "Meet", "en" => "Meet" },
+      name_i18n: {"es" => "Reunión On-line", "en" => "Online meeting"},
+      description_i18n: {"es" => "Meet", "en" => "Meet"},
       duration_minutes: 30,
       location_type: "google_meet",
       weekly_hours: BookingEventType::DEFAULT_WEEKLY_HOURS,
@@ -44,12 +44,12 @@ RSpec.describe Public::BookingApiController, type: :request do
 
   def valid_booking_params(overrides = {})
     {
-      event_type: "video",
-      datetime: "2026-07-28T10:00:00",
-      timezone: "Europe/Madrid",
-      first_name: "Ana",
-      last_name: "Lopez",
-      email: "ana@example.com",
+      :event_type => "video",
+      :datetime => "2026-07-28T10:00:00",
+      :timezone => "Europe/Madrid",
+      :first_name => "Ana",
+      :last_name => "Lopez",
+      :email => "ana@example.com",
       BookingPage::TIMESTAMP_FIELD => BookingPage.signed_timestamp(at: 10.seconds.ago)
     }.merge(overrides)
   end
@@ -77,29 +77,29 @@ RSpec.describe Public::BookingApiController, type: :request do
     it "returns monthly availability" do
       allow(BookingAvailabilityService).to receive(:monthly).and_return(
         BookingAvailabilityService::Result.new(
-          days: [ { date: "2026-07-28", available: true } ],
+          days: [{date: "2026-07-28", available: true}],
           slots: nil,
           warning: nil
         )
       )
 
       get public_booking_api_availability_path(booking_page.slug),
-        params: { event_type: "video", month: "2026-07", timezone: "Europe/Madrid" }
+        params: {event_type: "video", month: "2026-07", timezone: "Europe/Madrid"}
 
       expect(response).to have_http_status(:ok)
-      expect(response.parsed_body["days"]).to eq([ { "date" => "2026-07-28", "available" => true } ])
+      expect(response.parsed_body["days"]).to eq([{"date" => "2026-07-28", "available" => true}])
     end
 
     it "returns daily slots" do
       allow(BookingAvailabilityService).to receive(:daily).and_return(
-        BookingAvailabilityService::Result.new(days: nil, slots: [ "10:00", "10:15" ], warning: nil)
+        BookingAvailabilityService::Result.new(days: nil, slots: ["10:00", "10:15"], warning: nil)
       )
 
       get public_booking_api_availability_path(booking_page.slug),
-        params: { event_type: "video", date: "2026-07-28", timezone: "Europe/Madrid" }
+        params: {event_type: "video", date: "2026-07-28", timezone: "Europe/Madrid"}
 
       expect(response).to have_http_status(:ok)
-      expect(response.parsed_body["slots"]).to eq([ "10:00", "10:15" ])
+      expect(response.parsed_body["slots"]).to eq(["10:00", "10:15"])
     end
   end
 
@@ -186,7 +186,7 @@ RSpec.describe Public::BookingApiController, type: :request do
 
       expect {
         post public_booking_api_book_path(booking_page.slug),
-          params: valid_booking_params(email: "bot@example.com", BookingPage::HONEYPOT_FIELD => "spam"),
+          params: valid_booking_params(:email => "bot@example.com", BookingPage::HONEYPOT_FIELD => "spam"),
           as: :json
       }.not_to change(Booking, :count)
 

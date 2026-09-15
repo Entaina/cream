@@ -74,7 +74,7 @@ module Marketing
     def open_deals_for_product
       workspace.deals.open_deals
         .joins(:deal_products, :deal_contacts)
-        .where(deal_products: { product_id: product.id }, deal_contacts: { person_id: person.id })
+        .where(deal_products: {product_id: product.id}, deal_contacts: {person_id: person.id})
     end
 
     def incompatible_retry?
@@ -127,9 +127,9 @@ module Marketing
         pipeline: pipeline,
         pipeline_stage: stage,
         owner: attributes["owner_id"].presence ? workspace.users.find(attributes["owner_id"]) : actor,
-        contacts: [ person ],
-        tasks: [ Task.new(task_attrs) ],
-        deal_products: [ DealProduct.new(product: product, quantity: 1) ],
+        contacts: [person],
+        tasks: [Task.new(task_attrs)],
+        deal_products: [DealProduct.new(product: product, quantity: 1)],
         campaign_id: resolve_campaign_id
       )
 
@@ -176,7 +176,7 @@ module Marketing
     end
 
     def default_deal_name
-      [ person.company.name, product.name ].compact.join(" — ")
+      [person.company.name, product.name].compact.join(" — ")
     end
 
     def resolve_assignee

@@ -8,7 +8,7 @@ RSpec.describe GmailConnection do
 
   def build_connection(**attrs)
     workspace.gmail_connections.create!(
-      { user: user, email: "me@gmail.com", refresh_token: "rt", access_token: "at" }.merge(attrs)
+      {user: user, email: "me@gmail.com", refresh_token: "rt", access_token: "at"}.merge(attrs)
     )
   end
 

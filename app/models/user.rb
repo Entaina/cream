@@ -17,8 +17,8 @@ class User < ApplicationRecord
 
   validates :name, presence: true
   validates :email_address, presence: true, uniqueness: true
-  validates :theme, inclusion: { in: THEMES }
-  validates :locale, inclusion: { in: LOCALES }
+  validates :theme, inclusion: {in: THEMES}
+  validates :locale, inclusion: {in: LOCALES}
 
   def self.organization_workspace_configured?
     ENV["CREAM_ORGANIZATION_EMAIL_DOMAIN"].present? &&
@@ -137,7 +137,7 @@ class User < ApplicationRecord
     merged_order = self.class.merge_sidebar_order(order, known)
     valid_hidden = hidden.map(&:to_s) & known
 
-    update!(sidebar_prefs: { "order" => merged_order, "hidden" => valid_hidden.uniq })
+    update!(sidebar_prefs: {"order" => merged_order, "hidden" => valid_hidden.uniq})
   end
 
   def self.merge_sidebar_order(saved_order, default_keys)

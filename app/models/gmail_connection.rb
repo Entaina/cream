@@ -6,7 +6,7 @@ class GmailConnection < ApplicationRecord
   belongs_to :workspace
   belongs_to :user
 
-  validates :user_id, uniqueness: { scope: :workspace_id }
+  validates :user_id, uniqueness: {scope: :workspace_id}
 
   # Connected once we hold a refresh token — that's what lets us send without
   # the user present (an access token alone expires within an hour).
@@ -54,7 +54,7 @@ class GmailConnection < ApplicationRecord
     scopes.include?(METADATA_SCOPE) && scopes.include?(READONLY_SCOPE)
   end
 
-  GMAIL_API_SCOPES = [ SEND_SCOPE, METADATA_SCOPE, READONLY_SCOPE ].freeze
+  GMAIL_API_SCOPES = [SEND_SCOPE, METADATA_SCOPE, READONLY_SCOPE].freeze
 
   # Stores tokens from an OmniAuth Gmail callback. Google only returns a refresh
   # token on the first consent, so keep the existing one if a re-auth omits it.

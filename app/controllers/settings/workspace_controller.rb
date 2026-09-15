@@ -5,13 +5,13 @@ module Settings
     after_action :verify_authorized, only: %i[show update]
 
     def show
-      authorize [ :settings, :workspace ]
+      authorize [:settings, :workspace]
       load_mailjet_connection
       load_beehiiv_connection
     end
 
     def update
-      authorize [ :settings, :workspace ]
+      authorize [:settings, :workspace]
 
       if current_workspace.update(workspace_params)
         redirect_to settings_workspace_path, notice: "Workspace updated."

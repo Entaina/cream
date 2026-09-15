@@ -2,6 +2,7 @@ require "csv"
 
 class ReportsController < ApplicationController
   include RequiresFeature
+
   requires_feature :reports
   requires_workspace_feature :reports
   skip_after_action :verify_policy_scoped
@@ -51,8 +52,8 @@ class ReportsController < ApplicationController
 
   def report_csv
     CSV.generate do |csv|
-      csv << [ @config[:group_by], @result.metric_label ]
-      @result.rows.each { |row| csv << [ row.label, row.value ] }
+      csv << [@config[:group_by], @result.metric_label]
+      @result.rows.each { |row| csv << [row.label, row.value] }
     end
   end
 
@@ -70,8 +71,8 @@ class ReportsController < ApplicationController
     date_range = params[:date_range].presence_in(Report::RANGES) || "all"
     pipeline_id = sanitized_pipeline_id(record_type)
     include_closed = show_closed?
-    { record_type: record_type, metric: metric, group_by: group_by, date_range: date_range,
-      pipeline_id: pipeline_id, include_closed: include_closed }
+    {record_type: record_type, metric: metric, group_by: group_by, date_range: date_range,
+     pipeline_id: pipeline_id, include_closed: include_closed}
   end
 
   def sanitized_pipeline_id(record_type)
@@ -88,6 +89,6 @@ class ReportsController < ApplicationController
   end
 
   def metrics_for(record_type)
-    record_type == "Deal" ? Report::METRICS : %w[count]
+    (record_type == "Deal") ? Report::METRICS : %w[count]
   end
 end

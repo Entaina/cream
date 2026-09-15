@@ -29,7 +29,7 @@ module StageTriggers
           Param.new(key: "message", label: "Texto", type: "text", required: true,
             placeholder: "Ej.: Recuerda pedir el NIF en esta etapa"),
           Param.new(key: "kind", label: "Estilo", type: "select",
-            options: [ [ "Información", "info" ], [ "Éxito", "success" ], [ "Aviso", "warning" ] ])
+            options: [["Información", "info"], ["Éxito", "success"], ["Aviso", "warning"]])
         ]
       ),
       "won_celebration" => Entry.new(

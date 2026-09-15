@@ -7,8 +7,8 @@ class Invitation < ApplicationRecord
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }
 
-  validates :email_address, presence: true, format: { with: URI::MailTo::EMAIL_REGEXP }
-  validates :role, inclusion: { in: Membership::ROLES }
+  validates :email_address, presence: true, format: {with: URI::MailTo::EMAIL_REGEXP}
+  validates :role, inclusion: {in: Membership::ROLES}
   validates :token_digest, presence: true
   validate :email_not_already_member, on: :create
   validate :no_duplicate_pending_invitation, on: :create

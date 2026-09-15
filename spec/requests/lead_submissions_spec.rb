@@ -21,7 +21,7 @@ RSpec.describe "Lead submission consents", type: :request do
       person: person,
       deal: deal,
       capture_destination: deal ? "deal" : "mql",
-      data: { "email" => person.email, "gdpr_consent" => "1" },
+      data: {"email" => person.email, "gdpr_consent" => "1"},
       metadata: {
         "gdpr_consent_at" => Time.zone.parse("2026-09-14 10:00:00").iso8601,
         "privacy_policy_url" => "https://example.test/f/#{lead_form.slug}/privacy",
@@ -43,14 +43,38 @@ RSpec.describe "Lead submission consents", type: :request do
     expect(response.body).to include("overflow-y-auto")
   end
 
+  it "renders the accepted policy without leaking public-page light styles" do
+    version = Marketing::ConsentPolicySnapshot.capture(
+      workspace: workspace,
+      policy_html: %(<style>.policy-leak-marker { color: #111; background: #fff; }</style><h1 class="policy-light-heading" style="color:#111">Política de prueba</h1>),
+      statement_html: "<p>Acepto el tratamiento de datos</p>"
+    )
+    submission = workspace.lead_submissions.create!(
+      lead_form: lead_form,
+      person: person,
+      capture_destination: "mql",
+      data: {"email" => person.email, "gdpr_consent" => "1"},
+      metadata: {"gdpr_consent_at" => Time.zone.parse("2026-09-14 10:00:00").iso8601},
+      privacy_policy_version: version
+    )
+
+    get person_lead_submission_path(person, submission)
+
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include("Política de prueba")
+    expect(response.body).not_to include("policy-leak-marker")
+    expect(response.body).not_to include("policy-light-heading")
+    expect(response.body).not_to include("color:#111")
+  end
+
   it "links to the consent from the person Information tab" do
     create_consented_submission!(person: person, lead_form: lead_form)
 
     get person_path(person, tab: "information")
 
     expect(response).to have_http_status(:ok)
-    expect(response.body).to include("Formularios enviados")
-    expect(response.body).to include("Ver consentimiento")
+    expect(response.body).to include(I18n.t("people.show.submissions"))
+    expect(response.body).to include(I18n.t("people.show.view_consent"))
     expect(response.body).to include(person_lead_submission_path(person, person.lead_submissions.last))
   end
 
@@ -61,8 +85,8 @@ RSpec.describe "Lead submission consents", type: :request do
     get deal_path(deal, tab: "information")
 
     expect(response).to have_http_status(:ok)
-    expect(response.body).to include("Ver consentimiento")
-    expect(response.body).to include("Consentimiento aceptado")
+    expect(response.body).to include(I18n.t("deals.show.view_consent"))
+    expect(response.body).to include(I18n.t("deals.consent.title"))
     expect(response.body).to include("Política de prueba")
     expect(response.body).to include(person_lead_submission_path(person, submission))
   end

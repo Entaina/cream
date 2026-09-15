@@ -83,7 +83,7 @@ module CreamMcp
         started_at: send_record.started_at&.iso8601,
         completed_at: send_record.completed_at&.iso8601,
         variants: send_record.campaign_variants.map { |v|
-          { id: v.id, name: v.name, weight: v.weight, winner: v.winner }
+          {id: v.id, name: v.name, weight: v.weight, winner: v.winner}
         }.presence
       }.compact
     end
@@ -174,11 +174,11 @@ module CreamMcp
     end
 
     def self.email_template_json(template)
-      { id: template.id, name: template.name, shared: template.shared }.compact
+      {id: template.id, name: template.name, shared: template.shared}.compact
     end
 
     def self.subscription_type_json(type)
-      { id: type.id, name: type.name, slug: type.slug, active: type.active }.compact
+      {id: type.id, name: type.name, slug: type.slug, active: type.active}.compact
     end
 
     def self.mql_filters_from_args(args)
@@ -191,7 +191,7 @@ module CreamMcp
 
       filters["marketing_eligible"] = true
       view = CreamMcp.arg(args, "view")
-      filters["open_deal"] = filters["open_deal"].presence || (view == "no_open_deal" ? "no" : "any")
+      filters["open_deal"] = filters["open_deal"].presence || ((view == "no_open_deal") ? "no" : "any")
       product_id = CreamMcp.arg(args, "product_id")
       filters["open_deal_product_id"] = product_id if product_id.present?
       filters
@@ -203,20 +203,20 @@ module CreamMcp
       input_schema: {
         type: "object",
         properties: {
-          q: { type: "string", description: "Search name or email" },
-          subscription_type_id: { type: "integer" },
-          subscription_status: { type: "string", enum: %w[subscribed unsubscribed pending missing] },
-          open_deal: { type: "string", enum: %w[any yes no] },
-          open_deal_product_id: { type: "integer" },
-          interest_product_id: { type: "integer" },
-          interest_status: { type: "string", enum: ::Marketing::ProductInterest::STATUSES },
-          lead_form_id: { type: "integer" },
-          capture_destination: { type: "string", enum: %w[any mql deal] },
-          lead_score_min: { type: "integer" },
-          lead_score_max: { type: "integer" },
-          view: { type: "string", enum: %w[no_open_deal], description: "Shortcut: exclude contacts with any open deal" },
-          product_id: { type: "integer", description: "With view=no_open_deal, exclude open deals for this product only" },
-          limit: { type: "integer", minimum: 1, maximum: CreamMcp::MAX_LIST_LIMIT }
+          q: {type: "string", description: "Search name or email"},
+          subscription_type_id: {type: "integer"},
+          subscription_status: {type: "string", enum: %w[subscribed unsubscribed pending missing]},
+          open_deal: {type: "string", enum: %w[any yes no]},
+          open_deal_product_id: {type: "integer"},
+          interest_product_id: {type: "integer"},
+          interest_status: {type: "string", enum: ::Marketing::ProductInterest::STATUSES},
+          lead_form_id: {type: "integer"},
+          capture_destination: {type: "string", enum: %w[any mql deal]},
+          lead_score_min: {type: "integer"},
+          lead_score_max: {type: "integer"},
+          view: {type: "string", enum: %w[no_open_deal], description: "Shortcut: exclude contacts with any open deal"},
+          product_id: {type: "integer", description: "With view=no_open_deal, exclude open deals for this product only"},
+          limit: {type: "integer", minimum: 1, maximum: CreamMcp::MAX_LIST_LIMIT}
         }
       }
     ) do |server_context:, **args|
@@ -252,8 +252,8 @@ module CreamMcp
       input_schema: {
         type: "object",
         properties: {
-          person_id: { type: "integer" },
-          person_query: { type: "string", description: "Search by name or email if person_id omitted" }
+          person_id: {type: "integer"},
+          person_query: {type: "string", description: "Search by name or email if person_id omitted"}
         }
       }
     ) do |server_context:, **args|
@@ -312,10 +312,10 @@ module CreamMcp
       input_schema: {
         type: "object",
         properties: {
-          person_id: { type: "integer" },
-          status: { type: "string", enum: ::Marketing::ProductInterest::STATUSES }
+          person_id: {type: "integer"},
+          status: {type: "string", enum: ::Marketing::ProductInterest::STATUSES}
         },
-        required: [ "person_id" ]
+        required: ["person_id"]
       }
     ) do |server_context:, **args|
       return CreamMcp.feature_unavailable_response(:mql_pool) unless CreamFeatures.enabled?(:mql_pool)
@@ -336,7 +336,7 @@ module CreamMcp
     LIST_SUBSCRIPTION_TYPES = MCP::Tool.define(
       name: "list_subscription_types",
       description: "List active subscription types (consent lists) in the workspace.",
-      input_schema: { type: "object", properties: {} }
+      input_schema: {type: "object", properties: {}}
     ) do |server_context:, **args|
       return CreamMcp.feature_unavailable_response(:marketing_consent) unless CreamFeatures.enabled?(:marketing_consent)
 
@@ -355,7 +355,7 @@ module CreamMcp
       description: "List marketing campaigns in the workspace.",
       input_schema: {
         type: "object",
-        properties: { limit: { type: "integer", minimum: 1, maximum: CreamMcp::MAX_LIST_LIMIT } }
+        properties: {limit: {type: "integer", minimum: 1, maximum: CreamMcp::MAX_LIST_LIMIT}}
       }
     ) do |server_context:, **args|
       return CreamMcp.feature_unavailable_response(:marketing_campaigns) unless CreamFeatures.enabled?(:marketing_campaigns)
@@ -374,8 +374,8 @@ module CreamMcp
       description: "Campaign detail with send history and engagement stats.",
       input_schema: {
         type: "object",
-        properties: { campaign_id: { type: "integer" } },
-        required: [ "campaign_id" ]
+        properties: {campaign_id: {type: "integer"}},
+        required: ["campaign_id"]
       }
     ) do |server_context:, **args|
       return CreamMcp.feature_unavailable_response(:marketing_campaigns) unless CreamFeatures.enabled?(:marketing_campaigns)
@@ -394,7 +394,7 @@ module CreamMcp
       description: "List marketing segments with member counts.",
       input_schema: {
         type: "object",
-        properties: { limit: { type: "integer", minimum: 1, maximum: CreamMcp::MAX_LIST_LIMIT } }
+        properties: {limit: {type: "integer", minimum: 1, maximum: CreamMcp::MAX_LIST_LIMIT}}
       }
     ) do |server_context:, **args|
       return CreamMcp.feature_unavailable_response(:marketing_segments) unless CreamFeatures.enabled?(:marketing_segments)
@@ -414,10 +414,10 @@ module CreamMcp
       input_schema: {
         type: "object",
         properties: {
-          segment_id: { type: "integer" },
-          include_members: { type: "boolean", description: "Include up to 25 matching records" }
+          segment_id: {type: "integer"},
+          include_members: {type: "boolean", description: "Include up to 25 matching records"}
         },
-        required: [ "segment_id" ]
+        required: ["segment_id"]
       }
     ) do |server_context:, **args|
       return CreamMcp.feature_unavailable_response(:marketing_segments) unless CreamFeatures.enabled?(:marketing_segments)
@@ -430,7 +430,7 @@ module CreamMcp
 
         members = nil
         if CreamMcp.arg(args, "include_members")
-          base = segment.record_type == "Person" ? ws.people : ws.public_send(segment.record_type.tableize)
+          base = (segment.record_type == "Person") ? ws.people : ws.public_send(segment.record_type.tableize)
           members = segment.resolve(base.includes(:company)).limit(25).to_a
         end
         CreamMcp.respond_with(segment: CreamMcp::Marketing.segment_json(segment, members: members))
@@ -442,7 +442,7 @@ module CreamMcp
       description: "List marketing journeys (automated sequences).",
       input_schema: {
         type: "object",
-        properties: { limit: { type: "integer", minimum: 1, maximum: CreamMcp::MAX_LIST_LIMIT } }
+        properties: {limit: {type: "integer", minimum: 1, maximum: CreamMcp::MAX_LIST_LIMIT}}
       }
     ) do |server_context:, **args|
       return CreamMcp.feature_unavailable_response(:journeys) unless CreamFeatures.enabled?(:journeys)
@@ -461,8 +461,8 @@ module CreamMcp
       description: "Journey detail with steps, enrollment stats and recent enrollments.",
       input_schema: {
         type: "object",
-        properties: { journey_id: { type: "integer" } },
-        required: [ "journey_id" ]
+        properties: {journey_id: {type: "integer"}},
+        required: ["journey_id"]
       }
     ) do |server_context:, **args|
       return CreamMcp.feature_unavailable_response(:journeys) unless CreamFeatures.enabled?(:journeys)
@@ -479,7 +479,7 @@ module CreamMcp
     LIST_SCORING_RULES = MCP::Tool.define(
       name: "list_scoring_rules",
       description: "List lead scoring rules (read-only).",
-      input_schema: { type: "object", properties: {} }
+      input_schema: {type: "object", properties: {}}
     ) do |server_context:, **args|
       return CreamMcp.feature_unavailable_response(:lead_scoring) unless CreamFeatures.enabled?(:lead_scoring)
 
@@ -498,10 +498,10 @@ module CreamMcp
       input_schema: {
         type: "object",
         properties: {
-          date_range: { type: "string", enum: %w[month quarter year all], description: "Default: month" },
-          utm_source: { type: "string" },
-          utm_medium: { type: "string" },
-          utm_campaign: { type: "string" }
+          date_range: {type: "string", enum: %w[month quarter year all], description: "Default: month"},
+          utm_source: {type: "string"},
+          utm_medium: {type: "string"},
+          utm_campaign: {type: "string"}
         }
       }
     ) do |server_context:, **args|
@@ -547,7 +547,7 @@ module CreamMcp
       description: "List email templates available for campaign sends.",
       input_schema: {
         type: "object",
-        properties: { limit: { type: "integer", minimum: 1, maximum: CreamMcp::MAX_LIST_LIMIT } }
+        properties: {limit: {type: "integer", minimum: 1, maximum: CreamMcp::MAX_LIST_LIMIT}}
       }
     ) do |server_context:, **args|
       return CreamMcp.feature_unavailable_response(:email_templates) unless CreamFeatures.enabled?(:email_templates)
@@ -567,7 +567,7 @@ module CreamMcp
       description: "List lead capture forms (MQL or deal destination).",
       input_schema: {
         type: "object",
-        properties: { limit: { type: "integer", minimum: 1, maximum: CreamMcp::MAX_LIST_LIMIT } }
+        properties: {limit: {type: "integer", minimum: 1, maximum: CreamMcp::MAX_LIST_LIMIT}}
       }
     ) do |server_context:, **args|
       CreamMcp.with_authorization(server_context, tool: "list_lead_forms") do
@@ -585,9 +585,9 @@ module CreamMcp
       input_schema: {
         type: "object",
         properties: {
-          person_id: { type: "integer" },
-          product_id: { type: "integer" },
-          description: { type: "string" }
+          person_id: {type: "integer"},
+          product_id: {type: "integer"},
+          description: {type: "string"}
         },
         required: %w[person_id product_id description]
       }
@@ -623,14 +623,14 @@ module CreamMcp
       input_schema: {
         type: "object",
         properties: {
-          product_interest_id: { type: "integer" },
-          pipeline_id: { type: "integer" },
-          task_title: { type: "string" },
-          task_due_on: { type: "string", description: "ISO date YYYY-MM-DD" },
-          name: { type: "string", description: "Deal name (optional)" },
-          owner_id: { type: "integer" },
-          task_assignee_id: { type: "integer" },
-          deal_id: { type: "integer", description: "Link to existing open deal when multiple exist" }
+          product_interest_id: {type: "integer"},
+          pipeline_id: {type: "integer"},
+          task_title: {type: "string"},
+          task_due_on: {type: "string", description: "ISO date YYYY-MM-DD"},
+          name: {type: "string", description: "Deal name (optional)"},
+          owner_id: {type: "integer"},
+          task_assignee_id: {type: "integer"},
+          deal_id: {type: "integer", description: "Link to existing open deal when multiple exist"}
         },
         required: %w[product_interest_id pipeline_id task_title task_due_on]
       }
@@ -668,9 +668,9 @@ module CreamMcp
       input_schema: {
         type: "object",
         properties: {
-          person_id: { type: "integer" },
-          subscription_type_id: { type: "integer" },
-          action: { type: "string", enum: %w[subscribe unsubscribe] }
+          person_id: {type: "integer"},
+          subscription_type_id: {type: "integer"},
+          action: {type: "string", enum: %w[subscribe unsubscribe]}
         },
         required: %w[person_id subscription_type_id action]
       }
@@ -716,8 +716,8 @@ module CreamMcp
       input_schema: {
         type: "object",
         properties: {
-          journey_id: { type: "integer" },
-          person_id: { type: "integer" }
+          journey_id: {type: "integer"},
+          person_id: {type: "integer"}
         },
         required: %w[journey_id person_id]
       }
@@ -742,11 +742,11 @@ module CreamMcp
       input_schema: {
         type: "object",
         properties: {
-          campaign_id: { type: "integer" },
-          segment_id: { type: "integer", description: "Must be a Person segment" },
-          email_template_id: { type: "integer", description: "Optional when the campaign already has email content" },
-          subscription_type_id: { type: "integer", description: "Defaults to newsletter type" },
-          scheduled_at: { type: "string", description: "ISO8601 datetime to schedule the send" }
+          campaign_id: {type: "integer"},
+          segment_id: {type: "integer", description: "Must be a Person segment"},
+          email_template_id: {type: "integer", description: "Optional when the campaign already has email content"},
+          subscription_type_id: {type: "integer", description: "Defaults to newsletter type"},
+          scheduled_at: {type: "string", description: "ISO8601 datetime to schedule the send"}
         },
         required: %w[campaign_id segment_id]
       }
@@ -808,8 +808,8 @@ module CreamMcp
       input_schema: {
         type: "object",
         properties: {
-          campaign_id: { type: "integer" },
-          send_id: { type: "integer" }
+          campaign_id: {type: "integer"},
+          send_id: {type: "integer"}
         },
         required: %w[campaign_id send_id]
       }

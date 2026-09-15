@@ -9,7 +9,7 @@ RSpec.describe "People merge", type: :request do
 
   before do
     sign_in_as(member)
-    patch switch_workspace_path, params: { workspace_id: workspace.id }
+    patch switch_workspace_path, params: {workspace_id: workspace.id}
   end
 
   describe "GET /people/duplicates" do
@@ -44,7 +44,7 @@ RSpec.describe "People merge", type: :request do
       primary = create_person!(workspace, company: company, first_name: "Primary", email: "dup@acme.com")
       secondary = create_person!(workspace, company: company, first_name: "Secondary", email: "dup@acme.com")
 
-      get merge_person_path(primary, secondary_ids: [ secondary.id ])
+      get merge_person_path(primary, secondary_ids: [secondary.id])
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include("Primary")
@@ -54,7 +54,7 @@ RSpec.describe "People merge", type: :request do
     it "includes same-email contacts from other companies as merge candidates" do
       other_company = create_company!(workspace, name: "Particulares")
       primary = create_person!(workspace, company: company, first_name: "Laura Shinakho Sanz", email: "laura@viveespana.es")
-      duplicate = create_person!(workspace, company: other_company, first_name: "Laura Shinakho", email: "laura@viveespana.es")
+      create_person!(workspace, company: other_company, first_name: "Laura Shinakho", email: "laura@viveespana.es")
 
       get merge_person_path(primary)
 
@@ -80,7 +80,7 @@ RSpec.describe "People merge", type: :request do
       secondary = create_person!(workspace, company: company, first_name: "Secondary", email: "dup@acme.com")
 
       expect {
-        post merge_person_path(primary), params: { secondary_ids: [ secondary.id ] }
+        post merge_person_path(primary), params: {secondary_ids: [secondary.id]}
       }.to change(Person, :count).by(-1)
 
       expect(response).to redirect_to(person_path(primary))
@@ -92,7 +92,7 @@ RSpec.describe "People merge", type: :request do
     it "rejects merging without selected contacts" do
       primary = create_person!(workspace, company: company, email: "dup@acme.com")
 
-      post merge_person_path(primary), params: { secondary_ids: [] }
+      post merge_person_path(primary), params: {secondary_ids: []}
 
       expect(response).to have_http_status(:unprocessable_entity)
       expect(response.body).to include("Select at least one contact to merge")
@@ -104,7 +104,7 @@ RSpec.describe "People merge", type: :request do
       secondary = create_person!(workspace, company: other_company, email: "dup@acme.com", first_name: "Secondary")
 
       expect {
-        post merge_person_path(primary), params: { secondary_ids: [ secondary.id ] }
+        post merge_person_path(primary), params: {secondary_ids: [secondary.id]}
       }.to change(Person, :count).by(-1)
 
       expect(response).to redirect_to(person_path(primary))
@@ -118,7 +118,7 @@ RSpec.describe "People merge", type: :request do
       secondary = create_person!(workspace, company: other_company, email: "other@acme.com", first_name: "Secondary")
 
       expect {
-        post merge_person_path(primary), params: { secondary_ids: [ secondary.id ] }
+        post merge_person_path(primary), params: {secondary_ids: [secondary.id]}
       }.to change(Person, :count).by(-1)
 
       expect(response).to redirect_to(person_path(primary))
@@ -129,10 +129,10 @@ RSpec.describe "People merge", type: :request do
     it "merges a secondary with a deal and redirects" do
       primary = create_person!(workspace, company: company, first_name: "Primary", email: "dup@acme.com")
       secondary = create_person!(workspace, company: company, first_name: "Secondary", email: "dup@acme.com")
-      deal = create_deal!(workspace, company: company, contacts: [ secondary ])
+      deal = create_deal!(workspace, company: company, contacts: [secondary])
 
       expect {
-        post merge_person_path(primary), params: { secondary_ids: [ secondary.id ] }
+        post merge_person_path(primary), params: {secondary_ids: [secondary.id]}
       }.to change(Person, :count).by(-1)
 
       expect(response).to redirect_to(person_path(primary))
@@ -146,7 +146,7 @@ RSpec.describe "People merge", type: :request do
 
       allow(PersonMerger).to receive(:call).and_raise(ActiveRecord::RecordInvalid.new(Person.new))
 
-      post merge_person_path(primary), params: { secondary_ids: [ secondary.id ] }
+      post merge_person_path(primary), params: {secondary_ids: [secondary.id]}
 
       expect(response).to have_http_status(:unprocessable_entity)
       expect(response.body).to include("Could not merge contacts")
