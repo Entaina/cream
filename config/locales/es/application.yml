@@ -128,6 +128,44 @@ es:
       submit: Iniciar sesión
       subtitle: El CRM que tu equipo disfrutará.
       title: Inicia sesión en cream
+  dashboard:
+    briefing:
+      categories:
+        important: Importante
+        urgent: Urgente
+      empty_category: Nada en esta categoría hoy.
+      for_you: Para ti
+      generate: Generar ahora
+      intro: Análisis diario del pipeline con indicaciones para el equipo.
+      misses: A mejorar
+      no_briefing: Todavía no hay briefing para hoy. Pulsa <strong>Generar ahora</strong>
+        para obtener indicaciones del director de ventas.
+      no_wins: Sin aciertos destacados hoy.
+      regenerate: Regenerar
+      regenerations_left: Quedan %{count} regeneraciones hoy
+      regenerations_used: Has usado las 5 regeneraciones de hoy
+      sales_director: Director de ventas
+      team: Equipo
+      title_on: Briefing del %{date}
+      wins: Aciertos
+      you: "(tú)"
+    closed_shown: Cerradas visibles
+    metrics:
+      companies: Empresas
+      open_pipeline: Pipeline abierto
+      people: Personas
+      won_revenue: Ingresos ganados
+    my_tasks: Mis tareas
+    no_pending_tasks: "No hay tareas pendientes. Disfruta de la calma 🍦"
+    no_stages: No hay etapas en este pipeline.
+    nothing_yet: Todavía no ha pasado nada — crea tu primer registro.
+    pipeline_by_stage: Pipeline por etapa
+    recent_activity: Actividad reciente
+    show_closed: Mostrar cerradas
+    time_ago: hace %{time}
+    title: Panel
+    view_all_tasks: Ver todas
+    view_stage_deals: Ver oportunidades en %{stage} en listado
   date:
     abbr_day_names:
     - dom
@@ -221,44 +259,6 @@ es:
     destroyed: "%{actor} eliminó este deal"
     updated: "%{actor} actualizó %{fields}"
     updated_deal: el deal
-  dashboard:
-    briefing:
-      categories:
-        important: Importante
-        urgent: Urgente
-      empty_category: Nada en esta categoría hoy.
-      for_you: Para ti
-      generate: Generar ahora
-      intro: Análisis diario del pipeline con indicaciones para el equipo.
-      misses: A mejorar
-      no_briefing: Todavía no hay briefing para hoy. Pulsa <strong>Generar ahora</strong>
-        para obtener indicaciones del director de ventas.
-      no_wins: Sin aciertos destacados hoy.
-      regenerate: Regenerar
-      regenerations_left: Quedan %{count} regeneraciones hoy
-      regenerations_used: Has usado las 5 regeneraciones de hoy
-      sales_director: Director de ventas
-      team: Equipo
-      title_on: Briefing del %{date}
-      wins: Aciertos
-      you: (tú)
-    closed_shown: Cerradas visibles
-    metrics:
-      companies: Empresas
-      open_pipeline: Pipeline abierto
-      people: Personas
-      won_revenue: Ingresos ganados
-    my_tasks: Mis tareas
-    no_pending_tasks: No hay tareas pendientes. Disfruta de la calma 🍦
-    no_stages: No hay etapas en este pipeline.
-    nothing_yet: Todavía no ha pasado nada — crea tu primer registro.
-    pipeline_by_stage: Pipeline por etapa
-    recent_activity: Actividad reciente
-    show_closed: Mostrar cerradas
-    time_ago: hace %{time}
-    title: Panel
-    view_all_tasks: Ver todas
-    view_stage_deals: Ver oportunidades en %{stage} en listado
   editions:
     from: Desde %{date}
     until: Hasta %{date}
@@ -304,27 +304,6 @@ es:
     tasks: Tareas
     team: Equipo
     workspace_settings: Ajustes
-  search:
-    index:
-      no_results: Sin resultados para «%{query}»
-      no_results_hint: Revisa la ortografía o prueba con otro término.
-      placeholder: Buscar personas, empresas y oportunidades...
-      sections:
-        companies: Empresas
-        deals: Oportunidades
-        people: Personas
-      title: Buscar
-  tasks:
-    index:
-      add_task: Añadir tarea
-      all: Todas
-      all_assignees: Todos los asignados
-      completed: Completadas
-      empty_subtitle: Mantente al día de los seguimientos añadiendo tareas.
-      empty_title: No hay tareas aquí
-      my_tasks: Mis tareas
-      open: Abiertas
-      title: Tareas
   profile:
     alert_email: Email
     alert_in_app: Notificación in-app (campana)
@@ -358,7 +337,48 @@ es:
     sales_director_team: Equipo
     save: Guardar
     title: Perfil
+  search:
+    index:
+      no_results: Sin resultados para «%{query}»
+      no_results_hint: Revisa la ortografía o prueba con otro término.
+      placeholder: Buscar personas, empresas y oportunidades...
+      sections:
+        companies: Empresas
+        deals: Oportunidades
+        people: Personas
+      title: Buscar
   shared:
+    attachments:
+      remove_confirm: "¿Eliminar este archivo?"
+      title: Adjuntos
+      upload: Subir
+    comments:
+      add: Añadir comentario
+      delete: Eliminar comentario
+      delete_confirm: "¿Eliminar este comentario?"
+      placeholder: Añade un comentario... usa @nombre para mencionar al equipo
+      title: Comentarios
+    email:
+      attachments: Adjuntos
+      attachments_hint: Desmarca los que no quieras enviar.
+      body_placeholder: Cuerpo del mensaje...
+      create_templates_html: "%{link} para reutilizarlas al redactar correos."
+      create_templates_link: Crear plantillas
+      follow_up: Seguimiento
+      follow_up_options:
+        none: Sin recordatorio
+        one_week: en 1 semana
+        three_days: en 3 días
+        two_days: en 2 días
+        two_weeks: en 2 semanas
+      insert_template: Insertar plantilla…
+      no_templates: No hay plantillas disponibles
+      send: Enviar email
+      send_later: Enviar más tarde
+      subject: Asunto
+      title: Enviar email
+      to: Para
+    empty_value: "—"
     filters:
       all_name: Todos los %{name}
       'no': 'No'
@@ -397,49 +417,6 @@ es:
       show_closed: Mostrar cerradas
       table: Tabla
       unassigned: Sin asignar
-    views:
-      all: Todas
-      delete_confirm: "¿Eliminar esta vista?"
-      delete_view: Eliminar vista
-      personal_view: Vista personal
-      rename: Renombrar
-      save_view: Guardar vista
-      shared: Compartida
-      shared_view: Vista compartida
-      shared_with_workspace: Compartida con el workspace
-      update_view: Actualizar vista
-      view_name_placeholder: Nombre de la vista
-    attachments:
-      remove_confirm: "¿Eliminar este archivo?"
-      title: Adjuntos
-      upload: Subir
-    comments:
-      add: Añadir comentario
-      delete: Eliminar comentario
-      delete_confirm: "¿Eliminar este comentario?"
-      placeholder: Añade un comentario... usa @nombre para mencionar al equipo
-      title: Comentarios
-    email:
-      attachments: Adjuntos
-      attachments_hint: Desmarca los que no quieras enviar.
-      body_placeholder: Cuerpo del mensaje...
-      create_templates_html: "%{link} para reutilizarlas al redactar correos."
-      create_templates_link: Crear plantillas
-      follow_up: Seguimiento
-      follow_up_options:
-        none: Sin recordatorio
-        one_week: en 1 semana
-        three_days: en 3 días
-        two_days: en 2 días
-        two_weeks: en 2 semanas
-      insert_template: Insertar plantilla…
-      no_templates: No hay plantillas disponibles
-      send: Enviar email
-      send_later: Enviar más tarde
-      subject: Asunto
-      title: Enviar email
-      to: Para
-    empty_value: "—"
     notes:
       add: Añadir nota
       body_placeholder: Escribe una nota...
@@ -480,6 +457,29 @@ es:
       ago: hace %{time}
       empty: Sin actividad todavía.
       title: Actividad
+    views:
+      all: Todas
+      delete_confirm: "¿Eliminar esta vista?"
+      delete_view: Eliminar vista
+      personal_view: Vista personal
+      rename: Renombrar
+      save_view: Guardar vista
+      shared: Compartida
+      shared_view: Vista compartida
+      shared_with_workspace: Compartida con el workspace
+      update_view: Actualizar vista
+      view_name_placeholder: Nombre de la vista
+  tasks:
+    index:
+      add_task: Añadir tarea
+      all: Todas
+      all_assignees: Todos los asignados
+      completed: Completadas
+      empty_subtitle: Mantente al día de los seguimientos añadiendo tareas.
+      empty_title: No hay tareas aquí
+      my_tasks: Mis tareas
+      open: Abiertas
+      title: Tareas
   time:
     formats:
       default: "%d/%m/%Y %H:%M"

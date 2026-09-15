@@ -47,6 +47,7 @@ module StageTriggers
     }.freeze
 
     def self.keys = FUNCTIONS.keys
+    def self.key?(key) = FUNCTIONS.key?(key)
     def self.entries = FUNCTIONS.values
     def self.fetch(key) = FUNCTIONS.fetch(key)
     def self.handler_for(key) = fetch(key).handler.constantize

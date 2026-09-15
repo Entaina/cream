@@ -9,6 +9,9 @@ es:
       keep_by_default: Mantener por defecto
       review_merge: Revisar fusión
       title: Posibles duplicados
+    edit:
+      back: "← Volver a la empresa"
+      title: Editar %{name}
     form:
       about:
         description: Qué hace esta empresa y cómo la describes.
@@ -55,11 +58,8 @@ es:
         las empresas seleccionadas pasarán a la empresa de arriba.
       title: Fusionar empresas
     new:
-      back: ← Volver a empresas
+      back: "← Volver a empresas"
       title: Nueva empresa
-    edit:
-      back: ← Volver a la empresa
-      title: Editar %{name}
     show:
       about: Acerca de
       deals_empty: Todavía no hay oportunidades.
@@ -85,6 +85,17 @@ es:
       reorder_column: Reordenar columna
       reorder_column_title: Arrastrar para reordenar columna
       title: Tablero de oportunidades
+    consent:
+      date: 'Fecha:'
+      hash: 'Hash:'
+      policy: 'Política:'
+      title: Consentimiento aceptado
+      unverified: No se pudo verificar la versión de la política enlazada al envío.
+      view_policy: Ver texto de la política aceptada
+      view_statement: Ver frase de consentimiento aceptada
+    edit:
+      back: "← Volver a la oportunidad"
+      title: Editar %{name}
     form:
       contacts:
         create: Crear contacto
@@ -135,19 +146,8 @@ es:
       pipeline_column: Pipeline
       search_placeholder: Buscar oportunidades...
     new:
-      back: ← Volver al tablero
+      back: "← Volver al tablero"
       title: Nueva oportunidad
-    edit:
-      back: ← Volver a la oportunidad
-      title: Editar %{name}
-    consent:
-      date: 'Fecha:'
-      hash: 'Hash:'
-      policy: 'Política:'
-      title: Consentimiento aceptado
-      unverified: No se pudo verificar la versión de la política enlazada al envío.
-      view_policy: Ver texto de la política aceptada
-      view_statement: Ver frase de consentimiento aceptada
     show:
       add: Añadir
       add_collaborator: Añadir colaborador
@@ -215,6 +215,9 @@ es:
       keep_by_default: Mantener por defecto
       review_merge: Revisar fusión
       title: Posibles duplicados
+    edit:
+      back: "← Volver al contacto"
+      title: Editar %{name}
     form:
       contact:
         add_email: Añadir email
@@ -249,35 +252,6 @@ es:
       task_due: Fecha de la tarea
       task_title_default: Contactar tras interés en %{product}
       title: Convertir a SQL
-    merge:
-      cancel: Cancelar
-      confirm: "¿Fusionar los contactos seleccionados en %{name}? Esta acción no se
-        puede deshacer."
-      contact_to_keep: Contacto a conservar
-      contacts_to_merge: Contactos a fusionar
-      merge: Fusionar contactos
-      merging: Fusionando…
-      no_email: Sin email
-      no_suggestions: No hay contactos sugeridos para fusionar. Usa la búsqueda de
-        arriba para encontrar otros contactos en este workspace.
-      search_label: Buscar otros contactos
-      search_placeholder: Escribe para buscar…
-      same_email_hint: También se listan contactos con el mismo email en otras empresas.
-      subtitle: Las notas, tareas, oportunidades, emails y actividad de los contactos
-        seleccionados pasarán al contacto de arriba.
-      title: Fusionar contactos
-    new:
-      back: ← Volver a personas
-      title: Nueva persona
-    edit:
-      back: ← Volver al contacto
-      title: Editar %{name}
-    sources:
-      beehiiv: Beehiiv
-      booking: Reserva online
-      referral: Recomendado
-      team_member: Lo trae alguien del equipo
-      web_form: Formulario web
     interest_status:
       converted: Convertido
       dismissed: Descartado
@@ -290,6 +264,26 @@ es:
       opportunity: Oportunidad
       sql: SQL
       subscriber: Suscriptor
+    merge:
+      cancel: Cancelar
+      confirm: "¿Fusionar los contactos seleccionados en %{name}? Esta acción no se
+        puede deshacer."
+      contact_to_keep: Contacto a conservar
+      contacts_to_merge: Contactos a fusionar
+      merge: Fusionar contactos
+      merging: Fusionando…
+      no_email: Sin email
+      no_suggestions: No hay contactos sugeridos para fusionar. Usa la búsqueda de
+        arriba para encontrar otros contactos en este workspace.
+      same_email_hint: También se listan contactos con el mismo email en otras empresas.
+      search_label: Buscar otros contactos
+      search_placeholder: Escribe para buscar…
+      subtitle: Las notas, tareas, oportunidades, emails y actividad de los contactos
+        seleccionados pasarán al contacto de arriba.
+      title: Fusionar contactos
+    new:
+      back: "← Volver a personas"
+      title: Nueva persona
     quick_deal:
       create: Crear oportunidad
       create_pipeline: Crea uno
@@ -367,6 +361,12 @@ es:
       view_consent: Ver consentimiento
       view_more: Ver más
       view_more_count: Ver más (%{count})
+    sources:
+      beehiiv: Beehiiv
+      booking: Reserva online
+      referral: Recomendado
+      team_member: Lo trae alguien del equipo
+      web_form: Formulario web
   records:
     activity:
       actions: Acciones

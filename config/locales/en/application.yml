@@ -129,6 +129,44 @@ en:
       submit: Sign in
       subtitle: The CRM your team will love.
       title: Sign in to cream
+  dashboard:
+    briefing:
+      categories:
+        important: Important
+        urgent: Urgent
+      empty_category: Nothing in this category today.
+      for_you: For you
+      generate: Generate now
+      intro: Daily pipeline analysis with guidance for the team.
+      misses: To improve
+      no_briefing: No briefing for today yet. Click <strong>Generate now</strong>
+        to get guidance from the sales director.
+      no_wins: No notable wins today.
+      regenerate: Regenerate
+      regenerations_left: "%{count} regenerations left today"
+      regenerations_used: You have used all 5 regenerations today
+      sales_director: Sales director
+      team: Team
+      title_on: Briefing for %{date}
+      wins: Wins
+      you: "(you)"
+    closed_shown: Closed shown
+    metrics:
+      companies: Companies
+      open_pipeline: Open pipeline
+      people: People
+      won_revenue: Won revenue
+    my_tasks: My tasks
+    no_pending_tasks: "No pending tasks. Enjoy the calm 🍦"
+    no_stages: No stages in this pipeline.
+    nothing_yet: Nothing has happened yet — create your first record.
+    pipeline_by_stage: Pipeline by stage
+    recent_activity: Recent activity
+    show_closed: Show closed
+    time_ago: "%{time} ago"
+    title: Dashboard
+    view_all_tasks: View all
+    view_stage_deals: View %{stage} deals in list
   date:
     abbr_day_names:
     - Sun
@@ -222,44 +260,6 @@ en:
     destroyed: "%{actor} deleted this deal"
     updated: "%{actor} updated %{fields}"
     updated_deal: the deal
-  dashboard:
-    briefing:
-      categories:
-        important: Important
-        urgent: Urgent
-      empty_category: Nothing in this category today.
-      for_you: For you
-      generate: Generate now
-      intro: Daily pipeline analysis with guidance for the team.
-      misses: To improve
-      no_briefing: No briefing for today yet. Click <strong>Generate now</strong>
-        to get guidance from the sales director.
-      no_wins: No notable wins today.
-      regenerate: Regenerate
-      regenerations_left: "%{count} regenerations left today"
-      regenerations_used: You have used all 5 regenerations today
-      sales_director: Sales director
-      team: Team
-      title_on: Briefing for %{date}
-      wins: Wins
-      you: (you)
-    closed_shown: Closed shown
-    metrics:
-      companies: Companies
-      open_pipeline: Open pipeline
-      people: People
-      won_revenue: Won revenue
-    my_tasks: My tasks
-    no_pending_tasks: No pending tasks. Enjoy the calm 🍦
-    no_stages: No stages in this pipeline.
-    nothing_yet: Nothing has happened yet — create your first record.
-    pipeline_by_stage: Pipeline by stage
-    recent_activity: Recent activity
-    show_closed: Show closed
-    time_ago: "%{time} ago"
-    title: Dashboard
-    view_all_tasks: View all
-    view_stage_deals: View %{stage} deals in list
   editions:
     from: From %{date}
     until: Until %{date}
@@ -305,27 +305,6 @@ en:
     tasks: Tasks
     team: Team
     workspace_settings: Settings
-  search:
-    index:
-      no_results: No results for “%{query}”
-      no_results_hint: Check the spelling or try a different term.
-      placeholder: Search people, companies and deals...
-      sections:
-        companies: Companies
-        deals: Deals
-        people: People
-      title: Search
-  tasks:
-    index:
-      add_task: Add task
-      all: All
-      all_assignees: All assignees
-      completed: Completed
-      empty_subtitle: Stay on top of follow-ups by adding tasks.
-      empty_title: No tasks here
-      my_tasks: My tasks
-      open: Open
-      title: Tasks
   profile:
     alert_email: Email
     alert_in_app: In-app notification (bell)
@@ -358,7 +337,48 @@ en:
     sales_director_team: Team
     save: Save
     title: Profile
+  search:
+    index:
+      no_results: No results for “%{query}”
+      no_results_hint: Check the spelling or try a different term.
+      placeholder: Search people, companies and deals...
+      sections:
+        companies: Companies
+        deals: Deals
+        people: People
+      title: Search
   shared:
+    attachments:
+      remove_confirm: Remove this file?
+      title: Attachments
+      upload: Upload
+    comments:
+      add: Add comment
+      delete: Delete comment
+      delete_confirm: Delete this comment?
+      placeholder: Add a comment... use @name to mention teammates
+      title: Comments
+    email:
+      attachments: Attachments
+      attachments_hint: Uncheck any you do not want to send.
+      body_placeholder: Message body...
+      create_templates_html: "%{link} to reuse when composing emails."
+      create_templates_link: Create templates
+      follow_up: Follow up
+      follow_up_options:
+        none: No reminder
+        one_week: in 1 week
+        three_days: in 3 days
+        two_days: in 2 days
+        two_weeks: in 2 weeks
+      insert_template: Insert template…
+      no_templates: No templates available
+      send: Send email
+      send_later: Send later
+      subject: Subject
+      title: Send email
+      to: To
+    empty_value: "—"
     filters:
       all_name: All %{name}
       'no': 'No'
@@ -397,49 +417,6 @@ en:
       show_closed: Show closed
       table: Table
       unassigned: Unassigned
-    views:
-      all: All
-      delete_confirm: Delete this view?
-      delete_view: Delete view
-      personal_view: Personal view
-      rename: Rename
-      save_view: Save view
-      shared: Shared
-      shared_view: Shared view
-      shared_with_workspace: Shared with workspace
-      update_view: Update view
-      view_name_placeholder: View name
-    attachments:
-      remove_confirm: Remove this file?
-      title: Attachments
-      upload: Upload
-    comments:
-      add: Add comment
-      delete: Delete comment
-      delete_confirm: Delete this comment?
-      placeholder: Add a comment... use @name to mention teammates
-      title: Comments
-    email:
-      attachments: Attachments
-      attachments_hint: Uncheck any you do not want to send.
-      body_placeholder: Message body...
-      create_templates_html: "%{link} to reuse when composing emails."
-      create_templates_link: Create templates
-      follow_up: Follow up
-      follow_up_options:
-        none: No reminder
-        one_week: in 1 week
-        three_days: in 3 days
-        two_days: in 2 days
-        two_weeks: in 2 weeks
-      insert_template: Insert template…
-      no_templates: No templates available
-      send: Send email
-      send_later: Send later
-      subject: Subject
-      title: Send email
-      to: To
-    empty_value: "—"
     notes:
       add: Add note
       body_placeholder: Write a note...
@@ -480,6 +457,29 @@ en:
       ago: "%{time} ago"
       empty: No activity yet.
       title: Activity
+    views:
+      all: All
+      delete_confirm: Delete this view?
+      delete_view: Delete view
+      personal_view: Personal view
+      rename: Rename
+      save_view: Save view
+      shared: Shared
+      shared_view: Shared view
+      shared_with_workspace: Shared with workspace
+      update_view: Update view
+      view_name_placeholder: View name
+  tasks:
+    index:
+      add_task: Add task
+      all: All
+      all_assignees: All assignees
+      completed: Completed
+      empty_subtitle: Stay on top of follow-ups by adding tasks.
+      empty_title: No tasks here
+      my_tasks: My tasks
+      open: Open
+      title: Tasks
   time:
     formats:
       default: "%m/%d/%Y %I:%M %p"

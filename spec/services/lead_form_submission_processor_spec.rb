@@ -30,7 +30,7 @@ RSpec.describe LeadFormSubmissionProcessor do
   it "rejects submissions without required fields from the rendered template" do
     expect {
       submit(contacto_lead_params("last_name" => ""))
-    }.to raise_error(ActiveRecord::RecordInvalid, /Last name can't be blank/)
+    }.to raise_error(ActiveRecord::RecordInvalid, /#{Regexp.escape(Person.human_attribute_name(:last_name))} can't be blank/)
   end
 
   it "links privacy policy version to submission when hash is present" do

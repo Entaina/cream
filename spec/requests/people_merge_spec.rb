@@ -69,7 +69,7 @@ RSpec.describe "People merge", type: :request do
       get merge_person_path(primary)
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include("Search for other contacts")
+      expect(response.body).to include(I18n.t("people.merge.search_label"))
       expect(response.body).to include('data-controller="merge-person-search"')
     end
   end

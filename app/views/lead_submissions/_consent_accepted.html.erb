@@ -18,11 +18,11 @@
     <% if submission.privacy_policy_version %>
       <details class="text-sm">
         <summary class="cursor-pointer text-accent"><%= t("deals.consent.view_policy") %></summary>
-        <div class="mt-2 prose prose-sm max-w-none"><%= sanitize submission.privacy_policy_version.policy_content %></div>
+        <div class="mt-2 prose prose-sm max-w-none"><%= sanitize_accepted_policy_html submission.privacy_policy_version.policy_content %></div>
       </details>
       <details class="text-sm">
         <summary class="cursor-pointer text-accent"><%= t("deals.consent.view_statement") %></summary>
-        <div class="mt-2 text-ink-soft"><%= sanitize submission.privacy_policy_version.statement_content %></div>
+        <div class="mt-2 text-ink-soft"><%= sanitize_accepted_policy_html submission.privacy_policy_version.statement_content %></div>
       </details>
     <% end %>
   </div>

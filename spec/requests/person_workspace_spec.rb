@@ -61,7 +61,7 @@ RSpec.describe "Person workspace", type: :request do
     patch person_path(person), params: {section: "contact", person: {first_name: "", last_name: "", phone: "123456"}}
 
     expect(response).to have_http_status(:unprocessable_entity)
-    expect(document.at_css('[role="alert"]').text).to include("First name")
+    expect(document.at_css('[role="alert"]').text).to include(blank_error_for(Person, :first_name))
     expect(document.at_css('[name="person[phone]"]')["value"]).to eq("123456")
     expect(document.at_css('[name="person[owner_id]"]')).to be_nil
   end

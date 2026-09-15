@@ -9,6 +9,9 @@ en:
       keep_by_default: Keep by default
       review_merge: Review merge
       title: Possible duplicates
+    edit:
+      back: "← Back to company"
+      title: Edit %{name}
     form:
       about:
         description: What this company does and how you describe it.
@@ -54,11 +57,8 @@ en:
         selected companies will move to the company above.
       title: Merge companies
     new:
-      back: ← Back to companies
+      back: "← Back to companies"
       title: New company
-    edit:
-      back: ← Back to company
-      title: Edit %{name}
     show:
       about: About
       deals_empty: No deals yet.
@@ -84,6 +84,17 @@ en:
       reorder_column: Reorder column
       reorder_column_title: Drag to reorder column
       title: Deals board
+    consent:
+      date: 'Date:'
+      hash: 'Hash:'
+      policy: 'Policy:'
+      title: Consent accepted
+      unverified: Could not verify the policy version linked to this submission.
+      view_policy: View accepted policy text
+      view_statement: View accepted consent statement
+    edit:
+      back: "← Back to deal"
+      title: Edit %{name}
     form:
       contacts:
         create: Create contact
@@ -134,19 +145,8 @@ en:
       pipeline_column: Pipeline
       search_placeholder: Search deals...
     new:
-      back: ← Back to board
+      back: "← Back to board"
       title: New deal
-    edit:
-      back: ← Back to deal
-      title: Edit %{name}
-    consent:
-      date: 'Date:'
-      hash: 'Hash:'
-      policy: 'Policy:'
-      title: Consent accepted
-      unverified: Could not verify the policy version linked to this submission.
-      view_policy: View accepted policy text
-      view_statement: View accepted consent statement
     show:
       add: Add
       add_collaborator: Add collaborator
@@ -214,6 +214,9 @@ en:
       keep_by_default: Keep by default
       review_merge: Review merge
       title: Possible duplicates
+    edit:
+      back: "← Back to contact"
+      title: Edit %{name}
     form:
       contact:
         add_email: Add email
@@ -248,34 +251,6 @@ en:
       task_due: Task due date
       task_title_default: Follow up after interest in %{product}
       title: Convert to SQL
-    merge:
-      cancel: Cancel
-      confirm: Merge the selected contacts into %{name}? This cannot be undone.
-      contact_to_keep: Contact to keep
-      contacts_to_merge: Contacts to merge in
-      merge: Merge contacts
-      merging: Merging…
-      no_email: No email
-      no_suggestions: No suggested contacts to merge. Use the search above to find
-        other contacts in this workspace.
-      search_label: Search for other contacts
-      search_placeholder: Type to search…
-      same_email_hint: Contacts with the same email in other companies are also listed.
-      subtitle: Notes, tasks, deals, emails and timeline activity from the selected
-        contacts will move to the contact above.
-      title: Merge contacts
-    new:
-      back: ← Back to people
-      title: New person
-    edit:
-      back: ← Back to contact
-      title: Edit %{name}
-    sources:
-      beehiiv: Beehiiv
-      booking: Online booking
-      referral: Referral
-      team_member: Brought by a team member
-      web_form: Web form
     interest_status:
       converted: Converted
       dismissed: Dismissed
@@ -288,6 +263,25 @@ en:
       opportunity: Opportunity
       sql: SQL
       subscriber: Subscriber
+    merge:
+      cancel: Cancel
+      confirm: Merge the selected contacts into %{name}? This cannot be undone.
+      contact_to_keep: Contact to keep
+      contacts_to_merge: Contacts to merge in
+      merge: Merge contacts
+      merging: Merging…
+      no_email: No email
+      no_suggestions: No suggested contacts to merge. Use the search above to find
+        other contacts in this workspace.
+      same_email_hint: Contacts with the same email in other companies are also listed.
+      search_label: Search for other contacts
+      search_placeholder: Type to search…
+      subtitle: Notes, tasks, deals, emails and timeline activity from the selected
+        contacts will move to the contact above.
+      title: Merge contacts
+    new:
+      back: "← Back to people"
+      title: New person
     quick_deal:
       create: Create deal
       create_pipeline: Create one
@@ -364,6 +358,12 @@ en:
       view_consent: View consent
       view_more: View more
       view_more_count: View more (%{count})
+    sources:
+      beehiiv: Beehiiv
+      booking: Online booking
+      referral: Referral
+      team_member: Brought by a team member
+      web_form: Web form
   records:
     activity:
       actions: Actions
