@@ -280,6 +280,139 @@ RSpec.describe "People", type: :request do
         expect(response.body).to include('name="product_id"')
       end
     end
+
+    describe "campaign history" do
+      let(:company) { create_company!(workspace) }
+      let(:person) { create_person!(workspace, company: company, email: "pat@example.com") }
+
+      def create_campaign_message!(record, campaign:, subject:, created_at: Time.current, **attrs)
+        message = workspace.email_messages.create!({
+          user: member,
+          record: record,
+          to_address: record.email,
+          subject: subject,
+          body: "Hello",
+          campaign: campaign,
+          marketing_send: true,
+          status: "sent"
+        }.merge(attrs))
+        message.update_column(:created_at, created_at)
+        message
+      end
+
+      before { sign_in_as(member) }
+
+      it "lists the latest campaign sends with date and subject" do
+        campaign = workspace.campaigns.create!(name: "Welcome series", status: "sent")
+        create_campaign_message!(person, campaign: campaign, subject: "Hola desde Welcome", created_at: Time.zone.local(2026, 9, 10, 12))
+
+        get person_path(person)
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include("Campañas enviadas")
+        expect(response.body).to include("Welcome series")
+        expect(response.body).to include("Hola desde Welcome")
+        expect(response.body).to include("Ver más")
+        expect(response.body).to include(campaign_path(campaign))
+      end
+
+      it "previews the latest five sends and keeps older ones in the full list" do
+        6.times do |index|
+          campaign = workspace.campaigns.create!(name: "Campaign #{index}", status: "sent")
+          create_campaign_message!(
+            person,
+            campaign: campaign,
+            subject: "Subject #{index}",
+            created_at: Time.zone.local(2026, 9, 1 + index, 12)
+          )
+        end
+
+        get person_path(person)
+
+        html = Nokogiri::HTML(response.body)
+        preview = html.at('[data-person-campaigns="preview"]').text
+        full_list = html.at('[data-person-campaigns="full"]').text
+
+        expect(preview).to include("Campaign 5")
+        expect(preview).not_to include("Campaign 0")
+        expect(full_list).to include("Campaign 0")
+        expect(full_list).to include("Campaign 5")
+        expect(response.body).to include("Ver más (6)")
+      end
+
+      it "shows expanded delivery events in the full list" do
+        campaign = workspace.campaigns.create!(name: "Opened blast", status: "sent")
+        message = create_campaign_message!(person, campaign: campaign, subject: "Opened blast subject")
+        message.email_events.create!(event_type: "open", occurred_at: Time.zone.local(2026, 9, 12, 15), payload: {})
+
+        get person_path(person)
+
+        full_list = Nokogiri::HTML(response.body).at('[data-person-campaigns="full"]').text
+        expect(full_list).to include("Abierto")
+      end
+
+      it "omits transactional mail and sends without a campaign" do
+        campaign = workspace.campaigns.create!(name: "Real campaign", status: "sent")
+        create_campaign_message!(person, campaign: campaign, subject: "Real campaign subject")
+        workspace.email_messages.create!(
+          user: member, record: person, to_address: person.email,
+          subject: "One to one", body: "Hi", marketing_send: false, status: "sent"
+        )
+        workspace.email_messages.create!(
+          user: member, record: person, to_address: person.email,
+          subject: "Journey step", body: "Hi", marketing_send: true, status: "sent"
+        )
+
+        get person_path(person)
+
+        html = Nokogiri::HTML(response.body)
+        preview = html.at('[data-person-campaigns="preview"]').text
+        full_list = html.at('[data-person-campaigns="full"]').text
+
+        expect(preview).to include("Real campaign")
+        expect(preview).not_to include("One to one")
+        expect(preview).not_to include("Journey step")
+        expect(full_list).not_to include("One to one")
+        expect(full_list).not_to include("Journey step")
+      end
+
+      it "does not show another contact's campaign sends" do
+        other = create_person!(workspace, company: company, email: "other@example.com", first_name: "Other")
+        own_campaign = workspace.campaigns.create!(name: "Own campaign", status: "sent")
+        other_campaign = workspace.campaigns.create!(name: "Other campaign", status: "sent")
+        create_campaign_message!(person, campaign: own_campaign, subject: "Own subject")
+        create_campaign_message!(other, campaign: other_campaign, subject: "Other subject")
+
+        get person_path(person)
+
+        expect(response.body).to include("Own campaign")
+        expect(response.body).not_to include("Other campaign")
+      end
+
+      it "hides the section when marketing campaigns are disabled" do
+        allow(CreamFeatures).to receive(:enabled?).and_call_original
+        allow(CreamFeatures).to receive(:enabled?).with(:marketing_campaigns).and_return(false)
+
+        get person_path(person)
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).not_to include("Campañas enviadas")
+      end
+
+      it "shows campaign name without an admin link for a salesperson" do
+        campaign = workspace.campaigns.create!(name: "Sales visible", status: "sent")
+        create_campaign_message!(person, campaign: campaign, subject: "Sales visible subject")
+        sign_out
+        sign_in_as(users(:two))
+        patch switch_workspace_path, params: { workspace_id: workspace.id }
+
+        get person_path(person)
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include("Sales visible")
+        expect(response.body).not_to include(campaign_path(campaign))
+      end
+    end
   end
 
   describe "POST /people.json (inline contact creation)" do

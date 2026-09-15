@@ -105,6 +105,9 @@
               <button type="button" class="btn-ghost mt-4 -ml-2" data-action="record-workspace#selectTab" data-tab="deals">View deals (<%= @deals.size %>) <%= icon :chevron_right, classes: "size-3.5" %></button>
             <% else %><p class="text-sm text-ink-soft">No open deals.</p><% end %>
           </section>
+          <% if feature_enabled?(:marketing_campaigns) %>
+            <%= render "campaigns_section", messages: @person_campaign_messages || [] %>
+          <% end %>
           <% if feature_enabled?(:ai_assistant) %>
             <details class="record-disclosure record-card"><summary>AI Assistant</summary><div class="mt-4"><%= render "shared/ai_assistant_section", record: @person %></div></details>
           <% end %>

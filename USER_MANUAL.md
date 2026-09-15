@@ -4,7 +4,7 @@
 
 Cream is a **workspace**-based CRM for managing **people**, **companies** and **deals** (opportunities), with notes, tasks, lists and an activity history shared across the team.
 
-> **Last revision:** 2026-09-14 (consent accessible from person, deal and MQLs)
+> **Last revision:** 2026-09-15 (campaign history on the person record)
 > This document describes the functionality **visible to the user**. Disabled features are listed at the end under "Coming soon".
 
 ---
@@ -510,7 +510,7 @@ In the people, companies and deals tables, Cream adds automatically calculated c
 
 The contact header shows their name, company and main contact details. Use **Send email**, **Add note**, **Create task** or **Add deal** when you need them: the editors open on demand. **Edit** opens the grouped contact form; **Merge duplicates** and **Delete contact** are in the **•••** menu.
 
-- **Activity** opens by default. **Next tasks** puts overdue tasks first, followed by upcoming tasks; expand the remaining or completed tasks when needed. The history combines notes, emails, comments and record changes. Filter by type and use **Older / Newer** to browse the history.
+- **Activity** opens by default. **Next tasks** puts overdue tasks first, followed by upcoming tasks; expand the remaining or completed tasks when needed. The history combines notes, emails, comments and record changes. Filter by type and use **Older / Newer** to browse the history. In the context column, **Campañas enviadas** (Campaigns sent) lists the latest marketing campaigns this contact received; **Ver más** (View more) opens the full history with delivery events (see [§29](#29-marketing)).
 - **Opportunities** contains deals and the product filter, plus product interests and form submissions when enabled. Expand **Registrar interés** to add an interest.
 - **Information** groups contact details, professional profile, ownership, relationships, custom fields, email preferences and, when submissions exist, **Formularios enviados** (Form submissions) with a **Ver consentimiento** link to the accepted policy and statement. Each editable block has its own **Edit** link. Expand **Add relationship** to link another person.
 - **Files**, when enabled, contains the upload form and existing attachments.
@@ -1275,6 +1275,7 @@ Contacts with **active marketing permission** (at least one active subscription 
 
 - **Product interests** — record a commercial signal manually (product + description) or from an MQL form with a product. States: pending, converted or dismissed.
 - **Form submissions** — submission history grouped by form, on **Deals** and **Information**, with a **Ver consentimiento** link (answers, destination, accepted policy and statement).
+- **Campañas enviadas** (Campaigns sent) — on **Activity**, the latest marketing campaigns received and **Ver más** (View more) for the history with delivery events.
 
 **Notes:**
 
@@ -1323,6 +1324,12 @@ Subscriptions created from a form store the same **privacy policy version** as t
 3. **A/B test (optional):** subject and body for variants A and B with weights (%). If you fill A/B subjects, they replace the base template subject.
 4. **Send test to your email:** pick template and optional test subject/body.
 5. After sending, review **Historial de envíos** (Send history). With A/B you can **Marcar ganadora** (Mark winner) and **Enviar ganadora al resto** (Send winner to the rest) to those who did not receive it.
+
+**On a person's record** (**Activity** → **Campañas enviadas**):
+
+- You see the **latest 5** campaigns sent to that contact (date, campaign name, subject and whether it was opened or clicked).
+- **Ver más** (View more) opens the full history with delivery events (open, click, bounce…).
+- The list uses the same send log as the campaign; it does not include one-to-one emails or journey steps without a campaign.
 
 **Requirements:** Mailjet connected under **Settings → Mailjet** and the **webhook URL** registered in Mailjet for opens, clicks and unsubscribes (see [§21](#21-workspace-settings)). Without Mailjet, sends use server SMTP/Mailbin.
 

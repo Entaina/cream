@@ -67,6 +67,23 @@ module MarketingHelper
     "missing" => "Sin suscripción"
   }.freeze
 
+  CAMPAIGN_ENGAGEMENT_LABELS = {
+    "sent" => "Enviado",
+    "opened" => "Abierto",
+    "clicked" => "Clic",
+    "failed" => "Fallido"
+  }.freeze
+
+  EMAIL_EVENT_LABELS = {
+    "delivered" => "Entregado",
+    "open" => "Abierto",
+    "click" => "Clic",
+    "bounce" => "Rebote",
+    "spam" => "Spam",
+    "unsub" => "Baja",
+    "blocked" => "Bloqueado"
+  }.freeze
+
   def campaign_status_badge(status)
     badge(CAMPAIGN_STATUS_LABELS.fetch(status.to_s, status), color: CAMPAIGN_STATUS_COLORS.fetch(status.to_s, "chicago"))
   end
@@ -111,6 +128,21 @@ module MarketingHelper
     else "chicago"
     end
     badge(SUBSCRIPTION_STATUS_LABELS.fetch(status.to_s, status), color: color)
+  end
+
+  def campaign_engagement_badge(message)
+    engagement = message.campaign_engagement
+    color = case engagement
+    when "clicked" then "hoki"
+    when "opened" then "green"
+    when "failed" then "red"
+    else "chicago"
+    end
+    badge(CAMPAIGN_ENGAGEMENT_LABELS.fetch(engagement, engagement), color: color)
+  end
+
+  def email_event_label(event_type)
+    EMAIL_EVENT_LABELS.fetch(event_type.to_s, event_type.to_s.humanize)
   end
 
   def describe_segment_filters(filters)

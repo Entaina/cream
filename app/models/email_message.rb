@@ -4,6 +4,8 @@ class EmailMessage < ApplicationRecord
   MAX_ATTACHMENTS = 10
   MAX_ATTACHMENT_SIZE = 10.megabytes
   MAX_TOTAL_ATTACHMENT_SIZE = 25.megabytes
+  CAMPAIGN_HISTORY_PREVIEW = 5
+  CAMPAIGN_HISTORY_LIMIT = 100
 
   belongs_to :workspace
   belongs_to :user
@@ -30,6 +32,7 @@ class EmailMessage < ApplicationRecord
   scope :scheduled, -> { where(status: "scheduled") }
   scope :outbound, -> { where(direction: "outbound") }
   scope :inbound, -> { where(direction: "inbound") }
+  scope :from_campaigns, -> { where(marketing_send: true).where.not(campaign_id: nil) }
 
   def opened? = opened_at.present?
 
@@ -42,6 +45,14 @@ class EmailMessage < ApplicationRecord
   def inbound? = direction == "inbound"
 
   def outbound? = direction == "outbound"
+
+  def campaign_engagement
+    return "failed" if failed?
+    return "clicked" if clicks_count.positive?
+    return "opened" if opened?
+
+    "sent"
+  end
 
   def replied? = replied_at.present?
 

@@ -4,7 +4,7 @@
 
 Cream es un CRM por **workspaces** para gestionar **personas**, **empresas** y **deals** (oportunidades), con notas, tareas, listas y un historial de actividad compartido en el equipo.
 
-> **Última revisión:** 2026-09-14 (consentimiento accesible desde persona, deal y MQLs)
+> **Última revisión:** 2026-09-15 (histórico de campañas en la ficha de persona)
 > Este documento describe la funcionalidad **visible para el usuario**. Las funcionalidades desactivadas aparecen al final en «Próximamente».
 
 ---
@@ -510,7 +510,7 @@ En las tablas de personas, empresas y deals, Cream añade columnas calculadas au
 
 La cabecera muestra el nombre, la empresa y los datos principales de contacto. Usa **Send email**, **Add note**, **Create task** o **Add deal** cuando lo necesites: los editores se abren bajo demanda. **Edit** abre el formulario de contacto agrupado; **Merge duplicates** y **Delete contact** están en el menú **•••**.
 
-- **Activity** se abre por defecto. **Next tasks** muestra primero las tareas vencidas y después las próximas; despliega las restantes o completadas cuando lo necesites. El historial reúne notas, correos, comentarios y cambios del registro. Filtra por tipo y usa **Older / Newer** para consultar entradas anteriores o más recientes.
+- **Activity** se abre por defecto. **Next tasks** muestra primero las tareas vencidas y después las próximas; despliega las restantes o completadas cuando lo necesites. El historial reúne notas, correos, comentarios y cambios del registro. Filtra por tipo y usa **Older / Newer** para consultar entradas anteriores o más recientes. En la columna de contexto, **Campañas enviadas** lista las últimas campañas de marketing recibidas por el contacto; **Ver más** abre el historial completo con eventos de entrega (ver [§29](#29-marketing)).
 - **Opportunities** contiene los deals y el filtro por producto, además de intereses por producto y formularios enviados cuando están habilitados. Despliega **Registrar interés** para añadir un interés.
 - **Information** agrupa contacto, perfil profesional, responsable, relaciones, campos personalizados, preferencias de correo y, si hay envíos, **Formularios enviados** (enlace **Ver consentimiento** a la política y la frase aceptadas). Cada bloque editable tiene su enlace **Edit**. Despliega **Add relationship** para vincular a otra persona.
 - **Files**, cuando está habilitado, contiene el formulario de subida y los archivos adjuntos.
@@ -1275,6 +1275,7 @@ Contactos con **permiso de marketing vigente** (al menos una suscripción activa
 
 - **Intereses por producto** — registra manualmente una señal comercial (producto + descripción) o proviene de un formulario MQL con producto. Estados: pendiente, convertido o descartado.
 - **Formularios enviados** — historial de envíos agrupados por formulario, en **Deals** y en **Information**, con enlace **Ver consentimiento** (respuestas, destino, política y frase aceptadas).
+- **Campañas enviadas** — en **Activity**, las últimas campañas de marketing recibidas y **Ver más** para el historial con eventos de entrega.
 
 **Notas:**
 
@@ -1323,6 +1324,12 @@ Las suscripciones creadas desde un formulario guardan la misma **versión de pol
 3. **Prueba A/B (opcional):** asunto y cuerpo de variantes A y B con pesos (%). Si rellenas asuntos A/B, sustituyen al de la plantilla base.
 4. **Enviar prueba a tu email:** elige plantilla y, opcionalmente, asunto/cuerpo de prueba.
 5. Tras el envío, revisa **Historial de envíos** (estado, omitidos, fallidos). Con A/B puedes **Marcar ganadora** y **Enviar ganadora al resto** a quienes no la recibieron.
+
+**En la ficha de una persona** (**Activity** → **Campañas enviadas**):
+
+- Verás las **últimas 5** campañas enviadas a ese contacto (fecha, nombre de campaña, asunto y si se abrió o se hizo clic).
+- **Ver más** abre el historial completo con el detalle de eventos de entrega (apertura, clic, rebote…).
+- El listado usa el mismo registro de envíos que la campaña; no incluye correos uno a uno ni pasos de recorrido sin campaña.
 
 **Requisitos:** Mailjet conectado en **Settings → Mailjet** y **URL del webhook** registrada en Mailjet para registrar aperturas, clics y bajas (ver [§21](#21-ajustes-del-workspace)). Sin Mailjet, los envíos usan SMTP/Mailbin del servidor.
 

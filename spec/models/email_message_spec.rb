@@ -50,6 +50,57 @@ RSpec.describe EmailMessage do
     expect(outbound.replies).to include(inbound)
   end
 
+  describe ".from_campaigns" do
+    let(:person) { create_person!(workspace, email: "pat@example.com") }
+    let(:campaign) { workspace.campaigns.create!(name: "Blast", status: "sent") }
+
+    def build_message(**attrs)
+      workspace.email_messages.create!({
+        user: user,
+        record: person,
+        to_address: "pat@example.com",
+        subject: "Hi",
+        body: "Hello",
+        status: "sent"
+      }.merge(attrs))
+    end
+
+    it "includes marketing sends tied to a campaign" do
+      included = build_message(campaign: campaign, marketing_send: true)
+      build_message(campaign: campaign, marketing_send: false)
+      build_message(marketing_send: true)
+
+      expect(EmailMessage.from_campaigns).to contain_exactly(included)
+    end
+  end
+
+  describe "#campaign_engagement" do
+    let(:person) { create_person!(workspace, email: "pat@example.com") }
+
+    def build_message(**attrs)
+      workspace.email_messages.create!({
+        user: user,
+        record: person,
+        to_address: "pat@example.com",
+        subject: "Hi",
+        body: "Hello",
+        status: "sent"
+      }.merge(attrs))
+    end
+
+    it "returns clicked when the message has clicks" do
+      expect(build_message(clicks_count: 1).campaign_engagement).to eq("clicked")
+    end
+
+    it "returns opened when the message was opened" do
+      expect(build_message(opened_at: Time.current).campaign_engagement).to eq("opened")
+    end
+
+    it "returns failed when delivery failed" do
+      expect(build_message(status: "failed").campaign_engagement).to eq("failed")
+    end
+  end
+
   describe "#route_via_gmail?" do
     let(:message) do
       workspace.email_messages.new(user: user, record: companies(:acme), to_address: "a@b.com", subject: "Hi", body: "Hi")

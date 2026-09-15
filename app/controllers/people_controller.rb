@@ -59,6 +59,14 @@ class PeopleController < ApplicationController
     @person_tab = "activity" if @person_tab == "files" && !CreamFeatures.enabled?(:attachments)
     @pending_tasks = @person.tasks.pending.includes(:assignee).due_order
     @completed_tasks = @person.tasks.completed.includes(:assignee).order(completed_at: :desc)
+    if CreamFeatures.enabled?(:marketing_campaigns)
+      @person_campaign_messages = @person.email_messages
+        .from_campaigns
+        .includes(:campaign, :email_events)
+        .recent_first
+        .limit(EmailMessage::CAMPAIGN_HISTORY_LIMIT)
+        .to_a
+    end
     @activity_feed = RecordActivityFeed.new(@person, filter: params[:activity_filter], page: params[:activity_page],
       emails: CreamFeatures.enabled?(:record_email), comments: CreamFeatures.enabled?(:comments))
     @okm_chat_record = @person
