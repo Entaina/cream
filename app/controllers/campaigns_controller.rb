@@ -20,6 +20,7 @@ class CampaignsController < ApplicationController
   def new
     @campaign = current_workspace.campaigns.new(status: "draft")
     authorize @campaign
+    load_email_form_collections
   end
 
   def create
@@ -28,12 +29,14 @@ class CampaignsController < ApplicationController
     if @campaign.save
       redirect_to @campaign, notice: "Campaña creada."
     else
+      load_email_form_collections
       render :new, status: :unprocessable_entity
     end
   end
 
   def edit
     authorize @campaign
+    load_email_form_collections
   end
 
   def update
@@ -41,6 +44,7 @@ class CampaignsController < ApplicationController
     if @campaign.update(campaign_params)
       redirect_to @campaign, notice: "Campaña actualizada."
     else
+      load_email_form_collections
       render :edit, status: :unprocessable_entity
     end
   end
@@ -53,15 +57,18 @@ class CampaignsController < ApplicationController
 
   def send_campaign
     authorize @campaign, :update?
+    unless @campaign.email_content_present?
+      return redirect_to edit_campaign_path(@campaign), alert: "Añade asunto y cuerpo del email antes de enviar."
+    end
+
     segment = current_workspace.segments.find(params[:segment_id])
     return redirect_to(@campaign, alert: "El segmento debe ser de personas.") unless segment.record_type == "Person"
 
-    template = current_workspace.email_templates.find(params[:email_template_id])
     subscription_type = resolve_subscription_type
     send_record = current_workspace.campaign_sends.create!(
       campaign: @campaign,
       segment: segment,
-      email_template: template,
+      email_template: @campaign.email_template,
       user: current_user,
       subscription_type: subscription_type,
       status: "pending",
@@ -82,15 +89,19 @@ class CampaignsController < ApplicationController
 
   def send_test
     authorize @campaign, :update?
-    template = current_workspace.email_templates.find(params[:email_template_id])
+    unless @campaign.email_content_present?
+      return redirect_to edit_campaign_path(@campaign), alert: "Añade asunto y cuerpo del email antes de enviar una prueba."
+    end
+
     person = current_workspace.people.with_email(current_user.email_address).first ||
       create_test_person!(current_user.email_address)
+    email_content = @campaign.email_content
 
-    variant = build_test_variant(template)
+    variant = build_test_variant(email_content)
     subject, body = if variant
-      template.render_custom_for(person, subject: variant[:subject], body: variant[:body])
+      email_content.render_custom_for(person, subject: variant[:subject], body: variant[:body])
     else
-      [ template.render_subject_for(person), template.render_for(person) ]
+      [ email_content.render_subject_for(person), email_content.render_for(person) ]
     end
 
     message = current_workspace.email_messages.create!(
@@ -183,30 +194,36 @@ class CampaignsController < ApplicationController
     current_workspace.people.create!(first_name: "Prueba", last_name: "Marketing", email: email, company: company)
   end
 
-  def build_test_variant(template)
+  def build_test_variant(email_content)
     return nil if params[:variant_a_subject].blank?
 
     {
       subject: params[:variant_a_subject],
-      body: params[:variant_a_body].presence || template.body
+      body: params[:variant_a_body].presence || email_content.default_body
     }
   end
 
   def create_variants!(send_record)
     return if params[:variant_a_subject].blank?
 
+    default_body = @campaign.email_content.default_body
     send_record.campaign_variants.create!(
       name: "A",
       subject: params[:variant_a_subject],
-      body: params[:variant_a_body].presence || send_record.email_template.body,
+      body: params[:variant_a_body].presence || default_body,
       weight: params[:variant_a_weight].presence || 50
     )
     send_record.campaign_variants.create!(
       name: "B",
       subject: params[:variant_b_subject],
-      body: params[:variant_b_body].presence || send_record.email_template.body,
+      body: params[:variant_b_body].presence || default_body,
       weight: params[:variant_b_weight].presence || 50
     )
+  end
+
+  def load_email_form_collections
+    @email_templates = current_workspace.email_templates.ordered
+    @email_layouts = current_workspace.email_layouts.ordered
   end
 
   def set_campaign
@@ -216,7 +233,8 @@ class CampaignsController < ApplicationController
   def campaign_params
     params.require(:campaign).permit(
       :name, :status, :starts_on, :goal,
-      :utm_source, :utm_medium, :utm_campaign, :utm_term, :utm_content
+      :utm_source, :utm_medium, :utm_campaign, :utm_term, :utm_content,
+      :email_template_id, :email_layout_id, :email_subject, :email_body, :email_body_editor
     )
   end
 end

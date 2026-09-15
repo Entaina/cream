@@ -1,0 +1,56 @@
+<%# locals: (composer_id:, source_form_id:, email_templates:, email_layouts:, subject_name:, body_name:, body_editor_name:, email_layout_id_name:, email_template_id_name:, subject: nil, body: nil, body_editor: "quill", email_layout_id: nil, email_template_id: nil, show_template_picker: true, show_preview: true) %>
+<div class="space-y-3 border border-line rounded-lg p-3"
+     data-controller="email-composer"
+     data-email-composer-template-url-value="<%= email_templates_path %>">
+  <% if show_template_picker %>
+    <div>
+      <label class="label" for="<%= composer_id %>_template">Plantilla base (opcional)</label>
+      <%= select_tag email_template_id_name,
+            options_from_collection_for_select(email_templates, :id, :name, email_template_id),
+            include_blank: "Redactar sin plantilla",
+            class: "input w-full",
+            id: "#{composer_id}_template",
+            data: {
+              email_composer_target: "templateSelect",
+              action: "change->email-composer#templateSelected"
+            } %>
+      <p class="text-xs text-ink-faint mt-1">Elige una plantilla del workspace para copiar asunto y cuerpo como punto de partida. No se crea una plantilla global nueva.</p>
+    </div>
+  <% end %>
+
+  <div>
+    <label class="label" for="<%= composer_id %>_layout">Layout (opcional)</label>
+    <%= select_tag email_layout_id_name,
+          options_from_collection_for_select(email_layouts, :id, :name, email_layout_id),
+          include_blank: "Sin layout",
+          class: "input w-full",
+          id: "#{composer_id}_layout",
+          data: { email_composer_target: "layoutSelect" } %>
+    <p class="mt-1 text-xs text-ink-faint">El layout debe incluir <code class="font-mono">{{ content }}</code> o <code class="font-mono">{content}</code> donde irá el cuerpo del email.</p>
+  </div>
+
+  <div>
+    <label class="label" for="<%= composer_id %>_subject">Asunto</label>
+    <%= text_field_tag subject_name, subject,
+          class: "input w-full",
+          id: "#{composer_id}_subject",
+          data: { email_composer_target: "subjectInput" } %>
+  </div>
+
+  <div>
+    <label class="label">Cuerpo</label>
+    <%= render "shared/email_body_editor",
+          body_name: body_name,
+          body_editor_name: body_editor_name,
+          body: body.to_s,
+          body_editor: body_editor.presence || "quill",
+          editor_id: composer_id %>
+  </div>
+
+  <% if show_preview %>
+    <%= render "shared/email_preview_panel",
+          preview_url: preview_email_templates_path,
+          source_form_id: source_form_id,
+          tokens: EmailTemplatePreview::STANDARD_TOKENS %>
+  <% end %>
+</div>

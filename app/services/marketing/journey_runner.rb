@@ -52,9 +52,8 @@ module Marketing
     def journey = enrollment.journey
 
     def send_email!
-      template_id = step.config["email_template_id"]
-      template = workspace.email_templates.find_by(id: template_id)
-      return move_next! unless template && person.email.present?
+      email_content = Marketing::EmailContent.from_journey_step(step, workspace: workspace)
+      return move_next! unless email_content.present? && person.email.present?
 
       subscription_type = resolve_subscription_type
       unless Marketing::SendGuard.allowed?(workspace: workspace, address: person.email, subscription_type: subscription_type)
@@ -66,11 +65,12 @@ module Marketing
         user: workspace.briefing_actor,
         record: person,
         to_address: person.email,
-        subject: template.render_subject_for(person),
-        body: template.render_for(person),
+        subject: email_content.render_subject_for(person),
+        body: email_content.render_for(person),
         marketing_send: true
       )
-      Marketing::Esp::Client.for(message).deliver!
+      email_content.attach_to(message)
+      Marketing::Esp::Client.for(message, subscription_type: subscription_type).deliver!
       move_next!
     end
 

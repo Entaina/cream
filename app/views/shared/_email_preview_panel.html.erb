@@ -1,0 +1,44 @@
+<%# locals: (preview_url:, source_form_id:, tokens: EmailTemplatePreview::STANDARD_TOKENS, prefilled: {}, sample_content: nil, show_layout_sample: false) %>
+<% prefilled = prefilled.stringify_keys %>
+<div class="card p-4 space-y-3"
+     data-controller="email-preview"
+     data-email-preview-preview-url-value="<%= preview_url %>"
+     data-email-preview-source-form-id-value="<%= source_form_id %>"
+     data-email-preview-prefilled-value="<%= prefilled.to_json %>">
+  <div>
+    <h3 class="text-sm font-semibold text-ink">Vista previa</h3>
+    <p class="text-xs text-ink-faint mt-1">Rellena variables opcionales para ver cómo quedará el correo. Los campos vacíos usan valores de ejemplo.</p>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2" data-email-preview-target="tokenFields">
+    <% tokens.each do |token| %>
+      <div>
+        <label class="label text-xs" for="preview_token_<%= token %>_<%= source_form_id %>">{<%= token %>}</label>
+        <input type="text"
+               id="preview_token_<%= token %>_<%= source_form_id %>"
+               value="<%= prefilled[token] %>"
+               placeholder="<%= EmailTemplatePreview::SAMPLE_DEFAULTS[token] %>"
+               class="input w-full py-1 text-sm"
+               data-email-preview-target="tokenInput"
+               data-token-name="<%= token %>">
+      </div>
+    <% end %>
+  </div>
+
+  <% if show_layout_sample %>
+    <div>
+      <label class="label text-xs" for="preview_sample_content_<%= source_form_id %>">Contenido de ejemplo</label>
+      <textarea id="preview_sample_content_<%= source_form_id %>"
+                rows="4"
+                class="input w-full text-sm font-mono"
+                data-email-preview-target="sampleContent"><%= sample_content || EmailTemplatePreview::SAMPLE_CONTENT %></textarea>
+      <p class="text-xs text-ink-faint mt-1">HTML o texto que se insertará en <code class="font-mono">{{ content }}</code>.</p>
+    </div>
+  <% end %>
+
+  <button type="button"
+          class="btn-secondary"
+          data-action="email-preview#open">
+    Vista previa
+  </button>
+</div>

@@ -101,17 +101,20 @@ RSpec.describe "Api::V1::Marketing", type: :request do
   end
 
   describe "POST /api/v1/marketing/campaigns/:campaign_id/sends" do
-    it "queues CampaignSendJob" do
-      campaign = workspace.campaigns.create!(name: "API Campaign", status: "draft")
+    it "queues CampaignSendJob when campaign has inline content" do
+      campaign = workspace.campaigns.create!(
+        name: "API Campaign",
+        status: "draft",
+        email_subject: "Hi",
+        email_body: "Hello"
+      )
       segment = workspace.segments.create!(name: "All", record_type: "Person", user: admin, filters: {})
-      template = workspace.email_templates.create!(name: "Tpl", body: "Hi", user: admin)
 
       expect {
         post "/api/v1/marketing/campaigns/#{campaign.id}/sends",
           params: {
             campaign_send: {
-              segment_id: segment.id,
-              email_template_id: template.id
+              segment_id: segment.id
             }
           },
           headers: headers,
@@ -120,6 +123,18 @@ RSpec.describe "Api::V1::Marketing", type: :request do
 
       expect(response).to have_http_status(:created)
       expect(response.parsed_body["queued"]).to be(true)
+    end
+
+    it "returns 422 when campaign has no email content" do
+      campaign = workspace.campaigns.create!(name: "Empty", status: "draft")
+      segment = workspace.segments.create!(name: "All", record_type: "Person", user: admin, filters: {})
+
+      post "/api/v1/marketing/campaigns/#{campaign.id}/sends",
+        params: { campaign_send: { segment_id: segment.id } },
+        headers: headers,
+        as: :json
+
+      expect(response).to have_http_status(:unprocessable_entity)
     end
   end
 

@@ -1,11 +1,13 @@
+<% journey_form_id = dom_id(journey, :form) %>
 <%= form_with model: journey,
       html: {
+        id: journey_form_id,
         data: {
           controller: "journey-form",
           action: "nested-form:changed->journey-form#stepAdded"
         }
       },
-      class: "card p-4 space-y-4 max-w-3xl" do |f| %>
+      class: "card p-4 space-y-4 max-w-4xl" do |f| %>
   <% if journey.errors.any? %>
     <div class="rounded-lg bg-danger-soft text-danger-strong ring-1 ring-danger-line px-3 py-2 text-sm">
       <%= journey.errors.full_messages.to_sentence %>
@@ -102,14 +104,14 @@
 
     <div data-nested-form-target="list" class="space-y-3">
       <%= f.fields_for :steps do |step_form| %>
-        <%= render "step_fields", f: step_form %>
+        <%= render "step_fields", f: step_form, journey_form_id: journey_form_id %>
       <% end %>
     </div>
 
     <template data-nested-form-target="template">
       <%= f.fields_for :steps, JourneyStep.new(position: 0, step_type: "send_email", active: true),
             child_index: "NEW_RECORD" do |step_form| %>
-        <%= render "step_fields", f: step_form %>
+        <%= render "step_fields", f: step_form, journey_form_id: journey_form_id %>
       <% end %>
     </template>
   </div>

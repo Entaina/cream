@@ -11,7 +11,7 @@ module Marketing
       @campaign = campaign_send.campaign
       @segment = campaign_send.segment
       @workspace = campaign_send.workspace
-      @template = campaign_send.email_template
+      @email_content = @campaign.email_content
       @user = campaign_send.user
       @subscription_type = campaign_send.subscription_type || default_subscription_type
     end
@@ -19,6 +19,7 @@ module Marketing
     def call
       return unless CreamFeatures.enabled?(:marketing_campaigns)
       return if @campaign_send.status == "cancelled"
+      return mark_empty_failure! unless @email_content.present?
 
       @campaign_send.mark_started!
       @campaign.update!(status: "sending")
@@ -57,11 +58,16 @@ module Marketing
 
     private
 
-    attr_reader :subscription_type
+    attr_reader :subscription_type, :email_content
 
     def default_subscription_type
       SubscriptionType.ensure_defaults!(@workspace)
       @workspace.subscription_types.find_by(slug: "newsletter")
+    end
+
+    def mark_empty_failure!
+      @campaign_send.mark_failed!(stats: { "sent" => 0, "skipped" => 0, "failed" => 0, "last_error" => "missing_email_content" })
+      @campaign.update!(status: "draft")
     end
 
     def resolve_recipients
@@ -94,9 +100,9 @@ module Marketing
 
       variant = pick_variant(email)
       subject, body = if variant
-        @template.render_custom_for(person, subject: variant.subject, body: variant.body)
+        email_content.render_custom_for(person, subject: variant.subject, body: variant.body)
       else
-        [ @template.render_subject_for(person), @template.render_for(person) ]
+        [ email_content.render_subject_for(person), email_content.render_for(person) ]
       end
 
       message = @workspace.email_messages.create!(
@@ -109,7 +115,7 @@ module Marketing
         campaign_variant: variant,
         marketing_send: true
       )
-      attach_template_files(message)
+      email_content.attach_to(message)
       delivered = Marketing::Esp::Client.for(message, subscription_type: subscription_type).deliver!
       unless delivered
         @last_error = "ESP delivery failed"
@@ -127,12 +133,6 @@ module Marketing
     def pick_variant(email)
       variants = @campaign_send.campaign_variants.to_a
       CampaignVariant.pick_for_email(variants, email)
-    end
-
-    def attach_template_files(message)
-      return unless @template.attachments.attached?
-
-      @template.attachments.each { |file| message.attachments.attach(file.blob) }
     end
   end
 end

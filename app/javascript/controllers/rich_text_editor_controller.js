@@ -45,6 +45,8 @@ export default class extends Controller {
     this.quill.on("text-change", () => this.sync())
     this.setContentHandler = (event) => this.setContent(event.detail?.html ?? "")
     this.element.addEventListener("rich-text-editor:set", this.setContentHandler)
+    this.syncRequestHandler = () => this.sync()
+    this.element.addEventListener("rich-text-editor:sync-request", this.syncRequestHandler)
 
     this.form = this.element.closest("form")
     if (this.form) {
@@ -59,6 +61,9 @@ export default class extends Controller {
     }
     if (this.setContentHandler) {
       this.element.removeEventListener("rich-text-editor:set", this.setContentHandler)
+    }
+    if (this.syncRequestHandler) {
+      this.element.removeEventListener("rich-text-editor:sync-request", this.syncRequestHandler)
     }
     this.quill = null
   }

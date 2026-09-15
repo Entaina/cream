@@ -1,6 +1,14 @@
 <%# locals: (record:, email_message:, show_history: true) %>
 <% templates_enabled = feature_enabled?(:email_templates) %>
 <% templates = templates_enabled ? current_workspace.email_templates.visible_to(current_user).ordered.includes(attachments_attachments: :blob) : EmailTemplate.none %>
+<% email_form_id = dom_id(record, :email_form) %>
+<% preview_prefilled = {
+  "first_name" => record.try(:first_name),
+  "last_name" => record.try(:last_name),
+  "name" => (record.try(:display_name) || record.try(:name)),
+  "company" => record.try(:company)&.name,
+  "email" => record.try(:email)
+}.compact %>
 <section
   data-controller="template-picker"
   data-template-picker-first-name-value="<%= record.try(:first_name) %>"
@@ -12,13 +20,15 @@
     <%= icon :mail, classes: "size-3.5" %> <%= t("shared.email.title") %>
   </h3>
 
-  <%= form_with model: email_message, url: record_emails_path(record_type: record.class.name, record_id: record.id), class: "card p-3 mb-3", multipart: true do |f| %>
+  <%= form_with model: email_message, url: record_emails_path(record_type: record.class.name, record_id: record.id), html: { id: email_form_id }, class: "card p-3 mb-3", multipart: true do |f| %>
+    <%= hidden_field_tag :record_type, record.class.name %>
+    <%= hidden_field_tag :record_id, record.id %>
     <% if templates_enabled %>
       <div class="mb-2">
         <%= select_tag :template_picker,
               safe_join(templates.map { |template|
                 attachment_meta = template.attachments.map { |file| { id: file.id, filename: file.filename.to_s, byte_size: file.byte_size } }
-                tag.option(template.name, value: template.id, data: { subject: template.subject, body: template.body, attachments: attachment_meta.to_json })
+                tag.option(template.name, value: template.id, data: { subject: template.subject, body: template.picker_body, attachments: attachment_meta.to_json })
               }),
               include_blank: templates.any? ? t("shared.email.insert_template") : t("shared.email.no_templates"),
               disabled: templates.none?,
@@ -56,6 +66,12 @@
       </ul>
       <%= f.file_field :attachments, multiple: true, class: "file-input" %>
     </div>
+    <%= render "shared/email_preview_panel",
+          preview_url: preview_record_emails_path,
+          source_form_id: email_form_id,
+          tokens: EmailTemplatePreview::STANDARD_TOKENS,
+          prefilled: preview_prefilled %>
+
     <div class="flex items-end justify-between gap-2 flex-wrap">
       <div class="flex gap-2 flex-wrap">
         <label class="text-sm text-ink-faint flex items-center gap-1.5">

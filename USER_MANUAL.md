@@ -4,7 +4,7 @@
 
 Cream is a **workspace**-based CRM for managing **people**, **companies** and **deals** (opportunities), with notes, tasks, lists and an activity history shared across the team.
 
-> **Last revision:** 2026-09-15 (campaign history on the person record)
+> **Last revision:** 2026-09-15 (campaign and journey email content)
 > This document describes the functionality **visible to the user**. Disabled features are listed at the end under "Coming soon".
 
 ---
@@ -689,9 +689,11 @@ account; do not share authorization links or tokens.
 
 **Templates** save you from rewriting frequent emails (introduction, follow-up, etc.).
 
-- **Create and manage:** go to **Plantillas** (Templates) from the sidebar menu. Each template has a **name**, **subject** and **body**, and you can mark it as **shared** with the whole workspace or keep it personal. The **body** uses a rich text editor (bold, italic, color, lists, links, etc.); formatting is stored in an email-client-friendly way.
+- **Create and manage:** go to **Plantillas** (Templates) from the sidebar menu. Each template has a **name**, **subject** and **body**, and you can mark it as **shared** with the whole workspace or keep it personal. You can edit the **body** with the **rich text editor** (bold, italic, color, lists, links, etc.) or with **HTML** (tables, images, full documents). If you switch from HTML to the rich text editor and the content uses tags Quill cannot preserve, you will see a warning and can cancel before losing formatting.
+- **Layouts:** on the same screen you can create reusable **layouts** (header, footer, shared styles). A layout is HTML with `{{ content }}` or `{content}` where each template body is inserted. When creating or editing a template, pick an optional layout from the **Layout** dropdown.
 - **Predefined templates (Example):** the organization workspace includes eight templates for the course cycle (first contact, confirmed booking, payment reminders, closing, etc.). You can edit them from **Plantillas** if you are an administrator.
 - **Variables:** use `{first_name}`, `{last_name}`, `{name}`, `{company}` and `{email}` in the subject or body; when inserted they are replaced with the record's data. Texts in square brackets such as `[Nombre del curso]` or `[fechas]` are placeholders you must fill in manually after loading the template.
+- **Preview:** when creating or editing a template or layout, and when composing an email on a record, you will see a **Vista previa** (Preview) block with optional variables (`{first_name}`, `{name}`, etc.). Leave them blank to use sample values or fill them in to check the result. Click **Vista previa** to open the rendered email in a new tab (without sending it).
 - **Use in an email:** in the **Send email** section of a record (Person, Company or Deal), open **Insertar plantilla…** (Insert template…) and pick one. The subject and body are filled in automatically with the variables already substituted for that contact. You can edit the message with the same rich text editor before sending. If there are no templates yet, you will see a link to create them.
 
 ### Bulk sending
@@ -1315,15 +1317,17 @@ Subscriptions created from a form store the same **privacy policy version** as t
 
 ### Campaigns
 
-1. Menu **Campañas** → **Nueva campaña** (New campaign): name, goal, start date and **UTM** parameters (added to email links for attribution).
-2. Open the campaign. Under **Enviar campaña** (Send campaign) choose:
+1. Menu **Campañas** → **Nueva campaña** (New campaign): name, goal, start date, **UTM** parameters, and under **Contenido del email** (Email content) write the send or pick an optional **Plantilla base** (Base template) to copy subject and body as a starting point. Content is stored on the campaign, not as a new global template.
+2. In the same block you can pick a **layout**, switch **editor enriquecido** (rich text) / **HTML**, use `{first_name}`, `{name}`, `{company}`, `{email}` or Liquid `{{ name }}`, and open **Vista previa** (Preview) before saving.
+3. Open the campaign. Under **Enviar campaña** (Send campaign) choose:
    - **Person segment** (required; shows how many recipients match).
-   - **Email template**.
    - **Subscription type**: only contacts **subscribed** to that type receive the send.
    - **Schedule send** (optional): date and time; leave blank for immediate send when you click **Encolar envío** (Queue send).
-3. **A/B test (optional):** subject and body for variants A and B with weights (%). If you fill A/B subjects, they replace the base template subject.
-4. **Send test to your email:** pick template and optional test subject/body.
-5. After sending, review **Historial de envíos** (Send history). With A/B you can **Marcar ganadora** (Mark winner) and **Enviar ganadora al resto** (Send winner to the rest) to those who did not receive it.
+4. **A/B test (optional):** subject and body for variants A and B with weights (%). If you fill A/B subjects, they replace the campaign content subject.
+5. **Send test to your email:** uses content saved on the campaign; optionally try a different subject or body.
+6. After sending, review **Historial de envíos** (Send history). With A/B you can **Marcar ganadora** (Mark winner) and **Enviar ganadora al resto** (Send winner to the rest) to those who did not receive it.
+
+**Plantillas** (Templates) in the sidebar remain available as reusable bases for campaigns, record emails and forms.
 
 **On a person's record** (**Activity** → **Campañas enviadas**):
 
@@ -1355,7 +1359,7 @@ Automated per-contact sequences.
 
 | Step | Action |
 |------|--------|
-| **Enviar email** (Send email) | Template + subscription type (respects consent) |
+| **Enviar email** (Send email) | Write the step email (optional base template, layout, Quill/HTML, preview) + subscription type (respects consent) |
 | **Esperar** (Wait) | Pause N minutes |
 | **Condición** (Condition) | Branch on contact field |
 | **Establecer campo** (Set field) | Change lifecycle |

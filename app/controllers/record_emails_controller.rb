@@ -1,6 +1,20 @@
 class RecordEmailsController < ApplicationController
   include RequiresFeature
+  include EmailPreviewActions
   requires_feature :record_email
+
+  def preview
+    record = find_record
+    authorize EmailMessage, :preview?
+
+    subject, body = EmailTemplatePreview.render_email(
+      subject: params[:subject],
+      body: params[:body],
+      extra_tokens: record_preview_tokens(record).merge(preview_tokens_param)
+    )
+    render_email_preview_result(subject, body)
+  end
+
   def create
     record = find_record
     @message = current_workspace.email_messages.new(email_params.merge(user: current_user, record: record))
@@ -114,5 +128,15 @@ class RecordEmailsController < ApplicationController
     raise ActionController::BadRequest unless EmailMessage::RECORD_TYPES.include?(klass)
 
     klass.constantize.merge(policy_scope(current_workspace.public_send(klass.tableize))).find(params.require(:record_id))
+  end
+
+  def record_preview_tokens(record)
+    {
+      "first_name" => record.try(:first_name),
+      "last_name" => record.try(:last_name),
+      "name" => record.try(:display_name) || record.try(:name),
+      "company" => record.try(:company)&.name,
+      "email" => record.try(:email)
+    }.compact
   end
 end

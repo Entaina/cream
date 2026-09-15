@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_14_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_15_130000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -250,7 +250,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_14_120000) do
     t.bigint "campaign_id", null: false
     t.datetime "completed_at"
     t.datetime "created_at", null: false
-    t.bigint "email_template_id", null: false
+    t.bigint "email_template_id"
     t.datetime "scheduled_at"
     t.bigint "segment_id", null: false
     t.datetime "started_at"
@@ -282,6 +282,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_14_120000) do
 
   create_table "campaigns", force: :cascade do |t|
     t.datetime "created_at", null: false
+    t.text "email_body"
+    t.string "email_body_editor", default: "quill", null: false
+    t.bigint "email_layout_id"
+    t.string "email_subject"
+    t.bigint "email_template_id"
     t.text "goal"
     t.string "name", null: false
     t.date "starts_on"
@@ -293,6 +298,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_14_120000) do
     t.string "utm_source"
     t.string "utm_term"
     t.bigint "workspace_id", null: false
+    t.index ["email_layout_id"], name: "index_campaigns_on_email_layout_id"
+    t.index ["email_template_id"], name: "index_campaigns_on_email_template_id"
     t.index ["workspace_id"], name: "index_campaigns_on_workspace_id"
   end
 
@@ -452,6 +459,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_14_120000) do
     t.index ["occurred_at"], name: "index_email_events_on_occurred_at"
   end
 
+  create_table "email_layouts", force: :cascade do |t|
+    t.text "body", null: false
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "workspace_id", null: false
+    t.index ["workspace_id"], name: "index_email_layouts_on_workspace_id"
+  end
+
   create_table "email_messages", force: :cascade do |t|
     t.text "body", null: false
     t.bigint "campaign_id"
@@ -529,7 +545,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_14_120000) do
 
   create_table "email_templates", force: :cascade do |t|
     t.text "body", null: false
+    t.string "body_editor", default: "quill", null: false
     t.datetime "created_at", null: false
+    t.bigint "email_layout_id"
     t.string "key"
     t.string "name", null: false
     t.boolean "shared", default: false, null: false
@@ -537,6 +555,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_14_120000) do
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.bigint "workspace_id", null: false
+    t.index ["email_layout_id"], name: "index_email_templates_on_email_layout_id"
     t.index ["user_id"], name: "index_email_templates_on_user_id"
     t.index ["workspace_id", "key"], name: "index_email_templates_on_workspace_id_and_key", unique: true, where: "(key IS NOT NULL)"
     t.index ["workspace_id"], name: "index_email_templates_on_workspace_id"
@@ -1632,6 +1651,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_14_120000) do
   add_foreign_key "campaign_sends", "users"
   add_foreign_key "campaign_sends", "workspaces"
   add_foreign_key "campaign_variants", "campaign_sends"
+  add_foreign_key "campaigns", "email_layouts", on_delete: :nullify
+  add_foreign_key "campaigns", "email_templates", on_delete: :nullify
   add_foreign_key "campaigns", "workspaces"
   add_foreign_key "comments", "comments", column: "parent_id"
   add_foreign_key "comments", "users"
@@ -1658,6 +1679,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_14_120000) do
   add_foreign_key "editions", "products"
   add_foreign_key "editions", "workspaces"
   add_foreign_key "email_events", "email_messages"
+  add_foreign_key "email_layouts", "workspaces"
   add_foreign_key "email_messages", "campaign_variants"
   add_foreign_key "email_messages", "campaigns"
   add_foreign_key "email_messages", "email_messages", column: "in_reply_to_id"
@@ -1667,6 +1689,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_14_120000) do
   add_foreign_key "email_subscriptions", "subscription_types"
   add_foreign_key "email_subscriptions", "workspaces"
   add_foreign_key "email_suppressions", "workspaces"
+  add_foreign_key "email_templates", "email_layouts", on_delete: :nullify
   add_foreign_key "email_templates", "users"
   add_foreign_key "email_templates", "workspaces"
   add_foreign_key "gmail_connections", "users"

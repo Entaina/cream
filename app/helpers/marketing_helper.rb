@@ -171,8 +171,13 @@ module MarketingHelper
     config = step.config.to_h
     case step.step_type
     when "send_email"
-      template = workspace.email_templates.find_by(id: config["email_template_id"])
-      "Enviar «#{template&.name || 'plantilla'}»"
+      if config["subject"].present? || config["body"].present?
+        label = config["subject"].presence || truncate(config["body"].to_s, length: 40)
+        "Enviar «#{label}»"
+      else
+        template = workspace.email_templates.find_by(id: config["email_template_id"])
+        "Enviar «#{template&.name || 'plantilla'}»"
+      end
     when "wait"
       "Esperar #{config['minutes'] || 1} min"
     when "create_task"

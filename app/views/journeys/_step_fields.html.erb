@@ -20,14 +20,25 @@
 
   <% config = f.object.config.to_h.stringify_keys %>
   <% prefix = "#{f.object_name}[config]" %>
+  <% composer_id = "#{f.object_name.tr("[", "_").tr("]", "")}_email" %>
 
-  <div data-journey-form-target="stepField" data-step-type="send_email" class="space-y-2">
-    <div>
-      <label class="label">Plantilla de email</label>
-      <%= select_tag "#{prefix}[email_template_id]",
-            options_from_collection_for_select(@email_templates, :id, :name, config["email_template_id"]),
-            include_blank: "Selecciona plantilla", class: "input w-full" %>
-    </div>
+  <div data-journey-form-target="stepField" data-step-type="send_email" class="space-y-3">
+    <%= render "shared/email_composer",
+          composer_id: composer_id,
+          source_form_id: journey_form_id,
+          email_templates: @email_templates,
+          email_layouts: @email_layouts,
+          subject_name: "#{prefix}[subject]",
+          body_name: "#{prefix}[body]",
+          body_editor_name: "#{prefix}[body_editor]",
+          email_layout_id_name: "#{prefix}[email_layout_id]",
+          email_template_id_name: "#{prefix}[email_template_id]",
+          subject: config["subject"],
+          body: config["body"],
+          body_editor: config["body_editor"].presence || "quill",
+          email_layout_id: config["email_layout_id"],
+          email_template_id: config["email_template_id"] %>
+
     <div>
       <label class="label">Tipo de suscripción</label>
       <%= select_tag "#{prefix}[subscription_type_id]",

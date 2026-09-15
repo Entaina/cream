@@ -1,16 +1,43 @@
 class EmailTemplatesController < ApplicationController
   include RequiresFeature
+  include EmailPreviewActions
   requires_feature :email_templates
-  before_action :set_template, only: %i[edit update destroy]
+  before_action :set_template, only: %i[show edit update destroy]
+
+  def show
+    authorize @template
+    render json: {
+      id: @template.id,
+      subject: @template.subject,
+      body: @template.body,
+      body_editor: @template.effective_body_editor,
+      email_layout_id: @template.email_layout_id
+    }
+  end
+
+  def preview
+    authorize EmailTemplate, :preview?
+
+    layout = preview_layout
+    subject, body = EmailTemplatePreview.render_template(
+      subject: params[:subject],
+      body: params[:body],
+      layout: layout,
+      extra_tokens: preview_tokens_param
+    )
+    render_email_preview_result(subject, body)
+  end
 
   def index
-    @templates = policy_scope(current_workspace.email_templates).visible_to(current_user).ordered.includes(attachments_attachments: :blob)
+    @templates = policy_scope(current_workspace.email_templates).visible_to(current_user).ordered.includes(:email_layout, attachments_attachments: :blob)
+    @layouts = policy_scope(current_workspace.email_layouts).ordered
     authorize EmailTemplate
   end
 
   def new
     @template = current_workspace.email_templates.new(user: current_user)
     authorize @template
+    @preview_tokens = preview_token_names(@template)
   end
 
   def create
@@ -26,6 +53,7 @@ class EmailTemplatesController < ApplicationController
 
   def edit
     authorize @template
+    @preview_tokens = preview_token_names(@template)
   end
 
   def update
@@ -60,7 +88,7 @@ class EmailTemplatesController < ApplicationController
   end
 
   def template_params
-    params.require(:email_template).permit(:name, :subject, :body, :shared, attachments: [])
+    params.require(:email_template).permit(:name, :subject, :body, :body_editor, :email_layout_id, :shared, attachments: [])
   end
 
   def purge_attachments
@@ -68,5 +96,19 @@ class EmailTemplatesController < ApplicationController
     return if ids.empty?
 
     @template.attachments.where(id: ids).find_each(&:purge)
+  end
+
+  def preview_layout
+    return if params[:email_layout_id].blank?
+
+    policy_scope(current_workspace.email_layouts).find_by(id: params[:email_layout_id])
+  end
+
+  def preview_token_names(template)
+    (EmailTemplatePreview::STANDARD_TOKENS + EmailTemplatePreview.extract_tokens(
+      template.subject,
+      template.body,
+      template.email_layout&.body
+    )).uniq.sort
   end
 end

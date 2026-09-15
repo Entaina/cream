@@ -28,6 +28,7 @@ class Workspace < ApplicationRecord
   has_many :notifications, dependent: :destroy
   has_many :record_attachments, dependent: :destroy
   has_many :email_templates, dependent: :destroy
+  has_many :email_layouts, dependent: :destroy
   has_many :email_messages, dependent: :destroy
   has_many :gmail_connections, dependent: :destroy
   has_many :webhooks, dependent: :destroy

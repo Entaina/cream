@@ -157,17 +157,17 @@ RSpec.describe "Mcp marketing tools", type: :request do
 
   describe "send_campaign" do
     it "queues CampaignSendJob without calling the ESP" do
-      campaign = workspace.campaigns.create!(name: "Launch", status: "draft")
+      campaign = workspace.campaigns.create!(
+        name: "Launch",
+        status: "draft",
+        email_subject: "Hello",
+        email_body: "Hello body"
+      )
       segment = workspace.segments.create!(
         name: "Everyone",
         record_type: "Person",
         user: admin,
         filters: {}
-      )
-      template = workspace.email_templates.create!(
-        name: "Tpl",
-        body: "Hello",
-        user: admin
       )
       person = create_person!(workspace, email: "send@example.com")
       type = workspace.subscription_types.find_by!(slug: "general")
@@ -178,8 +178,7 @@ RSpec.describe "Mcp marketing tools", type: :request do
       expect {
         result = call_tool("send_campaign", {
           campaign_id: campaign.id,
-          segment_id: segment.id,
-          email_template_id: template.id
+          segment_id: segment.id
         })
         expect(result["queued"]).to be(true)
       }.to have_enqueued_job(CampaignSendJob)

@@ -4,7 +4,7 @@
 
 Cream es un CRM por **workspaces** para gestionar **personas**, **empresas** y **deals** (oportunidades), con notas, tareas, listas y un historial de actividad compartido en el equipo.
 
-> **Última revisión:** 2026-09-15 (histórico de campañas en la ficha de persona)
+> **Última revisión:** 2026-09-15 (email propio en campañas y recorridos)
 > Este documento describe la funcionalidad **visible para el usuario**. Las funcionalidades desactivadas aparecen al final en «Próximamente».
 
 ---
@@ -689,9 +689,11 @@ cuenta; no compartas enlaces de autorización ni tokens.
 
 Las **plantillas** te ahorran reescribir correos frecuentes (presentación, seguimiento, etc.).
 
-- **Crear y gestionar:** entra en **Plantillas** desde el menú lateral. Cada plantilla tiene **nombre**, **asunto** y **cuerpo**, y puedes marcarla como **compartida** con todo el workspace o dejarla personal. El **cuerpo** se edita con un editor enriquecido (negrita, cursiva, color, listas, enlaces, etc.); los estilos se guardan de forma compatible con clientes de email.
+- **Crear y gestionar:** entra en **Plantillas** desde el menú lateral. Cada plantilla tiene **nombre**, **asunto** y **cuerpo**, y puedes marcarla como **compartida** con todo el workspace o dejarla personal. El **cuerpo** puedes editarlo con **editor enriquecido** (negrita, cursiva, color, listas, enlaces, etc.) o con **HTML** (tablas, imágenes, documento completo). Si pasas de HTML al editor enriquecido y el contenido tiene etiquetas que Quill no conserva, verás un aviso y podrás cancelar antes de perder formato.
+- **Layouts:** en la misma pantalla puedes crear **layouts** reutilizables (cabecera, pie, estilos). Un layout es HTML con `{{ content }}` o `{content}` donde se insertará el cuerpo de cada plantilla. Al crear o editar una plantilla, elige un layout opcional en el desplegable **Layout**.
 - **Plantillas predefinidas (Example):** el workspace de organización incluye ocho plantillas del ciclo de curso (primer contacto, reserva confirmada, recordatorios de pago, cierre, etc.). Puedes editarlas desde **Plantillas** si eres administrador.
 - **Variables:** usa `{first_name}`, `{last_name}`, `{name}`, `{company}` y `{email}` en el asunto o el cuerpo; al insertarlas se sustituyen por los datos del registro. Los textos entre corchetes como `[Nombre del curso]` o `[fechas]` son marcadores que debes completar manualmente tras cargar la plantilla.
+- **Vista previa:** al crear o editar una plantilla o layout, y también al redactar un email en una ficha, verás un bloque **Vista previa** con variables opcionales (`{first_name}`, `{name}`, etc.). Déjalas vacías para usar valores de ejemplo o rellénalas para comprobar el resultado. Pulsa **Vista previa** para abrir el correo renderizado en una pestaña nueva (sin enviarlo).
 - **Usar en un email:** en la sección **Send email** de una ficha (Person, Company o Deal), despliega **Insertar plantilla…** y elige una. El asunto y el cuerpo se rellenan automáticamente con las variables ya sustituidas para ese contacto. Puedes editar el texto con el mismo editor enriquecido antes de enviar. Si aún no hay plantillas, verás un enlace para crearlas.
 
 ### Envío masivo
@@ -1315,15 +1317,17 @@ Las suscripciones creadas desde un formulario guardan la misma **versión de pol
 
 ### Campañas
 
-1. Menú **Campañas** → **Nueva campaña**: nombre, objetivo, fecha de inicio y parámetros **UTM** (se añaden a los enlaces del email para atribución).
-2. Abre la campaña creada. En **Enviar campaña** elige:
+1. Menú **Campañas** → **Nueva campaña**: nombre, objetivo, fecha de inicio, parámetros **UTM** y, en **Contenido del email**, redacta el envío o elige una **plantilla base (opcional)** para copiar asunto y cuerpo como punto de partida. El contenido se guarda en la campaña, no como plantilla global nueva.
+2. En el mismo bloque puedes elegir un **layout**, alternar **editor enriquecido** / **HTML**, usar variables `{first_name}`, `{name}`, `{company}`, `{email}` o Liquid `{{ name }}`, y abrir **Vista previa** antes de guardar.
+3. Abre la campaña creada. En **Enviar campaña** elige:
    - **Segmento de personas** (obligatorio; muestra cuántos destinatarios coinciden).
-   - **Plantilla de email**.
    - **Tipo de suscripción**: solo recibirán el envío contactos **suscritos** a ese tipo.
    - **Programar envío** (opcional): fecha y hora; vacío = envío inmediato al pulsar **Encolar envío**.
-3. **Prueba A/B (opcional):** asunto y cuerpo de variantes A y B con pesos (%). Si rellenas asuntos A/B, sustituyen al de la plantilla base.
-4. **Enviar prueba a tu email:** elige plantilla y, opcionalmente, asunto/cuerpo de prueba.
-5. Tras el envío, revisa **Historial de envíos** (estado, omitidos, fallidos). Con A/B puedes **Marcar ganadora** y **Enviar ganadora al resto** a quienes no la recibieron.
+4. **Prueba A/B (opcional):** asunto y cuerpo de variantes A y B con pesos (%). Si rellenas asuntos A/B, sustituyen al asunto del contenido de la campaña.
+5. **Enviar prueba a tu email:** usa el contenido guardado en la campaña; opcionalmente prueba otro asunto o cuerpo.
+6. Tras el envío, revisa **Historial de envíos** (estado, omitidos, fallidos). Con A/B puedes **Marcar ganadora** y **Enviar ganadora al resto** a quienes no la recibieron.
+
+Las **Plantillas** del menú lateral siguen disponibles como bases reutilizables para campañas, fichas y formularios.
 
 **En la ficha de una persona** (**Activity** → **Campañas enviadas**):
 
@@ -1355,7 +1359,7 @@ Secuencias automatizadas por contacto.
 
 | Paso | Qué hace |
 |------|----------|
-| **Enviar email** | Plantilla + tipo de suscripción (respeta consentimiento) |
+| **Enviar email** | Redacta el email del paso (plantilla base opcional, layout, Quill/HTML, vista previa) + tipo de suscripción (respeta consentimiento) |
 | **Esperar** | Pausa N minutos |
 | **Condición** | Rama según campo del contacto |
 | **Establecer campo** | Cambia ciclo de vida |

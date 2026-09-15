@@ -22,11 +22,42 @@
     </div>
   </section>
 
+  <section class="card p-4 space-y-3">
+    <div class="flex items-center justify-between gap-2 flex-wrap">
+      <h2 class="font-semibold">Contenido del email</h2>
+      <%= link_to "Editar contenido", edit_campaign_path(@campaign), class: "btn-secondary text-sm" %>
+    </div>
+    <% if @campaign.email_content_present? %>
+      <dl class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+        <div>
+          <dt class="text-ink-faint">Asunto</dt>
+          <dd><%= @campaign.email_subject.presence || @campaign.email_template&.subject || "—" %></dd>
+        </div>
+        <div>
+          <dt class="text-ink-faint">Layout</dt>
+          <dd><%= @campaign.email_layout&.name || @campaign.email_template&.email_layout&.name || "Sin layout" %></dd>
+        </div>
+        <% if @campaign.email_template.present? %>
+          <div class="sm:col-span-2">
+            <dt class="text-ink-faint">Basado en plantilla</dt>
+            <dd><%= @campaign.email_template.name %></dd>
+          </div>
+        <% end %>
+      </dl>
+    <% else %>
+      <p class="text-sm text-ink-faint">Aún no hay contenido de email. <%= link_to "Edita la campaña", edit_campaign_path(@campaign), class: "text-accent hover:underline" %> para redactar el envío o elegir una plantilla como base.</p>
+    <% end %>
+  </section>
+
   <section class="card p-4 space-y-4">
     <div class="flex items-center gap-2 flex-wrap">
       <h2 class="font-semibold">Enviar campaña</h2>
       <%= campaign_status_badge(@campaign.status) %>
     </div>
+
+    <% unless @campaign.email_content_present? %>
+      <p class="text-sm text-danger-strong">Configura el contenido del email antes de encolar un envío.</p>
+    <% end %>
 
     <div data-controller="segment-preview"
          data-segment-preview-url-value="<%= recipient_count_campaign_path(@campaign) %>">
@@ -45,15 +76,6 @@
           <p class="text-sm text-ink-faint mt-1">
             <span data-segment-preview-target="count">…</span> destinatarios coinciden con el segmento.
           </p>
-        </div>
-
-        <div>
-          <label class="label">Plantilla de email</label>
-          <%= select_tag :email_template_id,
-                options_from_collection_for_select(current_workspace.email_templates.ordered, :id, :name),
-                include_blank: "Selecciona una plantilla",
-                class: "input w-full",
-                required: true %>
         </div>
 
         <div>
@@ -98,34 +120,27 @@
               <%= text_area_tag :variant_b_body, nil, rows: 3, class: "input w-full resize-y" %>
             </div>
           </div>
-          <p class="text-xs text-ink-faint">Si rellenas los asuntos A/B, se ignorará el asunto de la plantilla base.</p>
+          <p class="text-xs text-ink-faint">Si rellenas los asuntos A/B, sustituyen al asunto del contenido de la campaña.</p>
         </fieldset>
 
-        <%= submit_tag "Encolar envío", class: "btn-primary" %>
+        <%= submit_tag "Encolar envío", class: "btn-primary", disabled: !@campaign.email_content_present? %>
       <% end %>
     </div>
 
     <%= form_with url: send_test_campaign_path(@campaign), method: :post, class: "border-t border-line pt-4 space-y-3 max-w-2xl" do %>
       <h3 class="text-sm font-semibold">Enviar prueba a tu email</h3>
-      <div>
-        <label class="label">Plantilla</label>
-        <%= select_tag :email_template_id,
-              options_from_collection_for_select(current_workspace.email_templates.ordered, :id, :name),
-              include_blank: "Selecciona una plantilla",
-              class: "input w-full",
-              required: true %>
-      </div>
+      <p class="text-sm text-ink-faint">Usa el contenido guardado en la campaña. Opcionalmente puedes probar otro asunto o cuerpo.</p>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
         <div>
           <label class="label">Asunto prueba (opcional)</label>
-          <%= text_field_tag :variant_a_subject, nil, class: "input w-full", placeholder: "Sustituye asunto de plantilla" %>
+          <%= text_field_tag :variant_a_subject, nil, class: "input w-full", placeholder: "Sustituye asunto de la campaña" %>
         </div>
         <div class="md:col-span-2">
           <label class="label">Cuerpo prueba (opcional)</label>
           <%= text_area_tag :variant_a_body, nil, rows: 2, class: "input w-full resize-y" %>
         </div>
       </div>
-      <%= submit_tag "Enviar prueba", class: "btn-secondary" %>
+      <%= submit_tag "Enviar prueba", class: "btn-secondary", disabled: !@campaign.email_content_present? %>
     <% end %>
   </section>
 

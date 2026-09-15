@@ -16,13 +16,18 @@ RSpec.describe Marketing::CampaignSender do
     )
   end
   let(:campaign) do
-    workspace.campaigns.create!(name: "Newsletter", status: "draft")
+    workspace.campaigns.create!(
+      name: "Newsletter",
+      status: "draft",
+      email_subject: "Hola {first_name}",
+      email_body: "Cuerpo {first_name}"
+    )
   end
   let(:campaign_send) do
     workspace.campaign_sends.create!(
       campaign: campaign,
       segment: segment,
-      email_template: template,
+      email_template: nil,
       user: user,
       status: "pending"
     )
@@ -54,6 +59,36 @@ RSpec.describe Marketing::CampaignSender do
     expect(campaign_send.reload.status).to eq("sent")
     expect(campaign.reload.status).to eq("sent")
     expect(workspace.email_messages.where(marketing_send: true).count).to eq(1)
+  end
+
+  it "uses campaign inline content with A/B variant overrides" do
+    campaign_send.campaign_variants.create!(
+      name: "A",
+      subject: "Variante {first_name}",
+      body: "Cuerpo A {first_name}",
+      weight: 100
+    )
+
+    described_class.call(campaign_send: campaign_send)
+
+    message = workspace.email_messages.where(marketing_send: true).sole
+    expect(message.subject).to eq("Variante Pat")
+    expect(message.body).to include("Cuerpo A Pat")
+  end
+
+  it "marks send failed when campaign has no email content" do
+    empty_campaign = workspace.campaigns.create!(name: "Empty", status: "draft")
+    empty_send = workspace.campaign_sends.create!(
+      campaign: empty_campaign,
+      segment: segment,
+      user: user,
+      status: "pending"
+    )
+
+    described_class.call(campaign_send: empty_send)
+
+    expect(esp_double).not_to have_received(:deliver!)
+    expect(empty_send.reload.status).to eq("failed")
   end
 
   it "excludes suppressed recipients before sending" do

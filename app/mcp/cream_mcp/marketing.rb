@@ -744,11 +744,11 @@ module CreamMcp
         properties: {
           campaign_id: { type: "integer" },
           segment_id: { type: "integer", description: "Must be a Person segment" },
-          email_template_id: { type: "integer" },
+          email_template_id: { type: "integer", description: "Optional when the campaign already has email content" },
           subscription_type_id: { type: "integer", description: "Defaults to newsletter type" },
           scheduled_at: { type: "string", description: "ISO8601 datetime to schedule the send" }
         },
-        required: %w[campaign_id segment_id email_template_id]
+        required: %w[campaign_id segment_id]
       }
     ) do |server_context:, **args|
       return CreamMcp.feature_unavailable_response(:marketing_campaigns) unless CreamFeatures.enabled?(:marketing_campaigns)
@@ -764,7 +764,16 @@ module CreamMcp
           return CreamMcp.error_response("invalid_segment", "Segment must be of type Person")
         end
 
-        template = CreamMcp.policy_scope(pundit_ctx, ws.email_templates).find(CreamMcp.arg(args, "email_template_id"))
+        unless campaign.email_content_present?
+          return CreamMcp.error_response("missing_email_content", "Campaign has no email content configured")
+        end
+
+        template_id = CreamMcp.arg(args, "email_template_id")
+        template = if template_id.present?
+          CreamMcp.policy_scope(pundit_ctx, ws.email_templates).find(template_id)
+        else
+          campaign.email_template
+        end
         subscription_type = CreamMcp::Marketing.resolve_subscription_type(ws, CreamMcp.arg(args, "subscription_type_id"))
         scheduled_at = CreamMcp::Marketing.parse_scheduled_at(CreamMcp.arg(args, "scheduled_at"))
 

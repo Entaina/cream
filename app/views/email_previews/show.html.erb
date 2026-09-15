@@ -1,0 +1,21 @@
+<% content_for :title, @preview_subject.presence || "Vista previa de email" %>
+
+<div class="mx-auto max-w-4xl space-y-4">
+  <div class="rounded-md border border-line bg-canvas px-4 py-3">
+    <p class="text-xs font-semibold uppercase tracking-wider text-ink-faint">Asunto</p>
+    <p class="text-base font-medium text-ink mt-1"><%= @preview_subject.presence || "(sin asunto)" %></p>
+  </div>
+
+  <div class="rounded-md border border-line bg-white shadow-sm overflow-hidden">
+    <% if full_html_document?(@preview_body) %>
+      <iframe title="Vista previa del email"
+              class="w-full min-h-[32rem] border-0"
+              sandbox="allow-same-origin"
+              srcdoc="<%= h(@preview_body) %>"></iframe>
+    <% else %>
+      <div class="p-4 email-body text-sm text-ink-soft break-words">
+        <%= email_body_html(@preview_body) %>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -145,10 +145,16 @@ Rails.application.routes.draw do
   get "exports/:record_type", to: "exports#show", as: :export
 
   resources :record_emails, only: %i[create destroy] do
+    collection { post :preview }
     member { patch :mark_replied }
   end
   resources :reports, only: %i[index create update destroy]
-  resources :email_templates, except: %i[show]
+  resources :email_templates do
+    collection { post :preview }
+  end
+  resources :email_layouts, except: %i[show] do
+    collection { post :preview }
+  end
   resource :mail_merge, only: %i[new create], controller: :mail_merges do
     get :recipients_count
   end

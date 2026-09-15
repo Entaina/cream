@@ -13,7 +13,11 @@ module Api
             return render json: { error: "Segment must be of type Person" }, status: :unprocessable_entity
           end
 
-          template = policy_scope(current_workspace.email_templates).find(send_params[:email_template_id])
+          unless campaign.email_content_present?
+            return render json: { error: "Campaign has no email content configured" }, status: :unprocessable_entity
+          end
+
+          template = resolve_campaign_send_template(campaign, send_params[:email_template_id])
           subscription_type = ::Marketing::ApiPresenter.resolve_subscription_type(
             current_workspace,
             send_params[:subscription_type_id]
@@ -59,6 +63,14 @@ module Api
 
         def send_params
           params.require(:campaign_send).permit(:segment_id, :email_template_id, :subscription_type_id, :scheduled_at)
+        end
+
+        def resolve_campaign_send_template(campaign, template_id)
+          if template_id.present?
+            policy_scope(current_workspace.email_templates).find(template_id)
+          else
+            campaign.email_template
+          end
         end
       end
     end

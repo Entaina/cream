@@ -9,6 +9,27 @@ RSpec.describe "Email templates", type: :request do
   before { sign_in_as(member) }
 
   describe "CRUD" do
+    it "returns template JSON for composer copy-on-select" do
+      template = create_email_template!(workspace, user: member, name: "Base", subject: "Hi", body: "<p>Body</p>")
+
+      get email_template_path(template, format: :json)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.parsed_body).to include(
+        "subject" => "Hi",
+        "body" => a_string_including("Body"),
+        "body_editor" => "quill"
+      )
+    end
+
+    it "shows preview panel on new template form" do
+      get new_email_template_path
+
+      expect(response.body).to include('data-controller="email-preview"')
+      expect(response.body).to include("Vista previa")
+      expect(response.body).to include("{first_name}")
+    end
+
     it "creates a template" do
       expect {
         post email_templates_path, params: {
@@ -30,6 +51,25 @@ RSpec.describe "Email templates", type: :request do
 
       template = EmailTemplate.order(:id).last
       expect(template.body).to include("<strong>Hello</strong>")
+    end
+
+    it "creates a template in html mode with tables and layout" do
+      layout = workspace.email_layouts.create!(name: "Shell", body: "<html><body>{{ content }}</body></html>")
+
+      post email_templates_path, params: {
+        email_template: {
+          name: "Table mail",
+          subject: "Hi",
+          body: '<table><tr><td>Hello</td></tr></table>',
+          body_editor: "html",
+          email_layout_id: layout.id
+        }
+      }
+
+      template = EmailTemplate.order(:id).last
+      expect(template.body_editor).to eq("html")
+      expect(template.body).to include("<table>")
+      expect(template.email_layout).to eq(layout)
     end
 
     it "creates a template with attachments" do
@@ -109,6 +149,23 @@ RSpec.describe "Email templates", type: :request do
       expect(response.body).to include('data-controller="template-picker"')
       expect(response.body).to include("No hay plantillas disponibles")
       expect(response.body).to include("Crear plantillas")
+    end
+
+    it "includes wrapped picker body when template has layout" do
+      layout = workspace.email_layouts.create!(name: "Shell", body: "<html><body>{{ content }}</body></html>")
+      workspace.email_templates.create!(
+        user: member,
+        name: "Wrapped",
+        subject: "Hi {first_name}",
+        body: "Hello {name}",
+        email_layout: layout
+      )
+      person = create_person!(workspace, company: companies(:acme))
+
+      get person_path(person)
+
+      expect(response.body).to include("Hello {name}")
+      expect(response.body).to include("data-body=")
     end
 
     it "renders attachment metadata on template options for deal compose" do

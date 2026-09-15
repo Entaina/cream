@@ -99,6 +99,7 @@ class JourneysController < ApplicationController
     @segments = current_workspace.segments.where(record_type: "Person").ordered
     @booking_pages = current_workspace.booking_pages.order(:name)
     @email_templates = current_workspace.email_templates.ordered
+    @email_layouts = current_workspace.email_layouts.ordered
     @lists = current_workspace.lists.where(record_type: "Person").order(:name)
     @users = current_workspace.users.order(:name)
     SubscriptionType.ensure_defaults!(current_workspace)

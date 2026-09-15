@@ -4,7 +4,7 @@ class CampaignSend < ApplicationRecord
   belongs_to :workspace
   belongs_to :campaign
   belongs_to :segment
-  belongs_to :email_template
+  belongs_to :email_template, optional: true
   belongs_to :user
   belongs_to :subscription_type, optional: true
   has_many :campaign_variants, dependent: :destroy

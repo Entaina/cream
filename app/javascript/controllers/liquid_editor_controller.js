@@ -20,6 +20,18 @@ export default class extends Controller {
     this.previewFormId = this.element.dataset.liquidEditorPreviewFormId
     this.previewForm = this.previewFormId ? document.getElementById(this.previewFormId) : null
 
+    this.setContentHandler = (event) => {
+      const value = event.detail?.value ?? ""
+      if (this.view) {
+        this.view.dispatch({ changes: { from: 0, to: this.view.state.doc.length, insert: value } })
+      } else {
+        this.inputTarget.value = value
+      }
+    }
+    this.element.addEventListener("liquid-editor:set", this.setContentHandler)
+    this.syncRequestHandler = () => this.sync()
+    this.element.addEventListener("liquid-editor:sync", this.syncRequestHandler)
+
     this.submitHandler = () => this.sync()
     if (this.form) {
       this.form.addEventListener("submit", this.submitHandler)
@@ -36,6 +48,12 @@ export default class extends Controller {
     }
     if (this.previewForm && this.previewSubmitHandler) {
       this.previewForm.removeEventListener("submit", this.previewSubmitHandler)
+    }
+    if (this.setContentHandler) {
+      this.element.removeEventListener("liquid-editor:set", this.setContentHandler)
+    }
+    if (this.syncRequestHandler) {
+      this.element.removeEventListener("liquid-editor:sync", this.syncRequestHandler)
     }
     if (this.view) {
       this.view.destroy()
