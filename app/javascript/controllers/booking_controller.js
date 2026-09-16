@@ -90,7 +90,7 @@ const LOCATION_ICONS = {
 export default class extends Controller {
   static targets = [
     "profile", "headingChoose", "eventTypeGrid", "stepEventTypes", "stepSchedule", "stepForm", "stepConfirmation",
-    "backToTypesLabel", "backToScheduleLabel", "monthLabel", "calendarGrid", "scheduleError", "timezoneLabel", "timezoneSelect",
+    "backToTypesWrap", "backToTypesLabel", "backToScheduleLabel", "monthLabel", "calendarGrid", "scheduleError", "timezoneLabel", "timezoneSelect",
     "eventSummary", "slotsHeading", "slotsList", "nextButton", "form", "formFields", "formSummary", "formError",
     "firstNameField", "lastNameField", "emailField", "phoneField", "messageField", "guestsSection",
     "confirmPanel", "confirmHeading", "confirmSummary",
@@ -105,6 +105,7 @@ export default class extends Controller {
     slug: String,
     locale: { type: String, default: "es" },
     timezone: String,
+    eventType: String,
     eventTypesUrl: String,
     availabilityUrl: String,
     bookUrl: String,
@@ -124,6 +125,7 @@ export default class extends Controller {
     this.availabilityRequestId = 0
     this.availabilityAbortController = null
     this.currentStep = "eventTypes"
+    this.deepLinkedEventType = this.hasEventTypeValue ? this.eventTypeValue : null
     this.tracking = this.captureTracking()
     this.parseUrlParams()
     this.detectTimezone()
@@ -271,6 +273,9 @@ export default class extends Controller {
     if (data.timezone) this.timezoneValue = data.timezone
     this.renderProfile()
     this.renderEventTypes()
+    if (this.deepLinkedEventType) {
+      this.selectEventTypeBySlug(this.deepLinkedEventType, { updateUrl: false })
+    }
   }
 
   renderProfile() {
@@ -302,8 +307,18 @@ export default class extends Controller {
   }
 
   selectEventType(event) {
-    const slug = event.currentTarget.dataset.slug
-    this.selectedEventType = this.eventTypes.find((item) => item.slug === slug)
+    this.selectEventTypeBySlug(event.currentTarget.dataset.slug, { updateUrl: true })
+  }
+
+  selectEventTypeBySlug(slug, { updateUrl = true } = {}) {
+    const eventType = this.eventTypes.find((item) => item.slug === slug)
+    if (!eventType) {
+      this.deepLinkedEventType = null
+      this.updateBackToTypesVisibility()
+      return
+    }
+
+    this.selectedEventType = eventType
     this.selectedDate = null
     this.selectedSlot = null
     this.availableDays = {}
@@ -313,10 +328,17 @@ export default class extends Controller {
     this.renderCalendar()
     this.hideScheduleError()
     this.loadMonthAvailability()
+    if (updateUrl) this.updateEventTypeUrl(slug)
+    this.updateBackToTypesVisibility()
   }
 
   backToEventTypes() {
+    this.selectedEventType = null
+    this.selectedDate = null
+    this.selectedSlot = null
     this.showStep("eventTypes")
+    this.updatePageUrl()
+    this.updateBackToTypesVisibility()
   }
 
   backToSchedule() {
@@ -667,7 +689,6 @@ export default class extends Controller {
   }
 
   restart() {
-    this.selectedEventType = null
     this.selectedDate = null
     this.selectedSlot = null
     this.formTarget.reset()
@@ -675,8 +696,34 @@ export default class extends Controller {
     this.formFieldsTarget.classList.remove("hidden")
     this.confirmPanelTarget.classList.add("hidden")
     this.applyFieldVisibility()
+    this.formErrorTarget.classList.add("hidden")
+
+    if (this.deepLinkedEventType) {
+      this.selectEventTypeBySlug(this.deepLinkedEventType, { updateUrl: false })
+      return
+    }
+
+    this.selectedEventType = null
     this.showStep("eventTypes")
     this.loadEventTypes()
+  }
+
+  updateEventTypeUrl(eventTypeSlug) {
+    const url = new URL(window.location.href)
+    url.pathname = `/b/${this.slugValue}/${eventTypeSlug}`
+    history.replaceState({}, "", url)
+  }
+
+  updatePageUrl() {
+    const url = new URL(window.location.href)
+    url.pathname = `/b/${this.slugValue}`
+    history.replaceState({}, "", url)
+  }
+
+  updateBackToTypesVisibility() {
+    if (!this.hasBackToTypesWrapTarget) return
+
+    this.backToTypesWrapTarget.classList.toggle("hidden", Boolean(this.deepLinkedEventType))
   }
 
   timezoneChanged() {

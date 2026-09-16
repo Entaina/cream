@@ -42,7 +42,11 @@ class BookingPage < ApplicationRecord
   end
 
   def public_url
-    Rails.application.routes.url_helpers.public_booking_page_url(slug, host: default_url_host)
+    Rails.application.routes.url_helpers.public_booking_page_url(slug, **public_url_options)
+  end
+
+  def public_url_options
+    {host: default_url_host}
   end
 
   def profile_payload(locale: I18n.locale)
@@ -123,4 +127,6 @@ class BookingPage < ApplicationRecord
 
     "#{host}:#{port}"
   end
+
+  private :default_url_host
 end

@@ -13,6 +13,74 @@ RSpec.describe "Booking pages CRUD", type: :request do
     sign_in_as(user)
   end
 
+  describe "GET /booking_pages" do
+    let!(:booking_page) do
+      page = workspace.booking_pages.new(
+        name: "Agenda",
+        slug: "agenda-crud-test",
+        host: user,
+        pipeline: pipeline,
+        timezone: "Europe/Madrid",
+        calendar_ids: ["primary"]
+      )
+      page.event_types.build(
+        slug: "video",
+        name_i18n: {"es" => "Video", "en" => "Video"},
+        duration_minutes: 30,
+        location_type: "google_meet",
+        weekly_hours: BookingEventType::DEFAULT_WEEKLY_HOURS,
+        slot_increment_minutes: 15,
+        min_notice_hours: 0,
+        visible: true,
+        position: 0
+      )
+      page.save!
+      page
+    end
+
+    it "lists direct event type URLs" do
+      get booking_pages_path
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("URLs directas por tipo")
+      expect(response.body).to include("/b/#{booking_page.slug}/video")
+    end
+  end
+
+  describe "GET /booking_pages/:id/edit" do
+    let!(:booking_page) do
+      page = workspace.booking_pages.new(
+        name: "Agenda",
+        slug: "agenda-crud-test",
+        host: user,
+        pipeline: pipeline,
+        timezone: "Europe/Madrid",
+        calendar_ids: ["primary"]
+      )
+      page.event_types.build(
+        slug: "video",
+        name_i18n: {"es" => "Video", "en" => "Video"},
+        duration_minutes: 30,
+        location_type: "google_meet",
+        weekly_hours: BookingEventType::DEFAULT_WEEKLY_HOURS,
+        slot_increment_minutes: 15,
+        min_notice_hours: 0,
+        visible: true,
+        position: 0
+      )
+      page.save!
+      page
+    end
+
+    it "shows direct event type URL in the form" do
+      get edit_booking_page_path(booking_page)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("URL directa del tipo")
+      expect(response.body).to include("/b/#{booking_page.slug}/video")
+    end
+  end
+
   describe "PATCH /booking_pages/:id" do
     let!(:booking_page) do
       page = workspace.booking_pages.new(

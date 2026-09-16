@@ -9,6 +9,7 @@ module Public
 
     before_action :ensure_feature_enabled
     before_action :set_booking_page
+    before_action :set_event_type, if: -> { params[:event_type].present? }
 
     rate_limit to: 60, within: 1.minute, only: :show, name: "booking_page_show"
 
@@ -25,6 +26,12 @@ module Public
 
     def set_booking_page
       @booking_page = BookingPage.active.find_by!(slug: params[:slug])
+    rescue ActiveRecord::RecordNotFound
+      head :not_found
+    end
+
+    def set_event_type
+      @event_type = @booking_page.event_types.visible.find_by!(slug: params[:event_type])
     rescue ActiveRecord::RecordNotFound
       head :not_found
     end

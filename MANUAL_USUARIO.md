@@ -4,7 +4,7 @@
 
 Cream es un CRM por **workspaces** para gestionar **personas**, **empresas** y **deals** (oportunidades), con notas, tareas, listas y un historial de actividad compartido en el equipo.
 
-> **Última revisión:** 2026-09-16 (reutilizar deal en reservas de calendario)
+> **Última revisión:** 2026-09-16 (enlace directo por tipo de reserva)
 > Este documento describe la funcionalidad **visible para el usuario**. Las funcionalidades desactivadas aparecen al final en «Próximamente».
 
 ---
@@ -201,11 +201,11 @@ La preferencia se guarda en tu usuario, así que se mantiene entre sesiones y di
 
 El dashboard muestra un resumen del workspace:
 
+- **Mis tareas:** tus tareas pendientes próximas, en el bloque principal del dashboard (marca completadas con un clic).
 - **Director de ventas:** briefing diario generado por IA con indicaciones para el equipo, clasificadas en **Urgente** e **Importante**. Solo aparece en workspaces donde un administrador lo haya activado en **Settings** (checkbox *Briefing diario del director de ventas*), y además requiere que la IA esté configurada en el servidor (`CREAM_AI_API_KEY`). Cada usuario puede desactivarlo para sí en **Settings → Profile** (checkbox *Mostrar briefing del director de ventas en el dashboard*); también puedes abrir Profile desde tu nombre en la parte inferior del menú lateral. Para enriquecer el informe, el director usa herramientas de lectura del CRM, el **OKM** del workspace (si está configurado) y **memoria persistente** (llmemory) con aprendizajes de briefings anteriores. Además, cada usuario que lo tenga activado recibe un bloque **Para ti** con indicaciones directas, **Aciertos** (felicitaciones por logros recientes) y **A mejorar** (fallos u omisiones con recomendación). Si un deal ya tiene una **próxima acción** (tarea abierta con fecha futura), el briefing no pide acciones paralelas ni lo marca como inactivo; como mucho puede sugerir **adelantar** esa fecha. Los deals sin tarea abierta sí pueden aparecer como pendientes de definir siguiente paso. Si aún no hay briefing del día, puedes pulsar **Generar ahora**; si ya existe, puedes pulsar **Regenerar** hasta 5 veces al día (se muestra cuántas regeneraciones te quedan). Las indicaciones pueden enlazar a deals, personas, empresas o tareas; en el bloque de equipo se resaltan las asignadas a ti.
 - **Tarjetas de métricas:** número de personas, empresas, valor del pipeline abierto y ingresos ganados (deals en etapa *won*). Las métricas de deals respetan el **pipeline activo** (ver abajo); personas y empresas son del workspace completo.
 - **Pipeline por etapa:** barras con el reparto de deals por etapa. Si tienes un pipeline activo, el gráfico y las tarjetas de deals usan ese pipeline; si eliges **Todos los pipelines**, las tarjetas suman todos los deals y el gráfico agrupa las etapas por nombre con barras apiladas por pipeline (cada tramo muestra el recuento de ese pipeline al pasar el cursor).
-- **Upcoming tasks:** tareas pendientes próximas (marca completadas con un clic).
-- **Recent activity:** últimas acciones del equipo (creaciones, cambios de campo, cambios de etapa, etc.).
+- **Actividad reciente:** últimas acciones del equipo (creaciones, cambios de campo, cambios de etapa, etc.).
 
 Haz clic en cualquier tarjeta o enlace para ir al listado correspondiente.
 
@@ -1273,7 +1273,7 @@ Toda la configuración se hace desde **Reservas** (no hace falta usar seeds ni d
 
 | Campo | Descripción |
 |-------|-------------|
-| Slug | Identificador del tipo en la URL y la API |
+| Slug | Identificador del tipo en la URL directa (`/b/slug-página/slug-tipo`) y la API |
 | Duración (min) | Duración de la cita |
 | Nombre / Descripción (ES y EN) | Textos en la página pública según idioma del visitante |
 | Franjas horarias semanales | Tramos reservables por día; «+ Franja» añade bloques; «Horario laboral por defecto» rellena un ejemplo |
@@ -1287,7 +1287,7 @@ Toda la configuración se hace desde **Reservas** (no hace falta usar seeds ni d
 
 Usa **Añadir tipo** para crear tipos nuevos o el icono de papelera para eliminarlos. Guarda la página para aplicar los cambios.
 
-Copia la **URL pública** y compártela con clientes.
+Copia la **URL pública** y compártela con clientes. Si la página tiene varios tipos, usa la **URL directa del tipo** (en el listado de **Reservas** o al editar el tipo en **URL directa del tipo**) para que el visitante vaya al calendario de ese tipo sin pasar por la pantalla de selección.
 
 ### Qué ocurre al reservar
 
@@ -1298,7 +1298,7 @@ Copia la **URL pública** y compártela con clientes.
 
 ### Página pública (visitante)
 
-Flujo en tres pasos: elegir tipo de evento → calendario y hora (con selector de zona horaria ES/EN) → formulario y confirmación con enlace Meet y descarga `.ics`.
+Flujo en tres pasos: elegir tipo de evento → calendario y hora (con selector de zona horaria ES/EN) → formulario y confirmación con enlace Meet y descarga `.ics`. Con una **URL directa de tipo** (`/b/slug-página/slug-tipo`), el visitante salta el primer paso y entra directamente en el calendario de ese tipo.
 
 ---
 

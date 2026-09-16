@@ -212,6 +212,8 @@ Rails.application.routes.draw do
     get "api/availability", to: "public/booking_api#availability"
     post "api/book", to: "public/booking_api#book"
   end
+  get "b/:slug/:event_type", to: "public/bookings#show", as: :public_booking_event_type,
+      constraints: {event_type: /[a-z0-9-]+/}
 
   get "p/:workspace_slug/:slug", to: "public/landing_pages#show", as: :public_landing_page
   get "e/preferences/:token", to: "public/email_preferences#show", as: :public_email_preferences

@@ -7,7 +7,8 @@
      data-booking-event-types-url-value="<%= public_booking_api_event_types_path(@booking_page.slug) %>"
      data-booking-availability-url-value="<%= public_booking_api_availability_path(@booking_page.slug) %>"
      data-booking-book-url-value="<%= public_booking_api_book_path(@booking_page.slug) %>"
-     data-booking-timestamp-value="<%= BookingPage.signed_timestamp %>">
+     data-booking-timestamp-value="<%= BookingPage.signed_timestamp %>"
+     <% if @event_type.present? %>data-booking-event-type-value="<%= @event_type.slug %>"<% end %>>
   <div class="public-booking-shell">
     <header class="public-booking-hero">
       <div data-booking-target="profile" class="public-booking-profile min-w-0 flex-1"></div>
@@ -43,7 +44,9 @@
       </div>
 
       <div data-booking-target="stepSchedule" class="public-booking-step hidden">
-        <button type="button" data-action="booking#backToEventTypes" class="public-booking-back" data-booking-target="backToTypesLabel"></button>
+        <div data-booking-target="backToTypesWrap">
+          <button type="button" data-action="booking#backToEventTypes" class="public-booking-back" data-booking-target="backToTypesLabel"></button>
+        </div>
         <div class="public-booking-two-col public-booking-two-col--schedule">
           <div class="public-booking-calendar-panel">
             <div class="public-booking-month-nav">

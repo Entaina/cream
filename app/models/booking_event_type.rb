@@ -102,6 +102,14 @@ class BookingEventType < ApplicationRecord
     remind_at > Time.current
   end
 
+  def public_url
+    Rails.application.routes.url_helpers.public_booking_event_type_url(
+      booking_page.slug,
+      slug,
+      **booking_page.public_url_options
+    )
+  end
+
   def payload(locale: I18n.locale)
     {
       slug: slug,

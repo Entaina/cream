@@ -52,6 +52,19 @@ RSpec.describe "Dashboard active pipeline", type: :request do
       expect(response.body).to include(I18n.t("dashboard.briefing.generate"))
     end
 
+    it "shows my tasks before the sales director briefing" do
+      allow(Ai::Configuration).to receive(:configured?).and_return(true)
+
+      get root_path
+
+      expect(response).to have_http_status(:ok)
+      my_tasks_index = response.body.index(I18n.t("dashboard.my_tasks"))
+      sales_director_index = response.body.index(I18n.t("dashboard.briefing.sales_director"))
+      expect(my_tasks_index).to be_present
+      expect(sales_director_index).to be_present
+      expect(my_tasks_index).to be < sales_director_index
+    end
+
     it "shows urgent and important items when a briefing exists" do
       allow(Ai::Configuration).to receive(:configured?).and_return(true)
       workspace.sales_briefings.create!(

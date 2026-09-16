@@ -4,7 +4,7 @@
 
 Cream is a **workspace**-based CRM for managing **people**, **companies** and **deals** (opportunities), with notes, tasks, lists and an activity history shared across the team.
 
-> **Last revision:** 2026-09-16 (reuse deal on calendar bookings)
+> **Last revision:** 2026-09-16 (direct link per booking event type)
 > This document describes the functionality **visible to the user**. Disabled features are listed at the end under "Coming soon".
 
 ---
@@ -201,10 +201,10 @@ The preference is stored on your user, so it persists across sessions and device
 
 The dashboard shows a workspace overview:
 
+- **My tasks:** your upcoming pending tasks, in the main block at the top of the dashboard (mark them complete with one click).
 - **Director de ventas (sales director):** daily AI-generated briefing with guidance for the team, classified as **Urgente** (urgent) and **Importante** (important). It only appears in workspaces where an administrator has enabled it in **Settings** (checkbox *Briefing diario del director de ventas*), and it also requires AI to be configured on the server (`CREAM_AI_API_KEY`). Each user can turn it off for themselves in **Settings → Profile** (checkbox *Mostrar briefing del director de ventas en el dashboard*); you can also open Profile from your name at the bottom of the sidebar. To enrich the report, the director uses CRM read tools, the workspace **OKM** (if configured) and **persistent memory** (llmemory) with learnings from previous briefings. In addition, each user who has it enabled receives a **Para ti** (for you) block with direct guidance, **Aciertos** (congratulations on recent wins) and **A mejorar** (mistakes or omissions with a recommendation). If a deal already has a **next action** (an open task with a future date), the briefing does not ask for parallel actions nor flags it as inactive; at most it may suggest **moving that date up**. Deals without an open task can appear as pending a defined next step. If there is no briefing for the day yet, you can click **Generar ahora** (generate now); if one already exists, you can click **Regenerar** (regenerate) up to 5 times a day (the number of regenerations you have left is shown). Guidance items can link to deals, people, companies or tasks; in the team block, the ones assigned to you are highlighted.
 - **Metric cards:** number of people, companies, open pipeline value and won revenue (deals in a *won* stage). Deal metrics respect the **active pipeline** (see above); people and companies cover the whole workspace.
 - **Pipeline by stage:** bars showing the distribution of deals per stage. If you have an active pipeline, the chart and the deal cards use that pipeline; if you choose **Todos los pipelines**, the cards add up all deals and the chart groups stages by name with bars stacked by pipeline (each segment shows that pipeline's count on hover).
-- **Upcoming tasks:** upcoming pending tasks (mark them complete with one click).
 - **Recent activity:** the team's latest actions (creations, field changes, stage changes, etc.).
 
 Click any card or link to go to the corresponding list.
@@ -1273,7 +1273,7 @@ All the configuration is done from **Reservas** (no need to use seeds or preload
 
 | Field | Description |
 |-------|-------------|
-| Slug | Identifier of the type in the URL and the API |
+| Slug | Identifier of the type in the direct URL (`/b/page-slug/type-slug`) and the API |
 | Duración (min) (Duration, min) | Duration of the appointment |
 | Nombre / Descripción (ES y EN) (Name / Description, ES and EN) | Texts on the public page depending on the visitor's language |
 | Franjas horarias semanales (Weekly time slots) | Bookable ranges per day; "+ Franja" adds blocks; "Horario laboral por defecto" (Default working hours) fills in an example |
@@ -1287,7 +1287,7 @@ All the configuration is done from **Reservas** (no need to use seeds or preload
 
 Use **Añadir tipo** (Add type) to create new types or the trash icon to remove them. Save the page to apply the changes.
 
-Copy the **public URL** and share it with clients.
+Copy the **public URL** and share it with clients. If the page has several types, use the **direct event type URL** (in the **Reservas** list under **URLs directas por tipo**, or when editing a type under **URL directa del tipo**) so visitors go straight to that type's calendar without the selection screen.
 
 ### What happens when someone books
 
@@ -1298,7 +1298,7 @@ Copy the **public URL** and share it with clients.
 
 ### Public page (visitor)
 
-Three-step flow: choose event type → calendar and time (with an ES/EN time zone selector) → form and confirmation with a Meet link and `.ics` download.
+Three-step flow: choose event type → calendar and time (with an ES/EN time zone selector) → form and confirmation with a Meet link and `.ics` download. With a **direct event type URL** (`/b/page-slug/type-slug`), the visitor skips the first step and lands on that type's calendar.
 
 ---
 

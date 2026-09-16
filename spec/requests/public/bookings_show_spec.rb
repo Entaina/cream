@@ -63,4 +63,26 @@ RSpec.describe "Public booking page", type: :request do
     expect(response.body).to include('name="last_name"')
     expect(response.body).to include('name="email"')
   end
+
+  it "renders direct event type link with data attribute" do
+    get public_booking_event_type_path(booking_page.slug, "video", lang: "es")
+
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include('data-booking-event-type-value="video"')
+    expect(response.body).to include('data-booking-target="backToTypesWrap"')
+  end
+
+  it "returns not found for unknown event type" do
+    get public_booking_event_type_path(booking_page.slug, "missing")
+
+    expect(response).to have_http_status(:not_found)
+  end
+
+  it "returns not found for hidden event type" do
+    booking_page.event_types.find_by!(slug: "video").update!(visible: false)
+
+    get public_booking_event_type_path(booking_page.slug, "video")
+
+    expect(response).to have_http_status(:not_found)
+  end
 end

@@ -50,6 +50,21 @@
             class: "block rounded-md border border-line bg-canvas-sunken px-3 py-2 text-sm break-all text-accent hover:underline",
             target: "_blank", rel: "noopener noreferrer" %>
       </div>
+
+      <% visible_types = page.event_types.visible.ordered %>
+      <% if visible_types.any? %>
+        <div class="space-y-2">
+          <p class="label">URLs directas por tipo</p>
+          <% visible_types.each do |event_type| %>
+            <div>
+              <p class="text-xs text-ink-faint mb-1"><%= event_type.localized_name %></p>
+              <%= link_to event_type.public_url, event_type.public_url,
+                  class: "block rounded-md border border-line bg-canvas-sunken px-3 py-2 text-sm break-all text-accent hover:underline",
+                  target: "_blank", rel: "noopener noreferrer" %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
     </article>
   <% end %>
 </div>

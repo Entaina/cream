@@ -56,6 +56,30 @@
           <%= form.label :duration_minutes, "Duración (min)", class: "label" %>
           <%= form.number_field :duration_minutes, min: 5, class: "input mt-1 w-full" %>
         </div>
+        <% if event_type.persisted? && event_type.visible? && event_type.booking_page&.persisted? %>
+          <div class="sm:col-span-2" data-controller="clipboard">
+            <p class="label">URL directa del tipo</p>
+            <div class="relative mt-1">
+              <input type="text" readonly tabindex="-1" aria-readonly="true"
+                     value="<%= event_type.public_url %>"
+                     class="input w-full font-mono text-sm cursor-default bg-canvas-sunken pr-28"
+                     data-clipboard-target="source" />
+              <div class="absolute top-2 right-2 flex items-center gap-1.5">
+                <span data-clipboard-target="feedback"
+                      class="hidden rounded-md bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700 dark:bg-green-950 dark:text-green-300"
+                      role="status" aria-live="polite">Copiado</span>
+                <button type="button"
+                        class="rounded-md p-1.5 text-ink-faint hover:text-ink hover:bg-canvas-raised"
+                        title="Copiar al portapapeles" aria-label="Copiar al portapapeles"
+                        data-action="clipboard#copy" data-clipboard-target="button">
+                  <span data-clipboard-target="copyIcon"><%= icon :copy, classes: "size-4" %></span>
+                  <span data-clipboard-target="copiedIcon" class="hidden"><%= icon :check, classes: "size-4" %></span>
+                </button>
+              </div>
+            </div>
+            <p class="text-xs text-ink-faint mt-1">Abre el calendario de este tipo sin pasar por la pantalla de selección.</p>
+          </div>
+        <% end %>
       </div>
       <div class="grid gap-3 sm:grid-cols-2">
         <div>
