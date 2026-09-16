@@ -82,6 +82,32 @@ RSpec.describe "Api::V1::GmailThreads", type: :request do
       expect(linked["next_task"]).to include("title" => "Next action")
     end
 
+    it "finds linked deals in another workspace the user belongs to" do
+      other_workspace = workspaces(:two)
+      Pipeline.create_default!(other_workspace)
+      Membership.create!(user: user, workspace: other_workspace, role: "salesperson")
+      deal = create_deal!(other_workspace, name: "Other workspace opp")
+      other_workspace.email_messages.create!(
+        user: user, record: deal, direction: "inbound", status: "received",
+        from_address: "client@example.com", to_address: user.email_address,
+        subject: "Proposal", body: "Hi", gmail_thread_id: "thread-shared",
+        rfc822_message_id: "<shared@mail.example.com>"
+      )
+
+      post "/api/v1/gmail/threads/status",
+        params: {
+          gmail_thread_id: "thread-shared",
+          rfc822_message_ids: ["<shared@mail.example.com>"],
+          participant_emails: ["client@example.com"]
+        },
+        headers: headers,
+        as: :json
+
+      body = JSON.parse(response.body)
+      linked = body["linked"].find { |d| d["name"] == "Other workspace opp" }
+      expect(linked).to include("workspace_id" => other_workspace.id)
+    end
+
     it "suggests deals whose contacts match thread participants" do
       person = create_person!(workspace, company: company, email: "client@example.com")
       suggested = create_deal!(workspace, company: company, contacts: [person], name: "Suggested opp")

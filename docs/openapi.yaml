@@ -745,6 +745,8 @@ components:
       properties:
         id:
           type: integer
+        workspace_id:
+          type: integer
         name:
           type: string
         stage:

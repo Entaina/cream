@@ -59,11 +59,12 @@ class GmailThreadLinker
   private
 
   def linked_deals_for(gmail_thread_id:, rfc822_message_ids:)
-    scope = @workspace.email_messages.where(record_type: "Deal")
-    by_thread = scope.where(gmail_thread_id: gmail_thread_id, user_id: @user.id).distinct.pluck(:record_id)
+    workspace_ids = @user.workspaces.pluck(:id)
+    scope = EmailMessage.where(workspace_id: workspace_ids, record_type: "Deal")
+    by_thread = scope.where(gmail_thread_id: gmail_thread_id).distinct.pluck(:record_id)
     by_message = scope.where(rfc822_message_id: rfc822_message_ids.compact).distinct.pluck(:record_id)
     deal_ids = (by_thread + by_message).uniq
-    @workspace.deals.where(id: deal_ids).includes(DEAL_INCLUDES).to_a
+    Deal.where(id: deal_ids, workspace_id: workspace_ids).includes(DEAL_INCLUDES).to_a
   end
 
   def suggested_deals_for(participant_emails:)
@@ -240,6 +241,7 @@ class GmailThreadLinker
     task = deal.next_pending_task
     {
       id: deal.id,
+      workspace_id: deal.workspace_id,
       name: deal.name,
       stage: deal.stage_label,
       pipeline: deal.pipeline&.name,

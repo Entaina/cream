@@ -9,16 +9,11 @@ function onGmailMessageOpen(e) {
   }
 
   try {
-    setSelectedWorkspaceId_(null);
-    setUserProperty_(CREAM_PIPELINE_KEY, null);
     var threadData = readOpenThread_(e);
+    var status = threadStatus_(threadData);
+    applyLinkedWorkspace_(status);
     var context = creamContext_();
     resolveDestination_(context);
-    var status = creamThreadStatus_({
-      gmail_thread_id: threadData.gmail_thread_id,
-      rfc822_message_ids: threadData.rfc822_message_ids,
-      participant_emails: threadData.participant_emails
-    });
     return [ buildThreadCard_(threadData, status, context) ];
   } catch (err) {
     if (String(err.message) === "not_connected") {
@@ -195,6 +190,16 @@ function threadStatus_(threadData) {
     rfc822_message_ids: threadData.rfc822_message_ids,
     participant_emails: threadData.participant_emails
   });
+}
+
+function applyLinkedWorkspace_(status) {
+  if (!status.linked || !status.linked.length) {
+    return;
+  }
+  var workspaceId = status.linked[0].workspace_id;
+  if (workspaceId) {
+    setSelectedWorkspaceId_(workspaceId);
+  }
 }
 
 function formatDealValue_(deal) {
@@ -380,8 +385,9 @@ function showLinkActions(e) {
 
 function refreshThreadCardAfterLink_(e, message) {
   var threadData = readOpenThread_(e);
-  var context = creamContext_();
   var status = threadStatus_(threadData);
+  applyLinkedWorkspace_(status);
+  var context = creamContext_();
   var builder = CardService.newActionResponseBuilder()
     .setNavigation(
       CardService.newNavigation().updateCard(buildThreadCard_(threadData, status, context))
