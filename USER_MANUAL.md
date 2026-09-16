@@ -4,7 +4,7 @@
 
 Cream is a **workspace**-based CRM for managing **people**, **companies** and **deals** (opportunities), with notes, tasks, lists and an activity history shared across the team.
 
-> **Last revision:** 2026-09-16 (manual journey step change)
+> **Last revision:** 2026-09-16 (journey history on the person record)
 > This document describes the functionality **visible to the user**. Disabled features are listed at the end under "Coming soon".
 
 ---
@@ -510,7 +510,7 @@ In the people, companies and deals tables, Cream adds automatically calculated c
 
 The contact header shows their name, company and main contact details. Use **Send email**, **Add note**, **Create task** or **Add deal** when you need them: the editors open on demand. **Edit** opens the grouped contact form; **Merge duplicates** and **Delete contact** are in the **•••** menu.
 
-- **Activity** opens by default. **Next tasks** puts overdue tasks first, followed by upcoming tasks; expand the remaining or completed tasks when needed. The history combines notes, emails, comments and record changes. Filter by type and use **Older / Newer** to browse the history. In the context column, **Campañas enviadas** (Campaigns sent) lists the latest marketing campaigns this contact received; **Ver más** (View more) opens the full history with delivery events (see [§29](#29-marketing)).
+- **Activity** opens by default. **Next tasks** puts overdue tasks first, followed by upcoming tasks; expand the remaining or completed tasks when needed. The history combines notes, emails, comments and record changes. Filter by type and use **Older / Newer** to browse the history. In the context column, **Campañas enviadas** (Campaigns sent) lists the latest marketing campaigns this contact received; **Recorridos** (Journeys) shows enrollments (active, waiting, completed or cancelled) with the current step. **Ver más** (View more) opens the full history (see [§29](#29-marketing)).
 - **Opportunities** contains deals and the product filter, plus product interests and form submissions when enabled. Expand **Registrar interés** to add an interest.
 - **Information** groups contact details, professional profile, ownership, relationships, custom fields, email preferences and, when submissions exist, **Formularios enviados** (Form submissions) with a **Ver consentimiento** link to the accepted policy and statement. Each editable block has its own **Edit** link. Expand **Add relationship** to link another person.
 - **Files**, when enabled, contains the upload form and existing attachments.
@@ -1338,6 +1338,7 @@ Contacts with **active marketing permission** (at least one active subscription 
 - **Product interests** — record a commercial signal manually (product + description) or from an MQL form with a product. States: pending, converted or dismissed.
 - **Form submissions** — submission history grouped by form, on **Deals** and **Information**, with a **Ver consentimiento** link (answers, destination, accepted policy and statement).
 - **Campañas enviadas** (Campaigns sent) — on **Activity**, the latest marketing campaigns received and **Ver más** (View more) for the history with delivery events.
+- **Recorridos** (Journeys) — on **Activity**, this contact's enrollments (active, waiting, completed or cancelled), with the current step and enrollment date. **Ver más** (View more) opens the full history.
 
 **Notes:**
 
@@ -1433,6 +1434,12 @@ Automated per-contact sequences.
 6. For **manual** journeys, open the journey page → **Inscribir contacto manualmente** (Enroll contact manually).
 7. From the journey page you can **Pausar** / **Activar** (Pause / Activate), view active enrollments and each contact's current step.
 8. For **Activo** (Active) or **En espera** (Waiting) enrollments, use **Cambiar paso** (Change step) to move the contact to another step. The journey continues from there and will run that step (it may resend an email or restart a wait). Admins only.
+
+**On a person's record** (**Activity** → **Recorridos** / Journeys):
+
+- You will see the contact's **latest 5** enrollments (journey, status, current step and enrollment date).
+- **Ver más** (View more) opens the full history, including completed or cancelled enrollments, and the next run if waiting.
+- The journey name links to its page (admins only).
 
 ### Lead scoring
 

@@ -413,6 +413,115 @@ RSpec.describe "People", type: :request do
         expect(response.body).not_to include(campaign_path(campaign))
       end
     end
+
+    describe "journey history" do
+      let(:company) { create_company!(workspace) }
+      let(:person) { create_person!(workspace, company: company, email: "pat@example.com") }
+
+      def create_journey_enrollment!(record, name:, state: "active", enrolled_at: Time.current, with_step: true)
+        journey = workspace.journeys.create!(name: name, entry_trigger: "manual", active: true, max_reenrollments: 0)
+        step = if with_step
+          journey.steps.create!(position: 0, step_type: "wait", active: true, config: {"minutes" => 5})
+        end
+        enrollment = JourneyEnrollment.create!(
+          workspace: workspace,
+          journey: journey,
+          person: record,
+          current_step: step,
+          state: state,
+          enrolled_at: enrolled_at,
+          next_run_at: (state == "waiting" ? 5.minutes.from_now : nil)
+        )
+        enrollment.update_column(:enrolled_at, enrolled_at)
+        enrollment
+      end
+
+      before { sign_in_as(member) }
+
+      it "lists enrollments with journey name, state and current step" do
+        create_journey_enrollment!(
+          person,
+          name: "Welcome nurture",
+          state: "waiting",
+          enrolled_at: Time.zone.local(2026, 9, 10, 12)
+        )
+
+        get person_path(person)
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include(I18n.t("people.show.journeys"))
+        expect(response.body).to include("Welcome nurture")
+        expect(response.body).to include("En espera")
+        expect(response.body).to include("Esperar 5 min")
+        expect(response.body).to include(I18n.t("people.show.view_more"))
+        expect(response.body).to include(journey_path(Journey.find_by!(name: "Welcome nurture")))
+      end
+
+      it "previews the latest five enrollments and keeps older ones in the full list" do
+        6.times do |index|
+          create_journey_enrollment!(
+            person,
+            name: "Journey #{index}",
+            enrolled_at: Time.zone.local(2026, 9, 1 + index, 12)
+          )
+        end
+
+        get person_path(person)
+
+        html = Nokogiri::HTML(response.body)
+        preview = html.at('[data-person-journeys="preview"]').text
+        full_list = html.at('[data-person-journeys="full"]').text
+
+        expect(preview).to include("Journey 5")
+        expect(preview).not_to include("Journey 0")
+        expect(full_list).to include("Journey 0")
+        expect(full_list).to include("Journey 5")
+        expect(response.body).to include(I18n.t("people.show.view_more_count", count: 6))
+      end
+
+      it "shows next run in the full list for waiting enrollments" do
+        create_journey_enrollment!(person, name: "Waiting nurture", state: "waiting")
+
+        get person_path(person)
+
+        full_list = Nokogiri::HTML(response.body).at('[data-person-journeys="full"]').text
+        expect(full_list).to include(I18n.t("people.show.journey_next_run"))
+      end
+
+      it "does not show another contact's enrollments" do
+        other = create_person!(workspace, company: company, email: "other@example.com", first_name: "Other")
+        create_journey_enrollment!(person, name: "Own journey")
+        create_journey_enrollment!(other, name: "Other journey")
+
+        get person_path(person)
+
+        expect(response.body).to include("Own journey")
+        expect(response.body).not_to include("Other journey")
+      end
+
+      it "hides the section when journeys are disabled" do
+        allow(CreamFeatures).to receive(:enabled?).and_call_original
+        allow(CreamFeatures).to receive(:enabled?).with(:journeys).and_return(false)
+
+        get person_path(person)
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).not_to include(I18n.t("people.show.journeys"))
+      end
+
+      it "shows journey name without an admin link for a salesperson" do
+        enrollment = create_journey_enrollment!(person, name: "Sales visible")
+        sign_out
+        sign_in_as(users(:two))
+        patch switch_workspace_path, params: {workspace_id: workspace.id}
+
+        get person_path(person)
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include("Sales visible")
+        expect(response.body).not_to include(journey_path(enrollment.journey))
+      end
+    end
   end
 
   describe "POST /people.json (inline contact creation)" do

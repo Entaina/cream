@@ -52,7 +52,8 @@ function readOpenThread_(e) {
   });
 
   return {
-    gmail_thread_id: thread.getId(),
+    gmail_thread_id: (e.gmail && e.gmail.threadId) || thread.getId(),
+    gmail_message_id: e.gmail.messageId,
     subject: message.getSubject() || "",
     messages: serialized,
     rfc822_message_ids: rfc822Ids,
@@ -274,6 +275,9 @@ function buildLinkedDealSection_(deal, multipleDeals) {
 function buildLinkActionsCard_(threadData, status, context) {
   var card = CardService.newCardBuilder()
     .setHeader(CardService.newCardHeader().setTitle("Link deal"));
+  if (threadData.gmail_message_id) {
+    card.setName(threadData.gmail_message_id);
+  }
 
   card.addSection(buildDestinationSection_(context));
 
@@ -339,6 +343,9 @@ function buildThreadCard_(threadData, status, context) {
 
   var card = CardService.newCardBuilder()
     .setHeader(CardService.newCardHeader().setTitle("CReaM"));
+  if (threadData.gmail_message_id) {
+    card.setName(threadData.gmail_message_id);
+  }
 
   var multipleDeals = status.linked.length > 1;
   status.linked.forEach(function(deal) {

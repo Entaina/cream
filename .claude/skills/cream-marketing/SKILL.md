@@ -159,7 +159,7 @@ resource :marketing_attribution, only: :show
 - **`MarketingHelper`**: badges ES (`campaign_status_badge`, `send_status_badge`), labels de triggers/pasos/eventos, `describe_segment_filters`, `describe_step`.
 - **Stimulus**: `journey_form_controller.js` (pasos dinámicos por tipo), `segment_preview_controller.js` (preview en vivo).
 - **Patrón visual**: mismo que Alertas — `shared/_page_header`, `.card`, `.table-base`, empty states, confirm en acciones destructivas.
-- **Ficha persona**: sección marketing (lifecycle, lead score, suscripciones, recorridos activos).
+- **Ficha persona**: sección marketing (lifecycle, lead score, suscripciones, campañas enviadas, historial de recorridos).
 
 ## Integraciones con el resto del CRM
 

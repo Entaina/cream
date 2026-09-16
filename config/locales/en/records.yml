@@ -320,6 +320,12 @@ en:
       campaigns: Campaigns sent
       campaigns_empty: No campaigns sent to this contact.
       campaigns_limit: Showing the %{count} most recent.
+      journeys: Journeys
+      journeys_empty: This contact is not enrolled in any journey.
+      journeys_limit: Showing the %{count} most recent enrollments.
+      journey_missing: Deleted journey
+      journey_no_step: No current step
+      journey_next_run: Next run
       contact_management: Contact management
       convert_to_sql: Convert to SQL
       copied: Copied

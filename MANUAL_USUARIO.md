@@ -4,7 +4,7 @@
 
 Cream es un CRM por **workspaces** para gestionar **personas**, **empresas** y **deals** (oportunidades), con notas, tareas, listas y un historial de actividad compartido en el equipo.
 
-> **Última revisión:** 2026-09-16 (cambio de paso manual en recorridos)
+> **Última revisión:** 2026-09-16 (historial de recorridos en la ficha de persona)
 > Este documento describe la funcionalidad **visible para el usuario**. Las funcionalidades desactivadas aparecen al final en «Próximamente».
 
 ---
@@ -510,7 +510,7 @@ En las tablas de personas, empresas y deals, Cream añade columnas calculadas au
 
 La cabecera muestra el nombre, la empresa y los datos principales de contacto. Usa **Send email**, **Add note**, **Create task** o **Add deal** cuando lo necesites: los editores se abren bajo demanda. **Edit** abre el formulario de contacto agrupado; **Merge duplicates** y **Delete contact** están en el menú **•••**.
 
-- **Activity** se abre por defecto. **Next tasks** muestra primero las tareas vencidas y después las próximas; despliega las restantes o completadas cuando lo necesites. El historial reúne notas, correos, comentarios y cambios del registro. Filtra por tipo y usa **Older / Newer** para consultar entradas anteriores o más recientes. En la columna de contexto, **Campañas enviadas** lista las últimas campañas de marketing recibidas por el contacto; **Ver más** abre el historial completo con eventos de entrega (ver [§29](#29-marketing)).
+- **Activity** se abre por defecto. **Next tasks** muestra primero las tareas vencidas y después las próximas; despliega las restantes o completadas cuando lo necesites. El historial reúne notas, correos, comentarios y cambios del registro. Filtra por tipo y usa **Older / Newer** para consultar entradas anteriores o más recientes. En la columna de contexto, **Campañas enviadas** lista las últimas campañas de marketing recibidas por el contacto; **Recorridos** muestra las inscripciones (activas, en espera, completadas o canceladas) con el paso actual. **Ver más** abre el historial completo (ver [§29](#29-marketing)).
 - **Opportunities** contiene los deals y el filtro por producto, además de intereses por producto y formularios enviados cuando están habilitados. Despliega **Registrar interés** para añadir un interés.
 - **Information** agrupa contacto, perfil profesional, responsable, relaciones, campos personalizados, preferencias de correo y, si hay envíos, **Formularios enviados** (enlace **Ver consentimiento** a la política y la frase aceptadas). Cada bloque editable tiene su enlace **Edit**. Despliega **Add relationship** para vincular a otra persona.
 - **Files**, cuando está habilitado, contiene el formulario de subida y los archivos adjuntos.
@@ -1338,6 +1338,7 @@ Contactos con **permiso de marketing vigente** (al menos una suscripción activa
 - **Intereses por producto** — registra manualmente una señal comercial (producto + descripción) o proviene de un formulario MQL con producto. Estados: pendiente, convertido o descartado.
 - **Formularios enviados** — historial de envíos agrupados por formulario, en **Deals** y en **Information**, con enlace **Ver consentimiento** (respuestas, destino, política y frase aceptadas).
 - **Campañas enviadas** — en **Activity**, las últimas campañas de marketing recibidas y **Ver más** para el historial con eventos de entrega.
+- **Recorridos** — en **Activity**, las inscripciones de este contacto (activas, en espera, completadas o canceladas), con el paso actual y la fecha de inscripción. **Ver más** abre el historial completo.
 
 **Notas:**
 
@@ -1433,6 +1434,12 @@ Secuencias automatizadas por contacto.
 6. En recorridos **manuales**, abre la ficha del recorrido → **Inscribir contacto manualmente**.
 7. Desde la ficha del recorrido puedes **Pausar** / **Activar**, ver inscripciones activas y el paso actual de cada contacto.
 8. En inscripciones **Activo** o **En espera**, usa **Cambiar paso** para mover al contacto a otro paso. El recorrido continúa desde ahí y ejecutará ese paso (puede reenviar un email o reiniciar una espera). Solo administradores.
+
+**En la ficha de una persona** (**Activity** → **Recorridos**):
+
+- Verás las **últimas 5** inscripciones de ese contacto (recorrido, estado, paso actual y fecha de inscripción).
+- **Ver más** abre el historial completo, incluidas las completadas o canceladas, y la próxima ejecución si está en espera.
+- El nombre del recorrido enlaza a su ficha (solo administradores).
 
 ### Puntuación de leads
 

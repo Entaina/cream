@@ -61,14 +61,28 @@ class GmailThreadLinker
   def linked_deals_for(gmail_thread_id:, rfc822_message_ids:)
     workspace_ids = @user.workspaces.pluck(:id)
     scope = EmailMessage.where(workspace_id: workspace_ids, record_type: "Deal")
-    by_thread = scope.where(gmail_thread_id: gmail_thread_id).distinct.pluck(:record_id)
-    by_message = scope.where(rfc822_message_id: rfc822_message_ids.compact).distinct.pluck(:record_id)
-    deal_ids = (by_thread + by_message).uniq
+    deal_ids = []
+
+    if gmail_thread_id.present?
+      deal_ids += scope.where(gmail_thread_id: gmail_thread_id).distinct.pluck(:record_id)
+    end
+
+    message_ids = Array(rfc822_message_ids).filter_map(&:presence).uniq
+    if message_ids.any?
+      deal_ids += scope.where(rfc822_message_id: message_ids).distinct.pluck(:record_id)
+    end
+
+    deal_ids = deal_ids.uniq
+    return [] if deal_ids.empty?
+
     Deal.where(id: deal_ids, workspace_id: workspace_ids).includes(DEAL_INCLUDES).to_a
   end
 
   def suggested_deals_for(participant_emails:)
-    emails = participant_emails.filter_map { |raw| EmailAddressParser.extract(raw) }.uniq
+    emails = participant_emails
+      .filter_map { |raw| EmailAddressParser.extract(raw) }
+      .reject { |email| owned_email?(email) }
+      .uniq
     return [] if emails.empty?
 
     person_ids = emails.flat_map { |email| @workspace.people.with_email(email).pluck(:id) }.uniq

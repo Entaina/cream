@@ -323,6 +323,12 @@ es:
       campaigns: Campañas enviadas
       campaigns_empty: Ninguna campaña enviada a este contacto.
       campaigns_limit: Se muestran las %{count} más recientes.
+      journeys: Recorridos
+      journeys_empty: Este contacto no está inscrito en ningún recorrido.
+      journeys_limit: Se muestran las %{count} inscripciones más recientes.
+      journey_missing: Recorrido eliminado
+      journey_no_step: Sin paso actual
+      journey_next_run: Próxima ejecución
       contact_management: Gestión del contacto
       convert_to_sql: Convertir a SQL
       copied: Copiado

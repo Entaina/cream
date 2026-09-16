@@ -1,5 +1,7 @@
 class JourneyEnrollment < ApplicationRecord
   STATES = %w[active waiting completed cancelled].freeze
+  HISTORY_PREVIEW = 5
+  HISTORY_LIMIT = 100
 
   belongs_to :workspace
   belongs_to :journey

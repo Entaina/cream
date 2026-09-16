@@ -108,6 +108,9 @@
           <% if feature_enabled?(:marketing_campaigns) %>
             <%= render "campaigns_section", messages: @person_campaign_messages || [] %>
           <% end %>
+          <% if feature_enabled?(:journeys) %>
+            <%= render "journeys_section", enrollments: @person_journey_enrollments || [] %>
+          <% end %>
           <% if feature_enabled?(:ai_assistant) %>
             <details class="record-disclosure record-card"><summary><%= t("records.ai_assistant") %></summary><div class="mt-4"><%= render "shared/ai_assistant_section", record: @person %></div></details>
           <% end %>

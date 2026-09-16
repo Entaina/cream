@@ -67,6 +67,13 @@ class PeopleController < ApplicationController
         .limit(EmailMessage::CAMPAIGN_HISTORY_LIMIT)
         .to_a
     end
+    if CreamFeatures.enabled?(:journeys)
+      @person_journey_enrollments = @person.journey_enrollments
+        .includes(:journey, :current_step)
+        .order(enrolled_at: :desc)
+        .limit(JourneyEnrollment::HISTORY_LIMIT)
+        .to_a
+    end
     @activity_feed = RecordActivityFeed.new(@person, filter: params[:activity_filter], page: params[:activity_page],
       emails: CreamFeatures.enabled?(:record_email), comments: CreamFeatures.enabled?(:comments))
     @okm_chat_record = @person

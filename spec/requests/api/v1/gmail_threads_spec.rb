@@ -126,6 +126,89 @@ RSpec.describe "Api::V1::GmailThreads", type: :request do
       expect(body["suggestions"].map { |d| d["id"] }).to include(suggested.id)
     end
 
+    it "does not return a deal linked to another thread" do
+      deal = create_deal!(workspace, company: company, name: "Thread A opp")
+      workspace.email_messages.create!(
+        user: user, record: deal, direction: "inbound", status: "received",
+        from_address: "client@example.com", to_address: user.email_address,
+        subject: "Proposal", body: "Hi", gmail_thread_id: "thread-a",
+        rfc822_message_id: "<a@mail.example.com>"
+      )
+
+      post "/api/v1/gmail/threads/status",
+        params: {
+          gmail_thread_id: "thread-b",
+          rfc822_message_ids: ["<b@mail.example.com>"],
+          participant_emails: ["other@example.com"]
+        },
+        headers: headers,
+        as: :json
+
+      body = JSON.parse(response.body)
+      expect(body["linked"].map { |d| d["name"] }).not_to include("Thread A opp")
+    end
+
+    it "does not match deals when gmail_thread_id is blank" do
+      deal = create_deal!(workspace, company: company, name: "Orphan thread opp")
+      workspace.email_messages.create!(
+        user: user, record: deal, direction: "inbound", status: "received",
+        from_address: "client@example.com", to_address: user.email_address,
+        subject: "Proposal", body: "Hi", gmail_thread_id: nil,
+        rfc822_message_id: nil
+      )
+
+      post "/api/v1/gmail/threads/status",
+        params: {
+          gmail_thread_id: "",
+          rfc822_message_ids: [],
+          participant_emails: ["client@example.com"]
+        },
+        headers: headers,
+        as: :json
+
+      body = JSON.parse(response.body)
+      expect(body["linked"].map { |d| d["name"] }).not_to include("Orphan thread opp")
+    end
+
+    it "does not match deals when rfc822_message_ids contains blank values" do
+      deal = create_deal!(workspace, company: company, name: "Blank message id opp")
+      workspace.email_messages.create!(
+        user: user, record: deal, direction: "inbound", status: "received",
+        from_address: "client@example.com", to_address: user.email_address,
+        subject: "Proposal", body: "Hi", gmail_thread_id: "thread-x",
+        rfc822_message_id: ""
+      )
+
+      post "/api/v1/gmail/threads/status",
+        params: {
+          gmail_thread_id: "thread-y",
+          rfc822_message_ids: [""],
+          participant_emails: ["client@example.com"]
+        },
+        headers: headers,
+        as: :json
+
+      body = JSON.parse(response.body)
+      expect(body["linked"].map { |d| d["name"] }).not_to include("Blank message id opp")
+    end
+
+    it "does not suggest deals whose only contact is the current user" do
+      person = create_person!(workspace, company: company, email: user.email_address)
+      create_deal!(workspace, company: company, contacts: [person], name: "Self contact opp")
+
+      post "/api/v1/gmail/threads/status",
+        params: {
+          gmail_thread_id: "thread-new",
+          rfc822_message_ids: [],
+          participant_emails: [user.email_address]
+        },
+        headers: headers,
+        as: :json
+
+      body = JSON.parse(response.body)
+      expect(body["suggestions"].map { |d| d["name"] }).not_to include("Self contact opp")
+    end
+
     it "returns 401 without auth" do
       post "/api/v1/gmail/threads/status",
         params: {gmail_thread_id: "thread-abc"},
