@@ -70,6 +70,7 @@ RSpec.describe "Public booking page", type: :request do
     expect(response).to have_http_status(:ok)
     expect(response.body).to include('data-booking-event-type-value="video"')
     expect(response.body).to include('data-booking-target="backToTypesWrap"')
+    expect(response.body).to include('data-booking-target="progressEventSeparator"')
   end
 
   it "returns not found for unknown event type" do

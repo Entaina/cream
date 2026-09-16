@@ -97,7 +97,7 @@ export default class extends Controller {
     "firstNameLabel", "lastNameLabel", "emailLabel", "phoneLabel", "messageLabel", "addGuestsLabel", "guestsFields",
     "submitLabel", "confirmedHeading", "confirmationDetails", "icsDownload", "bookAnotherLabel",
     "firstNameInput", "lastNameInput", "emailInput", "phoneInput", "messageInput", "honeypotInput", "honeypotLabel",
-    "localeEs", "localeEn", "progress", "progressEvent", "progressSchedule", "progressDetails",
+    "localeEs", "localeEn", "progress", "progressEvent", "progressEventSeparator", "progressSchedule", "progressDetails",
     "progressEventLabel", "progressScheduleLabel", "progressDetailsLabel"
   ]
 
@@ -131,7 +131,8 @@ export default class extends Controller {
     this.detectTimezone()
     this.applyCopy()
     this.updateLocaleButtons()
-    this.updateProgress("eventTypes")
+    this.updateDeepLinkProgress()
+    this.updateProgress(this.deepLinkedEventType ? "schedule" : "eventTypes")
     this.applyPrefill()
     this.loadEventTypes()
   }
@@ -245,12 +246,19 @@ export default class extends Controller {
   updateProgress(step) {
     if (!this.hasProgressTarget) return
 
-    const steps = [
-      { name: "eventTypes", target: "progressEventTarget" },
-      { name: "schedule", target: "progressScheduleTarget" },
-      { name: "form", target: "progressDetailsTarget" }
-    ]
-    const order = [ "eventTypes", "schedule", "form", "confirmation" ]
+    const steps = this.deepLinkedEventType
+      ? [
+        { name: "schedule", target: "progressScheduleTarget" },
+        { name: "form", target: "progressDetailsTarget" }
+      ]
+      : [
+        { name: "eventTypes", target: "progressEventTarget" },
+        { name: "schedule", target: "progressScheduleTarget" },
+        { name: "form", target: "progressDetailsTarget" }
+      ]
+    const order = this.deepLinkedEventType
+      ? [ "schedule", "form", "confirmation" ]
+      : [ "eventTypes", "schedule", "form", "confirmation" ]
     const currentIndex = order.indexOf(step)
 
     for (const { name, target } of steps) {
@@ -263,6 +271,22 @@ export default class extends Controller {
     }
 
     this.progressTarget.classList.toggle("hidden", step === "confirmation")
+  }
+
+  updateDeepLinkProgress() {
+    const deepLink = Boolean(this.deepLinkedEventType)
+
+    if (this.hasProgressEventTarget) {
+      this.progressEventTarget.classList.toggle("hidden", deepLink)
+    }
+    if (this.hasProgressEventSeparatorTarget) {
+      this.progressEventSeparatorTarget.classList.toggle("hidden", deepLink)
+    }
+
+    const scheduleNumber = this.progressScheduleTarget?.querySelector(".public-booking-progress-number")
+    const detailsNumber = this.progressDetailsTarget?.querySelector(".public-booking-progress-number")
+    if (scheduleNumber) scheduleNumber.textContent = deepLink ? "1" : "2"
+    if (detailsNumber) detailsNumber.textContent = deepLink ? "2" : "3"
   }
 
   async loadEventTypes() {
@@ -330,6 +354,8 @@ export default class extends Controller {
     this.loadMonthAvailability()
     if (updateUrl) this.updateEventTypeUrl(slug)
     this.updateBackToTypesVisibility()
+    this.updateDeepLinkProgress()
+    if (this.deepLinkedEventType) this.updateProgress("schedule")
   }
 
   backToEventTypes() {
