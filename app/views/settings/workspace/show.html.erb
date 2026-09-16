@@ -201,26 +201,29 @@
                             form: { data: { turbo_confirm: "¿Eliminar esta publicación Beehiiv?" } } %>
                     </div>
                   <% end %>
-                  <div class="pt-1" data-controller="clipboard">
+                  <div class="pt-1 space-y-2" data-controller="clipboard">
                     <p class="text-sm font-medium text-ink-soft mb-1">URL del webhook (registrar en Beehiiv → Settings → Webhooks)</p>
                     <p class="text-sm text-ink-faint mb-1">
                       Eventos recomendados: subscription.created, subscription.confirmed, subscription.deleted.
                     </p>
-                    <div class="relative">
-                      <input type="text" readonly value="<%= publication.webhook_url %>"
-                            class="input w-full text-xs font-mono bg-canvas-sunken pr-24 cursor-default"
-                            data-clipboard-target="source" tabindex="-1" aria-readonly="true" />
-                      <div class="absolute top-1.5 right-1.5 flex items-center gap-1">
-                        <span data-clipboard-target="feedback"
-                              class="hidden rounded-md bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700 dark:bg-green-950 dark:text-green-300"
-                              role="status" aria-live="polite">Copiado</span>
-                        <button type="button" class="rounded-md p-1.5 text-ink-faint hover:text-ink hover:bg-canvas-raised"
-                              title="Copiar URL" aria-label="Copiar URL"
-                              data-action="clipboard#copy" data-clipboard-target="button">
-                          <span data-clipboard-target="copyIcon"><%= icon :copy, classes: "size-4" %></span>
-                          <span data-clipboard-target="copiedIcon" class="hidden"><%= icon :check, classes: "size-4" %></span>
-                        </button>
-                      </div>
+                    <textarea readonly rows="2"
+                          class="input w-full text-xs font-mono bg-canvas-sunken resize-none break-all cursor-default"
+                          data-clipboard-target="source" tabindex="-1" aria-readonly="true"><%= publication.webhook_url %></textarea>
+                    <div class="flex items-center gap-2">
+                      <button type="button" class="btn-secondary text-sm py-1.5"
+                            data-action="clipboard#copy" data-clipboard-target="button">
+                        <span data-clipboard-target="copyIcon" class="inline-flex items-center gap-1.5">
+                          <%= icon :copy, classes: "size-4" %>
+                          Copiar URL
+                        </span>
+                        <span data-clipboard-target="copiedIcon" class="hidden inline-flex items-center gap-1.5">
+                          <%= icon :check, classes: "size-4" %>
+                          Copiado
+                        </span>
+                      </button>
+                      <span data-clipboard-target="feedback"
+                            class="hidden text-xs font-medium text-green-700 dark:text-green-300"
+                            role="status" aria-live="polite">Copiado al portapapeles</span>
                     </div>
                     <% if publication.last_synced_at.present? %>
                       <p class="text-xs text-ink-faint mt-1">Última sync: <%= l(publication.last_synced_at, format: :short) %></p>
@@ -327,26 +330,29 @@
         <% if @mailjet_connection.persisted? %>
           <%= button_to "Desconectar", mailjet_connection_path, method: :delete, class: "btn-danger",
                 form: { data: { turbo_confirm: "¿Desconectar Mailjet de este workspace?" } } %>
-          <div class="pt-2" data-controller="clipboard">
+          <div class="pt-2 space-y-2" data-controller="clipboard">
             <p class="text-sm font-medium text-ink-soft mb-1">URL del webhook</p>
             <p class="text-sm text-ink-faint mb-1">
               En Mailjet: Account settings → Event Tracking. Misma URL para sent, open, click, bounce, spam, unsub y blocked (Version 2).
             </p>
-            <div class="relative">
-              <input type="text" readonly value="<%= @mailjet_connection.webhook_url %>"
-                    class="input w-full text-xs font-mono bg-canvas-sunken pr-24 cursor-default"
-                    data-clipboard-target="source" tabindex="-1" aria-readonly="true" />
-              <div class="absolute top-1.5 right-1.5 flex items-center gap-1">
-                <span data-clipboard-target="feedback"
-                      class="hidden rounded-md bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700 dark:bg-green-950 dark:text-green-300"
-                      role="status" aria-live="polite">Copiado</span>
-                <button type="button" class="rounded-md p-1.5 text-ink-faint hover:text-ink hover:bg-canvas-raised"
-                      title="Copiar URL" aria-label="Copiar URL"
-                      data-action="clipboard#copy" data-clipboard-target="button">
-                  <span data-clipboard-target="copyIcon"><%= icon :copy, classes: "size-4" %></span>
-                  <span data-clipboard-target="copiedIcon" class="hidden"><%= icon :check, classes: "size-4" %></span>
-                </button>
-              </div>
+            <textarea readonly rows="2"
+                  class="input w-full text-xs font-mono bg-canvas-sunken resize-none break-all cursor-default"
+                  data-clipboard-target="source" tabindex="-1" aria-readonly="true"><%= @mailjet_connection.webhook_url %></textarea>
+            <div class="flex items-center gap-2">
+              <button type="button" class="btn-secondary text-sm py-1.5"
+                    data-action="clipboard#copy" data-clipboard-target="button">
+                <span data-clipboard-target="copyIcon" class="inline-flex items-center gap-1.5">
+                  <%= icon :copy, classes: "size-4" %>
+                  Copiar URL
+                </span>
+                <span data-clipboard-target="copiedIcon" class="hidden inline-flex items-center gap-1.5">
+                  <%= icon :check, classes: "size-4" %>
+                  Copiado
+                </span>
+              </button>
+              <span data-clipboard-target="feedback"
+                    class="hidden text-xs font-medium text-green-700 dark:text-green-300"
+                    role="status" aria-live="polite">Copiado al portapapeles</span>
             </div>
           </div>
         <% end %>

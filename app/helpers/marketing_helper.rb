@@ -75,6 +75,7 @@ module MarketingHelper
   }.freeze
 
   EMAIL_EVENT_LABELS = {
+    "sent" => "Enviado",
     "delivered" => "Entregado",
     "open" => "Abierto",
     "click" => "Clic",

@@ -1,5 +1,5 @@
 class EmailEvent < ApplicationRecord
-  EVENT_TYPES = %w[delivered open click bounce spam unsub blocked].freeze
+  EVENT_TYPES = %w[sent delivered open click bounce spam unsub blocked].freeze
 
   belongs_to :email_message
 

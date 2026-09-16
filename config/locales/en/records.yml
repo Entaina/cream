@@ -194,6 +194,7 @@ en:
       opened: Opened
       sent: Sent
     email_events:
+      sent: Sent
       blocked: Blocked
       bounce: Bounced
       click: Clicked

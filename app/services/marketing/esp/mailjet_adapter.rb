@@ -13,16 +13,22 @@ module Marketing
         end
 
         response = post_message
-        if response.is_a?(Net::HTTPSuccess)
-          body = JSON.parse(response.body)
-          message_id = body.dig("Messages", 0, "To", 0, "MessageID") || body.dig("Messages", 0, "MessageID")
-          message.update!(esp_message_id: message_id.to_s) if message_id.present?
-          record_event!("delivered", payload: JSON.parse(response.body))
-          true
-        else
+        unless response.is_a?(Net::HTTPSuccess)
           record_event!("blocked", payload: {"status" => response.code, "body" => response.body})
-          false
+          return false
         end
+
+        body = JSON.parse(response.body)
+        message_result = body.dig("Messages", 0) || {}
+        unless message_result["Status"] == "success"
+          record_event!("blocked", payload: body)
+          return false
+        end
+
+        message_id = message_result.dig("To", 0, "MessageID") || message_result["MessageID"]
+        message.update!(esp_message_id: message_id.to_s) if message_id.present?
+        record_event!("sent", payload: body)
+        true
       rescue => e
         record_event!("blocked", payload: {"error" => e.message})
         false

@@ -240,9 +240,11 @@ RSpec.describe Marketing::JourneyRunner do
       described_class.new(email_enrollment).advance!
 
       email_enrollment.reload
+      message = workspace.email_messages.where(marketing_send: true).order(:id).last
       expect(email_enrollment.current_step).to eq(email_step)
       expect(email_enrollment.state).to eq("active")
       expect(email_enrollment.metadata.dig("last_error", "message")).to eq("delivery_failed")
+      expect(message.status).to eq("failed")
     end
 
     it "records errors from message creation without advancing" do

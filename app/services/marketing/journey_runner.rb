@@ -96,6 +96,7 @@ module Marketing
 
       delivered = Marketing::Esp::Client.for(message, subscription_type: subscription_type).deliver!
       unless delivered
+        message.update!(status: "failed")
         record_step_error!("send_email", "delivery_failed")
         return
       end

@@ -3,7 +3,7 @@ module Marketing
     class SmtpAdapter < Client
       def deliver!
         RecordMailer.tracked_email(message: message).deliver_now
-        record_event!("delivered")
+        record_event!("sent")
         true
       rescue => e
         record_event!("blocked", payload: {"error" => e.message})

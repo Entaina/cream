@@ -195,6 +195,7 @@ es:
       opened: Abierto
       sent: Enviado
     email_events:
+      sent: Enviado
       blocked: Bloqueado
       bounce: Rebote
       click: Clic

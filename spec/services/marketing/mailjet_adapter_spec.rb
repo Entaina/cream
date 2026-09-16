@@ -26,9 +26,14 @@ RSpec.describe Marketing::Esp::MailjetAdapter do
     )
   end
   let(:http) { instance_double(Net::HTTP) }
+  let(:request) { instance_double(Net::HTTP::Post) }
 
   before do
     allow(Net::HTTP).to receive(:start).and_yield(http)
+    allow(Net::HTTP::Post).to receive(:new).and_return(request)
+    allow(request).to receive(:basic_auth)
+    allow(request).to receive(:[]=)
+    allow(request).to receive(:body=)
   end
 
   def success_response(body)
@@ -37,14 +42,15 @@ RSpec.describe Marketing::Esp::MailjetAdapter do
     end
   end
 
+  def error_response(code:, body:)
+    instance_double(Net::HTTPResponse, body: body, code: code.to_s).tap do |response|
+      allow(response).to receive(:is_a?) { |klass| klass == Net::HTTPSuccess }
+    end
+  end
+
   it "sends via the workspace Mailjet credentials and stores the ESP id" do
-    request = instance_double(Net::HTTP::Post)
-    allow(Net::HTTP::Post).to receive(:new).and_return(request)
-    allow(request).to receive(:basic_auth)
-    allow(request).to receive(:[]=)
-    allow(request).to receive(:body=)
     allow(http).to receive(:request).and_return(
-      success_response("Messages" => [{"To" => [{"MessageID" => 99}]}])
+      success_response("Messages" => [{"Status" => "success", "To" => [{"MessageID" => 99}]}])
     )
 
     expect(described_class.new(message).deliver!).to be(true)
@@ -55,6 +61,38 @@ RSpec.describe Marketing::Esp::MailjetAdapter do
       hash_including(use_ssl: true, open_timeout: 10, read_timeout: 10)
     )
     expect(message.reload.esp_message_id).to eq("99")
+    expect(EmailEvent.last.event_type).to eq("sent")
+    expect(message.email_events.where(event_type: "delivered")).to be_empty
+  end
+
+  it "treats Mailjet Status error as failure even with HTTP 200" do
+    allow(http).to receive(:request).and_return(
+      success_response(
+        "Messages" => [{
+          "Status" => "error",
+          "Errors" => [{"ErrorCode" => "mj-0001", "ErrorMessage" => "Invalid sender"}]
+        }]
+      )
+    )
+
+    expect(described_class.new(message).deliver!).to be(false)
+    expect(EmailEvent.last.event_type).to eq("blocked")
+    expect(message.reload.esp_message_id).to be_blank
+  end
+
+  it "records blocked on HTTP error responses" do
+    allow(http).to receive(:request).and_return(error_response(code: 401, body: "Unauthorized"))
+
+    expect(described_class.new(message).deliver!).to be(false)
+    expect(EmailEvent.last.event_type).to eq("blocked")
+  end
+
+  it "records blocked on network errors" do
+    allow(http).to receive(:request).and_raise(Timeout::Error, "timeout")
+
+    expect(described_class.new(message).deliver!).to be(false)
+    expect(EmailEvent.last.event_type).to eq("blocked")
+    expect(EmailEvent.last.payload["error"]).to eq("timeout")
   end
 
   it "does not call Mailjet when the workspace is not connected" do
