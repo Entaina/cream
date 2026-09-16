@@ -167,6 +167,21 @@ module MarketingHelper
     parts.presence&.join("; ") || "Sin filtros"
   end
 
+  def format_journey_wait_duration(minutes)
+    total = minutes.to_i
+    total = 1 if total <= 0
+
+    days, remainder = total.divmod(1440)
+    hours, mins = remainder.divmod(60)
+
+    parts = []
+    parts << (days == 1 ? "1 día" : "#{days} días") if days.positive?
+    parts << (hours == 1 ? "1 h" : "#{hours} h") if hours.positive?
+    parts << (mins == 1 ? "1 min" : "#{mins} min") if mins.positive? || parts.empty?
+
+    parts.join(" ")
+  end
+
   def describe_step(step, workspace:)
     config = step.config.to_h
     case step.step_type
@@ -179,7 +194,7 @@ module MarketingHelper
         "Enviar «#{template&.name || "plantilla"}»"
       end
     when "wait"
-      "Esperar #{config["minutes"] || 1} min"
+      "Esperar #{format_journey_wait_duration(config["minutes"] || 1)}"
     when "create_task"
       "Tarea: #{config["title"].presence || "sin título"}"
     when "adjust_score"
