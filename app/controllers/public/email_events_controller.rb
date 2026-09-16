@@ -4,6 +4,7 @@ module Public
     skip_before_action :set_current_workspace, :ensure_workspace_membership
     skip_after_action :verify_authorized
     skip_after_action :verify_policy_scoped
+    skip_forgery_protection only: :create
 
     before_action :verify_webhook_token!
 

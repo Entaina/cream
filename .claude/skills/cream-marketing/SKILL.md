@@ -78,6 +78,7 @@ Migraciones: `20260904100000_create_marketing_hub.rb`, `20260904110000_marketing
 | `CampaignSender` | Envío masivo: dedupe emails, A/B Liquid (`EmailTemplate#render_custom_for`), errores ESP → `failed` |
 | `Esp::Client` | Orquestador SMTP/Mailjet; usa `MailjetConnection` del workspace; `List-Unsubscribe` dinámico |
 | `Esp::MailjetAdapter` | API Mailjet con credenciales del workspace; `esp_message_id`, pixel apertura |
+| `Esp::MailjetWebhookRegistrar` | Registra/reactiva `eventcallbackurl` (Version 2) al guardar `MailjetConnection` |
 | `Esp::SmtpAdapter` | Fallback dev (Mailbin) |
 | `WebhookProcessor` | Mailjet webhook: supresión única, soft bounce no suprime, unsub → `ConsentService`, click → journey |
 | `JourneyTrigger` | Entrada en recorridos; `entry_config` vacío = «cualquiera»; `enroll!(journey:, person:)` para inscripción manual acotada |
@@ -180,7 +181,7 @@ resource :marketing_attribution, only: :show
 | `MARKETING_DATA_RETENTION_DAYS` | Retención page views / email events (default 180) |
 | `SMTP_*` / `MAILER_FROM` | Fallback de instancia (Mailbin en dev). Campañas usan `MailjetConnection` si existe; transaccional solo si `transactional_enabled` |
 
-Mailjet por workspace: **Settings** (admin) → `MailjetConnection` (`api_key`, `secret_key`, `from_email`, `from_name`, `webhook_token`, `transactional_enabled`). URL webhook: `https://<host>/e/events?token=<webhook_token>`.
+Mailjet por workspace: **Settings** (admin) → `MailjetConnection` (`api_key`, `secret_key`, `from_email`, `from_name`, `webhook_token`, `transactional_enabled`). Al guardar, `MailjetWebhookRegistrar` sincroniza los 7 tipos de evento en Mailjet (Version 2). URL webhook: `https://<host>/e/events?token=<webhook_token>`.
 
 Beehiiv por workspace: **Settings** (admin) → `BeehiivConnection` (`api_key`, `sync_enabled`) + N `BeehiivPublication` (`publication_id`, `webhook_signing_secret`, `subscription_type_id`, `webhook_token` único). URL webhook por publicación: `https://<host>/e/beehiiv/<webhook_token>`. Migración `20260910120000` backfill preserva token/URL de newsletter en prod. Push outbound desde `ConsentService` (por `subscription_type` mapeado) vía `BeehiivPushJob`; inbound no reempuja (`source` `beehiiv:*`).
 
@@ -215,4 +216,4 @@ Smoke tests con `cream-playwright` — sección «Verificar marketing hub».
 2. Specs (servicios + requests); rubocop
 3. Manual §29 si cambió UX
 4. `bin/rails db:migrate` en dev/prod al añadir columnas
-5. Prod: cada workspace configura Mailjet en **Settings**; registrar en Mailjet la URL de webhook que muestra esa pantalla.
+5. Prod: cada workspace configura Mailjet en **Settings**; el Event Tracking se registra al guardar (la URL en pantalla es referencia).

@@ -20,7 +20,7 @@ RSpec.describe Marketing::WebhookProcessor do
   it "records email events from webhook payload" do
     payload = {
       "Events" => [
-        {"event" => "open", "CustomID" => message.id.to_s, "time" => Time.current.iso8601}
+        { "event" => "open", "CustomID" => message.id.to_s, "time" => Time.current.iso8601 }
       ]
     }
 
@@ -31,10 +31,48 @@ RSpec.describe Marketing::WebhookProcessor do
     expect(EmailEvent.last.event_type).to eq("open")
   end
 
+  it "records events from a Mailjet Version 2 array payload" do
+    payload = [
+      { "event" => "open", "CustomID" => message.id.to_s, "time" => 1_433_103_519 }
+    ]
+
+    expect {
+      described_class.process!(payload: payload)
+    }.to change(EmailEvent, :count).by(1)
+
+    expect(EmailEvent.last.occurred_at).to eq(Time.zone.at(1_433_103_519))
+  end
+
+  it "records events from a single Mailjet Version 1 object payload" do
+    payload = {
+      "event" => "sent",
+      "CustomID" => message.id.to_s,
+      "time" => 1_433_333_949,
+      "MessageID" => 19_421_777_835_146_490
+    }
+
+    expect {
+      described_class.process!(payload: payload)
+    }.to change(EmailEvent, :count).by(1)
+
+    expect(EmailEvent.last.event_type).to eq("delivered")
+  end
+
+  it "ignores non-hash entries in the payload" do
+    payload = [
+      "invalid",
+      { "event" => "open", "CustomID" => message.id.to_s, "time" => Time.current.iso8601 }
+    ]
+
+    expect {
+      described_class.process!(payload: payload)
+    }.to change(EmailEvent, :count).by(1)
+  end
+
   it "ignores events for messages outside the given workspace" do
     payload = {
       "Events" => [
-        {"event" => "open", "CustomID" => message.id.to_s, "time" => Time.current.iso8601}
+        { "event" => "open", "CustomID" => message.id.to_s, "time" => Time.current.iso8601 }
       ]
     }
 
@@ -46,7 +84,7 @@ RSpec.describe Marketing::WebhookProcessor do
   it "suppresses addresses on hard bounces" do
     payload = {
       "Events" => [
-        {"event" => "bounce", "CustomID" => message.id.to_s, "email" => person.email, "time" => Time.current.iso8601}
+        { "event" => "bounce", "CustomID" => message.id.to_s, "email" => person.email, "time" => Time.current.iso8601 }
       ]
     }
 

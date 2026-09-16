@@ -18,6 +18,11 @@ RSpec.describe "Mailjet connections", type: :request do
     }
   end
 
+  before do
+    allow(Marketing::Esp::MailjetWebhookRegistrar).to receive(:sync!)
+    allow(Marketing::Esp::MailjetWebhookRegistrar).to receive(:remove!)
+  end
+
   describe "GET /settings/workspace" do
     it "shows the Mailjet form without echoing stored keys" do
       workspace.create_mailjet_connection!(
@@ -56,11 +61,12 @@ RSpec.describe "Mailjet connections", type: :request do
       expect(connection.user).to eq(admin)
       expect(connection.webhook_token).to be_present
       expect(connection.transactional_enabled?).to be(false)
+      expect(Marketing::Esp::MailjetWebhookRegistrar).to have_received(:sync!).with(connection)
     end
 
     it "is admin-only" do
       sign_in_as(member)
-      patch switch_workspace_path, params: {workspace_id: workspace.id}
+      patch switch_workspace_path, params: { workspace_id: workspace.id }
 
       expect {
         post mailjet_connection_path, params: connection_params
@@ -111,6 +117,7 @@ RSpec.describe "Mailjet connections", type: :request do
 
       expect(response).to redirect_to(settings_workspace_path)
       expect(workspace.reload.mailjet_connection).to be_nil
+      expect(Marketing::Esp::MailjetWebhookRegistrar).to have_received(:remove!)
     end
   end
 end

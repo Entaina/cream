@@ -4,7 +4,7 @@
 
 Cream is a **workspace**-based CRM for managing **people**, **companies** and **deals** (opportunities), with notes, tasks, lists and an activity history shared across the team.
 
-> **Last revision:** 2026-09-16 (journey history on the person record)
+> **Last revision:** 2026-09-16 (automatic Mailjet Event Tracking registration)
 > This document describes the functionality **visible to the user**. Disabled features are listed at the end under "Coming soon".
 
 ---
@@ -895,7 +895,7 @@ Connect **this workspace's** Mailjet account for campaigns and journeys (admins 
 2. In **Settings**, **Mailjet** section, paste the keys, the verified **from email**, and optionally the sender name.
 3. To also send invitations, alerts, bookings, reports and emails from records through Mailjet, enable **Usar Mailjet para el correo transaccional**.
 4. Click **Conectar Mailjet**. Keys are not shown again; leave the fields blank to keep the stored values.
-5. Copy the **webhook URL** and register it in Mailjet (Account settings → Event Tracking) for sent, open, click, bounce, spam, unsub and blocked (Version 2).
+5. When you save, Cream automatically registers sent, open, click, bounce, spam, unsub and blocked events in Mailjet (Version 2). The **webhook URL** shown below is for reference if you need to verify it in Mailjet.
 
 Each workspace has its own URL (it includes a token). Without Mailjet connected, campaigns use SMTP/Mailbin. Transactional email uses Mailjet only when the checkbox is on; otherwise SMTP/Mailbin.
 
@@ -1398,7 +1398,7 @@ Subscriptions created from a form store the same **privacy policy version** as t
 - **Ver más** (View more) opens the full history with delivery events (open, click, bounce…).
 - The list uses the same send log as the campaign; it does not include one-to-one emails or journey steps without a campaign.
 
-**Requirements:** Mailjet connected under **Settings → Mailjet** and the **webhook URL** registered in Mailjet for opens, clicks and unsubscribes (see [§21](#21-workspace-settings)). Without Mailjet, sends use server SMTP/Mailbin.
+**Requirements:** Mailjet connected under **Settings → Mailjet** (Cream registers Event Tracking when you save; see [§21](#21-workspace-settings)). Without Mailjet, sends use server SMTP/Mailbin.
 
 ### Segments
 

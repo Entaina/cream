@@ -1,11 +1,12 @@
 module Marketing
   class WebhookProcessor
     def self.process!(payload:, workspace: nil)
-      events = Array(payload["Events"] || payload["events"] || payload)
-      events.each { |event| process_event!(event, workspace: workspace) }
+      normalize_events(payload).each { |event| process_event!(event, workspace: workspace) }
     end
 
     def self.process_event!(event, workspace: nil)
+      return unless event.is_a?(Hash)
+
       message = find_message(event, workspace: workspace)
       return unless message
 
@@ -16,7 +17,7 @@ module Marketing
         email_message: message,
         event_type: event_type,
         url: event["url"],
-        occurred_at: Time.zone.parse(event["time"].to_s) || Time.current,
+        occurred_at: parse_occurred_at(event["time"]),
         payload: event
       )
       apply_scoring!(message: message, event_type: event_type)
@@ -39,9 +40,9 @@ module Marketing
 
       case event_type
       when "open"
-        Marketing::ScoringEngine.apply_event!(person: person, event: "email_opened", metadata: {"email_message_id" => message.id})
+        Marketing::ScoringEngine.apply_event!(person: person, event: "email_opened", metadata: { "email_message_id" => message.id })
       when "click"
-        Marketing::ScoringEngine.apply_event!(person: person, event: "email_clicked", metadata: {"email_message_id" => message.id})
+        Marketing::ScoringEngine.apply_event!(person: person, event: "email_clicked", metadata: { "email_message_id" => message.id })
       end
     end
     private_class_method :apply_scoring!
@@ -53,6 +54,35 @@ module Marketing
       JourneyTrigger.enqueue_email_clicked!(person: person) if person
     end
     private_class_method :enqueue_journey!
+
+    def self.normalize_events(payload)
+      case payload
+      when Array
+        payload
+      when Hash
+        if payload.key?("Events") || payload.key?("events")
+          Array(payload["Events"] || payload["events"])
+        elsif payload["event"].present? || payload["EventType"].present?
+          [ payload ]
+        else
+          []
+        end
+      else
+        []
+      end
+    end
+    private_class_method :normalize_events
+
+    def self.parse_occurred_at(raw)
+      return Time.current if raw.blank?
+
+      if raw.to_s.match?(/\A\d+\z/)
+        Time.zone.at(raw.to_i)
+      else
+        Time.zone.parse(raw.to_s) || Time.current
+      end
+    end
+    private_class_method :parse_occurred_at
 
     def self.map_event_type(raw)
       case raw.to_s.downcase
