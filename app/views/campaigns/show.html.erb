@@ -55,13 +55,22 @@
       <%= campaign_status_badge(@campaign.status) %>
     </div>
 
-    <% unless @campaign.email_content_present? %>
-      <p class="text-sm text-danger-strong">Configura el contenido del email antes de encolar un envío.</p>
-    <% end %>
-
-    <div data-controller="segment-preview"
-         data-segment-preview-url-value="<%= recipient_count_campaign_path(@campaign) %>">
+    <div data-controller="segment-preview campaign-send"
+         data-segment-preview-url-value="<%= recipient_count_campaign_path(@campaign) %>"
+         data-campaign-send-email-content-present-value="<%= @campaign.email_content_present? %>">
       <%= form_with url: send_campaign_campaign_path(@campaign), method: :post, class: "space-y-3 max-w-2xl" do %>
+        <div>
+          <label class="label">Tipo de entrega</label>
+          <%= select_tag :delivery_mode,
+                options_for_select(CampaignSend::DELIVERY_MODES.map { |mode| [delivery_mode_label(mode), mode] }, "email"),
+                class: "input w-full",
+                data: {
+                  "campaign-send-target" => "deliveryMode",
+                  action: "change->campaign-send#modeChanged"
+                } %>
+          <p class="text-sm text-ink-faint mt-1">Elige enviar un email, inscribir en un recorrido, o ambas acciones.</p>
+        </div>
+
         <div>
           <label class="label">Segmento de personas</label>
           <%= select_tag :segment_id,
@@ -78,52 +87,73 @@
           </p>
         </div>
 
-        <div>
-          <label class="label">Tipo de suscripción</label>
-          <%= select_tag :subscription_type_id,
-                options_from_collection_for_select(@subscription_types, :id, :name),
-                class: "input w-full" %>
-          <p class="text-sm text-ink-faint mt-1">Solo se enviará a contactos suscritos a este tipo.</p>
+        <div data-campaign-send-target="journeyField" hidden>
+          <label class="label">Recorrido</label>
+          <%= select_tag :journey_id,
+                options_from_collection_for_select(@journeys, :id, :name),
+                include_blank: "Selecciona un recorrido",
+                class: "input w-full",
+                data: {
+                  "campaign-send-target" => "journeySelect",
+                  action: "change->campaign-send#journeyChanged"
+                } %>
+          <p class="text-sm text-ink-faint mt-1">Las personas del segmento se inscribirán en este recorrido.</p>
+        </div>
+
+        <p class="text-sm text-danger-strong" data-campaign-send-target="emailWarning" hidden>
+          Configura el contenido del email antes de encolar un envío con email.
+        </p>
+
+        <div data-campaign-send-target="emailFields">
+          <div>
+            <label class="label">Tipo de suscripción</label>
+            <%= select_tag :subscription_type_id,
+                  options_from_collection_for_select(@subscription_types, :id, :name),
+                  class: "input w-full" %>
+            <p class="text-sm text-ink-faint mt-1">Solo se enviará a contactos suscritos a este tipo.</p>
+          </div>
+
+          <fieldset class="space-y-3 border border-line rounded-lg p-3 mt-3">
+            <legend class="text-sm font-semibold px-1">Prueba A/B (opcional)</legend>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label class="label">Asunto variante A</label>
+                <%= text_field_tag :variant_a_subject, nil, class: "input w-full" %>
+              </div>
+              <div>
+                <label class="label">Peso A (%)</label>
+                <%= number_field_tag :variant_a_weight, 50, min: 1, max: 100, class: "input w-full" %>
+              </div>
+              <div class="md:col-span-2">
+                <label class="label">Cuerpo variante A</label>
+                <%= text_area_tag :variant_a_body, nil, rows: 3, class: "input w-full resize-y" %>
+              </div>
+              <div>
+                <label class="label">Asunto variante B</label>
+                <%= text_field_tag :variant_b_subject, nil, class: "input w-full" %>
+              </div>
+              <div>
+                <label class="label">Peso B (%)</label>
+                <%= number_field_tag :variant_b_weight, 50, min: 1, max: 100, class: "input w-full" %>
+              </div>
+              <div class="md:col-span-2">
+                <label class="label">Cuerpo variante B</label>
+                <%= text_area_tag :variant_b_body, nil, rows: 3, class: "input w-full resize-y" %>
+              </div>
+            </div>
+            <p class="text-xs text-ink-faint">Si rellenas los asuntos A/B, sustituyen al asunto del contenido de la campaña.</p>
+          </fieldset>
         </div>
 
         <div>
           <label class="label">Programar envío (opcional)</label>
           <%= datetime_local_field_tag :scheduled_at, nil, class: "input w-full" %>
-          <p class="text-sm text-ink-faint mt-1">Déjalo vacío para enviar de inmediato.</p>
+          <p class="text-sm text-ink-faint mt-1">Déjalo vacío para ejecutar de inmediato.</p>
         </div>
 
-        <fieldset class="space-y-3 border border-line rounded-lg p-3">
-          <legend class="text-sm font-semibold px-1">Prueba A/B (opcional)</legend>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div>
-              <label class="label">Asunto variante A</label>
-              <%= text_field_tag :variant_a_subject, nil, class: "input w-full" %>
-            </div>
-            <div>
-              <label class="label">Peso A (%)</label>
-              <%= number_field_tag :variant_a_weight, 50, min: 1, max: 100, class: "input w-full" %>
-            </div>
-            <div class="md:col-span-2">
-              <label class="label">Cuerpo variante A</label>
-              <%= text_area_tag :variant_a_body, nil, rows: 3, class: "input w-full resize-y" %>
-            </div>
-            <div>
-              <label class="label">Asunto variante B</label>
-              <%= text_field_tag :variant_b_subject, nil, class: "input w-full" %>
-            </div>
-            <div>
-              <label class="label">Peso B (%)</label>
-              <%= number_field_tag :variant_b_weight, 50, min: 1, max: 100, class: "input w-full" %>
-            </div>
-            <div class="md:col-span-2">
-              <label class="label">Cuerpo variante B</label>
-              <%= text_area_tag :variant_b_body, nil, rows: 3, class: "input w-full resize-y" %>
-            </div>
-          </div>
-          <p class="text-xs text-ink-faint">Si rellenas los asuntos A/B, sustituyen al asunto del contenido de la campaña.</p>
-        </fieldset>
-
-        <%= submit_tag "Encolar envío", class: "btn-primary", disabled: !@campaign.email_content_present? %>
+        <%= submit_tag "Encolar envío", class: "btn-primary",
+              data: { "campaign-send-target" => "submit" },
+              disabled: !@campaign.email_content_present? %>
       <% end %>
     </div>
 
@@ -154,6 +184,7 @@
           <thead>
             <tr>
               <th>Fecha</th>
+              <th>Entrega</th>
               <th>Segmento</th>
               <th>Estado</th>
               <th>Resultado</th>
@@ -166,16 +197,16 @@
               <% stats = send_record.stats.to_h.stringify_keys %>
               <tr>
                 <td class="text-sm whitespace-nowrap"><%= l send_record.created_at, format: :short %></td>
+                <td class="text-sm">
+                  <div><%= delivery_mode_label(send_record.delivery_mode) %></div>
+                  <% if send_record.journey.present? %>
+                    <div class="text-ink-faint"><%= send_record.journey.name %></div>
+                  <% end %>
+                </td>
                 <td class="text-sm"><%= send_record.segment.name %></td>
                 <td><%= send_status_badge(send_record.status) %></td>
                 <td class="text-sm text-ink-soft">
-                  <% if stats.any? %>
-                    <%= stats["sent"] || 0 %> enviados
-                    <% if stats["skipped"].to_i.positive? %>, <%= stats["skipped"] %> omitidos<% end %>
-                    <% if stats["failed"].to_i.positive? %>, <%= stats["failed"] %> fallidos<% end %>
-                  <% else %>
-                    —
-                  <% end %>
+                  <%= describe_campaign_send_stats(stats, delivery_mode: send_record.delivery_mode) %>
                 </td>
                 <td class="text-sm">
                   <% if send_record.campaign_variants.any? %>

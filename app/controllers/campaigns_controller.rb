@@ -11,9 +11,10 @@ class CampaignsController < ApplicationController
 
   def show
     authorize @campaign
-    @sends = @campaign.campaign_sends.includes(:segment, :email_template, :campaign_variants).order(created_at: :desc)
+    @sends = @campaign.campaign_sends.includes(:segment, :email_template, :campaign_variants, :journey).order(created_at: :desc)
     @stats = campaign_stats
     @person_segments = current_workspace.segments.where(record_type: "Person").ordered
+    @journeys = current_workspace.journeys.active.ordered
     SubscriptionType.ensure_defaults!(current_workspace)
     @subscription_types = current_workspace.subscription_types.active.ordered
   end
@@ -58,8 +59,16 @@ class CampaignsController < ApplicationController
 
   def send_campaign
     authorize @campaign, :update?
-    unless @campaign.email_content_present?
+    delivery_mode = params[:delivery_mode].presence_in(CampaignSend::DELIVERY_MODES) || "email"
+
+    if delivery_mode.in?(%w[email both]) && !@campaign.email_content_present?
       return redirect_to edit_campaign_path(@campaign), alert: "Añade asunto y cuerpo del email antes de enviar."
+    end
+
+    journey = nil
+    if delivery_mode.in?(%w[journey both])
+      journey = current_workspace.journeys.active.find_by(id: params[:journey_id])
+      return redirect_to(@campaign, alert: "Selecciona un recorrido activo.") unless journey
     end
 
     segment = current_workspace.segments.find(params[:segment_id])
@@ -70,6 +79,8 @@ class CampaignsController < ApplicationController
       campaign: @campaign,
       segment: segment,
       email_template: @campaign.email_template,
+      journey: journey,
+      delivery_mode: delivery_mode,
       user: current_user,
       subscription_type: subscription_type,
       status: "pending",

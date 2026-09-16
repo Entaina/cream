@@ -22,6 +22,12 @@ module MarketingHelper
     "cancelled" => "Cancelado"
   }.freeze
 
+  DELIVERY_MODE_LABELS = {
+    "email" => "Email",
+    "journey" => "Recorrido",
+    "both" => "Email + recorrido"
+  }.freeze
+
   ENROLLMENT_STATE_LABELS = {
     "active" => "Activo",
     "waiting" => "En espera",
@@ -97,6 +103,32 @@ module MarketingHelper
     else "chicago"
     end
     badge(SEND_STATUS_LABELS.fetch(status.to_s, status), color: color)
+  end
+
+  def delivery_mode_label(mode)
+    DELIVERY_MODE_LABELS.fetch(mode.to_s, mode.to_s.humanize)
+  end
+
+  def describe_campaign_send_stats(stats, delivery_mode: "email")
+    stats = stats.to_h.stringify_keys
+    parts = []
+
+    if delivery_mode.in?(%w[email both]) && (stats["sent"] || stats["skipped"] || stats["failed"])
+      parts << "#{stats["sent"] || 0} enviados"
+      parts << "#{stats["skipped"]} omitidos" if stats["skipped"].to_i.positive?
+      parts << "#{stats["failed"]} fallidos" if stats["failed"].to_i.positive?
+    end
+
+    if delivery_mode.in?(%w[journey both])
+      enrolled = stats["journey_enrolled"].to_i
+      parts << "#{enrolled} inscritos en recorrido" if enrolled.positive? || delivery_mode == "journey"
+      %w[blocked max_reenrollments no_steps inactive feature_disabled].each do |key|
+        count = stats["journey_#{key}"].to_i
+        parts << "#{count} #{key.humanize.downcase}" if count.positive?
+      end
+    end
+
+    parts.presence&.join(", ") || "—"
   end
 
   def enrollment_state_badge(state)

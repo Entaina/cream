@@ -4,7 +4,7 @@
 
 Cream es un CRM por **workspaces** para gestionar **personas**, **empresas** y **deals** (oportunidades), con notas, tareas, listas y un historial de actividad compartido en el equipo.
 
-> **Última revisión:** 2026-09-16 (enlace directo por tipo de reserva)
+> **Última revisión:** 2026-09-16 (cambio de paso manual en recorridos)
 > Este documento describe la funcionalidad **visible para el usuario**. Las funcionalidades desactivadas aparecen al final en «Próximamente».
 
 ---
@@ -1432,6 +1432,7 @@ Secuencias automatizadas por contacto.
 
 6. En recorridos **manuales**, abre la ficha del recorrido → **Inscribir contacto manualmente**.
 7. Desde la ficha del recorrido puedes **Pausar** / **Activar**, ver inscripciones activas y el paso actual de cada contacto.
+8. En inscripciones **Activo** o **En espera**, usa **Cambiar paso** para mover al contacto a otro paso. El recorrido continúa desde ahí y ejecutará ese paso (puede reenviar un email o reiniciar una espera). Solo administradores.
 
 ### Puntuación de leads
 

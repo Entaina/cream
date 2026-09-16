@@ -9,6 +9,11 @@ class JourneyEnrollment < ApplicationRecord
   validates :state, inclusion: {in: STATES}
 
   scope :due, -> { where(state: %w[active waiting]).where("next_run_at IS NULL OR next_run_at <= ?", Time.current) }
+  scope :in_progress, -> { where(state: %w[active waiting]) }
+
+  def in_progress?
+    state.in?(%w[active waiting])
+  end
 
   def advance_to!(step, wait_until: nil)
     update!(

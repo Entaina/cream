@@ -4,7 +4,7 @@
 
 Cream is a **workspace**-based CRM for managing **people**, **companies** and **deals** (opportunities), with notes, tasks, lists and an activity history shared across the team.
 
-> **Last revision:** 2026-09-16 (direct link per booking event type)
+> **Last revision:** 2026-09-16 (manual journey step change)
 > This document describes the functionality **visible to the user**. Disabled features are listed at the end under "Coming soon".
 
 ---
@@ -1432,6 +1432,7 @@ Automated per-contact sequences.
 
 6. For **manual** journeys, open the journey page → **Inscribir contacto manualmente** (Enroll contact manually).
 7. From the journey page you can **Pausar** / **Activar** (Pause / Activate), view active enrollments and each contact's current step.
+8. For **Activo** (Active) or **En espera** (Waiting) enrollments, use **Cambiar paso** (Change step) to move the contact to another step. The journey continues from there and will run that step (it may resend an email or restart a wait). Admins only.
 
 ### Lead scoring
 

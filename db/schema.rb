@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_16_102653) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_16_170000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -251,7 +251,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_16_102653) do
     t.bigint "campaign_id", null: false
     t.datetime "completed_at"
     t.datetime "created_at", null: false
+    t.string "delivery_mode", default: "email", null: false
     t.bigint "email_template_id"
+    t.bigint "journey_id"
     t.datetime "scheduled_at"
     t.bigint "segment_id", null: false
     t.datetime "started_at"
@@ -263,6 +265,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_16_102653) do
     t.bigint "workspace_id", null: false
     t.index ["campaign_id"], name: "index_campaign_sends_on_campaign_id"
     t.index ["email_template_id"], name: "index_campaign_sends_on_email_template_id"
+    t.index ["journey_id"], name: "index_campaign_sends_on_journey_id"
     t.index ["segment_id"], name: "index_campaign_sends_on_segment_id"
     t.index ["subscription_type_id"], name: "index_campaign_sends_on_subscription_type_id"
     t.index ["user_id"], name: "index_campaign_sends_on_user_id"
@@ -1648,6 +1651,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_16_102653) do
   add_foreign_key "calendar_connections", "workspaces"
   add_foreign_key "campaign_sends", "campaigns"
   add_foreign_key "campaign_sends", "email_templates"
+  add_foreign_key "campaign_sends", "journeys"
   add_foreign_key "campaign_sends", "segments"
   add_foreign_key "campaign_sends", "subscription_types"
   add_foreign_key "campaign_sends", "users"

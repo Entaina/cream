@@ -19,40 +19,23 @@ module Marketing
     def call
       return unless CreamFeatures.enabled?(:marketing_campaigns)
       return if @campaign_send.status == "cancelled"
-      return mark_empty_failure! unless @email_content.present?
+      if @campaign_send.sends_email? && !@email_content.present?
+        return mark_empty_failure! unless @campaign_send.enrolls_in_journey?
+      end
 
       @campaign_send.mark_started!
       @campaign.update!(status: "sending")
 
-      recipients = resolve_recipients
-      sent = 0
-      skipped = 0
-      failed = 0
-      last_error = nil
+      stats = {}
+      stats.merge!(send_emails!) if @campaign_send.sends_email?
+      stats.merge!(enroll_in_journey!) if @campaign_send.enrolls_in_journey?
 
-      recipients.each_slice(BATCH_SIZE) do |batch|
-        batch.each do |person, email|
-          result = deliver_to(person, email)
-          case result
-          when :sent then sent += 1
-          when :skipped then skipped += 1
-          when :failed
-            failed += 1
-            last_error = @last_error
-          end
-        end
-        sleep 0.1
-      end
-
-      stats = {"sent" => sent, "skipped" => skipped, "failed" => failed}
-      stats["last_error"] = last_error if last_error.present?
-
-      if sent.zero? && failed.positive?
-        @campaign_send.mark_failed!(stats: stats)
-        @campaign.update!(status: "draft")
-      else
+      if success?(stats)
         @campaign_send.mark_completed!(stats: stats)
         @campaign.update!(status: "sent")
+      else
+        @campaign_send.mark_failed!(stats: stats)
+        @campaign.update!(status: "draft")
       end
     end
 
@@ -68,6 +51,71 @@ module Marketing
     def mark_empty_failure!
       @campaign_send.mark_failed!(stats: {"sent" => 0, "skipped" => 0, "failed" => 0, "last_error" => "missing_email_content"})
       @campaign.update!(status: "draft")
+    end
+
+    def send_emails!
+      sent = 0
+      skipped = 0
+      failed = 0
+      last_error = nil
+
+      resolve_recipients.each_slice(BATCH_SIZE) do |batch|
+        batch.each do |person, email|
+          result = deliver_to(person, email)
+          case result
+          when :sent then sent += 1
+          when :skipped then skipped += 1
+          when :failed
+            failed += 1
+            last_error = @last_error
+          end
+        end
+        sleep 0.1
+      end
+
+      stats = {"sent" => sent, "skipped" => skipped, "failed" => failed}
+      stats["last_error"] = last_error if last_error.present?
+      stats
+    end
+
+    def enroll_in_journey!
+      journey = @campaign_send.journey
+      people = @segment.resolve(@workspace.people).uniq
+      stats = Hash.new(0)
+
+      people.each do |person|
+        outcome = Marketing::JourneyTrigger.enroll!(journey: journey, person: person)
+        stats["journey_#{outcome}"] += 1
+      end
+
+      stats.to_h
+    end
+
+    def success?(stats)
+      case @campaign_send.delivery_mode
+      when "email"
+        email_success?(stats)
+      when "journey"
+        journey_success?(stats)
+      else
+        email_success?(stats) || journey_success?(stats)
+      end
+    end
+
+    def email_success?(stats)
+      !(stats["sent"].to_i.zero? && stats["failed"].to_i.positive?)
+    end
+
+    def journey_success?(stats)
+      journey_outcomes = stats.select { |key, _| key.start_with?("journey_") }
+      return true if journey_outcomes.values.sum.zero?
+
+      stats["journey_enrolled"].to_i.positive? || journey_all_skipped?(stats)
+    end
+
+    def journey_all_skipped?(stats)
+      journey_outcomes = stats.select { |key, _| key.start_with?("journey_") }
+      journey_outcomes.values.sum.positive? && stats["journey_enrolled"].to_i.zero?
     end
 
     def resolve_recipients

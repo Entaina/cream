@@ -7,6 +7,7 @@ class Journey < ApplicationRecord
   belongs_to :product, optional: true
   has_many :steps, class_name: "JourneyStep", dependent: :destroy, inverse_of: :journey
   has_many :enrollments, class_name: "JourneyEnrollment", dependent: :destroy
+  has_many :campaign_sends, dependent: :nullify
 
   validates :name, :entry_trigger, presence: true
   validates :entry_trigger, inclusion: {in: ENTRY_TRIGGERS}

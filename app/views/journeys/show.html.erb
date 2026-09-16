@@ -87,6 +87,7 @@
             <th>Paso actual</th>
             <th>Próxima ejecución</th>
             <th>Inscrito</th>
+            <th>Cambiar paso</th>
           </tr>
         </thead>
         <tbody>
@@ -111,6 +112,26 @@
                 <% end %>
               </td>
               <td class="text-sm text-ink-faint"><%= l enrollment.enrolled_at, format: :short %></td>
+              <td>
+                <% if enrollment.in_progress? && @journey.steps.any? %>
+                  <%= form_with url: journey_enrollment_path(@journey, enrollment), method: :patch, class: "flex flex-wrap items-center gap-2" do %>
+                    <%= select_tag :step_id,
+                          options_for_select(
+                            @journey.steps.ordered.map { |step|
+                              label = journey_step_label(step, workspace: current_workspace)
+                              label += " (inactivo)" unless step.active?
+                              [label, step.id]
+                            },
+                            enrollment.current_step_id
+                          ),
+                          class: "input min-w-[12rem]" %>
+                    <%= submit_tag "Mover", class: "btn-secondary",
+                          data: { turbo_confirm: "¿Mover a #{enrollment.person.display_name} a este paso? El recorrido continuará desde ahí y ejecutará ese paso." } %>
+                  <% end %>
+                <% else %>
+                  <span class="text-sm text-ink-faint">—</span>
+                <% end %>
+              </td>
             </tr>
           <% end %>
         </tbody>

@@ -23,7 +23,7 @@ Ocho flags en [`app/services/cream_features.rb`](../../../app/services/cream_fea
 | `:marketing_campaigns` | sí | Campañas | `CampaignsController`, ESP, webhooks |
 | `:marketing_segments` | sí | Segmentos | `SegmentsController` |
 | `:marketing_attribution` | sí | Atribución | `MarketingAttributionController` |
-| `:journeys` | sí | Recorridos | `JourneysController`, `JourneyRunnerJob` |
+| `:journeys` | sí | Recorridos | `JourneysController`, `JourneyEnrollmentsController`, `JourneyRunnerJob` |
 | `:lead_scoring` | sí | Puntuación de leads | `ScoringRulesController`, `ScoringRecalculateJob` |
 | `:web_tracking` | no | Web tracking | `Public::TrackingController`, landing pages |
 
@@ -89,6 +89,7 @@ Migraciones: `20260904100000_create_marketing_hub.rb`, `20260904110000_marketing
 | `Beehiiv::Client` / `SubscriberSync` / `PushService` / `WebhookProcessor` | Sync bidireccional por `BeehiivPublication` ↔ `subscription_type` mapeado |
 | `MqlToSqlConverter` | Conversión transaccional de interés → deal (crear o vincular) |
 | `JourneyExit` | Cancelar/bloquear recorridos con `stop_on_open_deal` |
+| `JourneyStepMover` | Cambio manual de paso en inscripciones activas/en espera (admin) |
 | `ConsentPolicySnapshot` | Versionar política + frase de checkbox por hash; find_or_create idempotente |
 | `SegmentWatcher` | Detecta entrada en segmento → `JourneyTrigger.enqueue_segment_entry!` |
 | `LiquidRenderer` / `LinkRewriter` | Personalización y tracking en campañas |
@@ -118,7 +119,7 @@ resources :campaigns do
   end
 end
 resources :segments { member { get :preview } }
-resources :journeys { member { post :enroll; patch :toggle_active } }
+resources :journeys { member { post :enroll; patch :toggle_active }; resources :enrollments, only: :update }
 resources :scoring_rules, except: :show { collection { post :recalculate } }
 resource :marketing_attribution, only: :show
 ```

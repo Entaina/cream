@@ -245,6 +245,7 @@ Rails.application.routes.draw do
       post :enroll
       patch :toggle_active
     end
+    resources :enrollments, only: :update, controller: "journey_enrollments"
   end
   resources :scoring_rules, except: :show do
     collection do
