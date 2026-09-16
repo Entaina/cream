@@ -141,7 +141,7 @@ RSpec.describe "Deals", type: :request do
       expect {
         post deals_path, params: {deal: {name: "Bad", company_id: company.id, pipeline_id: pipeline.id}}
       }.not_to change(Deal, :count)
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
 
     it "creates a deal from a person quick dialog with product and next action" do
@@ -220,7 +220,7 @@ RSpec.describe "Deals", type: :request do
         }, headers: turbo_headers
       }.not_to change(Deal, :count)
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(response.media_type).to eq("text/vnd.turbo-stream.html")
       expect(response.body).to include(ActionView::RecordIdentifier.dom_id(person, :quick_deal_form))
       expect(response.body).to include("Tasks title #{I18n.t("errors.messages.blank")}")

@@ -94,7 +94,7 @@ RSpec.describe "Lead forms", type: :request do
         }
       }.not_to change(LeadForm, :count)
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
 
     it "updates success redirect URL" do
@@ -142,7 +142,7 @@ RSpec.describe "Lead forms", type: :request do
         }
       }.not_to change(LeadForm, :count)
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
 
     it "rejects invalid hidden field keys" do
@@ -161,7 +161,7 @@ RSpec.describe "Lead forms", type: :request do
         }
       }.not_to change(LeadForm, :count)
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
 
     it "stores pipeline routes from parallel form fields" do
@@ -223,7 +223,7 @@ RSpec.describe "Lead forms", type: :request do
         }
       }.not_to change(LeadForm, :count)
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
 
     it "creates a lead form with a pipeline stage" do
@@ -286,7 +286,7 @@ RSpec.describe "Lead forms", type: :request do
         }
       }.not_to change(LeadForm, :count)
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
 
     it "updates the pipeline stage" do
@@ -336,7 +336,7 @@ RSpec.describe "Lead forms", type: :request do
         }
       }.not_to change(LeadForm, :count)
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
 
     it "updates first task configuration" do

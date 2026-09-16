@@ -22,7 +22,7 @@ RSpec.describe "Theme preferences", type: :request do
 
       patch theme_preference_path, params: {theme: "purple"}, as: :json
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(member.reload.theme).to eq("dark")
     end
 

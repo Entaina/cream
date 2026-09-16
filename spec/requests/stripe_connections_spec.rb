@@ -53,7 +53,7 @@ RSpec.describe "Stripe connections", type: :request do
 
       post stripe_connection_path, params: {stripe_connection: {api_key: "rk_test_bad"}}
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(workspace.stripe_connections.count).to eq(0)
     end
 

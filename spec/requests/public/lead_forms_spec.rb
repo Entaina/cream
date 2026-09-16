@@ -306,7 +306,7 @@ RSpec.describe "Public lead forms", type: :request do
         }
       }.not_to change(Deal, :count)
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(response.body).to include("política de privacidad")
     end
 
@@ -349,7 +349,7 @@ RSpec.describe "Public lead forms", type: :request do
         }
       }.not_to change(Deal, :count)
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(response.body).to include("verificar que eres una persona")
       expect(response.body).to include('role="alert"')
       expect(response.body).to include('value="Ana"')
@@ -361,7 +361,7 @@ RSpec.describe "Public lead forms", type: :request do
         lead: contacto_lead_params(email: "")
       }
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(response.body).to include("Contacto web")
     end
   end

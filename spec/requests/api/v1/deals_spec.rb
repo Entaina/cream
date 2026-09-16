@@ -143,7 +143,7 @@ RSpec.describe "Api::V1::Deals", type: :request do
         params: valid_create_params(deal: {contact_ids: [outsider.id]}),
         headers: headers
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(response.parsed_body["errors"]).to include(/Every contact must belong/)
     end
 
@@ -178,7 +178,7 @@ RSpec.describe "Api::V1::Deals", type: :request do
           headers: headers
       }.not_to change(Deal, :count)
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(response.parsed_body["errors"]).to include(blank_error_for(Note, :body))
     end
 
@@ -264,7 +264,7 @@ RSpec.describe "Api::V1::Deals", type: :request do
             as: :json
         }.not_to change(Deal, :count)
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.parsed_body["errors"]).to be_present
       end
 
@@ -283,7 +283,7 @@ RSpec.describe "Api::V1::Deals", type: :request do
             as: :json
         }.not_to change(Deal, :count)
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.parsed_body["errors"]).to be_present
       end
 
@@ -329,7 +329,7 @@ RSpec.describe "Api::V1::Deals", type: :request do
             as: :json
         }.not_to change(Deal, :count)
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.parsed_body["errors"]).to be_present
       end
     end

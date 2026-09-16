@@ -65,17 +65,17 @@ RSpec.describe Marketing::JourneyRunner do
     end
 
     it "advances past wait when next_run_at has elapsed" do
-      enrollment = JourneyEnrollment.create!(
-        workspace: workspace,
-        journey: journey,
-        person: person,
-        current_step: wait_step,
-        state: "waiting",
-        enrolled_at: 10.minutes.ago,
-        next_run_at: 1.minute.ago
-      )
-
       travel_to Time.zone.parse("2026-09-16 10:00:00") do
+        enrollment = JourneyEnrollment.create!(
+          workspace: workspace,
+          journey: journey,
+          person: person,
+          current_step: wait_step,
+          state: "waiting",
+          enrolled_at: 10.minutes.ago,
+          next_run_at: 1.minute.ago
+        )
+
         described_class.new(enrollment).advance!
 
         enrollment.reload

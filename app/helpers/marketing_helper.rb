@@ -116,6 +116,10 @@ module MarketingHelper
     STEP_TYPE_LABELS.fetch(step_type.to_s, step_type.to_s.humanize)
   end
 
+  def journey_step_label(step, workspace:)
+    "#{step.position + 1}. #{describe_step(step, workspace: workspace)}"
+  end
+
   def scoring_event_label(event_type)
     SCORING_EVENT_LABELS.fetch(event_type.to_s, event_type.to_s.humanize)
   end

@@ -37,7 +37,7 @@ RSpec.describe "Api::V1::DealNotes", type: :request do
           headers: headers
       }.not_to change(Note, :count)
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(response.parsed_body["errors"]).to include(blank_error_for(Note, :body))
     end
 

@@ -36,7 +36,7 @@ RSpec.describe "Booking pages calendars", type: :request do
   it "returns error when host is not connected" do
     get calendars_booking_pages_path, params: {host_id: user.id}
 
-    expect(response).to have_http_status(:unprocessable_entity)
+    expect(response).to have_http_status(:unprocessable_content)
     expect(response.parsed_body["error"]).to eq("not_connected")
   end
 end

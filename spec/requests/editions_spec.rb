@@ -44,7 +44,7 @@ RSpec.describe "Editions", type: :request do
       post product_editions_path(product, format: :json), params: {edition: {name: "duplicate"}},
         headers: {"Accept" => "application/json"}
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(response.parsed_body["errors"]).to be_present
     end
 

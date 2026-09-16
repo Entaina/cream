@@ -31,7 +31,7 @@ RSpec.describe "Locale preferences", type: :request do
 
       patch locale_preference_path, params: {locale: "fr"}, as: :json
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(member.reload.locale).to eq("es")
     end
   end

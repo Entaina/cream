@@ -1,6 +1,19 @@
 require "rails_helper"
 
 RSpec.describe MarketingHelper, type: :helper do
+  fixtures :users, :workspaces, :memberships
+
+  let(:workspace) { workspaces(:one) }
+
+  describe "#journey_step_label" do
+    it "includes the step number and description" do
+      journey = workspace.journeys.create!(name: "Test", entry_trigger: "manual", active: true)
+      step = journey.steps.create!(position: 2, step_type: "wait", config: {"minutes" => 1440})
+
+      expect(helper.journey_step_label(step, workspace: workspace)).to eq("3. Esperar 1 día")
+    end
+  end
+
   describe "#format_journey_wait_duration" do
     it "formats minutes only for short waits" do
       expect(helper.format_journey_wait_duration(5)).to eq("5 min")

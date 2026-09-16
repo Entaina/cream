@@ -105,7 +105,7 @@ RSpec.describe "Api::V1::DealEmails", type: :request do
           headers: headers
       }.not_to change(EmailMessage, :count)
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(response.parsed_body["errors"]).to be_present
     end
 
@@ -165,7 +165,7 @@ RSpec.describe "Api::V1::DealEmails", type: :request do
           post "/api/v1/deals/#{deal.id}/emails", params: params, headers: headers, as: :json
         }.not_to change(EmailMessage, :count)
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.parsed_body["errors"]).to be_present
       end
 
@@ -181,7 +181,7 @@ RSpec.describe "Api::V1::DealEmails", type: :request do
           post "/api/v1/deals/#{deal.id}/emails", params: params, headers: headers, as: :json
         }.not_to change(EmailMessage, :count)
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
 
       it "rejects a non-object attachment entry with 422" do
@@ -198,7 +198,7 @@ RSpec.describe "Api::V1::DealEmails", type: :request do
           post "/api/v1/deals/#{deal.id}/emails", params: params, headers: headers, as: :json
         }.not_to change(EmailMessage, :count)
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
 
       it "rejects an attachment without content with 422" do
@@ -215,7 +215,7 @@ RSpec.describe "Api::V1::DealEmails", type: :request do
           post "/api/v1/deals/#{deal.id}/emails", params: params, headers: headers, as: :json
         }.not_to change(EmailMessage, :count)
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
     end
 

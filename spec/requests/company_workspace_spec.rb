@@ -83,7 +83,7 @@ RSpec.describe "Company workspace", type: :request do
   it "keeps the block and submitted values when validation fails" do
     patch company_path(company), params: {section: "profile", company: {name: "", domain: "acme.com"}}
 
-    expect(response).to have_http_status(:unprocessable_entity)
+    expect(response).to have_http_status(:unprocessable_content)
     expect(document.at_css('[role="alert"]').text).to include(blank_error_for(Company, :name))
     expect(document.at_css('[name="company[domain]"]')["value"]).to eq("acme.com")
     expect(document.at_css('[name="company[owner_id]"]')).to be_nil

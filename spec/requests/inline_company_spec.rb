@@ -21,7 +21,7 @@ RSpec.describe "Inline company creation", type: :request do
   it "returns errors as JSON when invalid" do
     sign_in_as(member)
     post companies_path(format: :json), params: {company: {name: ""}}
-    expect(response).to have_http_status(:unprocessable_entity)
+    expect(response).to have_http_status(:unprocessable_content)
     expect(JSON.parse(response.body)["errors"]).to be_present
   end
 

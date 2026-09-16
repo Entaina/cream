@@ -445,7 +445,7 @@ RSpec.describe "People", type: :request do
         person: {first_name: "Ana", company_id: company.id, source: "team_member"}
       }, as: :json
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(JSON.parse(response.body)["errors"]).to include(blank_error_for(Person, :brought_by))
     end
 

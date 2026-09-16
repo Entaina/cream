@@ -63,7 +63,7 @@
             </span>
             <div class="min-w-0 flex-1">
               <div class="flex flex-wrap items-center gap-2">
-                <span class="font-medium"><%= step_type_label(step.step_type) %></span>
+                <span class="font-medium"><%= step.position + 1 %>. <%= step_type_label(step.step_type) %></span>
                 <% unless step.active? %><%= badge "Inactivo", color: "chicago" %><% end %>
               </div>
               <p class="text-sm text-ink-faint mt-0.5"><%= describe_step(step, workspace: current_workspace) %></p>
@@ -98,7 +98,7 @@
               <td><%= enrollment_state_badge(enrollment.state) %></td>
               <td class="text-sm text-ink-soft">
                 <% if enrollment.current_step %>
-                  <%= step_type_label(enrollment.current_step.step_type) %>
+                  <%= journey_step_label(enrollment.current_step, workspace: current_workspace) %>
                 <% else %>
                   —
                 <% end %>

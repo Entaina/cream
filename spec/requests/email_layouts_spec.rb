@@ -27,7 +27,7 @@ RSpec.describe "Email layouts", type: :request do
         email_layout: {name: "Bad", body: "<html><body></body></html>"}
       }
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
 
     it "updates and deletes a layout" do
