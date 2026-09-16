@@ -49,6 +49,11 @@ RSpec.describe Marketing::Esp::MailjetAdapter do
 
     expect(described_class.new(message).deliver!).to be(true)
     expect(request).to have_received(:basic_auth).with("api-key-xxxx", "secret-yyyy")
+    expect(Net::HTTP).to have_received(:start).with(
+      "api.mailjet.com",
+      443,
+      hash_including(use_ssl: true, open_timeout: 10, read_timeout: 10)
+    )
     expect(message.reload.esp_message_id).to eq("99")
   end
 

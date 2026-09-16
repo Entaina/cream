@@ -85,6 +85,7 @@
             <th>Contacto</th>
             <th>Estado</th>
             <th>Paso actual</th>
+            <th>Próxima ejecución</th>
             <th>Inscrito</th>
           </tr>
         </thead>
@@ -98,6 +99,13 @@
               <td class="text-sm text-ink-soft">
                 <% if enrollment.current_step %>
                   <%= step_type_label(enrollment.current_step.step_type) %>
+                <% else %>
+                  —
+                <% end %>
+              </td>
+              <td class="text-sm text-ink-faint">
+                <% if enrollment.next_run_at.present? %>
+                  <%= l enrollment.next_run_at, format: :short %>
                 <% else %>
                   —
                 <% end %>

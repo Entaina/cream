@@ -40,7 +40,7 @@ module Marketing
         request.basic_auth(connection.api_key, connection.secret_key)
         request["Content-Type"] = "application/json"
         request.body = payload.to_json
-        Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) { |http| http.request(request) }
+        Net::HTTP.start(uri.hostname, uri.port, use_ssl: true, open_timeout: 10, read_timeout: 10) { |http| http.request(request) }
       end
 
       def payload

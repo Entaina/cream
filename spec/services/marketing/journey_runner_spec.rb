@@ -1,6 +1,8 @@
 require "rails_helper"
 
 RSpec.describe Marketing::JourneyRunner do
+  include ActiveSupport::Testing::TimeHelpers
+
   fixtures :users, :workspaces, :memberships
 
   let(:workspace) { workspaces(:one) }
@@ -11,19 +13,8 @@ RSpec.describe Marketing::JourneyRunner do
   let!(:wait_step) do
     journey.steps.create!(position: 0, step_type: "wait", active: true, config: {"minutes" => 5})
   end
-  let!(:next_step) do
-    journey.steps.create!(position: 1, step_type: "adjust_score", active: true, config: {"points" => 5})
-  end
-  let(:enrollment) do
-    JourneyEnrollment.create!(
-      workspace: workspace,
-      journey: journey,
-      person: person,
-      current_step: wait_step,
-      state: "waiting",
-      enrolled_at: 10.minutes.ago,
-      next_run_at: 1.minute.ago
-    )
+  let!(:second_wait_step) do
+    journey.steps.create!(position: 1, step_type: "wait", active: true, config: {"minutes" => 10})
   end
 
   before do
@@ -31,12 +22,155 @@ RSpec.describe Marketing::JourneyRunner do
     allow(CreamFeatures).to receive(:enabled?).with(:journeys).and_return(true)
   end
 
-  it "advances past wait when next_run_at has elapsed" do
-    described_class.new(enrollment).advance!
+  describe "wait step" do
+    it "schedules next_run_at on first arrival without advancing" do
+      enrollment = JourneyEnrollment.create!(
+        workspace: workspace,
+        journey: journey,
+        person: person,
+        current_step: wait_step,
+        state: "active",
+        enrolled_at: Time.current,
+        next_run_at: Time.current
+      )
 
-    enrollment.reload
-    expect(enrollment.current_step).to eq(next_step)
-    expect(enrollment.state).to eq("active")
+      travel_to Time.zone.parse("2026-09-16 10:00:00") do
+        described_class.new(enrollment).advance!
+
+        enrollment.reload
+        expect(enrollment.current_step).to eq(wait_step)
+        expect(enrollment.state).to eq("waiting")
+        expect(enrollment.next_run_at).to eq(5.minutes.from_now)
+      end
+    end
+
+    it "does not reset next_run_at while still pending" do
+      scheduled_at = 3.minutes.from_now
+      enrollment = JourneyEnrollment.create!(
+        workspace: workspace,
+        journey: journey,
+        person: person,
+        current_step: wait_step,
+        state: "waiting",
+        enrolled_at: 2.minutes.ago,
+        next_run_at: scheduled_at
+      )
+
+      described_class.new(enrollment).advance!
+
+      enrollment.reload
+      expect(enrollment.current_step).to eq(wait_step)
+      expect(enrollment.state).to eq("waiting")
+      expect(enrollment.next_run_at).to be_within(1.second).of(scheduled_at)
+    end
+
+    it "advances past wait when next_run_at has elapsed" do
+      enrollment = JourneyEnrollment.create!(
+        workspace: workspace,
+        journey: journey,
+        person: person,
+        current_step: wait_step,
+        state: "waiting",
+        enrolled_at: 10.minutes.ago,
+        next_run_at: 1.minute.ago
+      )
+
+      travel_to Time.zone.parse("2026-09-16 10:00:00") do
+        described_class.new(enrollment).advance!
+
+        enrollment.reload
+        expect(enrollment.current_step).to eq(second_wait_step)
+        expect(enrollment.state).to eq("waiting")
+        expect(enrollment.next_run_at).to eq(10.minutes.from_now)
+      end
+    end
+
+    it "sends email in the same tick when wait is followed by send_email" do
+      esp_double = instance_double(Marketing::Esp::SmtpAdapter, deliver!: true)
+      allow(Marketing::Esp::Client).to receive(:for).and_return(esp_double)
+      SubscriptionType.ensure_defaults!(workspace)
+      type = workspace.subscription_types.find_by!(slug: "general")
+      Marketing::ConsentService.subscribe!(
+        person: person,
+        subscription_type: type,
+        source: "spec",
+        legal_basis: "consent"
+      )
+
+      email_journey = workspace.journeys.create!(name: "Wait then email", entry_trigger: "manual", active: true, max_reenrollments: 0)
+      email_journey.steps.destroy_all
+      email_journey.steps.create!(position: 0, step_type: "wait", active: true, config: {"minutes" => 5})
+      email_step = email_journey.steps.create!(
+        position: 1,
+        step_type: "send_email",
+        active: true,
+        config: {
+          "subject" => "Journey {first_name}",
+          "body" => "<p>Hola {first_name}</p>",
+          "body_editor" => "html"
+        }
+      )
+      after_email_step = email_journey.steps.create!(position: 2, step_type: "wait", active: true, config: {"minutes" => 1})
+
+      enrollment = JourneyEnrollment.create!(
+        workspace: workspace,
+        journey: email_journey,
+        person: person,
+        current_step: email_journey.steps.ordered.first,
+        state: "waiting",
+        enrolled_at: 10.minutes.ago,
+        next_run_at: 1.minute.ago
+      )
+
+      described_class.new(enrollment).advance!
+
+      expect(esp_double).to have_received(:deliver!).once
+      enrollment.reload
+      expect(enrollment.current_step).to eq(after_email_step)
+      expect(enrollment.state).to eq("active")
+    end
+  end
+
+  describe ".run!" do
+    let!(:adjust_step) do
+      journey.steps.create!(position: 2, step_type: "adjust_score", active: true, config: {"points" => 5})
+    end
+
+    it "continues processing other enrollments when one raises" do
+      bad_person = create_person!(workspace, email: "bad@example.com")
+      good_person = create_person!(workspace, email: "good@example.com")
+
+      bad_enrollment = JourneyEnrollment.create!(
+        workspace: workspace,
+        journey: journey,
+        person: bad_person,
+        current_step: adjust_step,
+        state: "active",
+        enrolled_at: Time.current,
+        next_run_at: Time.current
+      )
+      good_enrollment = JourneyEnrollment.create!(
+        workspace: workspace,
+        journey: journey,
+        person: good_person,
+        current_step: adjust_step,
+        state: "active",
+        enrolled_at: Time.current,
+        next_run_at: Time.current
+      )
+
+      allow(JourneyEnrollment).to receive(:due).and_return(JourneyEnrollment.where(id: [bad_enrollment.id, good_enrollment.id]))
+      call_count = 0
+      allow_any_instance_of(described_class).to receive(:advance!) do |runner|
+        call_count += 1
+        raise StandardError, "boom" if runner.send(:enrollment).id == bad_enrollment.id
+      end
+
+      described_class.run!
+
+      expect(call_count).to eq(2)
+      expect(bad_enrollment.reload.metadata.dig("last_error", "message")).to eq("boom")
+    end
   end
 
   describe "send_email step" do
@@ -98,6 +232,27 @@ RSpec.describe Marketing::JourneyRunner do
 
       expect(esp_double).not_to have_received(:deliver!)
       expect(email_enrollment.reload.current_step).to eq(after_email_step)
+    end
+
+    it "does not advance when delivery fails" do
+      allow(esp_double).to receive(:deliver!).and_return(false)
+
+      described_class.new(email_enrollment).advance!
+
+      email_enrollment.reload
+      expect(email_enrollment.current_step).to eq(email_step)
+      expect(email_enrollment.state).to eq("active")
+      expect(email_enrollment.metadata.dig("last_error", "message")).to eq("delivery_failed")
+    end
+
+    it "records errors from message creation without advancing" do
+      allow(workspace.email_messages).to receive(:create!).and_raise(ActiveRecord::RecordInvalid)
+
+      described_class.new(email_enrollment).advance!
+
+      email_enrollment.reload
+      expect(email_enrollment.current_step).to eq(email_step)
+      expect(email_enrollment.metadata["step_errors"]).to be_present
     end
   end
 end

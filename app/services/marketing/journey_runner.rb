@@ -5,7 +5,21 @@ module Marketing
 
       JourneyEnrollment.due.includes(:journey, :person, :current_step).find_each do |enrollment|
         new(enrollment).advance!
+      rescue StandardError => e
+        record_runner_error!(enrollment, e)
       end
+    end
+
+    def self.record_runner_error!(enrollment, error)
+      enrollment.update!(
+        metadata: enrollment.metadata.to_h.merge(
+          "last_error" => {
+            "class" => error.class.name,
+            "message" => error.message,
+            "at" => Time.current.iso8601
+          }
+        )
+      )
     end
 
     def initialize(enrollment)
@@ -14,18 +28,21 @@ module Marketing
       @step = resolve_current_step
     end
 
-    def advance!
+    def advance!(depth = 0)
+      max_depth = [@journey.steps.count, 1].max + 1
+      return if depth > max_depth
+
       return @enrollment.complete! unless @journey.active?
       return @enrollment.complete! if @step.nil?
       return cancel_for_open_deal! if JourneyExit.blocked_by_open_deal?(person: person, journey: journey)
 
-      return advance_past_inactive_step! unless @step.active?
+      return advance_past_inactive_step!(depth) unless @step.active?
 
       case @step.step_type
       when "send_email"
         send_email!
       when "wait"
-        wait!
+        wait!(depth)
       when "create_task"
         create_task!
       when "adjust_score"
@@ -61,8 +78,14 @@ module Marketing
         return move_next!
       end
 
+      actor = workspace.briefing_actor
+      unless actor
+        record_step_error!("send_email", "no_briefing_actor")
+        return
+      end
+
       message = workspace.email_messages.create!(
-        user: workspace.briefing_actor,
+        user: actor,
         record: person,
         to_address: person.email,
         subject: email_content.render_subject_for(person),
@@ -70,18 +93,51 @@ module Marketing
         marketing_send: true
       )
       email_content.attach_to(message)
-      Marketing::Esp::Client.for(message, subscription_type: subscription_type).deliver!
-      move_next!
-    end
 
-    def wait!
-      if enrollment.state == "waiting" && enrollment.next_run_at.present? && enrollment.next_run_at <= Time.current
-        return move_next!
+      delivered = Marketing::Esp::Client.for(message, subscription_type: subscription_type).deliver!
+      unless delivered
+        record_step_error!("send_email", "delivery_failed")
+        return
       end
 
-      minutes = step.config["minutes"].to_i
-      minutes = 1 if minutes <= 0
+      move_next!
+    rescue StandardError => e
+      record_step_error!("send_email", e.message, error_class: e.class.name)
+    end
+
+    def wait!(depth = 0)
+      if wait_elapsed?
+        move_next!
+        advance!(depth + 1)
+        return
+      end
+
+      return if wait_pending?
+
+      minutes = wait_minutes_from_config
       enrollment.advance_to!(step, wait_until: minutes.minutes.from_now)
+    end
+
+    def wait_elapsed?
+      enrollment.state == "waiting" &&
+        enrollment.next_run_at.present? &&
+        enrollment.next_run_at <= Time.current
+    end
+
+    def wait_pending?
+      enrollment.state == "waiting" &&
+        enrollment.next_run_at.present? &&
+        enrollment.next_run_at > Time.current
+    end
+
+    def wait_minutes_from_config
+      raw = step.config.to_h["minutes"]
+      minutes = case raw
+      when Numeric then raw.to_i
+      when String then raw.to_i
+      else 0
+      end
+      minutes.positive? ? minutes : 1
     end
 
     def create_task!
@@ -143,15 +199,16 @@ module Marketing
       return enrollment.complete! unless next_step
 
       enrollment.advance_to!(next_step)
+      @step = next_step
     end
 
-    def advance_past_inactive_step!
+    def advance_past_inactive_step!(depth = 0)
       next_step = step.next_step
       return enrollment.complete! unless next_step
 
       enrollment.advance_to!(next_step)
       @step = next_step
-      advance!
+      advance!(depth + 1)
     end
 
     def resolve_current_step
@@ -179,11 +236,21 @@ module Marketing
       enrollment.update!(metadata: metadata.merge("skipped_steps" => skipped))
     end
 
+    def record_step_error!(step_type, message, error_class: nil)
+      metadata = enrollment.metadata.to_h
+      errors = Array(metadata["step_errors"])
+      entry = {"step_type" => step_type, "message" => message, "at" => Time.current.iso8601}
+      entry["class"] = error_class if error_class
+      errors << entry
+      enrollment.update!(metadata: metadata.merge("step_errors" => errors.last(10), "last_error" => entry))
+    end
+
     def move_next!
       next_step = step.next_step
       return enrollment.complete! unless next_step
 
       enrollment.advance_to!(next_step)
+      @step = next_step
     end
 
     def cancel_for_open_deal!
