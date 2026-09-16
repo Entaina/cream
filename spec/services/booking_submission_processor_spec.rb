@@ -97,6 +97,26 @@ RSpec.describe BookingSubmissionProcessor, type: :service do
     expect(result.deal.pipeline_stage).to eq(pipeline.first_stage)
   end
 
+  it "creates a new deal when reuse is disabled even if one exists in the target pipeline and stage" do
+    booking_page.update!(reuse_existing_deal: false)
+    company = create_company!(workspace)
+    person = create_person!(workspace, company: company, email: "ana@example.com", first_name: "Ana", last_name: "Lopez")
+    existing_deal = create_deal!(
+      workspace,
+      pipeline: pipeline,
+      stage: pipeline.first_stage,
+      company: company,
+      contacts: [person],
+      name: "Existing deal"
+    )
+
+    expect { process }.to change(Deal, :count).by(1)
+
+    result = process
+    expect(result.deal).not_to eq(existing_deal)
+    expect(result.deal.pipeline_stage).to eq(pipeline.first_stage)
+  end
+
   it "creates a new deal when the person has a deal in another pipeline" do
     other_pipeline = pipeline.duplicate(name: "Other")
     other_pipeline.save!

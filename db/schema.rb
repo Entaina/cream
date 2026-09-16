@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_15_140000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_16_102653) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -187,6 +187,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_15_140000) do
     t.string "logo_url"
     t.string "name", null: false
     t.bigint "pipeline_id", null: false
+    t.boolean "reuse_existing_deal", default: true, null: false
     t.string "slug", null: false
     t.string "timezone", default: "Europe/Madrid", null: false
     t.datetime "updated_at", null: false

@@ -4,7 +4,7 @@
 
 Cream es un CRM por **workspaces** para gestionar **personas**, **empresas** y **deals** (oportunidades), con notas, tareas, listas y un historial de actividad compartido en el equipo.
 
-> **Última revisión:** 2026-09-15 (ficha de deal en add-on de Gmail)
+> **Última revisión:** 2026-09-16 (reutilizar deal en reservas de calendario)
 > Este documento describe la funcionalidad **visible para el usuario**. Las funcionalidades desactivadas aparecen al final en «Próximamente».
 
 ---
@@ -1261,6 +1261,7 @@ Toda la configuración se hace desde **Reservas** (no hace falta usar seeds ni d
 | Slug | Identificador en la URL pública (`/b/slug`) |
 | Anfitrión | Usuario cuyo Google Calendar consulta disponibilidad y recibe las citas |
 | Pipeline CRM | Pipeline donde se crean persona y deal al reservar |
+| Reutilizar deal existente | Si la persona ya tiene un deal en la primera etapa de este pipeline, la reserva se asocia a ese deal; si no, se crea uno nuevo |
 | Mensaje de bienvenida | Texto en la cabecera de la página pública |
 | Avatar URL / Logo URL | Imágenes opcionales del perfil |
 | Zona horaria | Zona por defecto de la página (lista desplegable) |
@@ -1292,7 +1293,7 @@ Copia la **URL pública** y compártela con clientes.
 
 - Se consulta la **disponibilidad real** contra los calendarios configurados (por defecto `primary`).
 - Al confirmar, se crea el **evento en Google Calendar** con invitaciones a asistentes e invitados opcionales (hasta 5).
-- En Cream se crean **persona** y **deal** en el pipeline indicado, con tarea de seguimiento para el anfitrión.
+- En Cream se crea o reutiliza la **persona** (por email) y se crea o reutiliza el **deal** en el pipeline indicado según la opción **Reutilizar deal existente**, con tarea de seguimiento para el anfitrión cuando el deal es nuevo.
 - El anfitrión recibe aviso según sus canales en **Settings → Profile → Alertas** (campana y/o email), con los datos de la reserva y un enlace al deal.
 
 ### Página pública (visitante)

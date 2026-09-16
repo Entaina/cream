@@ -4,7 +4,7 @@
 
 Cream is a **workspace**-based CRM for managing **people**, **companies** and **deals** (opportunities), with notes, tasks, lists and an activity history shared across the team.
 
-> **Last revision:** 2026-09-15 (Gmail add-on deal card)
+> **Last revision:** 2026-09-16 (reuse deal on calendar bookings)
 > This document describes the functionality **visible to the user**. Disabled features are listed at the end under "Coming soon".
 
 ---
@@ -1261,6 +1261,7 @@ All the configuration is done from **Reservas** (no need to use seeds or preload
 | Slug | Identifier in the public URL (`/b/slug`) |
 | Anfitrión (Host) | User whose Google Calendar is checked for availability and receives the appointments |
 | Pipeline CRM | Pipeline where the person and deal are created upon booking |
+| Reutilizar deal existente (Reuse existing deal) | If the person already has a deal in the first stage of this pipeline, the booking is linked to that deal; otherwise a new one is created |
 | Mensaje de bienvenida (Welcome message) | Text in the public page header |
 | Avatar URL / Logo URL | Optional profile images |
 | Zona horaria (Time zone) | Default time zone of the page (dropdown list) |
@@ -1292,7 +1293,7 @@ Copy the **public URL** and share it with clients.
 
 - **Real availability** is checked against the configured calendars (`primary` by default).
 - Upon confirmation, the **event is created in Google Calendar** with invitations to attendees and optional guests (up to 5).
-- In Cream, a **person** and a **deal** are created in the specified pipeline, with a follow-up task for the host.
+- In Cream, the **person** is created or reused (by email) and the **deal** is created or reused in the specified pipeline according to **Reuse existing deal**, with a follow-up task for the host when the deal is new.
 - The host is notified according to their channels in **Settings → Profile → Alertas** (bell and/or email), with the booking details and a link to the deal.
 
 ### Public page (visitor)

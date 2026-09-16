@@ -45,14 +45,17 @@ class BookingSubmissionProcessor
   def find_or_create_deal!(person:, company:)
     pipeline = @booking_page.pipeline
     stage = pipeline.first_stage
-    existing = person.deals
-      .where(pipeline_id: pipeline.id, pipeline_stage_id: stage.id)
-      .order(created_at: :desc)
-      .first
 
-    if existing
-      existing.update!(company: company) if existing.company_id != company.id
-      return existing
+    if @booking_page.reuse_existing_deal?
+      existing = person.deals
+        .where(pipeline_id: pipeline.id, pipeline_stage_id: stage.id)
+        .order(created_at: :desc)
+        .first
+
+      if existing
+        existing.update!(company: company) if existing.company_id != company.id
+        return existing
+      end
     end
 
     create_deal!(person:, company:, pipeline:, stage:)

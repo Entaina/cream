@@ -43,6 +43,13 @@
         <%= f.collection_select :pipeline_id, @pipelines, :id, :name, {}, class: "input mt-1 w-full" %>
       </div>
       <div>
+        <%= f.label :reuse_existing_deal, class: "inline-flex items-center gap-2" do %>
+          <%= f.check_box :reuse_existing_deal %>
+          <span>Reutilizar deal existente</span>
+        <% end %>
+        <p class="text-xs text-ink-faint mt-1">Si la persona ya tiene un deal en la primera etapa de este pipeline, la reserva se asocia a ese deal; si no, se crea uno nuevo.</p>
+      </div>
+      <div>
         <%= f.label :welcome_message, "Mensaje de bienvenida", class: "label" %>
         <%= f.text_area :welcome_message, rows: 2, class: "input mt-1 w-full" %>
       </div>
