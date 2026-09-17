@@ -323,6 +323,13 @@
           <p class="text-sm text-ink-faint">
             Invitaciones, alertas, reservas, informes y emails de ficha. Si está desactivado, esos envíos usan SMTP/Mailbin.
           </p>
+          <label class="flex items-center gap-2 text-base">
+            <%= f.check_box :sender_domain_validated %>
+            Dominio validado en Mailjet (enviar en nombre de cada usuario)
+          </label>
+          <p class="text-sm text-ink-faint">
+            Actívalo solo si el dominio del remitente está verificado en Mailjet (SPF/DKIM). Si no, los correos salen con el remitente del workspace y Reply-To al responsable.
+          </p>
           <div class="flex gap-2">
             <%= f.submit @mailjet_connection.persisted? ? "Guardar Mailjet" : "Conectar Mailjet", class: "btn-secondary" %>
           </div>

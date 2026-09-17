@@ -31,7 +31,9 @@ class MailjetConnectionsController < ApplicationController
   private
 
   def connection_params
-    params.require(:mailjet_connection).permit(:api_key, :secret_key, :from_email, :from_name, :transactional_enabled)
+    params.require(:mailjet_connection).permit(
+      :api_key, :secret_key, :from_email, :from_name, :transactional_enabled, :sender_domain_validated
+    )
   end
 
   def find_connection

@@ -21,6 +21,28 @@ RSpec.describe RecordMailer, type: :mailer do
   end
 
   describe "#tracked_email" do
+    it "sets From, Reply-To and sender header for transactional messages" do
+      user.update!(name: "Sales Rep", email_address: "sales@example.com")
+      message = build_message(body: "<p>Hello</p>")
+      mail = described_class.tracked_email(message: message)
+
+      expect(mail[:from].to_s).to include("sales@example.com")
+      expect(mail[:from].display_names).to eq(["Sales Rep"])
+      expect(mail.reply_to).to eq(["sales@example.com"])
+      expect(mail[MailjetDeliveryInterceptor::SENDER_HEADER]&.value).to eq("sales@example.com")
+    end
+
+    it "does not set sender identity for marketing sends" do
+      user.update!(name: "Sales Rep", email_address: "sales@example.com")
+      message = build_message(body: "<p>Hello</p>")
+      message.update!(marketing_send: true)
+      mail = described_class.tracked_email(message: message)
+
+      expect(mail[:from].to_s).not_to include("sales@example.com")
+      expect(mail.reply_to).to be_nil
+      expect(mail[MailjetDeliveryInterceptor::SENDER_HEADER]).to be_nil
+    end
+
     it "wraps fragment bodies with mailer layout" do
       message = build_message(body: "<p>Hello</p>")
       mail = described_class.tracked_email(message: message)
