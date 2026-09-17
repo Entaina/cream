@@ -364,5 +364,38 @@ RSpec.describe "Public lead forms", type: :request do
       expect(response).to have_http_status(:unprocessable_content)
       expect(response.body).to include("Contacto web")
     end
+
+    it "rejects free email when corporate email is required" do
+      lead_form.update!(require_corporate_email: true)
+
+      expect {
+        post public_lead_form_path(lead_form.slug), params: {
+          lead: contacto_lead_params("email" => "ana@gmail.com")
+        }
+      }.not_to change(Person, :count)
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to include("email corporativo")
+      expect(response.body).to include('role="alert"')
+    end
+  end
+
+  describe "GET /f/:slug with corporate email" do
+    it "embeds Stimulus values when corporate email is required" do
+      lead_form.update!(require_corporate_email: true)
+
+      get public_lead_form_path(lead_form.slug)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('data-lead-form-require-corporate-email-value="true"')
+      expect(response.body).to include("gmail.com")
+      expect(response.body).to include("validateCorporateEmail")
+    end
+
+    it "does not embed corporate email Stimulus values when disabled" do
+      get public_lead_form_path(lead_form.slug)
+
+      expect(response.body).not_to include('data-lead-form-require-corporate-email-value="true"')
+    end
   end
 end

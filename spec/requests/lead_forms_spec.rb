@@ -40,6 +40,7 @@ RSpec.describe "Lead forms", type: :request do
             email_template_id: template.id,
             collects_company: "1",
             active: "1",
+            require_corporate_email: "1",
             success_redirect_url: "https://example.com/gracias"
           }
         }
@@ -47,6 +48,7 @@ RSpec.describe "Lead forms", type: :request do
 
       expect(response).to redirect_to(lead_forms_path)
       expect(LeadForm.last.collects_company).to be(true)
+      expect(LeadForm.last.require_corporate_email).to be(true)
       expect(LeadForm.last.success_redirect_url).to eq("https://example.com/gracias")
     end
 

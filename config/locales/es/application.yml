@@ -480,6 +480,8 @@ es:
       my_tasks: Mis tareas
       open: Abiertas
       title: Tareas
+  lead_forms:
+    corporate_email_required: Por favor, utiliza tu email corporativo para descargar este recurso
   time:
     formats:
       default: "%d/%m/%Y %H:%M"

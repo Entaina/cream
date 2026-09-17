@@ -87,7 +87,7 @@ class LeadFormsController < ApplicationController
     permitted = params.require(:lead_form).permit(
       :name, :slug, :template_key, :destination, :pipeline_id, :pipeline_stage_id, :responsible_id,
       :email_template_id, :product_id, :subscription_type_id, :marketing_consent_text,
-      :collects_company, :active, :success_redirect_url,
+      :collects_company, :active, :require_corporate_email, :success_redirect_url,
       :hidden_field_keys_text, :first_task_title, :first_task_due_days,
       :pipeline_routes_submitted,
       pipeline_routes: {},

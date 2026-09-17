@@ -1179,7 +1179,8 @@ En el menú lateral, abre **Formularios**.
 6. Opcional: indica la **URL de redirección tras envío** (p. ej. `https://entaina.com/gracias`) para llevar al visitante a una página de tu web. Si se deja vacía, se muestra la página de gracias de Cream (`/f/slug/success`).
 7. Opcional: define **campos ocultos adicionales** (uno por línea, p. ej. `producto`, `landing`). Sus valores se pasan como query params en la URL pública o del iframe, p. ej. `/f/slug?producto=curso-ia`. Se guardan con el envío y aparecen en **Formulario de origen** del deal o en el historial del contacto.
 8. Marca **Recoger datos de empresa** si el formulario debe pedir nombre y CIF de la empresa. Con esta opción, un envío sin nombre de empresa sigue aceptándose en servidor (se usa una empresa placeholder); marca el campo `required: true` en la plantilla si quieres exigirlo en el navegador.
-9. Guarda. En el listado verás la **URL pública**, la **política de privacidad** (`/f/slug/privacy`) y el **código iframe** listos para copiar.
+9. Opcional: marca **Exigir email corporativo** en lead magnets u otros formularios donde quieras rechazar correos personales (Gmail, Hotmail, Yahoo, Outlook, iCloud, etc.). El visitante verá un aviso y no podrá enviar hasta usar un email de dominio que no esté en la lista de proveedores gratuitos. Cream no comprueba que la empresa exista; solo descarta dominios conocidos de correo personal.
+10. Guarda. En el listado verás la **URL pública**, la **política de privacidad** (`/f/slug/privacy`) y el **código iframe** listos para copiar.
 
 ### Ficha del formulario (Ver)
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_17_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_17_120100) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -676,6 +676,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_17_120000) do
     t.jsonb "pipeline_routes", default: {}, null: false
     t.bigint "pipeline_stage_id"
     t.bigint "product_id"
+    t.boolean "require_corporate_email", default: false, null: false
     t.bigint "responsible_id", null: false
     t.string "slug", null: false
     t.bigint "subscription_type_id"

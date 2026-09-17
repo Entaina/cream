@@ -439,6 +439,19 @@ class LeadFormSubmissionProcessor
 
   def validate_submission!
     submission_schema.validate!(params)
+    validate_corporate_email!
+  end
+
+  def validate_corporate_email!
+    return unless lead_form.require_corporate_email?
+
+    email = params["email"].to_s.strip
+    return if email.blank?
+    return unless LeadForms::FreeEmailDomain.blocked?(email)
+
+    person = Person.new
+    person.errors.add(:base, I18n.t("lead_forms.corporate_email_required"))
+    raise ActiveRecord::RecordInvalid.new(person)
   end
 
   def submission_schema

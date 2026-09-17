@@ -1,0 +1,36 @@
+# Free / personal email providers blocked when LeadForm#require_corporate_email is enabled.
+# Add one domain per line (lowercase). Exact match on the part after @.
+domains:
+  - aol.com
+  - gmx.com
+  - gmx.de
+  - gmx.es
+  - gmx.net
+  - gmail.com
+  - googlemail.com
+  - hotmail.co.uk
+  - hotmail.com
+  - hotmail.es
+  - hotmail.fr
+  - icloud.com
+  - live.com
+  - live.co.uk
+  - mac.com
+  - mail.com
+  - me.com
+  - msn.com
+  - outlook.com
+  - outlook.es
+  - outlook.fr
+  - pm.me
+  - proton.me
+  - protonmail.com
+  - tutanota.com
+  - tutanota.de
+  - yahoo.co.uk
+  - yahoo.com
+  - yahoo.es
+  - yahoo.fr
+  - yandex.com
+  - yandex.ru
+  - zoho.com

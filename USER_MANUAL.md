@@ -1179,7 +1179,8 @@ In the sidebar menu, open **Formularios** (Forms).
 6. Optional: set a **redirect URL after submission** (e.g. `https://example.com/thanks`) to send the visitor to a page on your site. If left blank, Cream's thank-you page is shown (`/f/slug/success`).
 7. Optional: define **additional hidden fields** (one per line, e.g. `producto`, `landing`). Their values are passed as query params in the public or iframe URL, e.g. `/f/slug?producto=curso-ia`. They are saved with the submission and shown on the deal under **Formulario de origen** (Source form) or in the contact's history.
 8. Check **Recoger datos de empresa** (Collect company data) if the form should ask for the company name and tax ID (CIF). When enabled, submissions with an empty company name still succeed server-side (a placeholder company is used); mark the field `required: true` in the template if you want to enforce it in the browser.
-9. Save. In the list you will see the **public URL**, the **privacy policy** link (`/f/slug/privacy`) and the **iframe code** ready to copy.
+9. Optional: check **Exigir email corporativo** (Require work email) on lead magnets or other forms where you want to reject personal addresses (Gmail, Hotmail, Yahoo, Outlook, iCloud, etc.). The visitor sees an error and cannot submit until they use an email whose domain is not on the known free-provider list. Cream does not verify that the company exists; it only blocks known personal email domains.
+10. Save. In the list you will see the **public URL**, the **privacy policy** link (`/f/slug/privacy`) and the **iframe code** ready to copy.
 
 ### Form detail page (View)
 

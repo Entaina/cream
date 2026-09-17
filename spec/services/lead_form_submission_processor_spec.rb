@@ -617,4 +617,31 @@ RSpec.describe LeadFormSubmissionProcessor do
       expect(EmailSubscription.find_by!(person: existing, subscription_type: newsletter).status).to eq("subscribed")
     end
   end
+
+  describe "corporate email requirement" do
+    before { lead_form.update!(require_corporate_email: true) }
+
+    it "rejects free email domains when enabled" do
+      expect {
+        submit(contacto_lead_params("email" => "ana@gmail.com"))
+      }.to raise_error(ActiveRecord::RecordInvalid, /email corporativo/)
+        .and change(Person, :count).by(0)
+        .and change(Deal, :count).by(0)
+    end
+
+    it "accepts corporate domains when enabled" do
+      expect {
+        submit(contacto_lead_params("email" => "ana@entaina.com"))
+      }.to change(Person, :count).by(1)
+        .and change(Deal, :count).by(1)
+    end
+
+    it "accepts free email when disabled" do
+      lead_form.update!(require_corporate_email: false)
+
+      expect {
+        submit(contacto_lead_params("email" => "ana@gmail.com"))
+      }.to change(Person, :count).by(1)
+    end
+  end
 end

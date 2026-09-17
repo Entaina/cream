@@ -105,14 +105,25 @@ module LeadFormTemplates
         # se crea pero nadie llega al destino. data-turbo="false" devuelve el envío al
         # navegador, que sí respeta el target.
         target = lead_form.success_redirect_url.present? ? ' target="_top" data-turbo="false"' : ""
+        corporate_attrs = corporate_email_form_attrs(lead_form)
         <<~HTML
-          <form action="#{context.registers[:form_action]}" method="post" class="space-y-4" data-controller="lead-form"#{target}>
+          <form action="#{context.registers[:form_action]}" method="post" class="space-y-4" data-controller="lead-form"#{target}#{corporate_attrs[:form_suffix]}>
             #{inline_alert(context.registers[:flash_alert])}
+            <div data-lead-form-target="corporateEmailAlert" class="hidden rounded-lg bg-danger-soft text-danger-strong ring-1 ring-danger-line px-4 py-3 text-sm" role="alert"></div>
             <input type="hidden" name="authenticity_token" value="#{ERB::Util.html_escape(context.registers[:csrf_token])}" autocomplete="off" />
         HTML
       end
 
       private
+
+      def corporate_email_form_attrs(lead_form)
+        return {form_suffix: ""} unless lead_form.require_corporate_email?
+
+        domains_json = ERB::Util.html_escape(LeadForms::FreeEmailDomain.domains.to_a.to_json)
+        message = ERB::Util.html_escape(I18n.t("lead_forms.corporate_email_required"))
+        form_suffix = %( data-lead-form-require-corporate-email-value="true" data-lead-form-blocked-domains-value="#{domains_json}" data-lead-form-corporate-email-message-value="#{message}" data-action="submit->lead-form#validateCorporateEmail input->lead-form#clearCorporateEmailError")
+        {form_suffix: form_suffix}
+      end
 
       # Persistent error notice inside the form: the floating flash auto-hides,
       # so on a 422 re-render the visitor needs a message that stays put.

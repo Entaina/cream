@@ -480,6 +480,8 @@ en:
       my_tasks: My tasks
       open: Open
       title: Tasks
+  lead_forms:
+    corporate_email_required: Please use your work email to download this resource
   time:
     formats:
       default: "%m/%d/%Y %I:%M %p"

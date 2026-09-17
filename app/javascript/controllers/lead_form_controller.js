@@ -8,8 +8,15 @@ export default class extends Controller {
     "utmMedium",
     "utmCampaign",
     "utmTerm",
-    "utmContent"
+    "utmContent",
+    "corporateEmailAlert"
   ]
+
+  static values = {
+    requireCorporateEmail: Boolean,
+    blockedDomains: Array,
+    corporateEmailMessage: String
+  }
 
   connect() {
     this.setIfEmpty("referrerTarget", document.referrer || "")
@@ -29,6 +36,61 @@ export default class extends Controller {
       const value = params.get(param)
       if (value) input.value = value
     })
+  }
+
+  validateCorporateEmail(event) {
+    if (!this.requireCorporateEmailValue) return
+
+    const input = this.emailInput()
+    if (!input) return
+
+    const domain = this.extractDomain(input.value)
+    if (!domain || !this.isBlockedDomain(domain)) {
+      this.clearCorporateEmailError()
+      return
+    }
+
+    event.preventDefault()
+    const message = this.corporateEmailMessageValue
+    input.setCustomValidity(message)
+    input.reportValidity()
+    this.showCorporateEmailAlert(message)
+  }
+
+  clearCorporateEmailError() {
+    const input = this.emailInput()
+    if (input) input.setCustomValidity("")
+    this.hideCorporateEmailAlert()
+  }
+
+  emailInput() {
+    return (
+      this.element.querySelector('input[name="lead[email]"]') ||
+      this.element.querySelector('input[type="email"]')
+    )
+  }
+
+  extractDomain(email) {
+    const parts = email.trim().toLowerCase().split("@")
+    if (parts.length !== 2 || !parts[1]) return null
+    return parts[1]
+  }
+
+  isBlockedDomain(domain) {
+    const blocked = this.blockedDomainsValue || []
+    return blocked.includes(domain)
+  }
+
+  showCorporateEmailAlert(message) {
+    if (!this.hasCorporateEmailAlertTarget) return
+    this.corporateEmailAlertTarget.textContent = message
+    this.corporateEmailAlertTarget.classList.remove("hidden")
+  }
+
+  hideCorporateEmailAlert() {
+    if (!this.hasCorporateEmailAlertTarget) return
+    this.corporateEmailAlertTarget.textContent = ""
+    this.corporateEmailAlertTarget.classList.add("hidden")
   }
 
   setIfEmpty(targetKey, value) {
