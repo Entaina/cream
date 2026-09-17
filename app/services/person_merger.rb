@@ -29,6 +29,7 @@ class PersonMerger
       merge_list_entries!
       merge_product_interests!
       merge_lead_submissions!
+      merge_bookings!
       merge_custom_field_values!
       update_record_references!
       reassign_stripe_payments!
@@ -151,6 +152,11 @@ class PersonMerger
 
   def merge_lead_submissions!
     LeadSubmission.where(person_id: secondaries.map(&:id))
+      .update_all(person_id: primary.id, updated_at: Time.current)
+  end
+
+  def merge_bookings!
+    Booking.where(person_id: secondaries.map(&:id))
       .update_all(person_id: primary.id, updated_at: Time.current)
   end
 

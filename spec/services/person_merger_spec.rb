@@ -199,4 +199,47 @@ RSpec.describe PersonMerger do
     activity = primary.activities.where(action: "merged").last
     expect(activity.metadata["merged_people"].first["name"]).to eq("Secondary Doe")
   end
+
+  it "reassigns bookings to the primary contact" do
+    primary = create_person!(workspace, company: company, email: "pat@acme.com")
+    secondary = create_person!(workspace, company: company, email: "pat@acme.com")
+    pipeline = Pipeline.default_for(workspace) || Pipeline.create_default!(workspace)
+    booking_page = workspace.booking_pages.new(
+      name: "Agenda",
+      slug: "merger-booking-#{SecureRandom.hex(3)}",
+      host: user,
+      pipeline: pipeline,
+      timezone: "Europe/Madrid",
+      calendar_ids: ["primary@gmail.com"]
+    )
+    booking_page.event_types.build(
+      slug: "video",
+      name_i18n: {"es" => "Online"},
+      duration_minutes: 30,
+      location_type: "google_meet",
+      weekly_hours: BookingEventType::DEFAULT_WEEKLY_HOURS,
+      slot_increment_minutes: 15,
+      min_notice_hours: 0,
+      visible: true
+    )
+    booking_page.save!
+    event_type = booking_page.event_types.find_by!(slug: "video")
+    booking = Booking.create!(
+      workspace: workspace,
+      booking_page: booking_page,
+      booking_event_type: event_type,
+      person: secondary,
+      first_name: "Ana",
+      last_name: "Lopez",
+      email: "ana@example.com",
+      starts_at: Time.zone.parse("2026-08-10 10:00"),
+      ends_at: Time.zone.parse("2026-08-10 10:30"),
+      timezone: "Europe/Madrid"
+    )
+
+    merge(primary: primary, secondaries: [secondary])
+
+    expect(Person.exists?(secondary.id)).to be(false)
+    expect(booking.reload.person_id).to eq(primary.id)
+  end
 end

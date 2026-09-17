@@ -23,7 +23,8 @@ class Person < ApplicationRecord
   has_many :suggested_stripe_payments, class_name: "StripePayment",
     foreign_key: :suggested_person_id, dependent: :nullify, inverse_of: :suggested_person
   has_many :email_subscriptions, dependent: :destroy
-  has_many :lead_submissions, dependent: :nullify
+  has_many :lead_submissions, dependent: :destroy
+  has_many :bookings, dependent: :nullify
   has_many :journey_enrollments, dependent: :destroy
   has_many :page_views, dependent: :nullify
   has_many :segment_memberships, dependent: :destroy
