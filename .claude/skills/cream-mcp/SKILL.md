@@ -4,7 +4,7 @@ description: >-
   Servidor MCP de Cream CRM — transporte HTTP, OAuth/PKCE, herramientas IA y
   convenciones en CreamMcp. Usar al añadir o modificar tools MCP, auth OAuth
   para clientes LLM, o depurar POST /mcp. No confundir con REST API v1 (skill
-  cream-api).
+  cream-api). Skill de uso para agentes: [skills/cream/](../../../skills/cream/SKILL.md) (no está en `.claude/skills/`).
 ---
 
 # Cream — MCP server
