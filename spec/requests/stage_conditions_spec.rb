@@ -20,6 +20,17 @@ RSpec.describe "StageConditions", type: :request do
     get pipeline_stage_stage_conditions_path(stage)
     expect(response).to have_http_status(:ok)
     expect(response.body).to include("Importe")
+    expect(response.body).to include(I18n.t("stage_conditions.index.new"))
+  end
+
+  it "renders in English when the user locale is en" do
+    create_condition
+    member.update!(locale: "en")
+    get pipeline_stage_stage_conditions_path(stage)
+    expect(response.body).to include(I18n.t("stage_conditions.index.new", locale: :en))
+    expect(response.body).not_to include(I18n.t("stage_conditions.index.new", locale: :es))
+  ensure
+    member.update!(locale: "es")
   end
 
   it "creates a condition" do

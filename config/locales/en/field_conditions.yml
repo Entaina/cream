@@ -1,0 +1,39 @@
+---
+en:
+  field_conditions:
+    company_field: "%{field} of the company"
+    deal_fields:
+      open: Open (not won or lost)
+    groups:
+      company: Company
+      company_cf: Additional company fields
+      deal: Deal
+      deal_cf: Additional deal fields
+      person: Contact
+      person_cf: Additional contact fields
+    operators:
+      blank: is blank
+      contains: contains
+      eq: equals
+      gt: is greater than
+      gte: is greater than or equal to
+      lt: is less than
+      lte: is less than or equal to
+      neq: does not equal
+      present: is present
+    person_field: "%{field} of the contact"
+    person_fields:
+      email: Email
+      first_contact_on: First contact
+      source: Source
+    requirement_operators:
+      blank: must be blank
+      contains: must contain
+      eq: must equal
+      gt: must be greater than
+      gte: must be greater than or equal to
+      lt: must be less than
+      lte: must be less than or equal to
+      neq: must not equal
+      present: must be present
+    stage_move_blocked: 'Cannot move to «%{stage}»: %{requirements}.'

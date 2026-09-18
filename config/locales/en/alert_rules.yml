@@ -1,0 +1,56 @@
+---
+en:
+  alert_rules:
+    flash:
+      created: Alert created.
+      destroyed: Alert deleted.
+      updated: Alert updated.
+    form:
+      active: Active
+      add_condition: Add condition
+      additional_conditions: Additional conditions
+      additional_conditions_hint: All active conditions must pass in addition to the
+        date trigger. Contact fields are evaluated on any contact linked to the deal.
+      cancel: Cancel
+      compare_value: Value
+      compare_value_placeholder: e.g. true
+      condition_active: Active
+      condition_field: Field
+      condition_field_prompt: Select a field
+      condition_operator: Condition
+      condition_remove: Delete
+      date_field: Date field
+      date_field_hint: The alert runs when the matched date plus the offset is today
+        or earlier.
+      name: Name
+      name_placeholder: Edition ended without fiscal data
+      offset_days: Offset (days)
+      offset_days_hint: 0 = same day. Negative values notify in advance (e.g. -7 =
+        one week before).
+      recipient: Recipient
+      submit_create: Create alert
+      submit_update: Save
+      title_edit: Edit alert
+      title_new: New alert
+    index:
+      active: Active
+      and: " and "
+      days_offset: "%{count} days"
+      destroy: Delete
+      edit: Edit
+      empty_subtitle: Create a rule to notify automatically when date and deal data
+        conditions are met.
+      empty_title: No alerts
+      inactive: Inactive
+      new: New alert
+      page_title: Alerts
+      summary_html: When <strong>%{trigger}</strong>%{offset}%{conditions} → <strong>%{recipient}</strong>
+      title: Alerts
+      when: When
+    recipients:
+      admins: Workspace administrators
+      deal_owner: Deal owner
+    trigger_fields:
+      deal_expected_close_date: Deal expected close date
+      edition_ends_on: Edition end date
+      edition_starts_on: Edition start date

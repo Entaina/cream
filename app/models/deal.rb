@@ -236,7 +236,7 @@ class Deal < ApplicationRecord
     return if failed.empty?
 
     requirements = failed.map(&:describe_requirement).join("; ")
-    errors.add(:base, "No se puede pasar a «#{stage.name}»: #{requirements}.")
+    errors.add(:base, I18n.t("field_conditions.stage_move_blocked", stage: stage.name, requirements: requirements))
   end
 
   def contacts_belong_to_company

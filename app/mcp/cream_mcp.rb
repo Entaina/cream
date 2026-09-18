@@ -275,7 +275,7 @@ module CreamMcp
     {id: condition.id, pipeline_id: pipeline.id, pipeline: pipeline.name,
      stage_id: stage.id, stage: stage.name,
      field: condition.field, field_label: condition.field_label,
-     operator: condition.operator, operator_label: FieldCondition::OPERATORS[condition.operator],
+     operator: condition.operator, operator_label: FieldCondition.operator_label(condition.operator),
      compare_value: condition.compare_value, active: condition.active, position: condition.position,
      description: condition.describe}
   end
@@ -1378,7 +1378,7 @@ module CreamMcp
       CreamMcp.respond_with(
         stage_conditions: scope.map { |c| CreamMcp.stage_condition_json(c) },
         available_fields: CreamMcp.stage_condition_field_catalog(ws),
-        operators: FieldCondition::OPERATORS
+        operators: FieldCondition.operator_labels
       )
     end
   end
@@ -1391,7 +1391,7 @@ module CreamMcp
                    properties: {stage: {type: "string", description: "Target stage name"},
                                 pipeline: {type: "string", description: "Pipeline name (defaults to workspace default)"},
                                 field: {type: "string", description: "Field key (e.g. value, invoice_number, cf:key)"},
-                                operator: {type: "string", enum: FieldCondition::OPERATORS.keys},
+                                operator: {type: "string", enum: FieldCondition::OPERATORS},
                                 compare_value: {type: "string", description: "Not required for blank/present operators"},
                                 active: {type: "boolean"},
                                 position: {type: "integer"}},
@@ -1424,7 +1424,7 @@ module CreamMcp
     input_schema: {type: "object",
                    properties: {id: {type: "integer"},
                                 field: {type: "string"},
-                                operator: {type: "string", enum: FieldCondition::OPERATORS.keys},
+                                operator: {type: "string", enum: FieldCondition::OPERATORS},
                                 compare_value: {type: "string"},
                                 active: {type: "boolean"},
                                 position: {type: "integer"}},

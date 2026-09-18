@@ -23,7 +23,7 @@ class AlertRulesController < ApplicationController
     authorize @alert_rule
 
     if @alert_rule.save
-      redirect_to alert_rules_path, notice: "Alerta creada."
+      redirect_to alert_rules_path, notice: t("alert_rules.flash.created")
     else
       render :new, status: :unprocessable_entity
     end
@@ -36,7 +36,7 @@ class AlertRulesController < ApplicationController
   def update
     authorize @alert_rule
     if @alert_rule.update(alert_rule_params)
-      redirect_to alert_rules_path, notice: "Alerta actualizada."
+      redirect_to alert_rules_path, notice: t("alert_rules.flash.updated")
     else
       render :edit, status: :unprocessable_entity
     end
@@ -45,7 +45,7 @@ class AlertRulesController < ApplicationController
   def destroy
     authorize @alert_rule
     @alert_rule.destroy
-    redirect_to alert_rules_path, notice: "Alerta eliminada.", status: :see_other
+    redirect_to alert_rules_path, notice: t("alert_rules.flash.destroyed"), status: :see_other
   end
 
   private

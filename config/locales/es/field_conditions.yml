@@ -1,0 +1,39 @@
+---
+es:
+  field_conditions:
+    company_field: "%{field} de la empresa"
+    deal_fields:
+      open: Abierto (no ganado ni perdido)
+    groups:
+      company: Empresa
+      company_cf: Campos adicionales de la empresa
+      deal: Oportunidad
+      deal_cf: Campos adicionales de la oportunidad
+      person: Contacto
+      person_cf: Campos adicionales del contacto
+    operators:
+      blank: está vacío
+      contains: contiene
+      eq: es igual a
+      gt: es mayor que
+      gte: es mayor o igual que
+      lt: es menor que
+      lte: es menor o igual que
+      neq: no es igual a
+      present: tiene valor
+    person_field: "%{field} del contacto"
+    person_fields:
+      email: Email
+      first_contact_on: Primer contacto
+      source: Origen
+    requirement_operators:
+      blank: debe estar vacío
+      contains: debe contener
+      eq: debe ser igual a
+      gt: debe ser mayor que
+      gte: debe ser mayor o igual que
+      lt: debe ser menor que
+      lte: debe ser menor o igual que
+      neq: debe ser distinto de
+      present: debe tener valor
+    stage_move_blocked: 'No se puede pasar a «%{stage}»: %{requirements}.'

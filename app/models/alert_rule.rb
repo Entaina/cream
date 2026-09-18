@@ -2,17 +2,6 @@ class AlertRule < ApplicationRecord
   TRIGGER_FIELDS = %w[edition_ends_on edition_starts_on deal_expected_close_date].freeze
   RECIPIENTS = %w[deal_owner admins].freeze
 
-  TRIGGER_FIELD_LABELS = {
-    "edition_ends_on" => "Fin de edición",
-    "edition_starts_on" => "Inicio de edición",
-    "deal_expected_close_date" => "Fecha de cierre esperada del deal"
-  }.freeze
-
-  RECIPIENT_LABELS = {
-    "deal_owner" => "Owner del deal",
-    "admins" => "Administradores del workspace"
-  }.freeze
-
   belongs_to :workspace
   has_many :alert_conditions, dependent: :destroy
   has_many :alert_deliveries, dependent: :destroy
@@ -27,10 +16,40 @@ class AlertRule < ApplicationRecord
   scope :active, -> { where(active: true) }
 
   def trigger_field_label
-    TRIGGER_FIELD_LABELS.fetch(trigger_field, trigger_field)
+    self.class.trigger_field_label(trigger_field)
   end
 
   def recipient_label
-    RECIPIENT_LABELS.fetch(recipient, recipient)
+    self.class.recipient_label(recipient)
+  end
+
+  def offset_summary
+    return "" if offset_days.zero?
+
+    " (#{I18n.t("alert_rules.index.days_offset", count: offset_days)})"
+  end
+
+  def active_conditions_summary
+    active = alert_conditions.select(&:active?)
+    return "" if active.empty?
+
+    joiner = I18n.t("alert_rules.index.and")
+    " #{joiner}#{active.map(&:describe).join(joiner)}"
+  end
+
+  def self.trigger_field_label(key)
+    I18n.t(key, scope: "alert_rules.trigger_fields")
+  end
+
+  def self.recipient_label(key)
+    I18n.t(key, scope: "alert_rules.recipients")
+  end
+
+  def self.trigger_field_options
+    TRIGGER_FIELDS.map { |key| [trigger_field_label(key), key] }
+  end
+
+  def self.recipient_options
+    RECIPIENTS.map { |key| [recipient_label(key), key] }
   end
 end

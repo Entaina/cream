@@ -264,6 +264,8 @@ en:
   editions:
     from: From %{date}
     until: Until %{date}
+  lead_forms:
+    corporate_email_required: Please use your work email to download this resource
   nav:
     api_tokens: API tokens
     companies: Companies
@@ -481,8 +483,6 @@ en:
       my_tasks: My tasks
       open: Open
       title: Tasks
-  lead_forms:
-    corporate_email_required: Please use your work email to download this resource
   time:
     formats:
       default: "%m/%d/%Y %I:%M %p"

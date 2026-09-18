@@ -1,5 +1,7 @@
-<% page_title alert_rule.persisted? ? "Editar alerta" : "Nueva alerta" %>
-<%= render "shared/page_header", title: alert_rule.persisted? ? "Editar alerta" : "Nueva alerta", icon_name: :bell, actions: nil %>
+<% page_title alert_rule.persisted? ? t("alert_rules.form.title_edit") : t("alert_rules.form.title_new") %>
+<%= render "shared/page_header",
+      title: alert_rule.persisted? ? t("alert_rules.form.title_edit") : t("alert_rules.form.title_new"),
+      icon_name: :bell, actions: nil %>
 
 <div class="flex-1 overflow-y-auto scrollbar-subtle p-5">
   <div class="max-w-2xl">
@@ -11,39 +13,30 @@
       <% end %>
 
       <div>
-        <%= f.label :name, "Nombre", class: "label" %>
-        <%= f.text_field :name, class: "input w-full", placeholder: "Edición finalizada sin datos fiscales" %>
+        <%= f.label :name, t("alert_rules.form.name"), class: "label" %>
+        <%= f.text_field :name, class: "input w-full", placeholder: t("alert_rules.form.name_placeholder") %>
       </div>
 
       <div>
-        <%= f.label :trigger_field, "Campo de fecha", class: "label" %>
-        <%= f.select :trigger_field,
-              AlertRule::TRIGGER_FIELDS.map { |key| [ AlertRule::TRIGGER_FIELD_LABELS.fetch(key), key ] },
-              {}, class: "input w-full" %>
-        <p class="text-sm text-ink-faint mt-1">
-          La alerta se evalúa cuando la fecha cumplida más el desfase es hoy o anterior.
-        </p>
+        <%= f.label :trigger_field, t("alert_rules.form.date_field"), class: "label" %>
+        <%= f.select :trigger_field, AlertRule.trigger_field_options, {}, class: "input w-full" %>
+        <p class="text-sm text-ink-faint mt-1"><%= t("alert_rules.form.date_field_hint") %></p>
       </div>
 
       <div>
-        <%= f.label :offset_days, "Desfase (días)", class: "label" %>
+        <%= f.label :offset_days, t("alert_rules.form.offset_days"), class: "label" %>
         <%= f.number_field :offset_days, class: "input w-full" %>
-        <p class="text-sm text-ink-faint mt-1">
-          0 = el mismo día. Valores negativos avisan con antelación (p. ej. -7 = una semana antes).
-        </p>
+        <p class="text-sm text-ink-faint mt-1"><%= t("alert_rules.form.offset_days_hint") %></p>
       </div>
 
       <div data-controller="nested-form">
         <div class="flex items-center justify-between gap-2 mb-2">
           <div>
-            <p class="label">Condiciones adicionales</p>
-            <p class="text-sm text-ink-faint">
-              Todas las condiciones activas deben cumplirse además del disparador de fecha.
-              Los campos de contacto se evalúan sobre cualquiera de los contactos del deal.
-            </p>
+            <p class="label"><%= t("alert_rules.form.additional_conditions") %></p>
+            <p class="text-sm text-ink-faint"><%= t("alert_rules.form.additional_conditions_hint") %></p>
           </div>
           <button type="button" data-action="nested-form#add" class="btn-secondary shrink-0">
-            <%= icon :plus, classes: "size-3.5" %> Añadir condición
+            <%= icon :plus, classes: "size-3.5" %> <%= t("alert_rules.form.add_condition") %>
           </button>
         </div>
 
@@ -62,15 +55,14 @@
       </div>
 
       <div>
-        <%= f.label :recipient, "Destinatario", class: "label" %>
-        <%= f.select :recipient,
-              AlertRule::RECIPIENTS.map { |key| [ AlertRule::RECIPIENT_LABELS.fetch(key), key ] },
-              {}, class: "input w-full" %>
+        <%= f.label :recipient, t("alert_rules.form.recipient"), class: "label" %>
+        <%= f.select :recipient, AlertRule.recipient_options, {}, class: "input w-full" %>
       </div>
 
-      <label class="flex items-center gap-2 text-base"><%= f.check_box :active %> Activa</label>
-      <%= f.submit alert_rule.persisted? ? "Guardar" : "Crear alerta", class: "btn-primary" %>
-      <%= link_to "Cancelar", alert_rules_path, class: "btn-secondary ml-2" %>
+      <label class="flex items-center gap-2 text-base"><%= f.check_box :active %> <%= t("alert_rules.form.active") %></label>
+      <%= f.submit alert_rule.persisted? ? t("alert_rules.form.submit_update") : t("alert_rules.form.submit_create"),
+            class: "btn-primary" %>
+      <%= link_to t("alert_rules.form.cancel"), alert_rules_path, class: "btn-secondary ml-2" %>
     <% end %>
   </div>
 </div>

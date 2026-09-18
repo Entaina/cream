@@ -1,0 +1,35 @@
+---
+es:
+  stage_conditions:
+    edit:
+      page_title: Editar condición
+      title: Editar condición — %{field}
+    flash:
+      created: Condición creada.
+      destroyed: Condición eliminada.
+      updated: Condición actualizada.
+    form:
+      active: Activa
+      compare_value: Valor
+      compare_value_placeholder: 'Ej.: 1000'
+      field: Campo
+      operator: Condición
+      submit_create: Crear condición
+      submit_update: Guardar
+    index:
+      active: Activa
+      back_pipeline: Pipeline
+      destroy: Eliminar
+      destroy_confirm: "¿Eliminar esta condición?"
+      edit: Editar
+      empty: No hay condiciones para esta etapa todavía.
+      inactive: Inactiva
+      intro_html: Para pasar un deal a la etapa <strong>%{stage}</strong> deben cumplirse
+        <strong>todas</strong> las condiciones activas. Los campos de contacto se
+        evalúan sobre <strong>cualquiera</strong> de los contactos del deal.
+      new: Nueva condición
+      page_title: Condiciones — %{stage}
+      title: Condiciones de entrada — %{stage} (%{pipeline})
+    new:
+      page_title: Nueva condición
+      title: Nueva condición — %{stage}

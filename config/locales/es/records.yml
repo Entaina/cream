@@ -195,12 +195,12 @@ es:
       opened: Abierto
       sent: Enviado
     email_events:
-      sent: Enviado
       blocked: Bloqueado
       bounce: Rebote
       click: Clic
       delivered: Entregado
       open: Abierto
+      sent: Enviado
       spam: Spam
       unsub: Baja
     subscription_statuses:
@@ -323,12 +323,6 @@ es:
       campaigns: Campañas enviadas
       campaigns_empty: Ninguna campaña enviada a este contacto.
       campaigns_limit: Se muestran las %{count} más recientes.
-      journeys: Recorridos
-      journeys_empty: Este contacto no está inscrito en ningún recorrido.
-      journeys_limit: Se muestran las %{count} inscripciones más recientes.
-      journey_missing: Recorrido eliminado
-      journey_no_step: Sin paso actual
-      journey_next_run: Próxima ejecución
       contact_management: Gestión del contacto
       convert_to_sql: Convertir a SQL
       copied: Copiado
@@ -341,6 +335,12 @@ es:
       edit_management: Editar gestión del contacto
       edit_profile: Editar perfil profesional
       email_preferences: Preferencias de email
+      journey_missing: Recorrido eliminado
+      journey_next_run: Próxima ejecución
+      journey_no_step: Sin paso actual
+      journeys: Recorridos
+      journeys_empty: Este contacto no está inscrito en ningún recorrido.
+      journeys_limit: Se muestran las %{count} inscripciones más recientes.
       merge: Fusionar duplicados
       more_actions: Más acciones del contacto
       no_delivery_events: Sin eventos de entrega registrados.

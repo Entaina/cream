@@ -20,7 +20,7 @@ class StageConditionsController < ApplicationController
     authorize @stage_condition
 
     if @stage_condition.save
-      redirect_to pipeline_stage_stage_conditions_path(@stage), notice: "Condición creada."
+      redirect_to pipeline_stage_stage_conditions_path(@stage), notice: t("stage_conditions.flash.created")
     else
       render :new, status: :unprocessable_entity
     end
@@ -33,7 +33,8 @@ class StageConditionsController < ApplicationController
   def update
     authorize @stage_condition
     if @stage_condition.update(stage_condition_params)
-      redirect_to pipeline_stage_stage_conditions_path(@stage_condition.pipeline_stage), notice: "Condición actualizada."
+      redirect_to pipeline_stage_stage_conditions_path(@stage_condition.pipeline_stage),
+        notice: t("stage_conditions.flash.updated")
     else
       render :edit, status: :unprocessable_entity
     end
@@ -43,7 +44,8 @@ class StageConditionsController < ApplicationController
     authorize @stage_condition
     stage = @stage_condition.pipeline_stage
     @stage_condition.destroy
-    redirect_to pipeline_stage_stage_conditions_path(stage), notice: "Condición eliminada.", status: :see_other
+    redirect_to pipeline_stage_stage_conditions_path(stage), notice: t("stage_conditions.flash.destroyed"),
+      status: :see_other
   end
 
   private

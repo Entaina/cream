@@ -1,0 +1,35 @@
+---
+en:
+  stage_conditions:
+    edit:
+      page_title: Edit condition
+      title: Edit condition — %{field}
+    flash:
+      created: Condition created.
+      destroyed: Condition deleted.
+      updated: Condition updated.
+    form:
+      active: Active
+      compare_value: Value
+      compare_value_placeholder: e.g. 1000
+      field: Field
+      operator: Condition
+      submit_create: Create condition
+      submit_update: Save
+    index:
+      active: Active
+      back_pipeline: Pipeline
+      destroy: Delete
+      destroy_confirm: Delete this condition?
+      edit: Edit
+      empty: No conditions for this stage yet.
+      inactive: Inactive
+      intro_html: To move a deal into stage <strong>%{stage}</strong>, <strong>all</strong>
+        active conditions must pass. Contact fields are evaluated on <strong>any</strong>
+        contact linked to the deal.
+      new: New condition
+      page_title: Conditions — %{stage}
+      title: Entry conditions — %{stage} (%{pipeline})
+    new:
+      page_title: New condition
+      title: New condition — %{stage}

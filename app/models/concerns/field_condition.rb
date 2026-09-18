@@ -2,71 +2,42 @@
 module FieldCondition
   extend ActiveSupport::Concern
 
-  DEAL_FIELDS = {
-    "value" => "Importe",
-    "probability" => "Probabilidad",
-    "expected_close_date" => "Fecha de cierre",
-    "name" => "Nombre",
-    "invoice_number" => "Nº factura",
-    "open" => "Abierto (no ganado ni perdido)"
+  DEAL_FIELD_KEYS = %w[value probability expected_close_date name invoice_number open].freeze
+
+  COMPANY_FIELD_KEYS = {
+    "company.name" => :name,
+    "company.domain" => :domain,
+    "company.industry" => :industry,
+    "company.annual_revenue" => :annual_revenue,
+    "company.employee_range" => :employee_range,
+    "company.location" => :location,
+    "company.fiscal_information" => :fiscal_information
   }.freeze
 
-  COMPANY_FIELDS = {
-    "company.name" => "Nombre",
-    "company.domain" => "Dominio",
-    "company.industry" => "Industria",
-    "company.annual_revenue" => "Facturación anual",
-    "company.employee_range" => "Tamaño",
-    "company.location" => "Ubicación",
-    "company.fiscal_information" => "Información fiscal"
+  PERSON_FIELD_KEYS = {
+    "person.first_name" => :first_name,
+    "person.last_name" => :last_name,
+    "person.email" => :email,
+    "person.phone" => :phone,
+    "person.job_title" => :job_title,
+    "person.source" => :source,
+    "person.first_contact_on" => :first_contact_on
   }.freeze
 
-  PERSON_FIELDS = {
-    "person.first_name" => "Nombre",
-    "person.last_name" => "Apellidos",
-    "person.email" => "Email",
-    "person.phone" => "Teléfono",
-    "person.job_title" => "Cargo",
-    "person.source" => "Origen",
-    "person.first_contact_on" => "Primer contacto"
-  }.freeze
-
-  OPERATORS = {
-    "eq" => "es igual a",
-    "neq" => "no es igual a",
-    "lt" => "es menor que",
-    "lte" => "es menor o igual que",
-    "gt" => "es mayor que",
-    "gte" => "es mayor o igual que",
-    "contains" => "contiene",
-    "blank" => "está vacío",
-    "present" => "tiene valor"
-  }.freeze
-
-  REQUIREMENT_OPERATORS = {
-    "eq" => "debe ser igual a",
-    "neq" => "debe ser distinto de",
-    "lt" => "debe ser menor que",
-    "lte" => "debe ser menor o igual que",
-    "gt" => "debe ser mayor que",
-    "gte" => "debe ser mayor o igual que",
-    "contains" => "debe contener",
-    "blank" => "debe estar vacío",
-    "present" => "debe tener valor"
-  }.freeze
+  OPERATORS = %w[eq neq lt lte gt gte contains blank present].freeze
 
   FIELD_GROUPS = [
-    {key: :deal, label: "Deal", prefix: nil, record_type: "Deal", natives: DEAL_FIELDS},
-    {key: :deal_cf, label: "Campos adicionales del deal", prefix: "cf", record_type: "Deal", natives: {}},
-    {key: :company, label: "Empresa", prefix: nil, record_type: "Company", natives: COMPANY_FIELDS},
-    {key: :company_cf, label: "Campos adicionales de la empresa", prefix: "company.cf", record_type: "Company", natives: {}},
-    {key: :person, label: "Contacto", prefix: nil, record_type: "Person", natives: PERSON_FIELDS},
-    {key: :person_cf, label: "Campos adicionales del contacto", prefix: "person.cf", record_type: "Person", natives: {}}
+    {key: :deal, prefix: nil, record_type: "Deal", natives: DEAL_FIELD_KEYS},
+    {key: :deal_cf, prefix: "cf", record_type: "Deal", natives: nil},
+    {key: :company, prefix: nil, record_type: "Company", natives: COMPANY_FIELD_KEYS.keys},
+    {key: :company_cf, prefix: "company.cf", record_type: "Company", natives: nil},
+    {key: :person, prefix: nil, record_type: "Person", natives: PERSON_FIELD_KEYS.keys},
+    {key: :person_cf, prefix: "person.cf", record_type: "Person", natives: nil}
   ].freeze
 
   included do
     validates :field, presence: true
-    validates :operator, inclusion: {in: OPERATORS.keys}
+    validates :operator, inclusion: {in: OPERATORS}
     validates :compare_value, presence: true, unless: :blank_or_present_operator?
     validate :field_allowed_in_workspace
 
@@ -74,7 +45,7 @@ module FieldCondition
     scope :ordered, -> { order(:position, :id) }
   end
 
-  class_methods do
+  module ClassMethods
     def allowed_field_keys(workspace)
       FIELD_GROUPS.flat_map { |group| field_keys_for_group(workspace, group) }
     end
@@ -84,29 +55,61 @@ module FieldCondition
         options = field_keys_for_group(workspace, group).map { |key| [field_label_for(workspace, key), key] }
         next if options.empty?
 
-        [group[:label], options]
+        [group_label(group[:key]), options]
       end
     end
 
+    def group_label(group_key)
+      I18n.t(group_key, scope: "field_conditions.groups")
+    end
+
+    def operator_label(operator)
+      I18n.t(operator, scope: "field_conditions.operators")
+    end
+
+    def requirement_operator_label(operator)
+      I18n.t(operator, scope: "field_conditions.requirement_operators")
+    end
+
+    def operator_options
+      OPERATORS.map { |key| [operator_label(key), key] }
+    end
+
+    def operator_labels
+      OPERATORS.index_with { |operator| operator_label(operator) }
+    end
+
     def field_label_for(workspace, key)
-      return DEAL_FIELDS[key] if DEAL_FIELDS.key?(key)
-      return "#{COMPANY_FIELDS[key]} de la empresa" if COMPANY_FIELDS.key?(key)
-      return "#{PERSON_FIELDS[key]} del contacto" if PERSON_FIELDS.key?(key)
+      if DEAL_FIELD_KEYS.include?(key)
+        return I18n.t("field_conditions.deal_fields.open") if key == "open"
+
+        return I18n.t("activerecord.attributes.deal.#{key}")
+      end
+
+      if (attr = COMPANY_FIELD_KEYS[key])
+        label = I18n.t("activerecord.attributes.company.#{attr}")
+        return I18n.t("field_conditions.company_field", field: label)
+      end
+
+      if (attr = PERSON_FIELD_KEYS[key])
+        label = person_native_label(attr)
+        return I18n.t("field_conditions.person_field", field: label)
+      end
 
       custom_field = resolve_custom_field(workspace, key)
       return key unless custom_field
 
       case custom_field.record_type
       when "Deal" then custom_field.name
-      when "Company" then "#{custom_field.name} de la empresa"
-      when "Person" then "#{custom_field.name} del contacto"
+      when "Company" then I18n.t("field_conditions.company_field", field: custom_field.name)
+      when "Person" then I18n.t("field_conditions.person_field", field: custom_field.name)
       else custom_field.name
       end
     end
 
     def field_keys_for_group(workspace, group)
-      if group[:natives].present?
-        group[:natives].keys
+      if group[:natives]
+        group[:natives]
       else
         prefix = group[:prefix]
         workspace.custom_fields.where(record_type: group[:record_type]).ordered.pluck(:key)
@@ -124,7 +127,17 @@ module FieldCondition
         workspace.custom_fields.find_by(record_type: "Person", key: Regexp.last_match(1))
       end
     end
+
+    def person_native_label(attr)
+      if attr.in?(%i[email source first_contact_on])
+        I18n.t(attr, scope: "field_conditions.person_fields")
+      else
+        I18n.t("activerecord.attributes.person.#{attr}")
+      end
+    end
   end
+
+  extend ClassMethods
 
   def met?(deal)
     values = raw_values(deal)
@@ -138,9 +151,9 @@ module FieldCondition
     end
   end
 
-  def describe = "#{field_label} #{OPERATORS[operator]}#{compare_suffix}"
+  def describe = "#{field_label} #{self.class.operator_label(operator)}#{compare_suffix}"
 
-  def describe_requirement = "#{field_label} #{REQUIREMENT_OPERATORS[operator]}#{compare_suffix}"
+  def describe_requirement = "#{field_label} #{self.class.requirement_operator_label(operator)}#{compare_suffix}"
 
   def field_label = self.class.field_label_for(workspace, field)
 

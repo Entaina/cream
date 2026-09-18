@@ -128,9 +128,22 @@ RSpec.describe StageCondition, type: :model do
     end
   end
 
+  describe ".field_label_for" do
+    it "follows the current locale" do
+      expect(FieldCondition.field_label_for(workspace, "value")).to eq("Importe")
+      expect(FieldCondition.operator_label("eq")).to eq("es igual a")
+
+      I18n.with_locale(:en) do
+        expect(FieldCondition.field_label_for(workspace, "value")).to eq("Value")
+        expect(FieldCondition.operator_label("eq")).to eq("equals")
+        expect(FieldCondition.group_label(:deal)).to eq("Deal")
+      end
+    end
+  end
+
   describe ".field_options" do
     it "includes invoice_number among deal fields" do
-      deal_group = described_class.field_options(workspace).find { |label, _| label == "Deal" }
+      deal_group = described_class.field_options(workspace).find { |label, _| label == FieldCondition.group_label(:deal) }
       keys = deal_group.last.map(&:last)
       expect(keys).to include("invoice_number")
     end
@@ -156,7 +169,7 @@ RSpec.describe StageCondition, type: :model do
         expect(messages.size).to eq(1)
         expect(messages.first).to include("No se puede pasar a «Qualified»")
         expect(messages.first).to include("Importe debe ser mayor que 1000")
-        expect(messages.first).to include("Fecha de cierre debe tener valor")
+        expect(messages.first).to include("Fecha de cierre prevista debe tener valor")
         expect(messages.first.scan(/No se puede pasar/).size).to eq(1)
       }
     end

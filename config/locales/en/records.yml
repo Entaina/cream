@@ -194,12 +194,12 @@ en:
       opened: Opened
       sent: Sent
     email_events:
-      sent: Sent
       blocked: Blocked
       bounce: Bounced
       click: Clicked
       delivered: Delivered
       open: Opened
+      sent: Sent
       spam: Spam
       unsub: Unsubscribed
     subscription_statuses:
@@ -320,12 +320,6 @@ en:
       campaigns: Campaigns sent
       campaigns_empty: No campaigns sent to this contact.
       campaigns_limit: Showing the %{count} most recent.
-      journeys: Journeys
-      journeys_empty: This contact is not enrolled in any journey.
-      journeys_limit: Showing the %{count} most recent enrollments.
-      journey_missing: Deleted journey
-      journey_no_step: No current step
-      journey_next_run: Next run
       contact_management: Contact management
       convert_to_sql: Convert to SQL
       copied: Copied
@@ -338,6 +332,12 @@ en:
       edit_management: Edit contact management
       edit_profile: Edit professional profile
       email_preferences: Email preferences
+      journey_missing: Deleted journey
+      journey_next_run: Next run
+      journey_no_step: No current step
+      journeys: Journeys
+      journeys_empty: This contact is not enrolled in any journey.
+      journeys_limit: Showing the %{count} most recent enrollments.
       merge: Merge duplicates
       more_actions: More contact actions
       no_delivery_events: No delivery events recorded.

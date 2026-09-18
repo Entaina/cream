@@ -1,0 +1,57 @@
+---
+es:
+  alert_rules:
+    flash:
+      created: Alerta creada.
+      destroyed: Alerta eliminada.
+      updated: Alerta actualizada.
+    form:
+      active: Activa
+      add_condition: Añadir condición
+      additional_conditions: Condiciones adicionales
+      additional_conditions_hint: Todas las condiciones activas deben cumplirse además
+        del disparador de fecha. Los campos de contacto se evalúan sobre cualquiera
+        de los contactos del deal.
+      cancel: Cancelar
+      compare_value: Valor
+      compare_value_placeholder: 'Ej.: true'
+      condition_active: Activa
+      condition_field: Campo
+      condition_field_prompt: Selecciona un campo
+      condition_operator: Condición
+      condition_remove: Eliminar
+      date_field: Campo de fecha
+      date_field_hint: La alerta se evalúa cuando la fecha cumplida más el desfase
+        es hoy o anterior.
+      name: Nombre
+      name_placeholder: Edición finalizada sin datos fiscales
+      offset_days: Desfase (días)
+      offset_days_hint: 0 = el mismo día. Valores negativos avisan con antelación
+        (p. ej. -7 = una semana antes).
+      recipient: Destinatario
+      submit_create: Crear alerta
+      submit_update: Guardar
+      title_edit: Editar alerta
+      title_new: Nueva alerta
+    index:
+      active: Activa
+      and: " y "
+      days_offset: "%{count} días"
+      destroy: Eliminar
+      edit: Editar
+      empty_subtitle: Crea una regla para avisar automáticamente cuando se cumplan
+        condiciones de fecha y datos del deal.
+      empty_title: Sin alertas
+      inactive: Inactiva
+      new: Nueva alerta
+      page_title: Alertas
+      summary_html: Cuando <strong>%{trigger}</strong>%{offset}%{conditions} → <strong>%{recipient}</strong>
+      title: Alertas
+      when: Cuando
+    recipients:
+      admins: Administradores del workspace
+      deal_owner: Owner del deal
+    trigger_fields:
+      deal_expected_close_date: Fecha de cierre esperada del deal
+      edition_ends_on: Fin de edición
+      edition_starts_on: Inicio de edición
