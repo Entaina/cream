@@ -232,8 +232,11 @@ class Deal < ApplicationRecord
     stage = pipeline_stage
     return if stage.nil?
 
-    stage.stage_conditions.active.ordered.reject { |condition| condition.met?(self) }
-      .each { |condition| errors.add(:base, "No se puede pasar a «#{stage.name}»: #{condition.describe}") }
+    failed = stage.stage_conditions.active.ordered.reject { |condition| condition.met?(self) }
+    return if failed.empty?
+
+    requirements = failed.map(&:describe_requirement).join("; ")
+    errors.add(:base, "No se puede pasar a «#{stage.name}»: #{requirements}.")
   end
 
   def contacts_belong_to_company

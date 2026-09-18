@@ -12,6 +12,10 @@ Tool names exposed by the **Cream MCP server** (see `tools/list` in your MCP cli
 | `list_deals` | — | Optional: `stage` (name), `query`, `limit` |
 | `get_record` | `record_type`, `record_id` | Notes, comments, tasks (≤20), recent activity |
 | `list_pipelines` | — | Pipeline names and stages |
+| `list_stage_conditions` | — | Optional: `pipeline`, `stage`; includes `available_fields` and `operators` |
+| `create_stage_condition` | `stage`, `field`, `operator` | Optional: `pipeline`, `compare_value`, `active`, `position`; feature `:stage_conditions` |
+| `update_stage_condition` | `id` | Partial: `field`, `operator`, `compare_value`, `active`, `position` |
+| `delete_stage_condition` | `id` | Removes one entry rule |
 | `list_products` | — | Optional: `query`, `limit` |
 | `list_activity` | — | Optional: `record_type`, `record_id`, `limit` |
 | `list_emails` | — | Optional: `record_type`, `record_id`, `status`, `awaiting_follow_up`, `limit` |

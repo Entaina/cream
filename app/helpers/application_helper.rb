@@ -284,6 +284,14 @@ module ApplicationHelper
       else t("activities.products_updated", actor: actor, product: product)
       end
     when "ai_task_created" then t("activities.ai_task_created", actor: actor, title: activity.metadata["title"])
+    when "booking_created"
+      zone = ActiveSupport::TimeZone[activity.metadata["timezone"]] || Time.zone
+      starts_at = Time.zone.parse(activity.metadata["starts_at"].to_s)&.in_time_zone(zone)
+      datetime = starts_at ? I18n.l(starts_at, format: :short) : activity.metadata["starts_at"]
+      t("activities.booking_created",
+        guest: activity.metadata["guest"].presence || t("shared.someone"),
+        event: activity.metadata["event_name"],
+        datetime: datetime)
     when "payment_received"
       amount = number_to_currency(activity.metadata["amount"],
         unit: (activity.metadata["currency"] == "EUR") ? "€" : activity.metadata["currency"],

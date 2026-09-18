@@ -4,7 +4,7 @@
 
 Cream es un CRM por **workspaces** para gestionar **personas**, **empresas** y **deals** (oportunidades), con notas, tareas, listas y un historial de actividad compartido en el equipo.
 
-> **Última revisión:** 2026-09-16 (registro automático de Event Tracking Mailjet)
+> **Última revisión:** 2026-09-18 (actividad de reserva en el timeline)
 > Este documento describe la funcionalidad **visible para el usuario**. Las funcionalidades desactivadas aparecen al final en «Próximamente».
 
 ---
@@ -1296,6 +1296,7 @@ Copia la **URL pública** y compártela con clientes. Si la página tiene varios
 - Al confirmar, se crea el **evento en Google Calendar** con invitaciones a asistentes e invitados opcionales (hasta 5).
 - En Cream se crea o reutiliza la **persona** (por email) y se crea o reutiliza el **deal** en el pipeline indicado según la opción **Reutilizar deal existente**, con tarea de seguimiento para el anfitrión cuando el deal es nuevo.
 - El anfitrión recibe aviso según sus canales en **Settings → Profile → Alertas** (campana y/o email), con los datos de la reserva y un enlace al deal.
+- En la ficha del **deal** y del **contacto**, el timeline de **Actividad** registra la reserva (invitado, tipo de cita y fecha/hora), también cuando se reutiliza un deal existente.
 
 ### Página pública (visitante)
 

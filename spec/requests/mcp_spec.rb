@@ -58,6 +58,7 @@ RSpec.describe "Mcp", type: :request do
       expect(tools.map { |t| t["name"] }).to include("search_records", "pipeline_summary",
         "list_custom_fields", "set_custom_fields",
         "list_products", "list_tasks", "list_my_tasks", "list_emails", "get_email", "send_deal_email", "list_activity", "list_payments", "list_pipelines",
+        "list_stage_conditions", "create_stage_condition", "update_stage_condition", "delete_stage_condition",
         "update_person", "update_company", "update_deal", "add_comment",
         "list_person_duplicates", "list_company_duplicates", "merge_person", "merge_company", "delete_record",
         "create_product", "update_product", "add_deal_product", "update_deal_product", "update_task", "get_deal_history",
@@ -257,6 +258,87 @@ RSpec.describe "Mcp", type: :request do
       expect(result["pipelines"]).to be_present
       stage_names = result["pipelines"].flat_map { |pl| pl["stages"].map { |s| s["name"] } }
       expect(stage_names).to include("Lead")
+    end
+
+    describe "stage conditions" do
+      let!(:pipeline) { Pipeline.default_for(workspace) || Pipeline.create_default!(workspace) }
+      let(:stage) { pipeline.pipeline_stages.find_by!(name: "Qualified") }
+
+      it "lists stage conditions with field catalog and operators" do
+        workspace.stage_conditions.create!(pipeline_stage: stage, field: "value",
+          operator: "gt", compare_value: "1000")
+
+        result = call_tool("list_stage_conditions", {stage: "Qualified"})
+
+        expect(result["stage_conditions"].size).to eq(1)
+        expect(result["stage_conditions"].first).to include("field" => "value", "stage" => "Qualified")
+        expect(result["operators"]).to include("gt")
+        expect(result["available_fields"]).to be_present
+      end
+
+      it "does not list conditions from another workspace" do
+        other = workspaces(:two)
+        other_pipeline = Pipeline.create_default!(other)
+        other_stage = other_pipeline.pipeline_stages.second
+        other.stage_conditions.create!(pipeline_stage: other_stage, field: "value",
+          operator: "gt", compare_value: "500")
+
+        result = call_tool("list_stage_conditions", {})
+
+        fields = result["stage_conditions"].map { |c| c["compare_value"] }
+        expect(fields).not_to include("500")
+      end
+
+      it "creates a stage condition" do
+        result = call_tool("create_stage_condition", {
+          stage: "Qualified", field: "value", operator: "gt", compare_value: "1000"
+        })
+
+        expect(result.dig("created", "field")).to eq("value")
+        expect(result.dig("created", "stage")).to eq("Qualified")
+        expect(workspace.stage_conditions.find_by(field: "value", compare_value: "1000")).to be_present
+      end
+
+      it "returns validation_error for an invalid create" do
+        result = mcp_tool_error("create_stage_condition", {
+          stage: "Qualified", field: "value", operator: "gt", compare_value: ""
+        })
+
+        expect(result["error"]).to eq("validation_error")
+      end
+
+      it "updates and deletes a stage condition" do
+        condition = workspace.stage_conditions.create!(pipeline_stage: stage, field: "value",
+          operator: "gt", compare_value: "1000")
+
+        updated = call_tool("update_stage_condition", {id: condition.id, compare_value: "2000"})
+        expect(updated.dig("updated", "compare_value")).to eq("2000")
+
+        deleted = call_tool("delete_stage_condition", {id: condition.id})
+        expect(deleted.dig("deleted", "id")).to eq(condition.id)
+        expect { condition.reload }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+
+      it "returns not_found when updating a condition from another workspace" do
+        other = workspaces(:two)
+        other_pipeline = Pipeline.create_default!(other)
+        other_stage = other_pipeline.pipeline_stages.second
+        foreign = other.stage_conditions.create!(pipeline_stage: other_stage, field: "value",
+          operator: "gt", compare_value: "999")
+
+        result = mcp_tool_error("update_stage_condition", {id: foreign.id, compare_value: "1"})
+
+        expect(result["error"]).to eq("not_found")
+      end
+
+      it "returns feature_unavailable when stage_conditions is disabled" do
+        allow(CreamFeatures).to receive(:enabled?).and_call_original
+        allow(CreamFeatures).to receive(:enabled?).with(:stage_conditions).and_return(false)
+
+        result = mcp_tool_error("list_stage_conditions", {})
+
+        expect(result["error"]).to eq("feature_unavailable")
+      end
     end
 
     it "lists payments scoped to the token workspace" do

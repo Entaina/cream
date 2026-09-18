@@ -43,6 +43,18 @@ module FieldCondition
     "present" => "tiene valor"
   }.freeze
 
+  REQUIREMENT_OPERATORS = {
+    "eq" => "debe ser igual a",
+    "neq" => "debe ser distinto de",
+    "lt" => "debe ser menor que",
+    "lte" => "debe ser menor o igual que",
+    "gt" => "debe ser mayor que",
+    "gte" => "debe ser mayor o igual que",
+    "contains" => "debe contener",
+    "blank" => "debe estar vacío",
+    "present" => "debe tener valor"
+  }.freeze
+
   FIELD_GROUPS = [
     {key: :deal, label: "Deal", prefix: nil, record_type: "Deal", natives: DEAL_FIELDS},
     {key: :deal_cf, label: "Campos adicionales del deal", prefix: "cf", record_type: "Deal", natives: {}},
@@ -127,6 +139,8 @@ module FieldCondition
   end
 
   def describe = "#{field_label} #{OPERATORS[operator]}#{compare_suffix}"
+
+  def describe_requirement = "#{field_label} #{REQUIREMENT_OPERATORS[operator]}#{compare_suffix}"
 
   def field_label = self.class.field_label_for(workspace, field)
 

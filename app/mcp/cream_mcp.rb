@@ -47,7 +47,8 @@ module CreamMcp
       (not natural_language_search or get_record). Tasks on a record → list_tasks with record_type,
       record_id or record_query. Member tasks → list_tasks with assignee_id or assignee_query.
       Phrase search → natural_language_search. Record detail → get_record. Pipeline →
-      pipeline_summary or sales_forecast. Stages via list_pipelines. People, companies and deals
+      pipeline_summary or sales_forecast. Stages via list_pipelines; stage entry rules via
+      list_stage_conditions. People, companies and deals
       in pipelines; deal value = sum of line subtotals (list_products/create_product,
       add_deal_product). Edit with update_person/update_company/update_deal (update_deal can
       move pipeline/replace contacts). Duplicates: list_person_duplicates/list_company_duplicates
@@ -68,6 +69,7 @@ module CreamMcp
   def self.tools
     [SEARCH, LIST_PEOPLE, LIST_COMPANIES, LIST_DEALS, GET_RECORD,
       LIST_PRODUCTS, LIST_TASKS, LIST_MY_TASKS, LIST_EMAILS, GET_EMAIL, LIST_ACTIVITY, LIST_PAYMENTS, LIST_PIPELINES,
+      LIST_STAGE_CONDITIONS, CREATE_STAGE_CONDITION, UPDATE_STAGE_CONDITION, DELETE_STAGE_CONDITION,
       CREATE_PERSON, CREATE_COMPANY, CREATE_DEAL,
       UPDATE_PERSON, UPDATE_COMPANY, UPDATE_DEAL, UPDATE_DEAL_STAGE,
       LIST_PERSON_DUPLICATES, LIST_COMPANY_DUPLICATES, MERGE_PERSON, MERGE_COMPANY, DELETE_RECORD,
@@ -252,6 +254,34 @@ module CreamMcp
      stages: pl.pipeline_stages.ordered.map { |s|
        {id: s.id, name: s.name, probability: s.probability, won: s.won, closed: s.closed}
      }}
+  end
+
+  def self.find_pipeline_stage(ws, pipeline_name:, stage_name:)
+    raise ActiveRecord::RecordNotFound, "Stage name is required" if stage_name.blank?
+
+    pipeline = (pipeline_name.present? && ws.pipelines.find_by("name ILIKE ?", pipeline_name)) ||
+      Pipeline.default_for(ws)
+    raise ActiveRecord::RecordNotFound, "Unknown pipeline: #{pipeline_name}" if pipeline_name.present? && pipeline.nil?
+
+    stage = pipeline.pipeline_stages.find_by("name ILIKE ?", stage_name)
+    raise ActiveRecord::RecordNotFound, "Unknown stage: #{stage_name}" unless stage
+
+    stage
+  end
+
+  def self.stage_condition_json(condition)
+    stage = condition.pipeline_stage
+    pipeline = stage.pipeline
+    {id: condition.id, pipeline_id: pipeline.id, pipeline: pipeline.name,
+     stage_id: stage.id, stage: stage.name,
+     field: condition.field, field_label: condition.field_label,
+     operator: condition.operator, operator_label: FieldCondition::OPERATORS[condition.operator],
+     compare_value: condition.compare_value, active: condition.active, position: condition.position,
+     description: condition.describe}
+  end
+
+  def self.stage_condition_field_catalog(workspace)
+    StageCondition.field_options(workspace).to_h { |label, options| [label, options.to_h] }
   end
 
   def self.cream_context(server_context)
@@ -1310,7 +1340,8 @@ module CreamMcp
   LIST_PIPELINES = MCP::Tool.define(
     name: "list_pipelines",
     description: "List the workspace's pipelines and their ordered stages (name, probability, won/closed flags). " \
-                 "Use this to discover valid stage names for create_deal and update_deal_stage.",
+                 "Use this to discover valid stage names for create_deal and update_deal_stage. " \
+                 "Stage entry rules: list_stage_conditions.",
     input_schema: {type: "object", properties: {}}
   ) do |server_context:, **_args|
     CreamMcp.with_authorization(server_context) do
@@ -1318,6 +1349,117 @@ module CreamMcp
       CreamMcp.authorize!(ctx, Pipeline, :index?)
       pipelines = CreamMcp.policy_scope(ctx, ctx.workspace.pipelines).ordered.includes(:pipeline_stages)
       CreamMcp.respond_with(pipelines: pipelines.map { |pl| CreamMcp.pipeline_json(pl) })
+    end
+  end
+
+  LIST_STAGE_CONDITIONS = MCP::Tool.define(
+    name: "list_stage_conditions",
+    description: "List pipeline stage entry conditions (all active rules must pass before a deal can enter a stage). " \
+                 "Returns available_fields and operators for create_stage_condition.",
+    input_schema: {type: "object",
+                   properties: {pipeline: {type: "string", description: "Optional pipeline name filter"},
+                                  stage: {type: "string", description: "Optional stage name filter"}}}
+  ) do |server_context:, **args|
+    return CreamMcp.feature_unavailable_response(:stage_conditions) unless CreamFeatures.enabled?(:stage_conditions)
+
+    CreamMcp.with_authorization(server_context) do
+      ctx = CreamMcp.pundit_context(server_context)
+      ws = ctx.workspace
+      CreamMcp.authorize!(ctx, StageCondition, :index?)
+      scope = CreamMcp.policy_scope(ctx, ws.stage_conditions).includes(pipeline_stage: :pipeline).ordered
+      pipeline_name = CreamMcp.arg(args, "pipeline")
+      stage_name = CreamMcp.arg(args, "stage")
+      if pipeline_name.present?
+        scope = scope.joins(pipeline_stage: :pipeline).where("pipelines.name ILIKE ?", pipeline_name)
+      end
+      if stage_name.present?
+        scope = scope.joins(:pipeline_stage).where("pipeline_stages.name ILIKE ?", stage_name)
+      end
+      CreamMcp.respond_with(
+        stage_conditions: scope.map { |c| CreamMcp.stage_condition_json(c) },
+        available_fields: CreamMcp.stage_condition_field_catalog(ws),
+        operators: FieldCondition::OPERATORS
+      )
+    end
+  end
+
+  CREATE_STAGE_CONDITION = MCP::Tool.define(
+    name: "create_stage_condition",
+    description: "Create an entry condition for a pipeline stage. All active conditions on a stage must pass " \
+                 "before a deal can move into it. Use list_stage_conditions for field keys and operators.",
+    input_schema: {type: "object",
+                   properties: {stage: {type: "string", description: "Target stage name"},
+                                pipeline: {type: "string", description: "Pipeline name (defaults to workspace default)"},
+                                field: {type: "string", description: "Field key (e.g. value, invoice_number, cf:key)"},
+                                operator: {type: "string", enum: FieldCondition::OPERATORS.keys},
+                                compare_value: {type: "string", description: "Not required for blank/present operators"},
+                                active: {type: "boolean"},
+                                position: {type: "integer"}},
+                   required: %w[stage field operator]}
+  ) do |server_context:, **args|
+    return CreamMcp.feature_unavailable_response(:stage_conditions) unless CreamFeatures.enabled?(:stage_conditions)
+
+    CreamMcp.with_authorization(server_context) do
+      ctx = CreamMcp.pundit_context(server_context)
+      ws = ctx.workspace
+      stage = CreamMcp.find_pipeline_stage(ws, pipeline_name: CreamMcp.arg(args, "pipeline"),
+        stage_name: CreamMcp.arg(args, "stage"))
+      condition = ws.stage_conditions.new(
+        pipeline_stage: stage,
+        field: CreamMcp.arg(args, "field"),
+        operator: CreamMcp.arg(args, "operator"),
+        compare_value: CreamMcp.arg(args, "compare_value"),
+        active: CreamMcp.arg(args, "active").nil? ? true : CreamMcp.arg(args, "active"),
+        position: CreamMcp.arg(args, "position") || 0
+      )
+      CreamMcp.authorize!(ctx, condition, :create?)
+      condition.save!
+      CreamMcp.respond_with(created: CreamMcp.stage_condition_json(condition))
+    end
+  end
+
+  UPDATE_STAGE_CONDITION = MCP::Tool.define(
+    name: "update_stage_condition",
+    description: "Update a stage entry condition (field, operator, compare_value, active, position).",
+    input_schema: {type: "object",
+                   properties: {id: {type: "integer"},
+                                field: {type: "string"},
+                                operator: {type: "string", enum: FieldCondition::OPERATORS.keys},
+                                compare_value: {type: "string"},
+                                active: {type: "boolean"},
+                                position: {type: "integer"}},
+                   required: ["id"]}
+  ) do |server_context:, **args|
+    return CreamMcp.feature_unavailable_response(:stage_conditions) unless CreamFeatures.enabled?(:stage_conditions)
+
+    CreamMcp.with_authorization(server_context) do
+      ctx = CreamMcp.pundit_context(server_context)
+      condition = CreamMcp.policy_scope(ctx, ctx.workspace.stage_conditions)
+        .includes(pipeline_stage: :pipeline).find(CreamMcp.arg(args, "id"))
+      CreamMcp.authorize!(ctx, condition, :update?)
+      attrs = CreamMcp.picked(args, "field", "operator", "compare_value", "active", "position")
+      condition.update!(attrs) if attrs.present?
+      CreamMcp.respond_with(updated: CreamMcp.stage_condition_json(condition.reload))
+    end
+  end
+
+  DELETE_STAGE_CONDITION = MCP::Tool.define(
+    name: "delete_stage_condition",
+    description: "Permanently delete a stage entry condition.",
+    input_schema: {type: "object",
+                   properties: {id: {type: "integer"}},
+                   required: ["id"]}
+  ) do |server_context:, **args|
+    return CreamMcp.feature_unavailable_response(:stage_conditions) unless CreamFeatures.enabled?(:stage_conditions)
+
+    CreamMcp.with_authorization(server_context) do
+      ctx = CreamMcp.pundit_context(server_context)
+      condition = CreamMcp.policy_scope(ctx, ctx.workspace.stage_conditions)
+        .includes(pipeline_stage: :pipeline).find(CreamMcp.arg(args, "id"))
+      CreamMcp.authorize!(ctx, condition, :destroy?)
+      deleted = CreamMcp.stage_condition_json(condition)
+      condition.destroy!
+      CreamMcp.respond_with(deleted: deleted)
     end
   end
 

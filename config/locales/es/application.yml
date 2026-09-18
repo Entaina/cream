@@ -43,6 +43,7 @@ es:
   activities:
     ai_task_created: '%{actor} creó la tarea sugerida por IA "%{title}"'
     attachment_added: "%{actor} adjuntó %{filename}"
+    booking_created: "%{guest} reservó %{event} para el %{datetime}"
     comment_added: "%{actor} añadió un comentario"
     contact_added: "%{actor} añadió a %{contact} como contacto"
     contact_removed: "%{actor} eliminó a %{contact} como contacto"

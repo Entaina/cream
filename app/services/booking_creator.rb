@@ -69,6 +69,7 @@ class BookingCreator
     enqueue_reminder!(booking)
     enqueue_confirmation!(booking)
     notify_host!(booking)
+    track_booking_activity!(booking)
 
     if booking.person
       assign_campaign_from_utm!(booking)
@@ -81,6 +82,21 @@ class BookingCreator
   end
 
   private
+
+  def track_booking_activity!(booking)
+    metadata = {
+      "booking_id" => booking.id,
+      "event_name" => @event_type.localized_name,
+      "starts_at" => booking.starts_at.iso8601,
+      "timezone" => booking.timezone,
+      "guest" => booking.display_name
+    }
+    [booking.deal, booking.person].compact.uniq.each do |record|
+      next unless record.respond_to?(:track_activity)
+
+      record.track_activity("booking_created", user: @booking_page.host, metadata: metadata)
+    end
+  end
 
   def assign_campaign_from_utm!(booking)
     return unless CreamFeatures.enabled?(:marketing_campaigns)

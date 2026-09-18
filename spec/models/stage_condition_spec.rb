@@ -136,7 +136,31 @@ RSpec.describe StageCondition, type: :model do
     end
   end
 
+  describe "#describe_requirement" do
+    it "phrases the rule as something the deal must satisfy" do
+      condition = build_condition(operator: "gt", compare_value: "1000")
+      expect(condition.describe_requirement).to eq("Valor debe ser mayor que 1000")
+    end
+  end
+
   describe "deal stage validation" do
+    it "aggregates failed conditions into one error message" do
+      build_condition(field: "value", operator: "gt", compare_value: "1000").save!
+      build_condition(field: "expected_close_date", operator: "present", compare_value: nil).save!
+      deal.update_columns(value: 100, expected_close_date: nil)
+
+      expect {
+        deal.move_to_stage!(stage)
+      }.to raise_error(ActiveRecord::RecordInvalid) { |error|
+        messages = error.record.errors.full_messages
+        expect(messages.size).to eq(1)
+        expect(messages.first).to include("No se puede pasar a «Qualified»")
+        expect(messages.first).to include("Valor debe ser mayor que 1000")
+        expect(messages.first).to include("Fecha de cierre debe tener valor")
+        expect(messages.first.scan(/No se puede pasar/).size).to eq(1)
+      }
+    end
+
     it "blocks moving when conditions fail" do
       build_condition(operator: "gt", compare_value: "1000").save!
       deal.update_column(:value, 100)

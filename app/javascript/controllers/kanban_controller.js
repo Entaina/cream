@@ -253,13 +253,13 @@ export default class extends Controller {
     return null
   }
 
-  restoreCardPosition(card) {
-    if (!this.draggedOrigin) return
+  restoreCardPosition(card, origin, nextSibling) {
+    if (!origin) return
 
-    if (this.draggedNextSibling && this.draggedNextSibling.parentElement === this.draggedOrigin) {
-      this.draggedOrigin.insertBefore(card, this.draggedNextSibling)
+    if (nextSibling && nextSibling.parentElement === origin) {
+      origin.insertBefore(card, nextSibling)
     } else {
-      this.draggedOrigin.appendChild(card)
+      origin.appendChild(card)
     }
   }
 
@@ -296,6 +296,8 @@ export default class extends Controller {
     const dealId = card.dataset.dealId
     const cards = [...column.querySelectorAll("[data-kanban-target='card']")]
     const position = cards.indexOf(card)
+    const origin = this.draggedOrigin
+    const nextSibling = this.draggedNextSibling
 
     try {
       const response = await fetch(this.urlValue.replace(":id", dealId), {
@@ -311,7 +313,7 @@ export default class extends Controller {
       if (response.ok) {
         if (window.Turbo) window.Turbo.renderStreamMessage(await response.text())
       } else {
-        this.restoreCardPosition(card)
+        this.restoreCardPosition(card, origin, nextSibling)
         const contentType = response.headers.get("Content-Type") || ""
         if (window.Turbo && contentType.includes("turbo-stream")) {
           window.Turbo.renderStreamMessage(await response.text())
@@ -319,7 +321,7 @@ export default class extends Controller {
         console.error("Failed to move deal", response.status)
       }
     } catch (error) {
-      this.restoreCardPosition(card)
+      this.restoreCardPosition(card, origin, nextSibling)
       console.error("Failed to move deal", error)
     }
   }

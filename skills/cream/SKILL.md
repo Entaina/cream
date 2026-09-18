@@ -24,7 +24,7 @@ Operate the workspace through the **Cream MCP server** (`POST /mcp`). Responses 
 6. **Create person** requires **`company_id`**. No company yet → `create_company` first.
 7. **Create deal** requires **`name`, `company_id`, `next_action_title`, `next_action_due_on`** (ISO `YYYY-MM-DD`, today or future). Optional `person_ids` must belong to that company.
 8. **Deal value** rolls up from product lines — use `add_deal_product` / `update_deal_product`. After lines exist, trust `products` / subtotals on the deal, not a manual `value` alone.
-9. **Stage / pipeline moves** → `update_deal_stage` or `update_deal` with `stage` / `pipeline` (triggers timeline + stage automations). Stage names: `list_pipelines`.
+9. **Stage / pipeline moves** → `update_deal_stage` or `update_deal` with `stage` / `pipeline` (triggers timeline + stage automations). Stage names: `list_pipelines`. **Stage entry rules** → `list_stage_conditions`, `create_stage_condition`, `update_stage_condition`, `delete_stage_condition` (feature `:stage_conditions`).
 10. **Destructive ops** — `delete_record` on a **company** deletes its people and deals. Duplicates: `list_person_duplicates` / `list_company_duplicates`, then `merge_person` / `merge_company`.
 11. **AI tools** (`summarize_record`, `suggest_next_steps`, `draft_email`, `natural_language_search`, `enrich_record`) may return `ai_unavailable`. Other tools may return feature-disabled errors — do not retry blindly.
 12. **Workspace scope** — the API token binds **one user + one workspace**. No workspace switcher. When the payload includes **`url`**, share it with the user (needs `CREAM_APP_URL` on the server).
@@ -79,6 +79,7 @@ Want to change CRM data?
 | Create person / company / deal | `create_person`, `create_company`, `create_deal` |
 | Update records | `update_person`, `update_company`, `update_deal` |
 | Move stage | `update_deal_stage` |
+| Stage entry conditions | `list_stage_conditions`, `create_stage_condition`, … |
 | Note / comment | `add_note`, `add_comment` |
 | Task lifecycle | `create_task`, `update_task`, `complete_task` |
 | Email | `send_deal_email` |

@@ -78,6 +78,19 @@ RSpec.describe BookingCreator, type: :service do
     expect(workspace.deals.where("name ILIKE ?", "%Ana Lopez%")).to exist
     expect(client).to have_received(:create_event)
 
+    deal = result.booking.deal
+    person = workspace.people.with_email("ana@example.com").first
+    deal_activity = deal.activities.find_by!(action: "booking_created")
+    person_activity = person.activities.find_by!(action: "booking_created")
+    expect(deal_activity.user).to eq(user)
+    expect(person_activity.user).to eq(user)
+    expect(deal_activity.metadata).to include(
+      "booking_id" => result.booking.id,
+      "guest" => "Ana Lopez",
+      "event_name" => "Online"
+    )
+    expect(deal_activity.metadata["starts_at"]).to be_present
+
     notification = user.notifications.order(:id).last
     expect(notification).to be_present
     expect(notification.kind).to eq("booking")
@@ -328,5 +341,7 @@ RSpec.describe BookingCreator, type: :service do
 
     expect(result.booking.deal).to eq(existing_deal)
     expect(workspace.deals.where(pipeline: pipeline, pipeline_stage: pipeline.first_stage).count).to eq(1)
+    expect(existing_deal.activities.where(action: "booking_created")).to exist
+    expect(person.activities.where(action: "booking_created")).to exist
   end
 end
