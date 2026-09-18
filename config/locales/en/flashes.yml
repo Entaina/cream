@@ -46,9 +46,9 @@ en:
       merged: Merged %{count} duplicate companies into %{name}.
       updated: Company updated.
     deal_accesses:
-      collaborator_added: '%{name} added as collaborator.'
+      already_has_access: "%{name} already has access to this deal."
+      collaborator_added: "%{name} added as collaborator."
       collaborator_removed: Collaborator removed.
-      already_has_access: '%{name} already has access to this deal.'
       owner_has_access: The deal owner already has access.
     deal_products:
       added: Product added.
@@ -124,14 +124,15 @@ en:
       all_read: All notifications marked as read.
     oauth:
       calendar_booking_disabled: Calendar booking is not enabled.
-      calendar_connected: Google Calendar connected for %{email}.
       calendar_connect_failed: Could not connect Google Calendar.
+      calendar_connected: Google Calendar connected for %{email}.
       calendar_sign_in_first: Sign in first to connect Google Calendar.
-      gmail_connected: Gmail connected for %{email}.
       gmail_connect_failed: Could not connect Gmail.
+      gmail_connected: Gmail connected for %{email}.
       gmail_sign_in_first: Sign in first to connect Gmail.
-      sign_in_session_expired: Sign-in session expired. Open the app from the same URL you use in Google OAuth and try again.
       google_sign_in_failed: Could not sign in with Google.
+      sign_in_session_expired: Sign-in session expired. Open the app from the same
+        URL you use in Google OAuth and try again.
     people:
       created: Person created.
       deleted: Person deleted.

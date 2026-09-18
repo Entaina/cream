@@ -1,14 +1,14 @@
 <% page_title @segment.name %>
 <% actions = capture do %>
-  <%= link_to "Editar", edit_segment_path(@segment), class: "btn-secondary" %>
-  <%= button_to "Eliminar", segment_path(@segment), method: :delete, class: "btn-danger",
-        form: { data: { turbo_confirm: "¿Eliminar el segmento «#{@segment.name}»?" } } %>
+  <%= link_to t("marketing.shared.edit"), edit_segment_path(@segment), class: "btn-secondary" %>
+  <%= button_to t("marketing.shared.delete"), segment_path(@segment), method: :delete, class: "btn-danger",
+        form: { data: { turbo_confirm: t("marketing.segments.show.delete_confirm", name: @segment.name) } } %>
 <% end %>
 <%= render "shared/page_header", title: @segment.name, icon_name: :users, count: @count, actions: actions %>
 
 <div class="flex-1 overflow-y-auto scrollbar-subtle p-5 space-y-4">
   <div class="card p-4 space-y-2">
-    <p class="text-sm"><strong><%= @count %></strong> registros coinciden con este segmento.</p>
+    <p class="text-sm"><%= t("marketing.segments.show.match_count_html", count: @count).html_safe %></p>
     <p class="text-sm text-ink-faint"><%= describe_segment_filters(@segment.filters) %></p>
     <% if @segment.description.present? %>
       <p class="text-sm text-ink-soft"><%= @segment.description %></p>
@@ -21,12 +21,12 @@
         <thead>
           <tr>
             <% if @segment.record_type == "Person" %>
-              <th>Nombre</th>
-              <th>Email</th>
-              <th>Empresa</th>
-              <th>Ciclo de vida</th>
+              <th><%= t("marketing.segments.show.col_name") %></th>
+              <th><%= t("marketing.shared.email") %></th>
+              <th><%= t("marketing.shared.company") %></th>
+              <th><%= t("marketing.shared.lifecycle") %></th>
             <% else %>
-              <th>Nombre</th>
+              <th><%= t("marketing.segments.show.col_name") %></th>
             <% end %>
           </tr>
         </thead>
@@ -50,7 +50,7 @@
       <%= render "shared/pagination", pagy: @pagy %>
     <% end %>
   <% else %>
-    <%= render "shared/empty_state", icon_name: :users, title: "Sin coincidencias",
-          subtitle: "Ningún registro cumple los filtros actuales de este segmento." %>
+    <%= render "shared/empty_state", icon_name: :users, title: t("marketing.segments.show.empty_title"),
+          subtitle: t("marketing.segments.show.empty_subtitle") %>
   <% end %>
 </div>

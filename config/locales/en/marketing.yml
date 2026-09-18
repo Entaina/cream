@@ -1,0 +1,476 @@
+---
+en:
+  marketing:
+    attribution:
+      page_title: Attribution
+    automations:
+      edit:
+        page_title: Edit automation
+      form:
+        action_label: Do this
+        add_condition: Add condition
+        condition_field_placeholder: field
+        condition_value_placeholder: value
+        conditions_hint: Each row must match exactly. Leave empty to run on every
+          trigger.
+        conditions_label: Only if (optional)
+        due_date: Due date
+        due_date_hint: Leave empty to default to one week ahead.
+        email_body: Email body
+        email_body_placeholder: Checking in.
+        email_hint: Sent to the record's email (or its first contact). Requires the
+          record to have an email.
+        email_subject: Email subject
+        hint_deal_stage_changed: Fires when a deal changes stage. Conditions can match
+          <code>to</code> (the new stage name) or any deal field.
+        hint_record_created: Fires when a person, company, or deal is created. Conditions
+          can match any field on the new record.
+        hint_task_completed: Fires when a task is completed. Conditions can match
+          <code>title</code> (the task title).
+        remove_condition: Remove condition
+        slack_hint_html: Posts a Slack message using this automation's name. <strong>Requires
+          the Slack integration to be enabled</strong>; until then this action does
+          nothing.
+        task_title: Task title
+        task_title_placeholder: Follow up
+        trigger_label: When this happens
+      index:
+        active: Active
+        if_conditions: " if %{conditions}"
+        inactive: Inactive
+        new: New automation
+        page_title: Automations
+        then_html: " → <strong>%{action}</strong>"
+        when_html: When <strong>%{trigger}</strong>
+      new:
+        page_title: New automation
+    campaign_statuses:
+      draft: Draft
+      scheduled: Scheduled
+      sending: Sending
+      sent: Sent
+    campaigns:
+      edit:
+        page_title: Edit campaign
+        view: View campaign
+      form:
+        create: Create campaign
+        goal: Goal
+        goal_placeholder: Generate qualified leads for product X
+        name: Name
+        name_placeholder: March newsletter
+        starts_on: Start date
+        status: Status
+        utm_campaign: UTM campaign
+        utm_content: UTM content
+        utm_medium: UTM medium
+        utm_source: UTM source
+        utm_term: UTM term
+      index:
+        delete_confirm: Delete campaign «%{name}»?
+        empty_subtitle: Create a campaign to email segments, run A/B tests, and track
+          opens and clicks.
+        empty_title: No campaigns
+        new: New campaign
+        page_title: Campaigns
+      new:
+        page_title: New campaign
+      show:
+        ab_legend: A/B test (optional)
+        ab_override_hint: If you fill A/B subjects, they override the campaign content
+          subject.
+        based_on_template: Based on template
+        cancel_scheduled: Cancel scheduled
+        cancel_send: Cancel
+        cancel_send_confirm: Cancel this send?
+        col_date: Date
+        col_delivery: Delivery
+        col_result: Result
+        col_segment: Segment
+        col_status: Status
+        col_variants: Variants
+        delete_confirm: Delete campaign «%{name}»?
+        delivery_mode: Delivery type
+        delivery_mode_hint: Send an email, enroll in a journey, or both.
+        edit_campaign_link: Edit the campaign
+        edit_content: Edit content
+        email_content_heading: Email content
+        email_content_warning: Configure email content before queueing an email send.
+        journey: Journey
+        journey_hint: People in the segment will be enrolled in this journey.
+        layout: Layout
+        mark_winner: Mark winner
+        no_email_content_html: No email content yet. %{link} to write the send or
+          pick a template as a base.
+        no_layout: No layout
+        person_segment: Person segment
+        queue_send: Queue send
+        recipients_match: recipients match the segment.
+        resend_failed: Resend failed
+        retry: Retry
+        schedule_hint: Leave empty to send immediately.
+        schedule_optional: Schedule send (optional)
+        select_journey: Select a journey
+        select_segment: Select a segment
+        send_heading: Send campaign
+        send_history: Send history
+        send_history_empty: No sends for this campaign yet.
+        send_test: Send test
+        send_winner_confirm: Send the winning variant to those who have not received
+          it yet?
+        send_winner_rest: Send winner to remainder
+        stat_clicks: Clicks
+        stat_opened: Opened
+        stat_sent: Sent
+        subject: Subject
+        subscription_hint: Only contacts subscribed to this type will receive the
+          send.
+        subscription_type: Subscription type
+        test_body_optional: Test body (optional)
+        test_description: Uses content saved on the campaign. Optionally try a different
+          subject or body.
+        test_heading: Send test to your email
+        test_subject_optional: Test subject (optional)
+        test_subject_placeholder: Overrides campaign subject
+        variant_a_body: Variant A body
+        variant_a_subject: Variant A subject
+        variant_a_weight: Weight A (%)
+        variant_b_body: Variant B body
+        variant_b_subject: Variant B subject
+        variant_b_weight: Weight B (%)
+        view_attribution: View attribution
+        winner_badge: Winner
+    delivery_modes:
+      both: Email + journey
+      email: Email
+      journey: Journey
+    enrollment_states:
+      active: Active
+      cancelled: Cancelled
+      completed: Completed
+      waiting: Waiting
+    journey_steps:
+      add_to_list: Add to list «%{name}»
+      adjust_score: "%{points} pts"
+      branch: Condition → step %{true_step} / %{false_step}
+      next_step: next
+      notify_user: Notify user
+      send_labeled: Send «%{label}»
+      send_template: Send «%{name}»
+      set_field: "%{field}: %{value}"
+      task: 'Task: %{title}'
+      task_untitled: untitled
+      template_fallback: template
+      wait: Wait %{duration}
+    journey_triggers:
+      booking_created: Booking created
+      email_clicked: Email clicked
+      lead_form_submitted: Form submitted
+      lifecycle_changed: Lifecycle changed
+      manual: Manual
+      segment_entry: Segment entry
+    journeys:
+      edit:
+        page_title: Edit journey
+      form:
+        add_step: Add step
+        any_form: Any form
+        any_page: Any page
+        booking_page: Booking page
+        create: Create journey
+        email_link_contains: Link URL (contains)
+        entry_condition_legend: Entry condition
+        entry_trigger: Entry trigger
+        lead_form: Lead capture form
+        lifecycle_from: Previous lifecycle
+        lifecycle_to: New lifecycle
+        max_reenrollments: Max re-enrollments
+        max_reenrollments_hint: 0 = once per contact only.
+        name_placeholder: Welcome new leads
+        product_output: Product (commercial exit)
+        segment: Segment
+        select_segment: Select segment
+        steps_legend: Steps
+        stop_on_open_deal: Exit journey if there is an open deal for the product
+      index:
+        delete_confirm: Delete journey «%{name}»?
+        empty_subtitle: Automate email sequences, waits, and tasks when marketing
+          triggers fire.
+        empty_title: No journeys
+        new: New journey
+        page_title: Journeys
+      new:
+        page_title: New journey
+      show:
+        col_contact: Contact
+        col_started: Started
+        col_state: State
+        col_step: Step
+        contact: Contact
+        delete_confirm: Delete journey «%{name}»?
+        manual_enroll_heading: Enroll contact manually
+        no_steps: No steps configured.
+        recent_enrollments: Recent enrollments
+        stat_active: Active
+        stat_completed: Completed
+        stat_enrollments: Enrollments
+        stat_waiting: Waiting
+        steps_heading: Journey steps
+        trigger: 'Trigger:'
+      step_fields:
+        branch_false: If false → step (ID)
+        branch_hint: Evaluate a condition on the contact and jump to the indicated
+          step.
+        branch_true: If true → step (ID)
+        due_in_days: Due in (days)
+        field: Field
+        message: Message
+        message_placeholder: Step completed for {name}
+        notify_user: User to notify
+        person_list: Person list
+        position: Position
+        score_points: Score points
+        score_points_placeholder: 10 or -5
+        step_type: Step type
+        subscription_type: Subscription type
+        task_title: Task title
+        task_title_placeholder: Sales follow-up
+        wait_minutes: Wait (minutes)
+    lead_form_templates:
+      edit:
+        page_title: Edit form template
+      index:
+        page_title: Public form templates
+      new:
+        page_title: New form template
+    lead_forms:
+      edit:
+        page_title: Edit lead capture form
+      index:
+        email_to_lead: Email to lead
+        empty: No forms configured yet.
+        iframe_code: Iframe embed code
+        new: New form
+        page_title: Lead capture forms
+        pipeline: Pipeline
+        public_url: Public URL
+        responsible: Owner
+        template: Template
+        templates: Form templates
+      new:
+        page_title: New lead capture form
+    mqls:
+      index:
+        col_forms: Forms
+        col_lifecycle: Lifecycle (scoring)
+        col_pending_interests: Pending interests
+        col_score: Score
+        col_subscriptions: Subscriptions
+        col_visible_deals: Visible deals
+        empty_subtitle: Adjust filters or capture contacts with marketing consent.
+        empty_title: No eligible MQLs
+        interest_product: Product interest
+        lead_form_source: Source form
+        open_deal_any: Any deal
+        open_deal_no: Without open deal
+        open_deal_product: Product (deal)
+        open_deal_yes: With open deal
+        page_title: MQL pool
+        subscription_filter: Subscription type (eligibility)
+    scoring_events:
+      booking_created: Booking created
+      deal_created: Deal created
+      email_clicked: Email clicked
+      email_opened: Email opened
+      email_sent: Email sent
+      form_field: Form field
+      lead_submission: Form submitted
+      page_view: Page view
+    scoring_rules:
+      edit:
+        page_title: Edit rule
+      form:
+        conditions_heading: Additional conditions
+        conditions_hint: All must match in addition to the event type.
+        create: Create rule
+        decay_days: Decay (days)
+        decay_hint: 0 = no decay.
+        event_type: Event type
+        event_type_hint: Leave blank to apply when any event matches the conditions.
+        name_placeholder: Email opened
+        points: Points
+      index:
+        active: Active
+        delete_confirm: Delete rule «%{name}»?
+        empty_subtitle: Automatically assign points when contacts open emails, visit
+          pages, or submit forms.
+        empty_title: No scoring rules
+        inactive: Inactive
+        new: New rule
+        page_title: Scoring rules
+        recalculate: Recalculate scores
+        recalculate_confirm: Recalculate scores for all contacts in the workspace?
+      new:
+        page_title: New rule
+    segment_filters:
+      capture_destination: destination %{value}
+      capture_values:
+        any: any
+        deal: Deal
+        mql: MQL
+      dealt_product: product history %{id}
+      email_contains: email contains «%{value}»
+      exclude_suppressed: excluding suppressed
+      interest_product: product interest %{id}
+      lead_form: form %{id}
+      lead_score: score %{min}-%{max}
+      lifecycle: lifecycle %{stage}
+      none: No filters
+      open_deal: 'open deal: %{value}'
+      open_deal_product: no deal on product %{id}
+      open_deal_values:
+        any: any
+        'no': 'no'
+        'yes': 'yes'
+      opened_email: opened email (%{days} days)
+      search: search «%{q}»
+      submitted_form: form «%{slug}»
+      visited_url: visited URL «%{url}»
+    segments:
+      edit:
+        page_title: Edit segment
+      form:
+        create: Create segment
+        exclude_suppressed: Exclude suppressed addresses
+        filter_capture_destination: Capture destination
+        filter_dealt_product: Commercial history (product)
+        filter_email_contains: Email contains
+        filter_form_slug: Submitted form (slug)
+        filter_interest_product: Product interest
+        filter_interest_status: Interest status
+        filter_lead_form: Source form
+        filter_lifecycle: Lifecycle stage
+        filter_open_deal: Open deal
+        filter_open_deal_product: Product (open deal)
+        filter_opened_email: Opened email (last N days)
+        filter_score_max: Maximum score
+        filter_score_min: Minimum score
+        filter_search: Search
+        filter_visited_url: Visited URL (contains)
+        filters_legend: Filters
+        interest_pending_default: Pending (default)
+        name_placeholder: Qualified leads
+        open_deal_any: Any
+        open_deal_no: 'No'
+        open_deal_yes: 'Yes'
+        preview_html: 'Preview: <strong data-segment-preview-target="count">…</strong>
+          records with saved filters. Save changes to refresh the count.'
+        record_type: Record type
+        search_placeholder: Name or email
+      index:
+        delete_confirm: Delete segment «%{name}»?
+        empty_subtitle: Build dynamic audiences by lifecycle, score, email activity,
+          and more.
+        empty_title: No segments
+        new: New segment
+        page_title: Segments
+      new:
+        page_title: New segment
+      show:
+        col_name: Name
+        delete_confirm: Delete segment «%{name}»?
+        empty_subtitle: No records match this segment's current filters.
+        empty_title: No matches
+        match_count_html: "<strong>%{count}</strong> records match this segment."
+    send_stats:
+      failed: "%{count} failed"
+      journey_blocked: "%{count} blocked"
+      journey_enrolled: "%{count} enrolled in journey"
+      journey_feature_disabled: "%{count} feature disabled"
+      journey_inactive: "%{count} inactive"
+      journey_max_reenrollments: "%{count} max re-enrollments"
+      journey_no_steps: "%{count} no steps"
+      sent: "%{count} sent"
+      skipped: "%{count} skipped"
+    send_statuses:
+      cancelled: Cancelled
+      failed: Failed
+      pending: Pending
+      scheduled: Scheduled
+      sending: Sending
+      sent: Sent
+    shared:
+      activate: Activate
+      active: Active
+      add_condition: Add condition
+      any: Any
+      any_event: Any event
+      cancel: Cancel
+      clear: Clear
+      company: Company
+      contact_owner: Contact owner
+      convert_to_sql: Convert to SQL
+      copied: Copied
+      copy_clipboard: Copy to clipboard
+      deal_badge: Deal
+      decay_in_days: decays in %{count} days
+      default: Default
+      delete: Delete
+      delete_condition: Remove condition
+      delete_step: Remove step
+      description: Description
+      edit: Edit
+      em_dash: "—"
+      email: Email
+      enroll: Enroll
+      inactive: Inactive
+      lifecycle: Lifecycle
+      lifecycle_field: Lifecycle stage
+      mql_badge: MQL
+      name: Name
+      no_email: No email
+      none: None
+      pause: Pause
+      person: Person
+      pts: pts
+      save: Save
+      search_placeholder: Search...
+      select_contact: Select a contact
+      select_list: Select list
+      select_value: Select value
+      shared_with_team: Shared with team
+      steps_count: "%{count} steps"
+      trigger_label: 'Trigger:'
+      utm_prefix: 'UTM:'
+      value: Value
+      view: View
+      view_consent: View consent
+      with_company: With company
+    step_types:
+      add_to_segment: Add to list
+      adjust_score: Adjust score
+      branch: Condition
+      create_task: Create task
+      notify: Notify
+      send_email: Send email
+      set_field: Set field
+      wait: Wait
+    subscription_types:
+      edit:
+        page_title: Edit subscription type
+      index:
+        delete_confirm: Delete type «%{name}»?
+        empty_subtitle: Define communication categories (newsletter, promotions, etc.)
+          to manage consent.
+        empty_title: No subscription types
+        new: New type
+        page_title: Subscription types
+      new:
+        page_title: New subscription type
+    wait_duration:
+      n_days: "%{count} days"
+      n_hours: "%{count} h"
+      n_minutes: "%{count} min"
+      one_day: 1 day
+      one_hour: 1 h
+      one_minute: 1 min

@@ -12,33 +12,33 @@
   <% end %>
 
   <div>
-    <%= f.label :name, "Nombre", class: "label" %>
-    <%= f.text_field :name, class: "input w-full", placeholder: "Leads cualificados" %>
+    <%= f.label :name, t("marketing.shared.name"), class: "label" %>
+    <%= f.text_field :name, class: "input w-full", placeholder: t("marketing.segments.form.name_placeholder") %>
   </div>
 
   <div>
-    <%= f.label :record_type, "Tipo de registro", class: "label" %>
+    <%= f.label :record_type, t("marketing.segments.form.record_type"), class: "label" %>
     <%= f.select :record_type, Segment::RECORD_TYPES.map { |t| [ t, t ] }, {}, class: "input w-full" %>
   </div>
 
   <div>
-    <%= f.label :description, "Descripción", class: "label" %>
+    <%= f.label :description, t("marketing.shared.description"), class: "label" %>
     <%= f.text_area :description, class: "input w-full resize-y", rows: 2 %>
   </div>
 
   <% filters = segment.filters.to_h.stringify_keys %>
   <fieldset class="space-y-3 border border-line rounded-lg p-3">
-    <legend class="text-sm font-semibold px-1">Filtros</legend>
+    <legend class="text-sm font-semibold px-1"><%= t("marketing.segments.form.filters_legend") %></legend>
 
     <div>
-      <label class="label">Búsqueda</label>
-      <%= text_field_tag "segment[filters][q]", filters["q"], class: "input w-full", placeholder: "Nombre o email" %>
+      <label class="label"><%= t("marketing.segments.form.filter_search") %></label>
+      <%= text_field_tag "segment[filters][q]", filters["q"], class: "input w-full", placeholder: t("marketing.segments.form.search_placeholder") %>
     </div>
     <div>
-      <label class="label">Ciclo de vida</label>
+      <label class="label"><%= t("marketing.segments.form.filter_lifecycle") %></label>
       <%= select_tag "segment[filters][lifecycle_stage]",
             options_for_select(Person::LIFECYCLE_STAGES.map { |s| [ s.humanize, s ] }, filters["lifecycle_stage"]),
-            include_blank: "Cualquiera", class: "input w-full" %>
+            include_blank: t("marketing.shared.any"), class: "input w-full" %>
     </div>
     <div>
       <label class="label">Email contiene</label>
@@ -123,8 +123,8 @@
     </p>
   <% end %>
 
-  <label class="flex items-center gap-2"><%= f.check_box :shared %> Compartido con el equipo</label>
+  <label class="flex items-center gap-2"><%= f.check_box :shared %> <%= t("marketing.shared.shared_with_team") %></label>
 
-  <%= f.submit segment.persisted? ? "Guardar" : "Crear segmento", class: "btn-primary" %>
-  <%= link_to "Cancelar", segment.persisted? ? segment_path(segment) : segments_path, class: "btn-secondary ml-2" %>
+  <%= f.submit segment.persisted? ? t("marketing.shared.save") : t("marketing.segments.form.create"), class: "btn-primary" %>
+  <%= link_to t("marketing.shared.cancel"), segment.persisted? ? segment_path(segment) : segments_path, class: "btn-secondary ml-2" %>
 <% end %>

@@ -61,13 +61,13 @@ RSpec.describe Marketing::Esp::MailjetWebhookRegistrar do
 
   it "recreates dead callbacks" do
     allow(http).to receive(:request).and_return(
-      success_response("Data" => [ {
+      success_response("Data" => [{
         "ID" => 2_173_940,
         "EventType" => "open",
         "Status" => "dead",
         "Version" => 1,
         "Url" => webhook_url
-      } ]),
+      }]),
       success_response("Count" => 1),
       success_response("Count" => 1),
       *Array.new(described_class::EVENT_TYPES.size - 1, success_response("Count" => 1))
@@ -83,13 +83,13 @@ RSpec.describe Marketing::Esp::MailjetWebhookRegistrar do
 
   it "removes callbacks for the workspace webhook URL" do
     allow(http).to receive(:request).and_return(
-      success_response("Data" => [ {
+      success_response("Data" => [{
         "ID" => 2_173_940,
         "EventType" => "open",
         "Status" => "alive",
         "Version" => 2,
         "Url" => webhook_url
-      } ]),
+      }]),
       success_response("Count" => 1)
     )
 

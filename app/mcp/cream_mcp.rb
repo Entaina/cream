@@ -1358,7 +1358,7 @@ module CreamMcp
                  "Returns available_fields and operators for create_stage_condition.",
     input_schema: {type: "object",
                    properties: {pipeline: {type: "string", description: "Optional pipeline name filter"},
-                                  stage: {type: "string", description: "Optional stage name filter"}}}
+                                stage: {type: "string", description: "Optional stage name filter"}}}
   ) do |server_context:, **args|
     return CreamMcp.feature_unavailable_response(:stage_conditions) unless CreamFeatures.enabled?(:stage_conditions)
 
@@ -1409,7 +1409,7 @@ module CreamMcp
         field: CreamMcp.arg(args, "field"),
         operator: CreamMcp.arg(args, "operator"),
         compare_value: CreamMcp.arg(args, "compare_value"),
-        active: CreamMcp.arg(args, "active").nil? ? true : CreamMcp.arg(args, "active"),
+        active: CreamMcp.arg(args, "active").nil? || CreamMcp.arg(args, "active"),
         position: CreamMcp.arg(args, "position") || 0
       )
       CreamMcp.authorize!(ctx, condition, :create?)

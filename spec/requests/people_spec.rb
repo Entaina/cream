@@ -430,7 +430,7 @@ RSpec.describe "People", type: :request do
           current_step: step,
           state: state,
           enrolled_at: enrolled_at,
-          next_run_at: (state == "waiting" ? 5.minutes.from_now : nil)
+          next_run_at: ((state == "waiting") ? 5.minutes.from_now : nil)
         )
         enrollment.update_column(:enrolled_at, enrolled_at)
         enrollment

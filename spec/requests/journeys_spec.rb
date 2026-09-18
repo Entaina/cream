@@ -44,8 +44,8 @@ RSpec.describe "Journeys", type: :request do
     let(:journey) do
       workspace.journeys.create!(name: "Nurture", entry_trigger: "manual", active: true, max_reenrollments: 0)
     end
-    let!(:first_step) { journey.steps.create!(position: 0, step_type: "wait", active: true, config: { "minutes" => 5 }) }
-    let!(:second_step) { journey.steps.create!(position: 1, step_type: "notify", active: true, config: { "message" => "Hola" }) }
+    let!(:first_step) { journey.steps.create!(position: 0, step_type: "wait", active: true, config: {"minutes" => 5}) }
+    let!(:second_step) { journey.steps.create!(position: 1, step_type: "notify", active: true, config: {"message" => "Hola"}) }
     let!(:enrollment) do
       JourneyEnrollment.create!(
         workspace: workspace,
@@ -59,7 +59,7 @@ RSpec.describe "Journeys", type: :request do
     end
 
     it "lets admins move an enrollment to another step" do
-      patch journey_enrollment_path(journey, enrollment), params: { step_id: second_step.id }
+      patch journey_enrollment_path(journey, enrollment), params: {step_id: second_step.id}
 
       expect(response).to redirect_to(journey)
       follow_redirect!
@@ -79,7 +79,7 @@ RSpec.describe "Journeys", type: :request do
     it "does not move completed enrollments" do
       enrollment.update!(state: "completed", current_step: nil, next_run_at: nil)
 
-      patch journey_enrollment_path(journey, enrollment), params: { step_id: second_step.id }
+      patch journey_enrollment_path(journey, enrollment), params: {step_id: second_step.id}
 
       expect(response).to redirect_to(journey)
       follow_redirect!
@@ -89,9 +89,9 @@ RSpec.describe "Journeys", type: :request do
 
     it "blocks salespeople from changing enrollment steps" do
       sign_in_as(users(:two))
-      patch switch_workspace_path, params: { workspace_id: workspace.id }
+      patch switch_workspace_path, params: {workspace_id: workspace.id}
 
-      patch journey_enrollment_path(journey, enrollment), params: { step_id: second_step.id }
+      patch journey_enrollment_path(journey, enrollment), params: {step_id: second_step.id}
 
       expect(response).to have_http_status(:not_found)
       expect(enrollment.reload.current_step).to eq(first_step)

@@ -1,16 +1,14 @@
 module Marketing
   class ConditionEvaluator
-    OPERATORS = {
-      "eq" => "es igual a",
-      "neq" => "no es igual a",
-      "contains" => "contiene",
-      "gt" => "mayor que",
-      "gte" => "mayor o igual",
-      "lt" => "menor que",
-      "lte" => "menor o igual",
-      "blank" => "está vacío",
-      "present" => "tiene valor"
-    }.freeze
+    OPERATOR_KEYS = %w[eq neq contains gt gte lt lte blank present].freeze
+
+    def self.operator_label(key)
+      I18n.t("field_conditions.operators.#{key}", default: key.to_s)
+    end
+
+    def self.operator_options_for_select
+      OPERATOR_KEYS.map { |key| [operator_label(key), key] }
+    end
 
     def initialize(condition)
       @field = condition["field"].to_s

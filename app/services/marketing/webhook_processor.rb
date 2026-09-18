@@ -40,9 +40,9 @@ module Marketing
 
       case event_type
       when "open"
-        Marketing::ScoringEngine.apply_event!(person: person, event: "email_opened", metadata: { "email_message_id" => message.id })
+        Marketing::ScoringEngine.apply_event!(person: person, event: "email_opened", metadata: {"email_message_id" => message.id})
       when "click"
-        Marketing::ScoringEngine.apply_event!(person: person, event: "email_clicked", metadata: { "email_message_id" => message.id })
+        Marketing::ScoringEngine.apply_event!(person: person, event: "email_clicked", metadata: {"email_message_id" => message.id})
       end
     end
     private_class_method :apply_scoring!
@@ -63,7 +63,7 @@ module Marketing
         if payload.key?("Events") || payload.key?("events")
           Array(payload["Events"] || payload["events"])
         elsif payload["event"].present? || payload["EventType"].present?
-          [ payload ]
+          [payload]
         else
           []
         end

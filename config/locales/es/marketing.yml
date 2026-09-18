@@ -1,0 +1,480 @@
+---
+es:
+  marketing:
+    attribution:
+      page_title: Atribución
+    automations:
+      edit:
+        page_title: Editar automatización
+      form:
+        action_label: Entonces
+        add_condition: Añadir condición
+        condition_field_placeholder: campo
+        condition_value_placeholder: valor
+        conditions_hint: Cada fila debe coincidir exactamente. Déjalo vacío para ejecutar
+          en cada disparador.
+        conditions_label: Solo si (opcional)
+        due_date: Fecha de vencimiento
+        due_date_hint: Déjalo vacío para usar una semana por defecto.
+        email_body: Cuerpo del email
+        email_body_placeholder: Seguimiento del contacto.
+        email_hint: Se envía al email del registro (o su primer contacto). Requiere
+          que el registro tenga email.
+        email_subject: Asunto del email
+        hint_deal_stage_changed: Se dispara al cambiar la etapa de una oportunidad.
+          Las condiciones pueden usar <code>to</code> (nombre de la nueva etapa) o
+          cualquier campo de la oportunidad.
+        hint_record_created: Se dispara al crear una persona, empresa u oportunidad.
+          Las condiciones pueden usar cualquier campo del registro nuevo.
+        hint_task_completed: Se dispara al completar una tarea. Las condiciones pueden
+          usar <code>title</code> (título de la tarea).
+        remove_condition: Quitar condición
+        slack_hint_html: Publica un mensaje en Slack con el nombre de esta automatización.
+          <strong>Requiere la integración de Slack activada</strong>; hasta entonces
+          no hace nada.
+        task_title: Título de la tarea
+        task_title_placeholder: Seguimiento
+        trigger_label: Cuando ocurre
+      index:
+        active: Activa
+        if_conditions: " si %{conditions}"
+        inactive: Inactiva
+        new: Nueva automatización
+        page_title: Automatizaciones
+        then_html: " → <strong>%{action}</strong>"
+        when_html: Cuando <strong>%{trigger}</strong>
+      new:
+        page_title: Nueva automatización
+    campaign_statuses:
+      draft: Borrador
+      scheduled: Programada
+      sending: Enviando
+      sent: Enviada
+    campaigns:
+      edit:
+        page_title: Editar campaña
+        view: Ver campaña
+      form:
+        create: Crear campaña
+        goal: Objetivo
+        goal_placeholder: Generar leads cualificados para el producto X
+        name: Nombre
+        name_placeholder: Newsletter marzo
+        starts_on: Fecha de inicio
+        status: Estado
+        utm_campaign: UTM campaign
+        utm_content: UTM content
+        utm_medium: UTM medium
+        utm_source: UTM source
+        utm_term: UTM term
+      index:
+        delete_confirm: "¿Eliminar la campaña «%{name}»?"
+        empty_subtitle: Crea una campaña para enviar emails a segmentos, hacer pruebas
+          A/B y medir aperturas y clics.
+        empty_title: Sin campañas
+        new: Nueva campaña
+        page_title: Campañas
+      new:
+        page_title: Nueva campaña
+      show:
+        ab_legend: Prueba A/B (opcional)
+        ab_override_hint: Si rellenas los asuntos A/B, sustituyen al asunto del contenido
+          de la campaña.
+        based_on_template: Basado en plantilla
+        cancel_scheduled: Cancelar programado
+        cancel_send: Cancelar
+        cancel_send_confirm: "¿Cancelar este envío?"
+        col_date: Fecha
+        col_delivery: Entrega
+        col_result: Resultado
+        col_segment: Segmento
+        col_status: Estado
+        col_variants: Variantes
+        delete_confirm: "¿Eliminar la campaña «%{name}»?"
+        delivery_mode: Tipo de entrega
+        delivery_mode_hint: Elige enviar un email, inscribir en un recorrido, o ambas
+          acciones.
+        edit_campaign_link: Edita la campaña
+        edit_content: Editar contenido
+        email_content_heading: Contenido del email
+        email_content_warning: Configura el contenido del email antes de encolar un
+          envío con email.
+        journey: Recorrido
+        journey_hint: Las personas del segmento se inscribirán en este recorrido.
+        layout: Layout
+        mark_winner: Marcar ganadora
+        no_email_content_html: Aún no hay contenido de email. %{link} para redactar
+          el envío o elegir una plantilla como base.
+        no_layout: Sin layout
+        person_segment: Segmento de personas
+        queue_send: Encolar envío
+        recipients_match: destinatarios coinciden con el segmento.
+        resend_failed: Reenviar fallidos
+        retry: Reintentar
+        schedule_hint: Déjalo vacío para ejecutar de inmediato.
+        schedule_optional: Programar envío (opcional)
+        select_journey: Selecciona un recorrido
+        select_segment: Selecciona un segmento
+        send_heading: Enviar campaña
+        send_history: Historial de envíos
+        send_history_empty: Aún no hay envíos para esta campaña.
+        send_test: Enviar prueba
+        send_winner_confirm: "¿Enviar la variante ganadora a quienes aún no la recibieron?"
+        send_winner_rest: Enviar ganadora al resto
+        stat_clicks: Clics
+        stat_opened: Abiertos
+        stat_sent: Enviados
+        subject: Asunto
+        subscription_hint: Solo se enviará a contactos suscritos a este tipo.
+        subscription_type: Tipo de suscripción
+        test_body_optional: Cuerpo prueba (opcional)
+        test_description: Usa el contenido guardado en la campaña. Opcionalmente puedes
+          probar otro asunto o cuerpo.
+        test_heading: Enviar prueba a tu email
+        test_subject_optional: Asunto prueba (opcional)
+        test_subject_placeholder: Sustituye asunto de la campaña
+        variant_a_body: Cuerpo variante A
+        variant_a_subject: Asunto variante A
+        variant_a_weight: Peso A (%)
+        variant_b_body: Cuerpo variante B
+        variant_b_subject: Asunto variante B
+        variant_b_weight: Peso B (%)
+        view_attribution: Ver atribución
+        winner_badge: Ganadora
+    delivery_modes:
+      both: Email + recorrido
+      email: Email
+      journey: Recorrido
+    enrollment_states:
+      active: Activo
+      cancelled: Cancelado
+      completed: Completado
+      waiting: En espera
+    journey_steps:
+      add_to_list: Añadir a lista «%{name}»
+      adjust_score: "%{points} pts"
+      branch: Condición → paso %{true_step} / %{false_step}
+      next_step: siguiente
+      notify_user: Notificar usuario
+      send_labeled: Enviar «%{label}»
+      send_template: Enviar «%{name}»
+      set_field: "%{field}: %{value}"
+      task: 'Tarea: %{title}'
+      task_untitled: sin título
+      template_fallback: plantilla
+      wait: Esperar %{duration}
+    journey_triggers:
+      booking_created: Reserva creada
+      email_clicked: Clic en email
+      lead_form_submitted: Formulario enviado
+      lifecycle_changed: Cambio de ciclo de vida
+      manual: Manual
+      segment_entry: Entrada en segmento
+    journeys:
+      edit:
+        page_title: Editar recorrido
+      form:
+        add_step: Añadir paso
+        any_form: Cualquier formulario
+        any_page: Cualquier página
+        booking_page: Página de reservas
+        create: Crear recorrido
+        email_link_contains: URL del enlace (contiene)
+        entry_condition_legend: Condición de entrada
+        entry_trigger: Disparador de entrada
+        lead_form: Formulario de captación
+        lifecycle_from: Ciclo de vida anterior
+        lifecycle_to: Ciclo de vida nuevo
+        max_reenrollments: Reinscripciones máximas
+        max_reenrollments_hint: 0 = solo una vez por contacto.
+        name_placeholder: Bienvenida nuevos leads
+        product_output: Producto (salida comercial)
+        segment: Segmento
+        select_segment: Selecciona segmento
+        steps_legend: Pasos
+        stop_on_open_deal: Salir del recorrido si hay oportunidad abierta del producto
+      index:
+        delete_confirm: "¿Eliminar el recorrido «%{name}»?"
+        empty_subtitle: Automatiza secuencias de emails, esperas y tareas cuando se
+          cumplan disparadores de marketing.
+        empty_title: Sin recorridos
+        new: Nuevo recorrido
+        page_title: Recorridos
+      new:
+        page_title: Nuevo recorrido
+      show:
+        col_contact: Contacto
+        col_started: Inicio
+        col_state: Estado
+        col_step: Paso
+        contact: Contacto
+        delete_confirm: "¿Eliminar el recorrido «%{name}»?"
+        manual_enroll_heading: Inscribir contacto manualmente
+        no_steps: Sin pasos configurados.
+        recent_enrollments: Inscripciones recientes
+        stat_active: Activas
+        stat_completed: Completadas
+        stat_enrollments: Inscripciones
+        stat_waiting: En espera
+        steps_heading: Pasos del recorrido
+        trigger: 'Disparador:'
+      step_fields:
+        branch_false: Si no cumple → paso (ID)
+        branch_hint: Evalúa una condición sobre el contacto y salta al paso indicado.
+        branch_true: Si cumple → paso (ID)
+        due_in_days: Vence en (días)
+        field: Campo
+        message: Mensaje
+        message_placeholder: Paso completado para {nombre}
+        notify_user: Usuario a notificar
+        person_list: Lista de personas
+        position: Posición
+        score_points: Puntos de puntuación
+        score_points_placeholder: 10 o -5
+        step_type: Tipo de paso
+        subscription_type: Tipo de suscripción
+        task_title: Título de la tarea
+        task_title_placeholder: Seguimiento comercial
+        wait_minutes: Esperar (minutos)
+    lead_form_templates:
+      edit:
+        page_title: Editar plantilla de formulario
+      index:
+        page_title: Plantillas de formularios públicos
+      new:
+        page_title: Nueva plantilla de formulario
+    lead_forms:
+      edit:
+        page_title: Editar formulario de captación
+      index:
+        email_to_lead: Email al lead
+        empty: Todavía no hay formularios configurados.
+        iframe_code: Código iframe
+        new: Nuevo formulario
+        page_title: Formularios de captación
+        pipeline: Pipeline
+        public_url: URL pública
+        responsible: Responsable
+        template: Plantilla
+        templates: Plantillas de formulario
+      new:
+        page_title: Nuevo formulario de captación
+    mqls:
+      index:
+        col_forms: Formularios
+        col_lifecycle: Lifecycle (scoring)
+        col_pending_interests: Intereses pendientes
+        col_score: Score
+        col_subscriptions: Suscripciones
+        col_visible_deals: Oportunidades visibles
+        empty_subtitle: Ajusta los filtros o captura contactos con permiso de marketing.
+        empty_title: No hay MQLs elegibles
+        interest_product: Interés en producto
+        lead_form_source: Formulario origen
+        open_deal_any: Cualquier oportunidad
+        open_deal_no: Sin oportunidad abierta
+        open_deal_product: Producto (oportunidad)
+        open_deal_yes: Con oportunidad abierta
+        page_title: Pool MQL
+        subscription_filter: Tipo suscripción (elegibilidad)
+    scoring_events:
+      booking_created: Reserva creada
+      deal_created: Oportunidad creada
+      email_clicked: Email clicado
+      email_opened: Email abierto
+      email_sent: Email enviado
+      form_field: Campo de formulario
+      lead_submission: Formulario enviado
+      page_view: Visita web
+    scoring_rules:
+      edit:
+        page_title: Editar regla
+      form:
+        conditions_heading: Condiciones adicionales
+        conditions_hint: Todas deben cumplirse además del tipo de evento.
+        create: Crear regla
+        decay_days: Decaimiento (días)
+        decay_hint: 0 = sin decaimiento.
+        event_type: Tipo de evento
+        event_type_hint: Deja vacío para aplicar la regla a cualquier evento que cumpla
+          las condiciones.
+        name_placeholder: Email abierto
+        points: Puntos
+      index:
+        active: Activa
+        delete_confirm: "¿Eliminar la regla «%{name}»?"
+        empty_subtitle: Asigna puntos automáticamente cuando los contactos abren emails,
+          visitan páginas o envían formularios.
+        empty_title: Sin reglas de scoring
+        inactive: Inactiva
+        new: Nueva regla
+        page_title: Reglas de scoring
+        recalculate: Recalcular puntuaciones
+        recalculate_confirm: "¿Recalcular la puntuación de todos los contactos del
+          workspace?"
+      new:
+        page_title: Nueva regla
+    segment_filters:
+      capture_destination: destino %{value}
+      capture_values:
+        any: cualquiera
+        deal: Oportunidad
+        mql: MQL
+      dealt_product: historial producto %{id}
+      email_contains: email contiene «%{value}»
+      exclude_suppressed: sin suprimidos
+      interest_product: interés producto %{id}
+      lead_form: formulario %{id}
+      lead_score: puntuación %{min}-%{max}
+      lifecycle: ciclo %{stage}
+      none: Sin filtros
+      open_deal: 'oportunidad abierta: %{value}'
+      open_deal_product: sin oportunidad en producto %{id}
+      open_deal_values:
+        any: cualquiera
+        'no': 'no'
+        'yes': sí
+      opened_email: abrió email (%{days} días)
+      search: búsqueda «%{q}»
+      submitted_form: formulario «%{slug}»
+      visited_url: visitó URL «%{url}»
+    segments:
+      edit:
+        page_title: Editar segmento
+      form:
+        create: Crear segmento
+        exclude_suppressed: Excluir direcciones suprimidas
+        filter_capture_destination: Destino captura
+        filter_dealt_product: Historial comercial (producto)
+        filter_email_contains: Email contiene
+        filter_form_slug: Envió formulario (slug)
+        filter_interest_product: Interés en producto
+        filter_interest_status: Estado del interés
+        filter_lead_form: Formulario origen
+        filter_lifecycle: Ciclo de vida
+        filter_open_deal: Oportunidad abierta
+        filter_open_deal_product: Producto (oportunidad abierta)
+        filter_opened_email: Abrió email (últimos N días)
+        filter_score_max: Puntuación máxima
+        filter_score_min: Puntuación mínima
+        filter_search: Búsqueda
+        filter_visited_url: Visitó URL (contiene)
+        filters_legend: Filtros
+        interest_pending_default: Pendiente (por defecto)
+        name_placeholder: Leads cualificados
+        open_deal_any: Cualquiera
+        open_deal_no: 'No'
+        open_deal_yes: Sí
+        preview_html: 'Vista previa: <strong data-segment-preview-target="count">…</strong>
+          registros con los filtros guardados. Guarda los cambios para actualizar
+          el recuento.'
+        record_type: Tipo de registro
+        search_placeholder: Nombre o email
+      index:
+        delete_confirm: "¿Eliminar el segmento «%{name}»?"
+        empty_subtitle: Define audiencias dinámicas por ciclo de vida, puntuación,
+          actividad de email y más.
+        empty_title: Sin segmentos
+        new: Nuevo segmento
+        page_title: Segmentos
+      new:
+        page_title: Nuevo segmento
+      show:
+        col_name: Nombre
+        delete_confirm: "¿Eliminar el segmento «%{name}»?"
+        empty_subtitle: Ningún registro cumple los filtros actuales de este segmento.
+        empty_title: Sin coincidencias
+        match_count_html: "<strong>%{count}</strong> registros coinciden con este
+          segmento."
+    send_stats:
+      failed: "%{count} fallidos"
+      journey_blocked: "%{count} bloqueados"
+      journey_enrolled: "%{count} inscritos en recorrido"
+      journey_feature_disabled: "%{count} función deshabilitada"
+      journey_inactive: "%{count} inactivos"
+      journey_max_reenrollments: "%{count} máximo de reinscripciones"
+      journey_no_steps: "%{count} sin pasos"
+      sent: "%{count} enviados"
+      skipped: "%{count} omitidos"
+    send_statuses:
+      cancelled: Cancelado
+      failed: Fallido
+      pending: Pendiente
+      scheduled: Programado
+      sending: Enviando
+      sent: Enviado
+    shared:
+      activate: Activar
+      active: Activo
+      add_condition: Añadir condición
+      any: Cualquiera
+      any_event: Cualquier evento
+      cancel: Cancelar
+      clear: Limpiar
+      company: Empresa
+      contact_owner: Propietario del contacto
+      convert_to_sql: Convertir a SQL
+      copied: Copiado
+      copy_clipboard: Copiar al portapapeles
+      deal_badge: Oportunidad
+      decay_in_days: decae en %{count} días
+      default: Por defecto
+      delete: Eliminar
+      delete_condition: Eliminar condición
+      delete_step: Eliminar paso
+      description: Descripción
+      edit: Editar
+      em_dash: "—"
+      email: Email
+      enroll: Inscribir
+      inactive: Inactivo
+      lifecycle: Ciclo de vida
+      lifecycle_field: Ciclo de vida
+      mql_badge: MQL
+      name: Nombre
+      no_email: Sin email
+      none: Ninguno
+      pause: Pausar
+      person: Persona
+      pts: pts
+      save: Guardar
+      search_placeholder: Buscar...
+      select_contact: Selecciona un contacto
+      select_list: Selecciona lista
+      select_value: Selecciona valor
+      shared_with_team: Compartido con el equipo
+      steps_count: "%{count} pasos"
+      trigger_label: 'Disparador:'
+      utm_prefix: 'UTM:'
+      value: Valor
+      view: Ver
+      view_consent: Ver consentimiento
+      with_company: Con empresa
+    step_types:
+      add_to_segment: Añadir a lista
+      adjust_score: Ajustar puntuación
+      branch: Condición
+      create_task: Crear tarea
+      notify: Notificar
+      send_email: Enviar email
+      set_field: Establecer campo
+      wait: Esperar
+    subscription_types:
+      edit:
+        page_title: Editar tipo de suscripción
+      index:
+        delete_confirm: "¿Eliminar el tipo «%{name}»?"
+        empty_subtitle: Define categorías de comunicación (newsletter, promociones,
+          etc.) para gestionar el consentimiento.
+        empty_title: Sin tipos de suscripción
+        new: Nuevo tipo
+        page_title: Tipos de suscripción
+      new:
+        page_title: Nuevo tipo de suscripción
+    wait_duration:
+      n_days: "%{count} días"
+      n_hours: "%{count} h"
+      n_minutes: "%{count} min"
+      one_day: 1 día
+      one_hour: 1 h
+      one_minute: 1 min

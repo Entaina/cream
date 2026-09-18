@@ -10,8 +10,8 @@ RSpec.describe Marketing::JourneyStepMover do
   let(:journey) do
     workspace.journeys.create!(name: "Nurture", entry_trigger: "manual", active: true, max_reenrollments: 0)
   end
-  let!(:first_step) { journey.steps.create!(position: 0, step_type: "wait", active: true, config: { "minutes" => 5 }) }
-  let!(:second_step) { journey.steps.create!(position: 1, step_type: "wait", active: true, config: { "minutes" => 10 }) }
+  let!(:first_step) { journey.steps.create!(position: 0, step_type: "wait", active: true, config: {"minutes" => 5}) }
+  let!(:second_step) { journey.steps.create!(position: 1, step_type: "wait", active: true, config: {"minutes" => 10}) }
   let(:enrollment) do
     JourneyEnrollment.create!(
       workspace: workspace,
@@ -50,7 +50,7 @@ RSpec.describe Marketing::JourneyStepMover do
 
   it "rejects steps from another journey" do
     other = workspace.journeys.create!(name: "Other", entry_trigger: "manual", active: true)
-    foreign_step = other.steps.create!(position: 0, step_type: "wait", active: true, config: { "minutes" => 1 })
+    foreign_step = other.steps.create!(position: 0, step_type: "wait", active: true, config: {"minutes" => 1})
 
     expect(described_class.move!(enrollment: enrollment, step: foreign_step)).to eq(:invalid_step)
     expect(enrollment.reload.current_step).to eq(first_step)

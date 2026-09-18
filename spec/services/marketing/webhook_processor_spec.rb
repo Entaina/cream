@@ -20,7 +20,7 @@ RSpec.describe Marketing::WebhookProcessor do
   it "records email events from webhook payload" do
     payload = {
       "Events" => [
-        { "event" => "open", "CustomID" => message.id.to_s, "time" => Time.current.iso8601 }
+        {"event" => "open", "CustomID" => message.id.to_s, "time" => Time.current.iso8601}
       ]
     }
 
@@ -33,7 +33,7 @@ RSpec.describe Marketing::WebhookProcessor do
 
   it "records events from a Mailjet Version 2 array payload" do
     payload = [
-      { "event" => "open", "CustomID" => message.id.to_s, "time" => 1_433_103_519 }
+      {"event" => "open", "CustomID" => message.id.to_s, "time" => 1_433_103_519}
     ]
 
     expect {
@@ -61,7 +61,7 @@ RSpec.describe Marketing::WebhookProcessor do
   it "ignores non-hash entries in the payload" do
     payload = [
       "invalid",
-      { "event" => "open", "CustomID" => message.id.to_s, "time" => Time.current.iso8601 }
+      {"event" => "open", "CustomID" => message.id.to_s, "time" => Time.current.iso8601}
     ]
 
     expect {
@@ -72,7 +72,7 @@ RSpec.describe Marketing::WebhookProcessor do
   it "ignores events for messages outside the given workspace" do
     payload = {
       "Events" => [
-        { "event" => "open", "CustomID" => message.id.to_s, "time" => Time.current.iso8601 }
+        {"event" => "open", "CustomID" => message.id.to_s, "time" => Time.current.iso8601}
       ]
     }
 
@@ -84,7 +84,7 @@ RSpec.describe Marketing::WebhookProcessor do
   it "suppresses addresses on hard bounces" do
     payload = {
       "Events" => [
-        { "event" => "bounce", "CustomID" => message.id.to_s, "email" => person.email, "time" => Time.current.iso8601 }
+        {"event" => "bounce", "CustomID" => message.id.to_s, "email" => person.email, "time" => Time.current.iso8601}
       ]
     }
 

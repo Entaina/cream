@@ -3,8 +3,11 @@ en:
   pipelines:
     card_fields:
       products: Products and editions
-    duplicate_confirm: "Duplicate %{name}? Only the stages are copied, not the deals."
-    duplicate_name_suffix: ' (copy)'
+    duplicate_confirm: Duplicate %{name}? Only the stages are copied, not the deals.
+    duplicate_name_suffix: " (copy)"
+    edit:
+      page_title: Edit %{name}
+      title: Edit %{name}
     flash:
       created: Pipeline created.
       created_from_template: Pipeline created from template.
@@ -30,7 +33,7 @@ en:
       won: Won
     index:
       default_badge: Default
-      delete_confirm: "Delete %{name}?"
+      delete_confirm: Delete %{name}?
       duplicate: Duplicate
       edit: Edit
       empty_subtitle: Create a pipeline with its stages and win probabilities.
@@ -42,9 +45,6 @@ en:
     new:
       page_title: New pipeline
       title: New pipeline
-    edit:
-      page_title: 'Edit %{name}'
-      title: 'Edit %{name}'
     stage_row:
       drag_reorder: Reorder stage
       entry_conditions: Entry conditions for this stage

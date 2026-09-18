@@ -25,7 +25,8 @@ es:
       created: Campaña creada.
       deleted: Campaña eliminada.
       missing_email_content: Añade asunto y cuerpo del email antes de enviar.
-      missing_email_content_test: Añade asunto y cuerpo del email antes de enviar una prueba.
+      missing_email_content_test: Añade asunto y cuerpo del email antes de enviar
+        una prueba.
       pick_active_journey: Selecciona un recorrido activo.
       segment_must_be_people: El segmento debe ser de personas.
       send_cancelled: Envío cancelado.
@@ -46,9 +47,9 @@ es:
       merged: Se fusionaron %{count} empresas duplicadas en %{name}.
       updated: Empresa actualizada.
     deal_accesses:
-      collaborator_added: '%{name} añadido como colaborador.'
+      already_has_access: "%{name} ya tiene acceso a esta oportunidad."
+      collaborator_added: "%{name} añadido como colaborador."
       collaborator_removed: Colaborador eliminado.
-      already_has_access: '%{name} ya tiene acceso a esta oportunidad.'
       owner_has_access: El propietario de la oportunidad ya tiene acceso.
     deal_products:
       added: Producto añadido.
@@ -78,8 +79,10 @@ es:
     gmail:
       connect_first: Conecta Gmail primero.
       disconnected: Gmail desconectado.
-      grant_inbox_for_replies: Concede acceso a la bandeja de entrada antes de sincronizar respuestas.
-      grant_inbox_for_reply_detection: Concede acceso a la bandeja de entrada antes de activar la detección de respuestas.
+      grant_inbox_for_replies: Concede acceso a la bandeja de entrada antes de sincronizar
+        respuestas.
+      grant_inbox_for_reply_detection: Concede acceso a la bandeja de entrada antes
+        de activar la detección de respuestas.
       reconnect_for_send: Vuelve a conectar Gmail para conceder permiso de envío.
       settings_updated: Ajustes de Gmail actualizados.
       sync_started: Sincronización de bandeja iniciada.
@@ -124,14 +127,15 @@ es:
       all_read: Todas las notificaciones marcadas como leídas.
     oauth:
       calendar_booking_disabled: Las reservas con calendario no están habilitadas.
-      calendar_connected: Google Calendar conectado para %{email}.
       calendar_connect_failed: No se pudo conectar Google Calendar.
+      calendar_connected: Google Calendar conectado para %{email}.
       calendar_sign_in_first: Inicia sesión primero para conectar Google Calendar.
-      gmail_connected: Gmail conectado para %{email}.
       gmail_connect_failed: No se pudo conectar Gmail.
+      gmail_connected: Gmail conectado para %{email}.
       gmail_sign_in_first: Inicia sesión primero para conectar Gmail.
-      sign_in_session_expired: La sesión de inicio de sesión ha caducado. Abre la app desde la misma URL que usas en OAuth de Google e inténtalo de nuevo.
       google_sign_in_failed: No se pudo iniciar sesión con Google.
+      sign_in_session_expired: La sesión de inicio de sesión ha caducado. Abre la
+        app desde la misma URL que usas en OAuth de Google e inténtalo de nuevo.
     people:
       created: Contacto creado.
       deleted: Contacto eliminado.
@@ -156,7 +160,7 @@ es:
       follow_up_cleared: Marcado como respondido; recordatorio de seguimiento eliminado.
       scheduled_cancelled: Email programado cancelado.
     registrations:
-      welcome: '¡Bienvenido a Cream!'
+      welcome: "¡Bienvenido a Cream!"
     reports:
       deleted: Informe eliminado.
       saved: Informe guardado.
@@ -164,7 +168,8 @@ es:
     sales_briefings:
       ai_not_configured: La IA no está configurada. Configura CREAM_AI_API_KEY.
       daily_limit: Has alcanzado el límite de 5 regeneraciones diarias.
-      disabled_for_user: Has desactivado el briefing del director de ventas en tu perfil.
+      disabled_for_user: Has desactivado el briefing del director de ventas en tu
+        perfil.
       not_enabled: El director de ventas no está habilitado para este workspace.
     saved_views:
       deleted: Vista eliminada.

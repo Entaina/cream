@@ -5,7 +5,7 @@ module Marketing
 
       JourneyEnrollment.due.includes(:journey, :person, :current_step).find_each do |enrollment|
         new(enrollment).advance!
-      rescue StandardError => e
+      rescue => e
         record_runner_error!(enrollment, e)
       end
     end
@@ -102,7 +102,7 @@ module Marketing
       end
 
       move_next!
-    rescue StandardError => e
+    rescue => e
       record_step_error!("send_email", e.message, error_class: e.class.name)
     end
 

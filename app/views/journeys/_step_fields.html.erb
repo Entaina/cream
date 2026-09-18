@@ -110,7 +110,7 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
       <%= text_field_tag "#{condition_prefix}[field]", condition["field"], placeholder: "person.lead_score", class: "input w-full" %>
       <%= select_tag "#{condition_prefix}[operator]",
-            options_for_select(Marketing::ConditionEvaluator::OPERATORS.map { |k, v| [ v, k ] }, condition["operator"]),
+            options_for_select(Marketing::ConditionEvaluator.operator_options_for_select, condition["operator"]),
             class: "input w-full" %>
       <%= text_field_tag "#{condition_prefix}[compare_value]", condition["compare_value"], class: "input w-full" %>
     </div>

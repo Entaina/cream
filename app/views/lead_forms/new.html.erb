@@ -1,5 +1,5 @@
-<% page_title "Nuevo formulario de captación" %>
-<%= render "shared/page_header", title: "Nuevo formulario de captación", icon_name: :globe %>
+<% page_title t("marketing.lead_forms.new.page_title") %>
+<%= render "shared/page_header", title: t("marketing.lead_forms.new.page_title"), icon_name: :globe %>
 
 <div class="flex-1 overflow-y-auto scrollbar-subtle p-5">
   <%= render "form", lead_form: @lead_form %>

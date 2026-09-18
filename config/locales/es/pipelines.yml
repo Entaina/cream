@@ -4,7 +4,10 @@ es:
     card_fields:
       products: Productos y ediciones
     duplicate_confirm: "¿Duplicar %{name}? Solo se copian las etapas, no las oportunidades."
-    duplicate_name_suffix: ' (copia)'
+    duplicate_name_suffix: " (copia)"
+    edit:
+      page_title: Editar %{name}
+      title: Editar %{name}
     flash:
       created: Pipeline creado.
       created_from_template: Pipeline creado desde plantilla.
@@ -42,9 +45,6 @@ es:
     new:
       page_title: Nuevo pipeline
       title: Nuevo pipeline
-    edit:
-      page_title: 'Editar %{name}'
-      title: 'Editar %{name}'
     stage_row:
       drag_reorder: Reordenar etapa
       entry_conditions: Condiciones de entrada de esta etapa

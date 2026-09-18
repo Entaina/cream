@@ -43,7 +43,7 @@ class MailjetConnectionsController < ApplicationController
   def save_connection(notice)
     if @mailjet_connection.save
       webhook_notice = sync_mailjet_webhooks!
-      redirect_to settings_workspace_path, notice: [ notice, webhook_notice ].compact.join(" ")
+      redirect_to settings_workspace_path, notice: [notice, webhook_notice].compact.join(" ")
     else
       render "settings/workspace/show", status: :unprocessable_entity
     end

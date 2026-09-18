@@ -100,7 +100,7 @@ RSpec.describe Marketing::JourneyRunner do
       email_journey = workspace.journeys.create!(name: "Wait then email", entry_trigger: "manual", active: true, max_reenrollments: 0)
       email_journey.steps.destroy_all
       email_journey.steps.create!(position: 0, step_type: "wait", active: true, config: {"minutes" => 5})
-      email_step = email_journey.steps.create!(
+      email_journey.steps.create!(
         position: 1,
         step_type: "send_email",
         active: true,

@@ -1,4 +1,4 @@
-<% page_title "Atribución" %>
+<% page_title t("marketing.attribution.page_title") %>
 <% totals = @rows.each_with_object({ visits: 0, leads: 0, mqls: 0, deals: 0, revenue: 0.0 }) do |row, sum|
   sum[:visits] += row.visits
   sum[:leads] += row.leads

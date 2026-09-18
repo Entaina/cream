@@ -170,7 +170,7 @@ RSpec.describe StageCondition, type: :model do
         expect(messages.first).to include("No se puede pasar a «Qualified»")
         expect(messages.first).to include("Importe debe ser mayor que 1000")
         expect(messages.first).to include("Fecha de cierre prevista debe tener valor")
-        expect(messages.first.scan(/No se puede pasar/).size).to eq(1)
+        expect(messages.first.scan("No se puede pasar").size).to eq(1)
       }
     end
 

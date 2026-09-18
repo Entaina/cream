@@ -47,7 +47,7 @@ RSpec.describe "Public email events webhook", type: :request do
   end
 
   it "rejects requests without a valid token" do
-    post public_email_events_path, params: { Events: [] }.to_json, headers: mailjet_headers
+    post public_email_events_path, params: {Events: []}.to_json, headers: mailjet_headers
 
     expect(response).to have_http_status(:unauthorized)
   end
@@ -55,7 +55,7 @@ RSpec.describe "Public email events webhook", type: :request do
   it "accepts Mailjet-style event payloads with token without CSRF token" do
     payload = {
       Events: [
-        { event: "open", CustomID: message.id.to_s, time: Time.current.iso8601 }
+        {event: "open", CustomID: message.id.to_s, time: Time.current.iso8601}
       ]
     }
 
@@ -68,7 +68,7 @@ RSpec.describe "Public email events webhook", type: :request do
 
   it "accepts Mailjet Version 2 array payloads" do
     payload = [
-      { event: "open", CustomID: message.id.to_s, time: 1_433_103_519, MessageID: 19_421_777_396_190_490 }
+      {event: "open", CustomID: message.id.to_s, time: 1_433_103_519, MessageID: 19_421_777_396_190_490}
     ]
 
     expect {
@@ -107,7 +107,7 @@ RSpec.describe "Public email events webhook", type: :request do
     )
     payload = {
       Events: [
-        { event: "open", CustomID: message.id.to_s, time: Time.current.iso8601 }
+        {event: "open", CustomID: message.id.to_s, time: Time.current.iso8601}
       ]
     }
 

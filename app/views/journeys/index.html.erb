@@ -1,15 +1,15 @@
-<% page_title "Recorridos" %>
+<% page_title t("marketing.journeys.index.page_title") %>
 <% actions = capture do %>
   <%= link_to new_journey_path, class: "btn-primary" do %>
-    <%= icon :plus, classes: "size-3.5" %> Nuevo recorrido
+    <%= icon :plus, classes: "size-3.5" %> <%= t("marketing.journeys.index.new") %>
   <% end %>
 <% end %>
-<%= render "shared/page_header", title: "Recorridos", icon_name: :zap, count: @journeys.size, actions: actions %>
+<%= render "shared/page_header", title: t("marketing.journeys.index.page_title"), icon_name: :zap, count: @journeys.size, actions: actions %>
 
 <div class="flex-1 overflow-y-auto scrollbar-subtle p-5 space-y-3">
   <% if @journeys.empty? %>
-    <%= render "shared/empty_state", icon_name: :zap, title: "Sin recorridos",
-          subtitle: "Automatiza secuencias de emails, esperas y tareas cuando se cumplan disparadores de marketing." %>
+    <%= render "shared/empty_state", icon_name: :zap, title: t("marketing.journeys.index.empty_title"),
+          subtitle: t("marketing.journeys.index.empty_subtitle") %>
   <% else %>
     <% @journeys.each do |journey| %>
       <article class="card p-4">
@@ -17,16 +17,16 @@
           <h2 class="font-semibold text-base">
             <%= link_to journey.name, journey, class: "hover:underline" %>
           </h2>
-          <%= badge journey.active? ? "Activo" : "Inactivo", color: journey.active? ? "green" : "chicago" %>
+          <%= badge journey.active? ? t("marketing.shared.active") : t("marketing.shared.inactive"), color: journey.active? ? "green" : "chicago" %>
           <div class="ml-auto flex gap-2">
-            <%= link_to "Editar", edit_journey_path(journey), class: "btn-secondary" %>
-            <%= button_to "Eliminar", journey_path(journey), method: :delete, class: "btn-danger",
-                  form: { data: { turbo_confirm: "¿Eliminar el recorrido «#{journey.name}»?" } } %>
+            <%= link_to t("marketing.shared.edit"), edit_journey_path(journey), class: "btn-secondary" %>
+            <%= button_to t("marketing.shared.delete"), journey_path(journey), method: :delete, class: "btn-danger",
+                  form: { data: { turbo_confirm: t("marketing.journeys.index.delete_confirm", name: journey.name) } } %>
           </div>
         </div>
         <p class="text-sm text-ink-faint mt-1">
-          Disparador: <strong><%= journey_trigger_label(journey.entry_trigger) %></strong>
-          · <%= journey.steps.size %> pasos
+          <%= t("marketing.shared.trigger_label") %> <strong><%= journey_trigger_label(journey.entry_trigger) %></strong>
+          · <%= t("marketing.shared.steps_count", count: journey.steps.size) %>
         </p>
       </article>
     <% end %>
