@@ -70,7 +70,7 @@ class CompaniesController < ApplicationController
 
     if @company.save
       respond_to do |format|
-        format.html { redirect_to @company, notice: "Company created." }
+        format.html { redirect_to @company, notice: t("flashes.companies.created") }
         format.json { render json: {id: @company.id, name: @company.name}, status: :created }
       end
     else
@@ -88,7 +88,7 @@ class CompaniesController < ApplicationController
   def update
     authorize @company
     if @company.update(company_params)
-      redirect_to @edit_section ? company_path(@company, tab: "information") : @company, notice: "Company updated."
+      redirect_to @edit_section ? company_path(@company, tab: "information") : @company, notice: t("flashes.companies.updated")
     else
       render :edit, status: :unprocessable_entity
     end
@@ -97,7 +97,7 @@ class CompaniesController < ApplicationController
   def destroy
     authorize @company
     @company.destroy
-    redirect_to companies_path, notice: "Company deleted.", status: :see_other
+    redirect_to companies_path, notice: t("flashes.companies.deleted"), status: :see_other
   end
 
   def duplicates
@@ -119,7 +119,7 @@ class CompaniesController < ApplicationController
       end
 
       CompanyMerger.call(primary: @company, secondaries: secondaries, user: current_user)
-      redirect_to @company, notice: "Merged #{secondaries.size} duplicate #{"company".pluralize(secondaries.size)} into #{@company.name}.", status: :see_other
+      redirect_to @company, notice: t("flashes.companies.merged", count: secondaries.size, name: @company.name), status: :see_other
     else
       @selected_secondary_ids = Array(params[:secondary_ids]).map(&:to_i).uniq - [@company.id]
     end

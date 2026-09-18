@@ -115,7 +115,7 @@ RSpec.describe "OmniauthCallbacks", type: :request do
       get "/auth/failure"
 
       expect(response).to redirect_to(new_session_path)
-      expect(flash[:alert]).to eq("Could not sign in with Google.")
+      expect(flash[:alert]).to eq(I18n.t("flashes.oauth.google_sign_in_failed"))
     end
   end
 end

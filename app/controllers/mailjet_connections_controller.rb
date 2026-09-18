@@ -25,7 +25,7 @@ class MailjetConnectionsController < ApplicationController
     authorize @mailjet_connection
     remove_mailjet_webhooks!
     @mailjet_connection.destroy
-    redirect_to settings_workspace_path, notice: "Mailjet desconectado.", status: :see_other
+    redirect_to settings_workspace_path, notice: t("flashes.mailjet.disconnected"), status: :see_other
   end
 
   private

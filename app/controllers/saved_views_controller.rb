@@ -16,7 +16,7 @@ class SavedViewsController < ApplicationController
     authorize @saved_view
 
     if @saved_view.save
-      redirect_to @saved_view.records_path(surface: saved_view_surface), notice: "View saved."
+      redirect_to @saved_view.records_path(surface: saved_view_surface), notice: t("flashes.saved_views.saved")
     else
       redirect_to fallback_index_path, alert: @saved_view.errors.full_messages.to_sentence
     end
@@ -27,7 +27,7 @@ class SavedViewsController < ApplicationController
     @saved_view.assign_attributes(saved_view_params) if params[:saved_view].present?
 
     if @saved_view.save
-      redirect_to @saved_view.records_path(surface: saved_view_surface), notice: "View updated."
+      redirect_to @saved_view.records_path(surface: saved_view_surface), notice: t("flashes.saved_views.updated")
     else
       redirect_to @saved_view.records_path(surface: saved_view_surface), alert: @saved_view.errors.full_messages.to_sentence
     end
@@ -36,7 +36,7 @@ class SavedViewsController < ApplicationController
   def destroy
     record_type = @saved_view.record_type
     @saved_view.destroy
-    redirect_to fallback_index_path(record_type), notice: "View deleted.", status: :see_other
+    redirect_to fallback_index_path(record_type), notice: t("flashes.saved_views.deleted"), status: :see_other
   end
 
   private

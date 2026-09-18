@@ -85,7 +85,7 @@ RSpec.describe "People merge", type: :request do
 
       expect(response).to redirect_to(person_path(primary))
       follow_redirect!
-      expect(response.body).to include("Merged 1 duplicate contact")
+      expect(response.body).to include(I18n.t("flashes.people.merged", count: 1, name: primary.display_name))
       expect(Person.exists?(secondary.id)).to be(false)
     end
 

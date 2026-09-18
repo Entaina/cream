@@ -26,7 +26,7 @@ class SegmentsController < ApplicationController
     @segment = current_workspace.segments.new(segment_params.merge(user: current_user))
     authorize @segment
     if @segment.save
-      redirect_to @segment, notice: "Segmento creado."
+      redirect_to @segment, notice: t("flashes.segments.created")
     else
       render :new, status: :unprocessable_entity
     end
@@ -39,7 +39,7 @@ class SegmentsController < ApplicationController
   def update
     authorize @segment
     if @segment.update(segment_params)
-      redirect_to @segment, notice: "Segmento actualizado."
+      redirect_to @segment, notice: t("flashes.segments.updated")
     else
       render :edit, status: :unprocessable_entity
     end
@@ -48,7 +48,7 @@ class SegmentsController < ApplicationController
   def destroy
     authorize @segment
     @segment.destroy
-    redirect_to segments_path, notice: "Segmento eliminado.", status: :see_other
+    redirect_to segments_path, notice: t("flashes.segments.deleted"), status: :see_other
   end
 
   def preview

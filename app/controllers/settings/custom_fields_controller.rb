@@ -27,7 +27,7 @@ module Settings
       authorize [:settings, @custom_field]
 
       if @custom_field.save
-        redirect_to settings_custom_fields_path, notice: "Custom field created."
+        redirect_to settings_custom_fields_path, notice: t("flashes.settings.custom_field_created")
       else
         render :new, status: :unprocessable_entity
       end
@@ -41,7 +41,7 @@ module Settings
       authorize [:settings, @custom_field]
 
       if @custom_field.update(custom_field_params)
-        redirect_to settings_custom_fields_path, notice: "Custom field updated."
+        redirect_to settings_custom_fields_path, notice: t("flashes.settings.custom_field_updated")
       else
         render :edit, status: :unprocessable_entity
       end
@@ -50,7 +50,7 @@ module Settings
     def destroy
       authorize [:settings, @custom_field]
       @custom_field.destroy
-      redirect_to settings_custom_fields_path, notice: "Custom field deleted.", status: :see_other
+      redirect_to settings_custom_fields_path, notice: t("flashes.settings.custom_field_deleted"), status: :see_other
     end
 
     private

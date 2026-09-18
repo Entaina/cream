@@ -18,7 +18,7 @@ module People
 
       if @interest.save
         Marketing::SegmentWatcher.sync_person!(@person)
-        redirect_to @person, notice: "Interés registrado."
+        redirect_to @person, notice: t("flashes.product_interests.registered")
       else
         redirect_to @person, alert: @interest.errors.full_messages.to_sentence
       end
@@ -27,7 +27,7 @@ module People
     def dismiss
       authorize @interest, :dismiss?, policy_class: Marketing::ProductInterestPolicy
       @interest.dismiss!(reason: params.require(:dismissal_reason), actor: current_user)
-      redirect_to @person, notice: "Interés descartado."
+      redirect_to @person, notice: t("flashes.product_interests.dismissed")
     end
 
     private

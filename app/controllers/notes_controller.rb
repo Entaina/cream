@@ -5,9 +5,9 @@ class NotesController < ApplicationController
     authorize @note
 
     if @note.save
-      redirect_back fallback_location: polymorphic_path(notable), notice: "Note added."
+      redirect_back fallback_location: polymorphic_path(notable), notice: t("flashes.notes.added")
     else
-      redirect_back fallback_location: polymorphic_path(notable), alert: "Note can't be empty."
+      redirect_back fallback_location: polymorphic_path(notable), alert: t("flashes.notes.empty")
     end
   end
 
@@ -15,7 +15,7 @@ class NotesController < ApplicationController
     @note = policy_scope(current_workspace.notes).find(params[:id])
     authorize @note
     @note.update(note_params)
-    redirect_back fallback_location: polymorphic_path(@note.notable), notice: "Note updated."
+    redirect_back fallback_location: polymorphic_path(@note.notable), notice: t("flashes.notes.updated")
   end
 
   def destroy
@@ -23,7 +23,7 @@ class NotesController < ApplicationController
     authorize @note
     notable = @note.notable
     @note.destroy
-    redirect_back fallback_location: polymorphic_path(notable), notice: "Note deleted.", status: :see_other
+    redirect_back fallback_location: polymorphic_path(notable), notice: t("flashes.notes.deleted"), status: :see_other
   end
 
   private

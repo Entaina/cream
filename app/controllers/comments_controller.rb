@@ -15,9 +15,9 @@ class CommentsController < ApplicationController
           payload: {comment_id: @comment.id, record_type: commentable.class.name, record_id: commentable.id}
         )
       end
-      redirect_to polymorphic_path(commentable), notice: "Comment added."
+      redirect_to polymorphic_path(commentable), notice: t("flashes.comments.added")
     else
-      redirect_to polymorphic_path(commentable), alert: "Comment can't be empty."
+      redirect_to polymorphic_path(commentable), alert: t("flashes.comments.empty")
     end
   end
 
@@ -26,7 +26,7 @@ class CommentsController < ApplicationController
     authorize @comment
     commentable = @comment.commentable
     @comment.destroy
-    redirect_back fallback_location: polymorphic_path(commentable), notice: "Comment deleted.", status: :see_other
+    redirect_back fallback_location: polymorphic_path(commentable), notice: t("flashes.comments.deleted"), status: :see_other
   end
 
   private

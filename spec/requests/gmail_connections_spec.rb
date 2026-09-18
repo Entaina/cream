@@ -147,7 +147,7 @@ RSpec.describe "Gmail connections", type: :request do
       connection = workspace.gmail_connections.find_by(user: user)
       expect(connection.sync_enabled).to be(false)
       expect(response).to redirect_to(gmail_connection_path)
-      expect(flash[:alert]).to include("Grant inbox access")
+      expect(flash[:alert]).to include(I18n.t("flashes.gmail.grant_inbox_for_reply_detection"))
     end
 
     it "enqueues a manual sync when metadata scope is granted" do
@@ -174,7 +174,7 @@ RSpec.describe "Gmail connections", type: :request do
       }.not_to have_enqueued_job(GmailSyncJob)
 
       expect(response).to redirect_to(gmail_connection_path)
-      expect(flash[:alert]).to include("Grant inbox access")
+      expect(flash[:alert]).to include(I18n.t("flashes.gmail.grant_inbox_for_replies"))
     end
 
     it "disconnects the account" do

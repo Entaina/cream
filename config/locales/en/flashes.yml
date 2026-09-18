@@ -1,0 +1,215 @@
+---
+en:
+  flashes:
+    api_tokens:
+      created: Token created. Copy it now — it won't be shown again.
+      revoked: Token revoked.
+    automations:
+      created: Automation created.
+      deleted: Automation deleted.
+      updated: Automation updated.
+    beehiiv:
+      configure_first: Configure the API key and at least one publication first.
+      disconnected: Beehiiv disconnected.
+      publication_deleted: Beehiiv publication removed.
+      sync_started: Beehiiv sync started.
+    booking_pages:
+      created: Booking page created.
+      deleted: Booking page deleted.
+      updated: Booking page updated.
+    bookings:
+      cancelled: Booking cancelled.
+    calendar:
+      disconnected: Google Calendar disconnected.
+    campaigns:
+      created: Campaign created.
+      deleted: Campaign deleted.
+      missing_email_content: Add email subject and body before sending.
+      missing_email_content_test: Add email subject and body before sending a test.
+      pick_active_journey: Select an active journey.
+      segment_must_be_people: The segment must contain people.
+      send_cancelled: Send cancelled.
+      send_queued: Campaign send queued.
+      send_scheduled: Send scheduled.
+      test_send_failed: 'Could not send test email: %{message}'
+      test_sent: Test email sent to %{email}.
+      updated: Campaign updated.
+      variant_winner: Variant %{name} marked as winner.
+      winner_send_queued: Winner send queued for %{count} remaining recipients.
+    comments:
+      added: Comment added.
+      deleted: Comment deleted.
+      empty: Comment can't be empty.
+    companies:
+      created: Company created.
+      deleted: Company deleted.
+      merged: Merged %{count} duplicate companies into %{name}.
+      updated: Company updated.
+    deal_accesses:
+      collaborator_added: '%{name} added as collaborator.'
+      collaborator_removed: Collaborator removed.
+      already_has_access: '%{name} already has access to this deal.'
+      owner_has_access: The deal owner already has access.
+    deal_products:
+      added: Product added.
+      line_updated: Line updated.
+      removed: Product removed.
+    deals:
+      created: Deal created.
+      deleted: Deal deleted.
+      duplicated: Deal duplicated.
+      moved_pipeline: Deal moved to pipeline %{pipeline}.
+      updated: Deal updated.
+    editions:
+      created: Edition created.
+      deleted: Edition deleted.
+      in_use: Can't delete an edition in use by a deal.
+      updated: Edition updated.
+    email_layouts:
+      created: Layout created.
+      deleted: Layout deleted.
+      updated: Layout updated.
+    email_preferences:
+      updated: Preferences updated.
+    email_templates:
+      created: Template created.
+      deleted: Template deleted.
+      updated: Template updated.
+    gmail:
+      connect_first: Connect Gmail first.
+      disconnected: Gmail disconnected.
+      grant_inbox_for_replies: Grant inbox access before syncing replies.
+      grant_inbox_for_reply_detection: Grant inbox access before enabling reply detection.
+      reconnect_for_send: Reconnect Gmail to grant send permission.
+      settings_updated: Gmail settings updated.
+      sync_started: Inbox sync started.
+    imports:
+      completed: Imported %{count} records.
+    invitations:
+      revoked: Invitation revoked.
+    journeys:
+      created: Journey created.
+      deleted: Journey deleted.
+      updated: Journey updated.
+    lead_form_templates:
+      created: Template created.
+      deleted: Template deleted.
+      preview_pages_only: Only full pages support preview.
+      updated: Template updated.
+    lead_forms:
+      created: Form created.
+      deleted: Form deleted.
+      updated: Form updated.
+    list_entries:
+      added: Added to list.
+      removed: Removed from list.
+    lists:
+      created: List created.
+      deleted: List deleted.
+      updated: List updated.
+    mail_merges:
+      no_recipients: No recipients matched the selected source.
+      queued: Mail merge queued for %{count} recipients.
+    mailjet:
+      disconnected: Mailjet disconnected.
+    memberships:
+      removed: Member removed from workspace.
+      role_updated: Member role updated.
+    notes:
+      added: Note added.
+      deleted: Note deleted.
+      empty: Note can't be empty.
+      updated: Note updated.
+    notifications:
+      all_read: All notifications marked as read.
+    oauth:
+      calendar_booking_disabled: Calendar booking is not enabled.
+      calendar_connected: Google Calendar connected for %{email}.
+      calendar_connect_failed: Could not connect Google Calendar.
+      calendar_sign_in_first: Sign in first to connect Google Calendar.
+      gmail_connected: Gmail connected for %{email}.
+      gmail_connect_failed: Could not connect Gmail.
+      gmail_sign_in_first: Sign in first to connect Gmail.
+      sign_in_session_expired: Sign-in session expired. Open the app from the same URL you use in Google OAuth and try again.
+      google_sign_in_failed: Could not sign in with Google.
+    people:
+      created: Person created.
+      deleted: Person deleted.
+      merged: Merged %{count} duplicate contacts into %{name}.
+      subscription_updated: Subscription updated.
+      updated: Person updated.
+    person_relationships:
+      added: Relationship added.
+      removed: Relationship removed.
+    product_interests:
+      dismissed: Interest dismissed.
+      registered: Interest registered.
+    products:
+      created: Product created.
+      deleted: Product deleted.
+      in_use: Can't delete a product in use by a deal.
+      updated: Product updated.
+    record_attachments:
+      removed: File removed.
+      uploaded: File uploaded.
+    record_emails:
+      follow_up_cleared: Marked as replied; follow-up reminder cleared.
+      scheduled_cancelled: Scheduled email cancelled.
+    registrations:
+      welcome: Welcome to Cream!
+    reports:
+      deleted: Report deleted.
+      saved: Report saved.
+      updated: Report updated.
+    sales_briefings:
+      ai_not_configured: AI is not configured. Set CREAM_AI_API_KEY.
+      daily_limit: You have reached the limit of 5 daily regenerations.
+      disabled_for_user: You have disabled the sales director briefing in your profile.
+      not_enabled: Sales director is not enabled for this workspace.
+    saved_views:
+      deleted: View deleted.
+      saved: View saved.
+      updated: View updated.
+    scoring_rules:
+      created: Scoring rule created.
+      deleted: Scoring rule deleted.
+      recalculation_queued: Lead score recalculation queued.
+      updated: Scoring rule updated.
+    segments:
+      created: Segment created.
+      deleted: Segment deleted.
+      updated: Segment updated.
+    settings:
+      custom_field_created: Custom field created.
+      custom_field_deleted: Custom field deleted.
+      custom_field_updated: Custom field updated.
+      workspace_updated: Workspace updated.
+    slack_integrations:
+      created: Slack integration created.
+      deleted: Slack integration removed.
+      updated: Slack integration updated.
+    stage_triggers:
+      created: Trigger created.
+      deleted: Trigger deleted.
+      updated: Trigger updated.
+    stripe:
+      add_api_key_first: Add a Stripe API key first.
+      disconnected: Stripe disconnected.
+      ignored: Payment ignored.
+      linked: Payment linked to %{deal}.
+      pick_deal: Pick a deal to link this payment to.
+      review: Payment back in review.
+      sync_started: Payment sync started.
+    subscription_types:
+      created: Subscription type created.
+      deleted: Subscription type deleted.
+      updated: Subscription type updated.
+    tasks:
+      created: Task created.
+      deleted: Task deleted.
+      needs_title: Task needs a title.
+      updated: Task updated.
+    webhooks:
+      created: Webhook created.
+      deleted: Webhook deleted.
+      updated: Webhook updated.

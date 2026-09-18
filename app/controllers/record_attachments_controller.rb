@@ -8,7 +8,7 @@ class RecordAttachmentsController < ApplicationController
     authorize @attachment
 
     if @attachment.save
-      redirect_back fallback_location: polymorphic_path(attachable), notice: "File uploaded."
+      redirect_back fallback_location: polymorphic_path(attachable), notice: t("flashes.record_attachments.uploaded")
     else
       redirect_back fallback_location: polymorphic_path(attachable), alert: @attachment.errors.full_messages.to_sentence
     end
@@ -19,7 +19,7 @@ class RecordAttachmentsController < ApplicationController
     authorize @attachment
     attachable = @attachment.attachable
     @attachment.destroy
-    redirect_back fallback_location: polymorphic_path(attachable), notice: "File removed.", status: :see_other
+    redirect_back fallback_location: polymorphic_path(attachable), notice: t("flashes.record_attachments.removed"), status: :see_other
   end
 
   private

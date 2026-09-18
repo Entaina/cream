@@ -14,7 +14,7 @@ class CalendarConnectionsController < ApplicationController
     @connection = current_workspace.calendar_connections.find_by!(user: current_user)
     authorize @connection
     @connection.destroy
-    redirect_to calendar_connection_path, notice: "Google Calendar disconnected.", status: :see_other
+    redirect_to calendar_connection_path, notice: t("flashes.calendar.disconnected"), status: :see_other
   end
 
   # Reuses the google_gmail OmniAuth route (already registered in middleware) with

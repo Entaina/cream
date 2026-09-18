@@ -20,6 +20,6 @@ class NotificationsController < ApplicationController
   def mark_all_read
     authorize Notification, :mark_all_read?
     policy_scope(Notification).unread.update_all(read_at: Time.current)
-    redirect_to notifications_path, notice: "All notifications marked as read."
+    redirect_to notifications_path, notice: t("flashes.notifications.all_read")
   end
 end

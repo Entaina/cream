@@ -50,7 +50,7 @@ RSpec.describe "Companies merge", type: :request do
 
       expect(response).to redirect_to(company_path(primary))
       follow_redirect!
-      expect(response.body).to include("Merged 1 duplicate company")
+      expect(response.body).to include(I18n.t("flashes.companies.merged", count: 1, name: primary.name))
       expect(Company.exists?(secondary.id)).to be(false)
       expect(person.reload.company).to eq(primary)
     end

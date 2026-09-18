@@ -32,25 +32,25 @@ class StripePaymentsController < ApplicationController
     deal_id = params[:deal_id].presence || payment.suggested_deal_id
     deal = current_workspace.deals.find_by(id: deal_id)
     if deal.nil?
-      redirect_back_to_inbox(alert: "Pick a deal to link this payment to.") and return
+      redirect_back_to_inbox(alert: t("flashes.stripe.pick_deal")) and return
     end
 
     payment.match!(deal, user: current_user)
-    redirect_back_to_inbox(notice: "Payment linked to #{deal.name}.")
+    redirect_back_to_inbox(notice: t("flashes.stripe.linked", deal: deal.name))
   end
 
   def ignore
     payment = current_workspace.stripe_payments.find(params[:id])
     authorize payment
     payment.ignore!(user: current_user)
-    redirect_back_to_inbox(notice: "Payment ignored.")
+    redirect_back_to_inbox(notice: t("flashes.stripe.ignored"))
   end
 
   def unignore
     payment = current_workspace.stripe_payments.find(params[:id])
     authorize payment
     payment.unignore!
-    redirect_back_to_inbox(status: "pending_review", notice: "Payment back in review.")
+    redirect_back_to_inbox(status: "pending_review", notice: t("flashes.stripe.review"))
   end
 
   private

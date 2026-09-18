@@ -17,7 +17,7 @@ class RegistrationsController < ApplicationController
       persist_locale_cookie(@user.locale)
       User.provision_default_workspace!(@user, workspace_name: params[:workspace_name])
       start_new_session_for @user
-      redirect_to root_path, notice: "Welcome to Cream!"
+      redirect_to root_path, notice: t("flashes.registrations.welcome")
     else
       render :new, status: :unprocessable_entity
     end

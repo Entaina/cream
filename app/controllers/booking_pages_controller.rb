@@ -29,7 +29,7 @@ class BookingPagesController < ApplicationController
     authorize @booking_page
 
     if @booking_page.save
-      redirect_to booking_pages_path, notice: "Página de reservas creada."
+      redirect_to booking_pages_path, notice: t("flashes.booking_pages.created")
     else
       load_form_options
       render :new, status: :unprocessable_entity
@@ -44,7 +44,7 @@ class BookingPagesController < ApplicationController
   def update
     authorize @booking_page
     if @booking_page.update(booking_page_params)
-      redirect_to booking_pages_path, notice: "Página de reservas actualizada."
+      redirect_to booking_pages_path, notice: t("flashes.booking_pages.updated")
     else
       load_form_options
       render :edit, status: :unprocessable_entity
@@ -54,7 +54,7 @@ class BookingPagesController < ApplicationController
   def destroy
     authorize @booking_page
     @booking_page.destroy
-    redirect_to booking_pages_path, notice: "Página de reservas eliminada.", status: :see_other
+    redirect_to booking_pages_path, notice: t("flashes.booking_pages.deleted"), status: :see_other
   end
 
   def calendars

@@ -7,17 +7,17 @@ class SalesBriefingsController < ApplicationController
     authorize current_workspace, :dashboard?
 
     unless Ai::Configuration.configured?
-      redirect_to root_path, alert: "AI is not configured. Set CREAM_AI_API_KEY."
+      redirect_to root_path, alert: t("flashes.sales_briefings.ai_not_configured")
       return
     end
 
     unless current_workspace.sales_director_enabled?
-      redirect_to root_path, alert: "El director de ventas no está habilitado para este workspace."
+      redirect_to root_path, alert: t("flashes.sales_briefings.not_enabled")
       return
     end
 
     unless current_membership.sales_director_briefing_enabled?
-      redirect_to root_path, alert: "Has desactivado el briefing del director de ventas en tu perfil."
+      redirect_to root_path, alert: t("flashes.sales_briefings.disabled_for_user")
       return
     end
 
@@ -25,7 +25,7 @@ class SalesBriefingsController < ApplicationController
 
     if briefing_exists
       unless current_membership.can_regenerate_sales_briefing?
-        redirect_to root_path, alert: "Has alcanzado el límite de 5 regeneraciones diarias."
+        redirect_to root_path, alert: t("flashes.sales_briefings.daily_limit")
         return
       end
 

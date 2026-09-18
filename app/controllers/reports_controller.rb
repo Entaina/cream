@@ -24,7 +24,7 @@ class ReportsController < ApplicationController
     authorize @report
 
     if @report.save
-      redirect_to reports_path(@report.config_params), notice: "Report saved."
+      redirect_to reports_path(@report.config_params), notice: t("flashes.reports.saved")
     else
       redirect_to reports_path(@report.config_params), alert: @report.errors.full_messages.to_sentence
     end
@@ -34,14 +34,14 @@ class ReportsController < ApplicationController
     report = policy_scope(current_workspace.reports).find(params[:id])
     authorize report
     report.update(report_params)
-    redirect_to reports_path, notice: "Report updated."
+    redirect_to reports_path, notice: t("flashes.reports.updated")
   end
 
   def destroy
     report = policy_scope(current_workspace.reports).find(params[:id])
     authorize report
     report.destroy
-    redirect_to reports_path, notice: "Report deleted."
+    redirect_to reports_path, notice: t("flashes.reports.deleted")
   end
 
   private

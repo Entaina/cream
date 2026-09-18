@@ -23,7 +23,7 @@ class AutomationsController < ApplicationController
     authorize @automation
 
     if @automation.save
-      redirect_to automations_path, notice: "Automation created."
+      redirect_to automations_path, notice: t("flashes.automations.created")
     else
       render :new, status: :unprocessable_entity
     end
@@ -36,7 +36,7 @@ class AutomationsController < ApplicationController
   def update
     authorize @automation
     if @automation.update(automation_params.merge(trigger_conditions: build_conditions))
-      redirect_to automations_path, notice: "Automation updated."
+      redirect_to automations_path, notice: t("flashes.automations.updated")
     else
       render :edit, status: :unprocessable_entity
     end
@@ -45,7 +45,7 @@ class AutomationsController < ApplicationController
   def destroy
     authorize @automation
     @automation.destroy
-    redirect_to automations_path, notice: "Automation deleted.", status: :see_other
+    redirect_to automations_path, notice: t("flashes.automations.deleted"), status: :see_other
   end
 
   private

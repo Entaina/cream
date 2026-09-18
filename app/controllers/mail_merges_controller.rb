@@ -20,7 +20,7 @@ class MailMergesController < ApplicationController
     recipients = resolve_recipients
 
     if recipients.record_ids.empty?
-      redirect_to mail_merge_path(record_type: recipients.record_type), alert: "No recipients matched the selected source."
+      redirect_to mail_merge_path(record_type: recipients.record_type), alert: t("flashes.mail_merges.no_recipients")
       return
     end
 
@@ -35,7 +35,7 @@ class MailMergesController < ApplicationController
     )
 
     redirect_to mail_merge_path(record_type: recipients.record_type),
-      notice: "Mail merge queued for #{recipients.record_ids.size} recipients."
+      notice: t("flashes.mail_merges.queued", count: recipients.record_ids.size)
   end
 
   # Live recipient count for the picker (fetched by the form via JS).

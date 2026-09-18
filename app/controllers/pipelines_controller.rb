@@ -16,7 +16,7 @@ class PipelinesController < ApplicationController
     authorize @pipeline
 
     if @pipeline.save
-      redirect_to pipelines_path, notice: "Pipeline created."
+      redirect_to pipelines_path, notice: t("pipelines.flash.created")
     else
       render :new, status: :unprocessable_entity
     end
@@ -29,7 +29,7 @@ class PipelinesController < ApplicationController
   def update
     authorize @pipeline
     if @pipeline.update(pipeline_params)
-      redirect_to pipelines_path, notice: "Pipeline updated."
+      redirect_to pipelines_path, notice: t("pipelines.flash.updated")
     else
       render :edit, status: :unprocessable_entity
     end
@@ -40,7 +40,7 @@ class PipelinesController < ApplicationController
     copy = @pipeline.duplicate
     authorize copy, :create?
     if copy.save
-      redirect_to edit_pipeline_path(copy), notice: "Pipeline duplicated."
+      redirect_to edit_pipeline_path(copy), notice: t("pipelines.flash.duplicated")
     else
       redirect_to pipelines_path, alert: copy.errors.full_messages.to_sentence
     end
@@ -48,7 +48,7 @@ class PipelinesController < ApplicationController
 
   def from_template
     unless CreamFeatures.enabled?(:pipeline_templates)
-      redirect_to pipelines_path, alert: "Pipeline templates are not available yet."
+      redirect_to pipelines_path, alert: t("pipelines.flash.template_unavailable")
       return
     end
 
@@ -56,15 +56,15 @@ class PipelinesController < ApplicationController
     pipeline = Pipeline.new(workspace: current_workspace, name: "Template")
     authorize pipeline, :create?
     pipeline = PipelineTemplate.create_pipeline!(workspace: current_workspace, template_key: template_key)
-    redirect_to edit_pipeline_path(pipeline), notice: "Pipeline created from template."
+    redirect_to edit_pipeline_path(pipeline), notice: t("pipelines.flash.created_from_template")
   rescue KeyError
-    redirect_to pipelines_path, alert: "Unknown template."
+    redirect_to pipelines_path, alert: t("pipelines.flash.unknown_template")
   end
 
   def destroy
     authorize @pipeline
     if @pipeline.destroy
-      redirect_to pipelines_path, notice: "Pipeline deleted.", status: :see_other
+      redirect_to pipelines_path, notice: t("pipelines.flash.deleted"), status: :see_other
     else
       redirect_to pipelines_path, alert: @pipeline.errors.full_messages.to_sentence, status: :see_other
     end

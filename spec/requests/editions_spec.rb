@@ -126,7 +126,7 @@ RSpec.describe "Editions", type: :request do
       }.not_to change(product.editions, :count)
 
       expect(response).to redirect_to(edit_product_path(product))
-      expect(flash[:alert]).to eq("Can't delete an edition in use by a deal.")
+      expect(flash[:alert]).to eq(I18n.t("flashes.editions.in_use"))
     end
   end
 end

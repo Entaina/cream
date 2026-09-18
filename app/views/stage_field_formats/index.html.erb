@@ -13,7 +13,7 @@
 
 <div class="flex-1 overflow-y-auto scrollbar-subtle p-5 space-y-3">
   <p class="text-sm text-ink-faint">
-    <%= t("stage_field_formats.index.intro_html", stage: @stage.name).html_safe %>
+    <%= t("stage_field_formats.index.intro_html", stage: h(@stage.name)).html_safe %>
   </p>
   <% if @stage_field_formats.empty? %>
     <p class="text-base text-ink-soft"><%= t("stage_field_formats.index.empty") %></p>
@@ -32,9 +32,9 @@
       </div>
       <p class="text-sm text-ink-faint mt-1">
         <%= t("stage_field_formats.index.rule_html",
-              field: StageFieldFormat.field_label(format.field).downcase,
-              operator_phrase: format.operator_phrase,
-              display_text: format.display_text).html_safe %>
+              field: h(StageFieldFormat.field_label(format.field).downcase),
+              operator_phrase: h(format.operator_phrase),
+              display_text: h(format.display_text)).html_safe %>
       </p>
     </article>
   <% end %>

@@ -24,20 +24,20 @@ class BeehiivConnectionsController < ApplicationController
     authorize @beehiiv_connection, :sync?
 
     unless @beehiiv_connection.connected?
-      redirect_to settings_workspace_path, alert: "Configura la API key y al menos una publicación primero." and return
+      redirect_to settings_workspace_path, alert: t("flashes.beehiiv.configure_first") and return
     end
 
     @beehiiv_connection.beehiiv_publications.find_each do |publication|
       BeehiivSyncJob.perform_later(publication.id)
     end
-    redirect_to settings_workspace_path, notice: "Sincronización con Beehiiv iniciada."
+    redirect_to settings_workspace_path, notice: t("flashes.beehiiv.sync_started")
   end
 
   def destroy
     @beehiiv_connection = find_connection
     authorize @beehiiv_connection
     @beehiiv_connection.destroy
-    redirect_to settings_workspace_path, notice: "Beehiiv desconectado.", status: :see_other
+    redirect_to settings_workspace_path, notice: t("flashes.beehiiv.disconnected"), status: :see_other
   end
 
   private

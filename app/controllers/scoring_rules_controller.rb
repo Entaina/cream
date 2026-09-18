@@ -19,7 +19,7 @@ class ScoringRulesController < ApplicationController
     @scoring_rule = current_workspace.scoring_rules.new(scoring_rule_params)
     authorize @scoring_rule
     if @scoring_rule.save
-      redirect_to scoring_rules_path, notice: "Regla de scoring creada."
+      redirect_to scoring_rules_path, notice: t("flashes.scoring_rules.created")
     else
       render :new, status: :unprocessable_entity
     end
@@ -32,7 +32,7 @@ class ScoringRulesController < ApplicationController
   def update
     authorize @scoring_rule
     if @scoring_rule.update(scoring_rule_params)
-      redirect_to scoring_rules_path, notice: "Regla de scoring actualizada."
+      redirect_to scoring_rules_path, notice: t("flashes.scoring_rules.updated")
     else
       render :edit, status: :unprocessable_entity
     end
@@ -41,13 +41,13 @@ class ScoringRulesController < ApplicationController
   def destroy
     authorize @scoring_rule
     @scoring_rule.destroy
-    redirect_to scoring_rules_path, notice: "Regla de scoring eliminada.", status: :see_other
+    redirect_to scoring_rules_path, notice: t("flashes.scoring_rules.deleted"), status: :see_other
   end
 
   def recalculate
     authorize ScoringRule
     ScoringRecalculateJob.perform_later(current_workspace.id)
-    redirect_to scoring_rules_path, notice: "Recálculo de puntuación encolado."
+    redirect_to scoring_rules_path, notice: t("flashes.scoring_rules.recalculation_queued")
   end
 
   private

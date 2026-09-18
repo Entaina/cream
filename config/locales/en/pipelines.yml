@@ -1,0 +1,55 @@
+---
+en:
+  pipelines:
+    card_fields:
+      products: Products and editions
+    duplicate_confirm: "Duplicate %{name}? Only the stages are copied, not the deals."
+    duplicate_name_suffix: ' (copy)'
+    flash:
+      created: Pipeline created.
+      created_from_template: Pipeline created from template.
+      deleted: Pipeline deleted.
+      duplicated: Pipeline duplicated.
+      template_unavailable: Pipeline templates are not available yet.
+      unknown_template: Unknown template.
+      updated: Pipeline updated.
+    form:
+      add_stage: Add stage
+      board_card_fields: Board card fields
+      cancel: Cancel
+      closed: Closed
+      color: Color
+      create: Create pipeline
+      default_for_new_deals: Default pipeline for new deals
+      name_placeholder: Sales
+      probability: Prob. %
+      save: Save changes
+      stage_name: Stage name
+      stage_name_placeholder: Stage name
+      stages: Stages
+      won: Won
+    index:
+      default_badge: Default
+      delete_confirm: "Delete %{name}?"
+      duplicate: Duplicate
+      edit: Edit
+      empty_subtitle: Create a pipeline with its stages and win probabilities.
+      empty_title: No pipelines yet
+      new: New pipeline
+      page_title: Pipelines
+      templates_heading: Pipeline templates
+      title: Pipelines
+    new:
+      page_title: New pipeline
+      title: New pipeline
+    edit:
+      page_title: 'Edit %{name}'
+      title: 'Edit %{name}'
+    stage_row:
+      drag_reorder: Reorder stage
+      entry_conditions: Entry conditions for this stage
+      field_formats: Field display formats for this stage
+      remove_stage: Remove stage
+      stage_triggers: Triggers for this stage
+    validation:
+      needs_stage: A pipeline needs at least one stage.

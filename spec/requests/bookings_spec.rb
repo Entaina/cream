@@ -81,7 +81,7 @@ RSpec.describe "Bookings", type: :request do
       patch cancel_booking_path(booking)
 
       expect(response).to redirect_to(bookings_path)
-      expect(flash[:notice]).to eq("Reserva cancelada.")
+      expect(flash[:notice]).to eq(I18n.t("flashes.bookings.cancelled"))
       expect(booking.reload.status).to eq("cancelled")
       expect(calendar_client).to have_received(:delete_event).with(
         calendar_id: "primary@gmail.com",

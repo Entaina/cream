@@ -19,7 +19,7 @@ class SlackIntegrationsController < ApplicationController
     authorize @integration
 
     if @integration.save
-      redirect_to slack_integrations_path, notice: "Slack integration created."
+      redirect_to slack_integrations_path, notice: t("flashes.slack_integrations.created")
     else
       render :new, status: :unprocessable_entity
     end
@@ -32,7 +32,7 @@ class SlackIntegrationsController < ApplicationController
   def update
     authorize @integration
     if @integration.update(integration_params)
-      redirect_to slack_integrations_path, notice: "Slack integration updated."
+      redirect_to slack_integrations_path, notice: t("flashes.slack_integrations.updated")
     else
       render :edit, status: :unprocessable_entity
     end
@@ -41,7 +41,7 @@ class SlackIntegrationsController < ApplicationController
   def destroy
     authorize @integration
     @integration.destroy
-    redirect_to slack_integrations_path, notice: "Slack integration removed.", status: :see_other
+    redirect_to slack_integrations_path, notice: t("flashes.slack_integrations.deleted"), status: :see_other
   end
 
   private

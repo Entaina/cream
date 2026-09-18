@@ -39,14 +39,14 @@ class RecordEmailsController < ApplicationController
     @message = policy_scope(current_workspace.email_messages).find(params[:id])
     authorize @message
     @message.destroy if @message.scheduled?
-    redirect_back fallback_location: polymorphic_path(@message.record), notice: "Scheduled email cancelled."
+    redirect_back fallback_location: polymorphic_path(@message.record), notice: t("flashes.record_emails.scheduled_cancelled")
   end
 
   def mark_replied
     @message = policy_scope(current_workspace.email_messages).find(params[:id])
     authorize @message, :update?
     @message.update!(replied_at: Time.current)
-    redirect_back fallback_location: polymorphic_path(@message.record), notice: "Marked as replied; follow-up reminder cleared."
+    redirect_back fallback_location: polymorphic_path(@message.record), notice: t("flashes.record_emails.follow_up_cleared")
   end
 
   private

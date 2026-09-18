@@ -1,0 +1,55 @@
+---
+es:
+  pipelines:
+    card_fields:
+      products: Productos y ediciones
+    duplicate_confirm: "¿Duplicar %{name}? Solo se copian las etapas, no las oportunidades."
+    duplicate_name_suffix: ' (copia)'
+    flash:
+      created: Pipeline creado.
+      created_from_template: Pipeline creado desde plantilla.
+      deleted: Pipeline eliminado.
+      duplicated: Pipeline duplicado.
+      template_unavailable: Las plantillas de pipeline aún no están disponibles.
+      unknown_template: Plantilla desconocida.
+      updated: Pipeline actualizado.
+    form:
+      add_stage: Añadir etapa
+      board_card_fields: Campos en tarjetas del tablero
+      cancel: Cancelar
+      closed: Cerrada
+      color: Color
+      create: Crear pipeline
+      default_for_new_deals: Pipeline predeterminado para nuevas oportunidades
+      name_placeholder: Ventas
+      probability: Prob. %
+      save: Guardar cambios
+      stage_name: Nombre de etapa
+      stage_name_placeholder: Nombre de la etapa
+      stages: Etapas
+      won: Ganada
+    index:
+      default_badge: Predeterminado
+      delete_confirm: "¿Eliminar %{name}?"
+      duplicate: Duplicar
+      edit: Editar
+      empty_subtitle: Crea un pipeline con sus etapas y probabilidades de cierre.
+      empty_title: Aún no hay pipelines
+      new: Nuevo pipeline
+      page_title: Pipelines
+      templates_heading: Plantillas de pipeline
+      title: Pipelines
+    new:
+      page_title: Nuevo pipeline
+      title: Nuevo pipeline
+    edit:
+      page_title: 'Editar %{name}'
+      title: 'Editar %{name}'
+    stage_row:
+      drag_reorder: Reordenar etapa
+      entry_conditions: Condiciones de entrada de esta etapa
+      field_formats: Formatos de campos de esta etapa
+      remove_stage: Quitar etapa
+      stage_triggers: Disparadores de esta etapa
+    validation:
+      needs_stage: Un pipeline necesita al menos una etapa.

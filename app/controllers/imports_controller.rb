@@ -22,7 +22,7 @@ class ImportsController < ApplicationController
     result = CsvImporter.import(@record_type, workspace: current_workspace, user: current_user, io: params[:file])
 
     if result.errors.empty?
-      redirect_to import_redirect_path(@record_type), notice: "Imported #{result.created} records."
+      redirect_to import_redirect_path(@record_type), notice: t("flashes.imports.completed", count: result.created)
     else
       flash[:alert] = result.errors.first(5).join("; ")
       redirect_to new_import_path(record_type: @record_type)

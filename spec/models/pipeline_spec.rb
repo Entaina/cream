@@ -32,7 +32,7 @@ RSpec.describe Pipeline, type: :model do
       copy = source.duplicate
       expect(copy.save).to be(true)
 
-      expect(copy.name).to eq("Ventas (copy)")
+      expect(copy.name).to eq("Ventas#{I18n.t("pipelines.duplicate_name_suffix")}")
       expect(copy).not_to be_default_pipeline
       expect(copy.pipeline_stages.ordered.map { |s| [s.name, s.probability, s.color, s.won, s.closed] })
         .to eq(source.pipeline_stages.ordered.map { |s| [s.name, s.probability, s.color, s.won, s.closed] })
@@ -54,6 +54,18 @@ RSpec.describe Pipeline, type: :model do
     end
   end
 
+  describe ".card_field_label" do
+    it "follows the current locale" do
+      expect(described_class.card_field_label("value")).to eq("Importe")
+      expect(described_class.card_field_label("products")).to eq("Productos y ediciones")
+
+      I18n.with_locale(:en) do
+        expect(described_class.card_field_label("value")).to eq("Value")
+        expect(described_class.card_field_label("products")).to eq("Products and editions")
+      end
+    end
+  end
+
   describe "card_fields" do
     it "normalizes unknown keys on save" do
       pipeline = Pipeline.create_default!(workspace)
@@ -68,7 +80,7 @@ RSpec.describe Pipeline, type: :model do
     it "requires at least one stage" do
       pipeline = workspace.pipelines.new(name: "Empty")
       expect(pipeline).not_to be_valid
-      expect(pipeline.errors[:base]).to include("A pipeline needs at least one stage")
+      expect(pipeline.errors[:base]).to include(I18n.t("pipelines.validation.needs_stage"))
     end
   end
 

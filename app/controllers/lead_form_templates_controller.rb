@@ -23,7 +23,7 @@ class LeadFormTemplatesController < ApplicationController
     authorize @template
 
     if @template.save
-      redirect_to lead_form_templates_path, notice: "Plantilla creada."
+      redirect_to lead_form_templates_path, notice: t("flashes.lead_form_templates.created")
     else
       render :new, status: :unprocessable_entity
     end
@@ -37,7 +37,7 @@ class LeadFormTemplatesController < ApplicationController
   def update
     authorize @template
     if @template.update(template_params)
-      redirect_to lead_form_templates_path, notice: "Plantilla actualizada."
+      redirect_to lead_form_templates_path, notice: t("flashes.lead_form_templates.updated")
     else
       render :edit, status: :unprocessable_entity
     end
@@ -46,14 +46,14 @@ class LeadFormTemplatesController < ApplicationController
   def destroy
     authorize @template
     @template.destroy
-    redirect_to lead_form_templates_path, notice: "Plantilla eliminada.", status: :see_other
+    redirect_to lead_form_templates_path, notice: t("flashes.lead_form_templates.deleted"), status: :see_other
   end
 
   def preview
     authorize @template, :preview?
 
     unless @template.previewable?
-      redirect_to lead_form_templates_path, alert: "Solo las páginas completas admiten vista previa."
+      redirect_to lead_form_templates_path, alert: t("flashes.lead_form_templates.preview_pages_only")
       return
     end
 

@@ -984,7 +984,7 @@ RSpec.describe "Deals", type: :request do
 
       copy = Deal.order(:id).last
       expect(response).to redirect_to(deal_path(copy))
-      expect(flash[:notice]).to eq("Deal duplicado.")
+      expect(flash[:notice]).to eq(I18n.t("flashes.deals.duplicated"))
       expect(copy.name).to eq("Source deal (copia)")
       expect(copy.company).to eq(company)
       expect(copy.contacts).to contain_exactly(contact)

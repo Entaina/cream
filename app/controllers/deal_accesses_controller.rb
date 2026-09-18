@@ -8,15 +8,15 @@ class DealAccessesController < ApplicationController
 
     user = current_workspace.users.find(params.require(:user_id))
     if user.id == @deal.owner_id
-      redirect_to @deal, alert: "The deal owner already has access."
+      redirect_to @deal, alert: t("flashes.deal_accesses.owner_has_access")
       return
     end
 
     access = @deal.deal_accesses.find_or_create_by!(user: user)
     if access.previously_new_record?
-      redirect_to @deal, notice: "#{user.name} added as collaborator."
+      redirect_to @deal, notice: t("flashes.deal_accesses.collaborator_added", name: user.name)
     else
-      redirect_to @deal, alert: "#{user.name} already has access to this deal."
+      redirect_to @deal, alert: t("flashes.deal_accesses.already_has_access", name: user.name)
     end
   rescue ActiveRecord::RecordInvalid => e
     redirect_to @deal, alert: e.record.errors.full_messages.to_sentence
@@ -27,7 +27,7 @@ class DealAccessesController < ApplicationController
 
     access = @deal.deal_accesses.find(params[:id])
     access.destroy!
-    redirect_to @deal, notice: "Collaborator removed.", status: :see_other
+    redirect_to @deal, notice: t("flashes.deal_accesses.collaborator_removed"), status: :see_other
   end
 
   private

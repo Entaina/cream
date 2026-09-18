@@ -23,7 +23,7 @@ class ProductsController < ApplicationController
     authorize @product
 
     if @product.save
-      redirect_to products_path, notice: "Product created."
+      redirect_to products_path, notice: t("flashes.products.created")
     else
       render :new, status: :unprocessable_entity
     end
@@ -37,7 +37,7 @@ class ProductsController < ApplicationController
   def update
     authorize @product
     if @product.update(product_params)
-      redirect_to products_path, notice: "Product updated."
+      redirect_to products_path, notice: t("flashes.products.updated")
     else
       render :edit, status: :unprocessable_entity
     end
@@ -46,9 +46,9 @@ class ProductsController < ApplicationController
   def destroy
     authorize @product
     if @product.destroy
-      redirect_to products_path, notice: "Product deleted.", status: :see_other
+      redirect_to products_path, notice: t("flashes.products.deleted"), status: :see_other
     else
-      redirect_to products_path, alert: "Can't delete a product in use by a deal.", status: :see_other
+      redirect_to products_path, alert: t("flashes.products.in_use"), status: :see_other
     end
   end
 

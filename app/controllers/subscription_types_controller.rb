@@ -20,7 +20,7 @@ class SubscriptionTypesController < ApplicationController
     @subscription_type = current_workspace.subscription_types.new(subscription_type_params)
     authorize @subscription_type
     if @subscription_type.save
-      redirect_to subscription_types_path, notice: "Tipo de suscripción creado."
+      redirect_to subscription_types_path, notice: t("flashes.subscription_types.created")
     else
       render :new, status: :unprocessable_entity
     end
@@ -33,7 +33,7 @@ class SubscriptionTypesController < ApplicationController
   def update
     authorize @subscription_type
     if @subscription_type.update(subscription_type_params)
-      redirect_to subscription_types_path, notice: "Tipo de suscripción actualizado."
+      redirect_to subscription_types_path, notice: t("flashes.subscription_types.updated")
     else
       render :edit, status: :unprocessable_entity
     end
@@ -42,7 +42,7 @@ class SubscriptionTypesController < ApplicationController
   def destroy
     authorize @subscription_type
     @subscription_type.destroy
-    redirect_to subscription_types_path, notice: "Tipo de suscripción eliminado.", status: :see_other
+    redirect_to subscription_types_path, notice: t("flashes.subscription_types.deleted"), status: :see_other
   end
 
   private

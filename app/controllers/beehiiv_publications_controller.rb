@@ -26,7 +26,7 @@ class BeehiivPublicationsController < ApplicationController
     @beehiiv_publication = @beehiiv_connection.beehiiv_publications.find(params[:id])
     authorize @beehiiv_publication
     @beehiiv_publication.destroy
-    redirect_to settings_workspace_path, notice: "Publicación Beehiiv eliminada.", status: :see_other
+    redirect_to settings_workspace_path, notice: t("flashes.beehiiv.publication_deleted"), status: :see_other
   end
 
   private

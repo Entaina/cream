@@ -8,7 +8,7 @@ class MembershipsController < ApplicationController
     authorize membership
 
     if membership.update(role: requested_role)
-      redirect_to settings_team_path, notice: "Member role updated."
+      redirect_to settings_team_path, notice: t("flashes.memberships.role_updated")
     else
       redirect_to settings_team_path, alert: membership.errors.full_messages.to_sentence
     end
@@ -18,7 +18,7 @@ class MembershipsController < ApplicationController
     membership = policy_scope(Membership).find(params[:id])
     authorize membership
     membership.destroy!
-    redirect_to settings_team_path, notice: "Member removed from workspace."
+    redirect_to settings_team_path, notice: t("flashes.memberships.removed")
   rescue ActiveRecord::RecordNotDestroyed
     redirect_to settings_team_path, alert: membership.errors.full_messages.to_sentence
   end

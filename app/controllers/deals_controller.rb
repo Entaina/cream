@@ -119,7 +119,7 @@ class DealsController < ApplicationController
 
     if @deal.save
       link_stripe_payment(@deal)
-      redirect_to @deal, notice: "Deal created."
+      redirect_to @deal, notice: t("flashes.deals.created")
     elsif quick_from_person?
       respond_to do |format|
         format.turbo_stream do
@@ -152,7 +152,7 @@ class DealsController < ApplicationController
       @deal.update!(attrs)
       @deal.move_to_stage!(new_stage) if new_stage
     end
-    redirect_to @edit_section ? deal_path(@deal, tab: "information") : @deal, notice: "Deal updated."
+    redirect_to @edit_section ? deal_path(@deal, tab: "information") : @deal, notice: t("flashes.deals.updated")
   rescue ActiveRecord::RecordInvalid
     unless @edit_section
       @deal.reload
@@ -165,7 +165,7 @@ class DealsController < ApplicationController
   def destroy
     authorize @deal
     @deal.destroy
-    redirect_to board_deals_path, notice: "Deal deleted.", status: :see_other
+    redirect_to board_deals_path, notice: t("flashes.deals.deleted"), status: :see_other
   end
 
   def duplicate
@@ -173,7 +173,7 @@ class DealsController < ApplicationController
     authorize copy, :create?
     copy.owner ||= current_user
     if copy.save
-      redirect_to copy, notice: "Deal duplicado."
+      redirect_to copy, notice: t("flashes.deals.duplicated")
     else
       redirect_to @deal, alert: copy.errors.full_messages.to_sentence
     end
@@ -204,7 +204,7 @@ class DealsController < ApplicationController
   def move_pipeline
     authorize @deal, :move?
     @deal.move_to_pipeline!(params.require(:pipeline_id))
-    redirect_to @deal, notice: "Deal moved to pipeline #{@deal.pipeline.name}."
+    redirect_to @deal, notice: t("flashes.deals.moved_pipeline", pipeline: @deal.pipeline.name)
   rescue ActiveRecord::RecordInvalid => e
     redirect_to @deal, alert: e.record.errors.full_messages.to_sentence
   end

@@ -10,7 +10,7 @@ class PersonRelationshipsController < ApplicationController
     authorize @relationship
 
     if @relationship.save
-      redirect_to person_path(@person), notice: "Relationship added."
+      redirect_to person_path(@person), notice: t("flashes.person_relationships.added")
     else
       redirect_to person_path(@person), alert: @relationship.errors.full_messages.to_sentence
     end
@@ -22,7 +22,7 @@ class PersonRelationshipsController < ApplicationController
     raise ActiveRecord::RecordNotFound unless @relationship.involves?(@person)
 
     @relationship.destroy
-    redirect_to person_path(@person), notice: "Relationship removed.", status: :see_other
+    redirect_to person_path(@person), notice: t("flashes.person_relationships.removed"), status: :see_other
   end
 
   private

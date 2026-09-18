@@ -21,7 +21,7 @@ class ListsController < ApplicationController
     authorize @list
 
     if @list.save
-      redirect_to @list, notice: "List created."
+      redirect_to @list, notice: t("flashes.lists.created")
     else
       render :new, status: :unprocessable_entity
     end
@@ -34,7 +34,7 @@ class ListsController < ApplicationController
   def update
     authorize @list
     if @list.update(list_params)
-      redirect_to @list, notice: "List updated."
+      redirect_to @list, notice: t("flashes.lists.updated")
     else
       render :edit, status: :unprocessable_entity
     end
@@ -43,7 +43,7 @@ class ListsController < ApplicationController
   def destroy
     authorize @list
     @list.destroy
-    redirect_to lists_path, notice: "List deleted.", status: :see_other
+    redirect_to lists_path, notice: t("flashes.lists.deleted"), status: :see_other
   end
 
   private

@@ -16,14 +16,14 @@ class GmailConnectionsController < ApplicationController
 
     attrs = connection_params
     if enabled_param?(attrs[:sync_enabled]) && !@connection.can_read_metadata?
-      redirect_to gmail_connection_path, alert: "Grant inbox access before enabling reply detection." and return
+      redirect_to gmail_connection_path, alert: t("flashes.gmail.grant_inbox_for_reply_detection") and return
     end
     if enabled_param?(attrs[:send_enabled]) && !@connection.can_send?
-      redirect_to gmail_connection_path, alert: "Reconnect Gmail to grant send permission." and return
+      redirect_to gmail_connection_path, alert: t("flashes.gmail.reconnect_for_send") and return
     end
 
     @connection.update(attrs)
-    redirect_to gmail_connection_path, notice: "Gmail settings updated."
+    redirect_to gmail_connection_path, notice: t("flashes.gmail.settings_updated")
   end
 
   def sync
@@ -31,21 +31,21 @@ class GmailConnectionsController < ApplicationController
     authorize @connection
 
     unless @connection.connected?
-      redirect_to gmail_connection_path, alert: "Connect Gmail first." and return
+      redirect_to gmail_connection_path, alert: t("flashes.gmail.connect_first") and return
     end
     unless @connection.can_read_metadata?
-      redirect_to gmail_connection_path, alert: "Grant inbox access before syncing replies." and return
+      redirect_to gmail_connection_path, alert: t("flashes.gmail.grant_inbox_for_replies") and return
     end
 
     GmailSyncJob.perform_later(@connection.id)
-    redirect_to gmail_connection_path, notice: "Inbox sync started."
+    redirect_to gmail_connection_path, notice: t("flashes.gmail.sync_started")
   end
 
   def destroy
     @connection = current_workspace.gmail_connections.find_by!(user: current_user)
     authorize @connection
     @connection.destroy
-    redirect_to gmail_connection_path, notice: "Gmail disconnected.", status: :see_other
+    redirect_to gmail_connection_path, notice: t("flashes.gmail.disconnected"), status: :see_other
   end
 
   def gmail_auth_url(mode)

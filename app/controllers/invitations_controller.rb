@@ -25,7 +25,7 @@ class InvitationsController < ApplicationController
     invitation = policy_scope(Invitation).pending.find(params[:id])
     authorize invitation
     invitation.destroy!
-    redirect_to settings_team_path, notice: "Invitation revoked."
+    redirect_to settings_team_path, notice: t("flashes.invitations.revoked")
   end
 
   def resend

@@ -10,7 +10,7 @@ class DealProductsController < ApplicationController
   def create
     @line_item = @deal.deal_products.new(line_item_params)
     if @line_item.save
-      redirect_to @deal, notice: "Product added."
+      redirect_to @deal, notice: t("flashes.deal_products.added")
     else
       redirect_to @deal, alert: @line_item.errors.full_messages.to_sentence
     end
@@ -19,7 +19,7 @@ class DealProductsController < ApplicationController
   def update
     @line_item = @deal.deal_products.find(params[:id])
     if @line_item.update(line_item_params)
-      redirect_to @deal, notice: "Line updated."
+      redirect_to @deal, notice: t("flashes.deal_products.line_updated")
     else
       redirect_to @deal, alert: @line_item.errors.full_messages.to_sentence
     end
@@ -27,7 +27,7 @@ class DealProductsController < ApplicationController
 
   def destroy
     @deal.deal_products.find(params[:id]).destroy
-    redirect_to @deal, notice: "Product removed.", status: :see_other
+    redirect_to @deal, notice: t("flashes.deal_products.removed"), status: :see_other
   end
 
   private

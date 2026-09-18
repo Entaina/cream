@@ -30,18 +30,18 @@ class StripeConnectionsController < ApplicationController
     authorize @connection
 
     unless @connection.connected?
-      redirect_to stripe_connection_path, alert: "Add a Stripe API key first." and return
+      redirect_to stripe_connection_path, alert: t("flashes.stripe.add_api_key_first") and return
     end
 
     StripeSyncJob.perform_later(@connection.id)
-    redirect_to stripe_connection_path, notice: "Payment sync started."
+    redirect_to stripe_connection_path, notice: t("flashes.stripe.sync_started")
   end
 
   def destroy
     @connection = current_workspace.stripe_connections.first!
     authorize @connection
     @connection.destroy
-    redirect_to stripe_connection_path, notice: "Stripe disconnected.", status: :see_other
+    redirect_to stripe_connection_path, notice: t("flashes.stripe.disconnected"), status: :see_other
   end
 
   private

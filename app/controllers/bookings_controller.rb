@@ -18,7 +18,7 @@ class BookingsController < ApplicationController
     client = connection&.connected? ? GoogleCalendar::Client.new(connection) : nil
 
     BookingCanceller.call(booking: @booking, client:)
-    redirect_to bookings_path, notice: "Reserva cancelada."
+    redirect_to bookings_path, notice: t("flashes.bookings.cancelled")
   rescue GoogleCalendar::Error => e
     redirect_to bookings_path, alert: e.message
   end

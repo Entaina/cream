@@ -39,7 +39,7 @@ class LeadFormsController < ApplicationController
     authorize @lead_form
 
     if @lead_form.save
-      redirect_to lead_forms_path, notice: "Formulario creado."
+      redirect_to lead_forms_path, notice: t("flashes.lead_forms.created")
     else
       load_form_options
       render :new, status: :unprocessable_entity
@@ -54,7 +54,7 @@ class LeadFormsController < ApplicationController
   def update
     authorize @lead_form
     if @lead_form.update(lead_form_params)
-      redirect_to lead_forms_path, notice: "Formulario actualizado."
+      redirect_to lead_forms_path, notice: t("flashes.lead_forms.updated")
     else
       load_form_options
       render :edit, status: :unprocessable_entity
@@ -64,7 +64,7 @@ class LeadFormsController < ApplicationController
   def destroy
     authorize @lead_form
     @lead_form.destroy
-    redirect_to lead_forms_path, notice: "Formulario eliminado.", status: :see_other
+    redirect_to lead_forms_path, notice: t("flashes.lead_forms.deleted"), status: :see_other
   end
 
   private

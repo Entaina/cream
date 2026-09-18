@@ -26,16 +26,16 @@ class TasksController < ApplicationController
     authorize @task
 
     if @task.save
-      redirect_back fallback_location: tasks_path, notice: "Task created."
+      redirect_back fallback_location: tasks_path, notice: t("flashes.tasks.created")
     else
-      redirect_back fallback_location: tasks_path, alert: "Task needs a title."
+      redirect_back fallback_location: tasks_path, alert: t("flashes.tasks.needs_title")
     end
   end
 
   def update
     authorize @task
     @task.update(task_params)
-    redirect_back fallback_location: tasks_path, notice: "Task updated."
+    redirect_back fallback_location: tasks_path, notice: t("flashes.tasks.updated")
   end
 
   def toggle
@@ -56,7 +56,7 @@ class TasksController < ApplicationController
   def destroy
     authorize @task
     @task.destroy
-    redirect_back fallback_location: tasks_path, notice: "Task deleted.", status: :see_other
+    redirect_back fallback_location: tasks_path, notice: t("flashes.tasks.deleted"), status: :see_other
   end
 
   private

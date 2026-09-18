@@ -25,10 +25,10 @@
         </div>
         <p class="text-sm text-ink-faint mt-1">
           <%= t("alert_rules.index.summary_html",
-                trigger: alert_rule.trigger_field_label,
-                offset: alert_rule.offset_summary,
-                conditions: alert_rule.active_conditions_summary,
-                recipient: alert_rule.recipient_label).html_safe %>
+                trigger: h(alert_rule.trigger_field_label),
+                offset: h(alert_rule.offset_summary),
+                conditions: h(alert_rule.active_conditions_summary),
+                recipient: h(alert_rule.recipient_label)).html_safe %>
         </p>
       </article>
     <% end %>

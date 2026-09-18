@@ -95,7 +95,7 @@ class PeopleController < ApplicationController
 
     if @person.save
       respond_to do |format|
-        format.html { redirect_to @person, notice: "Person created." }
+        format.html { redirect_to @person, notice: t("flashes.people.created") }
         format.json { render json: {id: @person.id, name: @person.display_name}, status: :created }
       end
     else
@@ -119,7 +119,7 @@ class PeopleController < ApplicationController
     if inline_edit?
       update_inline
     elsif @person.update(person_params)
-      redirect_to @edit_section ? person_path(@person, tab: "information") : person_path(@person), notice: "Person updated."
+      redirect_to @edit_section ? person_path(@person, tab: "information") : person_path(@person), notice: t("flashes.people.updated")
     else
       render :edit, status: :unprocessable_entity
     end
@@ -128,7 +128,7 @@ class PeopleController < ApplicationController
   def destroy
     authorize @person
     @person.destroy
-    redirect_to people_path, notice: "Person deleted.", status: :see_other
+    redirect_to people_path, notice: t("flashes.people.deleted"), status: :see_other
   end
 
   def duplicates
@@ -153,7 +153,7 @@ class PeopleController < ApplicationController
       end
 
       PersonMerger.call(primary: @person, secondaries: secondaries, user: current_user)
-      redirect_to @person, notice: "Merged #{secondaries.size} duplicate #{"contact".pluralize(secondaries.size)} into #{@person.display_name}.", status: :see_other
+      redirect_to @person, notice: t("flashes.people.merged", count: secondaries.size, name: @person.display_name), status: :see_other
     else
       @selected_secondary_ids = Array(params[:secondary_ids]).map(&:to_i).uniq - [@person.id]
     end
@@ -178,7 +178,7 @@ class PeopleController < ApplicationController
       Marketing::ConsentService.subscribe!(person: @person, subscription_type: type, source: "crm_admin", legal_basis: "consent")
     end
 
-    redirect_to @person, notice: "Suscripción actualizada."
+    redirect_to @person, notice: t("flashes.people.subscription_updated")
   end
 
   private
@@ -256,7 +256,7 @@ class PeopleController < ApplicationController
             locals: {person: @person, field: inline_field, editing: false}
           )
         end
-        format.html { redirect_to people_path, notice: "Person updated." }
+        format.html { redirect_to people_path, notice: t("flashes.people.updated") }
       end
     else
       respond_to do |format|

@@ -25,7 +25,7 @@ class StageTriggersController < ApplicationController
     authorize @stage_trigger
 
     if @stage_trigger.save
-      redirect_to pipeline_stage_stage_triggers_path(@stage), notice: "Disparador creado."
+      redirect_to pipeline_stage_stage_triggers_path(@stage), notice: t("flashes.stage_triggers.created")
     else
       render :new, status: :unprocessable_entity
     end
@@ -38,7 +38,7 @@ class StageTriggersController < ApplicationController
   def update
     authorize @stage_trigger
     if @stage_trigger.update(stage_trigger_params)
-      redirect_to pipeline_stage_stage_triggers_path(@stage_trigger.pipeline_stage), notice: "Disparador actualizado."
+      redirect_to pipeline_stage_stage_triggers_path(@stage_trigger.pipeline_stage), notice: t("flashes.stage_triggers.updated")
     else
       render :edit, status: :unprocessable_entity
     end
@@ -48,7 +48,7 @@ class StageTriggersController < ApplicationController
     authorize @stage_trigger
     stage = @stage_trigger.pipeline_stage
     @stage_trigger.destroy
-    redirect_to pipeline_stage_stage_triggers_path(stage), notice: "Disparador eliminado.", status: :see_other
+    redirect_to pipeline_stage_stage_triggers_path(stage), notice: t("flashes.stage_triggers.deleted"), status: :see_other
   end
 
   private

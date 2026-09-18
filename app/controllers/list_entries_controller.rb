@@ -7,14 +7,14 @@ class ListEntriesController < ApplicationController
     entry = @list.list_entries.new(record: record)
     authorize entry
     entry.save!
-    redirect_to @list, notice: "Added to list."
+    redirect_to @list, notice: t("flashes.list_entries.added")
   end
 
   def destroy
     entry = @list.list_entries.find(params[:id])
     authorize entry
     entry.destroy
-    redirect_to @list, notice: "Removed from list.", status: :see_other
+    redirect_to @list, notice: t("flashes.list_entries.removed"), status: :see_other
   end
 
   private

@@ -20,7 +20,7 @@ class WebhooksController < ApplicationController
     authorize @webhook
 
     if @webhook.save
-      redirect_to webhooks_path, notice: "Webhook created."
+      redirect_to webhooks_path, notice: t("flashes.webhooks.created")
     else
       render :new, status: :unprocessable_entity
     end
@@ -33,7 +33,7 @@ class WebhooksController < ApplicationController
   def update
     authorize @webhook
     if @webhook.update(webhook_params)
-      redirect_to webhooks_path, notice: "Webhook updated."
+      redirect_to webhooks_path, notice: t("flashes.webhooks.updated")
     else
       render :edit, status: :unprocessable_entity
     end
@@ -42,7 +42,7 @@ class WebhooksController < ApplicationController
   def destroy
     authorize @webhook
     @webhook.destroy
-    redirect_to webhooks_path, notice: "Webhook deleted.", status: :see_other
+    redirect_to webhooks_path, notice: t("flashes.webhooks.deleted"), status: :see_other
   end
 
   private

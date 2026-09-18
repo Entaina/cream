@@ -31,7 +31,7 @@ class JourneysController < ApplicationController
     @journey = current_workspace.journeys.new(journey_params)
     authorize @journey
     if @journey.save
-      redirect_to @journey, notice: "Recorrido creado."
+      redirect_to @journey, notice: t("flashes.journeys.created")
     else
       load_form_collections
       render :new, status: :unprocessable_entity
@@ -46,7 +46,7 @@ class JourneysController < ApplicationController
   def update
     authorize @journey
     if @journey.update(journey_params)
-      redirect_to @journey, notice: "Recorrido actualizado."
+      redirect_to @journey, notice: t("flashes.journeys.updated")
     else
       load_form_collections
       render :edit, status: :unprocessable_entity
@@ -56,7 +56,7 @@ class JourneysController < ApplicationController
   def destroy
     authorize @journey
     @journey.destroy
-    redirect_to journeys_path, notice: "Recorrido eliminado.", status: :see_other
+    redirect_to journeys_path, notice: t("flashes.journeys.deleted"), status: :see_other
   end
 
   def enroll

@@ -46,7 +46,7 @@ class EmailTemplatesController < ApplicationController
     authorize @template
 
     if @template.save
-      redirect_to email_templates_path, notice: "Plantilla creada."
+      redirect_to email_templates_path, notice: t("flashes.email_templates.created")
     else
       render :new, status: :unprocessable_entity
     end
@@ -70,7 +70,7 @@ class EmailTemplatesController < ApplicationController
     @template.attachments.attach(new_files) if new_files.any?
 
     if @template.save
-      redirect_to email_templates_path, notice: "Plantilla actualizada."
+      redirect_to email_templates_path, notice: t("flashes.email_templates.updated")
     else
       render :edit, status: :unprocessable_entity
     end
@@ -79,7 +79,7 @@ class EmailTemplatesController < ApplicationController
   def destroy
     authorize @template
     @template.destroy
-    redirect_to email_templates_path, notice: "Plantilla eliminada.", status: :see_other
+    redirect_to email_templates_path, notice: t("flashes.email_templates.deleted"), status: :see_other
   end
 
   private

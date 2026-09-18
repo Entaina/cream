@@ -14,7 +14,7 @@ module Settings
       authorize [:settings, :workspace]
 
       if current_workspace.update(workspace_params)
-        redirect_to settings_workspace_path, notice: "Workspace updated."
+        redirect_to settings_workspace_path, notice: t("flashes.settings.workspace_updated")
       else
         redirect_to settings_workspace_path, alert: current_workspace.errors.full_messages.to_sentence
       end

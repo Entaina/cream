@@ -5,6 +5,19 @@ RSpec.describe "Pipelines", type: :request do
 
   let(:member) { users(:one) }
 
+  describe "GET /pipelines" do
+    it "renders in English when the user locale is en" do
+      sign_in_as(member)
+      Pipeline.create_default!(workspaces(:one))
+      member.update!(locale: "en")
+      get pipelines_path
+      expect(response.body).to include(I18n.t("pipelines.index.new", locale: :en))
+      expect(response.body).not_to include(I18n.t("pipelines.index.new", locale: :es))
+    ensure
+      member.update!(locale: "es")
+    end
+  end
+
   describe "POST /pipelines" do
     it "creates a pipeline with its nested stages" do
       sign_in_as(member)
@@ -33,7 +46,7 @@ RSpec.describe "Pipelines", type: :request do
       }.to change(Pipeline, :count).by(1).and change(PipelineStage, :count).by(source.pipeline_stages.count)
 
       copy = Pipeline.order(:id).last
-      expect(copy.name).to eq("Ventas (copy)")
+      expect(copy.name).to eq("Ventas#{I18n.t("pipelines.duplicate_name_suffix")}")
       expect(copy.deals).to be_empty
       expect(response).to redirect_to(edit_pipeline_path(copy))
     end

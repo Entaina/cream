@@ -9,16 +9,9 @@ class Pipeline < ApplicationRecord
     {name: "Lost", color: "red", probability: 0, closed: true}
   ].freeze
 
-  CARD_FIELDS = {
-    "value" => "Importe",
-    "company" => "Empresa",
-    "owner" => "Responsable",
-    "expected_close_date" => "Fecha de cierre",
-    "probability" => "Probabilidad",
-    "invoice_number" => "Nº factura",
-    "contacts" => "Contactos",
-    "products" => "Productos y ediciones"
-  }.freeze
+  CARD_FIELD_KEYS = %w[
+    value company owner expected_close_date probability invoice_number contacts products
+  ].freeze
 
   belongs_to :workspace
   has_many :pipeline_stages, -> { order(:position, :id) }, dependent: :destroy, inverse_of: :pipeline
@@ -54,6 +47,24 @@ class Pipeline < ApplicationRecord
 
   def show_card_field?(field) = card_fields.include?(field.to_s)
 
+  def self.card_field_label(key)
+    case key
+    when "value" then I18n.t("records.fields.value")
+    when "company" then I18n.t("records.fields.company")
+    when "owner" then I18n.t("records.fields.owner")
+    when "expected_close_date" then I18n.t("records.fields.close_date")
+    when "probability" then I18n.t("records.fields.probability")
+    when "invoice_number" then I18n.t("records.fields.invoice_number")
+    when "contacts" then I18n.t("records.fields.contacts")
+    when "products" then I18n.t("pipelines.card_fields.products")
+    else key.humanize
+    end
+  end
+
+  def self.card_field_options
+    CARD_FIELD_KEYS.map { |key| [card_field_label(key), key] }
+  end
+
   # Reorder stages by id list (must include every stage exactly once).
   def reorder_stages!(stage_ids)
     ids = Array(stage_ids).map(&:to_i)
@@ -69,7 +80,7 @@ class Pipeline < ApplicationRecord
   # Build an unsaved copy with the same stages (structure only — no deals, not default).
   def duplicate(name: nil)
     copy = workspace.pipelines.new(
-      name: name.presence || "#{self.name} (copy)",
+      name: name.presence || "#{self.name}#{I18n.t("pipelines.duplicate_name_suffix")}",
       position: workspace.pipelines.count,
       default_pipeline: false,
       card_fields: card_fields
@@ -96,12 +107,12 @@ class Pipeline < ApplicationRecord
   end
 
   def normalize_card_fields
-    self.card_fields = Array(card_fields).map(&:to_s).uniq & CARD_FIELDS.keys
+    self.card_fields = Array(card_fields).map(&:to_s).uniq & CARD_FIELD_KEYS
   end
 
   def must_have_a_stage
     return if pipeline_stages.reject(&:marked_for_destruction?).any?
 
-    errors.add(:base, "A pipeline needs at least one stage")
+    errors.add(:base, I18n.t("pipelines.validation.needs_stage"))
   end
 end

@@ -29,7 +29,7 @@ class CampaignsController < ApplicationController
     @campaign = current_workspace.campaigns.new(campaign_params)
     authorize @campaign
     if @campaign.save
-      redirect_to @campaign, notice: "Campaña creada."
+      redirect_to @campaign, notice: t("flashes.campaigns.created")
     else
       load_email_form_collections
       render :new, status: :unprocessable_entity
@@ -44,7 +44,7 @@ class CampaignsController < ApplicationController
   def update
     authorize @campaign
     if @campaign.update(campaign_params)
-      redirect_to @campaign, notice: "Campaña actualizada."
+      redirect_to @campaign, notice: t("flashes.campaigns.updated")
     else
       load_email_form_collections
       render :edit, status: :unprocessable_entity
@@ -54,7 +54,7 @@ class CampaignsController < ApplicationController
   def destroy
     authorize @campaign
     @campaign.destroy
-    redirect_to campaigns_path, notice: "Campaña eliminada.", status: :see_other
+    redirect_to campaigns_path, notice: t("flashes.campaigns.deleted"), status: :see_other
   end
 
   def send_campaign
@@ -62,17 +62,17 @@ class CampaignsController < ApplicationController
     delivery_mode = params[:delivery_mode].presence_in(CampaignSend::DELIVERY_MODES) || "email"
 
     if delivery_mode.in?(%w[email both]) && !@campaign.email_content_present?
-      return redirect_to edit_campaign_path(@campaign), alert: "Añade asunto y cuerpo del email antes de enviar."
+      return redirect_to edit_campaign_path(@campaign), alert: t("flashes.campaigns.missing_email_content")
     end
 
     journey = nil
     if delivery_mode.in?(%w[journey both])
       journey = current_workspace.journeys.active.find_by(id: params[:journey_id])
-      return redirect_to(@campaign, alert: "Selecciona un recorrido activo.") unless journey
+      return redirect_to(@campaign, alert: t("flashes.campaigns.pick_active_journey")) unless journey
     end
 
     segment = current_workspace.segments.find(params[:segment_id])
-    return redirect_to(@campaign, alert: "El segmento debe ser de personas.") unless segment.record_type == "Person"
+    return redirect_to(@campaign, alert: t("flashes.campaigns.segment_must_be_people")) unless segment.record_type == "Person"
 
     subscription_type = resolve_subscription_type
     send_record = current_workspace.campaign_sends.create!(
@@ -92,17 +92,17 @@ class CampaignsController < ApplicationController
       send_record.mark_scheduled!
       @campaign.update!(status: "scheduled")
       CampaignSendJob.set(wait_until: send_record.scheduled_at).perform_later(send_record.id)
-      redirect_to @campaign, notice: "Envío programado."
+      redirect_to @campaign, notice: t("flashes.campaigns.send_scheduled")
     else
       CampaignSendJob.perform_later(send_record.id)
-      redirect_to @campaign, notice: "Envío de campaña encolado."
+      redirect_to @campaign, notice: t("flashes.campaigns.send_queued")
     end
   end
 
   def send_test
     authorize @campaign, :update?
     unless @campaign.email_content_present?
-      return redirect_to edit_campaign_path(@campaign), alert: "Añade asunto y cuerpo del email antes de enviar una prueba."
+      return redirect_to edit_campaign_path(@campaign), alert: t("flashes.campaigns.missing_email_content_test")
     end
 
     person = current_workspace.people.with_email(current_user.email_address).first ||
@@ -126,16 +126,16 @@ class CampaignsController < ApplicationController
       marketing_send: false
     )
     Marketing::Esp::Client.for(message).deliver!
-    redirect_to @campaign, notice: "Email de prueba enviado a #{current_user.email_address}."
+    redirect_to @campaign, notice: t("flashes.campaigns.test_sent", email: current_user.email_address)
   rescue => e
-    redirect_to @campaign, alert: "No se pudo enviar la prueba: #{e.message}"
+    redirect_to @campaign, alert: t("flashes.campaigns.test_send_failed", message: e.message)
   end
 
   def cancel_send
     authorize @campaign, :update?
     send_record = @campaign.campaign_sends.find(params[:send_id])
     send_record.cancel!
-    redirect_to @campaign, notice: "Envío cancelado."
+    redirect_to @campaign, notice: t("flashes.campaigns.send_cancelled")
   end
 
   def mark_winner
@@ -144,7 +144,7 @@ class CampaignsController < ApplicationController
     variant = send_record.campaign_variants.find(params[:variant_id])
     send_record.campaign_variants.update_all(winner: false)
     variant.update!(winner: true)
-    redirect_to @campaign, notice: "Variante #{variant.name} marcada como ganadora."
+    redirect_to @campaign, notice: t("flashes.campaigns.variant_winner", name: variant.name)
   end
 
   def send_winner_rest
@@ -171,7 +171,7 @@ class CampaignsController < ApplicationController
       winner: true
     )
     CampaignSendJob.perform_later(send_record.id)
-    redirect_to @campaign, notice: "Envío de ganadora encolado para #{remaining.size} destinatarios restantes."
+    redirect_to @campaign, notice: t("flashes.campaigns.winner_send_queued", count: remaining.size)
   end
 
   def recipient_count

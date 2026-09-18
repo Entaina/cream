@@ -22,14 +22,14 @@ class OmniauthCallbacksController < ApplicationController
     start_new_session_for user
     redirect_to after_authentication_url
   rescue ActiveRecord::RecordInvalid
-    redirect_to new_session_path, alert: "Could not sign in with Google."
+    redirect_to new_session_path, alert: t("flashes.oauth.google_sign_in_failed")
   end
 
   def failure
     alert = if params[:message] == "csrf_detected"
-      "Sign-in session expired. Open the app from the same URL you use in Google OAuth and try again."
+      t("flashes.oauth.sign_in_session_expired")
     else
-      "Could not sign in with Google."
+      t("flashes.oauth.google_sign_in_failed")
     end
 
     redirect_to new_session_path, alert: alert
@@ -42,11 +42,11 @@ class OmniauthCallbacksController < ApplicationController
   def connect_calendar(auth)
     resume_session
     unless current_user
-      redirect_to new_session_path, alert: "Sign in first to connect Google Calendar." and return
+      redirect_to new_session_path, alert: t("flashes.oauth.calendar_sign_in_first") and return
     end
 
     unless CreamFeatures.enabled?(:calendar_booking)
-      redirect_to root_path, alert: "Calendar booking is not enabled." and return
+      redirect_to root_path, alert: t("flashes.oauth.calendar_booking_disabled") and return
     end
 
     workspace = current_user.active_workspace(session_workspace_id: session[:workspace_id])
@@ -54,9 +54,9 @@ class OmniauthCallbacksController < ApplicationController
     connection.assign_oauth_credentials(auth)
 
     if connection.save
-      redirect_to calendar_connection_path, notice: "Google Calendar connected for #{connection.email}."
+      redirect_to calendar_connection_path, notice: t("flashes.oauth.calendar_connected", email: connection.email)
     else
-      redirect_to calendar_connection_path, alert: "Could not connect Google Calendar."
+      redirect_to calendar_connection_path, alert: t("flashes.oauth.calendar_connect_failed")
     end
   end
 
@@ -65,7 +65,7 @@ class OmniauthCallbacksController < ApplicationController
     # isn't resumed automatically — do it here to identify who is connecting.
     resume_session
     unless current_user
-      redirect_to new_session_path, alert: "Sign in first to connect Gmail." and return
+      redirect_to new_session_path, alert: t("flashes.oauth.gmail_sign_in_first") and return
     end
 
     if calendar_connect_request?
@@ -79,9 +79,9 @@ class OmniauthCallbacksController < ApplicationController
     connection.assign_oauth_credentials(auth, mode: mode)
 
     if connection.save
-      redirect_to gmail_connection_path, notice: "Gmail connected for #{connection.email}."
+      redirect_to gmail_connection_path, notice: t("flashes.oauth.gmail_connected", email: connection.email)
     else
-      redirect_to gmail_connection_path, alert: "Could not connect Gmail."
+      redirect_to gmail_connection_path, alert: t("flashes.oauth.gmail_connect_failed")
     end
   end
 

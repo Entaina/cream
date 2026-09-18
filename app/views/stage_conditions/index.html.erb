@@ -13,7 +13,7 @@
 
 <div class="flex-1 overflow-y-auto scrollbar-subtle p-5 space-y-3">
   <p class="text-sm text-ink-faint">
-    <%= t("stage_conditions.index.intro_html", stage: @stage.name).html_safe %>
+    <%= t("stage_conditions.index.intro_html", stage: h(@stage.name)).html_safe %>
   </p>
   <% if @stage_conditions.empty? %>
     <p class="text-base text-ink-soft"><%= t("stage_conditions.index.empty") %></p>

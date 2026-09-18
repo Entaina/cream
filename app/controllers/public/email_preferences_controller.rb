@@ -35,7 +35,7 @@ module Public
         end
       end
 
-      redirect_to public_email_preferences_path(token: params[:token]), notice: "Preferencias actualizadas."
+      redirect_to public_email_preferences_path(token: params[:token]), notice: t("flashes.email_preferences.updated")
     end
 
     def unsubscribe

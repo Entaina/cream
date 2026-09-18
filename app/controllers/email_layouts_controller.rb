@@ -32,7 +32,7 @@ class EmailLayoutsController < ApplicationController
     authorize @layout
 
     if @layout.save
-      redirect_to email_templates_path, notice: "Layout creado."
+      redirect_to email_templates_path, notice: t("flashes.email_layouts.created")
     else
       render :new, status: :unprocessable_entity
     end
@@ -47,7 +47,7 @@ class EmailLayoutsController < ApplicationController
     authorize @layout
 
     if @layout.update(layout_params)
-      redirect_to email_templates_path, notice: "Layout actualizado."
+      redirect_to email_templates_path, notice: t("flashes.email_layouts.updated")
     else
       render :edit, status: :unprocessable_entity
     end
@@ -56,7 +56,7 @@ class EmailLayoutsController < ApplicationController
   def destroy
     authorize @layout
     @layout.destroy
-    redirect_to email_templates_path, notice: "Layout eliminado.", status: :see_other
+    redirect_to email_templates_path, notice: t("flashes.email_layouts.deleted"), status: :see_other
   end
 
   private

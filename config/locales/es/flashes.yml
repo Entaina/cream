@@ -1,0 +1,215 @@
+---
+es:
+  flashes:
+    api_tokens:
+      created: Token creado. Cópialo ahora — no se volverá a mostrar.
+      revoked: Token revocado.
+    automations:
+      created: Automatización creada.
+      deleted: Automatización eliminada.
+      updated: Automatización actualizada.
+    beehiiv:
+      configure_first: Configura la API key y al menos una publicación primero.
+      disconnected: Beehiiv desconectado.
+      publication_deleted: Publicación Beehiiv eliminada.
+      sync_started: Sincronización con Beehiiv iniciada.
+    booking_pages:
+      created: Página de reservas creada.
+      deleted: Página de reservas eliminada.
+      updated: Página de reservas actualizada.
+    bookings:
+      cancelled: Reserva cancelada.
+    calendar:
+      disconnected: Google Calendar desconectado.
+    campaigns:
+      created: Campaña creada.
+      deleted: Campaña eliminada.
+      missing_email_content: Añade asunto y cuerpo del email antes de enviar.
+      missing_email_content_test: Añade asunto y cuerpo del email antes de enviar una prueba.
+      pick_active_journey: Selecciona un recorrido activo.
+      segment_must_be_people: El segmento debe ser de personas.
+      send_cancelled: Envío cancelado.
+      send_queued: Envío de campaña encolado.
+      send_scheduled: Envío programado.
+      test_send_failed: 'No se pudo enviar la prueba: %{message}'
+      test_sent: Email de prueba enviado a %{email}.
+      updated: Campaña actualizada.
+      variant_winner: Variante %{name} marcada como ganadora.
+      winner_send_queued: Envío de ganadora encolado para %{count} destinatarios restantes.
+    comments:
+      added: Comentario añadido.
+      deleted: Comentario eliminado.
+      empty: El comentario no puede estar vacío.
+    companies:
+      created: Empresa creada.
+      deleted: Empresa eliminada.
+      merged: Se fusionaron %{count} empresas duplicadas en %{name}.
+      updated: Empresa actualizada.
+    deal_accesses:
+      collaborator_added: '%{name} añadido como colaborador.'
+      collaborator_removed: Colaborador eliminado.
+      already_has_access: '%{name} ya tiene acceso a esta oportunidad.'
+      owner_has_access: El propietario de la oportunidad ya tiene acceso.
+    deal_products:
+      added: Producto añadido.
+      line_updated: Línea actualizada.
+      removed: Producto eliminado.
+    deals:
+      created: Oportunidad creada.
+      deleted: Oportunidad eliminada.
+      duplicated: Oportunidad duplicada.
+      moved_pipeline: Oportunidad movida al pipeline %{pipeline}.
+      updated: Oportunidad actualizada.
+    editions:
+      created: Edición creada.
+      deleted: Edición eliminada.
+      in_use: No se puede eliminar una edición en uso por una oportunidad.
+      updated: Edición actualizada.
+    email_layouts:
+      created: Layout creado.
+      deleted: Layout eliminado.
+      updated: Layout actualizado.
+    email_preferences:
+      updated: Preferencias actualizadas.
+    email_templates:
+      created: Plantilla creada.
+      deleted: Plantilla eliminada.
+      updated: Plantilla actualizada.
+    gmail:
+      connect_first: Conecta Gmail primero.
+      disconnected: Gmail desconectado.
+      grant_inbox_for_replies: Concede acceso a la bandeja de entrada antes de sincronizar respuestas.
+      grant_inbox_for_reply_detection: Concede acceso a la bandeja de entrada antes de activar la detección de respuestas.
+      reconnect_for_send: Vuelve a conectar Gmail para conceder permiso de envío.
+      settings_updated: Ajustes de Gmail actualizados.
+      sync_started: Sincronización de bandeja iniciada.
+    imports:
+      completed: Se importaron %{count} registros.
+    invitations:
+      revoked: Invitación revocada.
+    journeys:
+      created: Recorrido creado.
+      deleted: Recorrido eliminado.
+      updated: Recorrido actualizado.
+    lead_form_templates:
+      created: Plantilla creada.
+      deleted: Plantilla eliminada.
+      preview_pages_only: Solo las páginas completas admiten vista previa.
+      updated: Plantilla actualizada.
+    lead_forms:
+      created: Formulario creado.
+      deleted: Formulario eliminado.
+      updated: Formulario actualizado.
+    list_entries:
+      added: Añadido a la lista.
+      removed: Eliminado de la lista.
+    lists:
+      created: Lista creada.
+      deleted: Lista eliminada.
+      updated: Lista actualizada.
+    mail_merges:
+      no_recipients: Ningún destinatario coincide con el origen seleccionado.
+      queued: Mail merge encolado para %{count} destinatarios.
+    mailjet:
+      disconnected: Mailjet desconectado.
+    memberships:
+      removed: Miembro eliminado del workspace.
+      role_updated: Rol del miembro actualizado.
+    notes:
+      added: Nota añadida.
+      deleted: Nota eliminada.
+      empty: La nota no puede estar vacía.
+      updated: Nota actualizada.
+    notifications:
+      all_read: Todas las notificaciones marcadas como leídas.
+    oauth:
+      calendar_booking_disabled: Las reservas con calendario no están habilitadas.
+      calendar_connected: Google Calendar conectado para %{email}.
+      calendar_connect_failed: No se pudo conectar Google Calendar.
+      calendar_sign_in_first: Inicia sesión primero para conectar Google Calendar.
+      gmail_connected: Gmail conectado para %{email}.
+      gmail_connect_failed: No se pudo conectar Gmail.
+      gmail_sign_in_first: Inicia sesión primero para conectar Gmail.
+      sign_in_session_expired: La sesión de inicio de sesión ha caducado. Abre la app desde la misma URL que usas en OAuth de Google e inténtalo de nuevo.
+      google_sign_in_failed: No se pudo iniciar sesión con Google.
+    people:
+      created: Contacto creado.
+      deleted: Contacto eliminado.
+      merged: Se fusionaron %{count} contactos duplicados en %{name}.
+      subscription_updated: Suscripción actualizada.
+      updated: Contacto actualizado.
+    person_relationships:
+      added: Relación añadida.
+      removed: Relación eliminada.
+    product_interests:
+      dismissed: Interés descartado.
+      registered: Interés registrado.
+    products:
+      created: Producto creado.
+      deleted: Producto eliminado.
+      in_use: No se puede eliminar un producto en uso por una oportunidad.
+      updated: Producto actualizado.
+    record_attachments:
+      removed: Archivo eliminado.
+      uploaded: Archivo subido.
+    record_emails:
+      follow_up_cleared: Marcado como respondido; recordatorio de seguimiento eliminado.
+      scheduled_cancelled: Email programado cancelado.
+    registrations:
+      welcome: '¡Bienvenido a Cream!'
+    reports:
+      deleted: Informe eliminado.
+      saved: Informe guardado.
+      updated: Informe actualizado.
+    sales_briefings:
+      ai_not_configured: La IA no está configurada. Configura CREAM_AI_API_KEY.
+      daily_limit: Has alcanzado el límite de 5 regeneraciones diarias.
+      disabled_for_user: Has desactivado el briefing del director de ventas en tu perfil.
+      not_enabled: El director de ventas no está habilitado para este workspace.
+    saved_views:
+      deleted: Vista eliminada.
+      saved: Vista guardada.
+      updated: Vista actualizada.
+    scoring_rules:
+      created: Regla de scoring creada.
+      deleted: Regla de scoring eliminada.
+      recalculation_queued: Recálculo de puntuación encolado.
+      updated: Regla de scoring actualizada.
+    segments:
+      created: Segmento creado.
+      deleted: Segmento eliminado.
+      updated: Segmento actualizado.
+    settings:
+      custom_field_created: Campo personalizado creado.
+      custom_field_deleted: Campo personalizado eliminado.
+      custom_field_updated: Campo personalizado actualizado.
+      workspace_updated: Workspace actualizado.
+    slack_integrations:
+      created: Integración con Slack creada.
+      deleted: Integración con Slack eliminada.
+      updated: Integración con Slack actualizada.
+    stage_triggers:
+      created: Disparador creado.
+      deleted: Disparador eliminado.
+      updated: Disparador actualizado.
+    stripe:
+      add_api_key_first: Añade primero una API key de Stripe.
+      disconnected: Stripe desconectado.
+      ignored: Pago ignorado.
+      linked: Pago vinculado a %{deal}.
+      pick_deal: Elige una oportunidad para vincular este pago.
+      review: Pago de nuevo en revisión.
+      sync_started: Sincronización de pagos iniciada.
+    subscription_types:
+      created: Tipo de suscripción creado.
+      deleted: Tipo de suscripción eliminado.
+      updated: Tipo de suscripción actualizado.
+    tasks:
+      created: Tarea creada.
+      deleted: Tarea eliminada.
+      needs_title: La tarea necesita un título.
+      updated: Tarea actualizada.
+    webhooks:
+      created: Webhook creado.
+      deleted: Webhook eliminado.
+      updated: Webhook actualizado.

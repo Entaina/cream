@@ -43,7 +43,7 @@ RSpec.describe "Campaigns", type: :request do
     post send_campaign_campaign_path(campaign), params: {segment_id: segment.id}
 
     expect(response).to redirect_to(edit_campaign_path(campaign))
-    expect(flash[:alert]).to include("asunto y cuerpo")
+    expect(flash[:alert]).to include(I18n.t("flashes.campaigns.missing_email_content"))
     expect(campaign.campaign_sends.count).to eq(0)
   end
 
@@ -92,7 +92,7 @@ RSpec.describe "Campaigns", type: :request do
     }
 
     expect(response).to redirect_to(campaign)
-    expect(flash[:alert]).to include("recorrido activo")
+    expect(flash[:alert]).to include(I18n.t("flashes.campaigns.pick_active_journey"))
     expect(campaign.campaign_sends.count).to eq(0)
   end
 end
