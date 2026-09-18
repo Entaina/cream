@@ -1,22 +1,22 @@
-<% content_for :title, "Vista previa: #{@template.display_name}" %>
+<% content_for :title, t("marketing.lead_form_templates.preview.title", name: @template.display_name) %>
 
 <div class="mx-auto max-w-xl space-y-4">
   <div class="rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-100 space-y-3">
     <div>
-      <p class="font-medium">Vista previa de plantilla</p>
+      <p class="font-medium"><%= t("marketing.lead_form_templates.preview.heading") %></p>
       <p class="mt-1">
-        Estás viendo <strong class="font-mono"><%= @template.display_name %></strong>.
+        <%= t("marketing.lead_form_templates.preview.intro_html", name: h(@template.display_name)).html_safe %>
         <% if @preview_draft %>
-          Incluye cambios sin guardar del editor.
+          <%= t("marketing.lead_form_templates.preview.draft_note") %>
         <% end %>
-        El formulario no enviará datos reales.
+        <%= t("marketing.lead_form_templates.preview.no_submit") %>
       </p>
-      <%= link_to "Volver al editor", edit_lead_form_template_path(@template), class: "mt-2 inline-block text-accent hover:underline" %>
+      <%= link_to t("marketing.lead_form_templates.preview.back_to_editor"), edit_lead_form_template_path(@template), class: "mt-2 inline-block text-accent hover:underline" %>
     </div>
 
     <% if @preview_draft %>
       <% if @preview_product %>
-        <p class="text-xs">Producto: <strong><%= @preview_product.name %></strong></p>
+        <p class="text-xs"><%= t("marketing.lead_form_templates.preview.product_label") %> <strong><%= @preview_product.name %></strong></p>
       <% end %>
     <% elsif @preview_products.any? %>
       <%= render "preview_product_field",

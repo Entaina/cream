@@ -18,7 +18,7 @@
 
   <div>
     <%= f.label :record_type, t("marketing.segments.form.record_type"), class: "label" %>
-    <%= f.select :record_type, Segment::RECORD_TYPES.map { |t| [ t, t ] }, {}, class: "input w-full" %>
+    <%= f.select :record_type, Segment::RECORD_TYPES.map { |rt| [ rt, rt ] }, {}, class: "input w-full" %>
   </div>
 
   <div>
@@ -41,76 +41,84 @@
             include_blank: t("marketing.shared.any"), class: "input w-full" %>
     </div>
     <div>
-      <label class="label">Email contiene</label>
+      <label class="label"><%= t("marketing.segments.form.filter_email_contains") %></label>
       <%= text_field_tag "segment[filters][email_contains]", filters["email_contains"], class: "input w-full" %>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
       <div>
-        <label class="label">Puntuación mínima</label>
+        <label class="label"><%= t("marketing.segments.form.filter_score_min") %></label>
         <%= number_field_tag "segment[filters][lead_score_min]", filters["lead_score_min"], class: "input w-full" %>
       </div>
       <div>
-        <label class="label">Puntuación máxima</label>
+        <label class="label"><%= t("marketing.segments.form.filter_score_max") %></label>
         <%= number_field_tag "segment[filters][lead_score_max]", filters["lead_score_max"], class: "input w-full" %>
       </div>
     </div>
     <div>
-      <label class="label">Abrió email (últimos N días)</label>
+      <label class="label"><%= t("marketing.segments.form.filter_opened_email") %></label>
       <%= number_field_tag "segment[filters][opened_email_days]", filters["opened_email_days"], class: "input w-full", min: 1 %>
     </div>
     <div>
-      <label class="label">Envió formulario (slug)</label>
+      <label class="label"><%= t("marketing.segments.form.filter_form_slug") %></label>
       <%= text_field_tag "segment[filters][submitted_form_slug]", filters["submitted_form_slug"], class: "input w-full" %>
     </div>
     <div>
-      <label class="label">Visitó URL (contiene)</label>
+      <label class="label"><%= t("marketing.segments.form.filter_visited_url") %></label>
       <%= text_field_tag "segment[filters][visited_url]", filters["visited_url"], class: "input w-full" %>
     </div>
     <label class="flex items-center gap-2 text-sm">
       <%= check_box_tag "segment[filters][exclude_suppressed]", "1", filters["exclude_suppressed"].in?([ true, "true", "1", 1 ]) %>
-      Excluir direcciones suprimidas
+      <%= t("marketing.segments.form.exclude_suppressed") %>
     </label>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-3 border-t border-line pt-3">
       <div>
-        <label class="label">Oportunidad abierta</label>
+        <label class="label"><%= t("marketing.segments.form.filter_open_deal") %></label>
         <%= select_tag "segment[filters][open_deal]",
-              options_for_select([ [ "Cualquiera", "any" ], [ "Sí", "yes" ], [ "No", "no" ] ], filters["open_deal"]),
+              options_for_select([
+                [t("marketing.segments.form.open_deal_any"), "any"],
+                [t("marketing.segments.form.open_deal_yes"), "yes"],
+                [t("marketing.segments.form.open_deal_no"), "no"]
+              ], filters["open_deal"]),
               class: "input w-full" %>
       </div>
       <div>
-        <label class="label">Producto (oportunidad abierta)</label>
+        <label class="label"><%= t("marketing.segments.form.filter_open_deal_product") %></label>
         <%= select_tag "segment[filters][open_deal_product_id]",
               options_from_collection_for_select(current_workspace.products.ordered, :id, :name, filters["open_deal_product_id"]),
-              include_blank: "Cualquiera", class: "input w-full" %>
+              include_blank: t("marketing.shared.any"), class: "input w-full" %>
       </div>
       <div>
-        <label class="label">Interés en producto</label>
+        <label class="label"><%= t("marketing.segments.form.filter_interest_product") %></label>
         <%= select_tag "segment[filters][interest_product_id]",
               options_from_collection_for_select(current_workspace.products.ordered, :id, :name, filters["interest_product_id"]),
-              include_blank: "Cualquiera", class: "input w-full" %>
+              include_blank: t("marketing.shared.any"), class: "input w-full" %>
       </div>
       <div>
-        <label class="label">Estado del interés</label>
+        <label class="label"><%= t("marketing.segments.form.filter_interest_status") %></label>
         <%= select_tag "segment[filters][interest_status]",
               options_for_select(Marketing::ProductInterest::STATUSES.map { |s| [ s.humanize, s ] }, filters["interest_status"]),
-              include_blank: "Pendiente (por defecto)", class: "input w-full" %>
+              include_blank: t("marketing.segments.form.interest_pending_default"), class: "input w-full" %>
       </div>
       <div>
-        <label class="label">Historial comercial (producto)</label>
+        <label class="label"><%= t("marketing.segments.form.filter_dealt_product") %></label>
         <%= select_tag "segment[filters][dealt_product_id]",
               options_from_collection_for_select(current_workspace.products.ordered, :id, :name, filters["dealt_product_id"]),
-              include_blank: "Cualquiera", class: "input w-full" %>
+              include_blank: t("marketing.shared.any"), class: "input w-full" %>
       </div>
       <div>
-        <label class="label">Formulario origen</label>
+        <label class="label"><%= t("marketing.segments.form.filter_lead_form") %></label>
         <%= select_tag "segment[filters][lead_form_id]",
               options_from_collection_for_select(current_workspace.lead_forms.ordered, :id, :name, filters["lead_form_id"]),
-              include_blank: "Cualquiera", class: "input w-full" %>
+              include_blank: t("marketing.shared.any"), class: "input w-full" %>
       </div>
       <div>
-        <label class="label">Destino captura</label>
+        <label class="label"><%= t("marketing.segments.form.filter_capture_destination") %></label>
         <%= select_tag "segment[filters][capture_destination]",
-              options_for_select([ [ "Cualquiera", "any" ], [ "MQL", "mql" ], [ "Deal", "deal" ] ], filters["capture_destination"]),
+              options_for_select([
+                [t("marketing.segments.form.open_deal_any"), "any"],
+                [t("marketing.shared.mql_badge"), "mql"],
+                [t("marketing.shared.deal_badge"), "deal"]
+              ], filters["capture_destination"]),
               class: "input w-full" %>
       </div>
     </div>
@@ -118,8 +126,7 @@
 
   <% if segment.persisted? %>
     <p class="text-sm text-ink-faint">
-      Vista previa: <strong data-segment-preview-target="count">…</strong> registros con los filtros guardados.
-      Guarda los cambios para actualizar el recuento.
+      <%= t("marketing.segments.form.preview_html").html_safe %>
     </p>
   <% end %>
 

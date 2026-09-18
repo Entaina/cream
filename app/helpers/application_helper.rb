@@ -138,9 +138,7 @@ module ApplicationHelper
   end
 
   def lead_form_email_template_tokens_hint
-    "Tokens disponibles: {first_name}, {last_name}, {name}, {email}, {company}, " \
-      "{form_name}, {form_slug}, {product}, {edition} y cualquier campo del envío " \
-      "(p. ej. {help_type}, {message})."
+    t("marketing.lead_forms.form.email_tokens_hint")
   end
 
   def info_tooltip(content, label: "Más información", width: "w-72")

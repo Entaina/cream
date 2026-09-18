@@ -3,6 +3,21 @@ en:
   marketing:
     attribution:
       page_title: Attribution
+      header_title: Marketing attribution
+      period: Period
+      period_month: Current month
+      period_quarter: Quarter
+      period_year: Year
+      filter: Filter
+      empty_title: No attribution data
+      empty_subtitle: When there are visits, leads, or deals with UTM parameters, they will appear here grouped by channel.
+      col_channel: Channel (source)
+      col_visits: Visits
+      col_leads: Leads
+      col_mql: MQL
+      col_deals: Deals
+      col_revenue: Revenue
+      total: Total
     automations:
       edit:
         page_title: Edit automation
@@ -66,6 +81,11 @@ en:
         utm_medium: UTM medium
         utm_source: UTM source
         utm_term: UTM term
+        goal_hint: Briefly describe what you want to achieve with this campaign.
+        email_content_legend: Email content
+        email_content_hint: Write this campaign's send or pick a template as a base. Content is saved on the campaign, not as a global template.
+        utm_legend: UTM parameters
+        utm_hint: Automatically appended to campaign links for attribution tracking.
       index:
         delete_confirm: Delete campaign «%{name}»?
         empty_subtitle: Create a campaign to email segments, run A/B tests, and track
@@ -172,6 +192,7 @@ en:
     journeys:
       edit:
         page_title: Edit journey
+        view: View journey
       form:
         add_step: Add step
         any_form: Any form
@@ -192,6 +213,8 @@ en:
         select_segment: Select segment
         steps_legend: Steps
         stop_on_open_deal: Exit journey if there is an open deal for the product
+        manual_entry_hint: Manual enrollments are done from the journey detail page.
+        email_clicked_hint: Fires when the contact clicks a link in a marketing email.
       index:
         delete_confirm: Delete journey «%{name}»?
         empty_subtitle: Automate email sequences, waits, and tasks when marketing
@@ -217,6 +240,14 @@ en:
         stat_waiting: Waiting
         steps_heading: Journey steps
         trigger: 'Trigger:'
+        col_current_step: Current step
+        col_next_run: Next run
+        col_enrolled_at: Enrolled
+        col_move_step: Change step
+        move: Move
+        move_confirm: "Move %{name} to this step? The journey will continue from there and run that step."
+        no_enrollments: No enrollments yet.
+        inactive_step_suffix: " (inactive)"
       step_fields:
         branch_false: If false → step (ID)
         branch_hint: Evaluate a condition on the contact and jump to the indicated
@@ -241,8 +272,74 @@ en:
         page_title: Edit form template
       index:
         page_title: Public form templates
+        back_to_forms: Back to forms
+        new_template: New template
+        filter_all: All
+        filter_view: Pages
+        filter_partial: Partials
+        empty_all: No templates in this workspace yet.
+        empty_kind: No templates of this type.
+        badge_partial: Partial
+        badge_page: Page
+        preview: Preview
+        delete_confirm: "Delete template «%{name}»?"
       new:
         page_title: New form template
+      form:
+        slug_label: Name
+        slug_placeholder: contact
+        slug_hint_html: 'Template identifier (e.g. <code class="font-mono">contact</code>, <code class="font-mono">contact_fields</code>). Used in the form picker and in <code class="font-mono">{% partial ''name'' %}</code>.'
+        partial_checkbox: Is a partial
+        kind: Type
+        kind_page: Landing page (/p/:slug)
+        kind_form: Lead form
+        page_slug: Public slug (landing only)
+        page_slug_placeholder: my-landing
+        page_slug_hint: "Public URL:"
+        body: Liquid content
+        body_hint: 'Use tags like {% field ... %}, {% partial ''name'' %}, {% form_open %}, and variables {{ lead_form.name }}.'
+        save: Save
+        preview_button: Preview
+      submission_schema:
+        heading: Validation schema
+        intro: Fields the server accepts and validates on each submission. Rebuilt when you save the template.
+        partial_note: Partials have no schema of their own; they are included when compiling the form page that imports them.
+        empty_note: No compiled schema yet. Save the template to generate it from the rendered HTML.
+        fields_badge: "%{count} fields"
+        metadata_badge: "%{count} metadata"
+        system_fields_summary: Metadata and system fields (%{count})
+      schema_field:
+        required: Required
+        optional: Optional
+        values_label: "Values:"
+      schema_types:
+        text: Text
+        email: Email
+        tel: Phone
+        textarea: Long text
+        select: Select
+        checkbox: Checkbox
+        radio: Radio
+        hidden: Hidden
+      schema_conditions:
+        collects_company: Collect company
+        requires_product: Product configured
+        open_editions: Open editions
+      schema_values:
+        open_editions_dynamic: Open edition IDs (at runtime)
+        more: "+%{count} more"
+      preview:
+        title: "Preview: %{name}"
+        heading: Template preview
+        intro_html: 'You are viewing <strong class="font-mono">%{name}</strong>.'
+        draft_note: Includes unsaved editor changes.
+        no_submit: The form will not submit real data.
+        back_to_editor: Back to editor
+        product_label: "Product:"
+      preview_product:
+        label: Product for preview
+        auto_option: Automatic (form or sample)
+        hint: Optional. Used when opening preview to test product and edition fields.
     lead_forms:
       edit:
         page_title: Edit lead capture form
@@ -259,6 +356,83 @@ en:
         templates: Form templates
       new:
         page_title: New lead capture form
+      form:
+        identity_heading: Identity
+        identity_intro: Public name, URL, and template for the capture form.
+        slug_label: Slug (public URL)
+        slug_placeholder: contact-ai-course
+        slug_hint: Used at /f/slug. Lowercase letters, numbers, and hyphens only.
+        template_key: Form template
+        collects_company: Collect company data (name and tax ID)
+        require_corporate_email: Require corporate email
+        corporate_email_hint: Rejects Gmail, Hotmail, Yahoo, Outlook, and other personal addresses. Use for lead magnets targeting businesses only.
+        destination_heading: Submission destination
+        destination_intro: Deal creates or reuses an opportunity. MQL captures the person and consent without creating a deal.
+        destination_label: Destination
+        destination_mql: MQL (marketing)
+        destination_deal: Deal (sales)
+        subscription_type_mql: Subscription type (MQL)
+        subscription_default: General (default)
+        marketing_consent_text: Marketing consent text (MQL)
+        marketing_consent_hint: Overrides the primary subscription type checkbox label on MQL forms.
+        consent_template_hint_html: 'The template must include a marketing checkbox with key <code class="font-mono text-xs">%{key}</code> (e.g. <code class="font-mono text-xs">{% subscription_opt_in slug: "%{slug}" %}</code>).'
+        consent_template_missing_html: 'Template «%{template_key}» does not include that field in its submission schema. Visitors will not be able to opt in to marketing.'
+        crm_heading: CRM and assignment
+        crm_intro: Pipeline, stage, and owner for deals created from this form (Deal destination only).
+        default_pipeline: Default pipeline
+        default_pipeline_hint_html: 'Default pipeline for new deals. If the form posts <code class="text-2xs">help_type</code>, routing can use the table below.'
+        stage: Stage
+        first_stage_blank: First pipeline stage
+        stage_hint: Optional. New deals start in this stage; existing open deals advance to it (never move backward).
+        responsible: Owner
+        product_optional: Product (optional)
+        product_hint_html: 'When set, sent hidden on the public form and linked to the deal. Override with <code class="text-2xs">?product_id=</code> in the URL.'
+        pipeline_routes_heading: Pipeline by form field
+        pipeline_routes_hint_html: 'Optional. If the template posts a field (e.g. <code class="text-2xs">help_type</code>), assign a different pipeline per POST <strong>value</strong>. Keys must match Liquid <code class="text-2xs">choices:</code> <code class="text-2xs">value</code> attributes.'
+        route_field_value: Field value
+        route_field_title: Lowercase letters, numbers, and underscores
+        route_field_placeholder: course
+        route_pipeline: Pipeline
+        route_default_pipeline: Use default pipeline
+        remove_route: Remove route
+        add_route: Add route
+        first_task_heading: First task
+        first_task_intro: Created on every form submission, including when reusing an open deal.
+        first_task_title: First task title
+        first_task_due_days: Due in (days from deal creation)
+        first_task_due_hint: When the form creates a deal, the task is due N days later (0 = same day).
+        email_redirect_heading: Email and redirect
+        email_redirect_intro: Automatic message to the lead and post-submit destination.
+        email_template: Email template to lead
+        email_template_open_aria: Open email template in new tab
+        email_tokens_tooltip: Tokens available in the email template
+        email_tokens_hint: "Available tokens: {first_name}, {last_name}, {name}, {email}, {company}, {form_name}, {form_slug}, {product}, {edition}, and any submission field (e.g. {help_type}, {message})."
+        no_email_hint: If you choose «No email», no automatic email is sent to the lead after submit.
+        success_redirect_url: Redirect URL after submit
+        success_redirect_placeholder: https://example.com/thanks
+        success_redirect_hint: Optional. If blank, Cream's thank-you page is shown (/f/slug/success).
+        hidden_fields_heading: Hidden fields
+        hidden_fields_intro: Extra parameters read from the public URL (e.g. /f/slug?product=course-ai).
+        hidden_field_keys: Additional keys
+        hidden_field_keys_placeholder: "product\nlanding"
+        hidden_field_keys_hint: One key per line.
+      show:
+        destination_mql_badge: MQL destination
+        destination_deal_badge: Deal destination
+        mql_captured_heading: MQL captures (%{count} people)
+        col_person: Person
+        col_submissions: Submissions
+        col_first_capture: First capture
+        col_last_capture: Last capture
+        col_eligible_now: Eligible now
+        yes: "Yes"
+        no: "No"
+        mql_empty: No MQL captures from this form yet.
+        recent_submissions: Recent submissions
+        col_destination: Destination
+        col_date: Date
+        detail: Detail
+        submissions_empty: No submissions yet.
     mqls:
       index:
         col_forms: Forms
@@ -458,6 +632,21 @@ en:
     subscription_types:
       edit:
         page_title: Edit subscription type
+      form:
+        slug: Identifier (slug)
+        slug_hint: Lowercase letters, numbers, and hyphens only. Do not change in production.
+        description_placeholder: Monthly product and company updates
+        description_hint: Shown to contacts in the preference center.
+        position: Order
+        consent_field_key: Checkbox field key in forms
+        consent_field_title: Lowercase letters, numbers, and underscores
+        consent_field_hint_html: 'Optional. Name of the <code class="text-2xs">lead[key]</code> field in Liquid templates (<code class="text-2xs">{% subscription_opt_in slug: "…" %}</code>). Must be unique in the workspace.'
+        default_consent_label: Default checkbox label
+        default_consent_label_placeholder: I want to receive the newsletter
+        default_consent_label_hint: Label shown on forms unless the template or MQL form overrides it.
+        exclude_subscribe_all: Exclude from «subscribe to all»
+        exclude_subscribe_all_hint_html: 'When checked, the <code class="text-2xs">subscription_opt_in_all</code> tag will not subscribe this type (individual checkbox still works).'
+        create: Create type
       index:
         delete_confirm: Delete type «%{name}»?
         empty_subtitle: Define communication categories (newsletter, promotions, etc.)

@@ -9,34 +9,39 @@
       <% end %>
 
       <div>
-        <%= f.label :slug, "Nombre", class: "label" %>
-        <%= f.text_field :slug, class: "input w-full font-mono", placeholder: "contacto", required: true %>
-        <p class="mt-1 text-xs text-ink-faint">Identificador de la plantilla (p. ej. <code class="font-mono">contacto</code>, <code class="font-mono">contact_fields</code>). Se usa en el selector de formularios y en <code class="font-mono">{% partial 'nombre' %}</code>.</p>
+        <%= f.label :slug, t("marketing.lead_form_templates.form.slug_label"), class: "label" %>
+        <%= f.text_field :slug, class: "input w-full font-mono", placeholder: t("marketing.lead_form_templates.form.slug_placeholder"), required: true %>
+        <p class="mt-1 text-xs text-ink-faint"><%= t("marketing.lead_form_templates.form.slug_hint_html").html_safe %></p>
       </div>
 
       <label class="flex items-center gap-2 text-sm">
-        <%= f.check_box :partial %> Es un parcial (partial)
+        <%= f.check_box :partial %> <%= t("marketing.lead_form_templates.form.partial_checkbox") %>
       </label>
 
       <div>
-        <%= f.label :kind, "Tipo", class: "label" %>
-        <%= f.select :kind, LeadFormTemplate::KINDS.map { |k| [ k == "page" ? "Landing page (/p/:slug)" : "Formulario de lead", k ] }, {}, class: "input w-full" %>
+        <%= f.label :kind, t("marketing.lead_form_templates.form.kind"), class: "label" %>
+        <%= f.select :kind,
+              LeadFormTemplate::KINDS.map { |k| [t("marketing.lead_form_templates.form.kind_#{k}"), k] },
+              {}, class: "input w-full" %>
       </div>
       <div>
-        <%= f.label :page_slug, "Slug público (solo landing)", class: "label" %>
-        <%= f.text_field :page_slug, class: "input w-full font-mono", placeholder: "mi-landing" %>
-        <p class="mt-1 text-xs text-ink-faint">URL pública: <code class="font-mono">/p/<%= template.workspace.slug %>/&lt;slug&gt;</code></p>
+        <%= f.label :page_slug, t("marketing.lead_form_templates.form.page_slug"), class: "label" %>
+        <%= f.text_field :page_slug, class: "input w-full font-mono", placeholder: t("marketing.lead_form_templates.form.page_slug_placeholder") %>
+        <p class="mt-1 text-xs text-ink-faint">
+          <%= t("marketing.lead_form_templates.form.page_slug_hint") %>
+          <code class="font-mono">/p/<%= template.workspace.slug %>/&lt;slug&gt;</code>
+        </p>
       </div>
 
       <div>
-        <%= f.label :body, "Contenido Liquid", class: "label" %>
+        <%= f.label :body, t("marketing.lead_form_templates.form.body"), class: "label" %>
         <%= render "shared/liquid_editor",
               form: f,
               field: :body,
               rows: 24,
               required: true,
               preview_form_id: (template.persisted? && template.previewable? ? "lead-form-template-preview-form" : nil) %>
-        <p class="mt-1 text-xs text-ink-faint">Usa etiquetas como {% raw %}{% field type: "select", name: "help_type", label: "…", choices: "Curso|curso; Otro|otro", blank: "Elige", required: true %}{% endraw %}, {% raw %}{% partial 'nombre' %}{% endraw %}, {% raw %}{% form_open %}{% endraw %} y variables {{ lead_form.name }}.</p>
+        <p class="mt-1 text-xs text-ink-faint"><%= t("marketing.lead_form_templates.form.body_hint") %></p>
       </div>
     <% end %>
 
@@ -52,12 +57,12 @@
     <% end %>
 
     <div class="flex flex-wrap gap-2">
-      <%= button_tag "Guardar", type: "submit", form: edit_form_id, class: "btn-primary" %>
+      <%= button_tag t("marketing.lead_form_templates.form.save"), type: "submit", form: edit_form_id, class: "btn-primary" %>
       <% if template.persisted? && template.previewable? %>
-        <%= button_tag "Vista previa", type: "submit", form: "lead-form-template-preview-form",
+        <%= button_tag t("marketing.lead_form_templates.form.preview_button"), type: "submit", form: "lead-form-template-preview-form",
               class: "btn-secondary" %>
       <% end %>
-      <%= link_to "Cancelar", lead_form_templates_path, class: "btn-secondary" %>
+      <%= link_to t("marketing.shared.cancel"), lead_form_templates_path, class: "btn-secondary" %>
     </div>
   </div>
 

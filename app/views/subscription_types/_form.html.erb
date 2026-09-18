@@ -6,53 +6,53 @@
   <% end %>
 
   <div>
-    <%= f.label :name, "Nombre", class: "label" %>
+    <%= f.label :name, t("marketing.shared.name"), class: "label" %>
     <%= f.text_field :name, class: "input w-full", placeholder: "Newsletter" %>
   </div>
 
   <div>
-    <%= f.label :slug, "Identificador (slug)", class: "label" %>
+    <%= f.label :slug, t("marketing.subscription_types.form.slug"), class: "label" %>
     <%= f.text_field :slug, class: "input w-full font-mono", placeholder: "newsletter" %>
-    <p class="text-sm text-ink-faint mt-1">Solo letras minúsculas, números y guiones. No cambiar en producción.</p>
+    <p class="text-sm text-ink-faint mt-1"><%= t("marketing.subscription_types.form.slug_hint") %></p>
   </div>
 
   <div>
-    <%= f.label :description, "Descripción", class: "label" %>
+    <%= f.label :description, t("marketing.shared.description"), class: "label" %>
     <%= f.text_area :description, class: "input w-full resize-y", rows: 3,
-          placeholder: "Novedades mensuales sobre producto y empresa" %>
-    <p class="text-sm text-ink-faint mt-1">Visible para contactos en el centro de preferencias.</p>
+          placeholder: t("marketing.subscription_types.form.description_placeholder") %>
+    <p class="text-sm text-ink-faint mt-1"><%= t("marketing.subscription_types.form.description_hint") %></p>
   </div>
 
   <div>
-    <%= f.label :position, "Orden", class: "label" %>
+    <%= f.label :position, t("marketing.subscription_types.form.position"), class: "label" %>
     <%= f.number_field :position, class: "input w-full", min: 0 %>
   </div>
 
   <div>
-    <%= f.label :consent_field_key, "Clave del checkbox en formularios", class: "label" %>
+    <%= f.label :consent_field_key, t("marketing.subscription_types.form.consent_field_key"), class: "label" %>
     <%= f.text_field :consent_field_key, class: "input w-full font-mono",
           placeholder: "newsletter_opt_in",
           pattern: LeadForm::FIELD_KEY_FORMAT.source,
-          title: "Letras minúsculas, números y guiones bajos" %>
-    <p class="text-sm text-ink-faint mt-1">Opcional. Nombre del campo <code class="text-2xs">lead[clave]</code> en plantillas Liquid (<code class="text-2xs">{% subscription_opt_in slug: \"…\" %}</code>). Debe ser única en el workspace.</p>
+          title: t("marketing.subscription_types.form.consent_field_title") %>
+    <p class="text-sm text-ink-faint mt-1"><%= t("marketing.subscription_types.form.consent_field_hint_html").html_safe %></p>
   </div>
 
   <div>
-    <%= f.label :default_consent_label, "Texto por defecto del checkbox", class: "label" %>
+    <%= f.label :default_consent_label, t("marketing.subscription_types.form.default_consent_label"), class: "label" %>
     <%= f.text_area :default_consent_label, class: "input w-full resize-y", rows: 2,
-          placeholder: "Quiero recibir la newsletter" %>
-    <p class="text-sm text-ink-faint mt-1">Etiqueta mostrada en formularios salvo que la plantilla o el formulario MQL la sobrescriban.</p>
+          placeholder: t("marketing.subscription_types.form.default_consent_label_placeholder") %>
+    <p class="text-sm text-ink-faint mt-1"><%= t("marketing.subscription_types.form.default_consent_label_hint") %></p>
   </div>
 
   <label class="flex items-center gap-2 text-base">
-    <%= f.check_box :active %> Activo
+    <%= f.check_box :active %> <%= t("marketing.shared.active") %>
   </label>
 
   <label class="flex items-center gap-2 text-base">
-    <%= f.check_box :excluded_from_subscribe_all %> Excluir de «suscribir a todas»
+    <%= f.check_box :excluded_from_subscribe_all %> <%= t("marketing.subscription_types.form.exclude_subscribe_all") %>
   </label>
-  <p class="text-sm text-ink-faint -mt-2">Si está marcado, el tag <code class="text-2xs">subscription_opt_in_all</code> no dará de alta este tipo (sigue disponible con su checkbox individual).</p>
+  <p class="text-sm text-ink-faint -mt-2"><%= t("marketing.subscription_types.form.exclude_subscribe_all_hint_html").html_safe %></p>
 
-  <%= f.submit subscription_type.persisted? ? "Guardar" : "Crear tipo", class: "btn-primary" %>
-  <%= link_to "Cancelar", subscription_types_path, class: "btn-secondary ml-2" %>
+  <%= f.submit subscription_type.persisted? ? t("marketing.shared.save") : t("marketing.subscription_types.form.create"), class: "btn-primary" %>
+  <%= link_to t("marketing.shared.cancel"), subscription_types_path, class: "btn-secondary ml-2" %>
 <% end %>

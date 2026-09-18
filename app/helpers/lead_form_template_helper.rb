@@ -10,17 +10,6 @@ module LeadFormTemplateHelper
     "hidden" => "chicago"
   }.freeze
 
-  SUBMISSION_SCHEMA_TYPE_LABELS = {
-    "text" => "Texto",
-    "email" => "Email",
-    "tel" => "Teléfono",
-    "textarea" => "Texto largo",
-    "select" => "Select",
-    "checkbox" => "Checkbox",
-    "radio" => "Radio",
-    "hidden" => "Oculto"
-  }.freeze
-
   def submission_schema_fields(template)
     Array(template.submission_schema["fields"])
   end
@@ -36,7 +25,7 @@ module LeadFormTemplateHelper
   end
 
   def submission_schema_field_type_label(input_type)
-    SUBMISSION_SCHEMA_TYPE_LABELS.fetch(input_type.to_s, input_type.to_s.humanize)
+    t("marketing.lead_form_templates.schema_types.#{input_type}", default: input_type.to_s.humanize)
   end
 
   def submission_schema_field_type_color(input_type)
@@ -45,24 +34,24 @@ module LeadFormTemplateHelper
 
   def submission_schema_conditions(field)
     [].tap do |conditions|
-      conditions << "Recoger empresa" if field["requires_collects_company"]
-      conditions << "Producto configurado" if field["requires_product"]
-      conditions << "Ediciones abiertas" if field["requires_open_editions"]
+      conditions << t("marketing.lead_form_templates.schema_conditions.collects_company") if field["requires_collects_company"]
+      conditions << t("marketing.lead_form_templates.schema_conditions.requires_product") if field["requires_product"]
+      conditions << t("marketing.lead_form_templates.schema_conditions.open_editions") if field["requires_open_editions"]
     end
   end
 
   def submission_schema_allowed_values_summary(field)
     if field["dynamic_allowed_values"] == "open_editions"
-      return "IDs de ediciones abiertas (en runtime)"
+      return t("marketing.lead_form_templates.schema_values.open_editions_dynamic")
     end
 
     values = Array(field["allowed_values"]).compact_blank
-    return "—" if values.empty?
+    return t("marketing.shared.em_dash") if values.empty?
 
     if values.size <= 4
       values.join(", ")
     else
-      "#{values.first(3).join(", ")} +#{values.size - 3} más"
+      "#{values.first(3).join(", ")} #{t("marketing.lead_form_templates.schema_values.more", count: values.size - 3)}"
     end
   end
 end

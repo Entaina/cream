@@ -14,7 +14,7 @@
   <div>
     <%= f.label :goal, t("marketing.campaigns.form.goal"), class: "label" %>
     <%= f.text_area :goal, class: "input w-full resize-y", rows: 3, placeholder: t("marketing.campaigns.form.goal_placeholder") %>
-    <p class="text-sm text-ink-faint mt-1">Describe brevemente qué quieres conseguir con esta campaña.</p>
+    <p class="text-sm text-ink-faint mt-1"><%= t("marketing.campaigns.form.goal_hint") %></p>
   </div>
 
   <div>
@@ -32,8 +32,8 @@
   <% end %>
 
   <fieldset class="space-y-3 border border-line rounded-lg p-3">
-    <legend class="text-sm font-semibold px-1">Contenido del email</legend>
-    <p class="text-sm text-ink-faint">Redacta el envío de esta campaña o elige una plantilla como base. El contenido se guarda en la campaña, no como plantilla global.</p>
+    <legend class="text-sm font-semibold px-1"><%= t("marketing.campaigns.form.email_content_legend") %></legend>
+    <p class="text-sm text-ink-faint"><%= t("marketing.campaigns.form.email_content_hint") %></p>
     <%= render "shared/email_composer",
           composer_id: dom_id(campaign, :composer),
           source_form_id: form_id,
@@ -52,8 +52,8 @@
   </fieldset>
 
   <fieldset class="space-y-3 border border-line rounded-lg p-3">
-    <legend class="text-sm font-semibold px-1">Parámetros UTM</legend>
-    <p class="text-sm text-ink-faint">Se añaden automáticamente a los enlaces de la campaña para medir atribución.</p>
+    <legend class="text-sm font-semibold px-1"><%= t("marketing.campaigns.form.utm_legend") %></legend>
+    <p class="text-sm text-ink-faint"><%= t("marketing.campaigns.form.utm_hint") %></p>
     <div>
       <%= f.label :utm_source, t("marketing.campaigns.form.utm_source"), class: "label" %>
       <%= f.text_field :utm_source, class: "input w-full", placeholder: "newsletter" %>

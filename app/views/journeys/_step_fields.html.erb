@@ -6,14 +6,14 @@
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
     <div>
-      <%= f.label :step_type, "Tipo de paso", class: "label" %>
+      <%= f.label :step_type, t("marketing.journeys.step_fields.step_type"), class: "label" %>
       <%= f.select :step_type,
-            JourneyStep::STEP_TYPES.map { |t| [ step_type_label(t), t ] },
+            JourneyStep::STEP_TYPES.map { |st| [ step_type_label(st), st ] },
             {}, class: "input w-full",
             data: { "journey-form-target" => "stepType", action: "journey-form#stepTypeChanged" } %>
     </div>
     <div>
-      <%= f.label :position, "Posición", class: "label" %>
+      <%= f.label :position, t("marketing.journeys.step_fields.position"), class: "label" %>
       <%= f.number_field :position, class: "input w-full", min: 0 %>
     </div>
   </div>
@@ -40,71 +40,71 @@
           email_template_id: config["email_template_id"] %>
 
     <div>
-      <label class="label">Tipo de suscripción</label>
+      <label class="label"><%= t("marketing.journeys.step_fields.subscription_type") %></label>
       <%= select_tag "#{prefix}[subscription_type_id]",
             options_from_collection_for_select(@subscription_types, :id, :name, config["subscription_type_id"]),
-            include_blank: "Por defecto", class: "input w-full" %>
+            include_blank: t("marketing.shared.default"), class: "input w-full" %>
     </div>
   </div>
 
   <div data-journey-form-target="stepField" data-step-type="wait" hidden>
-    <label class="label">Esperar (minutos)</label>
+    <label class="label"><%= t("marketing.journeys.step_fields.wait_minutes") %></label>
     <%= number_field_tag "#{prefix}[minutes]", config["minutes"], class: "input w-full", min: 1 %>
   </div>
 
   <div data-journey-form-target="stepField" data-step-type="create_task" hidden class="space-y-2">
     <div>
-      <label class="label">Título de la tarea</label>
-      <%= text_field_tag "#{prefix}[title]", config["title"], class: "input w-full", placeholder: "Seguimiento comercial" %>
+      <label class="label"><%= t("marketing.journeys.step_fields.task_title") %></label>
+      <%= text_field_tag "#{prefix}[title]", config["title"], class: "input w-full", placeholder: t("marketing.journeys.step_fields.task_title_placeholder") %>
     </div>
     <div>
-      <label class="label">Vence en (días)</label>
+      <label class="label"><%= t("marketing.journeys.step_fields.due_in_days") %></label>
       <%= number_field_tag "#{prefix}[due_days]", config["due_days"] || 1, class: "input w-full", min: 0 %>
     </div>
   </div>
 
   <div data-journey-form-target="stepField" data-step-type="adjust_score" hidden>
-    <label class="label">Puntos de puntuación</label>
-    <%= number_field_tag "#{prefix}[points]", config["points"], class: "input w-full", placeholder: "10 o -5" %>
+    <label class="label"><%= t("marketing.journeys.step_fields.score_points") %></label>
+    <%= number_field_tag "#{prefix}[points]", config["points"], class: "input w-full", placeholder: t("marketing.journeys.step_fields.score_points_placeholder") %>
   </div>
 
   <div data-journey-form-target="stepField" data-step-type="add_to_segment" hidden>
-    <label class="label">Lista de personas</label>
+    <label class="label"><%= t("marketing.journeys.step_fields.person_list") %></label>
     <%= select_tag "#{prefix}[list_id]",
           options_from_collection_for_select(@lists, :id, :name, config["list_id"]),
-          include_blank: "Selecciona lista", class: "input w-full" %>
+          include_blank: t("marketing.shared.select_list"), class: "input w-full" %>
   </div>
 
   <div data-journey-form-target="stepField" data-step-type="notify" hidden class="space-y-2">
     <div>
-      <label class="label">Usuario a notificar</label>
+      <label class="label"><%= t("marketing.journeys.step_fields.notify_user") %></label>
       <%= select_tag "#{prefix}[user_id]",
             options_from_collection_for_select(@users, :id, :name, config["user_id"]),
-            include_blank: "Propietario del contacto", class: "input w-full" %>
+            include_blank: t("marketing.shared.contact_owner"), class: "input w-full" %>
     </div>
     <div>
-      <label class="label">Mensaje</label>
-      <%= text_field_tag "#{prefix}[message]", config["message"], class: "input w-full", placeholder: "Paso completado para {nombre}" %>
+      <label class="label"><%= t("marketing.journeys.step_fields.message") %></label>
+      <%= text_field_tag "#{prefix}[message]", config["message"], class: "input w-full", placeholder: t("marketing.journeys.step_fields.message_placeholder") %>
     </div>
   </div>
 
   <div data-journey-form-target="stepField" data-step-type="set_field" hidden class="space-y-2">
     <div>
-      <label class="label">Campo</label>
+      <label class="label"><%= t("marketing.journeys.step_fields.field") %></label>
       <%= select_tag "#{prefix}[field]",
-            options_for_select([ [ "Ciclo de vida", "lifecycle_stage" ] ], config["field"]),
+            options_for_select([ [ t("marketing.shared.lifecycle_field"), "lifecycle_stage" ] ], config["field"]),
             class: "input w-full" %>
     </div>
     <div>
-      <label class="label">Valor</label>
+      <label class="label"><%= t("marketing.shared.value") %></label>
       <%= select_tag "#{prefix}[value]",
             options_for_select(Person::LIFECYCLE_STAGES.map { |s| [ s.humanize, s ] }, config["value"]),
-            include_blank: "Selecciona valor", class: "input w-full" %>
+            include_blank: t("marketing.shared.select_value"), class: "input w-full" %>
     </div>
   </div>
 
   <div data-journey-form-target="stepField" data-step-type="branch" hidden class="space-y-3">
-    <p class="text-sm text-ink-faint">Evalúa una condición sobre el contacto y salta al paso indicado.</p>
+    <p class="text-sm text-ink-faint"><%= t("marketing.journeys.step_fields.branch_hint") %></p>
     <% condition = (config["condition"] || {}).to_h.stringify_keys %>
     <% condition_prefix = "#{prefix}[condition]" %>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
@@ -116,20 +116,20 @@
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
       <div>
-        <label class="label">Si cumple → paso (ID)</label>
+        <label class="label"><%= t("marketing.journeys.step_fields.branch_true") %></label>
         <%= number_field_tag "#{prefix}[true_step_id]", config["true_step_id"], class: "input w-full" %>
       </div>
       <div>
-        <label class="label">Si no cumple → paso (ID)</label>
+        <label class="label"><%= t("marketing.journeys.step_fields.branch_false") %></label>
         <%= number_field_tag "#{prefix}[false_step_id]", config["false_step_id"], class: "input w-full" %>
       </div>
     </div>
   </div>
 
   <div class="flex items-center justify-between gap-2">
-    <label class="flex items-center gap-2 text-base"><%= f.check_box :active %> Activo</label>
+    <label class="flex items-center gap-2 text-base"><%= f.check_box :active %> <%= t("marketing.shared.active") %></label>
     <button type="button" data-action="nested-form#remove" class="btn-ghost text-danger">
-      <%= icon :trash, classes: "size-3.5" %> Eliminar paso
+      <%= icon :trash, classes: "size-3.5" %> <%= t("marketing.shared.delete_step") %>
     </button>
   </div>
 </div>

@@ -5,9 +5,9 @@
       <%= badge submission_schema_field_type_label(field["input_type"]),
             color: submission_schema_field_type_color(field["input_type"]) %>
       <% if field["required"] %>
-        <%= badge "Obligatorio", color: "golden" %>
+        <%= badge t("marketing.lead_form_templates.schema_field.required"), color: "golden" %>
       <% else %>
-        <%= badge "Opcional", color: "chicago" %>
+        <%= badge t("marketing.lead_form_templates.schema_field.optional"), color: "chicago" %>
       <% end %>
     </div>
   </div>
@@ -24,7 +24,7 @@
   <% end %>
 
   <p class="mt-2 text-xs text-ink-faint">
-    <span class="font-medium text-ink-soft">Valores:</span>
+    <span class="font-medium text-ink-soft"><%= t("marketing.lead_form_templates.schema_field.values_label") %></span>
     <%= submission_schema_allowed_values_summary(field) %>
   </p>
 </div>

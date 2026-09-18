@@ -1,28 +1,28 @@
 <section class="card overflow-hidden">
   <div class="border-b border-line bg-canvas-sunken px-4 py-3">
-    <h2 class="font-display text-base font-semibold text-ink">Esquema de validación</h2>
+    <h2 class="font-display text-base font-semibold text-ink"><%= t("marketing.lead_form_templates.submission_schema.heading") %></h2>
     <p class="mt-1 text-xs text-ink-faint">
-      Campos que el servidor acepta y valida en cada envío. Se recalcula al guardar la plantilla.
+      <%= t("marketing.lead_form_templates.submission_schema.intro") %>
     </p>
   </div>
 
   <div class="p-4">
     <% if template.partial? %>
       <p class="text-sm text-ink-soft">
-        Los parciales no tienen esquema propio; se incluyen al compilar la página de formulario que los importa.
+        <%= t("marketing.lead_form_templates.submission_schema.partial_note") %>
       </p>
     <% elsif submission_schema_fields(template).empty? %>
       <p class="text-sm text-ink-soft">
-        Todavía no hay esquema compilado. Guarda la plantilla para generarlo a partir del HTML renderizado.
+        <%= t("marketing.lead_form_templates.submission_schema.empty_note") %>
       </p>
     <% else %>
       <% user_fields = submission_schema_user_fields(template) %>
       <% system_fields = submission_schema_system_fields(template) %>
 
       <div class="mb-3 flex flex-wrap items-center gap-2 text-xs text-ink-faint">
-        <%= badge "#{user_fields.size} campos", color: "green" %>
+        <%= badge t("marketing.lead_form_templates.submission_schema.fields_badge", count: user_fields.size), color: "green" %>
         <% if system_fields.any? %>
-          <%= badge "#{system_fields.size} metadatos", color: "chicago" %>
+          <%= badge t("marketing.lead_form_templates.submission_schema.metadata_badge", count: system_fields.size), color: "chicago" %>
         <% end %>
       </div>
 
@@ -35,7 +35,7 @@
       <% if system_fields.any? %>
         <details class="mt-4 group">
           <summary class="cursor-pointer text-xs font-medium text-ink-faint hover:text-ink">
-            Metadatos y campos de sistema (<%= system_fields.size %>)
+            <%= t("marketing.lead_form_templates.submission_schema.system_fields_summary", count: system_fields.size) %>
           </summary>
           <div class="mt-2 space-y-2 border-t border-line pt-3">
             <% system_fields.each do |field| %>
