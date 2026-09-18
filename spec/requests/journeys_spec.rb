@@ -39,6 +39,48 @@ RSpec.describe "Journeys", type: :request do
     expect(step.config["body_editor"]).to eq("html")
   end
 
+  it "persists 'until time' and 'weekdays only' on wait steps" do
+    post journeys_path, params: {
+      journey: {
+        name: "Timed",
+        entry_trigger: "manual",
+        active: true,
+        steps_attributes: {
+          "0" => {
+            position: "0",
+            step_type: "wait",
+            active: "1",
+            config: {minutes: "1440", until_time: "10:00", weekdays_only: "1"}
+          }
+        }
+      }
+    }
+
+    step = Journey.last.steps.sole
+    expect(step.config["until_time"]).to eq("10:00")
+    expect(step.config["weekdays_only"]).to eq("1")
+
+    get journey_path(Journey.last)
+    expect(response.body).to include("Esperar 1 día y luego hasta las 10:00 (solo días laborables)")
+  end
+
+  it "rejects malformed 'until time' values on wait steps" do
+    expect {
+      post journeys_path, params: {
+        journey: {
+          name: "Broken",
+          entry_trigger: "manual",
+          active: true,
+          steps_attributes: {
+            "0" => {position: "0", step_type: "wait", active: "1", config: {minutes: "5", until_time: "9:30"}}
+          }
+        }
+      }
+    }.not_to change(Journey, :count)
+
+    expect(response.body).to include("formato HH:MM")
+  end
+
   describe "manual step change" do
     let(:person) { create_person!(workspace, email: "move-step@example.com") }
     let(:journey) do

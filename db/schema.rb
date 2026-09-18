@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_17_120100) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_18_130000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -1558,6 +1558,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_17_120100) do
     t.string "provider"
     t.jsonb "sidebar_prefs", default: {}, null: false
     t.string "theme", default: "system", null: false
+    t.string "time_zone"
     t.string "uid"
     t.datetime "updated_at", null: false
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
@@ -1616,6 +1617,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_17_120100) do
     t.boolean "salespeople_can_edit_all_deals", default: false, null: false
     t.boolean "salespeople_can_view_all_deals", default: false, null: false
     t.string "slug", null: false
+    t.string "time_zone", default: "Europe/Madrid", null: false
     t.datetime "updated_at", null: false
     t.boolean "webhooks_enabled", default: false, null: false
     t.index ["slug"], name: "index_workspaces_on_slug", unique: true

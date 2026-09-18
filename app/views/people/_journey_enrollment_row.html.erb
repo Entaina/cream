@@ -24,6 +24,6 @@
     <div class="shrink-0"><%= enrollment_state_badge(enrollment.state) %></div>
   </div>
   <% if expanded && enrollment.next_run_at.present? %>
-    <p class="mt-2 text-xs text-ink-soft"><%= t("people.show.journey_next_run") %>: <%= l(enrollment.next_run_at, format: :short) %></p>
+    <p class="mt-2 text-xs text-ink-soft"><%= t("people.show.journey_next_run") %>: <%= l(enrollment.next_run_at, format: :default) %></p>
   <% end %>
 </li>

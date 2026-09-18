@@ -5,8 +5,7 @@
   en <strong><%= @booking_page.workspace.name %></strong>.
 </p>
 <ul>
-  <li><strong>Fecha:</strong> <%= l(@starts_at_in_zone.to_date, format: :long) %></li>
-  <li><strong>Hora:</strong> <%= @starts_at_time %> (<%= @booking.timezone %>)</li>
+  <li><strong><%= t("booking.mailer.host_notification.date_time") %>:</strong> <%= @starts_at_display %></li>
 </ul>
 <% if @deal_url %>
   <p>

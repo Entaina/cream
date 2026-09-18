@@ -62,6 +62,20 @@ RSpec.describe "Bookings", type: :request do
       expect(response.body).to include("Ana Lopez")
       expect(response.body).to include("Online")
     end
+
+    it "shows the booking time in the booking's timezone, not the viewer's" do
+      user.update!(time_zone: "America/New_York")
+      booking.update!(
+        starts_at: Time.find_zone("UTC").local(2026, 8, 10, 8, 0),
+        ends_at: Time.find_zone("UTC").local(2026, 8, 10, 8, 30)
+      )
+
+      get bookings_path
+
+      expect(response.body).to include("10:00")
+      expect(response.body).to include("Europe/Madrid")
+      expect(response.body).not_to include("04:00")
+    end
   end
 
   describe "PATCH /bookings/:id/cancel" do

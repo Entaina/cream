@@ -26,6 +26,7 @@ RSpec.describe "Settings::Profile", type: :request do
       expect(response).to have_http_status(:success)
       expect(response.body).to include("Datos personales")
       expect(response.body).to include("Idioma")
+      expect(response.body).to include("Zona horaria")
       expect(response.body).to include(admin.name)
       expect(response.body).to include(admin.email_address)
       expect(response.body).to include("Mostrar briefing del director de ventas en el dashboard")
@@ -78,6 +79,21 @@ RSpec.describe "Settings::Profile", type: :request do
       expect(flash[:notice]).to eq(I18n.t("profile.flashes.name_updated"))
       expect(member.reload.locale).to eq("en")
       expect(cookies[:locale]).to eq("en")
+    end
+
+    it "allows users to set and clear their time zone" do
+      sign_in_as(member)
+      patch switch_workspace_path, params: {workspace_id: workspace.id}
+
+      patch settings_profile_path, params: {user: {name: member.name, time_zone: "America/New_York"}}
+
+      expect(response).to redirect_to(settings_profile_path)
+      expect(member.reload.time_zone).to eq("America/New_York")
+
+      patch settings_profile_path, params: {user: {name: member.name, time_zone: ""}}
+
+      expect(response).to redirect_to(settings_profile_path)
+      expect(member.reload.time_zone).to be_nil
     end
 
     it "rejects a blank name" do

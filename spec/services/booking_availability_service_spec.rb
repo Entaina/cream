@@ -111,4 +111,68 @@ RSpec.describe BookingAvailabilityService do
     expect(result.slots).to include("11:00")
     expect(result.slots).not_to include("10:00", "10:30")
   end
+
+  it "converts host weekly hours into the visitor timezone" do
+    travel_to Time.zone.parse("2026-07-28 08:00")
+    allow(client).to receive(:free_busy).and_return([])
+
+    result = described_class.daily(
+      booking_page: booking_page,
+      event_type: event_type,
+      date: "2026-07-28",
+      timezone: "America/New_York",
+      client: client
+    )
+
+    expect(result.slots).to include("04:00", "04:30", "05:00", "05:30")
+    expect(result.slots).not_to include("10:00")
+  end
+
+  it "accepts a guest-zone slot that maps to a host window" do
+    travel_to Time.zone.parse("2026-07-28 06:00")
+    allow(client).to receive(:free_busy).and_return([])
+    starts_at = ActiveSupport::TimeZone["America/New_York"].parse("2026-07-28 04:00")
+
+    expect(
+      described_class.slot_available?(
+        booking_page: booking_page,
+        event_type: event_type,
+        starts_at: starts_at,
+        timezone: "America/New_York",
+        client: client
+      )
+    ).to be(true)
+  end
+
+  it "rejects a guest-zone slot outside the host window" do
+    travel_to Time.zone.parse("2026-07-28 06:00")
+    allow(client).to receive(:free_busy).and_return([])
+    starts_at = ActiveSupport::TimeZone["America/New_York"].parse("2026-07-28 10:00")
+
+    expect(
+      described_class.slot_available?(
+        booking_page: booking_page,
+        event_type: event_type,
+        starts_at: starts_at,
+        timezone: "America/New_York",
+        client: client
+      )
+    ).to be(false)
+  end
+
+  it "shows a host slot on the guest's previous calendar day when zones cross midnight" do
+    travel_to Time.zone.parse("2026-07-27 12:00")
+    allow(client).to receive(:free_busy).and_return([])
+
+    result = described_class.daily(
+      booking_page: booking_page,
+      event_type: event_type,
+      date: "2026-07-27",
+      timezone: "Pacific/Honolulu",
+      client: client
+    )
+
+    # Tuesday 10:00 Madrid (UTC+2) is Monday 22:00 in Honolulu (UTC-10).
+    expect(result.slots).to include("22:00", "22:30", "23:00", "23:30")
+  end
 end

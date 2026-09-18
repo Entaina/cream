@@ -17,6 +17,11 @@
           </div>
           <%= f.submit "Save", class: "btn-secondary" %>
         </div>
+        <div>
+          <%= f.label :time_zone, t("workspace_settings.time_zone"), class: "label" %>
+          <%= f.select :time_zone, time_zone_options(selected: current_workspace.time_zone), {}, class: "input mt-1 w-full" %>
+          <p class="mt-1 text-sm text-ink-faint"><%= t("workspace_settings.time_zone_hint") %></p>
+        </div>
         <label class="flex items-center gap-2 text-base">
           <%= f.check_box :salespeople_can_view_all_deals %>
           Los vendedores pueden ver los deals de otros

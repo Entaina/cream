@@ -44,6 +44,29 @@ RSpec.describe Marketing::JourneyRunner do
       end
     end
 
+    it "schedules 'until time' waits in the workspace zone" do
+      workspace.update!(time_zone: "Europe/Madrid")
+      wait_step.update!(config: {"minutes" => 0, "until_time" => "10:00", "weekdays_only" => "1"})
+      enrollment = JourneyEnrollment.create!(
+        workspace: workspace,
+        journey: journey,
+        person: person,
+        current_step: wait_step,
+        state: "active",
+        enrolled_at: Time.current,
+        next_run_at: Time.current
+      )
+
+      # Friday 18 Sep 2026, 12:00 UTC (14:00 Madrid): 10:00 already passed, weekend skipped.
+      travel_to Time.find_zone("UTC").local(2026, 9, 18, 12, 0) do
+        Time.use_zone("America/New_York") { described_class.new(enrollment).advance! }
+      end
+
+      enrollment.reload
+      expect(enrollment.state).to eq("waiting")
+      expect(enrollment.next_run_at).to eq(ActiveSupport::TimeZone["Europe/Madrid"].local(2026, 9, 21, 10, 0))
+    end
+
     it "does not reset next_run_at while still pending" do
       scheduled_at = 3.minutes.from_now
       enrollment = JourneyEnrollment.create!(
@@ -170,6 +193,30 @@ RSpec.describe Marketing::JourneyRunner do
 
       expect(call_count).to eq(2)
       expect(bad_enrollment.reload.metadata.dig("last_error", "message")).to eq("boom")
+    end
+
+    it "computes task due dates on the workspace's calendar day" do
+      workspace.update!(time_zone: "Europe/Madrid")
+      task_step = journey.steps.create!(
+        position: 3, step_type: "create_task", active: true, config: {"title" => "Follow up", "due_days" => 1}
+      )
+      enrollment = JourneyEnrollment.create!(
+        workspace: workspace,
+        journey: journey,
+        person: person,
+        current_step: task_step,
+        state: "active",
+        enrolled_at: Time.current,
+        next_run_at: Time.current
+      )
+      allow(JourneyEnrollment).to receive(:due).and_return(JourneyEnrollment.where(id: enrollment.id))
+
+      # 23:30 UTC on the 16th is already 01:30 on the 17th in Madrid.
+      travel_to Time.find_zone("UTC").local(2026, 9, 16, 23, 30) do
+        described_class.run!
+      end
+
+      expect(person.tasks.order(:id).last.due_on).to eq(Date.new(2026, 9, 18))
     end
   end
 

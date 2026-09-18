@@ -38,7 +38,7 @@ module Settings
     end
 
     def user_params
-      params.require(:user).permit(:name, :locale)
+      params.require(:user).permit(:name, :locale, :time_zone)
     end
 
     def membership_params

@@ -10,7 +10,6 @@
   <% end %>
 
   <% @bookings.each do |booking| %>
-    <% starts_at_in_zone = booking.starts_at.in_time_zone(booking.timezone) %>
     <article class="card p-4 space-y-3">
       <div class="flex items-center gap-2">
         <h2 class="font-semibold text-base"><%= booking.display_name %></h2>
@@ -36,7 +35,7 @@
         <div><dt class="text-ink-faint">Página</dt><dd><%= booking.booking_page.name %></dd></div>
         <div>
           <dt class="text-ink-faint">Fecha y hora</dt>
-          <dd><%= l(starts_at_in_zone, format: :long) %> (<%= booking.timezone %>)</dd>
+          <dd><%= booking.localized_starts_at_with_zone %></dd>
         </div>
         <% if booking.person.present? %>
           <div><dt class="text-ink-faint">Persona</dt><dd><%= link_to booking.person.display_name, person_path(booking.person), class: "text-accent hover:underline" %></dd></div>

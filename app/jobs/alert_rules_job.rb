@@ -5,7 +5,9 @@ class AlertRulesJob < ApplicationJob
     Workspace.find_each do |workspace|
       next unless workspace.alert_rules.active.exists?
 
-      AlertRuleEngine.run!(workspace)
+      Time.use_zone(workspace.time_zone.presence || IanaTimeZone::DEFAULT_TIME_ZONE) do
+        AlertRuleEngine.run!(workspace)
+      end
     end
   end
 end

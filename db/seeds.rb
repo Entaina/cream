@@ -8,8 +8,9 @@ ActiveRecord::Base.transaction do
     org_name = ENV.fetch("CREAM_ORGANIZATION_WORKSPACE_NAME")
     organization_workspace = Workspace.find_or_create_by!(slug: org_name.parameterize) do |record|
       record.name = org_name
+      record.time_zone = "Europe/Madrid"
     end
-    organization_workspace.update!(sales_director_enabled: true, okm_chat_enabled: true)
+    organization_workspace.update!(sales_director_enabled: true, okm_chat_enabled: true, time_zone: "Europe/Madrid")
   end
 
   workspace = Workspace.create!(name: "Cream Demo", slug: "cream-demo")

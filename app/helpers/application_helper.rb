@@ -1,4 +1,14 @@
 module ApplicationHelper
+  # Datetimes are stored in UTC; render them in the request Time.zone (user or
+  # workspace). Calendar-only dates (Date) are never shifted.
+  def l(object, **options)
+    if object.is_a?(Time) || object.is_a?(DateTime)
+      super(object.in_time_zone, **options)
+    else
+      super
+    end
+  end
+
   # Brand color families: Hoki (technology), Copperfield (innovation), Golden Tainoi (people).
   AVATAR_COLORS = [
     %w[bg-hoki-100 text-hoki-700 dark:bg-hoki-900 dark:text-hoki-200],
@@ -283,9 +293,15 @@ module ApplicationHelper
       end
     when "ai_task_created" then t("activities.ai_task_created", actor: actor, title: activity.metadata["title"])
     when "booking_created"
-      zone = ActiveSupport::TimeZone[activity.metadata["timezone"]] || Time.zone
-      starts_at = Time.zone.parse(activity.metadata["starts_at"].to_s)&.in_time_zone(zone)
-      datetime = starts_at ? I18n.l(starts_at, format: :short) : activity.metadata["starts_at"]
+      instant = Time.zone.parse(activity.metadata["starts_at"].to_s)
+      datetime = if instant
+        Booking.display_starts_at_with_zone(
+          starts_at: instant,
+          timezone: activity.metadata["timezone"]
+        )
+      else
+        activity.metadata["starts_at"]
+      end
       t("activities.booking_created",
         guest: activity.metadata["guest"].presence || t("shared.someone"),
         event: activity.metadata["event_name"],

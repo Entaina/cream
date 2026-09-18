@@ -67,6 +67,7 @@
         <div>
           <%= f.label :timezone, "Zona horaria", class: "label" %>
           <%= f.select :timezone, booking_timezone_options(booking_page.timezone), {}, class: "input mt-1 w-full" %>
+          <p class="mt-1 text-sm text-ink-faint">Las franjas de cada tipo de evento se interpretan en esta zona. Quien reserva ve los huecos convertidos a la suya; el evento en Google Calendar es el mismo instante.</p>
         </div>
         <div>
           <%= f.label :booking_window_days, "Ventana de reserva (días)", class: "label" %>

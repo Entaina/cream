@@ -60,11 +60,13 @@ RSpec.describe "Record emails", type: :request do
 
       it "schedules the email when a future send time is given" do
         sign_in_as(member)
-        future = 1.hour.from_now
-
-        expect {
-          post record_emails_path, params: valid_params.merge(scheduled_at: future.strftime("%Y-%m-%dT%H:%M"))
-        }.to change(EmailMessage, :count).by(1).and have_enqueued_job(SendScheduledEmailJob)
+        future = nil
+        Time.use_zone(member.effective_time_zone(workspace)) do
+          future = 1.hour.from_now
+          expect {
+            post record_emails_path, params: valid_params.merge(scheduled_at: future.strftime("%Y-%m-%dT%H:%M"))
+          }.to change(EmailMessage, :count).by(1).and have_enqueued_job(SendScheduledEmailJob)
+        end
 
         message = EmailMessage.order(:id).last
         expect(message).to be_scheduled
@@ -74,9 +76,11 @@ RSpec.describe "Record emails", type: :request do
       it "sends immediately when the send time is in the past" do
         sign_in_as(member)
 
-        expect {
-          post record_emails_path, params: valid_params.merge(scheduled_at: 1.hour.ago.strftime("%Y-%m-%dT%H:%M"))
-        }.to have_enqueued_mail(RecordMailer, :tracked_email)
+        Time.use_zone(member.effective_time_zone(workspace)) do
+          expect {
+            post record_emails_path, params: valid_params.merge(scheduled_at: 1.hour.ago.strftime("%Y-%m-%dT%H:%M"))
+          }.to have_enqueued_mail(RecordMailer, :tracked_email)
+        end
 
         expect(EmailMessage.order(:id).last.status).to eq("sent")
       end

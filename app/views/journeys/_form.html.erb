@@ -101,6 +101,7 @@
         <%= icon :plus, classes: "size-3.5" %> <%= t("marketing.journeys.form.add_step") %>
       </button>
     </div>
+    <p class="text-sm text-ink-faint mb-3"><%= t("marketing.journeys.form.steps_timing_hint", time_zone: current_workspace.time_zone) %></p>
 
     <div data-nested-form-target="list" class="space-y-3">
       <%= f.fields_for :steps do |step_form| %>

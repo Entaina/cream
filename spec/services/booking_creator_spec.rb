@@ -100,6 +100,33 @@ RSpec.describe BookingCreator, type: :service do
     expect(notification.url).to eq(Rails.application.routes.url_helpers.deal_path(result.booking.deal))
   end
 
+  it "stores an IANA timezone and creates the Google event as local time plus zone" do
+    described_class.call(
+      booking_page: booking_page,
+      event_type: event_type,
+      params: {
+        datetime: "2026-07-28T10:00:00",
+        timezone: "Europe/Madrid",
+        first_name: "Ana",
+        last_name: "Lopez",
+        email: "ana@example.com"
+      },
+      request: request,
+      client: client
+    )
+
+    booking = Booking.order(:id).last
+    expect(booking.timezone).to eq("Europe/Madrid")
+    expect(client).to have_received(:create_event).with(
+      hash_including(
+        event: hash_including(
+          start: {dateTime: "2026-07-28T10:00:00", timeZone: "Europe/Madrid"},
+          end: {dateTime: "2026-07-28T10:30:00", timeZone: "Europe/Madrid"}
+        )
+      )
+    )
+  end
+
   it "emails the host when they enabled the email channel" do
     memberships(:one_one).update!(alert_in_app: false, alert_email: true)
 
@@ -311,6 +338,53 @@ RSpec.describe BookingCreator, type: :service do
         client: client
       )
     }.not_to have_enqueued_job(SendViaGmailJob)
+  end
+
+  it "books the same instant when the guest is in another timezone" do
+    described_class.call(
+      booking_page: booking_page,
+      event_type: event_type,
+      params: {
+        datetime: "2026-07-28T04:00:00",
+        timezone: "America/New_York",
+        first_name: "Ana",
+        last_name: "Lopez",
+        email: "ana@example.com"
+      },
+      request: request,
+      client: client
+    )
+
+    booking = Booking.order(:id).last
+    expect(booking.timezone).to eq("America/New_York")
+    expect(booking.starts_at).to eq(Time.find_zone("UTC").local(2026, 7, 28, 8, 0))
+    expect(booking.starts_at.in_time_zone("Europe/Madrid").strftime("%H:%M")).to eq("10:00")
+    expect(client).to have_received(:create_event).with(
+      hash_including(
+        event: hash_including(
+          start: {dateTime: "2026-07-28T04:00:00", timeZone: "America/New_York"}
+        )
+      )
+    )
+    expect(booking.localized_starts_at_with_zone(locale: :es)).to include("04:00", "America/New_York")
+  end
+
+  it "rejects datetimes that carry their own offset" do
+    expect {
+      described_class.call(
+        booking_page: booking_page,
+        event_type: event_type,
+        params: {
+          datetime: "2026-07-28T10:00:00+05:00",
+          timezone: "Europe/Madrid",
+          first_name: "Ana",
+          last_name: "Lopez",
+          email: "ana@example.com"
+        },
+        request: request,
+        client: client
+      )
+    }.to raise_error(BookingCreator::ValidationError)
   end
 
   it "reuses an existing deal in the target pipeline and stage" do

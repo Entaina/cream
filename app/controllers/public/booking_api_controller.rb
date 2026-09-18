@@ -164,6 +164,11 @@ module Public
         starts_at: starts_at.iso8601,
         ends_at: ends_at.iso8601,
         timezone: timezone,
+        display_starts_at: Booking.display_starts_at_with_zone(
+          starts_at:,
+          timezone:,
+          locale: resolved_locale
+        ),
         attendee_name: [booking_params["first_name"], booking_params["last_name"]].compact.join(" ").strip,
         attendee_email: booking_params["email"],
         guest_emails: Array(booking_params["guests"]).compact,
@@ -195,7 +200,7 @@ module Public
     end
 
     def availability_payload(result)
-      payload = {}
+      payload = {timezone: params[:timezone].presence || @booking_page.timezone}
       payload[:days] = result.days if result.days
       payload[:slots] = result.slots if result.slots
       payload[:warning] = result.warning if result.warning.present?

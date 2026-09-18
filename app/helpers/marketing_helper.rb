@@ -150,6 +150,20 @@ module MarketingHelper
     parts.join(" ")
   end
 
+  def describe_wait_step(config)
+    scheduler = Marketing::WaitScheduler.new(config, zone: IanaTimeZone::DEFAULT_TIME_ZONE)
+    duration = format_journey_wait_duration(scheduler.minutes) if scheduler.minutes.positive?
+    text = if scheduler.until_time && duration
+      t("marketing.journey_steps.wait_then_until", duration: duration, time: scheduler.until_time)
+    elsif scheduler.until_time
+      t("marketing.journey_steps.wait_until", time: scheduler.until_time)
+    else
+      t("marketing.journey_steps.wait", duration: duration || format_journey_wait_duration(0))
+    end
+    text += t("marketing.journey_steps.wait_weekdays_only_suffix") if scheduler.weekdays_only?
+    text
+  end
+
   def describe_step(step, workspace:)
     config = step.config.to_h
     next_label = t("marketing.journey_steps.next_step")
@@ -164,7 +178,7 @@ module MarketingHelper
         t("marketing.journey_steps.send_template", name: name)
       end
     when "wait"
-      t("marketing.journey_steps.wait", duration: format_journey_wait_duration(config["minutes"] || 1))
+      describe_wait_step(config)
     when "create_task"
       title = config["title"].presence || t("marketing.journey_steps.task_untitled")
       t("marketing.journey_steps.task", title: title)

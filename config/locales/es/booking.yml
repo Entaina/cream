@@ -1,12 +1,17 @@
 ---
 es:
   booking:
+    display:
+      datetime_with_zone: "%{datetime} (%{timezone})"
     errors:
       event_type_not_found: Tipo de evento no encontrado.
       invalid_datetime: La fecha u hora seleccionada no es válida.
       rate_limited: Demasiadas peticiones. Inténtalo de nuevo en un minuto.
       slot_unavailable: Ese horario ya no está disponible.
     mailer:
+      datetime: Fecha y hora
+      host_notification:
+        date_time: Fecha y hora
       reminder:
         address: Dirección
         date: Fecha

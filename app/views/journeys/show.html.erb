@@ -106,7 +106,7 @@
               </td>
               <td class="text-sm text-ink-faint">
                 <% if enrollment.next_run_at.present? %>
-                  <%= l enrollment.next_run_at, format: :short %>
+                  <%= l enrollment.next_run_at, format: :default %>
                 <% else %>
                   <%= t("marketing.shared.em_dash") %>
                 <% end %>

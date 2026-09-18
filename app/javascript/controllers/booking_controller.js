@@ -10,6 +10,7 @@ const COPY = {
     backToSchedule: "← Volver al calendario",
     timezone: "Zona horaria",
     availableSlots: "Horarios disponibles",
+    availableSlotsInZone: "Horarios disponibles (%{timezone})",
     next: "Siguiente",
     firstName: "Nombre",
     lastName: "Apellidos",
@@ -38,6 +39,7 @@ const COPY = {
     doNotFill: "No rellenar",
     enableCalendarApi: "Activar Google Calendar API",
     genericError: "Ha ocurrido un error. Inténtalo de nuevo.",
+    scheduleSummary: "%{datetime} (%{timezone})",
     weekdays: [ "L", "M", "X", "J", "V", "S", "D" ]
   },
   en: {
@@ -49,6 +51,7 @@ const COPY = {
     backToSchedule: "← Back to calendar",
     timezone: "Timezone",
     availableSlots: "Available times",
+    availableSlotsInZone: "Available times (%{timezone})",
     next: "Next",
     firstName: "First name",
     lastName: "Last name",
@@ -77,6 +80,7 @@ const COPY = {
     doNotFill: "Do not fill",
     enableCalendarApi: "Enable Google Calendar API",
     genericError: "Something went wrong. Please try again.",
+    scheduleSummary: "%{datetime} (%{timezone})",
     weekdays: [ "M", "T", "W", "T", "F", "S", "S" ]
   }
 }
@@ -217,7 +221,7 @@ export default class extends Controller {
     this.backToTypesLabelTarget.textContent = this.copy.backToTypes
     this.backToScheduleLabelTarget.textContent = this.copy.backToSchedule
     this.timezoneLabelTarget.textContent = this.copy.timezone
-    this.slotsHeadingTarget.textContent = this.copy.availableSlots
+    this.updateSlotsHeading()
     this.nextButtonTarget.textContent = this.copy.next
     this.firstNameLabelTarget.textContent = this.copy.firstName
     this.lastNameLabelTarget.textContent = this.copy.lastName
@@ -294,7 +298,6 @@ export default class extends Controller {
     const data = await response.json()
     this.profile = data.profile
     this.eventTypes = data.event_types
-    if (data.timezone) this.timezoneValue = data.timezone
     this.renderProfile()
     this.renderEventTypes()
     if (this.deepLinkedEventType) {
@@ -483,6 +486,7 @@ export default class extends Controller {
       }
 
       const slots = data.slots || []
+      if (data.timezone && data.timezone !== this.timezoneValue) return
       if (!slots.length) {
         this.slotsListTarget.innerHTML = `<p class="public-booking-slot-empty">${this.copy.noSlots}</p>`
         return
@@ -580,8 +584,7 @@ export default class extends Controller {
   renderFormSummary() {
     this.formSummaryTarget.innerHTML = `
       <p class="public-booking-summary-name">${this.escape(this.selectedEventType.name)}</p>
-      <p class="public-booking-summary-meta">${this.formatDateTime(this.selectedDate, this.selectedSlot)}</p>
-      <p class="public-booking-summary-desc">${this.escape(this.timezoneValue)}</p>
+      <p class="public-booking-summary-meta">${this.escape(this.formatDateTime(this.selectedDate, this.selectedSlot))}</p>
     `
   }
 
@@ -667,18 +670,12 @@ export default class extends Controller {
 
   showConfirmation(data) {
     this.showStep("confirmation")
-    const formattedDate = new Date(data.starts_at).toLocaleString(this.localeValue, {
-      weekday: "long",
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit"
-    })
+    const whenLabel = data.display_starts_at ||
+      this.formatInstantInZone(data.starts_at, data.timezone)
     const lines = [
       `<p class="public-booking-summary-name">${this.escape(data.event_type.name)}</p>`,
-      `<p class="public-booking-summary-meta">${formattedDate}</p>`,
-      `<p class="public-booking-summary-desc">${this.escape(data.timezone)} · ${data.event_type.duration_minutes} ${this.copy.minutes}</p>`
+      `<p class="public-booking-summary-meta">${this.escape(whenLabel)}</p>`,
+      `<p class="public-booking-summary-desc">${data.event_type.duration_minutes} ${this.copy.minutes}</p>`
     ]
     if (data.meet_link) {
       lines.push(`<p><a href="${this.escape(data.meet_link)}" class="text-accent underline" target="_blank" rel="noopener">${this.copy.meetLink}</a></p>`)
@@ -697,8 +694,8 @@ export default class extends Controller {
   }
 
   buildIcs(data) {
-    const start = new Date(data.starts_at).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "")
-    const end = new Date(data.ends_at).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "")
+    const start = this.icsUtcStamp(data.starts_at)
+    const end = this.icsUtcStamp(data.ends_at)
     const body = [
       "BEGIN:VCALENDAR",
       "VERSION:2.0",
@@ -756,8 +753,18 @@ export default class extends Controller {
     if (this.syncingTimezoneSelect) return
 
     this.timezoneValue = this.timezoneSelectTarget.value
+    this.selectedSlot = null
+    if (this.hasNextButtonTarget) this.nextButtonTarget.classList.add("hidden")
+    this.updateSlotsHeading()
     if (this.selectedEventType) this.loadMonthAvailability()
     if (this.selectedDate) this.loadSlots()
+  }
+
+  updateSlotsHeading() {
+    if (!this.hasSlotsHeadingTarget) return
+
+    this.slotsHeadingTarget.textContent = this.copy.availableSlotsInZone
+      .replace("%{timezone}", this.timezoneValue)
   }
 
   detectTimezone() {
@@ -841,18 +848,45 @@ export default class extends Controller {
   formatDateTime(dateStr, timeStr) {
     if (!dateStr || !timeStr) return ""
 
-    const [ year, month, day ] = dateStr.split("-").map(Number)
-    const [ hours, minutes ] = timeStr.split(":").map(Number)
-    const date = new Date(year, month - 1, day, hours, minutes)
+    const datetime = this.formatCalendarDateLabel(dateStr)
+    return this.copy.scheduleSummary
+      .replace("%{datetime}", `${datetime}, ${timeStr}`)
+      .replace("%{timezone}", this.timezoneValue)
+  }
 
-    return date.toLocaleString(this.localeValue, {
+  icsUtcStamp(iso8601) {
+    const stamp = new Date(iso8601).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z")
+    return stamp.endsWith("Z") ? stamp : `${stamp}Z`
+  }
+
+  formatCalendarDateLabel(dateStr) {
+    const [ year, month, day ] = dateStr.split("-").map(Number)
+    const anchor = new Date(Date.UTC(year, month - 1, day, 12, 0))
+    return anchor.toLocaleDateString(this.localeValue, {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      timeZone: "UTC"
+    })
+  }
+
+  formatInstantInZone(iso8601, timeZone) {
+    if (!iso8601 || !timeZone) return ""
+
+    const formatted = new Intl.DateTimeFormat(this.localeValue, {
       weekday: "long",
       day: "numeric",
       month: "long",
       year: "numeric",
       hour: "2-digit",
-      minute: "2-digit"
-    })
+      minute: "2-digit",
+      timeZone
+    }).format(new Date(iso8601))
+
+    return this.copy.scheduleSummary
+      .replace("%{datetime}", formatted)
+      .replace("%{timezone}", timeZone)
   }
 
   reminderNotice(minutes) {

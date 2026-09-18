@@ -339,6 +339,10 @@ en:
       on the server.
     sales_director_team: Team
     save: Save
+    time_zone: Time zone
+    time_zone_blank: Workspace default (%{workspace_zone})
+    time_zone_hint: Datetimes are shown in this zone. Leave blank to use the workspace
+      default.
     title: Profile
   search:
     index:
@@ -488,3 +492,7 @@ en:
       default: "%m/%d/%Y %I:%M %p"
       long: "%A, %B %d, %Y"
       short: "%b %d, %Y"
+  workspace_settings:
+    time_zone: Workspace time zone
+    time_zone_hint: Default zone for members without a personal choice. Also defines
+      “today” for alerts and briefings.

@@ -130,6 +130,7 @@ RSpec.describe Public::BookingApiController, type: :request do
 
       expect(response).to have_http_status(:created)
       expect(response.parsed_body["attendee_email"]).to eq("ana@example.com")
+      expect(response.parsed_body["display_starts_at"]).to include("Europe/Madrid")
       expect(BookingCreator).to have_received(:call)
     end
 

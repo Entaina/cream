@@ -25,6 +25,7 @@ module Settings
     def workspace_params
       permitted = params.require(:workspace).permit(
         :name,
+        :time_zone,
         :sales_director_enabled,
         :salespeople_can_view_all_deals,
         :salespeople_can_edit_all_deals,

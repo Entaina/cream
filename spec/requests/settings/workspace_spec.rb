@@ -49,6 +49,13 @@ RSpec.describe "Settings::Workspace", type: :request do
       expect(workspace.reload.name).to eq("Renamed Workspace")
     end
 
+    it "allows admins to update the workspace time zone" do
+      patch settings_workspace_path, params: {workspace: {time_zone: "Europe/London"}}
+
+      expect(response).to redirect_to(settings_workspace_path)
+      expect(workspace.reload.time_zone).to eq("Europe/London")
+    end
+
     it "allows admins to enable sales director for the workspace" do
       allow(CreamFeatures).to receive(:enabled?).and_call_original
       allow(CreamFeatures).to receive(:enabled?).with(:sales_director).and_return(true)

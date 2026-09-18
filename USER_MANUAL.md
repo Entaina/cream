@@ -4,7 +4,7 @@
 
 Cream is a **workspace**-based CRM for managing **people**, **companies** and **deals** (opportunities), with notes, tasks, lists and an activity history shared across the team.
 
-> **Last revision:** 2026-09-18 (booking activity on timeline)
+> **Last revision:** 2026-09-18 (user and workspace time zone)
 > This document describes the functionality **visible to the user**. Disabled features are listed at the end under "Coming soon".
 
 ---
@@ -154,7 +154,7 @@ Some entries are **optional per workspace** and are **hidden by default**. An ad
 
 | Entry | Description |
 |-------|-------------|
-| **Profile** | Name, language, default pipeline, AI briefing, alert channels |
+| **Profile** | Name, language, time zone, default pipeline, AI briefing, alert channels |
 | **Gmail** | OAuth to send from records and detect replies |
 | **Reservas** (Bookings) | Public calendar booking pages |
 | **Mis listas** (My lists) | Workspace lists |
@@ -848,7 +848,7 @@ Invitees accept with the link they received and create an account, or sign in if
 
 Available to **all members** under **Profile** ( **Mi perfil** menu group, or click your name at the bottom of the sidebar). Personal preferences **in the active workspace**:
 
-1. **Personal details** — your **name** (shown in mentions and activity) and **language** (Español / English). Account email is read-only.
+1. **Personal details** — your **name** (shown in mentions and activity), **language** (Español / English) and optional **time zone**. If you leave time zone blank, Cream uses the workspace default. Datetimes (activity, emails, etc.) display in your zone; calendar dates (task due date, expected close) are not shifted. Account email is read-only.
 2. **Default pipeline** — pipeline selected at sign-in, in the sidebar selector and in the Gmail add-on ([§3](#3-navigation)).
 3. **Sales director briefing** — checkbox to show or hide the AI block on the dashboard ([§4](#4-dashboard)). Only shown if an admin enabled it in workspace **Settings** and AI is configured on the server.
 4. **Alertas** (Alerts) — **In-app notification (bell)** and **Email** channels for configured alerts, **form submissions** (if you are the owner) and **calendar bookings** (if you are the host). If you disable both, you will not receive those notices ([§17](#17-configurable-alerts), [§19](#19-notifications)).
@@ -860,6 +860,7 @@ In **Settings** (**admins** only):
 ### General
 
 - Change the **workspace name**.
+- **Workspace time zone** — default for members without a personal zone and for “today” in alerts and briefings (default `Europe/Madrid`).
 - **Salespeople can view other users' deals** — when enabled, salespeople see all deals in the workspace on lists, boards and detail pages (not only their own or shared as collaborators).
 - **Salespeople can edit other users' deals** — when enabled, salespeople can update, move and delete any deal in the workspace. Enabling edit also allows viewing those deals.
 
@@ -1265,7 +1266,7 @@ All the configuration is done from **Reservas** (no need to use seeds or preload
 | Reutilizar deal existente (Reuse existing deal) | If the person already has a deal in the first stage of this pipeline, the booking is linked to that deal; otherwise a new one is created |
 | Mensaje de bienvenida (Welcome message) | Text in the public page header |
 | Avatar URL / Logo URL | Optional profile images |
-| Zona horaria (Time zone) | Default time zone of the page (dropdown list) |
+| Zona horaria (Time zone) | Time zone of the host’s **weekly hours**. Visitors see slots converted to their zone; Google Calendar stores the same instant. |
 | Ventana de reserva (días) (Booking window, days) | How many days ahead dates can be chosen |
 | Calendarios (Calendars) | Google calendars where slots are checked; drag to reorder — the first one marked writable receives the bookings ("Recibe nuevas citas" badge) |
 | Página activa (Page active) | If unchecked, the public URL does not accept bookings |
@@ -1300,7 +1301,7 @@ Copy the **public URL** and share it with clients. If the page has several types
 
 ### Public page (visitor)
 
-Three-step flow: choose event type → calendar and time (with an ES/EN time zone selector) → form and confirmation with a Meet link and `.ics` download. With a **direct event type URL** (`/b/page-slug/type-slug`), the visitor skips the first step and lands on that type's calendar.
+Three-step flow: choose event type → calendar and time (the time zone selector converts the host’s slots into the visitor’s zone; date and time always include the IANA label, e.g. `Europe/Madrid`) → form and confirmation with a Meet link and `.ics` download (times in UTC). With a **direct event type URL** (`/b/page-slug/type-slug`), the visitor skips the first step and lands on that type's calendar.
 
 ---
 
@@ -1425,16 +1426,18 @@ Automated per-contact sequences.
 | Step | Action |
 |------|--------|
 | **Enviar email** (Send email) | Write the step email (optional base template, layout, Quill/HTML, preview) + subscription type (respects consent) |
-| **Esperar** (Wait) | Pause N minutes |
+| **Esperar** (Wait) | Pause N minutes from when the contact reaches the step (60 = 1 h, 1440 = 1 day). Optional: **Hasta las HH:MM** (Until, workspace time) holds the contact until the next time the clock reads that time; **Solo días laborables** (Weekdays only) moves Saturdays and Sundays to Monday at the same time |
 | **Condición** (Condition) | Branch on contact field |
 | **Establecer campo** (Set field) | Change lifecycle |
 | **Añadir a lista** (Add to list) | Add contact to a CRM list |
-| **Crear tarea** (Create task) | Sales task with due date |
+| **Crear tarea** (Create task) | Sales task due in N calendar days, counted in the workspace time zone |
 | **Ajustar puntuación** (Adjust score) | Add or subtract points |
 | **Notificar** (Notify) | Alert a team user |
 
+> **When each step runs.** Steps run in order and immediately once the contact enters the journey (or a wait ends), in 10-minute cycles, at any time of day and any day of the week; there are no business hours unless you set them with a **Esperar** (Wait) step. Examples: **Esperar 1440** = one day later, same time; **Esperar 1440 + Hasta las 10:00** = next day at 10:00; **Esperar 0 + Hasta las 09:30 + Solo días laborables** = next weekday at 09:30 (today if it is not yet 09:30). Place the step right before **Enviar email**. On the journey page, **Próxima ejecución** (Next run) shows date and time in your time zone (see [§20](#20-team-and-invitations)).
+
 6. For **manual** journeys, open the journey page → **Inscribir contacto manualmente** (Enroll contact manually).
-7. From the journey page you can **Pausar** / **Activar** (Pause / Activate), view active enrollments and each contact's current step.
+7. From the journey page you can **Pausar** / **Activar** (Pause / Activate), view active enrollments, each contact's current step and the **next run** (date and time).
 8. For **Activo** (Active) or **En espera** (Waiting) enrollments, use **Cambiar paso** (Change step) to move the contact to another step. The journey continues from there and will run that step (it may resend an email or restart a wait). Admins only.
 
 **On a person's record** (**Activity** → **Recorridos** / Journeys):

@@ -3,8 +3,10 @@ module Marketing
     def self.run!
       return unless CreamFeatures.enabled?(:journeys)
 
-      JourneyEnrollment.due.includes(:journey, :person, :current_step).find_each do |enrollment|
-        new(enrollment).advance!
+      JourneyEnrollment.due.includes(:journey, :person, :current_step, :workspace).find_each do |enrollment|
+        # Calendar-based steps (task due dates) must use the workspace's day, not UTC's.
+        zone = enrollment.workspace.time_zone.presence || IanaTimeZone::DEFAULT_TIME_ZONE
+        Time.use_zone(zone) { new(enrollment).advance! }
       rescue => e
         record_runner_error!(enrollment, e)
       end
@@ -115,8 +117,7 @@ module Marketing
 
       return if wait_pending?
 
-      minutes = wait_minutes_from_config
-      enrollment.advance_to!(step, wait_until: minutes.minutes.from_now)
+      enrollment.advance_to!(step, wait_until: wait_until_from_config)
     end
 
     def wait_elapsed?
@@ -131,14 +132,13 @@ module Marketing
         enrollment.next_run_at > Time.current
     end
 
-    def wait_minutes_from_config
-      raw = step.config.to_h["minutes"]
-      minutes = case raw
-      when Numeric then raw.to_i
-      when String then raw.to_i
-      else 0
-      end
-      minutes.positive? ? minutes : 1
+    # "Until HH:MM" and "weekdays only" are evaluated in the workspace zone,
+    # regardless of the Time.zone of the caller.
+    def wait_until_from_config
+      Marketing::WaitScheduler.new(
+        step.config,
+        zone: workspace.time_zone.presence || IanaTimeZone::DEFAULT_TIME_ZONE
+      ).next_run_at
     end
 
     def create_task!

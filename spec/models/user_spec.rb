@@ -36,6 +36,55 @@ RSpec.describe User, type: :model do
     end
   end
 
+  describe "time_zone" do
+    fixtures :workspaces
+
+    it "allows blank time_zone" do
+      user = User.new(name: "TZ User", email_address: "tz@example.com", password: "password", time_zone: nil)
+
+      expect(user).to be_valid
+    end
+
+    it "rejects invalid IANA identifiers" do
+      user = User.new(name: "TZ User", email_address: "tz2@example.com", password: "password", time_zone: "Not/A/Zone")
+
+      expect(user).not_to be_valid
+      expect(user.errors[:time_zone]).to be_present
+    end
+
+    it "normalizes blank strings to nil" do
+      user = User.create!(name: "TZ User", email_address: "tz3@example.com", password: "password", time_zone: "")
+
+      expect(user.time_zone).to be_nil
+    end
+  end
+
+  describe "#effective_time_zone" do
+    fixtures :workspaces
+
+    let(:workspace) { workspaces(:one) }
+
+    it "returns the user time zone when set" do
+      user = User.new(time_zone: "America/New_York")
+
+      expect(user.effective_time_zone(workspace)).to eq("America/New_York")
+    end
+
+    it "falls back to the workspace time zone" do
+      workspace.update!(time_zone: "Europe/London")
+      user = User.new(time_zone: nil)
+
+      expect(user.effective_time_zone(workspace)).to eq("Europe/London")
+    end
+
+    it "falls back to the default when neither is set" do
+      workspace.update_column(:time_zone, "Europe/Madrid")
+      user = User.new(time_zone: nil)
+
+      expect(user.effective_time_zone(nil)).to eq(IanaTimeZone::DEFAULT_TIME_ZONE)
+    end
+  end
+
   describe "#active_workspace" do
     fixtures :users, :workspaces, :memberships
 

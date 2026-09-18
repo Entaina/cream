@@ -1,0 +1,25 @@
+require "rails_helper"
+
+RSpec.describe Booking, type: :model do
+  describe ".display_starts_at_with_zone" do
+    it "formats the instant in the booking timezone with the IANA label" do
+      starts_at = Time.find_zone("UTC").local(2026, 7, 28, 8, 0)
+      label = described_class.display_starts_at_with_zone(
+        starts_at:,
+        timezone: "Europe/Madrid",
+        locale: :es
+      )
+
+      expect(label).to include("10:00")
+      expect(label).to include("Europe/Madrid")
+    end
+  end
+end
+
+RSpec.describe IanaTimeZone do
+  it "canonicalizes Rails zone names to IANA identifiers" do
+    expect(described_class.canonical("Madrid")).to eq("Europe/Madrid")
+    expect(described_class.canonical("Europe/Madrid")).to eq("Europe/Madrid")
+    expect(described_class.canonical("Not/A/Zone")).to be_nil
+  end
+end

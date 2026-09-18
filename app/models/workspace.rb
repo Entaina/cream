@@ -1,4 +1,6 @@
 class Workspace < ApplicationRecord
+  include IanaTimeZone
+
   WORKSPACE_FEATURE_TOGGLES = {
     reports: :reports_enabled,
     marketing_attribution: :marketing_attribution_enabled,
@@ -68,6 +70,7 @@ class Workspace < ApplicationRecord
 
   validates :name, presence: true
   validates :slug, presence: true, uniqueness: true, format: {with: /\A[a-z0-9-]+\z/}
+  validates :time_zone, presence: true
   validate :okm_service_account_key_format, if: -> { okm_service_account_key.present? }
 
   scope :sales_director_enabled, -> { where(sales_director_enabled: true) }

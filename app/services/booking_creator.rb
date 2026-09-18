@@ -16,6 +16,7 @@ class BookingCreator
     @client = client
     @timezone = ActiveSupport::TimeZone[@params["timezone"].presence || booking_page.timezone] ||
       ActiveSupport::TimeZone["UTC"]
+    @timezone_name = IanaTimeZone.canonical(@timezone.name) || "UTC"
   end
 
   def call
@@ -27,7 +28,7 @@ class BookingCreator
       booking_page: @booking_page,
       event_type: @event_type,
       starts_at:,
-      timezone: @timezone.name,
+      timezone: @timezone_name,
       client: @client
     )
       raise Conflict, I18n.t("booking.errors.slot_unavailable")
@@ -55,7 +56,7 @@ class BookingCreator
       guest_emails: normalized_guests,
       starts_at:,
       ends_at:,
-      timezone: @timezone.name,
+      timezone: @timezone_name,
       google_event_id: google_event["id"],
       google_event_link: google_event["htmlLink"],
       meet_link: extract_meet_link(google_event),
@@ -192,7 +193,7 @@ class BookingCreator
       guest_emails: normalized_guests,
       starts_at: Time.current,
       ends_at: Time.current + 1.hour,
-      timezone: @timezone.name,
+      timezone: @timezone_name,
       workspace: @booking_page.workspace,
       booking_page: @booking_page,
       booking_event_type: @event_type
@@ -201,8 +202,16 @@ class BookingCreator
     raise ValidationError, I18n.t("booking.errors.invalid_datetime") if @params["datetime"].blank?
   end
 
+  # The public form sends a naive local datetime (YYYY-MM-DDTHH:MM:SS) in the
+  # visitor's timezone. Reject anything carrying its own offset/zone so the
+  # instant can never be reinterpreted in a different zone.
   def parse_starts_at!
-    time = @timezone.parse(@params["datetime"].to_s)
+    raw = @params["datetime"].to_s.strip
+    unless raw.match?(/\A\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?\z/)
+      raise ValidationError, I18n.t("booking.errors.invalid_datetime")
+    end
+
+    time = @timezone.parse(raw)
     raise ValidationError, I18n.t("booking.errors.invalid_datetime") if time.nil?
 
     time.change(sec: 0)
@@ -227,8 +236,8 @@ class BookingCreator
     event = {
       summary: summary,
       description: description_lines.join("\n\n"),
-      start: {dateTime: starts_at.iso8601, timeZone: @timezone.name},
-      end: {dateTime: ends_at.iso8601, timeZone: @timezone.name},
+      start: google_event_time(starts_at),
+      end: google_event_time(ends_at),
       attendees: normalized_guests.map { |email| {email:} }.prepend({email: normalized_email})
     }
 
@@ -244,6 +253,14 @@ class BookingCreator
     end
 
     @client.create_event(calendar_id:, event:)
+  end
+
+  def google_event_time(time)
+    local = time.in_time_zone(@timezone)
+    {
+      dateTime: local.strftime("%Y-%m-%dT%H:%M:%S"),
+      timeZone: @timezone_name
+    }
   end
 
   def extract_meet_link(google_event)

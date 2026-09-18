@@ -1,4 +1,6 @@
 class User < ApplicationRecord
+  include IanaTimeZone
+
   has_secure_password
   has_many :sessions, dependent: :destroy
   has_many :memberships, dependent: :destroy
@@ -11,6 +13,7 @@ class User < ApplicationRecord
   has_many :gmail_connections, dependent: :destroy
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }
+  normalizes :time_zone, with: ->(tz) { tz.presence }
 
   THEMES = %w[light dark system].freeze
   LOCALES = %w[es en].freeze
@@ -102,6 +105,12 @@ class User < ApplicationRecord
   end
 
   def default_workspace = workspaces.order(:id).first
+
+  def effective_time_zone(workspace = Current.workspace)
+    return time_zone if time_zone.present?
+
+    workspace&.time_zone.presence || IanaTimeZone::DEFAULT_TIME_ZONE
+  end
 
   def active_workspace(session_workspace_id: nil)
     if session_workspace_id.present?

@@ -183,6 +183,9 @@ es:
       task_untitled: sin título
       template_fallback: plantilla
       wait: Esperar %{duration}
+      wait_then_until: Esperar %{duration} y luego hasta las %{time}
+      wait_until: Esperar hasta las %{time}
+      wait_weekdays_only_suffix: " (solo días laborables)"
     journey_triggers:
       booking_created: Reserva creada
       email_clicked: Clic en email
@@ -213,6 +216,12 @@ es:
         segment: Segmento
         select_segment: Selecciona segmento
         steps_legend: Pasos
+        steps_timing_hint: Los pasos se ejecutan en orden y de inmediato en cuanto el
+          contacto entra (o termina una espera), en ciclos de 10 minutos, a cualquier
+          hora y cualquier día de la semana. Para controlar cuándo sale un email, pon
+          un paso «Esperar» justo antes, con «Hasta las» y «Solo días laborables» si
+          quieres fijar hora y día. Las horas se muestran en tu zona horaria; el
+          workspace usa %{time_zone}.
         stop_on_open_deal: Salir del recorrido si hay oportunidad abierta del producto
         manual_entry_hint: Las inscripciones manuales se hacen desde la ficha del recorrido.
         email_clicked_hint: Se activa cuando el contacto hace clic en un enlace de email de marketing.
@@ -254,6 +263,9 @@ es:
         branch_hint: Evalúa una condición sobre el contacto y salta al paso indicado.
         branch_true: Si cumple → paso (ID)
         due_in_days: Vence en (días)
+        due_in_days_hint: Días naturales contados desde el día en que se ejecuta el
+          paso, según la zona horaria del workspace (%{time_zone}). 0 = vence el mismo
+          día.
         field: Campo
         message: Mensaje
         message_placeholder: Paso completado para {nombre}
@@ -267,6 +279,19 @@ es:
         task_title: Título de la tarea
         task_title_placeholder: Seguimiento comercial
         wait_minutes: Esperar (minutos)
+        wait_minutes_hint: Cuenta desde que el contacto llega a este paso. El siguiente
+          paso se ejecuta al cumplirse la espera, en el siguiente ciclo del motor (hasta
+          10 minutos después). 60 = 1 hora, 1440 = 1 día, 10080 = 1 semana. Puede ser
+          0 si indicas una hora.
+        wait_until_time: Hasta las (hora)
+        wait_until_time_hint: Opcional. Tras la espera, retiene al contacto hasta la
+          próxima vez que el reloj marque esa hora en la zona del workspace (%{time_zone}).
+          Ej. 1440 + 10:00 = mañana a las 10:00; 0 + 09:30 = hoy a las 09:30 si aún no
+          han pasado, o mañana.
+        wait_until_time_invalid: la hora de «Esperar hasta las» debe tener formato HH:MM.
+        wait_weekdays_only: Solo días laborables (lunes a viernes)
+        wait_weekdays_only_hint: Si el resultado cae en sábado o domingo, se pasa al
+          lunes a la misma hora.
     lead_form_templates:
       edit:
         page_title: Editar plantilla de formulario

@@ -12,9 +12,11 @@ class SalesDirectorBriefingJob < ApplicationJob
   private
 
   def generate_for(workspace)
-    Ai::SalesDirector.new(workspace: workspace).call
-    workspace.memberships.where(sales_director_briefing_enabled: true).includes(:user).find_each do |membership|
-      generate_personal_for(workspace, membership.user)
+    Time.use_zone(workspace.time_zone.presence || IanaTimeZone::DEFAULT_TIME_ZONE) do
+      Ai::SalesDirector.new(workspace: workspace).call
+      workspace.memberships.where(sales_director_briefing_enabled: true).includes(:user).find_each do |membership|
+        generate_personal_for(workspace, membership.user)
+      end
     end
   rescue => e
     Rails.logger.error("[SalesDirectorBriefingJob] workspace=#{workspace.id}: #{e.class}: #{e.message}")

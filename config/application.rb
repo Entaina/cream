@@ -21,7 +21,7 @@ module Cream
     # These settings can be overridden in specific environments using the files
     # in config/environments, which are processed later.
     #
-    # config.time_zone = "Central Time (US & Canada)"
+    config.time_zone = "UTC"
     # config.eager_load_paths << Rails.root.join("extras")
 
     config.action_mailer.preview_paths = [Rails.root.join("spec/mailers/previews")]

@@ -23,6 +23,11 @@
           <p class="mt-1 text-sm text-ink-faint"><%= t("profile.locale_hint") %></p>
         </div>
         <div>
+          <%= f.label :time_zone, t("profile.time_zone"), class: "label" %>
+          <%= f.select :time_zone, time_zone_options(selected: current_user.time_zone, include_blank: true, blank_label: t("profile.time_zone_blank", workspace_zone: current_workspace.time_zone)), {}, class: "input mt-1 w-full" %>
+          <p class="mt-1 text-sm text-ink-faint"><%= t("profile.time_zone_hint") %></p>
+        </div>
+        <div>
           <span class="label"><%= t("profile.email") %></span>
           <p class="mt-1 text-base text-ink"><%= current_user.email_address %></p>
         </div>

@@ -19,7 +19,8 @@ class BookingAvailabilityService
   def initialize(booking_page:, event_type:, timezone:, client:)
     @booking_page = booking_page
     @event_type = event_type
-    @timezone = ActiveSupport::TimeZone[timezone] || ActiveSupport::TimeZone["UTC"]
+    @guest_timezone = ActiveSupport::TimeZone[timezone] || ActiveSupport::TimeZone["UTC"]
+    @host_timezone = ActiveSupport::TimeZone[booking_page.timezone] || @guest_timezone
     @client = client
   end
 
@@ -27,13 +28,13 @@ class BookingAvailabilityService
     @calendar_warning = nil
     month_start = Date.strptime("#{month_string}-01", "%Y-%m-%d")
     month_end = month_start.end_of_month
-    range_start = month_start.beginning_of_day.in_time_zone(@timezone)
-    range_end = month_end.end_of_day.in_time_zone(@timezone)
-    busy = fetch_busy(range_start, range_end)
+    busy = fetch_busy(
+      local_beginning_of_day(@guest_timezone, month_start) - 1.day,
+      local_end_of_day(@guest_timezone, month_end) + 1.day
+    )
 
     days = (month_start..month_end).map do |date|
-      available = day_has_slots?(date, busy)
-      {date: date.iso8601, available: available}
+      {date: date.iso8601, available: day_has_slots?(date, busy)}
     end
 
     Result.new(days:, slots: nil, warning: @calendar_warning)
@@ -42,20 +43,24 @@ class BookingAvailabilityService
   def daily(date_string)
     @calendar_warning = nil
     date = Date.iso8601(date_string)
-    range_start = date.beginning_of_day.in_time_zone(@timezone)
-    range_end = date.end_of_day.in_time_zone(@timezone)
-    busy = fetch_busy(range_start, range_end)
-    slots = slots_for_date(date, busy).map { |time| time.strftime("%H:%M") }
+    busy = fetch_busy(
+      local_beginning_of_day(@guest_timezone, date) - 1.day,
+      local_end_of_day(@guest_timezone, date) + 1.day
+    )
+    slots = slots_for_guest_date(date, busy).map { |time| time.strftime("%H:%M") }
 
     Result.new(days: nil, slots:, warning: @calendar_warning)
   end
 
   def slot_available?(starts_at)
-    time = starts_at.in_time_zone(@timezone)
+    time = starts_at.in_time_zone(@guest_timezone).change(sec: 0)
     return false unless within_booking_window?(time.to_date)
     return false unless slot_in_schedule?(time)
 
-    busy = fetch_busy(time.beginning_of_day.in_time_zone(@timezone), time.end_of_day.in_time_zone(@timezone))
+    busy = fetch_busy(
+      local_beginning_of_day(@guest_timezone, time.to_date) - 1.day,
+      local_end_of_day(@guest_timezone, time.to_date) + 1.day
+    )
     !overlaps_busy?(slot_range(time), busy)
   end
 
@@ -64,39 +69,47 @@ class BookingAvailabilityService
   def day_has_slots?(date, busy = nil)
     return false unless within_booking_window?(date)
 
-    busy ||= fetch_busy(date.beginning_of_day.in_time_zone(@timezone), date.end_of_day.in_time_zone(@timezone))
-    slots_for_date(date, busy).any?
+    busy ||= fetch_busy(
+      local_beginning_of_day(@guest_timezone, date) - 1.day,
+      local_end_of_day(@guest_timezone, date) + 1.day
+    )
+    slots_for_guest_date(date, busy).any?
   end
 
-  def slots_for_date(date, busy)
-    weekday = BookingEventType::WEEKDAYS[(date.wday == 0) ? 6 : date.wday - 1]
-    windows = @event_type.hours_for_weekday(weekday)
-    return [] if windows.blank?
+  # Weekly hours live in the booking page timezone. The public calendar date is
+  # the visitor's; convert each host slot so 10:00 in Madrid stays 10:00 Madrid
+  # on the host calendar even if the guest sees 04:00 in New York.
+  def slots_for_guest_date(date, busy)
+    increment = @event_type.slot_increment_minutes.to_i
+    return [] if increment <= 0
 
     slots = []
-    windows.each do |window|
-      window_start, window_end = window
-      cursor = @timezone.parse("#{date} #{window_start}")
-      window_end_at = @timezone.parse("#{date} #{window_end}")
-      increment = @event_type.slot_increment_minutes.to_i
-      next if increment <= 0
+    ((date - 1.day)..(date + 1.day)).each do |host_date|
+      weekday = BookingEventType::WEEKDAYS[(host_date.wday == 0) ? 6 : host_date.wday - 1]
+      windows = @event_type.hours_for_weekday(weekday)
+      next if windows.blank?
 
-      iterations = 0
-      while cursor + event_total_minutes.minutes <= window_end_at
-        iterations += 1
-        break if iterations > 2_000
+      windows.each do |window_start, window_end|
+        cursor = @host_timezone.parse("#{host_date} #{window_start}")
+        window_end_at = @host_timezone.parse("#{host_date} #{window_end}")
+        iterations = 0
+        while cursor + event_total_minutes.minutes <= window_end_at
+          iterations += 1
+          break if iterations > 2_000
 
-        next unless cursor >= min_bookable_time
-        range = slot_range(cursor)
-        slots << cursor unless overlaps_busy?(range, busy)
-        cursor += increment.minutes
+          guest_time = cursor.in_time_zone(@guest_timezone)
+          if guest_time.to_date == date && cursor >= min_bookable_time
+            slots << guest_time unless overlaps_busy?(slot_range(cursor), busy)
+          end
+          cursor += increment.minutes
+        end
       end
     end
-    slots
+    slots.sort
   end
 
   def slot_in_schedule?(time)
-    slots_for_date(time.to_date, []).any? { |slot| slot == time.change(sec: 0) }
+    slots_for_guest_date(time.to_date, []).any? { |slot| slot.change(sec: 0) == time.change(sec: 0) }
   end
 
   def slot_range(start_time)
@@ -121,7 +134,7 @@ class BookingAvailabilityService
   end
 
   def within_booking_window?(date)
-    today = Time.current.in_time_zone(@timezone).to_date
+    today = Time.current.in_time_zone(@guest_timezone).to_date
     return false if date < today
     return false if date > today + @booking_page.booking_window_days.days
 
@@ -129,7 +142,15 @@ class BookingAvailabilityService
   end
 
   def min_bookable_time
-    Time.current.in_time_zone(@timezone) + @event_type.min_notice_hours.hours
+    Time.current + @event_type.min_notice_hours.hours
+  end
+
+  def local_beginning_of_day(zone, date)
+    zone.local(date.year, date.month, date.day)
+  end
+
+  def local_end_of_day(zone, date)
+    local_beginning_of_day(zone, date).end_of_day
   end
 
   def fetch_busy(range_start, range_end)
@@ -140,7 +161,7 @@ class BookingAvailabilityService
         time_min: range_start,
         time_max: range_end,
         calendar_ids: @booking_page.calendar_ids,
-        timezone: @timezone.name
+        timezone: @host_timezone.tzinfo.name
       )
     end
   rescue Timeout::Error

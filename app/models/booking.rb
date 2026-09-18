@@ -39,6 +39,28 @@ class Booking < ApplicationRecord
     [first_name, last_name].compact.join(" ")
   end
 
+  def self.display_starts_at_with_zone(starts_at:, timezone:, locale: I18n.locale, format: :default)
+    zone = ActiveSupport::TimeZone[timezone.presence] || Time.zone
+    I18n.with_locale(locale) do
+      I18n.t(
+        "booking.display.datetime_with_zone",
+        datetime: I18n.l(starts_at.in_time_zone(zone), format: format),
+        timezone: timezone
+      )
+    end
+  end
+
+  def localized_starts_at(format: :default, locale: I18n.locale)
+    zone = ActiveSupport::TimeZone[timezone] || Time.zone
+    I18n.with_locale(locale) do
+      I18n.l(starts_at.in_time_zone(zone), format: format)
+    end
+  end
+
+  def localized_starts_at_with_zone(format: :default, locale: I18n.locale)
+    self.class.display_starts_at_with_zone(starts_at:, timezone:, locale:, format:)
+  end
+
   def all_attendee_emails
     [email, *guest_emails].map { |value| value.to_s.strip.downcase }.uniq
   end
@@ -50,6 +72,7 @@ class Booking < ApplicationRecord
       starts_at: starts_at.iso8601,
       ends_at: ends_at.iso8601,
       timezone: timezone,
+      display_starts_at: localized_starts_at_with_zone(locale:),
       attendee_name: display_name,
       attendee_email: email,
       guest_emails: guest_emails,

@@ -182,6 +182,9 @@ en:
       task_untitled: untitled
       template_fallback: template
       wait: Wait %{duration}
+      wait_then_until: Wait %{duration}, then until %{time}
+      wait_until: Wait until %{time}
+      wait_weekdays_only_suffix: " (weekdays only)"
     journey_triggers:
       booking_created: Booking created
       email_clicked: Email clicked
@@ -212,6 +215,11 @@ en:
         segment: Segment
         select_segment: Select segment
         steps_legend: Steps
+        steps_timing_hint: Steps run in order and immediately once the contact enters
+          (or a wait ends), in 10-minute cycles, at any time of day and any day of the
+          week. To control when an email goes out, add a "Wait" step right before it,
+          with "Until" and "Weekdays only" to pin the time and day. Times are shown in
+          your time zone; the workspace uses %{time_zone}.
         stop_on_open_deal: Exit journey if there is an open deal for the product
         manual_entry_hint: Manual enrollments are done from the journey detail page.
         email_clicked_hint: Fires when the contact clicks a link in a marketing email.
@@ -254,6 +262,8 @@ en:
           step.
         branch_true: If true → step (ID)
         due_in_days: Due in (days)
+        due_in_days_hint: Calendar days counted from the day the step runs, in the
+          workspace time zone (%{time_zone}). 0 = due the same day.
         field: Field
         message: Message
         message_placeholder: Step completed for {name}
@@ -267,6 +277,19 @@ en:
         task_title: Task title
         task_title_placeholder: Sales follow-up
         wait_minutes: Wait (minutes)
+        wait_minutes_hint: Counted from when the contact reaches this step. The next
+          step runs once the wait has elapsed, on the next engine cycle (up to 10
+          minutes later). 60 = 1 hour, 1440 = 1 day, 10080 = 1 week. May be 0 when a
+          time is set.
+        wait_until_time: Until (time)
+        wait_until_time_hint: Optional. After the delay, hold the contact until the
+          next time the clock reads this time in the workspace zone (%{time_zone}).
+          E.g. 1440 + 10:00 = tomorrow at 10:00; 0 + 09:30 = today at 09:30 if not yet
+          past, otherwise tomorrow.
+        wait_until_time_invalid: the "Wait until" time must be in HH:MM format.
+        wait_weekdays_only: Weekdays only (Monday to Friday)
+        wait_weekdays_only_hint: If the result lands on a Saturday or Sunday, it moves
+          to Monday at the same time.
     lead_form_templates:
       edit:
         page_title: Edit form template

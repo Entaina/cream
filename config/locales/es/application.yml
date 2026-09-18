@@ -340,6 +340,10 @@ es:
       en el servidor.
     sales_director_team: Equipo
     save: Guardar
+    time_zone: Zona horaria
+    time_zone_blank: Por defecto del workspace (%{workspace_zone})
+    time_zone_hint: Las fechas con hora se muestran en esta zona. Si no eliges ninguna,
+      se usa la del workspace.
     title: Perfil
   search:
     index:
@@ -489,3 +493,7 @@ es:
       default: "%d/%m/%Y %H:%M"
       long: "%A, %d de %B de %Y"
       short: "%d %b %Y"
+  workspace_settings:
+    time_zone: Zona horaria del workspace
+    time_zone_hint: Zona por defecto para miembros que no eligen una personal. También
+      define el «día de hoy» en alertas y briefings.

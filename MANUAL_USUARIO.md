@@ -4,7 +4,7 @@
 
 Cream es un CRM por **workspaces** para gestionar **personas**, **empresas** y **deals** (oportunidades), con notas, tareas, listas y un historial de actividad compartido en el equipo.
 
-> **Última revisión:** 2026-09-18 (actividad de reserva en el timeline)
+> **Última revisión:** 2026-09-18 (zona horaria de usuario y workspace)
 > Este documento describe la funcionalidad **visible para el usuario**. Las funcionalidades desactivadas aparecen al final en «Próximamente».
 
 ---
@@ -154,7 +154,7 @@ Algunas entradas son **opcionales por workspace** y están **ocultas por defecto
 
 | Entrada | Descripción |
 |---------|-------------|
-| **Perfil** | Nombre, idioma, pipeline predeterminado, briefing IA, canales de alerta |
+| **Perfil** | Nombre, idioma, zona horaria, pipeline predeterminado, briefing IA, canales de alerta |
 | **Gmail** | Conexión OAuth para enviar desde ficha y detectar respuestas |
 | **Reservas** | Páginas públicas de reserva de calendario |
 | **Mis listas** | Listas personales del workspace |
@@ -848,7 +848,7 @@ Los invitados aceptan con el enlace recibido y crean cuenta o inician sesión si
 
 Disponible para **todos los miembros** en **Perfil** (grupo **Mi perfil** del menú, o clic en tu nombre abajo del sidebar). Ajusta preferencias **personales en el workspace activo**:
 
-1. **Datos personales** — tu **nombre** (visible en menciones y actividad) e **idioma** (Español / English). El email de cuenta es solo lectura.
+1. **Datos personales** — tu **nombre** (visible en menciones y actividad), **idioma** (Español / English) y **zona horaria** (opcional). Si no eliges zona horaria, Cream usa la del workspace. Las fechas con hora (actividad, correos, etc.) se muestran en tu zona; los días de calendario (fecha límite de tarea, cierre previsto) no cambian. El email de cuenta es solo lectura.
 2. **Pipeline predeterminado** — pipeline que se selecciona al iniciar sesión, en el selector del sidebar y en el add-on de Gmail ([§3](#3-navegación)).
 3. **Briefing del director de ventas** — casilla para mostrar u ocultar el bloque de IA en el dashboard ([§4](#4-dashboard)). Solo aparece si el admin lo activó en **Settings** del workspace y la IA está configurada en el servidor.
 4. **Alertas** — canales **Notificación in-app (campana)** y **Email** para alertas configuradas, **envíos de formularios** (si eres responsable) y **reservas de calendario** (si eres anfitrión). Si desactivas ambos, no recibirás esos avisos ([§17](#17-alertas-configurables), [§19](#19-notificaciones)).
@@ -860,6 +860,7 @@ En **Settings** (solo **admins**):
 ### General
 
 - Cambiar el **nombre del workspace**.
+- **Zona horaria del workspace** — predeterminada para miembros sin zona personal y para el «día de hoy» en alertas y briefings (por defecto `Europe/Madrid`).
 - **Los vendedores pueden ver los deals de otros** — si está activo, los vendedores ven todos los deals del workspace en listados, tablero y ficha (no solo los propios ni los compartidos como colaboradores).
 - **Los vendedores pueden editar los deals de otros** — si está activo, los vendedores pueden actualizar, mover y eliminar cualquier deal del workspace. Activar editar también permite ver esos deals.
 
@@ -1265,7 +1266,7 @@ Toda la configuración se hace desde **Reservas** (no hace falta usar seeds ni d
 | Reutilizar deal existente | Si la persona ya tiene un deal en la primera etapa de este pipeline, la reserva se asocia a ese deal; si no, se crea uno nuevo |
 | Mensaje de bienvenida | Texto en la cabecera de la página pública |
 | Avatar URL / Logo URL | Imágenes opcionales del perfil |
-| Zona horaria | Zona por defecto de la página (lista desplegable) |
+| Zona horaria | Zona de las **franjas horarias** del anfitrión. Quien reserva ve los huecos convertidos a su zona; Google Calendar guarda el mismo instante. |
 | Ventana de reserva (días) | Cuántos días hacia adelante se pueden elegir fechas |
 | Calendarios | Calendarios de Google donde comprobar huecos; arrastra para ordenarlos — el primero marcado con escritura recibe las reservas (badge «Recibe nuevas citas») |
 | Página activa | Si está desmarcada, la URL pública no acepta reservas |
@@ -1300,7 +1301,7 @@ Copia la **URL pública** y compártela con clientes. Si la página tiene varios
 
 ### Página pública (visitante)
 
-Flujo en tres pasos: elegir tipo de evento → calendario y hora (con selector de zona horaria ES/EN) → formulario y confirmación con enlace Meet y descarga `.ics`. Con una **URL directa de tipo** (`/b/slug-página/slug-tipo`), el visitante salta el primer paso y entra directamente en el calendario de ese tipo.
+Flujo en tres pasos: elegir tipo de evento → calendario y hora (el selector de zona horaria convierte los huecos del anfitrión a la zona del visitante; fecha y hora se muestran siempre con el identificador IANA, p. ej. `Europe/Madrid`) → formulario y confirmación con enlace Meet y descarga `.ics` (hora en UTC). Con una **URL directa de tipo** (`/b/slug-página/slug-tipo`), el visitante salta el primer paso y entra directamente en el calendario de ese tipo.
 
 ---
 
@@ -1425,16 +1426,18 @@ Secuencias automatizadas por contacto.
 | Paso | Qué hace |
 |------|----------|
 | **Enviar email** | Redacta el email del paso (plantilla base opcional, layout, Quill/HTML, vista previa) + tipo de suscripción (respeta consentimiento) |
-| **Esperar** | Pausa N minutos |
+| **Esperar** | Pausa N minutos desde que el contacto llega al paso (60 = 1 h, 1440 = 1 día). Opcional: **Hasta las HH:MM** (hora del workspace) retiene al contacto hasta la próxima vez que sea esa hora; **Solo días laborables** pasa sábados y domingos al lunes a la misma hora |
 | **Condición** | Rama según campo del contacto |
 | **Establecer campo** | Cambia ciclo de vida |
 | **Añadir a lista** | Añade el contacto a una lista del CRM |
-| **Crear tarea** | Tarea comercial con vencimiento |
+| **Crear tarea** | Tarea comercial con vencimiento en N días naturales, contados en la zona horaria del workspace |
 | **Ajustar puntuación** | Suma o resta puntos |
 | **Notificar** | Aviso a un usuario del equipo |
 
+> **Cuándo se ejecuta cada paso.** Los pasos corren en orden y de inmediato en cuanto el contacto entra en el recorrido (o termina una espera), en ciclos de 10 minutos, a cualquier hora y cualquier día de la semana; no hay horario laboral salvo que lo fijes con un paso **Esperar**. Ejemplos: **Esperar 1440** = un día después, a la misma hora; **Esperar 1440 + Hasta las 10:00** = al día siguiente a las 10:00; **Esperar 0 + Hasta las 09:30 + Solo días laborables** = el próximo día laborable a las 09:30 (hoy mismo si aún no son las 09:30). Coloca el paso justo antes del **Enviar email**. En la ficha del recorrido, **Próxima ejecución** muestra fecha y hora en tu zona horaria (ver [§20](#20-equipo-e-invitaciones)).
+
 6. En recorridos **manuales**, abre la ficha del recorrido → **Inscribir contacto manualmente**.
-7. Desde la ficha del recorrido puedes **Pausar** / **Activar**, ver inscripciones activas y el paso actual de cada contacto.
+7. Desde la ficha del recorrido puedes **Pausar** / **Activar**, ver inscripciones activas, el paso actual de cada contacto y la **próxima ejecución** (fecha y hora).
 8. En inscripciones **Activo** o **En espera**, usa **Cambiar paso** para mover al contacto a otro paso. El recorrido continúa desde ahí y ejecutará ese paso (puede reenviar un email o reiniciar una espera). Solo administradores.
 
 **En la ficha de una persona** (**Activity** → **Recorridos**):
