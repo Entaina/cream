@@ -20,7 +20,7 @@ class StageFieldFormatsController < ApplicationController
     authorize @stage_field_format
 
     if @stage_field_format.save
-      redirect_to pipeline_stage_stage_field_formats_path(@stage), notice: "Formato creado."
+      redirect_to pipeline_stage_stage_field_formats_path(@stage), notice: t("stage_field_formats.flash.created")
     else
       render :new, status: :unprocessable_entity
     end
@@ -33,7 +33,8 @@ class StageFieldFormatsController < ApplicationController
   def update
     authorize @stage_field_format
     if @stage_field_format.update(stage_field_format_params)
-      redirect_to pipeline_stage_stage_field_formats_path(@stage_field_format.pipeline_stage), notice: "Formato actualizado."
+      redirect_to pipeline_stage_stage_field_formats_path(@stage_field_format.pipeline_stage),
+        notice: t("stage_field_formats.flash.updated")
     else
       render :edit, status: :unprocessable_entity
     end
@@ -43,7 +44,8 @@ class StageFieldFormatsController < ApplicationController
     authorize @stage_field_format
     stage = @stage_field_format.pipeline_stage
     @stage_field_format.destroy
-    redirect_to pipeline_stage_stage_field_formats_path(stage), notice: "Formato eliminado.", status: :see_other
+    redirect_to pipeline_stage_stage_field_formats_path(stage), notice: t("stage_field_formats.flash.destroyed"),
+      status: :see_other
   end
 
   private

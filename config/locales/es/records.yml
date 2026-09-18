@@ -122,7 +122,7 @@ es:
         task: Tarea
         title: Siguiente acción (obligatoria)
       overview:
-        description: Nombre, valor, etapa y fechas clave.
+        description: Nombre, importe, etapa y fechas clave.
         invoice_placeholder: FAC-2026-001
         name_placeholder: Acme — Plan anual
         title: Datos de la oportunidad
@@ -481,7 +481,7 @@ es:
       revenue: Facturación
       stage: Etapa
       twitter: X / Twitter
-      value: Valor
+      value: Importe
     more_actions: Más acciones
     next_tasks: Próximas tareas
     no_open_deals: No hay oportunidades abiertas.

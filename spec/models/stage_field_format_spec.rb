@@ -13,6 +13,18 @@ RSpec.describe StageFieldFormat, type: :model do
                                        operator: "eq", compare_value: "0", display_text: "guest"}.merge(attrs))
   end
 
+  describe ".field_label and .operator_label" do
+    it "follows the current locale" do
+      expect(described_class.field_label("value")).to eq("Importe")
+      expect(described_class.operator_label("eq")).to eq("es igual a")
+
+      I18n.with_locale(:en) do
+        expect(described_class.field_label("value")).to eq("Value")
+        expect(described_class.operator_label("eq")).to eq("equals")
+      end
+    end
+  end
+
   describe "validations" do
     it "accepts the guest example" do
       expect(build_format).to be_valid

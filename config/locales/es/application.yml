@@ -23,7 +23,7 @@ es:
         pipeline_id: Pipeline
         pipeline_stage_id: Etapa
         probability: Probabilidad (%)
-        value: Valor
+        value: Importe
       person:
         company_id: Empresa
         description: Acerca de

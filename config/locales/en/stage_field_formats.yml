@@ -1,0 +1,44 @@
+---
+en:
+  stage_field_formats:
+    flash:
+      created: Format created.
+      destroyed: Format deleted.
+      updated: Format updated.
+    form:
+      active: Active
+      compare_value: Value
+      compare_value_placeholder: 'e.g. 0'
+      display_text: Display as
+      display_text_hint: Text shown instead of the field value when the condition matches.
+      display_text_placeholder: 'e.g. guest'
+      field: Field
+      operator: Condition
+      submit_create: Create format
+      submit_update: Save
+    edit:
+      page_title: Edit format
+      title: 'Edit format — %{field}'
+    index:
+      active: Active
+      back_pipeline: Pipeline
+      destroy: Delete
+      destroy_confirm: Delete this format?
+      edit: Edit
+      empty: No formats for this stage yet.
+      inactive: Inactive
+      intro_html: When a deal is in stage <strong>%{stage}</strong> and the condition
+        matches, the field is shown using the configured text instead of its value
+        (record page, table and board). The first active matching rule wins.
+      new: New format
+      page_title: 'Formats — %{stage}'
+      rule_html: If <strong>%{field}</strong> %{operator_phrase} → show «<strong>%{display_text}</strong>»
+      title: 'Field formats — %{stage} (%{pipeline})'
+    new:
+      page_title: New format
+      title: 'New format — %{stage}'
+    operators:
+      blank: is blank
+      eq: equals
+      gt: is greater than
+      lt: is less than

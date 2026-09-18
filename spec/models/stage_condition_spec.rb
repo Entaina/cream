@@ -139,7 +139,7 @@ RSpec.describe StageCondition, type: :model do
   describe "#describe_requirement" do
     it "phrases the rule as something the deal must satisfy" do
       condition = build_condition(operator: "gt", compare_value: "1000")
-      expect(condition.describe_requirement).to eq("Valor debe ser mayor que 1000")
+      expect(condition.describe_requirement).to eq("Importe debe ser mayor que 1000")
     end
   end
 
@@ -155,7 +155,7 @@ RSpec.describe StageCondition, type: :model do
         messages = error.record.errors.full_messages
         expect(messages.size).to eq(1)
         expect(messages.first).to include("No se puede pasar a «Qualified»")
-        expect(messages.first).to include("Valor debe ser mayor que 1000")
+        expect(messages.first).to include("Importe debe ser mayor que 1000")
         expect(messages.first).to include("Fecha de cierre debe tener valor")
         expect(messages.first.scan(/No se puede pasar/).size).to eq(1)
       }

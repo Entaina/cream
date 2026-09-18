@@ -8,29 +8,32 @@
   <% end %>
 
   <div>
-    <%= f.label :field, "Campo", class: "label" %>
-    <%= f.select :field, StageFieldFormat::FIELDS.map { |key, label| [ label, key ] }, {}, class: "input w-full" %>
+    <%= f.label :field, t("stage_field_formats.form.field"), class: "label" %>
+    <%= f.select :field, StageFieldFormat.field_options, {}, class: "input w-full" %>
   </div>
 
   <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
     <div>
-      <%= f.label :operator, "Condición", class: "label" %>
-      <%= f.select :operator, StageFieldFormat::OPERATORS.map { |key, label| [ label, key ] }, {},
+      <%= f.label :operator, t("stage_field_formats.form.operator"), class: "label" %>
+      <%= f.select :operator, StageFieldFormat.operator_options, {},
             class: "input w-full",
             data: { "stage-field-format-form-target" => "operator", action: "stage-field-format-form#refresh" } %>
     </div>
     <div data-stage-field-format-form-target="compareValue">
-      <%= f.label :compare_value, "Valor", class: "label" %>
-      <%= f.text_field :compare_value, class: "input w-full", placeholder: "Ej.: 0" %>
+      <%= f.label :compare_value, t("stage_field_formats.form.compare_value"), class: "label" %>
+      <%= f.text_field :compare_value, class: "input w-full",
+            placeholder: t("stage_field_formats.form.compare_value_placeholder") %>
     </div>
   </div>
 
   <div>
-    <%= f.label :display_text, "Mostrar", class: "label" %>
-    <%= f.text_field :display_text, class: "input w-full", placeholder: "Ej.: guest" %>
-    <p class="text-sm text-ink-faint mt-1">Texto que sustituye al valor del campo cuando se cumple la condición.</p>
+    <%= f.label :display_text, t("stage_field_formats.form.display_text"), class: "label" %>
+    <%= f.text_field :display_text, class: "input w-full",
+          placeholder: t("stage_field_formats.form.display_text_placeholder") %>
+    <p class="text-sm text-ink-faint mt-1"><%= t("stage_field_formats.form.display_text_hint") %></p>
   </div>
 
-  <label class="flex items-center gap-2 text-base"><%= f.check_box :active %> Activo</label>
-  <%= f.submit stage_field_format.persisted? ? "Guardar" : "Crear formato", class: "btn-primary" %>
+  <label class="flex items-center gap-2 text-base"><%= f.check_box :active %> <%= t("stage_field_formats.form.active") %></label>
+  <%= f.submit stage_field_format.persisted? ? t("stage_field_formats.form.submit_update") : t("stage_field_formats.form.submit_create"),
+        class: "btn-primary" %>
 <% end %>

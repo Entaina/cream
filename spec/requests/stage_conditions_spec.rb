@@ -19,7 +19,7 @@ RSpec.describe "StageConditions", type: :request do
     create_condition
     get pipeline_stage_stage_conditions_path(stage)
     expect(response).to have_http_status(:ok)
-    expect(response.body).to include("Valor")
+    expect(response.body).to include("Importe")
   end
 
   it "creates a condition" do

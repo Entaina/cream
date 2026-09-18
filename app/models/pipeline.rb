@@ -10,7 +10,7 @@ class Pipeline < ApplicationRecord
   ].freeze
 
   CARD_FIELDS = {
-    "value" => "Valor",
+    "value" => "Importe",
     "company" => "Empresa",
     "owner" => "Responsable",
     "expected_close_date" => "Fecha de cierre",

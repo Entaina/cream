@@ -1,0 +1,44 @@
+---
+es:
+  stage_field_formats:
+    flash:
+      created: Formato creado.
+      destroyed: Formato eliminado.
+      updated: Formato actualizado.
+    form:
+      active: Activo
+      compare_value: Valor
+      compare_value_placeholder: 'Ej.: 0'
+      display_text: Mostrar
+      display_text_hint: Texto que sustituye al valor del campo cuando se cumple la condición.
+      display_text_placeholder: 'Ej.: guest'
+      field: Campo
+      operator: Condición
+      submit_create: Crear formato
+      submit_update: Guardar
+    edit:
+      page_title: Editar formato
+      title: 'Editar formato — %{field}'
+    index:
+      active: Activo
+      back_pipeline: Pipeline
+      destroy: Eliminar
+      destroy_confirm: "¿Eliminar este formato?"
+      edit: Editar
+      empty: No hay formatos para esta etapa todavía.
+      inactive: Inactivo
+      intro_html: Cuando un deal está en la etapa <strong>%{stage}</strong> y se cumple
+        la condición, el campo se muestra con el texto configurado en lugar de su valor
+        (ficha, tabla y tablero). Gana la primera regla activa que coincida.
+      new: Nuevo formato
+      page_title: 'Formatos — %{stage}'
+      rule_html: Si <strong>%{field}</strong> %{operator_phrase} → se muestra «<strong>%{display_text}</strong>»
+      title: 'Formatos de campos — %{stage} (%{pipeline})'
+    new:
+      page_title: Nuevo formato
+      title: 'Nuevo formato — %{stage}'
+    operators:
+      blank: está vacío
+      eq: es igual a
+      gt: es mayor que
+      lt: es menor que

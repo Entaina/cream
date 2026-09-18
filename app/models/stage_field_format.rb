@@ -2,30 +2,33 @@
 # views show display_text instead of the formatted value (e.g. price 0 in a
 # given stage renders as "guest"). First matching active rule wins.
 class StageFieldFormat < ApplicationRecord
-  FIELDS = {
-    "value" => "Precio",
-    "probability" => "Probabilidad",
-    "expected_close_date" => "Fecha de cierre"
-  }.freeze
-  OPERATORS = {
-    "eq" => "es igual a",
-    "lt" => "es menor que",
-    "gt" => "es mayor que",
-    "blank" => "está vacío"
-  }.freeze
+  FIELDS = %w[value probability expected_close_date].freeze
+  OPERATORS = %w[eq lt gt blank].freeze
 
   belongs_to :workspace
   belongs_to :pipeline_stage
   has_one :pipeline, through: :pipeline_stage
 
-  validates :field, inclusion: {in: FIELDS.keys}
-  validates :operator, inclusion: {in: OPERATORS.keys}
+  validates :field, inclusion: {in: FIELDS}
+  validates :operator, inclusion: {in: OPERATORS}
   validates :display_text, presence: true
   validates :compare_value, presence: true, unless: :blank_operator?
   validate :stage_belongs_to_workspace
 
   scope :active, -> { where(active: true) }
   scope :ordered, -> { order(:position, :id) }
+
+  def self.field_label(field)
+    I18n.t("activerecord.attributes.deal.#{field}")
+  end
+
+  def self.operator_label(operator)
+    I18n.t(operator, scope: "stage_field_formats.operators")
+  end
+
+  def self.field_options = FIELDS.map { |key| [field_label(key), key] }
+
+  def self.operator_options = OPERATORS.map { |key| [operator_label(key), key] }
 
   def self.display_for(deal, field)
     deal.pipeline_stage.stage_field_formats.active.ordered
@@ -44,6 +47,12 @@ class StageFieldFormat < ApplicationRecord
   end
 
   def blank_operator? = operator == "blank"
+
+  def operator_phrase
+    phrase = self.class.operator_label(operator)
+    phrase = "#{phrase} #{compare_value}" unless blank_operator?
+    phrase
+  end
 
   private
 

@@ -3,7 +3,7 @@ module FieldCondition
   extend ActiveSupport::Concern
 
   DEAL_FIELDS = {
-    "value" => "Valor",
+    "value" => "Importe",
     "probability" => "Probabilidad",
     "expected_close_date" => "Fecha de cierre",
     "name" => "Nombre",

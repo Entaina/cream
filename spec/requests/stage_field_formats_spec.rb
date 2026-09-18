@@ -20,6 +20,17 @@ RSpec.describe "StageFieldFormats", type: :request do
     get pipeline_stage_stage_field_formats_path(stage)
     expect(response).to have_http_status(:ok)
     expect(response.body).to include("guest")
+    expect(response.body).to include(I18n.t("stage_field_formats.index.new"))
+  end
+
+  it "renders in English when the user locale is en" do
+    create_format
+    member.update!(locale: "en")
+    get pipeline_stage_stage_field_formats_path(stage)
+    expect(response.body).to include(I18n.t("stage_field_formats.index.new", locale: :en))
+    expect(response.body).not_to include(I18n.t("stage_field_formats.index.new", locale: :es))
+  ensure
+    member.update!(locale: "es")
   end
 
   it "creates a format" do
