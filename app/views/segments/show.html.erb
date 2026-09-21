@@ -8,7 +8,7 @@
 
 <div class="flex-1 overflow-y-auto scrollbar-subtle p-5 space-y-4">
   <div class="card p-4 space-y-2">
-    <p class="text-sm"><%= t("marketing.segments.show.match_count_html", count: @count).html_safe %></p>
+    <p class="text-sm"><%= t("marketing.segments.show.match_count_html", count: tag.strong(@count)) %></p>
     <p class="text-sm text-ink-faint"><%= describe_segment_filters(@segment.filters) %></p>
     <% if @segment.description.present? %>
       <p class="text-sm text-ink-soft"><%= @segment.description %></p>

@@ -15,14 +15,14 @@ function setSelectedWorkspaceId_(workspaceId) {
   }
 }
 
-function creamApiFetch_(method, path, payload, accessToken) {
+function creamApiFetch_(method, path, payload, accessToken, workspaceIdOverride) {
   var url = getCreamBaseUrl_() + path;
   var headers = {
     Authorization: "Bearer " + accessToken,
     Accept: "application/json",
     "Content-Type": "application/json"
   };
-  var workspaceId = getSelectedWorkspaceId_();
+  var workspaceId = workspaceIdOverride || getSelectedWorkspaceId_();
   if (workspaceId) {
     headers["X-Cream-Workspace-Id"] = workspaceId;
   }
@@ -43,13 +43,13 @@ function creamApiFetch_(method, path, payload, accessToken) {
   };
 }
 
-function creamApiRequest_(method, path, payload) {
+function creamApiRequest_(method, path, payload, workspaceIdOverride) {
   var token = getCreamAccessToken_();
-  var result = creamApiFetch_(method, path, payload, token);
+  var result = creamApiFetch_(method, path, payload, token, workspaceIdOverride);
 
   if (result.code === 401 && refreshCreamAccessToken_()) {
     token = getCreamAccessToken_();
-    result = creamApiFetch_(method, path, payload, token);
+    result = creamApiFetch_(method, path, payload, token, workspaceIdOverride);
   }
 
   if (result.code === 401) {
@@ -79,4 +79,35 @@ function creamThreadLink_(payload) {
 function creamSearchDeals_(query) {
   var encoded = encodeURIComponent(query || "");
   return creamApiRequest_("get", "/api/v1/deals?q=" + encoded);
+}
+
+function creamUpdateDeal_(dealId, dealPayload, workspaceId) {
+  return creamApiRequest_(
+    "patch",
+    "/api/v1/deals/" + dealId,
+    { deal: dealPayload },
+    workspaceId
+  );
+}
+
+function creamCreateDealNote_(dealId, notePayload, workspaceId) {
+  return creamApiRequest_(
+    "post",
+    "/api/v1/deals/" + dealId + "/notes",
+    { note: notePayload },
+    workspaceId
+  );
+}
+
+function creamCreateTask_(taskPayload, workspaceId) {
+  return creamApiRequest_("post", "/api/v1/tasks", { task: taskPayload }, workspaceId);
+}
+
+function creamUpdateTask_(taskId, taskPayload, workspaceId) {
+  return creamApiRequest_(
+    "patch",
+    "/api/v1/tasks/" + taskId,
+    { task: taskPayload },
+    workspaceId
+  );
 }

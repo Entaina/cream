@@ -578,7 +578,7 @@ en:
         delete_confirm: Delete segment «%{name}»?
         empty_subtitle: No records match this segment's current filters.
         empty_title: No matches
-        match_count_html: "<strong>%{count}</strong> records match this segment."
+        match_count_html: "%{count} records match this segment."
     send_stats:
       failed: "%{count} failed"
       journey_blocked: "%{count} blocked"

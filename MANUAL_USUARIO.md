@@ -4,7 +4,7 @@
 
 Cream es un CRM por **workspaces** para gestionar **personas**, **empresas** y **deals** (oportunidades), con notas, tareas, listas y un historial de actividad compartido en el equipo.
 
-> **Última revisión:** 2026-09-18 (zona horaria de usuario y workspace)
+> **Última revisión:** 2026-09-21 (edición de deals en el add-on de Gmail)
 > Este documento describe la funcionalidad **visible para el usuario**. Las funcionalidades desactivadas aparecen al final en «Próximamente».
 
 ---
@@ -664,8 +664,10 @@ Desde el **add-on de CReaM en Gmail** (barra lateral al abrir un correo) puedes:
 1. **Conectar con CReaM** — autoriza con tu cuenta de CReaM (OAuth).
 2. Si el hilo **ya está vinculado** a un deal, verás una **ficha del deal** con
    etapa, pipeline, empresa, valor, propietario, contactos, fecha de cierre,
-   siguiente tarea y productos, además de un enlace **Open in CReaM**. Para
-   vincular otro deal o crear uno nuevo, pulsa **Link another deal**.
+   tareas pendientes y productos, además de un enlace **Open in CReaM**. Desde
+   esa ficha puedes **Edit deal** (etapa, valor y fecha de cierre), **Add note**,
+   **Add task** y **Edit task** (título, fecha y marcar completada) sin salir de
+   Gmail. Para vincular otro deal o crear uno nuevo, pulsa **Link another deal**.
 3. Si el hilo **aún no está vinculado**, elige el **Workspace** y **Pipeline** de
    destino (se propone el workspace **Example** y tu pipeline predeterminado).
    Los deals nuevos se crean en la primera etapa del pipeline.

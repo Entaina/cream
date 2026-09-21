@@ -754,6 +754,12 @@ components:
         pipeline:
           type: string
           nullable: true
+        pipeline_id:
+          type: integer
+          nullable: true
+        pipeline_stage_id:
+          type: integer
+          nullable: true
         company_id:
           type: integer
         company_name:
@@ -778,12 +784,32 @@ components:
           type: object
           nullable: true
           properties:
+            id:
+              type: integer
             title:
               type: string
             due_on:
               type: string
               format: date
               nullable: true
+            completed:
+              type: boolean
+        tasks:
+          type: array
+          description: Up to 10 pending tasks, same order as next_task first.
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              title:
+                type: string
+              due_on:
+                type: string
+                format: date
+                nullable: true
+              completed:
+                type: boolean
         products:
           type: array
           items:

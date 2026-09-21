@@ -583,8 +583,7 @@ es:
         delete_confirm: "¿Eliminar el segmento «%{name}»?"
         empty_subtitle: Ningún registro cumple los filtros actuales de este segmento.
         empty_title: Sin coincidencias
-        match_count_html: "<strong>%{count}</strong> registros coinciden con este
-          segmento."
+        match_count_html: "%{count} registros coinciden con este segmento."
     send_stats:
       failed: "%{count} fallidos"
       journey_blocked: "%{count} bloqueados"

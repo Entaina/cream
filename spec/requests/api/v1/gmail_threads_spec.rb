@@ -71,6 +71,8 @@ RSpec.describe "Api::V1::GmailThreads", type: :request do
       expect(linked).to include(
         "stage" => "Lead",
         "pipeline" => pipeline.name,
+        "pipeline_id" => pipeline.id,
+        "pipeline_stage_id" => deal.pipeline_stage_id,
         "company_name" => company.name,
         "value" => 1500.0,
         "currency" => "EUR",
@@ -79,7 +81,10 @@ RSpec.describe "Api::V1::GmailThreads", type: :request do
         "products" => ["Curso X — Edición 2026"]
       )
       expect(linked["contacts"]).to be_present
-      expect(linked["next_task"]).to include("title" => "Next action")
+      expect(linked["next_task"]).to include("title" => "Next action", "completed" => false)
+      expect(linked["next_task"]["id"]).to be_present
+      expect(linked["tasks"]).to be_an(Array)
+      expect(linked["tasks"].first).to include("title" => "Next action", "completed" => false)
     end
 
     it "finds linked deals in another workspace the user belongs to" do

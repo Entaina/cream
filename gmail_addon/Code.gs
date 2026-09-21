@@ -170,6 +170,75 @@ function formValue_(e, fieldName) {
   return values && values.length ? values[0] : null;
 }
 
+function dateFormValue_(e, fieldName) {
+  var formInputs = e.commonEventObject && e.commonEventObject.formInputs;
+  if (formInputs && formInputs[fieldName] && formInputs[fieldName].dateInput) {
+    var ms = formInputs[fieldName].dateInput.msSinceEpoch;
+    if (ms !== undefined && ms !== null && ms !== "") {
+      return new Date(Number(ms));
+    }
+  }
+  return null;
+}
+
+function switchFormValue_(e, fieldName) {
+  var formInputs = e.commonEventObject && e.commonEventObject.formInputs;
+  if (formInputs && formInputs[fieldName] && formInputs[fieldName].switchControl) {
+    return formInputs[fieldName].switchControl.selected === true;
+  }
+  return false;
+}
+
+function formatDateForApi_(date) {
+  if (!date) {
+    return null;
+  }
+  return Utilities.formatDate(date, "GMT", "yyyy-MM-dd");
+}
+
+function parseIsoDateMs_(iso) {
+  if (!iso) {
+    return null;
+  }
+  var date = new Date(iso);
+  return isNaN(date.getTime()) ? null : date.getTime();
+}
+
+function dealActionParams_(deal) {
+  return {
+    deal_id: String(deal.id),
+    workspace_id: String(deal.workspace_id)
+  };
+}
+
+function pipelineStagesForDeal_(context, deal) {
+  var workspace = findById_(context.workspaces || [], deal.workspace_id);
+  if (!workspace) {
+    return [];
+  }
+  var pipeline = findById_(workspace.pipelines || [], deal.pipeline_id);
+  if (!pipeline) {
+    return [];
+  }
+  return pipeline.stages || [];
+}
+
+function findLinkedDeal_(e) {
+  var dealId = e.parameters && e.parameters.deal_id;
+  if (!dealId) {
+    throw new Error("Missing deal.");
+  }
+  var threadData = readOpenThread_(e);
+  var status = threadStatus_(threadData);
+  var deal = (status.linked || []).filter(function(item) {
+    return String(item.id) === String(dealId);
+  })[0];
+  if (!deal) {
+    throw new Error("Deal not found for this thread.");
+  }
+  return { threadData: threadData, deal: deal, status: status };
+}
+
 function refreshThreadCard_(e) {
   return refreshThreadCardAfterLink_(e, null);
 }
@@ -252,16 +321,54 @@ function buildLinkedDealSection_(deal, multipleDeals) {
     addDealField_(section, "Contacts", deal.contacts.join(", "));
   }
   addDealField_(section, "Close date", formatIsoDate_(deal.expected_close_date));
-  if (deal.next_task) {
-    var taskText = deal.next_task.title;
-    if (deal.next_task.due_on) {
-      taskText += " (due " + formatIsoDate_(deal.next_task.due_on) + ")";
+  var tasks = deal.tasks && deal.tasks.length ?
+    deal.tasks :
+    (deal.next_task ? [deal.next_task] : []);
+  tasks.forEach(function(task) {
+    var taskText = task.title;
+    if (task.due_on) {
+      taskText += " (due " + formatIsoDate_(task.due_on) + ")";
     }
-    addDealField_(section, "Next task", taskText);
-  }
+    addDealField_(section, "Task", taskText);
+    if (task.id) {
+      section.addWidget(
+        CardService.newTextButton()
+          .setText("Edit task")
+          .setOnClickAction(
+            CardService.newAction()
+              .setFunctionName("showEditTask")
+              .setParameters(
+                Object.assign({}, dealActionParams_(deal), { task_id: String(task.id) })
+              )
+          )
+      );
+    }
+  });
   if (deal.products && deal.products.length) {
     addDealField_(section, "Products", deal.products.join("\n"));
   }
+  var params = dealActionParams_(deal);
+  section.addWidget(
+    CardService.newTextButton()
+      .setText("Edit deal")
+      .setOnClickAction(
+        CardService.newAction().setFunctionName("showEditDeal").setParameters(params)
+      )
+  );
+  section.addWidget(
+    CardService.newTextButton()
+      .setText("Add note")
+      .setOnClickAction(
+        CardService.newAction().setFunctionName("showAddNote").setParameters(params)
+      )
+  );
+  section.addWidget(
+    CardService.newTextButton()
+      .setText("Add task")
+      .setOnClickAction(
+        CardService.newAction().setFunctionName("showAddTask").setParameters(params)
+      )
+  );
   if (deal.url) {
     section.addWidget(
       CardService.newTextButton()
@@ -391,14 +498,20 @@ function showLinkActions(e) {
 }
 
 function refreshThreadCardAfterLink_(e, message) {
+  return refreshThreadCardFromEdit_(e, message, false);
+}
+
+function refreshThreadCardFromEdit_(e, message, popToRoot) {
   var threadData = readOpenThread_(e);
   var status = threadStatus_(threadData);
   applyLinkedWorkspace_(status);
   var context = creamContext_();
-  var builder = CardService.newActionResponseBuilder()
-    .setNavigation(
-      CardService.newNavigation().updateCard(buildThreadCard_(threadData, status, context))
-    );
+  var navigation = CardService.newNavigation();
+  if (popToRoot !== false) {
+    navigation = navigation.popToRoot();
+  }
+  navigation = navigation.updateCard(buildThreadCard_(threadData, status, context));
+  var builder = CardService.newActionResponseBuilder().setNavigation(navigation);
   if (message) {
     builder.setNotification(CardService.newNotification().setText(message));
   }
@@ -488,6 +601,312 @@ function searchDeals(e) {
     return CardService.newActionResponseBuilder()
       .setNavigation(CardService.newNavigation().pushCard(card.build()))
       .build();
+  } catch (err) {
+    return CardService.newActionResponseBuilder()
+      .setNotification(CardService.newNotification().setText(String(err.message)))
+      .build();
+  }
+}
+
+function buildEditDealCard_(deal, context) {
+  var card = CardService.newCardBuilder()
+    .setHeader(CardService.newCardHeader().setTitle("Edit deal"));
+  var section = CardService.newCardSection().setHeader(deal.name);
+  var stages = pipelineStagesForDeal_(context, deal);
+  if (stages.length) {
+    var stageInput = CardService.newSelectionInput()
+      .setType(CardService.SelectionInputType.DROPDOWN)
+      .setFieldName("pipeline_stage_id")
+      .setTitle("Stage");
+    stages.forEach(function(stage) {
+      stageInput.addItem(
+        stage.name,
+        String(stage.id),
+        String(stage.id) === String(deal.pipeline_stage_id)
+      );
+    });
+    section.addWidget(stageInput);
+  }
+  var valueInput = CardService.newTextInput()
+    .setFieldName("deal_value")
+    .setTitle("Value");
+  if (deal.value !== undefined && deal.value !== null) {
+    valueInput.setValue(String(deal.value));
+  }
+  section.addWidget(valueInput);
+  var closePicker = CardService.newDatePicker()
+    .setFieldName("expected_close_date")
+    .setTitle("Close date");
+  var closeMs = parseIsoDateMs_(deal.expected_close_date);
+  if (closeMs) {
+    closePicker.setValueInMsSinceEpoch(closeMs);
+  }
+  section.addWidget(closePicker);
+  var params = dealActionParams_(deal);
+  section.addWidget(
+    CardService.newTextButton()
+      .setText("Save")
+      .setOnClickAction(
+        CardService.newAction().setFunctionName("saveEditDeal").setParameters(params)
+      )
+  );
+  card.addSection(section);
+  return card.build();
+}
+
+function showEditDeal(e) {
+  try {
+    var found = findLinkedDeal_(e);
+    var context = creamContext_();
+    return CardService.newActionResponseBuilder()
+      .setNavigation(
+        CardService.newNavigation().pushCard(buildEditDealCard_(found.deal, context))
+      )
+      .build();
+  } catch (err) {
+    return CardService.newActionResponseBuilder()
+      .setNotification(CardService.newNotification().setText(String(err.message)))
+      .build();
+  }
+}
+
+function saveEditDeal(e) {
+  try {
+    var dealId = e.parameters.deal_id;
+    var workspaceId = e.parameters.workspace_id;
+    var payload = {};
+    var stageId = formValue_(e, "pipeline_stage_id");
+    if (stageId) {
+      payload.pipeline_stage_id = Number(stageId);
+    }
+    var valueStr = formValue_(e, "deal_value");
+    if (valueStr !== null && valueStr !== "") {
+      payload.value = Number(valueStr);
+    }
+    var closeDate = dateFormValue_(e, "expected_close_date");
+    if (closeDate) {
+      payload.expected_close_date = formatDateForApi_(closeDate);
+    }
+    creamUpdateDeal_(dealId, payload, workspaceId);
+    return refreshThreadCardFromEdit_(e, "Deal updated");
+  } catch (err) {
+    return CardService.newActionResponseBuilder()
+      .setNotification(CardService.newNotification().setText(String(err.message)))
+      .build();
+  }
+}
+
+function buildAddNoteCard_(deal) {
+  var card = CardService.newCardBuilder()
+    .setHeader(CardService.newCardHeader().setTitle("Add note"));
+  var section = CardService.newCardSection().setHeader(deal.name);
+  section.addWidget(
+    CardService.newTextInput().setFieldName("note_title").setTitle("Title (optional)")
+  );
+  section.addWidget(
+    CardService.newTextInput()
+      .setFieldName("note_body")
+      .setTitle("Note")
+      .setMultiline(true)
+  );
+  section.addWidget(
+    CardService.newTextButton()
+      .setText("Save note")
+      .setOnClickAction(
+        CardService.newAction()
+          .setFunctionName("saveAddNote")
+          .setParameters(dealActionParams_(deal))
+      )
+  );
+  card.addSection(section);
+  return card.build();
+}
+
+function showAddNote(e) {
+  try {
+    var found = findLinkedDeal_(e);
+    return CardService.newActionResponseBuilder()
+      .setNavigation(
+        CardService.newNavigation().pushCard(buildAddNoteCard_(found.deal))
+      )
+      .build();
+  } catch (err) {
+    return CardService.newActionResponseBuilder()
+      .setNotification(CardService.newNotification().setText(String(err.message)))
+      .build();
+  }
+}
+
+function saveAddNote(e) {
+  try {
+    var dealId = e.parameters.deal_id;
+    var workspaceId = e.parameters.workspace_id;
+    var body = formValue_(e, "note_body");
+    if (!body || !String(body).trim()) {
+      throw new Error("Note text is required.");
+    }
+    var notePayload = { body: String(body).trim() };
+    var title = formValue_(e, "note_title");
+    if (title && String(title).trim()) {
+      notePayload.title = String(title).trim();
+    }
+    creamCreateDealNote_(dealId, notePayload, workspaceId);
+    return refreshThreadCardFromEdit_(e, "Note added");
+  } catch (err) {
+    return CardService.newActionResponseBuilder()
+      .setNotification(CardService.newNotification().setText(String(err.message)))
+      .build();
+  }
+}
+
+function buildAddTaskCard_(deal) {
+  var card = CardService.newCardBuilder()
+    .setHeader(CardService.newCardHeader().setTitle("Add task"));
+  var section = CardService.newCardSection().setHeader(deal.name);
+  section.addWidget(
+    CardService.newTextInput().setFieldName("task_title").setTitle("Task title")
+  );
+  var tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  section.addWidget(
+    CardService.newDatePicker()
+      .setFieldName("task_due_on")
+      .setTitle("Due date")
+      .setValueInMsSinceEpoch(tomorrow.getTime())
+  );
+  section.addWidget(
+    CardService.newTextButton()
+      .setText("Save task")
+      .setOnClickAction(
+        CardService.newAction()
+          .setFunctionName("saveAddTask")
+          .setParameters(dealActionParams_(deal))
+      )
+  );
+  card.addSection(section);
+  return card.build();
+}
+
+function showAddTask(e) {
+  try {
+    var found = findLinkedDeal_(e);
+    return CardService.newActionResponseBuilder()
+      .setNavigation(
+        CardService.newNavigation().pushCard(buildAddTaskCard_(found.deal))
+      )
+      .build();
+  } catch (err) {
+    return CardService.newActionResponseBuilder()
+      .setNotification(CardService.newNotification().setText(String(err.message)))
+      .build();
+  }
+}
+
+function saveAddTask(e) {
+  try {
+    var dealId = e.parameters.deal_id;
+    var workspaceId = e.parameters.workspace_id;
+    var title = formValue_(e, "task_title");
+    if (!title || !String(title).trim()) {
+      throw new Error("Task title is required.");
+    }
+    var payload = {
+      title: String(title).trim(),
+      taskable_type: "Deal",
+      taskable_id: Number(dealId)
+    };
+    var dueOn = dateFormValue_(e, "task_due_on");
+    if (dueOn) {
+      payload.due_on = formatDateForApi_(dueOn);
+    }
+    creamCreateTask_(payload, workspaceId);
+    return refreshThreadCardFromEdit_(e, "Task added");
+  } catch (err) {
+    return CardService.newActionResponseBuilder()
+      .setNotification(CardService.newNotification().setText(String(err.message)))
+      .build();
+  }
+}
+
+function findTaskOnDeal_(deal, taskId) {
+  var tasks = deal.tasks && deal.tasks.length ?
+    deal.tasks :
+    (deal.next_task ? [deal.next_task] : []);
+  return tasks.filter(function(task) {
+    return String(task.id) === String(taskId);
+  })[0] || null;
+}
+
+function buildEditTaskCard_(deal, task) {
+  var card = CardService.newCardBuilder()
+    .setHeader(CardService.newCardHeader().setTitle("Edit task"));
+  var section = CardService.newCardSection().setHeader(deal.name);
+  section.addWidget(
+    CardService.newTextInput()
+      .setFieldName("task_title")
+      .setTitle("Task title")
+      .setValue(task.title || "")
+  );
+  var duePicker = CardService.newDatePicker().setFieldName("task_due_on").setTitle("Due date");
+  var dueMs = parseIsoDateMs_(task.due_on);
+  if (dueMs) {
+    duePicker.setValueInMsSinceEpoch(dueMs);
+  }
+  section.addWidget(duePicker);
+  section.addWidget(
+    CardService.newSwitch()
+      .setFieldName("task_completed")
+      .setTitle("Completed")
+      .setValue(task.completed === true)
+  );
+  var params = Object.assign({}, dealActionParams_(deal), { task_id: String(task.id) });
+  section.addWidget(
+    CardService.newTextButton()
+      .setText("Save task")
+      .setOnClickAction(
+        CardService.newAction().setFunctionName("saveEditTask").setParameters(params)
+      )
+  );
+  card.addSection(section);
+  return card.build();
+}
+
+function showEditTask(e) {
+  try {
+    var found = findLinkedDeal_(e);
+    var taskId = e.parameters.task_id;
+    var task = findTaskOnDeal_(found.deal, taskId);
+    if (!task) {
+      throw new Error("Task not found.");
+    }
+    return CardService.newActionResponseBuilder()
+      .setNavigation(
+        CardService.newNavigation().pushCard(buildEditTaskCard_(found.deal, task))
+      )
+      .build();
+  } catch (err) {
+    return CardService.newActionResponseBuilder()
+      .setNotification(CardService.newNotification().setText(String(err.message)))
+      .build();
+  }
+}
+
+function saveEditTask(e) {
+  try {
+    var taskId = e.parameters.task_id;
+    var workspaceId = e.parameters.workspace_id;
+    var title = formValue_(e, "task_title");
+    if (!title || !String(title).trim()) {
+      throw new Error("Task title is required.");
+    }
+    var payload = { title: String(title).trim() };
+    var dueOn = dateFormValue_(e, "task_due_on");
+    if (dueOn) {
+      payload.due_on = formatDateForApi_(dueOn);
+    }
+    payload.completed = switchFormValue_(e, "task_completed");
+    creamUpdateTask_(taskId, payload, workspaceId);
+    return refreshThreadCardFromEdit_(e, "Task updated");
   } catch (err) {
     return CardService.newActionResponseBuilder()
       .setNotification(CardService.newNotification().setText(String(err.message)))

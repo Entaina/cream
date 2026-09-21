@@ -252,13 +252,16 @@ class GmailThreadLinker
   end
 
   def deal_payload(deal)
-    task = deal.next_pending_task
+    pending_tasks = pending_tasks_for_addon(deal)
+    task = pending_tasks.first
     {
       id: deal.id,
       workspace_id: deal.workspace_id,
       name: deal.name,
       stage: deal.stage_label,
       pipeline: deal.pipeline&.name,
+      pipeline_id: deal.pipeline_id,
+      pipeline_stage_id: deal.pipeline_stage_id,
       company_id: deal.company_id,
       company_name: deal.company&.name,
       value: deal.value.to_f,
@@ -266,9 +269,24 @@ class GmailThreadLinker
       owner_name: deal.owner&.name,
       contacts: deal.contacts.map(&:display_name),
       expected_close_date: deal.expected_close_date&.iso8601,
-      next_task: task ? {title: task.title, due_on: task.due_on&.iso8601} : nil,
+      next_task: task ? task_summary(task) : nil,
+      tasks: pending_tasks.map { |t| task_summary(t) },
       products: deal.deal_products.map { |line| product_line_label(line) },
       url: deal_url(deal)
+    }
+  end
+
+  def pending_tasks_for_addon(deal)
+    pending = deal.tasks.select { |t| t.completed_at.nil? }
+    pending.sort_by { |t| [t.due_on ? 0 : 1, t.due_on || Date.new(9999, 12, 31), t.id] }.first(10)
+  end
+
+  def task_summary(task)
+    {
+      id: task.id,
+      title: task.title,
+      due_on: task.due_on&.iso8601,
+      completed: task.completed?
     }
   end
 
