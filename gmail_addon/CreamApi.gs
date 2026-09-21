@@ -15,11 +15,10 @@ function setSelectedWorkspaceId_(workspaceId) {
   }
 }
 
-function creamApiRequest_(method, path, payload) {
-  var token = getCreamAccessToken_();
+function creamApiFetch_(method, path, payload, accessToken) {
   var url = getCreamBaseUrl_() + path;
   var headers = {
-    Authorization: "Bearer " + token,
+    Authorization: "Bearer " + accessToken,
     Accept: "application/json",
     "Content-Type": "application/json"
   };
@@ -38,19 +37,31 @@ function creamApiRequest_(method, path, payload) {
   }
 
   var response = UrlFetchApp.fetch(url, options);
-  var code = response.getResponseCode();
-  var body = response.getContentText();
+  return {
+    code: response.getResponseCode(),
+    body: response.getContentText()
+  };
+}
 
-  if (code === 401) {
+function creamApiRequest_(method, path, payload) {
+  var token = getCreamAccessToken_();
+  var result = creamApiFetch_(method, path, payload, token);
+
+  if (result.code === 401 && refreshCreamAccessToken_()) {
+    token = getCreamAccessToken_();
+    result = creamApiFetch_(method, path, payload, token);
+  }
+
+  if (result.code === 401) {
     clearCreamAuth_();
     throw new Error("not_connected");
   }
 
-  if (code >= 400) {
-    throw new Error("CReaM API error " + code + ": " + body);
+  if (result.code >= 400) {
+    throw new Error("CReaM API error " + result.code + ": " + result.body);
   }
 
-  return body ? JSON.parse(body) : {};
+  return result.body ? JSON.parse(result.body) : {};
 }
 
 function creamThreadStatus_(threadPayload) {

@@ -21,6 +21,13 @@ function getCreamClientId_() {
   return clientId;
 }
 
+function stripEmptyClientSecretFromTokenPayload_(payload) {
+  if (payload && (payload.client_secret === "" || payload.client_secret === null)) {
+    delete payload.client_secret;
+  }
+  return payload;
+}
+
 function getCreamOAuthService_() {
   return OAuth2.createService("cream")
     .setAuthorizationBaseUrl(getCreamBaseUrl_() + "/oauth/authorize")
@@ -32,7 +39,8 @@ function getCreamOAuthService_() {
     .setCache(CacheService.getUserCache())
     .setLock(LockService.getUserLock())
     .setParam("access_type", "offline")
-    .setParam("prompt", "consent");
+    .setParam("prompt", "consent")
+    .setTokenPayloadHandler(stripEmptyClientSecretFromTokenPayload_);
 }
 
 function getCreamRedirectUri_() {
@@ -66,6 +74,21 @@ function getCreamAccessToken_() {
     throw new Error("not_connected");
   }
   return service.getAccessToken();
+}
+
+/** Refreshes the stored OAuth token. Returns true on success, false otherwise. */
+function refreshCreamAccessToken_() {
+  var service = getCreamOAuthService_();
+  var token = service.getToken();
+  if (!token || !token.refresh_token) {
+    return false;
+  }
+  try {
+    service.refresh();
+    return service.hasAccess();
+  } catch (err) {
+    return false;
+  }
 }
 
 function buildConnectCard_() {

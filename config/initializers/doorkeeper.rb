@@ -23,7 +23,7 @@ Doorkeeper.configure do
 
   grant_flows %w[authorization_code]
   use_refresh_token
-  access_token_expires_in 2.hours
+  access_token_expires_in 7.days
 
   # MCP clients are public clients: PKCE required, no client secret.
   force_pkce

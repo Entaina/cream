@@ -285,6 +285,7 @@ If you change the Script ID or the `/usercallback` URI, register a new OAuth cli
 | Symptom | Likely cause | Solution |
 |---------|----------------|----------|
 | **not_connected** when creating/linking a deal | No OAuth or invalid token | **Connect with CReaM**; check the Script Properties |
+| **not_connected** after a few hours (older add-on) | Expired access token cleared session on first API 401 | Deploy the latest add-on (`clasp push` + new deployment version); it refreshes automatically. Reconnect only if it persists |
 | **not_connected** after connecting | Wrong `client_id` or redirect URI | Re-run `logCreamRedirectUri`, register OAuth again |
 | **Code challenge is required** | Misconfigured PKCE | OAuth2 library v43; `generateCodeVerifier()` only when requesting the authorization URL |
 | **Redirect URI mismatch** | URI other than `/usercallback` | Register exactly the URI from `logCreamRedirectUri` |
@@ -293,7 +294,7 @@ If you change the Script ID or the `/usercallback` URI, register a new OAuth cli
 | Marketplace SDK: "No host applications" | Web app-type deployment, not Add-on | Create an **Add-on**-type deployment |
 | I do not see the app among private apps | Draft only, not published | Store Listing → **Publish** |
 | Admin cannot find the app | Restrictive Marketplace policy | §3.1 Settings + admin install |
-| Persistent **401** | `api` scope missing from the token | Disconnect → Connect; check the OAuth registration with `"scope": "api"` |
+| Persistent **401** (after add-on refresh retry) | Revoked refresh token or wrong `api` scope | **Disconnect** → **Connect with CReaM**; check OAuth registration with `"scope": "api"` |
 
 ---
 
