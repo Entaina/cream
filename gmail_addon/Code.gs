@@ -181,10 +181,15 @@ function dateFormValue_(e, fieldName) {
   return null;
 }
 
-function switchFormValue_(e, fieldName) {
+function switchFormValue_(e, fieldName, expectedValue) {
+  expectedValue = expectedValue || "true";
   var formInputs = e.commonEventObject && e.commonEventObject.formInputs;
-  if (formInputs && formInputs[fieldName] && formInputs[fieldName].switchControl) {
-    return formInputs[fieldName].switchControl.selected === true;
+  if (formInputs && formInputs[fieldName]) {
+    var field = formInputs[fieldName];
+    var bucket = field.stringInputs || (field[""] && field[""].stringInputs);
+    if (bucket && bucket.value && bucket.value.length) {
+      return bucket.value.indexOf(expectedValue) !== -1;
+    }
   }
   return false;
 }
@@ -854,10 +859,16 @@ function buildEditTaskCard_(deal, task) {
   }
   section.addWidget(duePicker);
   section.addWidget(
-    CardService.newSwitch()
-      .setFieldName("task_completed")
-      .setTitle("Completed")
-      .setValue(task.completed === true)
+    CardService.newDecoratedText()
+      .setTopLabel("Completed")
+      .setText("Mark this task as done")
+      .setWrapText(true)
+      .setSwitchControl(
+        CardService.newSwitch()
+          .setFieldName("task_completed")
+          .setValue("true")
+          .setSelected(task.completed === true)
+      )
   );
   var params = Object.assign({}, dealActionParams_(deal), { task_id: String(task.id) });
   section.addWidget(
