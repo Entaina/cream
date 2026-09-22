@@ -3,13 +3,13 @@
     {
       "warning_type": "Redirect",
       "warning_code": 18,
-      "fingerprint": "8aac22deece48f4f49113a2ac7ced9ed970ab9d4f3d912f7ad0c48faadd03c92",
+      "fingerprint": "147aa554b25425b9a3a81ee0427dd460292eaeb20501c6c1896e12b3fc06f9a8",
       "check_name": "Redirect",
       "message": "Possible unprotected redirect",
       "file": "app/controllers/public/lead_forms_controller.rb",
       "line": 184,
       "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
-      "code": "redirect_to(LeadForm.active.find_by!(:slug => params[:slug]).success_redirect_location(:prefill => prefill), :notice => \"Gracias. Hemos recibido tu solicitud.\", :allow_other_host => true)",
+      "code": "redirect_to(LeadForm.active.find_by!(:slug => params[:slug]).success_redirect_location(:prefill => prefill), :notice => t(\"public.lead_forms.submitted\"), :allow_other_host => true)",
       "render_path": null,
       "location": {
         "type": "method",
@@ -21,6 +21,6 @@
       "note": "Intentional external redirect after lead form submit. URL is admin-configured (success_redirect_url), validated as http(s) on save, and re-validated at runtime in LeadForm#success_redirect_location before allow_other_host: true. Prefill query params echo back only what the visitor typed (never CRM-stored data) and only when the lead was actually created (never on the bot path)."
     }
   ],
-  "updated": "2026-09-14 10:52:00 +0200",
+  "updated": "2026-09-22 13:12:00 +0200",
   "brakeman_version": "8.0.6"
 }

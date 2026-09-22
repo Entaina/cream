@@ -46,15 +46,15 @@ RSpec.describe PersonRelationship, type: :model do
     it "shows forward and inverse labels for directed types" do
       relationship = described_class.create!(from_person: alice, to_person: bob, relationship_type: "invited")
 
-      expect(relationship.label_for(alice)).to eq("invitó a")
-      expect(relationship.label_for(bob)).to eq("invitado por")
+      expect(relationship.label_for(alice)).to eq(I18n.t("people.relationships.types.invited.from"))
+      expect(relationship.label_for(bob)).to eq(I18n.t("people.relationships.types.invited.to"))
     end
 
     it "shows the same label on both sides for symmetric types" do
       relationship = described_class.create!(from_person: alice, to_person: bob, relationship_type: "colleague_of")
 
-      expect(relationship.label_for(alice)).to eq("colega de")
-      expect(relationship.label_for(bob)).to eq("colega de")
+      expect(relationship.label_for(alice)).to eq(I18n.t("people.relationships.types.colleague_of.from"))
+      expect(relationship.label_for(bob)).to eq(I18n.t("people.relationships.types.colleague_of.to"))
     end
   end
 
