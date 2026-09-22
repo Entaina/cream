@@ -9,7 +9,7 @@ RSpec.describe EmailLayout, type: :model do
   it "requires a content placeholder" do
     layout = workspace.email_layouts.build(name: "Bad", body: "<html><body>No slot</body></html>")
     expect(layout).not_to be_valid
-    expect(layout.errors[:body]).to include("must include {{ content }} or {content}")
+    expect(layout.errors[:body]).to include(I18n.t("email_templates.layouts.errors.content_placeholder"))
   end
 
   it "accepts liquid content placeholder" do

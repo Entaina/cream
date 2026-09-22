@@ -159,6 +159,7 @@ es:
         api_key_keep: Deja en blanco para conservar la clave actual
         api_key_placeholder: rk_live_…
         connect: Conectar Stripe
+        account_suffix: ' (%{label})'
         connected: Stripe conectado%{account} con clave <strong class="font-mono">%{key}</strong>.
         disconnect: Desconectar
         disconnect_confirm: "¿Desconectar Stripe? Se eliminarán los pagos importados."

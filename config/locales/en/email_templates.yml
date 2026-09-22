@@ -1,0 +1,84 @@
+---
+en:
+  activerecord:
+    attributes:
+      email_layout:
+        body: Body
+        name: Name
+      email_template:
+        body: Body
+        name: Name
+        subject: Subject
+  email_templates:
+    badges:
+      html: HTML
+      quill: Rich text
+      shared: Shared
+    body_editor:
+      html_hint: 'Full HTML: tables, images, documents. Use <code class="font-mono">{first_name}</code>
+        variables and Liquid <code class="font-mono">{{ name }}</code>.'
+      mode_html: HTML
+      mode_quill: Rich text editor
+    composer:
+      base_template: Base template (optional)
+      base_template_hint: Pick a workspace template to copy subject and body as a
+        starting point. This does not create a new global template.
+      blank_template: Compose without template
+      body: Body
+      layout: Layout (optional)
+      layout_hint: The layout must include <code class="font-mono">{{ content }}</code>
+        or <code class="font-mono">{content}</code> where the email body goes.
+      no_layout: No layout
+      subject: Subject
+    form:
+      add_attachments: Add attachments
+      attachments_purge_hint: Check any you want to remove when saving.
+      current_attachments: Current attachments
+      layout: Layout (optional)
+      layout_hint: The layout must include <code class="font-mono">{{ content }}</code>
+        or <code class="font-mono">{content}</code> where the template body goes.
+      no_layout: No layout
+      share_workspace: Share with workspace
+    index:
+      delete: Delete
+      delete_layout_confirm: Delete layout “%{name}”? Templates will be left without
+        a layout.
+      edit: Edit
+      layouts_empty_hint: Layouts wrap template bodies with shared header, footer
+        and styles. Use <code class="font-mono">{{ content }}</code> in the HTML.
+      layouts_heading: Layouts
+      new_layout: New layout
+      new_template: New template
+      page_title: Email templates
+      template_count:
+        one: 1 template
+        other: "%{count} templates"
+      templates_heading: Templates
+      title: Email templates
+    layouts:
+      edit_page_title: Edit email layout
+      errors:
+        content_placeholder: must include {{ content }} or {content}
+      form:
+        body_hint: Include <code class="font-mono">{{ content }}</code> or <code class="font-mono">{content}</code>
+          where each template body is inserted.
+        body_label: Layout HTML
+      new_page_title: New email layout
+    pages:
+      edit_template: Edit template
+      new_template: New template
+    preview:
+      button: Preview
+      document_title: Email preview
+      failed: Could not open the preview.
+      hint: Fill optional variables to see how the email will look. Empty fields use
+        sample values.
+      iframe_title: Email preview
+      popups_blocked: Allow pop-ups to view the preview.
+      sample_content: Sample content
+      sample_content_hint: HTML or text inserted into <code class="font-mono">{{ content
+        }}</code>.
+      title: Preview
+    preview_page:
+      no_subject: "(no subject)"
+      subject_heading: Subject

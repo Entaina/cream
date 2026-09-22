@@ -26,7 +26,7 @@ RSpec.describe "Email templates", type: :request do
       get new_email_template_path
 
       expect(response.body).to include('data-controller="email-preview"')
-      expect(response.body).to include("Vista previa")
+      expect(response.body).to include(I18n.t("email_templates.preview.title"))
       expect(response.body).to include("{first_name}")
     end
 
@@ -137,7 +137,7 @@ RSpec.describe "Email templates", type: :request do
 
       expect(response.body).to include('data-controller="template-picker"')
       expect(response.body).to include('data-controller="rich-text-editor"')
-      expect(response.body).to include("Insertar plantilla")
+      expect(response.body).to include(I18n.t("shared.email.insert_template"))
       expect(response.body).to include("Hi {first_name}")
     end
 
@@ -147,8 +147,8 @@ RSpec.describe "Email templates", type: :request do
       get person_path(person)
 
       expect(response.body).to include('data-controller="template-picker"')
-      expect(response.body).to include("No hay plantillas disponibles")
-      expect(response.body).to include("Crear plantillas")
+      expect(response.body).to include(I18n.t("shared.email.no_templates"))
+      expect(response.body).to include(I18n.t("shared.email.create_templates_link"))
     end
 
     it "includes wrapped picker body when template has layout" do

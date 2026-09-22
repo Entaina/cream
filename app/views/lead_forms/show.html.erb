@@ -30,7 +30,7 @@
               <td><%= row[:submission_count] %></td>
               <td><%= l(row[:first_at], format: :short) %></td>
               <td><%= l(row[:last_at], format: :short) %></td>
-              <td><%= row[:eligible] ? t("marketing.lead_forms.show.yes") : t("marketing.lead_forms.show.no") %></td>
+              <td><%= row[:eligible] ? t("marketing.lead_forms.show.true") : t("marketing.lead_forms.show.false") %></td>
             </tr>
           <% end %>
         </tbody>

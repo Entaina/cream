@@ -11,9 +11,9 @@
     <%= f.text_field :name, class: "input w-full", required: true %>
   </div>
   <div>
-    <%= f.label :body, "HTML del layout", class: "label" %>
+    <%= f.label :body, t("email_templates.layouts.form.body_label"), class: "label" %>
     <%= render "shared/liquid_editor", form: f, field: :body, rows: 24, required: true %>
-    <p class="mt-1 text-xs text-ink-faint">Incluye <code class="font-mono">{{ content }}</code> o <code class="font-mono">{content}</code> donde se insertará el cuerpo de cada plantilla.</p>
+    <p class="mt-1 text-xs text-ink-faint"><%= t("email_templates.layouts.form.body_hint").html_safe %></p>
   </div>
 
   <%= render "shared/email_preview_panel",
@@ -24,6 +24,6 @@
 
   <div class="flex gap-2">
     <%= f.submit class: "btn-primary" %>
-    <%= link_to "Cancel", email_templates_path, class: "btn-secondary" %>
+    <%= link_to t("shared.form.cancel"), email_templates_path, class: "btn-secondary" %>
   </div>
 <% end %>

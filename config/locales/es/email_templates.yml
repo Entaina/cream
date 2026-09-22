@@ -1,0 +1,85 @@
+---
+es:
+  activerecord:
+    attributes:
+      email_layout:
+        body: Cuerpo
+        name: Nombre
+      email_template:
+        body: Cuerpo
+        name: Nombre
+        subject: Asunto
+  email_templates:
+    badges:
+      html: HTML
+      quill: Enriquecido
+      shared: Compartida
+    body_editor:
+      html_hint: 'HTML completo: tablas, imágenes, documentos. Variables <code class="font-mono">{first_name}</code>
+        y Liquid <code class="font-mono">{{ name }}</code>.'
+      mode_html: HTML
+      mode_quill: Editor enriquecido
+    composer:
+      base_template: Plantilla base (opcional)
+      base_template_hint: Elige una plantilla del workspace para copiar asunto y cuerpo
+        como punto de partida. No se crea una plantilla global nueva.
+      blank_template: Redactar sin plantilla
+      body: Cuerpo
+      layout: Layout (opcional)
+      layout_hint: El layout debe incluir <code class="font-mono">{{ content }}</code>
+        o <code class="font-mono">{content}</code> donde irá el cuerpo del email.
+      no_layout: Sin layout
+      subject: Asunto
+    form:
+      add_attachments: Añadir adjuntos
+      attachments_purge_hint: Marca los que quieras eliminar al guardar.
+      current_attachments: Adjuntos actuales
+      layout: Layout (opcional)
+      layout_hint: El layout debe incluir <code class="font-mono">{{ content }}</code>
+        o <code class="font-mono">{content}</code> donde irá el cuerpo de la plantilla.
+      no_layout: Sin layout
+      share_workspace: Compartir con el workspace
+    index:
+      delete: Eliminar
+      delete_layout_confirm: "¿Eliminar el layout «%{name}»? Las plantillas quedarán
+        sin layout."
+      edit: Editar
+      layouts_empty_hint: Los layouts envuelven el cuerpo de las plantillas con cabecera,
+        pie y estilos comunes. Usa <code class="font-mono">{{ content }}</code> en
+        el HTML.
+      layouts_heading: Layouts
+      new_layout: Nuevo layout
+      new_template: Nueva plantilla
+      page_title: Plantillas de email
+      template_count:
+        one: 1 plantilla
+        other: "%{count} plantillas"
+      templates_heading: Plantillas
+      title: Plantillas de email
+    layouts:
+      edit_page_title: Editar layout de email
+      errors:
+        content_placeholder: debe incluir {{ content }} o {content}
+      form:
+        body_hint: Incluye <code class="font-mono">{{ content }}</code> o <code class="font-mono">{content}</code>
+          donde se insertará el cuerpo de cada plantilla.
+        body_label: HTML del layout
+      new_page_title: Nuevo layout de email
+    pages:
+      edit_template: Editar plantilla
+      new_template: Nueva plantilla
+    preview:
+      button: Vista previa
+      document_title: Vista previa de email
+      failed: No se pudo abrir la vista previa.
+      hint: Rellena variables opcionales para ver cómo quedará el correo. Los campos
+        vacíos usan valores de ejemplo.
+      iframe_title: Vista previa del email
+      popups_blocked: Permite las ventanas emergentes para ver la vista previa.
+      sample_content: Contenido de ejemplo
+      sample_content_hint: HTML o texto que se insertará en <code class="font-mono">{{
+        content }}</code>.
+      title: Vista previa
+    preview_page:
+      no_subject: "(sin asunto)"
+      subject_heading: Asunto

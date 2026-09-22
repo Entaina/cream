@@ -31,6 +31,6 @@ class EmailLayout < ApplicationRecord
 
     return if body.match?(CONTENT_PLACEHOLDER)
 
-    errors.add(:body, "must include {{ content }} or {content}")
+    errors.add(:body, I18n.t("email_templates.layouts.errors.content_placeholder"))
   end
 end

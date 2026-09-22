@@ -15,13 +15,13 @@
     <%= f.text_field :subject, class: "input w-full" %>
   </div>
   <div>
-    <%= f.label :email_layout_id, "Layout (opcional)", class: "label" %>
+    <%= f.label :email_layout_id, t("email_templates.form.layout"), class: "label" %>
     <%= f.collection_select :email_layout_id,
           current_workspace.email_layouts.ordered,
           :id, :name,
-          { include_blank: "Sin layout" },
+          { include_blank: t("email_templates.form.no_layout") },
           class: "input w-full" %>
-    <p class="mt-1 text-xs text-ink-faint">El layout debe incluir <code class="font-mono">{{ content }}</code> o <code class="font-mono">{content}</code> donde irá el cuerpo de la plantilla.</p>
+    <p class="mt-1 text-xs text-ink-faint"><%= t("email_templates.form.layout_hint").html_safe %></p>
   </div>
   <div>
     <%= f.label :body, class: "label" %>
@@ -29,7 +29,7 @@
   </div>
   <% if template.attachments.attached? %>
     <div>
-      <p class="label">Adjuntos actuales</p>
+      <p class="label"><%= t("email_templates.form.current_attachments") %></p>
       <ul class="space-y-1">
         <% template.attachments.each do |file| %>
           <li class="flex items-center gap-2 text-sm">
@@ -42,15 +42,15 @@
           </li>
         <% end %>
       </ul>
-      <p class="text-xs text-ink-faint mt-1">Marca los que quieras eliminar al guardar.</p>
+      <p class="text-xs text-ink-faint mt-1"><%= t("email_templates.form.attachments_purge_hint") %></p>
     </div>
   <% end %>
   <div>
-    <%= f.label :attachments, "Añadir adjuntos", class: "label" %>
+    <%= f.label :attachments, t("email_templates.form.add_attachments"), class: "label" %>
     <%= f.file_field :attachments, multiple: true, class: "file-input" %>
   </div>
   <label class="flex items-center gap-2 text-base">
-    <%= f.check_box :shared %> Compartir con el workspace
+    <%= f.check_box :shared %> <%= t("email_templates.form.share_workspace") %>
   </label>
 
   <%= render "shared/email_preview_panel",
@@ -60,6 +60,6 @@
 
   <div class="flex gap-2">
     <%= f.submit class: "btn-primary" %>
-    <%= link_to "Cancel", email_templates_path, class: "btn-secondary" %>
+    <%= link_to t("shared.form.cancel"), email_templates_path, class: "btn-secondary" %>
   </div>
 <% end %>

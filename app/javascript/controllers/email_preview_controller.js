@@ -8,7 +8,9 @@ export default class extends Controller {
   static values = {
     previewUrl: String,
     sourceFormId: String,
-    prefilled: Object
+    prefilled: Object,
+    popupsBlocked: String,
+    previewFailed: String
   }
 
   connect() {
@@ -48,7 +50,7 @@ export default class extends Controller {
       .then((html) => {
         const previewWindow = window.open("", "_blank")
         if (!previewWindow) {
-          window.alert("Permite las ventanas emergentes para ver la vista previa.")
+          window.alert(this.popupsBlockedValue)
           return
         }
         previewWindow.document.open()
@@ -57,7 +59,7 @@ export default class extends Controller {
       })
       .catch((error) => {
         console.error("Email preview failed", error)
-        window.alert("No se pudo abrir la vista previa.")
+        window.alert(this.previewFailedValue)
       })
   }
 

@@ -14,7 +14,7 @@
               email_template_body_editor_target: "quillModeRadio",
               action: "email-template-body-editor#selectQuill"
             } %>
-      Editor enriquecido
+      <%= t("email_templates.body_editor.mode_quill") %>
     </label>
     <label class="flex items-center gap-2 cursor-pointer">
       <%= radio_button_tag "body_editor_choice_#{editor_id}", "html", effective_mode == "html",
@@ -22,7 +22,7 @@
               email_template_body_editor_target: "htmlModeRadio",
               action: "email-template-body-editor#selectHtml"
             } %>
-      HTML
+      <%= t("email_templates.body_editor.mode_html") %>
     </label>
   </fieldset>
 
@@ -40,6 +40,6 @@
                 data-email-template-body-editor-target="htmlInput"><%= body %></textarea>
       <div data-liquid-editor-target="editor" class="liquid-editor__surface" style="min-height: 33.6rem;"></div>
     </div>
-    <p class="mt-1 text-xs text-ink-faint">HTML completo: tablas, imágenes, documentos. Variables <code class="font-mono">{first_name}</code> y Liquid <code class="font-mono">{{ name }}</code>.</p>
+    <p class="mt-1 text-xs text-ink-faint"><%= t("email_templates.body_editor.html_hint").html_safe %></p>
   </div>
 </div>
