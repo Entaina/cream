@@ -45,7 +45,7 @@ RSpec.describe "Products", type: :request do
       get edit_product_path(product)
 
       expect(response).to have_http_status(:success)
-      expect(response.body).to include("View deals")
+      expect(response.body).to include(I18n.t("products.edit.view_deals"))
       expect(response.body).to include("product_id=#{product.id}")
       expect(response.body).to include("closed=1")
     end

@@ -1,14 +1,14 @@
-<% page_title "#{@deal.name} — Version history" %>
+<% page_title t("deal_versions.index_page_title", deal: @deal.name) %>
 <% actions = capture do %>
   <%= link_to deal_path(@deal), class: "btn-secondary" do %>
-    <%= icon :arrow_left, classes: "size-3.5" %> Back to deal
+    <%= icon :arrow_left, classes: "size-3.5" %> <%= t("deal_versions.back_to_deal") %>
   <% end %>
 <% end %>
-<%= render "shared/page_header", title: "Version history · #{@deal.name}", icon_name: :activity, count: nil, actions: actions %>
+<%= render "shared/page_header", title: t("deal_versions.index_title", deal: @deal.name), icon_name: :activity, count: nil, actions: actions %>
 
 <div class="flex-1 overflow-y-auto scrollbar-subtle p-5 bg-canvas-soft/50">
   <p class="text-base text-ink-faint mb-4 max-w-3xl">
-    Field changes, notes, comments, stage moves, contacts, products and other events on this deal.
+    <%= t("deal_versions.index_intro") %>
   </p>
   <% if @audit_timeline.any? %>
     <ol class="relative space-y-4 before:absolute before:left-[9px] before:top-1 before:bottom-1 before:w-px before:bg-line max-w-3xl">
@@ -34,7 +34,7 @@
                 </ul>
               <% end %>
               <p class="text-xs text-ink-faint mt-0.5" title="<%= l version.created_at, format: :long %>">
-                <%= time_ago_in_words(version.created_at) %> ago
+                <%= t("deal_versions.time_ago", time: time_ago_in_words(version.created_at)) %>
               </p>
             </div>
           </li>
@@ -47,7 +47,7 @@
             <div class="min-w-0 flex-1">
               <p class="text-base text-ink-soft"><%= activity_sentence(activity) %></p>
               <p class="text-xs text-ink-faint mt-0.5" title="<%= l activity.created_at, format: :long %>">
-                <%= time_ago_in_words(activity.created_at) %> ago
+                <%= t("deal_versions.time_ago", time: time_ago_in_words(activity.created_at)) %>
               </p>
             </div>
           </li>
@@ -55,6 +55,6 @@
       <% end %>
     </ol>
   <% else %>
-    <p class="text-base text-ink-faint">No changes recorded yet.</p>
+    <p class="text-base text-ink-faint"><%= t("deal_versions.empty") %></p>
   <% end %>
 </div>

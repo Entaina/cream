@@ -1,8 +1,8 @@
 <section class="mt-8">
   <div class="flex items-center justify-between mb-3">
-    <h2 class="text-base font-semibold">Editions</h2>
+    <h2 class="text-base font-semibold"><%= t("products.editions.title") %></h2>
     <%= link_to new_product_edition_path(product), class: "btn-secondary" do %>
-      <%= icon :plus, classes: "size-3.5" %> New edition
+      <%= icon :plus, classes: "size-3.5" %> <%= t("products.editions.new") %>
     <% end %>
   </div>
 
@@ -11,9 +11,9 @@
       <table class="table-base">
         <thead>
           <tr>
-            <th>Name</th>
-            <th>Dates</th>
-            <th>Lines in use</th>
+            <th><%= t("products.editions.columns.name") %></th>
+            <th><%= t("products.editions.columns.dates") %></th>
+            <th><%= t("products.editions.columns.lines_in_use") %></th>
             <th class="w-10"></th>
           </tr>
         </thead>
@@ -31,7 +31,7 @@
               <td class="text-ink-soft tabular-nums"><%= edition.deal_products.size %></td>
               <td onclick="event.stopPropagation()">
                 <%= button_to product_edition_path(product, edition), method: :delete, class: "text-ink-faint hover:text-danger p-1",
-                      form: { data: { turbo_confirm: "Delete #{edition.name}?" } } do %>
+                      form: { data: { turbo_confirm: t("products.editions.delete_confirm", name: edition.name) } } do %>
                   <%= icon :trash, classes: "size-3.5" %>
                 <% end %>
               </td>
@@ -41,6 +41,6 @@
       </table>
     </div>
   <% else %>
-    <p class="text-base text-ink-faint">No editions yet. Add one to offer variants or cohorts for this product.</p>
+    <p class="text-base text-ink-faint"><%= t("products.editions.empty") %></p>
   <% end %>
 </section>

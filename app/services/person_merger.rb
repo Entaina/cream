@@ -48,11 +48,11 @@ class PersonMerger
   attr_reader :primary, :secondaries, :user
 
   def validate!
-    raise Error, "Select at least one contact to merge." if secondaries.empty?
-    raise Error, "Cannot merge a contact into itself." if secondaries.include?(primary)
+    raise Error, I18n.t("people.merge.errors.no_secondaries") if secondaries.empty?
+    raise Error, I18n.t("people.merge.errors.same_primary") if secondaries.include?(primary)
 
     ([primary] + secondaries).each do |person|
-      raise Error, "All contacts must belong to the same workspace." if person.workspace_id != primary.workspace_id
+      raise Error, I18n.t("people.merge.errors.same_workspace") if person.workspace_id != primary.workspace_id
     end
   end
 

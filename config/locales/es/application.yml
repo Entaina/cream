@@ -113,13 +113,17 @@ es:
       update_title: Actualiza tu contraseña
     registration:
       already_have_account: "¿Ya tienes cuenta?"
+      email_placeholder: tu@empresa.com
       name: Nombre
+      name_placeholder: Ana García
       password_confirmation: Confirmar contraseña
+      password_placeholder: Al menos 8 caracteres
       sign_in: Iniciar sesión
       submit: Crear cuenta
       subtitle: Empieza a gestionar relaciones en minutos.
       title: Crea tu cuenta
       workspace_name: Nombre del workspace
+      workspace_name_placeholder: Mi Empresa S.L.
     sign_in:
       create_account: Crear cuenta
       email: Email
@@ -256,8 +260,23 @@ es:
         one: 1 año
         other: "%{count} años"
   deal_versions:
+    all_versions: Todas las versiones
+    back_to_deal: Volver a la oportunidad
+    change: Cambio
     created: "%{actor} creó este deal"
+    current_deal: Oportunidad actual
     destroyed: "%{actor} eliminó este deal"
+    empty: Aún no hay cambios registrados.
+    history: Historial de versiones
+    index_intro: Cambios de campos, notas, comentarios, movimientos de etapa, contactos,
+      productos y otros eventos en esta oportunidad.
+    index_page_title: '%{deal} — Historial de versiones'
+    index_title: 'Historial de versiones · %{deal}'
+    initial_version: Versión inicial cuando se creó la oportunidad.
+    show_page_title: '%{deal} — Versión del %{time}'
+    show_title: '%{deal} · %{time}'
+    snapshot: Instantánea
+    time_ago: hace %{time}
     updated: "%{actor} actualizó %{fields}"
     updated_deal: el deal
   editions:

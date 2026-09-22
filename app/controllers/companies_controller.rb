@@ -114,7 +114,7 @@ class CompaniesController < ApplicationController
       secondaries = @merge_candidates.select { |candidate| @selected_secondary_ids.include?(candidate.id) }
 
       if secondaries.empty?
-        flash.now[:alert] = "Select at least one company to merge."
+        flash.now[:alert] = t("companies.merge.errors.no_secondaries")
         return render :merge, status: :unprocessable_entity
       end
 

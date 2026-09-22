@@ -5,7 +5,12 @@ import { Controller } from "@hotwired/stimulus"
 // server whenever the selected source (or manual input) changes.
 export default class extends Controller {
   static targets = ["source", "manual", "count", "recordType", "recordIds"]
-  static values = { countUrl: String }
+  static values = {
+    countUrl: String,
+    countOne: String,
+    countOther: String,
+    loading: String
+  }
 
   connect() {
     this.toggleManual()
@@ -36,14 +41,16 @@ export default class extends Controller {
       if (this.hasRecordIdsTarget) params.set("record_ids", this.recordIdsTarget.value)
     }
 
-    this.countTarget.textContent = "…"
+    this.countTarget.textContent = this.loadingValue
     try {
       const response = await fetch(`${this.countUrlValue}?${params}`, {
         headers: { Accept: "application/json" }
       })
       if (!response.ok) throw new Error(response.statusText)
       const data = await response.json()
-      this.countTarget.textContent = `${data.count} recipient${data.count === 1 ? "" : "s"}`
+      this.countTarget.textContent = data.count === 1
+        ? this.countOneValue
+        : this.countOtherValue.replace("%{count}", data.count)
     } catch {
       this.countTarget.textContent = "—"
     }

@@ -40,6 +40,10 @@ en:
       search_placeholder: Search companies...
     merge:
       cancel: Cancel
+      errors:
+        no_secondaries: Select at least one company to merge.
+        same_primary: Cannot merge a company into itself.
+        same_workspace: All companies must belong to the same workspace.
       companies_to_merge: Companies to merge in
       company_to_keep: Company to keep
       confirm: Merge the selected companies into %{name}? This cannot be undone.
@@ -264,10 +268,22 @@ en:
       opportunity: Opportunity
       sql: SQL
       subscriber: Subscriber
+    lead_submission:
+      back_to_person: Back to person
+      capture_destination: Capture destination
+      date: Date
+      deal: Deal
+      page_title: Form submission
+      person: Person
+      responses: Responses
     merge:
       cancel: Cancel
       confirm: Merge the selected contacts into %{name}? This cannot be undone.
       contact_to_keep: Contact to keep
+      errors:
+        no_secondaries: Select at least one contact to merge.
+        same_primary: Cannot merge a contact into itself.
+        same_workspace: All contacts must belong to the same workspace.
       contacts_to_merge: Contacts to merge in
       merge: Merge contacts
       merging: Merging…

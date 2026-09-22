@@ -529,7 +529,7 @@ RSpec.describe "Mcp", type: :request do
       result = call_tool("merge_person", {primary_id: person.id, secondary_ids: []})
 
       expect(result["error"]).to eq("merge_error")
-      expect(result["message"]).to include("Select at least one contact")
+      expect(result["message"]).to include(I18n.t("people.merge.errors.no_secondaries"))
     end
 
     it "does not merge people from another workspace" do

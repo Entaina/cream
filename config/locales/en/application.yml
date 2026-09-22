@@ -114,13 +114,17 @@ en:
       update_title: Update your password
     registration:
       already_have_account: Already have an account?
+      email_placeholder: you@company.com
       name: Name
+      name_placeholder: Jane Doe
       password_confirmation: Confirm password
+      password_placeholder: At least 8 characters
       sign_in: Sign in
       submit: Create account
       subtitle: Start managing relationships in minutes.
       title: Create your account
       workspace_name: Workspace name
+      workspace_name_placeholder: Acme Inc
     sign_in:
       create_account: Create account
       email: Email
@@ -257,8 +261,23 @@ en:
         one: 1 year
         other: "%{count} years"
   deal_versions:
+    all_versions: All versions
+    back_to_deal: Back to deal
+    change: Change
     created: "%{actor} created this deal"
+    current_deal: Current deal
     destroyed: "%{actor} deleted this deal"
+    empty: No changes recorded yet.
+    history: Version history
+    index_intro: Field changes, notes, comments, stage moves, contacts, products
+      and other events on this deal.
+    index_page_title: '%{deal} — Version history'
+    index_title: 'Version history · %{deal}'
+    initial_version: Initial version when the deal was created.
+    show_page_title: '%{deal} — Version at %{time}'
+    show_title: '%{deal} · %{time}'
+    snapshot: Snapshot
+    time_ago: '%{time} ago'
     updated: "%{actor} updated %{fields}"
     updated_deal: the deal
   editions:

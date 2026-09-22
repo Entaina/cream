@@ -95,7 +95,7 @@ RSpec.describe "People merge", type: :request do
       post merge_person_path(primary), params: {secondary_ids: []}
 
       expect(response).to have_http_status(:unprocessable_content)
-      expect(response.body).to include("Select at least one contact to merge")
+      expect(response.body).to include(I18n.t("people.merge.errors.no_secondaries"))
     end
 
     it "merges same-email contacts from another company" do

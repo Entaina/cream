@@ -20,6 +20,6 @@ RSpec.describe "AiSearch", type: :request do
 
     expect(response).to have_http_status(:success)
     expect(response.body).to include("Late")
-    expect(response.body).to include("Pending tasks")
+    expect(response.body).to include(I18n.t("ai_search.interpretations.overdue_tasks"))
   end
 end

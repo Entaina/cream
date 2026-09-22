@@ -17,7 +17,7 @@ RSpec.describe "Deal versions", type: :request do
       get deal_versions_path(deal)
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include("Version history")
+      expect(response.body).to include(I18n.t("deal_versions.history"))
       expect(response.body).to include("Updated deal name").or include("Name")
     end
 
@@ -51,8 +51,8 @@ RSpec.describe "Deal versions", type: :request do
       get deal_version_path(deal, version)
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include("Snapshot")
-      expect(response.body).to include("Probability")
+      expect(response.body).to include(I18n.t("deal_versions.snapshot"))
+      expect(response.body).to include(Deal.human_attribute_name(:probability))
     end
 
     it "rejects versions outside the current workspace scope" do

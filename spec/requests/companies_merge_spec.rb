@@ -61,7 +61,7 @@ RSpec.describe "Companies merge", type: :request do
       post merge_company_path(primary), params: {secondary_ids: []}
 
       expect(response).to have_http_status(:unprocessable_content)
-      expect(response.body).to include("Select at least one company to merge")
+      expect(response.body).to include(I18n.t("companies.merge.errors.no_secondaries"))
     end
 
     it "ignores secondary ids that are not suggested duplicates" do

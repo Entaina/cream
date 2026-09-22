@@ -1,5 +1,5 @@
-<% page_title "New product" %>
-<%= render "shared/page_header", title: "New product", icon_name: :briefcase, count: nil, actions: nil %>
+<% page_title t("products.new.page_title") %>
+<%= render "shared/page_header", title: t("products.new.title"), icon_name: :briefcase, count: nil, actions: nil %>
 <div class="flex-1 overflow-y-auto p-5">
   <div class="max-w-xl">
     <%= render "form", product: @product %>

@@ -148,7 +148,7 @@ class PeopleController < ApplicationController
         .to_a
 
       if secondaries.empty?
-        flash.now[:alert] = "Select at least one contact to merge."
+        flash.now[:alert] = t("people.merge.errors.no_secondaries")
         return render :merge, status: :unprocessable_entity
       end
 

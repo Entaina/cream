@@ -43,11 +43,11 @@ class CompanyMerger
   attr_reader :primary, :secondaries, :user
 
   def validate!
-    raise Error, "Select at least one company to merge." if secondaries.empty?
-    raise Error, "Cannot merge a company into itself." if secondaries.include?(primary)
+    raise Error, I18n.t("companies.merge.errors.no_secondaries") if secondaries.empty?
+    raise Error, I18n.t("companies.merge.errors.same_primary") if secondaries.include?(primary)
 
     ([primary] + secondaries).each do |company|
-      raise Error, "All companies must belong to the same workspace." if company.workspace_id != primary.workspace_id
+      raise Error, I18n.t("companies.merge.errors.same_workspace") if company.workspace_id != primary.workspace_id
     end
   end
 

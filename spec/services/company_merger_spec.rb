@@ -113,7 +113,7 @@ RSpec.describe CompanyMerger do
 
     expect {
       merge(primary: primary, secondaries: [secondary])
-    }.to raise_error(CompanyMerger::Error, /same workspace/)
+    }.to raise_error(CompanyMerger::Error, I18n.t("companies.merge.errors.same_workspace"))
   end
 
   it "logs a merged activity on the primary company" do

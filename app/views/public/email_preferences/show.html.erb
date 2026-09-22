@@ -2,9 +2,9 @@
   <div class="card p-6 sm:p-8 space-y-6 shadow-sm">
     <header class="space-y-1 text-center sm:text-left">
       <p class="text-sm font-medium text-accent"><%= @workspace.name %></p>
-      <h1 class="text-2xl font-display font-semibold">Preferencias de email</h1>
+      <h1 class="text-2xl font-display font-semibold"><%= t("public.email_preferences.title") %></h1>
       <p class="text-sm text-ink-faint">
-        Hola <strong><%= @person.display_name %></strong>, elige qué comunicaciones quieres recibir de <%= @workspace.name %>.
+        <%= t("public.email_preferences.greeting_html", name: @person.display_name, workspace: @workspace.name).html_safe %>
       </p>
     </header>
 
@@ -21,15 +21,15 @@
           </span>
         </label>
       <% end %>
-      <%= submit_tag "Guardar preferencias", class: "btn-primary w-full sm:w-auto" %>
+      <%= submit_tag t("public.email_preferences.save"), class: "btn-primary w-full sm:w-auto" %>
     <% end %>
 
     <div class="border-t border-line pt-4">
-      <%= button_to "Darse de baja de todas las comunicaciones",
+      <%= button_to t("public.email_preferences.unsubscribe_all"),
             public_email_unsubscribe_path(token: params[:token], all: 1),
             method: :post,
             class: "btn-secondary w-full sm:w-auto",
-            form: { data: { turbo_confirm: "¿Dejar de recibir cualquier email de marketing de #{@workspace.name}?" } } %>
+            form: { data: { turbo_confirm: t("public.email_preferences.unsubscribe_all_confirm", workspace: @workspace.name) } } %>
     </div>
   </div>
 </div>

@@ -18,7 +18,13 @@ class Product < ApplicationRecord
 
   def display_name = name
 
+  def self.segment_options_for_select
+    SEGMENTS.map { |s| [I18n.t("products.segments.#{s}"), s] }
+  end
+
   def segment_label
-    SEGMENT_LABELS[segment]
+    return if segment.blank?
+
+    I18n.t("products.segments.#{segment}")
   end
 end

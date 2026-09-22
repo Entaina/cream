@@ -40,6 +40,10 @@ es:
       search_placeholder: Buscar empresas...
     merge:
       cancel: Cancelar
+      errors:
+        no_secondaries: Selecciona al menos una empresa para fusionar.
+        same_primary: No puedes fusionar una empresa consigo misma.
+        same_workspace: Todas las empresas deben pertenecer al mismo workspace.
       companies_to_merge: Empresas a fusionar
       company_to_keep: Empresa a conservar
       confirm: "¿Fusionar las empresas seleccionadas en %{name}? Esta acción no se
@@ -265,11 +269,23 @@ es:
       opportunity: Oportunidad
       sql: SQL
       subscriber: Suscriptor
+    lead_submission:
+      back_to_person: Volver a persona
+      capture_destination: Destino captura
+      date: Fecha
+      deal: Oportunidad
+      page_title: Envío de formulario
+      person: Persona
+      responses: Respuestas
     merge:
       cancel: Cancelar
       confirm: "¿Fusionar los contactos seleccionados en %{name}? Esta acción no se
         puede deshacer."
       contact_to_keep: Contacto a conservar
+      errors:
+        no_secondaries: Selecciona al menos un contacto para fusionar.
+        same_primary: No puedes fusionar un contacto consigo mismo.
+        same_workspace: Todos los contactos deben pertenecer al mismo workspace.
       contacts_to_merge: Contactos a fusionar
       merge: Fusionar contactos
       merging: Fusionando…

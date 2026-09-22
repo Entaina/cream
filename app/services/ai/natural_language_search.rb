@@ -127,7 +127,9 @@ module Ai
       return nil if count != 1
 
       record = scope.first
-      tasks_for_record(record, interpretation: "Tasks linked to #{type} '#{record.display_name}'")
+      type_label = I18n.t("ai_search.record_types.#{type}")
+      interpretation = I18n.t("ai_search.interpretations.tasks_linked_to_record", type: type_label, name: record.display_name)
+      tasks_for_record(record, interpretation: interpretation)
     end
 
     def tasks_for_assignee_query(query)
@@ -181,7 +183,7 @@ module Ai
     def tasks_for_assignee(assignee)
       tasks = @tasks_scope.includes(:taskable, :assignee).where(assignee: assignee).due_order.limit(25).to_a
       result(
-        interpretation: "Tasks assigned to #{assignee.name}",
+        interpretation: I18n.t("ai_search.interpretations.tasks_assigned_to", name: assignee.name),
         tasks: tasks
       )
     end
@@ -193,7 +195,7 @@ module Ai
         .select { |deal| deal.magic_column_value(:days_in_stage).to_i >= 7 }
 
       result(
-        interpretation: "Open deals that have been in the current stage for 7+ days",
+        interpretation: I18n.t("ai_search.interpretations.stalled_deals"),
         deals: deals.first(25)
       )
     end
@@ -203,7 +205,7 @@ module Ai
       scope = scope.where(assignee: assignee) if assignee
 
       result(
-        interpretation: "Pending tasks past their due date",
+        interpretation: I18n.t("ai_search.interpretations.overdue_tasks"),
         tasks: scope.limit(25).to_a
       )
     end
@@ -213,7 +215,7 @@ module Ai
       scope = scope.where(assignee: assignee) if assignee
 
       result(
-        interpretation: "Pending tasks due today",
+        interpretation: I18n.t("ai_search.interpretations.due_today_tasks"),
         tasks: scope.limit(25).to_a
       )
     end
@@ -223,7 +225,7 @@ module Ai
       scope = scope.where(assignee: assignee) if assignee
 
       result(
-        interpretation: "Pending tasks due today or past their due date",
+        interpretation: I18n.t("ai_search.interpretations.tasks_due_today_or_overdue"),
         tasks: scope.limit(25).to_a
       )
     end
@@ -235,7 +237,7 @@ module Ai
         .to_a
 
       result(
-        interpretation: "Sent emails with a pending follow-up reminder",
+        interpretation: I18n.t("ai_search.interpretations.pending_follow_ups"),
         emails: emails
       )
     end
@@ -244,7 +246,7 @@ module Ai
       deals = @deals_scope.won.includes(:company).limit(25)
 
       result(
-        interpretation: "Deals in a won stage",
+        interpretation: I18n.t("ai_search.interpretations.won_deals"),
         deals: deals.to_a
       )
     end
@@ -263,7 +265,7 @@ module Ai
         .to_a
 
       result(
-        interpretation: "Records with no activity in the last 14 days",
+        interpretation: I18n.t("ai_search.interpretations.inactive_records"),
         people: people,
         companies: companies
       )
@@ -271,7 +273,7 @@ module Ai
 
     def default_search
       result(
-        interpretation: "Keyword search across people, companies and deals",
+        interpretation: I18n.t("ai_search.interpretations.default"),
         people: @people_scope.search(@query).includes(:company).limit(8).to_a,
         companies: @companies_scope.search(@query).limit(8).to_a,
         deals: @deals_scope.search(@query).includes(:company).limit(8).to_a
