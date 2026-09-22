@@ -1,10 +1,10 @@
-<% page_title "Stripe connection" %>
+<% page_title t("integrations.stripe.connection.page_title") %>
 <% actions = capture do %>
   <%= link_to stripe_payments_path, class: "btn-secondary" do %>
-    <%= icon :credit_card, classes: "size-3.5" %> Payments inbox
+    <%= icon :credit_card, classes: "size-3.5" %> <%= t("integrations.stripe.connection.payments_inbox") %>
   <% end %>
 <% end %>
-<%= render "shared/page_header", title: "Stripe connection", icon_name: :credit_card, actions: actions %>
+<%= render "shared/page_header", title: t("integrations.stripe.connection.title"), icon_name: :credit_card, actions: actions %>
 
 <div class="p-5 max-w-xl space-y-4">
   <div class="card p-4 space-y-3">
@@ -18,58 +18,55 @@
 
     <% if @connection.persisted? && @connection.connected? %>
       <p class="text-base text-ink-soft">
-        Stripe connected<%= " (#{@connection.account_label})" if @connection.account_label.present? %>
-        with key <strong class="font-mono"><%= @connection.masked_api_key %></strong>.
+        <%= t("integrations.stripe.connection.connected",
+              account: (@connection.account_label.present? ? t("integrations.stripe.connection.account_suffix", label: @connection.account_label) : ""),
+              key: @connection.masked_api_key).html_safe %>
       </p>
       <% if @connection.last_synced_at.present? %>
-        <p class="text-sm text-ink-faint">Last synced: <%= l(@connection.last_synced_at, format: :short) %>.</p>
+        <p class="text-sm text-ink-faint"><%= t("integrations.stripe.connection.last_synced", time: l(@connection.last_synced_at, format: :short)) %></p>
       <% end %>
       <% if @connection.last_error.present? %>
-        <p class="text-sm text-danger">Last sync failed: <%= @connection.last_error %></p>
+        <p class="text-sm text-danger"><%= t("integrations.stripe.connection.last_sync_failed", error: @connection.last_error) %></p>
       <% end %>
     <% else %>
       <p class="text-base text-ink-soft">
-        Connect your Stripe account to import payments and reconcile them with deals.
-        Create a <strong>restricted key</strong> in the Stripe dashboard with read access to Charges only.
+        <%= t("integrations.stripe.connection.disconnected_intro").html_safe %>
       </p>
     <% end %>
 
     <%= form_with model: @connection, url: stripe_connection_path,
           method: @connection.persisted? ? :patch : :post, class: "space-y-3" do |f| %>
       <div>
-        <%= f.label :api_key, "API key", class: "label" %>
+        <%= f.label :api_key, t("integrations.stripe.connection.api_key"), class: "label" %>
         <%= f.password_field :api_key, value: "", autocomplete: "off", class: "input font-mono",
-              placeholder: @connection.connected? ? "Leave blank to keep the current key" : "rk_live_…" %>
+              placeholder: @connection.connected? ? t("integrations.stripe.connection.api_key_keep") : t("integrations.stripe.connection.api_key_placeholder") %>
       </div>
       <div>
-        <%= f.label :account_label, "Label", class: "label" %>
-        <%= f.text_field :account_label, class: "input", placeholder: "e.g. Stripe Example" %>
+        <%= f.label :account_label, t("integrations.stripe.connection.account_label"), class: "label" %>
+        <%= f.text_field :account_label, class: "input", placeholder: t("integrations.stripe.connection.account_label_placeholder") %>
       </div>
       <label class="flex items-center gap-2 text-base">
         <%= f.check_box :sync_enabled %>
-        Import new payments automatically (every 15 minutes)
+        <%= t("integrations.stripe.connection.import_auto") %>
       </label>
       <div class="flex gap-2">
-        <%= f.submit @connection.persisted? ? "Save settings" : "Connect Stripe", class: "btn-primary" %>
+        <%= f.submit @connection.persisted? ? t("integrations.stripe.connection.save") : t("integrations.stripe.connection.connect"), class: "btn-primary" %>
         <% if @connection.persisted? && @connection.connected? %>
-          <%= button_to "Sync now", sync_stripe_connection_path, method: :post, class: "btn-secondary" %>
-          <%= button_to "Disconnect", stripe_connection_path, method: :delete, class: "btn-danger",
-                form: { data: { turbo_confirm: "Disconnect Stripe? Imported payments will be deleted." } } %>
+          <%= button_to t("integrations.stripe.connection.sync_now"), sync_stripe_connection_path, method: :post, class: "btn-secondary" %>
+          <%= button_to t("integrations.stripe.connection.disconnect"), stripe_connection_path, method: :delete, class: "btn-danger",
+                form: { data: { turbo_confirm: t("integrations.stripe.connection.disconnect_confirm") } } %>
         <% end %>
       </div>
     <% end %>
   </div>
 
   <div class="card p-4 space-y-2">
-    <h2 class="text-base font-semibold">Matching payments to deals</h2>
+    <h2 class="text-base font-semibold"><%= t("integrations.stripe.connection.matching_title") %></h2>
     <p class="text-sm text-ink-faint">
-      Payments are matched to deals by the payer's email (looked up among people and their open deals)
-      and by amount. For a guaranteed match, make your application set the deal id in the Stripe
-      payment metadata under the key <code class="font-mono bg-canvas-sunken px-1 rounded">cream_deal_id</code>.
+      <%= t("integrations.stripe.connection.matching_hint").html_safe %>
     </p>
     <p class="text-sm text-ink-faint">
-      The first sync imports the full payment history; later syncs only fetch new payments.
-      Unmatched payments wait in the payments inbox for manual review.
+      <%= t("integrations.stripe.connection.matching_wait") %>
     </p>
   </div>
 </div>

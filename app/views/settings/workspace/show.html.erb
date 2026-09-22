@@ -1,21 +1,21 @@
-<% page_title "Settings" %>
-<%= render "shared/page_header", title: "Settings", icon_name: :settings, actions: nil %>
+<% page_title t("integrations.workspace.page_title") %>
+<%= render "shared/page_header", title: t("integrations.workspace.title"), icon_name: :settings, actions: nil %>
 
 <div class="flex-1 overflow-y-auto scrollbar-subtle p-5">
   <div class="max-w-2xl space-y-6">
     <p class="text-base text-ink-soft">
-      Configure workspace options for <strong><%= current_workspace.name %></strong>.
+      <%= t("integrations.workspace.intro", workspace: current_workspace.name).html_safe %>
     </p>
 
     <section class="card p-4 space-y-3">
-      <h2 class="text-base font-semibold text-ink">General</h2>
+      <h2 class="text-base font-semibold text-ink"><%= t("integrations.workspace.general.title") %></h2>
       <%= form_with model: current_workspace, url: settings_workspace_path, method: :patch, class: "space-y-3" do |f| %>
         <div class="flex items-end gap-2">
           <div class="flex-1">
-            <%= f.label :name, "Workspace name", class: "block text-sm font-medium text-ink-soft mb-1" %>
+            <%= f.label :name, t("integrations.workspace.general.name"), class: "block text-sm font-medium text-ink-soft mb-1" %>
             <%= f.text_field :name, class: "input w-full" %>
           </div>
-          <%= f.submit "Save", class: "btn-secondary" %>
+          <%= f.submit t("integrations.workspace.general.save"), class: "btn-secondary" %>
         </div>
         <div>
           <%= f.label :time_zone, t("workspace_settings.time_zone"), class: "label" %>
@@ -24,88 +24,88 @@
         </div>
         <label class="flex items-center gap-2 text-base">
           <%= f.check_box :salespeople_can_view_all_deals %>
-          Los vendedores pueden ver los deals de otros
+          <%= t("integrations.workspace.general.salespeople_view") %>
         </label>
         <label class="flex items-center gap-2 text-base">
           <%= f.check_box :salespeople_can_edit_all_deals %>
-          Los vendedores pueden editar los deals de otros
+          <%= t("integrations.workspace.general.salespeople_edit") %>
         </label>
-        <p class="text-sm text-ink-faint">Si solo activas editar, los vendedores también podrán ver esos deals.</p>
+        <p class="text-sm text-ink-faint"><%= t("integrations.workspace.general.edit_hint") %></p>
         <% if feature_enabled?(:sales_director) %>
           <label class="flex items-center gap-2 text-base">
             <%= f.check_box :sales_director_enabled %>
-            Briefing diario del director de ventas (IA)
+            <%= t("integrations.workspace.general.sales_director") %>
           </label>
           <% unless Ai::Configuration.configured? %>
-            <p class="text-sm text-ink-faint">Requiere configurar <code>CREAM_AI_API_KEY</code> en el servidor.</p>
+            <p class="text-sm text-ink-faint"><%= t("integrations.workspace.okm.ai_required").html_safe %></p>
           <% end %>
         <% end %>
       <% end %>
     </section>
 
     <section class="card p-4 space-y-3">
-      <h2 class="text-base font-semibold text-ink">Funcionalidades</h2>
+      <h2 class="text-base font-semibold text-ink"><%= t("integrations.workspace.features.title") %></h2>
       <p class="text-sm text-ink-soft">
-        Activa las secciones del menú y la configuración que quieras usar en este workspace. Están desactivadas por defecto.
+        <%= t("integrations.workspace.features.intro") %>
       </p>
       <%= form_with model: current_workspace, url: settings_workspace_path, method: :patch, class: "space-y-3" do |f| %>
         <label class="flex items-center gap-2 text-base">
           <%= f.check_box :reports_enabled %>
-          Reports
+          <%= t("integrations.workspace.features.reports") %>
         </label>
         <label class="flex items-center gap-2 text-base">
           <%= f.check_box :marketing_attribution_enabled %>
-          Atribución
+          <%= t("integrations.workspace.features.attribution") %>
         </label>
         <label class="flex items-center gap-2 text-base">
           <%= f.check_box :lead_scoring_enabled %>
-          Puntuación de leads
+          <%= t("integrations.workspace.features.lead_scoring") %>
         </label>
         <label class="flex items-center gap-2 text-base">
           <%= f.check_box :webhooks_enabled %>
-          Webhooks
+          <%= t("integrations.workspace.features.webhooks") %>
         </label>
         <label class="flex items-center gap-2 text-base">
           <%= f.check_box :custom_fields_enabled %>
-          Campos personalizados
+          <%= t("integrations.workspace.features.custom_fields") %>
         </label>
-        <%= f.submit "Guardar funcionalidades", class: "btn-secondary" %>
+        <%= f.submit t("integrations.workspace.features.save"), class: "btn-secondary" %>
       <% end %>
     </section>
 
     <% if feature_enabled?(:okm_chat) %>
       <section class="card p-4 space-y-3">
-        <h2 class="text-base font-semibold text-ink">OKM</h2>
+        <h2 class="text-base font-semibold text-ink"><%= t("integrations.workspace.okm.title") %></h2>
         <p class="text-sm text-ink-soft">
-          Conecta el OKM corporativo (Google Shared Drive) para el chat contextual y los briefings de IA.
+          <%= t("integrations.workspace.okm.intro") %>
         </p>
         <%= form_with model: current_workspace, url: settings_workspace_path, method: :patch, class: "space-y-3" do |f| %>
           <label class="flex items-center gap-2 text-base">
             <%= f.check_box :okm_chat_enabled %>
-            Habilitar chat OKM en este workspace
+            <%= t("integrations.workspace.okm.enable") %>
           </label>
           <% unless Ai::Configuration.configured? %>
-            <p class="text-sm text-ink-faint">Requiere configurar <code>CREAM_AI_API_KEY</code> en el servidor.</p>
+            <p class="text-sm text-ink-faint"><%= t("integrations.workspace.okm.ai_required").html_safe %></p>
           <% end %>
           <div>
-            <%= f.label :okm_drive_id, "Google Shared Drive ID", class: "block text-sm font-medium text-ink-soft mb-1" %>
-            <%= f.text_field :okm_drive_id, class: "input w-full font-mono text-sm", placeholder: "0AxxxxxxxxxxxxUk9PVA" %>
-            <p class="text-sm text-ink-faint mt-1">ID del shared drive desde la URL de Google Drive.</p>
+            <%= f.label :okm_drive_id, t("integrations.workspace.okm.drive_id"), class: "block text-sm font-medium text-ink-soft mb-1" %>
+            <%= f.text_field :okm_drive_id, class: "input w-full font-mono text-sm", placeholder: t("integrations.workspace.okm.drive_id_placeholder") %>
+            <p class="text-sm text-ink-faint mt-1"><%= t("integrations.workspace.okm.drive_id_hint") %></p>
           </div>
           <div>
-            <%= f.label :okm_service_account_key, "Service account JSON", class: "block text-sm font-medium text-ink-soft mb-1" %>
+            <%= f.label :okm_service_account_key, t("integrations.workspace.okm.service_account"), class: "block text-sm font-medium text-ink-soft mb-1" %>
             <% if current_workspace.okm_configured? %>
               <p class="text-sm text-green-700 dark:text-green-400 mb-2">
-                Configurada: <%= current_workspace.okm_service_account_client_email %>
+                <%= t("integrations.workspace.okm.service_account_configured", email: current_workspace.okm_service_account_client_email) %>
               </p>
             <% end %>
             <%= f.text_area :okm_service_account_key,
                   class: "input w-full font-mono text-xs min-h-[8rem]",
-                  placeholder: "Pega aquí el JSON de la service account con acceso de lectura al drive…",
+                  placeholder: t("integrations.workspace.okm.service_account_placeholder"),
                   value: "" %>
-            <p class="text-sm text-ink-faint mt-1">Deja en blanco para conservar la clave actual. El JSON no se vuelve a mostrar.</p>
+            <p class="text-sm text-ink-faint mt-1"><%= t("integrations.workspace.okm.service_account_hint") %></p>
           </div>
-          <%= f.submit "Save OKM settings", class: "btn-secondary" %>
+          <%= f.submit t("integrations.workspace.okm.save"), class: "btn-secondary" %>
         <% end %>
       </section>
     <% end %>
@@ -115,11 +115,9 @@
       <% @new_beehiiv_publication ||= @beehiiv_connection.beehiiv_publications.build if @beehiiv_connection.persisted? %>
       <% subscription_types = current_workspace.subscription_types.active.ordered %>
       <section class="card p-4 space-y-3">
-        <h2 class="text-base font-semibold text-ink">Beehiiv</h2>
+        <h2 class="text-base font-semibold text-ink"><%= t("integrations.workspace.beehiiv.title") %></h2>
         <p class="text-sm text-ink-soft">
-          Sincroniza publicaciones de Beehiiv con tipos de suscripción de Cream.
-          Beehiiv sigue enviando cada newsletter; Cream refleja altas y bajas en el pool MQL.
-          Cada publicación tiene su propia URL de webhook en Beehiiv.
+          <%= t("integrations.workspace.beehiiv.intro") %>
         </p>
 
         <% if @beehiiv_connection.errors.any? %>
@@ -132,66 +130,66 @@
 
         <% if @beehiiv_connection.persisted? && @beehiiv_connection.api_key.present? %>
           <p class="text-sm text-green-700 dark:text-green-400">
-            API key <strong class="font-mono"><%= @beehiiv_connection.masked_api_key %></strong>.
+            <%= t("integrations.workspace.beehiiv.status_key", key: @beehiiv_connection.masked_api_key).html_safe %>
             <% if @beehiiv_connection.connected? %>
-              <%= @beehiiv_connection.beehiiv_publications.size %> publicación(es) configurada(s).
+              <%= t("integrations.workspace.beehiiv.status_connected", count: @beehiiv_connection.beehiiv_publications.size) %>
             <% else %>
-              Añade al menos una publicación para completar la conexión.
+              <%= t("integrations.workspace.beehiiv.status_incomplete") %>
             <% end %>
             <% if @beehiiv_connection.last_synced_at.present? %>
-              Última sync: <%= l(@beehiiv_connection.last_synced_at, format: :short) %>.
+              <%= t("integrations.workspace.beehiiv.last_sync", time: l(@beehiiv_connection.last_synced_at, format: :short)) %>
             <% end %>
           </p>
           <% if @beehiiv_connection.last_error.present? %>
-            <p class="text-sm text-danger">Último error: <%= @beehiiv_connection.last_error %></p>
+            <p class="text-sm text-danger"><%= t("integrations.workspace.beehiiv.last_error", error: @beehiiv_connection.last_error) %></p>
           <% end %>
         <% end %>
 
         <%= form_with model: @beehiiv_connection, url: beehiiv_connection_path,
               method: @beehiiv_connection.persisted? ? :patch : :post, class: "space-y-3" do |f| %>
           <div>
-            <%= f.label :api_key, "API Key (cuenta Beehiiv)", class: "block text-sm font-medium text-ink-soft mb-1" %>
+            <%= f.label :api_key, t("integrations.workspace.beehiiv.api_key"), class: "block text-sm font-medium text-ink-soft mb-1" %>
             <%= f.password_field :api_key, value: "", autocomplete: "off", class: "input w-full font-mono",
-                  placeholder: @beehiiv_connection.api_key.present? ? "Deja en blanco para conservar la clave actual" : "Clave de la API de Beehiiv" %>
+                  placeholder: @beehiiv_connection.api_key.present? ? t("integrations.workspace.beehiiv.api_key_keep") : t("integrations.workspace.beehiiv.api_key_placeholder") %>
           </div>
           <label class="flex items-center gap-2 text-base">
             <%= f.check_box :sync_enabled %>
-            Sincronización automática cada hora
+            <%= t("integrations.workspace.beehiiv.sync_enabled") %>
           </label>
           <div class="flex gap-2">
-            <%= f.submit @beehiiv_connection.persisted? ? "Guardar Beehiiv" : "Conectar Beehiiv", class: "btn-secondary" %>
+            <%= f.submit @beehiiv_connection.persisted? ? t("integrations.workspace.beehiiv.save") : t("integrations.workspace.beehiiv.connect"), class: "btn-secondary" %>
           </div>
         <% end %>
 
         <% if @beehiiv_connection.persisted? %>
           <div class="flex flex-wrap gap-2">
             <% if @beehiiv_connection.connected? %>
-              <%= button_to "Sincronizar ahora", sync_beehiiv_connection_path, method: :post, class: "btn-secondary" %>
+              <%= button_to t("integrations.workspace.beehiiv.sync_now"), sync_beehiiv_connection_path, method: :post, class: "btn-secondary" %>
             <% end %>
-            <%= button_to "Desconectar", beehiiv_connection_path, method: :delete, class: "btn-danger",
-                  form: { data: { turbo_confirm: "¿Desconectar Beehiiv de este workspace?" } } %>
+            <%= button_to t("integrations.workspace.beehiiv.disconnect"), beehiiv_connection_path, method: :delete, class: "btn-danger",
+                  form: { data: { turbo_confirm: t("integrations.workspace.beehiiv.disconnect_confirm") } } %>
           </div>
 
           <% if @beehiiv_connection.beehiiv_publications.any? %>
             <div class="space-y-4 pt-2">
-              <h3 class="text-sm font-semibold text-ink">Publicaciones</h3>
+              <h3 class="text-sm font-semibold text-ink"><%= t("integrations.workspace.beehiiv.publications") %></h3>
               <% @beehiiv_connection.beehiiv_publications.includes(:subscription_type).each do |publication| %>
                 <div class="rounded-lg border border-line p-3 space-y-3">
                   <%= form_with model: publication, url: beehiiv_publication_path(publication), method: :patch, class: "space-y-3" do |f| %>
                     <div class="grid gap-3 sm:grid-cols-2">
                       <div>
-                        <%= f.label :subscription_type_id, "Tipo de suscripción Cream", class: "block text-sm font-medium text-ink-soft mb-1" %>
+                        <%= f.label :subscription_type_id, t("integrations.workspace.beehiiv.subscription_type"), class: "block text-sm font-medium text-ink-soft mb-1" %>
                         <%= f.collection_select :subscription_type_id, subscription_types, :id, :name, {}, class: "input w-full" %>
                       </div>
                       <div>
-                        <%= f.label :publication_id, "Publication ID", class: "block text-sm font-medium text-ink-soft mb-1" %>
-                        <%= f.text_field :publication_id, class: "input w-full font-mono", placeholder: "pub_00000000-0000-0000-0000-000000000000" %>
+                        <%= f.label :publication_id, t("integrations.workspace.beehiiv.publication_id"), class: "block text-sm font-medium text-ink-soft mb-1" %>
+                        <%= f.text_field :publication_id, class: "input w-full font-mono", placeholder: t("integrations.workspace.beehiiv.publication_id_placeholder") %>
                       </div>
                     </div>
                     <div>
-                      <%= f.label :webhook_signing_secret, "Webhook signing secret (Svix)", class: "block text-sm font-medium text-ink-soft mb-1" %>
+                      <%= f.label :webhook_signing_secret, t("integrations.workspace.beehiiv.webhook_signing_secret"), class: "block text-sm font-medium text-ink-soft mb-1" %>
                       <%= f.password_field :webhook_signing_secret, value: "", autocomplete: "off", class: "input w-full font-mono",
-                            placeholder: publication.webhook_signing_secret.present? ? "Deja en blanco para conservar el secret actual" : "whsec_…" %>
+                            placeholder: publication.webhook_signing_secret.present? ? t("integrations.workspace.beehiiv.secret_keep") : t("integrations.workspace.beehiiv.secret_placeholder") %>
                     </div>
                     <% if publication.errors.any? %>
                       <div class="text-sm text-danger">
@@ -201,15 +199,15 @@
                       </div>
                     <% end %>
                     <div class="flex flex-wrap gap-2">
-                      <%= f.submit "Guardar publicación", class: "btn-secondary text-sm" %>
-                      <%= button_to "Eliminar", beehiiv_publication_path(publication), method: :delete, class: "btn-danger text-sm",
-                            form: { data: { turbo_confirm: "¿Eliminar esta publicación Beehiiv?" } } %>
+                      <%= f.submit t("integrations.workspace.beehiiv.save_publication"), class: "btn-secondary text-sm" %>
+                      <%= button_to t("integrations.workspace.beehiiv.remove_publication"), beehiiv_publication_path(publication), method: :delete, class: "btn-danger text-sm",
+                            form: { data: { turbo_confirm: t("integrations.workspace.beehiiv.remove_publication_confirm") } } %>
                     </div>
                   <% end %>
                   <div class="pt-1 space-y-2" data-controller="clipboard">
-                    <p class="text-sm font-medium text-ink-soft mb-1">URL del webhook (registrar en Beehiiv → Settings → Webhooks)</p>
+                    <p class="text-sm font-medium text-ink-soft mb-1"><%= t("integrations.workspace.beehiiv.webhook_url") %></p>
                     <p class="text-sm text-ink-faint mb-1">
-                      Eventos recomendados: subscription.created, subscription.confirmed, subscription.deleted.
+                      <%= t("integrations.workspace.beehiiv.webhook_events") %>
                     </p>
                     <textarea readonly rows="2"
                           class="input w-full text-xs font-mono bg-canvas-sunken resize-none break-all cursor-default"
@@ -219,22 +217,22 @@
                             data-action="clipboard#copy" data-clipboard-target="button">
                         <span data-clipboard-target="copyIcon" class="inline-flex items-center gap-1.5">
                           <%= icon :copy, classes: "size-4" %>
-                          Copiar URL
+                          <%= t("integrations.workspace.beehiiv.copy_url") %>
                         </span>
                         <span data-clipboard-target="copiedIcon" class="hidden inline-flex items-center gap-1.5">
                           <%= icon :check, classes: "size-4" %>
-                          Copiado
+                          <%= t("integrations.workspace.beehiiv.copied") %>
                         </span>
                       </button>
                       <span data-clipboard-target="feedback"
                             class="hidden text-xs font-medium text-green-700 dark:text-green-300"
-                            role="status" aria-live="polite">Copiado al portapapeles</span>
+                            role="status" aria-live="polite"><%= t("integrations.workspace.beehiiv.copied_clipboard") %></span>
                     </div>
                     <% if publication.last_synced_at.present? %>
-                      <p class="text-xs text-ink-faint mt-1">Última sync: <%= l(publication.last_synced_at, format: :short) %></p>
+                      <p class="text-xs text-ink-faint mt-1"><%= t("integrations.workspace.beehiiv.last_sync", time: l(publication.last_synced_at, format: :short)) %></p>
                     <% end %>
                     <% if publication.last_error.present? %>
-                      <p class="text-xs text-danger mt-1">Error: <%= publication.last_error %></p>
+                      <p class="text-xs text-danger mt-1"><%= t("integrations.workspace.beehiiv.last_error", error: publication.last_error) %></p>
                     <% end %>
                   </div>
                 </div>
@@ -244,23 +242,23 @@
 
           <% if @new_beehiiv_publication %>
             <div class="rounded-lg border border-dashed border-line p-3 space-y-3">
-              <h3 class="text-sm font-semibold text-ink">Añadir publicación</h3>
+              <h3 class="text-sm font-semibold text-ink"><%= t("integrations.workspace.beehiiv.add_publication_title") %></h3>
               <%= form_with model: @new_beehiiv_publication, url: beehiiv_publications_path, class: "space-y-3" do |f| %>
                 <div class="grid gap-3 sm:grid-cols-2">
                   <div>
-                    <%= f.label :subscription_type_id, "Tipo de suscripción Cream", class: "block text-sm font-medium text-ink-soft mb-1" %>
+                    <%= f.label :subscription_type_id, t("integrations.workspace.beehiiv.subscription_type"), class: "block text-sm font-medium text-ink-soft mb-1" %>
                     <%= f.collection_select :subscription_type_id, subscription_types, :id, :name,
-                          { include_blank: "Selecciona un tipo" }, class: "input w-full", required: true %>
+                          { include_blank: t("integrations.workspace.beehiiv.select_type") }, class: "input w-full", required: true %>
                   </div>
                   <div>
-                    <%= f.label :publication_id, "Publication ID", class: "block text-sm font-medium text-ink-soft mb-1" %>
-                    <%= f.text_field :publication_id, class: "input w-full font-mono", placeholder: "pub_00000000-0000-0000-0000-000000000000", required: true %>
+                    <%= f.label :publication_id, t("integrations.workspace.beehiiv.publication_id"), class: "block text-sm font-medium text-ink-soft mb-1" %>
+                    <%= f.text_field :publication_id, class: "input w-full font-mono", placeholder: t("integrations.workspace.beehiiv.publication_id_placeholder"), required: true %>
                   </div>
                 </div>
                 <div>
-                  <%= f.label :webhook_signing_secret, "Webhook signing secret (Svix)", class: "block text-sm font-medium text-ink-soft mb-1" %>
-                  <%= f.password_field :webhook_signing_secret, autocomplete: "off", class: "input w-full font-mono", placeholder: "whsec_…" %>
-                  <p class="text-sm text-ink-faint mt-1">Opcional pero recomendado (plan Scale+). Cada publicación en Beehiiv tiene su propio secret.</p>
+                  <%= f.label :webhook_signing_secret, t("integrations.workspace.beehiiv.webhook_signing_secret"), class: "block text-sm font-medium text-ink-soft mb-1" %>
+                  <%= f.password_field :webhook_signing_secret, autocomplete: "off", class: "input w-full font-mono", placeholder: t("integrations.workspace.beehiiv.secret_placeholder") %>
+                  <p class="text-sm text-ink-faint mt-1"><%= t("integrations.workspace.beehiiv.secret_hint") %></p>
                 </div>
                 <% if @beehiiv_publication&.errors&.any? %>
                   <div class="text-sm text-danger">
@@ -269,7 +267,7 @@
                     <% end %>
                   </div>
                 <% end %>
-                <%= f.submit "Añadir publicación", class: "btn-secondary" %>
+                <%= f.submit t("integrations.workspace.beehiiv.add_publication"), class: "btn-secondary" %>
               <% end %>
             </div>
           <% end %>
@@ -280,9 +278,9 @@
     <% if feature_enabled?(:marketing_campaigns) %>
       <% @mailjet_connection ||= current_workspace.mailjet_connection || current_workspace.build_mailjet_connection(user: current_user) %>
       <section class="card p-4 space-y-3">
-        <h2 class="text-base font-semibold text-ink">Mailjet</h2>
+        <h2 class="text-base font-semibold text-ink"><%= t("integrations.workspace.mailjet.title") %></h2>
         <p class="text-sm text-ink-soft">
-          Cada workspace usa su propia cuenta de Mailjet para campañas y recorridos. El correo transaccional (invitaciones, alertas, reservas, informes y emails de ficha) solo si lo activas abajo.
+          <%= t("integrations.workspace.mailjet.intro") %>
         </p>
 
         <% if @mailjet_connection.errors.any? %>
@@ -295,57 +293,58 @@
 
         <% if @mailjet_connection.persisted? && @mailjet_connection.connected? %>
           <p class="text-sm text-green-700 dark:text-green-400">
-            Conectado con API key <strong class="font-mono"><%= @mailjet_connection.masked_api_key %></strong>
-            y secret <strong class="font-mono"><%= @mailjet_connection.masked_secret_key %></strong>.
+            <%= t("integrations.workspace.mailjet.connected",
+                  api: @mailjet_connection.masked_api_key,
+                  secret: @mailjet_connection.masked_secret_key).html_safe %>
           </p>
         <% end %>
 
         <%= form_with model: @mailjet_connection, url: mailjet_connection_path,
               method: @mailjet_connection.persisted? ? :patch : :post, class: "space-y-3" do |f| %>
           <div>
-            <%= f.label :api_key, "API Key", class: "block text-sm font-medium text-ink-soft mb-1" %>
+            <%= f.label :api_key, t("integrations.workspace.mailjet.api_key"), class: "block text-sm font-medium text-ink-soft mb-1" %>
             <%= f.password_field :api_key, value: "", autocomplete: "off", class: "input w-full font-mono",
-                  placeholder: @mailjet_connection.connected? ? "Deja en blanco para conservar la clave actual" : "Clave pública de Mailjet" %>
+                  placeholder: @mailjet_connection.connected? ? t("integrations.workspace.mailjet.api_key_keep") : t("integrations.workspace.mailjet.api_key_placeholder") %>
           </div>
           <div>
-            <%= f.label :secret_key, "Secret Key", class: "block text-sm font-medium text-ink-soft mb-1" %>
+            <%= f.label :secret_key, t("integrations.workspace.mailjet.secret_key"), class: "block text-sm font-medium text-ink-soft mb-1" %>
             <%= f.password_field :secret_key, value: "", autocomplete: "off", class: "input w-full font-mono",
-                  placeholder: @mailjet_connection.connected? ? "Deja en blanco para conservar la clave actual" : "Clave secreta de Mailjet" %>
+                  placeholder: @mailjet_connection.connected? ? t("integrations.workspace.mailjet.secret_key_keep") : t("integrations.workspace.mailjet.secret_key_placeholder") %>
           </div>
           <div>
-            <%= f.label :from_email, "Email remitente", class: "block text-sm font-medium text-ink-soft mb-1" %>
-            <%= f.email_field :from_email, class: "input w-full", placeholder: "noreply@tudominio.com" %>
-            <p class="text-sm text-ink-faint mt-1">Debe ser un remitente verificado en Mailjet (SPF/DKIM del dominio).</p>
+            <%= f.label :from_email, t("integrations.workspace.mailjet.from_email"), class: "block text-sm font-medium text-ink-soft mb-1" %>
+            <%= f.email_field :from_email, class: "input w-full", placeholder: t("integrations.workspace.mailjet.from_email_placeholder") %>
+            <p class="text-sm text-ink-faint mt-1"><%= t("integrations.workspace.mailjet.from_email_hint") %></p>
           </div>
           <div>
-            <%= f.label :from_name, "Nombre del remitente", class: "block text-sm font-medium text-ink-soft mb-1" %>
+            <%= f.label :from_name, t("integrations.workspace.mailjet.from_name"), class: "block text-sm font-medium text-ink-soft mb-1" %>
             <%= f.text_field :from_name, class: "input w-full", placeholder: current_workspace.name %>
           </div>
           <label class="flex items-center gap-2 text-base">
             <%= f.check_box :transactional_enabled %>
-            Usar Mailjet para el correo transaccional
+            <%= t("integrations.workspace.mailjet.transactional") %>
           </label>
           <p class="text-sm text-ink-faint">
-            Invitaciones, alertas, reservas, informes y emails de ficha. Si está desactivado, esos envíos usan SMTP/Mailbin.
+            <%= t("integrations.workspace.mailjet.transactional_hint") %>
           </p>
           <label class="flex items-center gap-2 text-base">
             <%= f.check_box :sender_domain_validated %>
-            Dominio validado en Mailjet (enviar en nombre de cada usuario)
+            <%= t("integrations.workspace.mailjet.domain_validated") %>
           </label>
           <p class="text-sm text-ink-faint">
-            Actívalo solo si el dominio del remitente está verificado en Mailjet (SPF/DKIM). Si no, los correos salen con el remitente del workspace y Reply-To al responsable.
+            <%= t("integrations.workspace.mailjet.domain_validated_hint") %>
           </p>
           <div class="flex gap-2">
-            <%= f.submit @mailjet_connection.persisted? ? "Guardar Mailjet" : "Conectar Mailjet", class: "btn-secondary" %>
+            <%= f.submit @mailjet_connection.persisted? ? t("integrations.workspace.mailjet.save") : t("integrations.workspace.mailjet.connect"), class: "btn-secondary" %>
           </div>
         <% end %>
         <% if @mailjet_connection.persisted? %>
-          <%= button_to "Desconectar", mailjet_connection_path, method: :delete, class: "btn-danger",
-                form: { data: { turbo_confirm: "¿Desconectar Mailjet de este workspace?" } } %>
+          <%= button_to t("integrations.workspace.mailjet.disconnect"), mailjet_connection_path, method: :delete, class: "btn-danger",
+                form: { data: { turbo_confirm: t("integrations.workspace.mailjet.disconnect_confirm") } } %>
           <div class="pt-2 space-y-2" data-controller="clipboard">
-            <p class="text-sm font-medium text-ink-soft mb-1">URL del webhook</p>
+            <p class="text-sm font-medium text-ink-soft mb-1"><%= t("integrations.workspace.mailjet.webhook_url") %></p>
             <p class="text-sm text-ink-faint mb-1">
-              Al guardar Mailjet, Cream registra automáticamente sent, open, click, bounce, spam, unsub y blocked (Version 2). Copia la URL solo si necesitas revisarla en Mailjet.
+              <%= t("integrations.workspace.mailjet.webhook_hint") %>
             </p>
             <textarea readonly rows="2"
                   class="input w-full text-xs font-mono bg-canvas-sunken resize-none break-all cursor-default"
@@ -355,16 +354,16 @@
                     data-action="clipboard#copy" data-clipboard-target="button">
                 <span data-clipboard-target="copyIcon" class="inline-flex items-center gap-1.5">
                   <%= icon :copy, classes: "size-4" %>
-                  Copiar URL
+                  <%= t("integrations.workspace.mailjet.copy_url") %>
                 </span>
                 <span data-clipboard-target="copiedIcon" class="hidden inline-flex items-center gap-1.5">
                   <%= icon :check, classes: "size-4" %>
-                  Copiado
+                  <%= t("integrations.workspace.mailjet.copied") %>
                 </span>
               </button>
               <span data-clipboard-target="feedback"
                     class="hidden text-xs font-medium text-green-700 dark:text-green-300"
-                    role="status" aria-live="polite">Copiado al portapapeles</span>
+                    role="status" aria-live="polite"><%= t("integrations.workspace.mailjet.copied_clipboard") %></span>
             </div>
           </div>
         <% end %>

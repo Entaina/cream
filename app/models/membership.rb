@@ -1,10 +1,12 @@
 class Membership < ApplicationRecord
   ROLES = %w[admin sales_director salesperson].freeze
-  ROLE_LABELS = {
-    "admin" => "Admin",
-    "sales_director" => "Director comercial",
-    "salesperson" => "Vendedor"
-  }.freeze
+  def self.role_label_for(role)
+    I18n.t("integrations.team.roles.#{role}", default: role)
+  end
+
+  def self.role_options
+    ROLES.map { |role| [role_label_for(role), role] }
+  end
   SALES_BRIEFING_DAILY_REGENERATIONS_LIMIT = 5
 
   belongs_to :workspace
@@ -43,7 +45,7 @@ class Membership < ApplicationRecord
   end
 
   def role_label
-    ROLE_LABELS.fetch(role, role)
+    self.class.role_label_for(role)
   end
 
   def last_admin?

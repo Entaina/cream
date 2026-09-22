@@ -1,13 +1,45 @@
 ---
 en:
   booking:
+    bookings:
+      index:
+        cancel: Cancel
+        cancel_confirm: Cancel this booking? The Google Calendar event will be removed
+          and attendees will be notified.
+        empty: No bookings received yet.
+        fields:
+          deal: Deal
+          email: Email
+          event_type: Event type
+          page: Page
+          person: Person
+          starts_at: Date and time
+        page_title: Received bookings
+        pages_link: Booking pages
+        status:
+          cancelled: Cancelled
+          confirmed: Confirmed
+        title: Received bookings
+    colors:
+      blue: Blue
+      chicago: Gray
+      copperfield: Copper
+      golden: Gold
+      green: Green
+      hoki: Blue gray
     display:
       datetime_with_zone: "%{datetime} (%{timezone})"
     errors:
+      availability_params_required: month or date is required.
       event_type_not_found: Event type not found.
       invalid_datetime: The selected date or time is invalid.
+      name_i18n_es_required: must include a name in Spanish
       rate_limited: Too many requests. Please try again in a minute.
       slot_unavailable: That time slot is no longer available.
+    location_types:
+      google_meet: Google Meet
+      physical: In person
+      to_be_decided: To be arranged
     mailer:
       datetime: Date and time
       host_notification:
@@ -26,3 +58,202 @@ en:
         location: Location
         subject: 'Reminder: %{event_name} · %{date}'
         time: Time
+    pages:
+      edit:
+        page_title: Edit booking page
+        title: Edit booking page
+      event_type:
+        add_type: Add type
+        availability_section: Availability and booking
+        buffer_after: Buffer after (min)
+        buffer_before: Buffer before (min)
+        copied: Copied
+        copy_aria: Copy to clipboard
+        copy_title: Copy to clipboard
+        default_weekly_hours: Default business hours
+        description_en: Description (EN)
+        description_es: Description (ES)
+        direct_url: Direct URL for this type
+        direct_url_hint: Opens this type's calendar without the selection screen.
+        duration_min: Duration (min)
+        duration_minutes_abbr: "%{count} min"
+        email_blank: No email
+        email_section: Confirmation email
+        email_template: Guest email template
+        email_tokens_hint: 'Sent when the booking is confirmed. Available tokens:
+          {first_name}, {last_name}, {name}, {email}, {company}, {event_name}, {date},
+          {time}, {duration}, {timezone}, {location}, {meet_link}.'
+        hidden: Hidden
+        identification_section: Identification
+        increment: Slot increment (min)
+        location_address: Address (in person)
+        location_address_placeholder: Street, city…
+        location_appearance_section: Location and appearance
+        location_color: Calendar color
+        location_type: Location type
+        min_notice: Minimum notice (h)
+        name_en: Name (EN)
+        name_es: Name (ES)
+        new_type_summary: New event type
+        public_visible: Visible on the public page
+        reminder: Reminder (min before)
+        reminder_placeholder: 60 (0 = disabled)
+        remove_type: Delete
+        remove_type_title: Remove event type
+        reorder_aria: Reorder event type
+        reorder_title: Drag to reorder
+        slug: Slug (URL)
+        slug_placeholder: consulting
+        visible: Visible
+        weekly_hours: Weekly time windows
+      form:
+        active_page: Page active
+        avatar_url: Avatar URL
+        booking_window_days: Booking window (days)
+        calendar_activate_api: Enable Google Calendar API
+        calendar_drag_aria: Reorder calendar
+        calendar_drag_title: Drag to reorder
+        calendar_hint: Drag the handle to reorder. The «Receives new bookings» badge
+          shows where events will be created.
+        calendar_order_hint: Select calendars used for availability and drag to order
+          them. New appointments are created on the first selected calendar with write
+          access.
+        calendar_primary: "(primary)"
+        calendar_readonly: "· read only"
+        calendar_reconnect: Reconnect Google Calendar
+        calendar_section: Calendars
+        calendar_writable: "· write"
+        cancel: Cancel
+        connect_calendar: Connect Google Calendar
+        connect_calendar_now: Connect now
+        connect_calendar_short: Connect Google Calendar
+        crm_pipeline: CRM pipeline
+        event_types: Event types
+        event_types_hint: Drag to reorder. Click a card to edit it.
+        host: Host (calendar)
+        host_calendar_hint: Must have Google Calendar connected to check availability
+          and create appointments.
+        host_not_connected: The host does not have Google Calendar connected.
+        logo_url: Logo URL
+        name: Name
+        public_page: Public page
+        public_url: 'URL: %{url}'
+        reuse_deal: Reuse existing deal
+        reuse_deal_hint: If the person already has a deal in the first stage of this
+          pipeline, the booking links to it; otherwise a new deal is created.
+        slug: Slug (URL)
+        slug_placeholder: alex
+        submit_create: Create
+        submit_update: Save
+        timezone: Time zone
+        timezone_hint: Each event type's windows use this zone. Guests see slots in
+          their zone; the Google Calendar event is the same instant.
+        welcome_message: Welcome message
+      form_js:
+        activate_api_link: Enable Google Calendar API
+        api_disabled: Google Calendar API is not enabled on the Google Cloud OAuth
+          project.
+        calendar_drag_aria: Reorder calendar
+        calendar_drag_title: Drag to reorder
+        calendar_primary: "(primary)"
+        calendar_readonly: "· read only"
+        calendar_writable: "· write"
+        event_calendar_badge: Receives new bookings
+        insufficient_scopes: The host needs to update Google Calendar permissions.
+        load_failed: Could not load calendars. Please try again.
+        loading_calendars: Loading calendars…
+        no_calendars_found: No calendars found on the connected account.
+        not_connected: The selected host does not have Google Calendar connected.
+      index:
+        active: Active
+        connect_before_publish: Connect Google Calendar before publishing a page.
+        connect_calendar: Connect Google Calendar
+        direct_type_urls: Direct URLs by type
+        edit: Edit
+        empty: No booking pages configured yet.
+        fields:
+          event_types: Event types
+          host: Host
+          pipeline: Pipeline
+          slug: Slug
+        google_calendar: Google Calendar
+        inactive: Inactive
+        incomplete: Incomplete
+        new_page: New page
+        page_title: Bookings
+        public_url: Public URL
+        ready: Ready
+        received_bookings: Received bookings
+        remove: Delete
+        remove_confirm: Delete this page?
+        title: Bookings
+      new:
+        page_title: New booking page
+        title: New booking page
+      weekly_hours_js:
+        remove_window: Remove window
+        unavailable: Unavailable
+    public_ui:
+      addGuests: Add guests
+      aria:
+        booking_steps: Booking steps
+        language: Language
+        next_month: Next month
+        previous_month: Previous month
+      attendeeDetails: Attendee details
+      availableSlots: Available times
+      availableSlotsInZone: Available times (%{timezone})
+      backToSchedule: "← Back to calendar"
+      backToTypes: "← Back to event types"
+      bookAnother: Schedule another meeting
+      calendarEstimated: Showing times from the configured schedule. Google Calendar
+        did not respond; some slots may already be booked.
+      calendarUnavailable: Could not load calendar availability.
+      chooseEvent: Choose an event type
+      confirmationEmailNotice: We have sent a confirmation email to %{email}.
+      confirmed: Event scheduled!
+      doNotFill: Do not fill
+      downloadIcs: Download .ics
+      email: Email
+      enableCalendarApi: Enable Google Calendar API
+      firstName: First name
+      genericError: Something went wrong. Please try again.
+      guest: Guest
+      guestsLabel: Guests
+      lastName: Last name
+      loadingAvailability: Loading availability…
+      location: Location
+      meetLink: Google Meet link
+      message: What would you like to discuss?
+      minutes: min
+      next: Next
+      noSlots: No available times on this day.
+      phone: Phone (optional)
+      reminderNotice: We will send you an email reminder %{minutes} minutes before
+        the meeting.
+      schedule: Schedule event
+      scheduleSummary: "%{datetime} (%{timezone})"
+      scheduling: Scheduling…
+      slotTaken: That time is no longer available. Please choose another.
+      stepDetails: Details
+      stepEvent: Type
+      stepSchedule: Date
+      timezone: Timezone
+      weekdays:
+      - M
+      - T
+      - W
+      - T
+      - F
+      - S
+      - S
+    warnings:
+      calendar_timeout: Google Calendar did not respond in time.
+    weekdays:
+      friday: Fri
+      monday: Mon
+      saturday: Sat
+      sunday: Sun
+      thursday: Thu
+      tuesday: Tue
+      wednesday: Wed

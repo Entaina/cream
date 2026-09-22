@@ -10,11 +10,11 @@ module Public
     before_action :ensure_feature_enabled
     before_action :set_booking_page
     before_action :set_event_type, if: -> { params[:event_type].present? }
+    before_action :set_public_booking_locale, only: :show
 
     rate_limit to: 60, within: 1.minute, only: :show, name: "booking_page_show"
 
     def show
-      @locale = resolved_locale
       response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
     end
 
@@ -34,6 +34,11 @@ module Public
       @event_type = @booking_page.event_types.visible.find_by!(slug: params[:event_type])
     rescue ActiveRecord::RecordNotFound
       head :not_found
+    end
+
+    def set_public_booking_locale
+      @locale = resolved_locale
+      I18n.locale = @locale.to_sym
     end
 
     def resolved_locale

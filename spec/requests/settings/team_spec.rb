@@ -25,8 +25,8 @@ RSpec.describe "Settings::Team", type: :request do
     it "shows management controls to admins" do
       get settings_team_path
 
-      expect(response.body).to include("Invite member")
-      expect(response.body).to include("Pending invitations")
+      expect(response.body).to include(I18n.t("integrations.team.invite_section.title"))
+      expect(response.body).to include(I18n.t("integrations.team.pending_invitations"))
       expect(response.body).to include("invitee@example.com")
     end
 
@@ -37,8 +37,8 @@ RSpec.describe "Settings::Team", type: :request do
       get settings_team_path
 
       expect(response).to have_http_status(:success)
-      expect(response.body).not_to include("Send invitation")
-      expect(response.body).not_to include("Pending invitations")
+      expect(response.body).not_to include(I18n.t("integrations.team.invite_section.submit"))
+      expect(response.body).not_to include(I18n.t("integrations.team.pending_invitations"))
       expect(response.body).not_to include("invitee@example.com")
       expect(response.body).to include(member.name)
       expect(response.body).to include("Vendedor")

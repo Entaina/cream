@@ -1,20 +1,18 @@
 import { Controller } from "@hotwired/stimulus"
 
-const WEEKDAYS = [
-  { key: "monday", label: "Lun" },
-  { key: "tuesday", label: "Mar" },
-  { key: "wednesday", label: "Mié" },
-  { key: "thursday", label: "Jue" },
-  { key: "friday", label: "Vie" },
-  { key: "saturday", label: "Sáb" },
-  { key: "sunday", label: "Dom" }
+const DEFAULT_WEEKDAY_ORDER = [
+  "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"
 ]
 
 const DEFAULT_WINDOW = [ "10:00", "14:00" ]
 
 export default class extends Controller {
   static targets = [ "input", "list" ]
-  static values = { defaultSchedule: Object }
+  static values = {
+    defaultSchedule: Object,
+    weekdayLabels: Object,
+    i18n: Object
+  }
 
   connect() {
     this.schedule = this.parseSchedule(this.inputTarget.value)
@@ -57,7 +55,7 @@ export default class extends Controller {
   }
 
   render() {
-    this.listTarget.innerHTML = WEEKDAYS.map((day) => this.dayHtml(day)).join("")
+    this.listTarget.innerHTML = this.weekdays().map((day) => this.dayHtml(day)).join("")
     this.sync()
   }
 
@@ -65,11 +63,11 @@ export default class extends Controller {
     const windows = this.schedule[day.key] || []
     const windowsHtml = windows.length
       ? windows.map((window, index) => this.windowHtml(day.key, window, index)).join("")
-      : `<span class="text-xs text-ink-faint">No disponible</span>`
+      : `<span class="text-xs text-ink-faint">${this.escape(this.t("unavailable"))}</span>`
 
     return `
       <div class="flex flex-wrap items-center gap-x-2 gap-y-1 py-1.5 border-b border-line last:border-b-0">
-        <span class="text-sm font-medium w-24 shrink-0">${day.label}</span>
+        <span class="text-sm font-medium w-24 shrink-0">${this.escape(day.label)}</span>
         <div class="flex flex-wrap items-center gap-1 flex-1 min-w-0">
           ${windowsHtml}
         </div>
@@ -104,7 +102,7 @@ export default class extends Controller {
                data-action="change->weekly-hours-editor#updateWindow input->weekly-hours-editor#updateWindow click->weekly-hours-editor#stopClick">
         <button type="button"
                 class="btn-ghost text-danger p-0.5 text-xs leading-none"
-                title="Quitar franja"
+                title="${this.escape(this.t("remove_window"))}"
                 data-day="${day}"
                 data-index="${index}"
                 data-action="weekly-hours-editor#removeWindow">
@@ -118,10 +116,18 @@ export default class extends Controller {
     event.stopPropagation()
   }
 
+  weekdays() {
+    const labels = this.weekdayLabelsValue || {}
+    return DEFAULT_WEEKDAY_ORDER.map((key) => ({
+      key,
+      label: labels[key] || key
+    }))
+  }
+
   parseSchedule(raw) {
     try {
       const data = JSON.parse(raw || "{}")
-      return WEEKDAYS.reduce((schedule, day) => {
+      return this.weekdays().reduce((schedule, day) => {
         schedule[day.key] = Array.isArray(data[day.key])
           ? data[day.key].map((window) => [ String(window[0]), String(window[1]) ])
           : []
@@ -133,7 +139,7 @@ export default class extends Controller {
   }
 
   defaultSchedule() {
-    return WEEKDAYS.reduce((schedule, day) => {
+    return this.weekdays().reduce((schedule, day) => {
       schedule[day.key] = []
       return schedule
     }, {})
@@ -141,5 +147,15 @@ export default class extends Controller {
 
   sync() {
     this.inputTarget.value = JSON.stringify(this.schedule)
+  }
+
+  t(key) {
+    return this.i18nValue?.[key] || key
+  }
+
+  escape(text) {
+    return String(text || "").replace(/[&<>"']/g, (char) => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    })[char])
   }
 }

@@ -6,7 +6,8 @@
         booking_page_form_selected_ids_value: booking_page.calendar_ids.to_json,
         booking_page_form_calendars_value: @available_calendars.to_json,
         booking_page_form_calendars_error_value: @calendars_load_error.to_s,
-        booking_page_form_host_connected_value: @host_calendar_connection&.connected? == true
+        booking_page_form_host_connected_value: @host_calendar_connection&.connected? == true,
+        booking_page_form_i18n_value: booking_page_form_stimulus_i18n.to_json
       } do |f| %>
   <% if booking_page.errors.any? %>
     <div class="card p-4 border-red-200 bg-red-50 text-red-800 text-sm">
@@ -16,102 +17,102 @@
 
   <div class="grid gap-6 lg:grid-cols-2 lg:items-start">
     <div class="card p-6 space-y-4 lg:sticky lg:top-0 lg:self-start min-w-0">
-      <h2 class="font-display text-lg font-semibold">Página pública</h2>
+      <h2 class="font-display text-lg font-semibold"><%= t("booking.pages.form.public_page") %></h2>
       <div>
-        <%= f.label :name, "Nombre", class: "label" %>
+        <%= f.label :name, t("booking.pages.form.name"), class: "label" %>
         <%= f.text_field :name, class: "input mt-1 w-full" %>
       </div>
       <div>
-        <%= f.label :slug, "Slug (URL)", class: "label" %>
-        <%= f.text_field :slug, class: "input mt-1 w-full", placeholder: "alex" %>
+        <%= f.label :slug, t("booking.pages.form.slug"), class: "label" %>
+        <%= f.text_field :slug, class: "input mt-1 w-full", placeholder: t("booking.pages.form.slug_placeholder") %>
         <% if booking_page.persisted? %>
-          <p class="text-xs text-ink-faint mt-1">URL: <%= public_booking_page_url(booking_page.slug) %></p>
+          <p class="text-xs text-ink-faint mt-1"><%= t("booking.pages.form.public_url", url: public_booking_page_url(booking_page.slug)) %></p>
         <% end %>
       </div>
       <div>
-        <%= f.label :host_id, "Anfitrión (calendario)", class: "label" %>
+        <%= f.label :host_id, t("booking.pages.form.host"), class: "label" %>
         <%= f.collection_select :host_id, @hosts, :id, :name, {},
               class: "input mt-1 w-full",
               data: {
                 booking_page_form_target: "hostSelect",
                 action: "change->booking-page-form#hostChanged"
               } %>
-        <p class="text-xs text-ink-faint mt-1">Debe tener Google Calendar conectado para consultar disponibilidad y crear citas.</p>
+        <p class="text-xs text-ink-faint mt-1"><%= t("booking.pages.form.host_calendar_hint") %></p>
       </div>
       <div>
-        <%= f.label :pipeline_id, "Pipeline CRM", class: "label" %>
+        <%= f.label :pipeline_id, t("booking.pages.form.crm_pipeline"), class: "label" %>
         <%= f.collection_select :pipeline_id, @pipelines, :id, :name, {}, class: "input mt-1 w-full" %>
       </div>
       <div>
         <%= f.label :reuse_existing_deal, class: "inline-flex items-center gap-2" do %>
           <%= f.check_box :reuse_existing_deal %>
-          <span>Reutilizar deal existente</span>
+          <span><%= t("booking.pages.form.reuse_deal") %></span>
         <% end %>
-        <p class="text-xs text-ink-faint mt-1">Si la persona ya tiene un deal en la primera etapa de este pipeline, la reserva se asocia a ese deal; si no, se crea uno nuevo.</p>
+        <p class="text-xs text-ink-faint mt-1"><%= t("booking.pages.form.reuse_deal_hint") %></p>
       </div>
       <div>
-        <%= f.label :welcome_message, "Mensaje de bienvenida", class: "label" %>
+        <%= f.label :welcome_message, t("booking.pages.form.welcome_message"), class: "label" %>
         <%= f.text_area :welcome_message, rows: 2, class: "input mt-1 w-full" %>
       </div>
       <div class="grid gap-4 sm:grid-cols-2">
         <div>
-          <%= f.label :avatar_url, "Avatar URL", class: "label" %>
+          <%= f.label :avatar_url, t("booking.pages.form.avatar_url"), class: "label" %>
           <%= f.url_field :avatar_url, class: "input mt-1 w-full" %>
         </div>
         <div>
-          <%= f.label :logo_url, "Logo URL", class: "label" %>
+          <%= f.label :logo_url, t("booking.pages.form.logo_url"), class: "label" %>
           <%= f.url_field :logo_url, class: "input mt-1 w-full" %>
         </div>
       </div>
       <div class="grid gap-4 sm:grid-cols-2">
         <div>
-          <%= f.label :timezone, "Zona horaria", class: "label" %>
+          <%= f.label :timezone, t("booking.pages.form.timezone"), class: "label" %>
           <%= f.select :timezone, booking_timezone_options(booking_page.timezone), {}, class: "input mt-1 w-full" %>
-          <p class="mt-1 text-sm text-ink-faint">Las franjas de cada tipo de evento se interpretan en esta zona. Quien reserva ve los huecos convertidos a la suya; el evento en Google Calendar es el mismo instante.</p>
+          <p class="mt-1 text-sm text-ink-faint"><%= t("booking.pages.form.timezone_hint") %></p>
         </div>
         <div>
-          <%= f.label :booking_window_days, "Ventana de reserva (días)", class: "label" %>
+          <%= f.label :booking_window_days, t("booking.pages.form.booking_window_days"), class: "label" %>
           <%= f.number_field :booking_window_days, min: 1, class: "input mt-1 w-full" %>
         </div>
       </div>
       <div>
-        <p class="label">Calendarios</p>
-        <p class="text-xs text-ink-faint mb-2">Marca los calendarios donde comprobar disponibilidad y arrastra para ordenarlos. Las nuevas citas se crean en el primero marcado con permiso de escritura.</p>
+        <p class="label"><%= t("booking.pages.form.calendar_section") %></p>
+        <p class="text-xs text-ink-faint mb-2"><%= t("booking.pages.form.calendar_order_hint") %></p>
         <div data-booking-page-form-target="calendarError"
              class="hidden text-sm text-red-600 mb-2"></div>
         <% if @calendars_load_error.present? %>
           <p class="text-sm text-red-600 mb-2">
             <%= @calendars_load_error %>
             <% if @calendars_load_error_code == :api_disabled && @calendars_load_help_url.present? %>
-              <%= link_to "Activar Google Calendar API", @calendars_load_help_url, class: "text-accent hover:underline ml-1", target: "_blank", rel: "noopener" %>
+              <%= link_to t("booking.pages.form.calendar_activate_api"), @calendars_load_help_url, class: "text-accent hover:underline ml-1", target: "_blank", rel: "noopener" %>
             <% elsif @host_calendar_connection&.user_id == current_user.id && @calendars_load_error_code != :api_disabled %>
-              <%= link_to "Reconectar Google Calendar", calendar_connection_path, class: "text-accent hover:underline ml-1" %>
+              <%= link_to t("booking.pages.form.calendar_reconnect"), calendar_connection_path, class: "text-accent hover:underline ml-1" %>
             <% end %>
           </p>
         <% elsif @host_calendar_connection&.connected? && @host_calendar_connection.missing_scopes_message %>
           <p class="text-sm text-golden-800 bg-golden-100 rounded-md px-3 py-2 mb-2">
             <%= @host_calendar_connection.missing_scopes_message %>
             <% if @host_calendar_connection.user_id == current_user.id %>
-              <%= link_to "Reconectar Google Calendar", calendar_connection_path, class: "text-accent hover:underline ml-1" %>
+              <%= link_to t("booking.pages.form.calendar_reconnect"), calendar_connection_path, class: "text-accent hover:underline ml-1" %>
             <% end %>
           </p>
         <% elsif @host_calendar_connection.blank? || !@host_calendar_connection.connected? %>
           <p class="text-sm text-ink-soft mb-2">
-            El anfitrión no tiene Google Calendar conectado.
-            <%= link_to "Conectar ahora", calendar_connection_path, class: "text-accent hover:underline" %>
+            <%= t("booking.pages.form.host_not_connected") %>
+            <%= link_to t("booking.pages.form.connect_calendar_now"), calendar_connection_path, class: "text-accent hover:underline" %>
           </p>
         <% end %>
         <div data-booking-page-form-target="calendarList"></div>
         <div data-booking-page-form-target="calendarIdsInputs"></div>
         <p data-booking-page-form-target="calendarHint"
            class="text-xs text-ink-faint mt-2 <%= "hidden" if @available_calendars.blank? %>">
-          Arrastra el asa para cambiar el orden. El badge «Recibe nuevas citas» indica dónde se crearán los eventos.
+          <%= t("booking.pages.form.calendar_hint") %>
         </p>
       </div>
       <div>
         <%= f.label :active, class: "inline-flex items-center gap-2" do %>
           <%= f.check_box :active %>
-          <span>Página activa</span>
+          <span><%= t("booking.pages.form.active_page") %></span>
         <% end %>
       </div>
     </div>
@@ -119,11 +120,11 @@
     <div class="card p-6 space-y-4 min-w-0" data-controller="nested-form sortable-list" data-action="nested-form:changed->sortable-list#refresh">
       <div class="flex items-center justify-between gap-2">
         <div>
-          <h2 class="font-display text-lg font-semibold">Tipos de evento</h2>
-          <p class="text-xs text-ink-faint mt-1">Arrastra para cambiar el orden. Pulsa una tarjeta para editarla.</p>
+          <h2 class="font-display text-lg font-semibold"><%= t("booking.pages.form.event_types") %></h2>
+          <p class="text-xs text-ink-faint mt-1"><%= t("booking.pages.form.event_types_hint") %></p>
         </div>
         <button type="button" data-action="nested-form#add" class="btn-secondary shrink-0">
-          <%= icon :plus, classes: "size-3.5" %> Añadir tipo
+          <%= icon :plus, classes: "size-3.5" %> <%= t("booking.pages.event_type.add_type") %>
         </button>
       </div>
       <div data-nested-form-target="list" data-sortable-list-target="list" class="space-y-2">
@@ -142,7 +143,7 @@
   </div>
 
   <div class="sticky bottom-0 z-10 -mx-5 px-5 py-3 bg-canvas/95 backdrop-blur-sm border-t border-line flex gap-2">
-    <%= f.submit booking_page.persisted? ? "Guardar" : "Crear", class: "btn-primary" %>
-    <%= link_to "Cancelar", booking_pages_path, class: "btn-secondary" %>
+    <%= f.submit booking_page.persisted? ? t("booking.pages.form.submit_update") : t("booking.pages.form.submit_create"), class: "btn-primary" %>
+    <%= link_to t("booking.pages.form.cancel"), booking_pages_path, class: "btn-secondary" %>
   </div>
 <% end %>

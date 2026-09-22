@@ -1,10 +1,10 @@
-<% page_title "Lists" %>
+<% page_title t("integrations.lists.page_title") %>
 <% actions = capture do %>
   <%= link_to new_list_path, class: "btn-primary" do %>
-    <%= icon :plus, classes: "size-3.5" %> New list
+    <%= icon :plus, classes: "size-3.5" %> <%= t("integrations.lists.new") %>
   <% end %>
 <% end %>
-<%= render "shared/page_header", title: "Lists", icon_name: :list, count: @lists.size, actions: actions %>
+<%= render "shared/page_header", title: t("integrations.lists.title"), icon_name: :list, count: @lists.size, actions: actions %>
 
 <div class="flex-1 overflow-y-auto scrollbar-subtle p-5">
   <% if @lists.any? %>
@@ -16,7 +16,8 @@
             <span class="font-medium text-base"><%= list.name %></span>
           </div>
           <p class="text-sm text-ink-faint">
-            <%= pluralize(list.list_entries.size, list.record_type.downcase) %>
+            <%= t("integrations.lists.entry_count", count: list.list_entries.size,
+                  type: t("integrations.lists.record_types.#{list.record_type.downcase}")) %>
           </p>
         <% end %>
       <% end %>
@@ -24,11 +25,11 @@
   <% else %>
     <% action = capture do %>
       <%= link_to new_list_path, class: "btn-primary" do %>
-        <%= icon :plus, classes: "size-3.5" %> New list
+        <%= icon :plus, classes: "size-3.5" %> <%= t("integrations.lists.new_list") %>
       <% end %>
     <% end %>
-    <%= render "shared/empty_state", icon_name: :list, title: "No lists yet",
-          subtitle: "Lists let you group people, companies or deals for campaigns, segments or anything else.",
+    <%= render "shared/empty_state", icon_name: :list, title: t("integrations.lists.empty_title"),
+          subtitle: t("integrations.lists.empty_subtitle"),
           action: action %>
   <% end %>
 </div>

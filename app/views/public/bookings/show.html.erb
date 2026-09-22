@@ -8,17 +8,18 @@
      data-booking-availability-url-value="<%= public_booking_api_availability_path(@booking_page.slug) %>"
      data-booking-book-url-value="<%= public_booking_api_book_path(@booking_page.slug) %>"
      data-booking-timestamp-value="<%= BookingPage.signed_timestamp %>"
+     data-booking-copy-value="<%= public_booking_stimulus_copy_json %>"
      <% if @event_type.present? %>data-booking-event-type-value="<%= @event_type.slug %>"<% end %>>
   <div class="public-booking-shell">
     <header class="public-booking-hero">
       <div data-booking-target="profile" class="public-booking-profile min-w-0 flex-1"></div>
-      <div class="public-booking-locale shrink-0" role="group" aria-label="Language">
+      <div class="public-booking-locale shrink-0" role="group" aria-label="<%= t("booking.public_ui.aria.language") %>">
         <button type="button" data-action="booking#setLocale" data-locale="es" data-booking-target="localeEs" class="public-booking-locale-btn">ES</button>
         <button type="button" data-action="booking#setLocale" data-locale="en" data-booking-target="localeEn" class="public-booking-locale-btn">EN</button>
       </div>
     </header>
 
-    <nav data-booking-target="progress" class="public-booking-progress" aria-label="Booking steps">
+    <nav data-booking-target="progress" class="public-booking-progress" aria-label="<%= t("booking.public_ui.aria.booking_steps") %>">
       <ol class="public-booking-progress-list">
         <li data-booking-target="progressEvent" class="public-booking-progress-step" data-step="eventTypes">
           <span class="public-booking-progress-number">1</span>
@@ -50,9 +51,9 @@
         <div class="public-booking-two-col public-booking-two-col--schedule">
           <div class="public-booking-calendar-panel">
             <div class="public-booking-month-nav">
-              <button type="button" data-action="booking#prevMonth" class="public-booking-month-btn" aria-label="Previous month">&larr;</button>
+              <button type="button" data-action="booking#prevMonth" class="public-booking-month-btn" aria-label="<%= t("booking.public_ui.aria.previous_month") %>">&larr;</button>
               <h2 class="public-booking-month-label" data-booking-target="monthLabel"></h2>
-              <button type="button" data-action="booking#nextMonth" class="public-booking-month-btn" aria-label="Next month">&rarr;</button>
+              <button type="button" data-action="booking#nextMonth" class="public-booking-month-btn" aria-label="<%= t("booking.public_ui.aria.next_month") %>">&rarr;</button>
             </div>
             <div data-booking-target="calendarGrid" class="public-booking-calendar"></div>
             <p data-booking-target="scheduleError" class="public-booking-alert hidden"></p>

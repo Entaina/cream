@@ -1,90 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
 
-const COPY = {
-  es: {
-    chooseEvent: "Elige un tipo de reunión",
-    stepEvent: "Tipo",
-    stepSchedule: "Fecha",
-    stepDetails: "Datos",
-    backToTypes: "← Volver a tipos de evento",
-    backToSchedule: "← Volver al calendario",
-    timezone: "Zona horaria",
-    availableSlots: "Horarios disponibles",
-    availableSlotsInZone: "Horarios disponibles (%{timezone})",
-    next: "Siguiente",
-    firstName: "Nombre",
-    lastName: "Apellidos",
-    email: "Email",
-    phone: "Teléfono (opcional)",
-    message: "¿De qué quieres que hablemos?",
-    addGuests: "Añadir invitados",
-    guest: "Invitado",
-    schedule: "Programar evento",
-    scheduling: "Programando…",
-    confirmed: "¡Reunión programada!",
-    reminderNotice: "Te enviaremos un recordatorio por email %{minutes} minutos antes de la reunión.",
-    confirmationEmailNotice: "Te hemos enviado un email de confirmación a %{email}.",
-    meetLink: "Enlace de Google Meet",
-    location: "Ubicación",
-    downloadIcs: "Descargar .ics",
-    bookAnother: "Agendar otra reunión",
-    attendeeDetails: "Datos del asistente",
-    guestsLabel: "Invitados",
-    minutes: "min",
-    slotTaken: "Ese horario ya no está disponible. Elige otro.",
-    calendarUnavailable: "No se pudo consultar la disponibilidad del calendario.",
-    calendarEstimated: "Mostrando horarios según la agenda configurada. Google Calendar no respondió; algunos huecos pueden estar ocupados.",
-    loadingAvailability: "Consultando disponibilidad…",
-    noSlots: "No hay horarios disponibles este día.",
-    doNotFill: "No rellenar",
-    enableCalendarApi: "Activar Google Calendar API",
-    genericError: "Ha ocurrido un error. Inténtalo de nuevo.",
-    scheduleSummary: "%{datetime} (%{timezone})",
-    weekdays: [ "L", "M", "X", "J", "V", "S", "D" ]
-  },
-  en: {
-    chooseEvent: "Choose an event type",
-    stepEvent: "Type",
-    stepSchedule: "Date",
-    stepDetails: "Details",
-    backToTypes: "← Back to event types",
-    backToSchedule: "← Back to calendar",
-    timezone: "Timezone",
-    availableSlots: "Available times",
-    availableSlotsInZone: "Available times (%{timezone})",
-    next: "Next",
-    firstName: "First name",
-    lastName: "Last name",
-    email: "Email",
-    phone: "Phone (optional)",
-    message: "What would you like to discuss?",
-    addGuests: "Add guests",
-    guest: "Guest",
-    schedule: "Schedule event",
-    scheduling: "Scheduling…",
-    confirmed: "Event scheduled!",
-    reminderNotice: "We will send you an email reminder %{minutes} minutes before the meeting.",
-    confirmationEmailNotice: "We have sent a confirmation email to %{email}.",
-    meetLink: "Google Meet link",
-    location: "Location",
-    downloadIcs: "Download .ics",
-    bookAnother: "Schedule another meeting",
-    attendeeDetails: "Attendee details",
-    guestsLabel: "Guests",
-    minutes: "min",
-    slotTaken: "That time is no longer available. Please choose another.",
-    calendarUnavailable: "Could not load calendar availability.",
-    calendarEstimated: "Showing times from the configured schedule. Google Calendar did not respond; some slots may already be booked.",
-    loadingAvailability: "Loading availability…",
-    noSlots: "No available times on this day.",
-    doNotFill: "Do not fill",
-    enableCalendarApi: "Enable Google Calendar API",
-    genericError: "Something went wrong. Please try again.",
-    scheduleSummary: "%{datetime} (%{timezone})",
-    weekdays: [ "M", "T", "W", "T", "F", "S", "S" ]
-  }
-}
-
 const LOCATION_ICONS = {
   google_meet: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg>`,
   physical: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>`,
@@ -113,7 +28,8 @@ export default class extends Controller {
     eventTypesUrl: String,
     availabilityUrl: String,
     bookUrl: String,
-    timestamp: String
+    timestamp: String,
+    copy: Object
   }
 
   connect() {
@@ -216,7 +132,7 @@ export default class extends Controller {
   }
 
   applyCopy() {
-    this.copy = COPY[this.localeValue] || COPY.es
+    this.copy = this.localeCopy()
     this.headingChooseTarget.textContent = this.copy.chooseEvent
     this.backToTypesLabelTarget.textContent = this.copy.backToTypes
     this.backToScheduleLabelTarget.textContent = this.copy.backToSchedule
@@ -916,5 +832,10 @@ export default class extends Controller {
       green: "border-green-500",
       blue: "border-blue-500"
     }[color] || "border-accent"
+  }
+
+  localeCopy() {
+    const bundles = this.copyValue || {}
+    return bundles[this.localeValue] || bundles.es || {}
   }
 }

@@ -12,7 +12,8 @@ export default class extends Controller {
     selectedIds: Array,
     calendars: Array,
     calendarsError: String,
-    hostConnected: Boolean
+    hostConnected: Boolean,
+    i18n: Object
   }
 
   connect() {
@@ -40,7 +41,7 @@ export default class extends Controller {
     const hostId = this.hostSelectTarget.value
     if (!hostId) return
 
-    this.calendarListTarget.innerHTML = `<p class="text-sm text-ink-faint">Cargando calendarios…</p>`
+    this.calendarListTarget.innerHTML = `<p class="text-sm text-ink-faint">${this.escape(this.t("loading_calendars"))}</p>`
     this.clearCalendarIdsInputs()
     this.hideError()
 
@@ -71,7 +72,7 @@ export default class extends Controller {
   renderCalendars(calendars, selectedIds) {
     if (!calendars?.length) {
       if (this.hostConnectedValue) {
-        this.renderUnavailable("load_failed", "No se encontraron calendarios en la cuenta conectada.")
+        this.renderUnavailable("load_failed", this.t("no_calendars_found"))
       } else {
         this.renderUnavailable("not_connected")
       }
@@ -90,10 +91,10 @@ export default class extends Controller {
   }
 
   calendarRowHtml(calendar, checked) {
-    const primary = calendar.primary ? `<span class="text-xs text-ink-faint">(principal)</span>` : ""
+    const primary = calendar.primary ? `<span class="text-xs text-ink-faint">${this.escape(this.t("calendar_primary"))}</span>` : ""
     const access = calendar.writable
-      ? `<span class="text-xs text-ink-faint">· escritura</span>`
-      : `<span class="text-xs text-ink-faint">· solo lectura</span>`
+      ? `<span class="text-xs text-ink-faint">${this.escape(this.t("calendar_writable"))}</span>`
+      : `<span class="text-xs text-ink-faint">${this.escape(this.t("calendar_readonly"))}</span>`
 
     return `
       <div class="flex items-start gap-2 rounded-md border border-line px-2 py-2 hover:bg-canvas-sunken bg-canvas-raised"
@@ -102,8 +103,8 @@ export default class extends Controller {
            data-calendar-writable="${calendar.writable ? "true" : "false"}">
         <span role="button" tabindex="-1"
               class="cursor-grab active:cursor-grabbing text-ink-faint hover:text-ink-soft p-1.5 touch-none select-none shrink-0 mt-0.5"
-              title="Arrastrar para reordenar"
-              aria-label="Reordenar calendario"
+              title="${this.escape(this.t("calendar_drag_title"))}"
+              aria-label="${this.escape(this.t("calendar_drag_aria"))}"
               data-action="pointerdown->booking-page-form#calendarDragStart">
           ${GRIP_ICON}
         </span>
@@ -118,7 +119,7 @@ export default class extends Controller {
             ${access}
             <span data-booking-page-form-target="eventCalendarBadge"
                   class="hidden ml-1 inline-flex items-center rounded-full bg-green-100 px-1.5 py-0.5 text-xs font-medium text-green-800 ring-1 ring-inset ring-green-200 dark:bg-green-900 dark:text-green-200 dark:ring-green-800">
-              Recibe nuevas citas
+              ${this.escape(this.t("event_calendar_badge"))}
             </span>
           </span>
         </label>
@@ -250,15 +251,17 @@ export default class extends Controller {
     this.clearCalendarIdsInputs()
     this.calendarHintTarget.classList.add("hidden")
 
-    const message = customMessage || {
-      not_connected: "El anfitrión seleccionado no tiene Google Calendar conectado.",
-      insufficient_scopes: "El anfitrión necesita actualizar los permisos de Google Calendar.",
-      load_failed: "No se pudieron cargar los calendarios. Inténtalo de nuevo.",
-      api_disabled: "La API de Google Calendar no está activada en el proyecto OAuth de Google Cloud."
-    }[errorKey] || "No se pudieron cargar los calendarios."
+    const defaults = {
+      not_connected: this.t("not_connected"),
+      insufficient_scopes: this.t("insufficient_scopes"),
+      load_failed: this.t("load_failed"),
+      api_disabled: this.t("api_disabled")
+    }
+
+    const message = customMessage || defaults[errorKey] || this.t("load_failed")
 
     const helpLink = helpUrl
-      ? ` <a href="${this.escape(helpUrl)}" class="text-accent hover:underline" target="_blank" rel="noopener">Activar Google Calendar API</a>`
+      ? ` <a href="${this.escape(helpUrl)}" class="text-accent hover:underline" target="_blank" rel="noopener">${this.escape(this.t("activate_api_link"))}</a>`
       : ""
 
     this.calendarErrorTarget.innerHTML = `${this.escape(message)}${helpLink}`
@@ -279,6 +282,10 @@ export default class extends Controller {
   hideError() {
     this.calendarErrorTarget.textContent = ""
     this.calendarErrorTarget.classList.add("hidden")
+  }
+
+  t(key) {
+    return this.i18nValue?.[key] || key
   }
 
   escape(text) {

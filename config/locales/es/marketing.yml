@@ -2,21 +2,22 @@
 es:
   marketing:
     attribution:
-      page_title: Atribución
+      col_channel: Canal (source)
+      col_deals: Deals
+      col_leads: Leads
+      col_mql: MQL
+      col_revenue: Ingresos
+      col_visits: Visitas
+      empty_subtitle: Cuando haya visitas, leads o deals con parámetros UTM, aparecerán
+        aquí agrupados por canal.
+      empty_title: Sin datos de atribución
+      filter: Filtrar
       header_title: Atribución de marketing
+      page_title: Atribución
       period: Periodo
       period_month: Mes actual
       period_quarter: Trimestre
       period_year: Año
-      filter: Filtrar
-      empty_title: Sin datos de atribución
-      empty_subtitle: Cuando haya visitas, leads o deals con parámetros UTM, aparecerán aquí agrupados por canal.
-      col_channel: Canal (source)
-      col_visits: Visitas
-      col_leads: Leads
-      col_mql: MQL
-      col_deals: Deals
-      col_revenue: Ingresos
       total: Total
     automations:
       edit:
@@ -71,7 +72,11 @@ es:
         view: Ver campaña
       form:
         create: Crear campaña
+        email_content_hint: Redacta el envío de esta campaña o elige una plantilla
+          como base. El contenido se guarda en la campaña, no como plantilla global.
+        email_content_legend: Contenido del email
         goal: Objetivo
+        goal_hint: Describe brevemente qué quieres conseguir con esta campaña.
         goal_placeholder: Generar leads cualificados para el producto X
         name: Nombre
         name_placeholder: Newsletter marzo
@@ -79,14 +84,12 @@ es:
         status: Estado
         utm_campaign: UTM campaign
         utm_content: UTM content
+        utm_hint: Se añaden automáticamente a los enlaces de la campaña para medir
+          atribución.
+        utm_legend: Parámetros UTM
         utm_medium: UTM medium
         utm_source: UTM source
         utm_term: UTM term
-        goal_hint: Describe brevemente qué quieres conseguir con esta campaña.
-        email_content_legend: Contenido del email
-        email_content_hint: Redacta el envío de esta campaña o elige una plantilla como base. El contenido se guarda en la campaña, no como plantilla global.
-        utm_legend: Parámetros UTM
-        utm_hint: Se añaden automáticamente a los enlaces de la campaña para medir atribución.
       index:
         delete_confirm: "¿Eliminar la campaña «%{name}»?"
         empty_subtitle: Crea una campaña para enviar emails a segmentos, hacer pruebas
@@ -203,12 +206,16 @@ es:
         any_page: Cualquier página
         booking_page: Página de reservas
         create: Crear recorrido
+        email_clicked_hint: Se activa cuando el contacto hace clic en un enlace de
+          email de marketing.
         email_link_contains: URL del enlace (contiene)
         entry_condition_legend: Condición de entrada
         entry_trigger: Disparador de entrada
         lead_form: Formulario de captación
         lifecycle_from: Ciclo de vida anterior
         lifecycle_to: Ciclo de vida nuevo
+        manual_entry_hint: Las inscripciones manuales se hacen desde la ficha del
+          recorrido.
         max_reenrollments: Reinscripciones máximas
         max_reenrollments_hint: 0 = solo una vez por contacto.
         name_placeholder: Bienvenida nuevos leads
@@ -216,15 +223,13 @@ es:
         segment: Segmento
         select_segment: Selecciona segmento
         steps_legend: Pasos
-        steps_timing_hint: Los pasos se ejecutan en orden y de inmediato en cuanto el
-          contacto entra (o termina una espera), en ciclos de 10 minutos, a cualquier
-          hora y cualquier día de la semana. Para controlar cuándo sale un email, pon
-          un paso «Esperar» justo antes, con «Hasta las» y «Solo días laborables» si
-          quieres fijar hora y día. Las horas se muestran en tu zona horaria; el
+        steps_timing_hint: Los pasos se ejecutan en orden y de inmediato en cuanto
+          el contacto entra (o termina una espera), en ciclos de 10 minutos, a cualquier
+          hora y cualquier día de la semana. Para controlar cuándo sale un email,
+          pon un paso «Esperar» justo antes, con «Hasta las» y «Solo días laborables»
+          si quieres fijar hora y día. Las horas se muestran en tu zona horaria; el
           workspace usa %{time_zone}.
         stop_on_open_deal: Salir del recorrido si hay oportunidad abierta del producto
-        manual_entry_hint: Las inscripciones manuales se hacen desde la ficha del recorrido.
-        email_clicked_hint: Se activa cuando el contacto hace clic en un enlace de email de marketing.
       index:
         delete_confirm: "¿Eliminar el recorrido «%{name}»?"
         empty_subtitle: Automatiza secuencias de emails, esperas y tareas cuando se
@@ -236,12 +241,21 @@ es:
         page_title: Nuevo recorrido
       show:
         col_contact: Contacto
+        col_current_step: Paso actual
+        col_enrolled_at: Inscrito
+        col_move_step: Cambiar paso
+        col_next_run: Próxima ejecución
         col_started: Inicio
         col_state: Estado
         col_step: Paso
         contact: Contacto
         delete_confirm: "¿Eliminar el recorrido «%{name}»?"
+        inactive_step_suffix: " (inactivo)"
         manual_enroll_heading: Inscribir contacto manualmente
+        move: Mover
+        move_confirm: "¿Mover a %{name} a este paso? El recorrido continuará desde
+          ahí y ejecutará ese paso."
+        no_enrollments: Nadie inscrito todavía.
         no_steps: Sin pasos configurados.
         recent_enrollments: Inscripciones recientes
         stat_active: Activas
@@ -250,14 +264,6 @@ es:
         stat_waiting: En espera
         steps_heading: Pasos del recorrido
         trigger: 'Disparador:'
-        col_current_step: Paso actual
-        col_next_run: Próxima ejecución
-        col_enrolled_at: Inscrito
-        col_move_step: Cambiar paso
-        move: Mover
-        move_confirm: "¿Mover a %{name} a este paso? El recorrido continuará desde ahí y ejecutará ese paso."
-        no_enrollments: Nadie inscrito todavía.
-        inactive_step_suffix: " (inactivo)"
       step_fields:
         branch_false: Si no cumple → paso (ID)
         branch_hint: Evalúa una condición sobre el contacto y salta al paso indicado.
@@ -280,94 +286,188 @@ es:
         task_title_placeholder: Seguimiento comercial
         wait_minutes: Esperar (minutos)
         wait_minutes_hint: Cuenta desde que el contacto llega a este paso. El siguiente
-          paso se ejecuta al cumplirse la espera, en el siguiente ciclo del motor (hasta
-          10 minutos después). 60 = 1 hora, 1440 = 1 día, 10080 = 1 semana. Puede ser
-          0 si indicas una hora.
+          paso se ejecuta al cumplirse la espera, en el siguiente ciclo del motor
+          (hasta 10 minutos después). 60 = 1 hora, 1440 = 1 día, 10080 = 1 semana.
+          Puede ser 0 si indicas una hora.
         wait_until_time: Hasta las (hora)
-        wait_until_time_hint: Opcional. Tras la espera, retiene al contacto hasta la
-          próxima vez que el reloj marque esa hora en la zona del workspace (%{time_zone}).
-          Ej. 1440 + 10:00 = mañana a las 10:00; 0 + 09:30 = hoy a las 09:30 si aún no
-          han pasado, o mañana.
-        wait_until_time_invalid: la hora de «Esperar hasta las» debe tener formato HH:MM.
+        wait_until_time_hint: Opcional. Tras la espera, retiene al contacto hasta
+          la próxima vez que el reloj marque esa hora en la zona del workspace (%{time_zone}).
+          Ej. 1440 + 10:00 = mañana a las 10:00; 0 + 09:30 = hoy a las 09:30 si aún
+          no han pasado, o mañana.
+        wait_until_time_invalid: la hora de «Esperar hasta las» debe tener formato
+          HH:MM.
         wait_weekdays_only: Solo días laborables (lunes a viernes)
-        wait_weekdays_only_hint: Si el resultado cae en sábado o domingo, se pasa al
-          lunes a la misma hora.
+        wait_weekdays_only_hint: Si el resultado cae en sábado o domingo, se pasa
+          al lunes a la misma hora.
     lead_form_templates:
       edit:
         page_title: Editar plantilla de formulario
-      index:
-        page_title: Plantillas de formularios públicos
-        back_to_forms: Volver a formularios
-        new_template: Nueva plantilla
-        filter_all: Todas
-        filter_view: Páginas
-        filter_partial: Parciales
-        empty_all: Todavía no hay plantillas en este workspace.
-        empty_kind: No hay plantillas de este tipo.
-        badge_partial: Parcial
-        badge_page: Página
-        preview: Vista previa
-        delete_confirm: "¿Eliminar la plantilla «%{name}»?"
-      new:
-        page_title: Nueva plantilla de formulario
       form:
+        body: Contenido Liquid
+        body_hint: Usa etiquetas como {% field ... %}, {% partial 'nombre' %}, {%
+          form_open %} y variables {{ lead_form.name }}.
+        kind: Tipo
+        kind_form: Formulario de lead
+        kind_page: Landing page (/p/:slug)
+        page_slug: Slug público (solo landing)
+        page_slug_hint: 'URL pública:'
+        page_slug_placeholder: mi-landing
+        partial_checkbox: Es un parcial (partial)
+        preview_button: Vista previa
+        save: Guardar
+        slug_hint_html: Identificador de la plantilla (p. ej. <code class="font-mono">contacto</code>,
+          <code class="font-mono">contact_fields</code>). Se usa en el selector de
+          formularios y en <code class="font-mono">{% partial 'nombre' %}</code>.
         slug_label: Nombre
         slug_placeholder: contacto
-        slug_hint_html: 'Identificador de la plantilla (p. ej. <code class="font-mono">contacto</code>, <code class="font-mono">contact_fields</code>). Se usa en el selector de formularios y en <code class="font-mono">{% partial ''nombre'' %}</code>.'
-        partial_checkbox: Es un parcial (partial)
-        kind: Tipo
-        kind_page: Landing page (/p/:slug)
-        kind_form: Formulario de lead
-        page_slug: Slug público (solo landing)
-        page_slug_placeholder: mi-landing
-        page_slug_hint: "URL pública:"
-        body: Contenido Liquid
-        body_hint: 'Usa etiquetas como {% field ... %}, {% partial ''nombre'' %}, {% form_open %} y variables {{ lead_form.name }}.'
-        save: Guardar
-        preview_button: Vista previa
-      submission_schema:
-        heading: Esquema de validación
-        intro: Campos que el servidor acepta y valida en cada envío. Se recalcula al guardar la plantilla.
-        partial_note: Los parciales no tienen esquema propio; se incluyen al compilar la página de formulario que los importa.
-        empty_note: Todavía no hay esquema compilado. Guarda la plantilla para generarlo a partir del HTML renderizado.
-        fields_badge: "%{count} campos"
-        metadata_badge: "%{count} metadatos"
-        system_fields_summary: Metadatos y campos de sistema (%{count})
-      schema_field:
-        required: Obligatorio
-        optional: Opcional
-        values_label: "Valores:"
-      schema_types:
-        text: Texto
-        email: Email
-        tel: Teléfono
-        textarea: Texto largo
-        select: Select
-        checkbox: Checkbox
-        radio: Radio
-        hidden: Oculto
+      index:
+        back_to_forms: Volver a formularios
+        badge_page: Página
+        badge_partial: Parcial
+        delete_confirm: "¿Eliminar la plantilla «%{name}»?"
+        empty_all: Todavía no hay plantillas en este workspace.
+        empty_kind: No hay plantillas de este tipo.
+        filter_all: Todas
+        filter_partial: Parciales
+        filter_view: Páginas
+        new_template: Nueva plantilla
+        page_title: Plantillas de formularios públicos
+        preview: Vista previa
+      new:
+        page_title: Nueva plantilla de formulario
+      preview:
+        back_to_editor: Volver al editor
+        draft_note: Incluye cambios sin guardar del editor.
+        heading: Vista previa de plantilla
+        intro_html: Estás viendo <strong class="font-mono">%{name}</strong>.
+        no_submit: El formulario no enviará datos reales.
+        product_label: 'Producto:'
+        title: 'Vista previa: %{name}'
+      preview_product:
+        auto_option: Automático (formulario o ejemplo)
+        hint: Opcional. Se usa al abrir la vista previa para probar campos de producto
+          y ediciones.
+        label: Producto para vista previa
       schema_conditions:
         collects_company: Recoger empresa
-        requires_product: Producto configurado
         open_editions: Ediciones abiertas
+        requires_product: Producto configurado
+      schema_field:
+        optional: Opcional
+        required: Obligatorio
+        values_label: 'Valores:'
+      schema_types:
+        checkbox: Checkbox
+        email: Email
+        hidden: Oculto
+        radio: Radio
+        select: Select
+        tel: Teléfono
+        text: Texto
+        textarea: Texto largo
       schema_values:
-        open_editions_dynamic: IDs de ediciones abiertas (en runtime)
         more: "+%{count} más"
-      preview:
-        title: "Vista previa: %{name}"
-        heading: Vista previa de plantilla
-        intro_html: 'Estás viendo <strong class="font-mono">%{name}</strong>.'
-        draft_note: Incluye cambios sin guardar del editor.
-        no_submit: El formulario no enviará datos reales.
-        back_to_editor: Volver al editor
-        product_label: "Producto:"
-      preview_product:
-        label: Producto para vista previa
-        auto_option: Automático (formulario o ejemplo)
-        hint: Opcional. Se usa al abrir la vista previa para probar campos de producto y ediciones.
+        open_editions_dynamic: IDs de ediciones abiertas (en runtime)
+      submission_schema:
+        empty_note: Todavía no hay esquema compilado. Guarda la plantilla para generarlo
+          a partir del HTML renderizado.
+        fields_badge: "%{count} campos"
+        heading: Esquema de validación
+        intro: Campos que el servidor acepta y valida en cada envío. Se recalcula
+          al guardar la plantilla.
+        metadata_badge: "%{count} metadatos"
+        partial_note: Los parciales no tienen esquema propio; se incluyen al compilar
+          la página de formulario que los importa.
+        system_fields_summary: Metadatos y campos de sistema (%{count})
     lead_forms:
       edit:
         page_title: Editar formulario de captación
+      form:
+        add_route: Añadir ruta
+        collects_company: Recoger datos de empresa (nombre y CIF)
+        consent_template_hint_html: 'La plantilla debe incluir un checkbox de marketing
+          con clave <code class="font-mono text-xs">%{key}</code> (p. ej. <code class="font-mono
+          text-xs">{% subscription_opt_in slug: "%{slug}" %}</code>).'
+        consent_template_missing_html: La plantilla «%{template_key}» no incluye ese
+          campo en su esquema de envío. Los visitantes no podrán marcar el consentimiento
+          de marketing.
+        corporate_email_hint: Rechaza Gmail, Hotmail, Yahoo, Outlook y otros correos
+          personales. Úsalo en lead magnets para captar solo empresas.
+        crm_heading: CRM y asignación
+        crm_intro: Pipeline, etapa y responsable de los deals creados desde este formulario
+          (solo destino Deal).
+        default_pipeline: Pipeline por defecto
+        default_pipeline_hint_html: Pipeline por defecto para deals nuevos. Si el
+          formulario envía <code class="text-2xs">help_type</code>, puede enrutarse
+          según la tabla inferior.
+        destination_deal: Deal (ventas)
+        destination_heading: Destino del envío
+        destination_intro: Deal crea o reutiliza una oportunidad. MQL captura la persona
+          y el consentimiento sin crear deal.
+        destination_label: Destino
+        destination_mql: MQL (marketing)
+        email_redirect_heading: Email y redirección
+        email_redirect_intro: Comunicación automática al lead y destino tras el envío.
+        email_template: Plantilla de email al lead
+        email_template_open_aria: Abrir plantilla de email en otra pestaña
+        email_tokens_hint: 'Tokens disponibles: {first_name}, {last_name}, {name},
+          {email}, {company}, {form_name}, {form_slug}, {product}, {edition} y cualquier
+          campo del envío (p. ej. {help_type}, {message}).'
+        email_tokens_tooltip: Tokens disponibles en la plantilla de email
+        first_stage_blank: Primera etapa del pipeline
+        first_task_due_days: Vence en (días desde la creación del deal)
+        first_task_due_hint: Al enviar el formulario y crear el deal, la tarea vence
+          N días después (0 = el mismo día).
+        first_task_heading: Primera tarea
+        first_task_intro: Se crea en cada envío del formulario, también al reutilizar
+          un deal abierto.
+        first_task_title: Texto de la primera tarea
+        hidden_field_keys: Claves adicionales
+        hidden_field_keys_hint: Una clave por línea.
+        hidden_field_keys_placeholder: |-
+          producto
+          landing
+        hidden_fields_heading: Campos ocultos
+        hidden_fields_intro: Parámetros adicionales leídos de la URL pública (p. ej.
+          /f/slug?producto=curso-ia).
+        identity_heading: Identidad
+        identity_intro: Nombre público, URL y plantilla del formulario de captación.
+        marketing_consent_hint: Sobrescribe la etiqueta del checkbox del tipo de suscripción
+          principal en formularios MQL.
+        marketing_consent_text: Texto de permiso de marketing (MQL)
+        no_email_hint: Si eliges «Sin email», no se envía correo automático al lead
+          tras el envío.
+        pipeline_routes_heading: Pipeline según campo del formulario
+        pipeline_routes_hint_html: Opcional. Si la plantilla envía un campo (p. ej.
+          <code class="text-2xs">help_type</code>), asigna un pipeline distinto por
+          <strong>valor</strong> del POST. Las claves deben coincidir con los <code
+          class="text-2xs">value</code> del atributo <code class="text-2xs">choices:</code>
+          en Liquid.
+        product_hint_html: Si se configura, se envía oculto en el formulario público
+          y se asocia al deal. Puede sobrescribirse con <code class="text-2xs">?product_id=</code>
+          en la URL.
+        product_optional: Producto (opcional)
+        remove_route: Quitar ruta
+        require_corporate_email: Exigir email corporativo
+        responsible: Responsable
+        route_default_pipeline: Usar pipeline por defecto
+        route_field_placeholder: curso
+        route_field_title: Letras minúsculas, números y guiones bajos
+        route_field_value: Valor del campo
+        route_pipeline: Pipeline
+        slug_hint: Se usará en /f/slug. Solo letras minúsculas, números y guiones.
+        slug_label: Slug (URL pública)
+        slug_placeholder: contacto-curso-ia
+        stage: Etapa
+        stage_hint: Opcional. Los deals nuevos se crean en esta etapa; los deals abiertos
+          existentes avanzan hasta ella (nunca retroceden).
+        subscription_default: General (por defecto)
+        subscription_type_mql: Tipo de suscripción (MQL)
+        success_redirect_hint: Opcional. Si se deja vacío, se muestra la página de
+          gracias de Cream (/f/slug/success).
+        success_redirect_placeholder: https://entaina.com/gracias
+        success_redirect_url: URL de redirección tras envío
+        template_key: Plantilla del formulario
       index:
         email_to_lead: Email al lead
         empty: Todavía no hay formularios configurados.
@@ -381,83 +481,23 @@ es:
         templates: Plantillas de formulario
       new:
         page_title: Nuevo formulario de captación
-      form:
-        identity_heading: Identidad
-        identity_intro: Nombre público, URL y plantilla del formulario de captación.
-        slug_label: Slug (URL pública)
-        slug_placeholder: contacto-curso-ia
-        slug_hint: Se usará en /f/slug. Solo letras minúsculas, números y guiones.
-        template_key: Plantilla del formulario
-        collects_company: Recoger datos de empresa (nombre y CIF)
-        require_corporate_email: Exigir email corporativo
-        corporate_email_hint: Rechaza Gmail, Hotmail, Yahoo, Outlook y otros correos personales. Úsalo en lead magnets para captar solo empresas.
-        destination_heading: Destino del envío
-        destination_intro: Deal crea o reutiliza una oportunidad. MQL captura la persona y el consentimiento sin crear deal.
-        destination_label: Destino
-        destination_mql: MQL (marketing)
-        destination_deal: Deal (ventas)
-        subscription_type_mql: Tipo de suscripción (MQL)
-        subscription_default: General (por defecto)
-        marketing_consent_text: Texto de permiso de marketing (MQL)
-        marketing_consent_hint: Sobrescribe la etiqueta del checkbox del tipo de suscripción principal en formularios MQL.
-        consent_template_hint_html: 'La plantilla debe incluir un checkbox de marketing con clave <code class="font-mono text-xs">%{key}</code> (p. ej. <code class="font-mono text-xs">{% subscription_opt_in slug: "%{slug}" %}</code>).'
-        consent_template_missing_html: 'La plantilla «%{template_key}» no incluye ese campo en su esquema de envío. Los visitantes no podrán marcar el consentimiento de marketing.'
-        crm_heading: CRM y asignación
-        crm_intro: Pipeline, etapa y responsable de los deals creados desde este formulario (solo destino Deal).
-        default_pipeline: Pipeline por defecto
-        default_pipeline_hint_html: 'Pipeline por defecto para deals nuevos. Si el formulario envía <code class="text-2xs">help_type</code>, puede enrutarse según la tabla inferior.'
-        stage: Etapa
-        first_stage_blank: Primera etapa del pipeline
-        stage_hint: Opcional. Los deals nuevos se crean en esta etapa; los deals abiertos existentes avanzan hasta ella (nunca retroceden).
-        responsible: Responsable
-        product_optional: Producto (opcional)
-        product_hint_html: 'Si se configura, se envía oculto en el formulario público y se asocia al deal. Puede sobrescribirse con <code class="text-2xs">?product_id=</code> en la URL.'
-        pipeline_routes_heading: Pipeline según campo del formulario
-        pipeline_routes_hint_html: 'Opcional. Si la plantilla envía un campo (p. ej. <code class="text-2xs">help_type</code>), asigna un pipeline distinto por <strong>valor</strong> del POST. Las claves deben coincidir con los <code class="text-2xs">value</code> del atributo <code class="text-2xs">choices:</code> en Liquid.'
-        route_field_value: Valor del campo
-        route_field_title: Letras minúsculas, números y guiones bajos
-        route_field_placeholder: curso
-        route_pipeline: Pipeline
-        route_default_pipeline: Usar pipeline por defecto
-        remove_route: Quitar ruta
-        add_route: Añadir ruta
-        first_task_heading: Primera tarea
-        first_task_intro: Se crea en cada envío del formulario, también al reutilizar un deal abierto.
-        first_task_title: Texto de la primera tarea
-        first_task_due_days: Vence en (días desde la creación del deal)
-        first_task_due_hint: Al enviar el formulario y crear el deal, la tarea vence N días después (0 = el mismo día).
-        email_redirect_heading: Email y redirección
-        email_redirect_intro: Comunicación automática al lead y destino tras el envío.
-        email_template: Plantilla de email al lead
-        email_template_open_aria: Abrir plantilla de email en otra pestaña
-        email_tokens_tooltip: Tokens disponibles en la plantilla de email
-        email_tokens_hint: "Tokens disponibles: {first_name}, {last_name}, {name}, {email}, {company}, {form_name}, {form_slug}, {product}, {edition} y cualquier campo del envío (p. ej. {help_type}, {message})."
-        no_email_hint: Si eliges «Sin email», no se envía correo automático al lead tras el envío.
-        success_redirect_url: URL de redirección tras envío
-        success_redirect_placeholder: https://entaina.com/gracias
-        success_redirect_hint: Opcional. Si se deja vacío, se muestra la página de gracias de Cream (/f/slug/success).
-        hidden_fields_heading: Campos ocultos
-        hidden_fields_intro: Parámetros adicionales leídos de la URL pública (p. ej. /f/slug?producto=curso-ia).
-        hidden_field_keys: Claves adicionales
-        hidden_field_keys_placeholder: "producto\nlanding"
-        hidden_field_keys_hint: Una clave por línea.
       show:
-        destination_mql_badge: Destino MQL
-        destination_deal_badge: Destino Deal
-        mql_captured_heading: MQL captados (%{count} personas)
-        col_person: Persona
-        col_submissions: Envíos
+        col_date: Fecha
+        col_destination: Destino
+        col_eligible_now: Elegible ahora
         col_first_capture: Primera captura
         col_last_capture: Última captura
-        col_eligible_now: Elegible ahora
-        yes: Sí
-        no: "No"
+        col_person: Persona
+        col_submissions: Envíos
+        destination_deal_badge: Destino Deal
+        destination_mql_badge: Destino MQL
+        detail: Detalle
+        'false': 'No'
+        mql_captured_heading: MQL captados (%{count} personas)
         mql_empty: Aún no hay capturas MQL desde este formulario.
         recent_submissions: Envíos recientes
-        col_destination: Destino
-        col_date: Fecha
-        detail: Detalle
         submissions_empty: Sin envíos todavía.
+        'true': Sí
     mqls:
       index:
         col_forms: Formularios
@@ -661,20 +701,24 @@ es:
       edit:
         page_title: Editar tipo de suscripción
       form:
-        slug: Identificador (slug)
-        slug_hint: Solo letras minúsculas, números y guiones. No cambiar en producción.
-        description_placeholder: Novedades mensuales sobre producto y empresa
-        description_hint: Visible para contactos en el centro de preferencias.
-        position: Orden
+        consent_field_hint_html: 'Opcional. Nombre del campo <code class="text-2xs">lead[clave]</code>
+          en plantillas Liquid (<code class="text-2xs">{% subscription_opt_in slug:
+          "…" %}</code>). Debe ser única en el workspace.'
         consent_field_key: Clave del checkbox en formularios
         consent_field_title: Letras minúsculas, números y guiones bajos
-        consent_field_hint_html: 'Opcional. Nombre del campo <code class="text-2xs">lead[clave]</code> en plantillas Liquid (<code class="text-2xs">{% subscription_opt_in slug: "…" %}</code>). Debe ser única en el workspace.'
-        default_consent_label: Texto por defecto del checkbox
-        default_consent_label_placeholder: Quiero recibir la newsletter
-        default_consent_label_hint: Etiqueta mostrada en formularios salvo que la plantilla o el formulario MQL la sobrescriban.
-        exclude_subscribe_all: Excluir de «suscribir a todas»
-        exclude_subscribe_all_hint_html: 'Si está marcado, el tag <code class="text-2xs">subscription_opt_in_all</code> no dará de alta este tipo (sigue disponible con su checkbox individual).'
         create: Crear tipo
+        default_consent_label: Texto por defecto del checkbox
+        default_consent_label_hint: Etiqueta mostrada en formularios salvo que la
+          plantilla o el formulario MQL la sobrescriban.
+        default_consent_label_placeholder: Quiero recibir la newsletter
+        description_hint: Visible para contactos en el centro de preferencias.
+        description_placeholder: Novedades mensuales sobre producto y empresa
+        exclude_subscribe_all: Excluir de «suscribir a todas»
+        exclude_subscribe_all_hint_html: Si está marcado, el tag <code class="text-2xs">subscription_opt_in_all</code>
+          no dará de alta este tipo (sigue disponible con su checkbox individual).
+        position: Orden
+        slug: Identificador (slug)
+        slug_hint: Solo letras minúsculas, números y guiones. No cambiar en producción.
       index:
         delete_confirm: "¿Eliminar el tipo «%{name}»?"
         empty_subtitle: Define categorías de comunicación (newsletter, promociones,

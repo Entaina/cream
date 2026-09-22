@@ -44,4 +44,28 @@ module BookingPagesHelper
   def booking_event_type_color_class(color)
     BOOKING_EVENT_TYPE_COLOR_CLASSES.fetch(color.to_s, "bg-chicago-400")
   end
+
+  def booking_page_form_stimulus_i18n
+    I18n.t("booking.pages.form_js").stringify_keys
+  end
+
+  def booking_weekday_labels
+    BookingEventType::WEEKDAYS.index_with { |day| I18n.t("booking.weekdays.#{day}") }
+  end
+
+  def booking_weekly_hours_stimulus_i18n
+    I18n.t("booking.pages.weekly_hours_js").stringify_keys
+  end
+
+  def public_booking_stimulus_copy_json
+    public_booking_stimulus_copy.to_json
+  end
+
+  def public_booking_stimulus_copy
+    %i[es en].index_with do |locale|
+      copy = I18n.t("booking.public_ui", locale: locale)
+      copy = copy.deep_stringify_keys if copy.respond_to?(:deep_stringify_keys)
+      copy.except("aria")
+    end
+  end
 end

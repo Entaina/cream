@@ -1,13 +1,45 @@
 ---
 es:
   booking:
+    bookings:
+      index:
+        cancel: Cancelar
+        cancel_confirm: "¿Cancelar esta reserva? Se eliminará el evento de Google
+          Calendar y se avisará a los asistentes."
+        empty: Todavía no hay reservas recibidas.
+        fields:
+          deal: Deal
+          email: Email
+          event_type: Tipo de evento
+          page: Página
+          person: Persona
+          starts_at: Fecha y hora
+        page_title: Reservas recibidas
+        pages_link: Páginas de reservas
+        status:
+          cancelled: Cancelada
+          confirmed: Confirmada
+        title: Reservas recibidas
+    colors:
+      blue: Azul
+      chicago: Gris
+      copperfield: Cobre
+      golden: Dorado
+      green: Verde
+      hoki: Azul gris
     display:
       datetime_with_zone: "%{datetime} (%{timezone})"
     errors:
+      availability_params_required: Indica month o date.
       event_type_not_found: Tipo de evento no encontrado.
       invalid_datetime: La fecha u hora seleccionada no es válida.
+      name_i18n_es_required: debe incluir nombre en español
       rate_limited: Demasiadas peticiones. Inténtalo de nuevo en un minuto.
       slot_unavailable: Ese horario ya no está disponible.
+    location_types:
+      google_meet: Google Meet
+      physical: Presencial
+      to_be_decided: A coordinar
     mailer:
       datetime: Fecha y hora
       host_notification:
@@ -26,3 +58,205 @@ es:
         location: Ubicación
         subject: 'Recordatorio: %{event_name} · %{date}'
         time: Hora
+    pages:
+      edit:
+        page_title: Editar página de reservas
+        title: Editar página de reservas
+      event_type:
+        add_type: Añadir tipo
+        availability_section: Disponibilidad y reserva
+        buffer_after: Buffer después (min)
+        buffer_before: Buffer antes (min)
+        copied: Copiado
+        copy_aria: Copiar al portapapeles
+        copy_title: Copiar al portapapeles
+        default_weekly_hours: Horario laboral por defecto
+        description_en: Descripción (EN)
+        description_es: Descripción (ES)
+        direct_url: URL directa del tipo
+        direct_url_hint: Abre el calendario de este tipo sin pasar por la pantalla
+          de selección.
+        duration_min: Duración (min)
+        duration_minutes_abbr: "%{count} min"
+        email_blank: Sin email
+        email_section: Email de confirmación
+        email_template: Plantilla de email al invitado
+        email_tokens_hint: 'Se envía al confirmar la reserva. Tokens disponibles:
+          {first_name}, {last_name}, {name}, {email}, {company}, {event_name}, {date},
+          {time}, {duration}, {timezone}, {location}, {meet_link}.'
+        hidden: Oculto
+        identification_section: Identificación
+        increment: Incremento (min)
+        location_address: Dirección (presencial)
+        location_address_placeholder: Calle, ciudad…
+        location_appearance_section: Ubicación y apariencia
+        location_color: Color en calendario
+        location_type: Tipo de ubicación
+        min_notice: Antelación (h)
+        name_en: Nombre (EN)
+        name_es: Nombre (ES)
+        new_type_summary: Nuevo tipo de evento
+        public_visible: Visible en la página pública
+        reminder: Recordatorio (min antes)
+        reminder_placeholder: 60 (0 = desactivado)
+        remove_type: Eliminar
+        remove_type_title: Eliminar tipo de evento
+        reorder_aria: Reordenar tipo de evento
+        reorder_title: Arrastrar para reordenar
+        slug: Slug (URL)
+        slug_placeholder: consultoria
+        visible: Visible
+        weekly_hours: Franjas horarias semanales
+      form:
+        active_page: Página activa
+        avatar_url: Avatar URL
+        booking_window_days: Ventana de reserva (días)
+        calendar_activate_api: Activar Google Calendar API
+        calendar_drag_aria: Reordenar calendario
+        calendar_drag_title: Arrastrar para reordenar
+        calendar_hint: Arrastra el asa para cambiar el orden. El badge «Recibe nuevas
+          citas» indica dónde se crearán los eventos.
+        calendar_order_hint: Marca los calendarios donde comprobar disponibilidad
+          y arrastra para ordenarlos. Las nuevas citas se crean en el primero marcado
+          con permiso de escritura.
+        calendar_primary: "(principal)"
+        calendar_readonly: "· solo lectura"
+        calendar_reconnect: Reconectar Google Calendar
+        calendar_section: Calendarios
+        calendar_writable: "· escritura"
+        cancel: Cancelar
+        connect_calendar: Conectar Google Calendar
+        connect_calendar_now: Conectar ahora
+        connect_calendar_short: Conectar Google Calendar
+        crm_pipeline: Pipeline CRM
+        event_types: Tipos de evento
+        event_types_hint: Arrastra para cambiar el orden. Pulsa una tarjeta para editarla.
+        host: Anfitrión (calendario)
+        host_calendar_hint: Debe tener Google Calendar conectado para consultar disponibilidad
+          y crear citas.
+        host_not_connected: El anfitrión no tiene Google Calendar conectado.
+        logo_url: Logo URL
+        name: Nombre
+        public_page: Página pública
+        public_url: 'URL: %{url}'
+        reuse_deal: Reutilizar deal existente
+        reuse_deal_hint: Si la persona ya tiene un deal en la primera etapa de este
+          pipeline, la reserva se asocia a ese deal; si no, se crea uno nuevo.
+        slug: Slug (URL)
+        slug_placeholder: alex
+        submit_create: Crear
+        submit_update: Guardar
+        timezone: Zona horaria
+        timezone_hint: Las franjas de cada tipo de evento se interpretan en esta zona.
+          Quien reserva ve los huecos convertidos a la suya; el evento en Google Calendar
+          es el mismo instante.
+        welcome_message: Mensaje de bienvenida
+      form_js:
+        activate_api_link: Activar Google Calendar API
+        api_disabled: La API de Google Calendar no está activada en el proyecto OAuth
+          de Google Cloud.
+        calendar_drag_aria: Reordenar calendario
+        calendar_drag_title: Arrastrar para reordenar
+        calendar_primary: "(principal)"
+        calendar_readonly: "· solo lectura"
+        calendar_writable: "· escritura"
+        event_calendar_badge: Recibe nuevas citas
+        insufficient_scopes: El anfitrión necesita actualizar los permisos de Google
+          Calendar.
+        load_failed: No se pudieron cargar los calendarios. Inténtalo de nuevo.
+        loading_calendars: Cargando calendarios…
+        no_calendars_found: No se encontraron calendarios en la cuenta conectada.
+        not_connected: El anfitrión seleccionado no tiene Google Calendar conectado.
+      index:
+        active: Activa
+        connect_before_publish: Conecta Google Calendar antes de publicar una página.
+        connect_calendar: Conectar Google Calendar
+        direct_type_urls: URLs directas por tipo
+        edit: Editar
+        empty: Todavía no hay páginas de reservas configuradas.
+        fields:
+          event_types: Tipos de evento
+          host: Anfitrión
+          pipeline: Pipeline
+          slug: Slug
+        google_calendar: Google Calendar
+        inactive: Inactiva
+        incomplete: Incompleta
+        new_page: Nueva página
+        page_title: Reservas
+        public_url: URL pública
+        ready: Lista
+        received_bookings: Reservas recibidas
+        remove: Eliminar
+        remove_confirm: "¿Eliminar esta página?"
+        title: Reservas
+      new:
+        page_title: Nueva página de reservas
+        title: Nueva página de reservas
+      weekly_hours_js:
+        remove_window: Quitar franja
+        unavailable: No disponible
+    public_ui:
+      addGuests: Añadir invitados
+      aria:
+        booking_steps: Pasos de la reserva
+        language: Idioma
+        next_month: Mes siguiente
+        previous_month: Mes anterior
+      attendeeDetails: Datos del asistente
+      availableSlots: Horarios disponibles
+      availableSlotsInZone: Horarios disponibles (%{timezone})
+      backToSchedule: "← Volver al calendario"
+      backToTypes: "← Volver a tipos de evento"
+      bookAnother: Agendar otra reunión
+      calendarEstimated: Mostrando horarios según la agenda configurada. Google Calendar
+        no respondió; algunos huecos pueden estar ocupados.
+      calendarUnavailable: No se pudo consultar la disponibilidad del calendario.
+      chooseEvent: Elige un tipo de reunión
+      confirmationEmailNotice: Te hemos enviado un email de confirmación a %{email}.
+      confirmed: "¡Reunión programada!"
+      doNotFill: No rellenar
+      downloadIcs: Descargar .ics
+      email: Email
+      enableCalendarApi: Activar Google Calendar API
+      firstName: Nombre
+      genericError: Ha ocurrido un error. Inténtalo de nuevo.
+      guest: Invitado
+      guestsLabel: Invitados
+      lastName: Apellidos
+      loadingAvailability: Consultando disponibilidad…
+      location: Ubicación
+      meetLink: Enlace de Google Meet
+      message: "¿De qué quieres que hablemos?"
+      minutes: min
+      next: Siguiente
+      noSlots: No hay horarios disponibles este día.
+      phone: Teléfono (opcional)
+      reminderNotice: Te enviaremos un recordatorio por email %{minutes} minutos antes
+        de la reunión.
+      schedule: Programar evento
+      scheduleSummary: "%{datetime} (%{timezone})"
+      scheduling: Programando…
+      slotTaken: Ese horario ya no está disponible. Elige otro.
+      stepDetails: Datos
+      stepEvent: Tipo
+      stepSchedule: Fecha
+      timezone: Zona horaria
+      weekdays:
+      - L
+      - M
+      - X
+      - J
+      - V
+      - S
+      - D
+    warnings:
+      calendar_timeout: Google Calendar no respondió a tiempo.
+    weekdays:
+      friday: Vie
+      monday: Lun
+      saturday: Sáb
+      sunday: Dom
+      thursday: Jue
+      tuesday: Mar
+      wednesday: Mié

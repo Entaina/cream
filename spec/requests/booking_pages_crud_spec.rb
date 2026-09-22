@@ -42,8 +42,17 @@ RSpec.describe "Booking pages CRUD", type: :request do
       get booking_pages_path
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include("URLs directas por tipo")
+      expect(response.body).to include(I18n.t("booking.pages.index.direct_type_urls"))
       expect(response.body).to include("/b/#{booking_page.slug}/video")
+    end
+
+    it "renders in English when the user locale is en" do
+      user.update!(locale: "en")
+      get booking_pages_path
+      expect(response.body).to include(I18n.t("booking.pages.index.direct_type_urls", locale: :en))
+      expect(response.body).not_to include(I18n.t("booking.pages.index.direct_type_urls", locale: :es))
+    ensure
+      user.update!(locale: "es")
     end
   end
 
@@ -76,7 +85,7 @@ RSpec.describe "Booking pages CRUD", type: :request do
       get edit_booking_page_path(booking_page)
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include("URL directa del tipo")
+      expect(response.body).to include(I18n.t("booking.pages.event_type.direct_url"))
       expect(response.body).to include("/b/#{booking_page.slug}/video")
     end
   end

@@ -10,7 +10,7 @@ es:
       page_title: Editar disparador
       title: Editar disparador — %{name}
     errors:
-      param_required: «%{label}» es obligatorio
+      param_required: "«%{label}» es obligatorio"
     execution_modes:
       llm: Agente IA (instrucción en lenguaje natural)
       native: Función nativa (Ruby)
@@ -18,12 +18,12 @@ es:
       active: Activo
       execution_mode: Modo de ejecución
       function: Función
-      function_prompt: — Elegir función —
+      function_prompt: "— Elegir función —"
       instructions: Instrucción
-      instructions_hint: La IA puede consultar el deal, su empresa y contactos (solo lectura)
-        y mostrar toasts, alertas, confirmaciones o un panel dentro del deal.
-      instructions_placeholder: 'Ej.: Resume el estado del deal y muéstralo en el panel.
-        Si el valor supera 10.000 €, avisa con un toast.'
+      instructions_hint: La IA puede consultar el deal, su empresa y contactos (solo
+        lectura) y mostrar toasts, alertas, confirmaciones o un panel dentro del deal.
+      instructions_placeholder: 'Ej.: Resume el estado del deal y muéstralo en el
+        panel. Si el valor supera 10.000 €, avisa con un toast.'
       name: Nombre
       name_placeholder: Avisar al comercial
       submit_create: Crear disparador
@@ -61,7 +61,8 @@ es:
           la etapa.
         label: Checklist de la etapa en el deal
       won_celebration:
-        description: Muestra un toast de felicitación con el nombre y el valor del deal.
+        description: Muestra un toast de felicitación con el nombre y el valor del
+          deal.
         label: Celebración de deal ganado
     native_handlers:
       stage_checklist_panel:
@@ -72,8 +73,8 @@ es:
         task_item: "- %{title}"
         title: Checklist — %{stage}
       won_celebration:
-        message: 🎉 ¡Enhorabuena! «%{name}» ganado
-        message_with_value: 🎉 ¡Enhorabuena! «%{name}» ganado (%{amount})
+        message: "🎉 ¡Enhorabuena! «%{name}» ganado"
+        message_with_value: "🎉 ¡Enhorabuena! «%{name}» ganado (%{amount})"
     new:
       page_title: Nuevo disparador
       title: Nuevo disparador — %{stage}

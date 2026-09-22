@@ -2,21 +2,6 @@ class BookingEventType < ApplicationRecord
   LOCATION_TYPES = %w[google_meet physical to_be_decided].freeze
   COLORS = %w[hoki copperfield golden chicago green blue].freeze
   WEEKDAYS = %w[monday tuesday wednesday thursday friday saturday sunday].freeze
-  LOCATION_TYPE_LABELS = {
-    "google_meet" => "Google Meet",
-    "physical" => "Presencial",
-    "to_be_decided" => "A coordinar"
-  }.freeze
-
-  COLOR_LABELS = {
-    "hoki" => "Azul gris",
-    "copperfield" => "Cobre",
-    "golden" => "Dorado",
-    "chicago" => "Gris",
-    "green" => "Verde",
-    "blue" => "Azul"
-  }.freeze
-
   DEFAULT_WEEKLY_HOURS = {
     "monday" => [["10:00", "14:00"], ["16:30", "20:00"]],
     "tuesday" => [["10:00", "14:00"], ["16:30", "20:00"]],
@@ -68,11 +53,11 @@ class BookingEventType < ApplicationRecord
   end
 
   def self.location_type_label(type)
-    LOCATION_TYPE_LABELS.fetch(type.to_s, type.to_s.humanize)
+    I18n.t("booking.location_types.#{type}", default: type.to_s.humanize)
   end
 
   def self.color_label(color)
-    COLOR_LABELS.fetch(color.to_s, color.to_s.humanize)
+    I18n.t("booking.colors.#{color}", default: color.to_s.humanize)
   end
 
   def localized_name(locale = I18n.locale)
@@ -168,7 +153,7 @@ class BookingEventType < ApplicationRecord
     data = name_i18n.is_a?(Hash) ? name_i18n : {}
     return if data["es"].present?
 
-    errors.add(:name_i18n, "debe incluir nombre en español")
+    errors.add(:name_i18n, I18n.t("booking.errors.name_i18n_es_required"))
   end
 
   def fetch_i18n(hash, locale)

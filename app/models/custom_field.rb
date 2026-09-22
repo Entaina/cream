@@ -67,11 +67,11 @@ class CustomField < ApplicationRecord
   end
 
   def field_type_label
-    field_type.humanize
+    I18n.t("integrations.custom_fields.field_types.#{field_type}", default: field_type.humanize)
   end
 
   def record_type_label
-    record_type
+    I18n.t("integrations.custom_fields.record_types.#{record_type}", default: record_type)
   end
 
   private

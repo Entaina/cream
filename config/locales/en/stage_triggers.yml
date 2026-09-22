@@ -10,7 +10,7 @@ en:
       page_title: Edit trigger
       title: Edit trigger — %{name}
     errors:
-      param_required: «%{label}» is required
+      param_required: "«%{label}» is required"
     execution_modes:
       llm: AI agent (natural language instruction)
       native: Native function (Ruby)
@@ -18,12 +18,12 @@ en:
       active: Active
       execution_mode: Execution mode
       function: Function
-      function_prompt: — Choose function —
+      function_prompt: "— Choose function —"
       instructions: Instruction
       instructions_hint: The AI can read the deal, its company and contacts and show
         toasts, alerts, confirmations or a panel on the deal page.
-      instructions_placeholder: 'e.g. Summarize the deal in the panel. If value exceeds
-        €10,000, show a toast.'
+      instructions_placeholder: e.g. Summarize the deal in the panel. If value exceeds
+        €10,000, show a toast.
       name: Name
       name_placeholder: Notify the rep
       submit_create: Create trigger
@@ -34,8 +34,8 @@ en:
       destroy_confirm: Delete trigger «%{name}»?
       edit: Edit
       empty: No triggers for this stage yet.
-      intro_html: Run when a deal enters stage <strong>%{stage}</strong>. Actions appear
-        in the browser of the user who moved the deal.
+      intro_html: Run when a deal enters stage <strong>%{stage}</strong>. Actions
+        appear in the browser of the user who moved the deal.
       last_run: 'last run: %{status}'
       native_function: 'Native function: %{name}'
       new: New trigger
@@ -55,7 +55,7 @@ en:
               warning: Warning
           message:
             label: Text
-            placeholder: 'e.g. Remember to ask for tax ID at this stage'
+            placeholder: e.g. Remember to ask for tax ID at this stage
       stage_checklist_panel:
         description: Shows a panel on the deal with the next steps for the stage.
         label: Stage checklist on deal
@@ -71,8 +71,8 @@ en:
         task_item: "- %{title}"
         title: Checklist — %{stage}
       won_celebration:
-        message: 🎉 Congratulations! «%{name}» won
-        message_with_value: 🎉 Congratulations! «%{name}» won (%{amount})
+        message: "🎉 Congratulations! «%{name}» won"
+        message_with_value: "🎉 Congratulations! «%{name}» won (%{amount})"
     new:
       page_title: New trigger
       title: New trigger — %{stage}

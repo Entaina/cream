@@ -165,7 +165,7 @@ class BookingAvailabilityService
       )
     end
   rescue Timeout::Error
-    @calendar_warning ||= "Google Calendar no respondió a tiempo."
+    @calendar_warning ||= I18n.t("booking.warnings.calendar_timeout")
     []
   rescue GoogleCalendar::Error => e
     @calendar_warning = e.message

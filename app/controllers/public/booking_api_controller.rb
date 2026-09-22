@@ -30,32 +30,36 @@ module Public
     end
 
     def availability
-      event_type = find_event_type!
-      timezone = params[:timezone].presence || @booking_page.timezone
+      I18n.with_locale(resolved_locale) do
+        event_type = find_event_type!
+        timezone = params[:timezone].presence || @booking_page.timezone
 
-      if params[:month].present?
-        result = BookingAvailabilityService.monthly(
-          booking_page: @booking_page,
-          event_type:,
-          month: params[:month],
-          timezone:,
-          client: optional_calendar_client
-        )
-        render json: availability_payload(result)
-      elsif params[:date].present?
-        result = BookingAvailabilityService.daily(
-          booking_page: @booking_page,
-          event_type:,
-          date: params[:date],
-          timezone:,
-          client: optional_calendar_client
-        )
-        render json: availability_payload(result)
-      else
-        render json: {error: "month or date required"}, status: :bad_request
+        if params[:month].present?
+          result = BookingAvailabilityService.monthly(
+            booking_page: @booking_page,
+            event_type:,
+            month: params[:month],
+            timezone:,
+            client: optional_calendar_client
+          )
+          render json: availability_payload(result)
+        elsif params[:date].present?
+          result = BookingAvailabilityService.daily(
+            booking_page: @booking_page,
+            event_type:,
+            date: params[:date],
+            timezone:,
+            client: optional_calendar_client
+          )
+          render json: availability_payload(result)
+        else
+          render json: {error: I18n.t("booking.errors.availability_params_required")}, status: :bad_request
+        end
       end
     rescue ActiveRecord::RecordNotFound
-      render json: {error: "event type not found"}, status: :not_found
+      I18n.with_locale(resolved_locale) do
+        render json: {error: I18n.t("booking.errors.event_type_not_found")}, status: :not_found
+      end
     rescue ArgumentError => e
       render json: {error: e.message}, status: :bad_request
     end

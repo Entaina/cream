@@ -36,7 +36,7 @@ class Invitation < ApplicationRecord
   end
 
   def role_label
-    Membership::ROLE_LABELS.fetch(role, role)
+    Membership.role_label_for(role)
   end
 
   def expired?

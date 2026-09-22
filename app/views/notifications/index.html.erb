@@ -1,8 +1,8 @@
-<% page_title "Notifications" %>
-<%= render "shared/page_header", title: "Notifications", icon_name: :bell, count: @notifications.unread.size %>
+<% page_title t("integrations.notifications.page_title") %>
+<%= render "shared/page_header", title: t("integrations.notifications.title"), icon_name: :bell, count: @notifications.unread.size %>
 
 <div class="flex items-center justify-end px-5 py-2 border-b border-line">
-  <%= button_to "Mark all read", mark_all_read_notifications_path, method: :patch, class: "btn-ghost" %>
+  <%= button_to t("integrations.notifications.mark_all_read"), mark_all_read_notifications_path, method: :patch, class: "btn-ghost" %>
 </div>
 
 <div class="flex-1 overflow-y-auto scrollbar-subtle p-5 space-y-2">
@@ -18,17 +18,17 @@
             <p class="text-xs text-ink-faint mt-1"><%= l notification.created_at, format: :short %></p>
           </div>
           <% unless notification.read? %>
-            <%= button_to "Mark read", notification_path(notification), method: :patch, class: "btn-ghost text-sm" %>
+            <%= button_to t("integrations.notifications.mark_read"), notification_path(notification), method: :patch, class: "btn-ghost text-sm" %>
           <% end %>
         </div>
         <% if notification.url.present? %>
           <div class="mt-2">
-            <%= link_to "View", notification.url, class: "text-accent text-sm hover:underline" %>
+            <%= link_to t("integrations.notifications.view"), notification.url, class: "text-accent text-sm hover:underline" %>
           </div>
         <% end %>
       </article>
     <% end %>
   <% else %>
-    <p class="text-base text-ink-faint">No notifications yet.</p>
+    <p class="text-base text-ink-faint"><%= t("integrations.notifications.empty") %></p>
   <% end %>
 </div>

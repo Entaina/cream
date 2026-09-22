@@ -1,40 +1,41 @@
-<%= render "shared/page_header", title: "Google Calendar" %>
+<% page_title t("integrations.calendar.page_title") %>
+<%= render "shared/page_header", title: t("integrations.calendar.title") %>
 
 <div class="flex-1 overflow-y-auto scrollbar-subtle p-5">
   <div class="max-w-2xl space-y-6">
   <% if @connection.connected? %>
     <div class="card p-6 space-y-4">
-      <p>Conectado como <strong><%= @connection.email %></strong>.</p>
+      <p><%= t("integrations.calendar.connected_as", email: @connection.email).html_safe %></p>
       <% if @connection.missing_scopes_message %>
         <p class="text-sm text-golden-800 bg-golden-100 rounded-md px-3 py-2"><%= @connection.missing_scopes_message %></p>
       <% else %>
-        <p class="text-sm text-ink-soft">Las reservas consultarán tus calendarios y crearán eventos con invitaciones automáticas.</p>
+        <p class="text-sm text-ink-soft"><%= t("integrations.calendar.scopes_hint") %></p>
       <% end %>
       <p class="text-sm text-ink-faint">
-        Si cambian los permisos en Google o dejan de cargarse tus calendarios, reconecta para actualizar el acceso sin desconectar tu cuenta.
+        <%= t("integrations.calendar.reconnect_hint") %>
       </p>
       <div class="flex gap-2 flex-wrap">
         <%= button_to(
-              @connection.missing_scopes_message ? "Actualizar permisos de Google Calendar" : "Reconectar Google Calendar",
+              @connection.missing_scopes_message ? t("integrations.calendar.update_permissions") : t("integrations.calendar.reconnect"),
               calendar_auth_url,
               method: :post,
               data: { turbo: false },
               class: @connection.missing_scopes_message ? "btn-primary" : "btn-secondary"
             ) %>
-        <%= button_to "Desconectar", calendar_connection_path, method: :delete, class: "btn-danger" %>
+        <%= button_to t("integrations.calendar.disconnect"), calendar_connection_path, method: :delete, class: "btn-danger" %>
       </div>
     </div>
   <% else %>
     <div class="card p-6 space-y-4">
-      <p>Conecta tu Google Calendar para habilitar la disponibilidad en tiempo real y la creación automática de eventos con Google Meet.</p>
-      <%= button_to "Conectar Google Calendar", calendar_auth_url, method: :post, data: { turbo: false }, class: "btn-primary" %>
+      <p><%= t("integrations.calendar.disconnected_intro") %></p>
+      <%= button_to t("integrations.calendar.connect"), calendar_auth_url, method: :post, data: { turbo: false }, class: "btn-primary" %>
     </div>
   <% end %>
 
   <div class="card p-6">
-    <h2 class="font-display text-lg font-semibold mb-2">Páginas de reservas</h2>
-    <p class="text-sm text-ink-soft mb-4">Gestiona tipos de evento y comparte la URL pública con tus clientes.</p>
-    <%= link_to "Ir a reservas", booking_pages_path, class: "btn-secondary" %>
+    <h2 class="font-display text-lg font-semibold mb-2"><%= t("integrations.calendar.booking_pages_title") %></h2>
+    <p class="text-sm text-ink-soft mb-4"><%= t("integrations.calendar.booking_pages_hint") %></p>
+    <%= link_to t("integrations.calendar.booking_pages_cta"), booking_pages_path, class: "btn-secondary" %>
   </div>
   </div>
 </div>

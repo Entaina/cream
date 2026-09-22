@@ -1,0 +1,348 @@
+---
+en:
+  integrations:
+    api_tokens:
+      create: Create token
+      created: Created
+      empty_subtitle: Create a token to connect an MCP client to this workspace.
+      empty_title: No API tokens yet
+      intro: Use API tokens to connect MCP clients (Claude, Cursor, etc.) to your
+        workspace. OAuth is also available via the MCP authorization flow.
+      last_used: Last used
+      new_token_hint: Your new token (copy it now)
+      page_title: API tokens
+      revoke: Revoke token
+      title: API tokens
+      token_name: Token name
+      token_name_placeholder: My MCP client
+    calendar:
+      booking_pages_cta: Go to bookings
+      booking_pages_hint: Manage event types and share the public URL with your clients.
+      booking_pages_title: Booking pages
+      connect: Connect Google Calendar
+      connected_as: Connected as %{email}.
+      disconnect: Disconnect
+      disconnected_intro: Connect Google Calendar for real-time availability and automatic
+        Google Meet events.
+      page_title: Google Calendar
+      reconnect: Reconnect Google Calendar
+      reconnect_hint: If Google permissions change or calendars stop loading, reconnect
+        to refresh access without disconnecting your account.
+      scopes_hint: Bookings will check your calendars and create events with automatic
+        invitations.
+      title: Google Calendar
+      update_permissions: Update Google Calendar permissions
+    custom_fields:
+      add_field: Add %{type} field
+      admin_only: Only workspace admins can add or edit fields.
+      cancel: Cancel
+      create: Create field
+      delete_confirm: Delete the “%{name}” field? Existing values will be removed.
+      delete_title: Delete field
+      edit: Edit
+      edit_page_title: Edit custom field
+      field_types:
+        boolean: Boolean
+        currency: Currency
+        date: Date
+        email: Email
+        formula: Formula
+        long_text: Long text
+        multi_select: Multi-select
+        number: Number
+        record_reference: Record reference
+        select: Select
+        text: Text
+        url: URL
+      formula_expression: Formula expression
+      formula_hint: Use {field_name} or {cf.key} tokens. Supports +, -, *, / and parentheses.
+      formula_placeholder: "{value} * {probability} / 100"
+      intro: Define extra attributes for people, companies and deals in %{workspace}.
+      name_placeholder: Customer tier
+      new: New field
+      new_page_title: New custom field
+      no_fields: No custom fields yet.
+      object: Object
+      options_hint: One per line. Used for select and multi-select fields.
+      options_label: Options (one per line)
+      page_title: Custom fields
+      record_types:
+        Company: Companies
+        Deal: Deals
+        Person: People
+      reference_hint: Records of this type can be linked from the field.
+      reference_type: Related object
+      reference_type_prompt: Select object…
+      required: Required on create and edit
+      required_badge: Required
+      save: Save changes
+      select_object: Select object…
+      title: Custom fields
+      type: Type
+    gmail:
+      connect_full: Connect with full reply logging
+      connect_send: Connect for sending only
+      connect_send_receive: Connect for sending and reply detection
+      connected: Gmail connected for <strong>%{email}</strong>.
+      disconnect: Disconnect
+      disconnected_intro: Connect your Gmail account to send record emails from your
+        own address. You can start with send-only and add reply detection later.
+      enable_full_logging: Enable full reply logging
+      enable_reply_detection: Enable reply detection
+      full_logging_blocked: Reply text cannot be saved yet because your Google token
+        includes both inbox metadata and body access (Google blocks reading the body
+        in that case). Click <strong>Enable full reply logging</strong> below to re-authorize
+        with read-only access, then run <strong>Sync now</strong>.
+      full_logging_hint: Full reply logging saves inbound reply text on the record
+        conversation. Grant read access to message bodies.
+      help: When send is on, emails you send from a record go out from your Gmail
+        (and land in Sent). With reply detection, Cream checks your inbox and marks
+        replies automatically. With full logging, reply text also appears in the record
+        email list.
+      last_synced: 'Last synced: %{time}.'
+      mode_full: 'Mode: send emails, detect replies, and log full reply text.'
+      mode_reconnect: 'Mode: connected (reconnect to refresh permissions).'
+      mode_send: 'Mode: send emails only.'
+      mode_send_receive: 'Mode: send emails and detect replies.'
+      page_title: Gmail connection
+      permissions_hint: Sending requires permission to send on your behalf. Reply
+        detection requires reading message headers. Full logging also reads message
+        bodies.
+      reply_detection_hint: Reply detection needs inbox header access. Grant it without
+        disconnecting your account.
+      send_enabled: Send record emails through Gmail
+      sync_enabled: Detect replies in your inbox
+      sync_now: Sync now
+      title: Gmail connection
+    lists:
+      empty_subtitle: Group people, companies or deals for campaigns, segments or
+        anything else.
+      empty_title: No lists yet
+      entry_count:
+        one: 1 %{type}
+        other: "%{count} %{type}"
+      new: New list
+      new_list: New list
+      page_title: Lists
+      record_types:
+        company: company
+        deal: deal
+        person: person
+      title: Lists
+    notifications:
+      empty: No notifications yet.
+      mark_all_read: Mark all read
+      mark_read: Mark read
+      page_title: Notifications
+      title: Notifications
+      view: View
+    slack:
+      active: Active
+      edit: Edit
+      edit_page_title: Edit Slack integration
+      new: New integration
+      new_integration: New integration
+      new_page_title: New Slack integration
+      notify_on: Notify on
+      page_title: Slack integrations
+      title: Slack
+    stripe:
+      connection:
+        account_label: Label
+        account_label_placeholder: e.g. Stripe Example
+        account_suffix: " (%{label})"
+        api_key: API key
+        api_key_keep: Leave blank to keep the current key
+        api_key_placeholder: rk_live_…
+        connect: Connect Stripe
+        connected: Stripe connected%{account} with key <strong class="font-mono">%{key}</strong>.
+        disconnect: Disconnect
+        disconnect_confirm: Disconnect Stripe? Imported payments will be deleted.
+        disconnected_intro: Connect your Stripe account to import payments and reconcile
+          them with deals. Create a <strong>restricted key</strong> in the Stripe
+          dashboard with read access to Charges only.
+        import_auto: Import new payments automatically (every 15 minutes)
+        last_sync_failed: 'Last sync failed: %{error}'
+        last_synced: 'Last synced: %{time}.'
+        matching_hint: Payments are matched to deals by the payer's email (people
+          and their open deals) and by amount. For a guaranteed match, set the deal
+          id in Stripe payment metadata under <code class="font-mono bg-canvas-sunken
+          px-1 rounded">cream_deal_id</code>.
+        matching_title: Matching payments to deals
+        matching_wait: The first sync imports full history; later syncs only fetch
+          new payments. Unmatched payments wait in the payments inbox.
+        page_title: Stripe connection
+        payments_inbox: Payments inbox
+        save: Save settings
+        sync_now: Sync now
+        title: Stripe connection
+      payments:
+        actions: Actions
+        amount: Amount
+        connect_link: Connect Stripe
+        customer: Customer
+        date: Date
+        deal: Deal
+        description: Description
+        empty: No payments here.
+        not_connected: Stripe is not connected yet.
+        not_connected_hint: to import payments.
+        page_title: Stripe payments
+        search_placeholder: Search email, name, description…
+        settings: Stripe settings
+        status:
+          ignored: Ignored
+          matched: Matched
+          pending_review: To review
+        title: Stripe payments
+    team:
+      clear: Clear
+      intro_admin: Manage workspace members, roles, and invitations for <strong>%{workspace}</strong>.
+      intro_member: Workspace members of <strong>%{workspace}</strong>.
+      invitation_link: 'Invitation link (copy and share):'
+      invite_as: Invited as %{role}
+      invite_email: Email
+      invite_email_placeholder: colleague@company.com
+      invite_expires: expires %{time}
+      invite_section:
+        role: Role
+        submit: Send invitation
+        title: Invite member
+      members: Members
+      no_members: No members yet.
+      no_search_results: No members match your search.
+      page_title: Team
+      pending_invitations: Pending invitations
+      remove_member: Remove member
+      resend: Resend
+      resend_invitation: Resend invitation
+      revoke_invitation: Revoke invitation
+      roles:
+        admin: Admin
+        sales_director: Sales director
+        salesperson: Salesperson
+      search_placeholder: Search members…
+      title: Team
+    webhooks:
+      active: Active
+      edit: Edit
+      edit_page_title: Edit webhook
+      events: Events
+      inactive: Inactive
+      new: New webhook
+      new_page_title: New webhook
+      page_title: Webhooks
+      title: Webhooks
+    workspace:
+      beehiiv:
+        add_publication: Add publication
+        add_publication_title: Add publication
+        api_key: API Key (Beehiiv account)
+        api_key_keep: Leave blank to keep the current key
+        api_key_placeholder: Beehiiv API key
+        connect: Connect Beehiiv
+        copied: Copied
+        copied_clipboard: Copied to clipboard
+        copy_url: Copy URL
+        disconnect: Disconnect
+        disconnect_confirm: Disconnect Beehiiv from this workspace?
+        intro: Sync Beehiiv publications with Cream subscription types. Beehiiv still
+          sends each newsletter; Cream reflects subscribe/unsubscribe in the MQL pool.
+          Each publication has its own Beehiiv webhook URL.
+        last_error: 'Last error: %{error}'
+        last_sync: 'Last sync: %{time}.'
+        publication_id: Publication ID
+        publication_id_placeholder: pub_00000000-0000-0000-0000-000000000000
+        publications: Publications
+        remove_publication: Delete
+        remove_publication_confirm: Delete this Beehiiv publication?
+        save: Save Beehiiv
+        save_publication: Save publication
+        secret_hint: Optional but recommended (Scale+ plan). Each Beehiiv publication
+          has its own secret.
+        secret_keep: Leave blank to keep the current secret
+        secret_placeholder: whsec_…
+        select_type: Select a type
+        status_connected: "%{count} publication(s) configured."
+        status_incomplete: Add at least one publication to complete the connection.
+        status_key: API key <strong class="font-mono">%{key}</strong>.
+        subscription_type: Cream subscription type
+        sync_enabled: Automatic sync every hour
+        sync_now: Sync now
+        title: Beehiiv
+        webhook_events: 'Recommended events: subscription.created, subscription.confirmed,
+          subscription.deleted.'
+        webhook_signing_secret: Webhook signing secret (Svix)
+        webhook_url: Webhook URL (register in Beehiiv → Settings → Webhooks)
+      features:
+        attribution: Attribution
+        custom_fields: Custom fields
+        intro: Enable menu sections and settings you want in this workspace. They
+          are off by default.
+        lead_scoring: Lead scoring
+        reports: Reports
+        save: Save features
+        title: Features
+        webhooks: Webhooks
+      general:
+        edit_hint: If you only enable edit, salespeople can also view those deals.
+        name: Workspace name
+        sales_director: Daily sales director briefing (AI)
+        salespeople_edit: Salespeople can edit other users' deals
+        salespeople_view: Salespeople can view other users' deals
+        save: Save
+        title: General
+      intro: Configure workspace options for <strong>%{workspace}</strong>.
+      mailjet:
+        api_key: API Key
+        api_key_keep: Leave blank to keep the current key
+        api_key_placeholder: Mailjet public key
+        connect: Connect Mailjet
+        connected: Connected with API key <strong class="font-mono">%{api}</strong>
+          and secret <strong class="font-mono">%{secret}</strong>.
+        copied: Copied
+        copied_clipboard: Copied to clipboard
+        copy_url: Copy URL
+        disconnect: Disconnect
+        disconnect_confirm: Disconnect Mailjet from this workspace?
+        domain_validated: Domain validated in Mailjet (send on behalf of each user)
+        domain_validated_hint: Enable only if the sender domain is verified in Mailjet
+          (SPF/DKIM). Otherwise emails use the workspace sender and Reply-To to the
+          owner.
+        from_email: From email
+        from_email_hint: Must be a verified sender in Mailjet (domain SPF/DKIM).
+        from_email_placeholder: noreply@yourdomain.com
+        from_name: From name
+        intro: Each workspace uses its own Mailjet account for campaigns and journeys.
+          Transactional mail (invitations, alerts, bookings, reports, record emails)
+          only if enabled below.
+        save: Save Mailjet
+        secret_key: Secret Key
+        secret_key_keep: Leave blank to keep the current key
+        secret_key_placeholder: Mailjet secret key
+        title: Mailjet
+        transactional: Use Mailjet for transactional email
+        transactional_hint: Invitations, alerts, bookings, reports and record emails.
+          When off, those use SMTP/Mailbin.
+        webhook_hint: When you save Mailjet, Cream registers sent, open, click, bounce,
+          spam, unsub and blocked (Version 2). Copy the URL only if you need to review
+          it in Mailjet.
+        webhook_url: Webhook URL
+      okm:
+        ai_required: Requires <code>CREAM_AI_API_KEY</code> on the server.
+        drive_id: Google Shared Drive ID
+        drive_id_hint: Shared drive ID from the Google Drive URL.
+        drive_id_placeholder: 0AxxxxxxxxxxxxUk9PVA
+        enable: Enable OKM chat in this workspace
+        intro: Connect corporate OKM (Google Shared Drive) for contextual chat and
+          AI briefings.
+        save: Save OKM settings
+        service_account: Service account JSON
+        service_account_configured: 'Configured: %{email}'
+        service_account_hint: Leave blank to keep the current key. JSON is not shown
+          again.
+        service_account_placeholder: Paste the service account JSON with read access
+          to the drive…
+        title: OKM
+      page_title: Settings
+      title: Settings

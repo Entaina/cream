@@ -1,0 +1,354 @@
+---
+es:
+  integrations:
+    api_tokens:
+      create: Crear token
+      created: Creado
+      empty_subtitle: Crea un token para conectar un cliente MCP a este workspace.
+      empty_title: Aún no hay tokens de API
+      intro: Usa tokens de API para conectar clientes MCP (Claude, Cursor, etc.) a
+        tu workspace. OAuth también está disponible mediante el flujo de autorización
+        MCP.
+      last_used: Último uso
+      new_token_hint: Tu nuevo token (cópialo ahora)
+      page_title: Tokens de API
+      revoke: Revocar token
+      title: Tokens de API
+      token_name: Nombre del token
+      token_name_placeholder: Mi cliente MCP
+    calendar:
+      booking_pages_cta: Ir a reservas
+      booking_pages_hint: Gestiona tipos de evento y comparte la URL pública con tus
+        clientes.
+      booking_pages_title: Páginas de reservas
+      connect: Conectar Google Calendar
+      connected_as: Conectado como %{email}.
+      disconnect: Desconectar
+      disconnected_intro: Conecta tu Google Calendar para habilitar la disponibilidad
+        en tiempo real y la creación automática de eventos con Google Meet.
+      page_title: Google Calendar
+      reconnect: Reconectar Google Calendar
+      reconnect_hint: Si cambian los permisos en Google o dejan de cargarse tus calendarios,
+        reconecta para actualizar el acceso sin desconectar tu cuenta.
+      scopes_hint: Las reservas consultarán tus calendarios y crearán eventos con
+        invitaciones automáticas.
+      title: Google Calendar
+      update_permissions: Actualizar permisos de Google Calendar
+    custom_fields:
+      add_field: Añadir campo de %{type}
+      admin_only: Solo los administradores del workspace pueden añadir o editar campos.
+      cancel: Cancelar
+      create: Crear campo
+      delete_confirm: "¿Eliminar el campo «%{name}»? Se eliminarán los valores existentes."
+      delete_title: Eliminar campo
+      edit: Editar
+      edit_page_title: Editar campo personalizado
+      field_types:
+        boolean: Booleano
+        currency: Moneda
+        date: Fecha
+        email: Email
+        formula: Fórmula
+        long_text: Texto largo
+        multi_select: Selección múltiple
+        number: Número
+        record_reference: Referencia a registro
+        select: Selección
+        text: Texto
+        url: URL
+      formula_expression: Expresión de fórmula
+      formula_hint: Usa tokens {field_name} o {cf.key}. Admite +, -, *, / y paréntesis.
+      formula_placeholder: "{value} * {probability} / 100"
+      intro: Define atributos extra para personas, empresas y oportunidades en %{workspace}.
+      name_placeholder: Nivel de cliente
+      new: Nuevo campo
+      new_page_title: Nuevo campo personalizado
+      no_fields: Aún no hay campos personalizados.
+      object: Objeto
+      options_hint: Una por línea. Para campos de selección y selección múltiple.
+      options_label: Opciones (una por línea)
+      page_title: Campos personalizados
+      record_types:
+        Company: Empresas
+        Deal: Oportunidades
+        Person: Personas
+      reference_hint: Los registros de este tipo pueden vincularse desde el campo.
+      reference_type: Objeto relacionado
+      reference_type_prompt: Selecciona un objeto…
+      required: Obligatorio al crear y editar
+      required_badge: Obligatorio
+      save: Guardar cambios
+      select_object: Selecciona un objeto…
+      title: Campos personalizados
+      type: Tipo
+    gmail:
+      connect_full: Conectar con registro completo de respuestas
+      connect_send: Conectar solo para envío
+      connect_send_receive: Conectar para envío y detección de respuestas
+      connected: Gmail conectado para <strong>%{email}</strong>.
+      disconnect: Desconectar
+      disconnected_intro: Conecta tu cuenta de Gmail para enviar emails de ficha desde
+        tu propia dirección. Puedes empezar solo con envío y añadir detección de respuestas
+        después.
+      enable_full_logging: Activar registro completo de respuestas
+      enable_reply_detection: Activar detección de respuestas
+      full_logging_blocked: El texto de la respuesta aún no puede guardarse porque
+        en tu token de Google conviven acceso a metadatos del buzón y acceso al cuerpo
+        (Google bloquea leer el cuerpo en ese caso). Pulsa <strong>Activar registro
+        completo de respuestas</strong> abajo para reautorizar con acceso de solo
+        lectura, y luego <strong>Sincronizar ahora</strong>.
+      full_logging_hint: El registro completo guarda el texto de las respuestas entrantes
+        en la conversación del registro. Concede acceso de lectura al cuerpo del mensaje.
+      help: Cuando el envío está activo, los emails que envías desde un registro salen
+        desde tu Gmail (y aparecen en Enviados). Con detección de respuestas, Cream
+        revisa tu buzón y marca automáticamente las respuestas. Con registro completo,
+        el texto también aparece en el listado de emails del registro.
+      last_synced: 'Última sync: %{time}.'
+      mode_full: 'Modo: enviar emails, detectar respuestas y registrar el texto completo
+        de la respuesta.'
+      mode_reconnect: 'Modo: conectado (reconecta para actualizar permisos).'
+      mode_send: 'Modo: solo enviar emails.'
+      mode_send_receive: 'Modo: enviar emails y detectar respuestas.'
+      page_title: Conexión Gmail
+      permissions_hint: El envío requiere permiso para enviar en tu nombre. La detección
+        de respuestas requiere leer metadatos. El registro completo lee además el
+        cuerpo del mensaje.
+      reply_detection_hint: La detección de respuestas necesita acceso a metadatos
+        del buzón. Concédalo sin desconectar la cuenta.
+      send_enabled: Enviar emails de ficha a través de Gmail
+      sync_enabled: Detectar respuestas en tu buzón
+      sync_now: Sincronizar ahora
+      title: Conexión Gmail
+    lists:
+      empty_subtitle: Agrupa personas, empresas u oportunidades para campañas, segmentos
+        o lo que necesites.
+      empty_title: Aún no hay listas
+      entry_count:
+        one: 1 %{type}
+        other: "%{count} %{type}"
+      new: Nueva lista
+      new_list: Nueva lista
+      page_title: Listas
+      record_types:
+        company: empresa
+        deal: oportunidad
+        person: persona
+      title: Listas
+    notifications:
+      empty: Aún no hay notificaciones.
+      mark_all_read: Marcar todo como leído
+      mark_read: Marcar leída
+      page_title: Notificaciones
+      title: Notificaciones
+      view: Ver
+    slack:
+      active: Activa
+      edit: Editar
+      edit_page_title: Editar integración con Slack
+      new: Nueva integración
+      new_integration: Nueva integración
+      new_page_title: Nueva integración con Slack
+      notify_on: Notificar cuando
+      page_title: Integraciones con Slack
+      title: Slack
+    stripe:
+      connection:
+        account_label: Etiqueta
+        account_label_placeholder: p. ej. Stripe Example
+        api_key: API key
+        api_key_keep: Deja en blanco para conservar la clave actual
+        api_key_placeholder: rk_live_…
+        connect: Conectar Stripe
+        connected: Stripe conectado%{account} con clave <strong class="font-mono">%{key}</strong>.
+        disconnect: Desconectar
+        disconnect_confirm: "¿Desconectar Stripe? Se eliminarán los pagos importados."
+        disconnected_intro: Conecta tu cuenta de Stripe para importar pagos y conciliarlos
+          con oportunidades. Crea una <strong>clave restringida</strong> en el panel
+          de Stripe con acceso de lectura solo a Charges.
+        import_auto: Importar pagos nuevos automáticamente (cada 15 minutos)
+        last_sync_failed: 'Última sync fallida: %{error}'
+        last_synced: 'Última sync: %{time}.'
+        matching_hint: Los pagos se emparejan con oportunidades por el email del pagador
+          (personas y sus oportunidades abiertas) y por importe. Para un match garantizado,
+          tu aplicación puede enviar el id de la oportunidad en los metadatos de Stripe
+          con la clave <code class="font-mono bg-canvas-sunken px-1 rounded">cream_deal_id</code>.
+        matching_title: Emparejar pagos con oportunidades
+        matching_wait: La primera sync importa todo el historial; las siguientes solo
+          pagos nuevos. Los no emparejados quedan en la bandeja de pagos.
+        page_title: Conexión Stripe
+        payments_inbox: Bandeja de pagos
+        save: Guardar ajustes
+        sync_now: Sincronizar ahora
+        title: Conexión Stripe
+      payments:
+        actions: Acciones
+        amount: Importe
+        connect_link: Conectar Stripe
+        customer: Cliente
+        date: Fecha
+        deal: Oportunidad
+        description: Descripción
+        empty: No hay pagos aquí.
+        not_connected: Stripe aún no está conectado.
+        not_connected_hint: para importar pagos.
+        page_title: Pagos Stripe
+        search_placeholder: Buscar email, nombre, descripción…
+        settings: Ajustes Stripe
+        status:
+          ignored: Ignorados
+          matched: Emparejados
+          pending_review: Por revisar
+        title: Pagos Stripe
+    team:
+      clear: Limpiar
+      intro_admin: Gestiona miembros, roles e invitaciones del workspace <strong>%{workspace}</strong>.
+      intro_member: Miembros del workspace <strong>%{workspace}</strong>.
+      invitation_link: 'Enlace de invitación (copiar y compartir):'
+      invite_as: Invitado como %{role}
+      invite_email: Email
+      invite_email_placeholder: colega@empresa.com
+      invite_expires: caduca %{time}
+      invite_section:
+        role: Rol
+        submit: Enviar invitación
+        title: Invitar miembro
+      members: Miembros
+      no_members: Aún no hay miembros.
+      no_search_results: Ningún miembro coincide con la búsqueda.
+      page_title: Equipo
+      pending_invitations: Invitaciones pendientes
+      remove_member: Eliminar miembro
+      resend: Reenviar
+      resend_invitation: Reenviar invitación
+      revoke_invitation: Revocar invitación
+      roles:
+        admin: Admin
+        sales_director: Director comercial
+        salesperson: Vendedor
+      search_placeholder: Buscar miembros…
+      title: Equipo
+    webhooks:
+      active: Activa
+      edit: Editar
+      edit_page_title: Editar webhook
+      events: Eventos
+      inactive: Inactiva
+      new: Nuevo webhook
+      new_page_title: Nuevo webhook
+      page_title: Webhooks
+      title: Webhooks
+    workspace:
+      beehiiv:
+        add_publication: Añadir publicación
+        add_publication_title: Añadir publicación
+        api_key: API Key (cuenta Beehiiv)
+        api_key_keep: Deja en blanco para conservar la clave actual
+        api_key_placeholder: Clave de la API de Beehiiv
+        connect: Conectar Beehiiv
+        copied: Copiado
+        copied_clipboard: Copiado al portapapeles
+        copy_url: Copiar URL
+        disconnect: Desconectar
+        disconnect_confirm: "¿Desconectar Beehiiv de este workspace?"
+        intro: Sincroniza publicaciones de Beehiiv con tipos de suscripción de Cream.
+          Beehiiv sigue enviando cada newsletter; Cream refleja altas y bajas en el
+          pool MQL. Cada publicación tiene su propia URL de webhook en Beehiiv.
+        last_error: 'Último error: %{error}'
+        last_sync: 'Última sync: %{time}.'
+        publication_id: Publication ID
+        publication_id_placeholder: pub_00000000-0000-0000-0000-000000000000
+        publications: Publicaciones
+        remove_publication: Eliminar
+        remove_publication_confirm: "¿Eliminar esta publicación Beehiiv?"
+        save: Guardar Beehiiv
+        save_publication: Guardar publicación
+        secret_hint: Opcional pero recomendado (plan Scale+). Cada publicación en
+          Beehiiv tiene su propio secret.
+        secret_keep: Deja en blanco para conservar el secret actual
+        secret_placeholder: whsec_…
+        select_type: Selecciona un tipo
+        status_connected: "%{count} publicación(es) configurada(s)."
+        status_incomplete: Añade al menos una publicación para completar la conexión.
+        status_key: API key <strong class="font-mono">%{key}</strong>.
+        subscription_type: Tipo de suscripción Cream
+        sync_enabled: Sincronización automática cada hora
+        sync_now: Sincronizar ahora
+        title: Beehiiv
+        webhook_events: 'Eventos recomendados: subscription.created, subscription.confirmed,
+          subscription.deleted.'
+        webhook_signing_secret: Webhook signing secret (Svix)
+        webhook_url: URL del webhook (registrar en Beehiiv → Settings → Webhooks)
+      features:
+        attribution: Atribución
+        custom_fields: Campos personalizados
+        intro: Activa las secciones del menú y la configuración que quieras usar en
+          este workspace. Están desactivadas por defecto.
+        lead_scoring: Puntuación de leads
+        reports: Informes
+        save: Guardar funcionalidades
+        title: Funcionalidades
+        webhooks: Webhooks
+      general:
+        edit_hint: Si solo activas editar, los vendedores también podrán ver esas
+          oportunidades.
+        name: Nombre del workspace
+        sales_director: Briefing diario del director de ventas (IA)
+        salespeople_edit: Los vendedores pueden editar las oportunidades de otros
+        salespeople_view: Los vendedores pueden ver las oportunidades de otros
+        save: Guardar
+        title: General
+      intro: Opciones del workspace <strong>%{workspace}</strong>.
+      mailjet:
+        api_key: API Key
+        api_key_keep: Deja en blanco para conservar la clave actual
+        api_key_placeholder: Clave pública de Mailjet
+        connect: Conectar Mailjet
+        connected: Conectado con API key <strong class="font-mono">%{api}</strong>
+          y secret <strong class="font-mono">%{secret}</strong>.
+        copied: Copiado
+        copied_clipboard: Copiado al portapapeles
+        copy_url: Copiar URL
+        disconnect: Desconectar
+        disconnect_confirm: "¿Desconectar Mailjet de este workspace?"
+        domain_validated: Dominio validado en Mailjet (enviar en nombre de cada usuario)
+        domain_validated_hint: Actívalo solo si el dominio del remitente está verificado
+          en Mailjet (SPF/DKIM). Si no, los correos salen con el remitente del workspace
+          y Reply-To al responsable.
+        from_email: Email remitente
+        from_email_hint: Debe ser un remitente verificado en Mailjet (SPF/DKIM del
+          dominio).
+        from_email_placeholder: noreply@tudominio.com
+        from_name: Nombre del remitente
+        intro: Cada workspace usa su propia cuenta de Mailjet para campañas y recorridos.
+          El correo transaccional (invitaciones, alertas, reservas, informes y emails
+          de ficha) solo si lo activas abajo.
+        save: Guardar Mailjet
+        secret_key: Secret Key
+        secret_key_keep: Deja en blanco para conservar la clave actual
+        secret_key_placeholder: Clave secreta de Mailjet
+        title: Mailjet
+        transactional: Usar Mailjet para el correo transaccional
+        transactional_hint: Invitaciones, alertas, reservas, informes y emails de
+          ficha. Si está desactivado, esos envíos usan SMTP/Mailbin.
+        webhook_hint: Al guardar Mailjet, Cream registra automáticamente sent, open,
+          click, bounce, spam, unsub y blocked (Version 2). Copia la URL solo si necesitas
+          revisarla en Mailjet.
+        webhook_url: URL del webhook
+      okm:
+        ai_required: Requiere configurar <code>CREAM_AI_API_KEY</code> en el servidor.
+        drive_id: Google Shared Drive ID
+        drive_id_hint: ID del shared drive desde la URL de Google Drive.
+        drive_id_placeholder: 0AxxxxxxxxxxxxUk9PVA
+        enable: Habilitar chat OKM en este workspace
+        intro: Conecta el OKM corporativo (Google Shared Drive) para el chat contextual
+          y los briefings de IA.
+        save: Guardar ajustes OKM
+        service_account: Service account JSON
+        service_account_configured: 'Configurada: %{email}'
+        service_account_hint: Deja en blanco para conservar la clave actual. El JSON
+          no se vuelve a mostrar.
+        service_account_placeholder: Pega aquí el JSON de la service account con acceso
+          de lectura al drive…
+        title: OKM
+      page_title: Ajustes
+      title: Ajustes
