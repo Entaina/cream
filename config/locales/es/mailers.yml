@@ -1,0 +1,38 @@
+---
+es:
+  alert_mailer:
+    alert_email:
+      body_html: Se ha activado una alerta para la oportunidad <strong>%{deal_name}</strong>
+        (%{company_name}) en <strong>%{workspace_name}</strong>.
+      body_text: Se ha activado una alerta para la oportunidad %{deal_name} (%{company_name})
+        en %{workspace_name}.
+      footer: Recibes este correo porque tienes activadas las alertas por correo en
+        tu perfil de Cream.
+      greeting: Hola %{name},
+      subject: "[Cream] %{rule_name}"
+      view_deal: Ver oportunidad
+  invitation_mailer:
+    invite:
+      accept_link: Aceptar invitación
+      body_html: "%{inviter_name} te ha invitado a unirte a <strong>%{workspace_name}</strong>
+        en Cream como %{role}."
+      body_text: "%{inviter_name} te ha invitado a unirte a %{workspace_name} en Cream
+        como %{role}."
+      expires: Este enlace caduca el %{expires_at}.
+      subject: Únete a %{workspace_name} en Cream
+  lead_form_mailer:
+    responsible_notification:
+      footer_deal_link: Ver oportunidad en Cream
+      form_data_heading: Datos del formulario
+      greeting: Hola %{name},
+      intro: Se ha recibido un nuevo envío en el formulario <strong>%{form_name}</strong>.
+      intro_text: Se ha recibido un nuevo envío en el formulario %{form_name}.
+      metadata_heading: Origen
+      subject: Nuevo lead · %{form_name}%{lead_suffix}
+      subject_lead_suffix: " · %{descriptor}"
+  passwords_mailer:
+    reset:
+      expires: Este enlace caduca en %{distance}.
+      intro: Puedes restablecer tu contraseña en
+      link_text: esta página de restablecimiento
+      subject: Restablece tu contraseña

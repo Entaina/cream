@@ -1,0 +1,81 @@
+---
+es:
+  report_mailer:
+    scheduled_report:
+      empty: No hay datos para este informe.
+      footer: Recibes este correo porque este informe está programado %{schedule}
+        en Cream.
+      period_all: todo el tiempo
+      period_this:
+        month: este mes
+        quarter: este trimestre
+        year: este año
+      subject: Tu informe «%{name}»
+      subtitle: "%{metric} por %{group} · %{period}"
+      total: Total
+  reports:
+    builder:
+      all_pipelines: Todos los pipelines
+      group_by: Agrupar por
+      measure: Medida
+      period: Periodo
+      pipeline: Pipeline
+      record: Registro
+    chart:
+      heading: "%{metric} por %{group}"
+    closed:
+      show: Mostrar cerradas
+      shown: Cerradas visibles
+    date_ranges:
+      all: Todo el tiempo
+      month: Este mes
+      quarter: Este trimestre
+      year: Este año
+    drill_down:
+      title: Ver %{label} en la lista
+    export_csv: Exportar CSV
+    group_by:
+      company: Empresa
+      industry: Sector
+      lifecycle_stage: Etapa del lifecycle
+      month: Mes de creación
+      owner: Responsable
+      stage: Etapa
+      status: Estado
+      utm_campaign: UTM campaign
+      utm_medium: UTM medium
+      utm_source: UTM source
+    index:
+      page_title: Informes
+      title: Informes
+    labels:
+      unassigned: Sin asignar
+    metrics:
+      avg_value: Valor medio
+      count: Recuento
+      sum_value: Valor total
+    record_types:
+      Campaign: Campaña
+      Company: Empresa
+      Deal: Oportunidad
+      LeadSubmission: Envío de formulario
+      Person: Persona
+    results:
+      empty: No hay datos para esta selección.
+      total: 'Total: %{value}'
+    save:
+      name_placeholder: Nombre del informe
+      submit: Guardar
+    saved:
+      delete: Eliminar
+      heading: Informes guardados
+    schedules:
+      daily: Email diario
+      monthly: Email mensual
+      none: No enviar por email
+      weekly: Email semanal
+    schedules_saved:
+      daily: Diario
+      monthly: Mensual
+      none: Sin email
+      weekly: Semanal

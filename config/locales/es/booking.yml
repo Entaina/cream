@@ -43,7 +43,16 @@ es:
     mailer:
       datetime: Fecha y hora
       host_notification:
+        body_html: Se ha hecho una reserva de <strong>%{event_name}</strong> con <strong>%{guest_name}</strong>
+          (%{guest_email}) en <strong>%{workspace_name}</strong>.
+        body_text: Se ha hecho una reserva de %{event_name} con %{guest_name} (%{guest_email})
+          en %{workspace_name}.
         date_time: Fecha y hora
+        footer: Recibes este correo porque tienes activadas las alertas por correo
+          en tu perfil de Cream.
+        greeting: Hola %{name},
+        subject: "[Cream] Nueva reserva: %{event_name} · %{guest_name}"
+        view_deal: Ver oportunidad
       reminder:
         address: Dirección
         date: Fecha

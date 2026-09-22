@@ -17,7 +17,11 @@ RSpec.describe "Reports", type: :request do
       get reports_path(record_type: "Deal", metric: "count", group_by: "stage")
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include("by stage")
+      expect(response.body).to include(
+        I18n.t("reports.chart.heading",
+          metric: Report.metric_label("count"),
+          group: Report.group_by_label("stage"))
+      )
     end
 
     it "falls back to defaults for an invalid combination" do
@@ -31,7 +35,7 @@ RSpec.describe "Reports", type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(response.media_type).to eq("text/csv")
-      expect(response.body).to include("stage,Count")
+      expect(response.body).to include("stage,#{Report.metric_label("count")}")
     end
 
     it "filters deal reports by pipeline" do
@@ -43,7 +47,7 @@ RSpec.describe "Reports", type: :request do
       get reports_path(record_type: "Deal", metric: "count", group_by: "stage", pipeline_id: pipeline.id)
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include("Total: 1")
+      expect(response.body).to include(I18n.t("reports.results.total", value: 1))
     end
 
     it "defaults to the active pipeline when pipeline_id is omitted" do
@@ -56,7 +60,7 @@ RSpec.describe "Reports", type: :request do
       get reports_path(record_type: "Deal", metric: "count", group_by: "stage")
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include("Total: 1")
+      expect(response.body).to include(I18n.t("reports.results.total", value: 1))
     end
 
     it "ignores an invalid pipeline_id" do
@@ -75,7 +79,7 @@ RSpec.describe "Reports", type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(response.body).not_to include("Won</span>")
-      expect(response.body).to include("Total: 1")
+      expect(response.body).to include(I18n.t("reports.results.total", value: 1))
     end
 
     it "shows closed stages in a count-by-stage report when closed=1" do
@@ -89,7 +93,7 @@ RSpec.describe "Reports", type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include("Won</span>")
-      expect(response.body).to include("Total: 2")
+      expect(response.body).to include(I18n.t("reports.results.total", value: 2))
     end
 
     it "links each bar to the filtered deals list" do

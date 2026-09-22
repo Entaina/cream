@@ -5,7 +5,9 @@ class AlertMailer < ApplicationMailer
     @deal = deal
     @deal_url = deal_url(deal)
 
-    mail(to: user.email_address, subject: "[Cream] #{rule.name}")
+    with_mailer_locale(user.locale) do
+      mail(to: user.email_address, subject: t("alert_mailer.alert_email.subject", rule_name: rule.name))
+    end
   end
 
   private

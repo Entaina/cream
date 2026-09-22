@@ -48,6 +48,22 @@ class Report < ApplicationRecord
 
   def value_metric? = VALUE_METRICS.include?(metric)
 
+  def self.metric_label(metric)
+    I18n.t("reports.metrics.#{metric}", default: metric.to_s.humanize)
+  end
+
+  def self.group_by_label(group_by)
+    I18n.t("reports.group_by.#{group_by}", default: group_by.to_s.humanize)
+  end
+
+  def self.record_type_label(record_type)
+    I18n.t("reports.record_types.#{record_type}", default: record_type.to_s)
+  end
+
+  def self.date_range_label(date_range)
+    I18n.t("reports.date_ranges.#{date_range}", default: date_range.to_s.humanize)
+  end
+
   private
 
   def group_by_valid_for_type

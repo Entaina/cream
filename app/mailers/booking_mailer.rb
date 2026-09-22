@@ -3,9 +3,11 @@ class BookingMailer < ApplicationMailer
     @booking = booking
     @event_type = booking.booking_event_type
     @booking_page = booking.booking_page
-    @starts_at_display = booking.localized_starts_at_with_zone
 
-    mail(to: booking.email, subject: reminder_subject)
+    with_mailer_locale(booking.guest_locale) do
+      @starts_at_display = booking.localized_starts_at_with_zone(locale: booking.guest_locale)
+      mail(to: booking.email, subject: reminder_subject)
+    end
   end
 
   def host_notification(booking:, host:)
@@ -16,7 +18,9 @@ class BookingMailer < ApplicationMailer
     @starts_at_display = booking.localized_starts_at_with_zone
     @deal_url = booking.deal && deal_url(booking.deal)
 
-    mail(to: host.email_address, subject: host_notification_subject)
+    with_mailer_locale(host.locale) do
+      mail(to: host.email_address, subject: host_notification_subject)
+    end
   end
 
   private
@@ -32,7 +36,11 @@ class BookingMailer < ApplicationMailer
   end
 
   def host_notification_subject
-    "[Cream] Nueva reserva: #{@event_type.localized_name} · #{@booking.display_name}"
+    I18n.t(
+      "booking.mailer.host_notification.subject",
+      event_name: @event_type.localized_name,
+      guest_name: @booking.display_name
+    )
   end
 
   def mailjet_workspace = @booking.workspace

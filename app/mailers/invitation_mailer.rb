@@ -4,8 +4,15 @@ class InvitationMailer < ApplicationMailer
     @accept_url = invitation.accept_url(plaintext_token)
     @inviter_name = invitation.invited_by.name
     @workspace_name = invitation.workspace.name
+    @role_label = Membership.role_label_for(invitation.role)
 
-    mail subject: "Join #{@workspace_name} on Cream", to: invitation.email_address
+    with_mailer_locale(invitation.invited_by.locale) do
+      @expires_at = l(invitation.expires_at, format: :long)
+      mail(
+        subject: t("invitation_mailer.invite.subject", workspace_name: @workspace_name),
+        to: invitation.email_address
+      )
+    end
   end
 
   private

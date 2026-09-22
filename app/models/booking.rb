@@ -23,7 +23,7 @@ class Booking < ApplicationRecord
   scope :confirmed, -> { where(status: "confirmed") }
 
   def self.build_tracking_metadata(booking_page:, params:, request:)
-    TRACKING_METADATA_FIELDS.index_with do |key|
+    metadata = TRACKING_METADATA_FIELDS.index_with do |key|
       case key
       when "booking_page_slug" then booking_page.slug
       when "booking_page_name" then booking_page.name
@@ -33,6 +33,15 @@ class Booking < ApplicationRecord
       "user_agent" => request.user_agent,
       "ip" => request.remote_ip
     ).compact
+
+    lang = params["lang"].to_s.presence_in(User::LOCALES)
+    metadata["lang"] = lang if lang
+
+    metadata
+  end
+
+  def guest_locale
+    metadata.to_h["lang"].to_s.presence_in(User::LOCALES) || I18n.default_locale.to_s
   end
 
   def display_name

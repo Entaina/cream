@@ -18,7 +18,7 @@ RSpec.describe ReportRunner do
 
     result = run(metric: "count", group_by: "stage")
 
-    expect(result.metric_label).to eq("Count")
+    expect(result.metric_label).to eq(I18n.t("reports.metrics.count"))
     expect(result.rows.sum(&:value)).to eq(2)
   end
 
@@ -38,8 +38,9 @@ RSpec.describe ReportRunner do
 
     result = run(metric: "count", group_by: "owner")
 
-    expect(result.rows.map(&:label)).to include("Unassigned")
-    unassigned = result.rows.find { |row| row.label == "Unassigned" }
+    unassigned_label = I18n.t("reports.labels.unassigned")
+    expect(result.rows.map(&:label)).to include(unassigned_label)
+    unassigned = result.rows.find { |row| row.label == unassigned_label }
     expect(unassigned.key).to be_nil
   end
 

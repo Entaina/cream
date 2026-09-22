@@ -1,7 +1,11 @@
 class PasswordsMailer < ApplicationMailer
   def reset(user)
     @user = user
-    mail subject: "Reset your password", to: user.email_address
+
+    with_mailer_locale(user.locale) do
+      @expires_distance = distance_of_time_in_words(0, user.password_reset_token_expires_in)
+      mail subject: t("passwords_mailer.reset.subject"), to: user.email_address
+    end
   end
 
   private

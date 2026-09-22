@@ -1,6 +1,18 @@
 require "rails_helper"
 
 RSpec.describe Booking, type: :model do
+  describe "#guest_locale" do
+    it "returns metadata lang when valid" do
+      booking = Booking.new(metadata: {"lang" => "en"})
+      expect(booking.guest_locale).to eq("en")
+    end
+
+    it "falls back to the default locale when lang is missing or invalid" do
+      expect(Booking.new(metadata: {}).guest_locale).to eq(I18n.default_locale.to_s)
+      expect(Booking.new(metadata: {"lang" => "fr"}).guest_locale).to eq(I18n.default_locale.to_s)
+    end
+  end
+
   describe ".display_starts_at_with_zone" do
     it "formats the instant in the booking timezone with the IANA label" do
       starts_at = Time.find_zone("UTC").local(2026, 7, 28, 8, 0)

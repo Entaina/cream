@@ -1,10 +1,4 @@
 class ReportRunner
-  METRIC_LABELS = {
-    "count" => "Count",
-    "sum_value" => "Total value",
-    "avg_value" => "Average value"
-  }.freeze
-
   UTM_COLUMNS = {
     "utm_source" => :utm_source,
     "utm_medium" => :utm_medium,
@@ -50,7 +44,7 @@ class ReportRunner
     Result.new(
       rows: rows,
       metric: @metric,
-      metric_label: METRIC_LABELS.fetch(@metric),
+      metric_label: Report.metric_label(@metric),
       total: rows.sum(&:value),
       max: rows.map(&:value).max || 0,
       all_pipelines_stage_chart: all_pipelines_stage_grouping?
@@ -123,7 +117,7 @@ class ReportRunner
 
   def label_for(key)
     case @group_by
-    when "owner" then owner_names[key] || "Unassigned"
+    when "owner" then owner_names[key] || I18n.t("reports.labels.unassigned")
     when "stage" then stage_labels[key] || "—"
     when "company" then company_names[key] || "—"
     when "industry" then key.presence || "—"

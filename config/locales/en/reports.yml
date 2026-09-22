@@ -1,0 +1,81 @@
+---
+en:
+  report_mailer:
+    scheduled_report:
+      empty: No data for this report.
+      footer: You're receiving this because this report is scheduled %{schedule} in
+        Cream.
+      period_all: all time
+      period_this:
+        month: this month
+        quarter: this quarter
+        year: this year
+      subject: Your “%{name}” report
+      subtitle: "%{metric} by %{group} · %{period}"
+      total: Total
+  reports:
+    builder:
+      all_pipelines: All pipelines
+      group_by: Group by
+      measure: Measure
+      period: Period
+      pipeline: Pipeline
+      record: Record
+    chart:
+      heading: "%{metric} by %{group}"
+    closed:
+      show: Show closed
+      shown: Closed shown
+    date_ranges:
+      all: All time
+      month: This month
+      quarter: This quarter
+      year: This year
+    drill_down:
+      title: View %{label} in list
+    export_csv: Export CSV
+    group_by:
+      company: Company
+      industry: Industry
+      lifecycle_stage: Lifecycle stage
+      month: Month created
+      owner: Owner
+      stage: Stage
+      status: Status
+      utm_campaign: UTM campaign
+      utm_medium: UTM medium
+      utm_source: UTM source
+    index:
+      page_title: Reports
+      title: Reports
+    labels:
+      unassigned: Unassigned
+    metrics:
+      avg_value: Average value
+      count: Count
+      sum_value: Total value
+    record_types:
+      Campaign: Campaign
+      Company: Company
+      Deal: Deal
+      LeadSubmission: Lead submission
+      Person: Person
+    results:
+      empty: No data for this selection.
+      total: 'Total: %{value}'
+    save:
+      name_placeholder: Name this report
+      submit: Save
+    saved:
+      delete: Delete
+      heading: Saved reports
+    schedules:
+      daily: Email daily
+      monthly: Email monthly
+      none: Don't email
+      weekly: Email weekly
+    schedules_saved:
+      daily: Daily
+      monthly: Monthly
+      none: Not emailed
+      weekly: Weekly

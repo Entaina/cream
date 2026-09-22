@@ -1,12 +1,14 @@
 <p>
-  <%= @inviter_name %> invited you to join <strong><%= @workspace_name %></strong> on Cream
-  as a <%= @invitation.role %>.
+  <%= t("invitation_mailer.invite.body_html",
+        inviter_name: @inviter_name,
+        workspace_name: @workspace_name,
+        role: @role_label).html_safe %>
 </p>
 
 <p>
-  <%= link_to "Accept invitation", @accept_url %>
+  <%= link_to t("invitation_mailer.invite.accept_link"), @accept_url %>
 </p>
 
 <p>
-  This link will expire on <%= l @invitation.expires_at, format: :long %>.
+  <%= t("invitation_mailer.invite.expires", expires_at: @expires_at) %>
 </p>

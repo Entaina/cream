@@ -74,6 +74,7 @@ RSpec.describe BookingCreator, type: :service do
       "ip" => "127.0.0.1",
       "user_agent" => "rspec"
     )
+    expect(result.booking.metadata).not_to have_key("lang")
     expect(workspace.people.with_email("ana@example.com")).to exist
     expect(workspace.deals.where("name ILIKE ?", "%Ana Lopez%")).to exist
     expect(client).to have_received(:create_event)
@@ -98,6 +99,26 @@ RSpec.describe BookingCreator, type: :service do
     expect(notification.body).to include("Ana Lopez")
     expect(notification.body).to include("ana@example.com")
     expect(notification.url).to eq(Rails.application.routes.url_helpers.deal_path(result.booking.deal))
+  end
+
+  it "stores guest lang in metadata when provided" do
+    result = described_class.call(
+      booking_page: booking_page,
+      event_type: event_type,
+      params: {
+        datetime: "2026-07-28T10:00:00",
+        timezone: "Europe/Madrid",
+        first_name: "Ana",
+        last_name: "Lopez",
+        email: "ana@example.com",
+        lang: "en"
+      },
+      request: request,
+      client: client
+    )
+
+    expect(result.booking.metadata["lang"]).to eq("en")
+    expect(result.booking.guest_locale).to eq("en")
   end
 
   it "stores an IANA timezone and creates the Google event as local time plus zone" do

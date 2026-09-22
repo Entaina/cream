@@ -1,8 +1,8 @@
-<p>Hola <%= @responsible.name %>,</p>
+<p><%= t("lead_form_mailer.responsible_notification.greeting", name: @responsible.name) %></p>
 
-<p>Se ha recibido un nuevo envío en el formulario <strong><%= @lead_form.name %></strong>.</p>
+<p><%= t("lead_form_mailer.responsible_notification.intro", form_name: @lead_form.name).html_safe %></p>
 
-<h2>Datos del formulario</h2>
+<h2><%= t("lead_form_mailer.responsible_notification.form_data_heading") %></h2>
 <ul>
   <% @data.each do |key, value| %>
     <li><strong><%= key.humanize %>:</strong> <%= value %></li>
@@ -10,7 +10,7 @@
 </ul>
 
 <% if @metadata.present? %>
-  <h2>Origen</h2>
+  <h2><%= t("lead_form_mailer.responsible_notification.metadata_heading") %></h2>
   <ul>
     <% @metadata.each do |key, value| %>
       <li><strong><%= key.humanize %>:</strong> <%= value %></li>
@@ -19,5 +19,5 @@
 <% end %>
 
 <p>
-  <%= link_to "Ver deal en Cream", deal_url(@deal) %>
+  <%= link_to t("lead_form_mailer.responsible_notification.footer_deal_link"), deal_url(@deal) %>
 </p>

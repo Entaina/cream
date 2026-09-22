@@ -1,0 +1,38 @@
+---
+en:
+  alert_mailer:
+    alert_email:
+      body_html: An alert was triggered for deal <strong>%{deal_name}</strong> (%{company_name})
+        in <strong>%{workspace_name}</strong>.
+      body_text: An alert was triggered for deal %{deal_name} (%{company_name}) in
+        %{workspace_name}.
+      footer: You're receiving this email because email alerts are enabled on your
+        Cream profile.
+      greeting: Hi %{name},
+      subject: "[Cream] %{rule_name}"
+      view_deal: View deal
+  invitation_mailer:
+    invite:
+      accept_link: Accept invitation
+      body_html: "%{inviter_name} invited you to join <strong>%{workspace_name}</strong>
+        on Cream as %{role}."
+      body_text: "%{inviter_name} invited you to join %{workspace_name} on Cream as
+        %{role}."
+      expires: This link will expire on %{expires_at}.
+      subject: Join %{workspace_name} on Cream
+  lead_form_mailer:
+    responsible_notification:
+      footer_deal_link: View deal in Cream
+      form_data_heading: Form data
+      greeting: Hi %{name},
+      intro: A new submission was received on form <strong>%{form_name}</strong>.
+      intro_text: A new submission was received on form %{form_name}.
+      metadata_heading: Source
+      subject: New lead · %{form_name}%{lead_suffix}
+      subject_lead_suffix: " · %{descriptor}"
+  passwords_mailer:
+    reset:
+      expires: This link will expire in %{distance}.
+      intro: You can reset your password on
+      link_text: this password reset page
+      subject: Reset your password

@@ -9,18 +9,26 @@ class LeadFormMailer < ApplicationMailer
     @data = submission.data
     @metadata = submission.metadata
 
-    mail(to: responsible.email_address, subject: notification_subject)
+    with_mailer_locale(responsible.locale) do
+      mail(to: responsible.email_address, subject: notification_subject)
+    end
   end
 
   private
 
   def notification_subject
+    descriptor = lead_descriptor
+    lead_suffix = descriptor.present? ? t("lead_form_mailer.responsible_notification.subject_lead_suffix", descriptor: descriptor) : ""
+
+    t("lead_form_mailer.responsible_notification.subject", form_name: @lead_form.name, lead_suffix: lead_suffix)
+  end
+
+  def lead_descriptor
     lead_name = @person&.display_name.presence
     company_name = @company&.name.presence
-    descriptor = lead_name.to_s
-    descriptor += " (#{company_name})" if lead_name && company_name
+    return company_name if lead_name.blank?
 
-    ["Nuevo lead", @lead_form.name, descriptor.presence].compact.join(" · ")
+    company_name.present? ? "#{lead_name} (#{company_name})" : lead_name
   end
 
   def mailjet_workspace = @lead_form.workspace

@@ -43,7 +43,16 @@ en:
     mailer:
       datetime: Date and time
       host_notification:
+        body_html: A booking was made for <strong>%{event_name}</strong> with <strong>%{guest_name}</strong>
+          (%{guest_email}) in <strong>%{workspace_name}</strong>.
+        body_text: A booking was made for %{event_name} with %{guest_name} (%{guest_email})
+          in %{workspace_name}.
         date_time: Date and time
+        footer: You're receiving this email because email alerts are enabled on your
+          Cream profile.
+        greeting: Hi %{name},
+        subject: "[Cream] New booking: %{event_name} · %{guest_name}"
+        view_deal: View deal
       reminder:
         address: Address
         date: Date

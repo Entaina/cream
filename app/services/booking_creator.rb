@@ -161,7 +161,7 @@ class BookingCreator
   def booking_confirmation_tokens(booking)
     zone = ActiveSupport::TimeZone[booking.timezone] || Time.zone
     starts_at = booking.starts_at.in_time_zone(zone)
-    locale = @params["lang"].presence_in(%w[es en]) || I18n.locale
+    locale = booking.guest_locale
 
     location = if @event_type.location_address.present?
       @event_type.location_address

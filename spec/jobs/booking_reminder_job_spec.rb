@@ -57,6 +57,17 @@ RSpec.describe BookingReminderJob, type: :job do
     expect(mail.subject).to include("Online")
   end
 
+  it "uses the guest locale stored on the booking metadata" do
+    event_type.update!(name_i18n: {"es" => "Online", "en" => "Video call"})
+    booking.update!(metadata: {"lang" => "en"})
+
+    described_class.perform_now(booking.id)
+
+    mail = ActionMailer::Base.deliveries.last
+    expect(mail.subject).to include("Video call")
+    expect(mail.body.encoded).to include(I18n.t("booking.mailer.reminder.greeting", name: "Ana", locale: :en))
+  end
+
   it "is a no-op when the booking is cancelled" do
     booking.update!(status: "cancelled")
 

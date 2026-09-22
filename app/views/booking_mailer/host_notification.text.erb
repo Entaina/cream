@@ -1,13 +1,15 @@
-Hola <%= @host.name %>,
+<%= t("booking.mailer.host_notification.greeting", name: @host.name) %>
 
-Se ha hecho una reserva de <%= @event_type.localized_name %>
-con <%= @booking.display_name %> (<%= @booking.email %>)
-en <%= @booking_page.workspace.name %>.
+<%= t("booking.mailer.host_notification.body_text",
+      event_name: @event_type.localized_name,
+      guest_name: @booking.display_name,
+      guest_email: @booking.email,
+      workspace_name: @booking_page.workspace.name) %>
 
 <%= t("booking.mailer.host_notification.date_time") %>: <%= @starts_at_display %>
 
 <% if @deal_url -%>
-Ver deal: <%= @deal_url %>
+<%= t("booking.mailer.host_notification.view_deal") %>: <%= @deal_url %>
 <% end -%>
 
-Recibes este email porque tienes activadas las alertas por correo en tu perfil de Cream.
+<%= t("booking.mailer.host_notification.footer") %>
