@@ -1,0 +1,191 @@
+---
+en:
+  activerecord:
+    attributes:
+      booking_page:
+        active: Active
+        avatar_url: Avatar URL
+        booking_window_days: Booking window (days)
+        host_id: Host
+        logo_url: Logo URL
+        name: Name
+        pipeline_id: CRM pipeline
+        reuse_existing_deal: Reuse open deal
+        slug: Slug
+        timezone: Time zone
+        welcome_message: Welcome message
+      campaign:
+        goal: Goal
+        name: Name
+        starts_on: Start date
+        status: Status
+        utm_campaign: UTM campaign
+        utm_content: UTM content
+        utm_medium: UTM medium
+        utm_source: UTM source
+        utm_term: UTM term
+      company:
+        base: Company
+      custom_field:
+        field_type: Type
+        formula_expression: Formula expression
+        name: Name
+        options: Options
+        record_type: Object
+        reference_type: Reference type
+        required: Required
+      deal:
+        base: Deal
+        campaign_id: Campaign
+      edition:
+        ends_on: End date
+        name: Name
+        starts_on: Start date
+      email_message:
+        attachments: Attachments
+        body: Body
+        subject: Subject
+        to_address: To
+      invitation:
+        email_address: Email
+        role: Role
+      journey:
+        active: Active
+        name: Name
+        product_id: Product
+      lead_form:
+        active: Active
+        destination: Destination
+        email_template_id: Email template
+        hidden_field_keys: Hidden fields
+        name: Name
+        pipeline_id: Pipeline
+        pipeline_routes: Pipeline routes
+        pipeline_stage_id: Stage
+        product_id: Product
+        responsible_id: Owner
+        slug: Slug
+        subscription_type_id: Subscription type
+        success_redirect_url: Redirect URL
+        template_key: Template
+      lead_form_template:
+        body: Body
+        kind: Kind
+        page_slug: Page slug
+        slug: Identifier
+      membership:
+        current_pipeline_id: Default pipeline
+        role: Role
+      person:
+        base: Person
+        brought_by_id: Brought by
+        first_contact_on: First contact date
+        lifecycle_stage: Lifecycle stage
+      product:
+        description: Description
+        name: Name
+        price: Price
+        segment: Segment
+      segment:
+        filters: Filters
+        name: Name
+        record_type: Record type
+      subscription_type:
+        consent_field_key: Consent field key
+        description: Description
+        name: Name
+        slug: Slug
+      task:
+        assignee_id: Assignee
+        user_id: Created by
+      user:
+        email_address: Email
+        locale: Language
+        name: Name
+        password: Password
+        password_confirmation: Password confirmation
+        theme: Theme
+        timezone: Time zone
+      workspace:
+        name: Name
+        okm_service_account_key: OKM service account key
+        slug: Slug
+    models:
+      alert_rule:
+        one: Alert rule
+        other: Alert rules
+      booking:
+        one: Booking
+        other: Bookings
+      booking_page:
+        one: Booking page
+        other: Booking pages
+      campaign:
+        one: Campaign
+        other: Campaigns
+      company:
+        one: Company
+        other: Companies
+      custom_field:
+        one: Custom field
+        other: Custom fields
+      deal:
+        one: Deal
+        other: Deals
+      edition:
+        one: Edition
+        other: Editions
+      email_layout:
+        one: Email layout
+        other: Email layouts
+      email_message:
+        one: Email
+        other: Emails
+      email_template:
+        one: Email template
+        other: Email templates
+      invitation:
+        one: Invitation
+        other: Invitations
+      journey:
+        one: Journey
+        other: Journeys
+      lead_form:
+        one: Lead form
+        other: Lead forms
+      lead_form_template:
+        one: Form template
+        other: Form templates
+      list:
+        one: List
+        other: Lists
+      membership:
+        one: Member
+        other: Members
+      person:
+        one: Person
+        other: People
+      person_email:
+        one: Person email
+        other: Person emails
+      product:
+        one: Product
+        other: Products
+      segment:
+        one: Segment
+        other: Segments
+      subscription_type:
+        one: Subscription type
+        other: Subscription types
+      task:
+        one: Task
+        other: Tasks
+      user:
+        one: User
+        other: Users
+      webhook:
+        one: Webhook
+        other: Webhooks
+      workspace:
+        one: Workspace
+        other: Workspaces

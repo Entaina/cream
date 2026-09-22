@@ -19,6 +19,6 @@ class Webhook < ApplicationRecord
     invalid = Array(events) - EVENTS
     return if invalid.empty?
 
-    errors.add(:events, "contain invalid values: #{invalid.join(", ")}")
+    errors.add(:events, :contain_invalid_values, values: invalid.join(", "))
   end
 end

@@ -119,7 +119,7 @@ class Person < ApplicationRecord
     return if workspace.nil?
 
     unless workspace.users.exists?(id: brought_by_id)
-      errors.add(:brought_by_id, "must be a workspace member")
+      errors.add(:brought_by_id, :must_be_workspace_member)
     end
   end
 
@@ -145,7 +145,7 @@ class Person < ApplicationRecord
     primaries = person_emails.reject(&:marked_for_destruction?).count(&:primary?)
     return if primaries <= 1
 
-    errors.add(:base, "Only one email can be primary")
+    errors.add(:base, :single_primary_email)
   end
 
   def sync_person_emails_from_column

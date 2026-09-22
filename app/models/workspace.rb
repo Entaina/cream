@@ -118,9 +118,9 @@ class Workspace < ApplicationRecord
   def okm_service_account_key_format
     data = JSON.parse(okm_service_account_key)
     unless data.is_a?(Hash) && data["client_email"].present? && data["private_key"].present?
-      errors.add(:okm_service_account_key, "must be a valid service account JSON with client_email and private_key")
+      errors.add(:okm_service_account_key, :invalid_service_account_json)
     end
   rescue JSON::ParserError
-    errors.add(:okm_service_account_key, "must be valid JSON")
+    errors.add(:okm_service_account_key, :invalid_json)
   end
 end

@@ -94,7 +94,7 @@ class Invitation < ApplicationRecord
     return if email_address.blank? || workspace.blank?
 
     if workspace.users.exists?(email_address: email_address)
-      errors.add(:email_address, "is already a member of this workspace")
+      errors.add(:email_address, :invitation_already_member)
     end
   end
 
@@ -102,7 +102,7 @@ class Invitation < ApplicationRecord
     return if email_address.blank? || workspace.blank?
 
     if workspace.invitations.pending.exists?(email_address: email_address)
-      errors.add(:email_address, "already has a pending invitation")
+      errors.add(:email_address, :invitation_pending)
     end
   end
 end

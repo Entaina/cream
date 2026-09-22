@@ -101,13 +101,13 @@ module CustomFields
       next unless @custom_fields_input.key?(field.key)
 
       if field.boolean?
-        errors.add(:base, "#{field.name} is required") unless @custom_fields_input.key?(field.key)
+        errors.add(:base, :custom_field_required, name: field.name) unless @custom_fields_input.key?(field.key)
         next
       end
 
       cast = field.cast(@custom_fields_input[field.key])
       blank = cast.nil? || (cast.is_a?(String) && cast.blank?) || (cast.is_a?(Array) && cast.empty?)
-      errors.add(:base, "#{field.name} is required") if blank
+      errors.add(:base, :custom_field_required, name: field.name) if blank
     end
   end
 

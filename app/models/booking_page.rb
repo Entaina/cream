@@ -95,7 +95,7 @@ class BookingPage < ApplicationRecord
     ids = Array(calendar_ids).map(&:to_s).reject(&:blank?)
     return if ids.any?
 
-    errors.add(:calendar_ids, "selecciona al menos un calendario")
+    errors.add(:calendar_ids, :calendar_ids_required)
   end
 
   def all_blank_event_type?(attributes)
@@ -109,14 +109,14 @@ class BookingPage < ApplicationRecord
     types = event_types.reject(&:marked_for_destruction?)
     return if types.any? { |event_type| event_type.slug.present? || event_type.name_i18n.to_h["es"].present? }
 
-    errors.add(:base, "Configura al menos un tipo de evento")
+    errors.add(:base, :event_types_required)
   end
 
   def associations_belong_to_workspace
     return if workspace.nil?
 
-    errors.add(:pipeline, "must belong to the workspace") if pipeline && pipeline.workspace_id != workspace_id
-    errors.add(:host, "must be a workspace member") if host && !workspace.users.exists?(id: host_id)
+    errors.add(:pipeline, :must_belong_to_workspace) if pipeline && pipeline.workspace_id != workspace_id
+    errors.add(:host, :must_be_workspace_member) if host && !workspace.users.exists?(id: host_id)
   end
 
   def default_url_host

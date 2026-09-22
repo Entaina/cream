@@ -86,12 +86,12 @@ class LeadFormTemplate < ApplicationRecord
   def assign_path_from_slug
     segment = (@slug.presence || page_slug.presence || display_name.presence).to_s.strip.downcase
     if segment.blank?
-      errors.add(:slug, "can't be blank") unless path.present?
+      errors.add(:slug, :blank) unless path.present?
       return
     end
 
     unless segment.match?(/\A[a-z][a-z0-9_-]*\z/)
-      errors.add(:slug, "solo letras minúsculas, números, guiones y guiones bajos")
+      errors.add(:slug, :invalid_format)
       return
     end
 
@@ -109,7 +109,7 @@ class LeadFormTemplate < ApplicationRecord
   def page_slug_required_for_pages
     return unless page?
 
-    errors.add(:page_slug, "can't be blank") if page_slug.blank?
+    errors.add(:page_slug, :blank) if page_slug.blank?
   end
 
   def normalize_page_kind
@@ -122,6 +122,6 @@ class LeadFormTemplate < ApplicationRecord
     environment = LeadFormTemplates::Renderer.build_environment
     Liquid::Template.parse(body, environment: environment)
   rescue Liquid::SyntaxError => e
-    errors.add(:body, "syntax error: #{e.message}")
+    errors.add(:body, :reference_syntax_error, message: e.message)
   end
 end

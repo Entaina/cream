@@ -3,17 +3,17 @@ es:
   mail_merges:
     body: Cuerpo
     form:
-      body_default: 'Hola {first_name},'
-      subject_default: 'Hola {name}'
+      body_default: Hola {first_name},
+      subject_default: Hola {name}
     manual_source: Introducir IDs de registro manualmente
     page_title: Mail merge
     recipients: Destinatarios
     recipients_count:
-      loading: …
+      loading: "…"
       one: 1 destinatario
-      other: '%{count} destinatarios'
+      other: "%{count} destinatarios"
     record_ids: IDs de registro (separados por comas)
-    record_ids_placeholder: 1,2,3
+    record_ids_placeholder: 123
     record_type: Tipo de registro
     saved_views: Vistas guardadas
     send: Enviar mail merge

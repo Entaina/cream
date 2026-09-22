@@ -99,14 +99,14 @@ class Membership < ApplicationRecord
     return if current_pipeline_id.blank?
     return if current_pipeline&.workspace_id == workspace_id
 
-    errors.add(:current_pipeline, "must belong to the workspace")
+    errors.add(:current_pipeline, :must_belong_to_workspace)
   end
 
   def ensure_not_last_admin
     return if destroyed_by_association # cascading from workspace.destroy
     return unless last_admin?
 
-    errors.add(:base, "Cannot remove the last admin from the workspace")
+    errors.add(:base, :cannot_remove_last_admin)
     throw(:abort)
   end
 
@@ -114,6 +114,6 @@ class Membership < ApplicationRecord
     return unless role_changed? && role_was == "admin" && role != "admin"
     return unless workspace.memberships.admins.where.not(id: id).none?
 
-    errors.add(:role, "cannot demote the last admin")
+    errors.add(:role, :cannot_demote_last_admin)
   end
 end

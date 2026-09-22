@@ -21,7 +21,7 @@ class RecordAttachment < ApplicationRecord
   def attachable_type_allowed
     return if ATTACHABLE_TYPES.include?(attachable_type)
 
-    errors.add(:attachable_type, "is not allowed")
+    errors.add(:attachable_type, :attachable_not_allowed)
   end
 
   def track_on_record

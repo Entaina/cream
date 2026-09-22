@@ -225,7 +225,7 @@ class Deal < ApplicationRecord
   def stage_belongs_to_pipeline
     return if pipeline_stage.nil? || pipeline.nil?
 
-    errors.add(:pipeline_stage, "must belong to the selected pipeline") if pipeline_stage.pipeline_id != pipeline_id
+    errors.add(:pipeline_stage, :must_belong_to_selected_pipeline) if pipeline_stage.pipeline_id != pipeline_id
   end
 
   def stage_entry_conditions_met
@@ -246,20 +246,20 @@ class Deal < ApplicationRecord
     outsiders = live_contacts.reject { |person| allowed.include?(person.company_id) }
     return if outsiders.empty?
 
-    names = [company&.name, partner&.name].compact.join(" or ")
-    errors.add(:base, "Every contact must belong to #{names}")
+    names = [company&.name, partner&.name].compact.to_sentence
+    errors.add(:base, :contacts_must_belong_to_companies, names: names)
   end
 
   def partner_differs_from_company
     return if partner_id.blank? || company_id.blank?
 
-    errors.add(:partner, "must be different from the client company") if partner_id == company_id
+    errors.add(:partner, :must_differ_from_client_company) if partner_id == company_id
   end
 
   # On creation a deal must define a next action: a task due today or later.
   def has_a_future_task
     valid = tasks.reject(&:marked_for_destruction?).any? { |t| t.due_on.present? && t.due_on >= Date.current }
-    errors.add(:base, "A deal needs a next action (a task with a due date today or later)") unless valid
+    errors.add(:base, :needs_next_action) unless valid
   end
 
   def live_contacts

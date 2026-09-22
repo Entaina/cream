@@ -26,6 +26,6 @@ class Segment < ApplicationRecord
 
     self.filters = JSON.parse(filters)
   rescue JSON::ParserError
-    errors.add(:filters, "must be valid JSON")
+    errors.add(:filters, :invalid_json)
   end
 end

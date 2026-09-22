@@ -11,6 +11,6 @@ class DealAccess < ApplicationRecord
     return if deal.blank? || user.blank?
     return if deal.workspace.users.exists?(id: user_id)
 
-    errors.add(:user, "must belong to the deal workspace")
+    errors.add(:user, :must_belong_to_deal_workspace)
   end
 end

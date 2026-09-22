@@ -21,7 +21,7 @@ class PrivacyPolicyVersion < ApplicationRecord
     IMMUTABLE_ATTRIBUTES.each do |attribute|
       next unless will_save_change_to_attribute?(attribute)
 
-      errors.add(attribute, "cannot be changed")
+      errors.add(attribute, :cannot_be_changed)
     end
   end
 end

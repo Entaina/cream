@@ -19,6 +19,6 @@ class LeadSubmission < ApplicationRecord
   def deal_required_for_deal_capture
     return unless capture_destination == "deal"
 
-    errors.add(:deal, "is required for deal capture destination") if deal.blank?
+    errors.add(:deal, :deal_required_for_capture) if deal.blank?
   end
 end

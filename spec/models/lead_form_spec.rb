@@ -73,7 +73,9 @@ RSpec.describe LeadForm, type: :model do
       form.pipeline_routes = {"Invalid-Key" => form.pipeline_id}
 
       expect(form).not_to be_valid
-      expect(form.errors[:pipeline_routes]).to include("invalid key: Invalid-Key")
+      expect(form.errors[:pipeline_routes]).to include(
+        I18n.t("activerecord.errors.models.lead_form.attributes.pipeline_routes.invalid_key", key: "Invalid-Key")
+      )
     end
   end
 

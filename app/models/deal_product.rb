@@ -45,7 +45,7 @@ class DealProduct < ApplicationRecord
     return if edition.nil? || product.nil?
     return if edition.product_id == product_id
 
-    errors.add(:edition, "must belong to the same product")
+    errors.add(:edition, :must_belong_to_same_product)
   end
 
   def sync_deal_value

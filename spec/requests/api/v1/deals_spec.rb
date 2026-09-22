@@ -144,7 +144,7 @@ RSpec.describe "Api::V1::Deals", type: :request do
         headers: headers
 
       expect(response).to have_http_status(:unprocessable_content)
-      expect(response.parsed_body["errors"]).to include(/Every contact must belong/)
+      expect(response.parsed_body["errors"].join).to match(/pertenecer|Every contact must belong/)
     end
 
     it "creates a deal with nested notes" do

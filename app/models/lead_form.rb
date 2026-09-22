@@ -266,12 +266,12 @@ class LeadForm < ApplicationRecord
   def hidden_field_keys_are_valid
     hidden_field_keys.each do |key|
       unless key.match?(FIELD_KEY_FORMAT)
-        errors.add(:hidden_field_keys, "invalid key: #{key}")
+        errors.add(:hidden_field_keys, :invalid_key, key: key)
         next
       end
 
       if SYSTEM_FIELD_KEYS.include?(key)
-        errors.add(:hidden_field_keys, "reserved key: #{key}")
+        errors.add(:hidden_field_keys, :reserved_key, key: key)
       end
     end
   end
@@ -288,7 +288,7 @@ class LeadForm < ApplicationRecord
     pipeline_routes.each_key do |key|
       next if key.match?(FIELD_KEY_FORMAT)
 
-      errors.add(:pipeline_routes, "invalid key: #{key}")
+      errors.add(:pipeline_routes, :invalid_key, key: key)
     end
   end
 
@@ -298,40 +298,40 @@ class LeadForm < ApplicationRecord
     pipeline_routes.each do |help_type, pipeline_id|
       next if workspace.pipelines.exists?(id: pipeline_id)
 
-      errors.add(:pipeline_routes, "invalid pipeline for #{help_type}")
+      errors.add(:pipeline_routes, :invalid_pipeline, help_type: help_type)
     end
   end
 
   def deal_destination_requires_pipeline
     return unless deal_destination?
 
-    errors.add(:pipeline, "is required for deal destination forms") if pipeline.blank?
+    errors.add(:pipeline, :required_for_deal_destination) if pipeline.blank?
   end
 
   def mql_destination_allowed
     return unless mql_destination?
 
     unless CreamFeatures.enabled?(:mql_pool) && CreamFeatures.enabled?(:marketing_consent)
-      errors.add(:destination, "requires MQL pool and marketing consent features")
+      errors.add(:destination, :requires_mql_features)
     end
   end
 
   def subscription_type_belongs_to_workspace
     return if subscription_type.nil? || workspace.nil?
 
-    errors.add(:subscription_type, "must belong to the workspace") if subscription_type.workspace_id != workspace_id
+    errors.add(:subscription_type, :must_belong_to_workspace) if subscription_type.workspace_id != workspace_id
   end
 
   def associations_belong_to_workspace
     return if workspace.nil?
 
-    errors.add(:pipeline, "must belong to the workspace") if pipeline && pipeline.workspace_id != workspace_id
-    errors.add(:product, "must belong to the workspace") if product && product.workspace_id != workspace_id
+    errors.add(:pipeline, :must_belong_to_workspace) if pipeline && pipeline.workspace_id != workspace_id
+    errors.add(:product, :must_belong_to_workspace) if product && product.workspace_id != workspace_id
     if pipeline_stage && pipeline && pipeline_stage.pipeline_id != pipeline_id
-      errors.add(:pipeline_stage, "must belong to the selected pipeline")
+      errors.add(:pipeline_stage, :must_belong_to_selected_pipeline)
     end
-    errors.add(:email_template, "must belong to the workspace") if email_template && email_template.workspace_id != workspace_id
-    errors.add(:responsible, "must be a workspace member") if responsible && !workspace.users.exists?(id: responsible_id)
+    errors.add(:email_template, :must_belong_to_workspace) if email_template && email_template.workspace_id != workspace_id
+    errors.add(:responsible, :must_be_workspace_member) if responsible && !workspace.users.exists?(id: responsible_id)
   end
 
   def default_url_host

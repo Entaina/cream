@@ -1,0 +1,83 @@
+---
+en:
+  activerecord:
+    errors:
+      messages:
+        attachable_not_allowed: is not allowed
+        attachment_count_exceeded: cannot exceed %{count} files
+        attachment_file_too_large: "%{filename} exceeds %{megabytes} MB"
+        attachment_total_too_large: total size cannot exceed %{megabytes} MB
+        calendar_ids_required: select at least one calendar
+        cannot_be_changed: cannot be changed
+        cannot_be_same_person: cannot be the same person
+        cannot_demote_last_admin: cannot demote the last admin
+        cannot_remove_last_admin: cannot remove the last admin from the workspace
+        commentable_not_allowed: is not allowed
+        contain_invalid_values: 'contain invalid values: %{values}'
+        custom_field_required: "%{name} is required"
+        deal_converted_requires_attribute: is required when converted
+        deal_required_for_capture: is required for deal capture destination
+        ends_on_before_starts: must be on or after the start date
+        event_types_required: configure at least one event type
+        field_not_in_workspace: is not available in this workspace
+        formula_required: is required for formula fields
+        group_by_invalid: is not valid for %{record_type}
+        guest_count_exceeded: allows at most %{count} guests
+        guest_invalid_email: contains an invalid email
+        invalid: is invalid
+        invalid_json: must be valid JSON
+        invalid_priority: contains an invalid priority
+        invalid_service_account_json: must be a valid service account JSON with client_email
+          and private_key
+        invitation_already_member: is already a member of this workspace
+        invitation_pending: already has a pending invitation
+        is_already_on_contact: is already on this contact
+        item_must_include_text: each item must include text
+        journey_required_for_delivery: must be present for journey delivery
+        metric_deals_only: is only available for deals
+        must_be_array_of_objects: must be an array of objects
+        must_be_array_of_strings: must be an array of strings
+        must_be_empty_for_team_briefings: must be empty for team briefings
+        must_be_workspace_member: must be a workspace member
+        must_belong_to_deal_workspace: must belong to the deal workspace
+        must_belong_to_same_product: must belong to the same product
+        must_belong_to_same_workspace: must belong to the same workspace
+        must_belong_to_selected_pipeline: must belong to the selected pipeline
+        must_belong_to_workspace: must belong to the workspace
+        must_differ_from_client_company: must be different from the client company
+        partner_must_differ_from_company: must be different from the client company
+        pipeline_id_deals_only: is only valid for deals
+        pipeline_id_invalid_workspace: is not valid for this workspace
+        product_required_stop_open_deal: is required when stop on open deal is enabled
+        record_reference_types_invalid: must be Person, Company, or Deal for record
+          reference fields
+        reference_syntax_error: 'syntax error: %{message}'
+        relationship_exists_opposite: this relationship already exists in the opposite
+          direction
+        requires_mql_features: requires MQL pool and marketing consent features
+        reserved_consent_field_key: is reserved
+        select_options_required: must include at least one option for select fields
+        single_primary_email: only one email can be primary
+      models:
+        deal:
+          attributes:
+            base:
+              contacts_must_belong_to_companies: Every contact must belong to %{names}
+              needs_next_action: A deal needs a next action (a task with a due date
+                today or later)
+        lead_form:
+          attributes:
+            destination:
+              requires_mql_features: requires MQL pool and marketing consent features
+            hidden_field_keys:
+              invalid_key: 'invalid key: %{key}'
+              reserved_key: 'reserved key: %{key}'
+            pipeline:
+              required_for_deal_destination: is required for deal destination forms
+            pipeline_routes:
+              invalid_key: 'invalid key: %{key}'
+              invalid_pipeline: invalid pipeline for %{help_type}
+        lead_form_template:
+          attributes:
+            slug:
+              invalid_format: only lowercase letters, numbers, hyphens and underscores

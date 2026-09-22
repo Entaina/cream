@@ -70,22 +70,22 @@ class Report < ApplicationRecord
     return if record_type.blank?
 
     allowed = DIMENSIONS[record_type] || []
-    errors.add(:group_by, "is not valid for #{record_type}") unless allowed.include?(group_by)
+    errors.add(:group_by, :group_by_invalid, record_type: record_type) unless allowed.include?(group_by)
   end
 
   def metric_valid_for_type
     return if metric == "count"
 
-    errors.add(:metric, "is only available for deals") unless record_type == "Deal"
+    errors.add(:metric, :metric_deals_only) unless record_type == "Deal"
   end
 
   def pipeline_valid_for_type
     return if pipeline_id.blank?
 
     if record_type != "Deal"
-      errors.add(:pipeline_id, "is only valid for deals")
+      errors.add(:pipeline_id, :pipeline_id_deals_only)
     elsif !workspace.pipelines.exists?(id: pipeline_id)
-      errors.add(:pipeline_id, "is not valid for this workspace")
+      errors.add(:pipeline_id, :pipeline_id_invalid_workspace)
     end
   end
 end

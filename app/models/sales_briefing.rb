@@ -70,18 +70,18 @@ class SalesBriefing < ApplicationRecord
 
     Array(items).each do |item|
       unless item.is_a?(Hash)
-        errors.add(:items, "must be an array of objects")
+        errors.add(:items, :must_be_array_of_objects)
         break
       end
 
       priority = item["priority"].to_s
       unless PRIORITIES.include?(priority)
-        errors.add(:items, "contains an invalid priority")
+        errors.add(:items, :invalid_priority)
         break
       end
 
       if item["text"].blank?
-        errors.add(:items, "each item must include text")
+        errors.add(:items, :item_must_include_text)
         break
       end
     end
@@ -92,8 +92,8 @@ class SalesBriefing < ApplicationRecord
     validate_string_array(:misses)
     return unless team?
 
-    errors.add(:wins, "must be empty for team briefings") if Array(wins).any?
-    errors.add(:misses, "must be empty for team briefings") if Array(misses).any?
+    errors.add(:wins, :must_be_empty_for_team_briefings) if Array(wins).any?
+    errors.add(:misses, :must_be_empty_for_team_briefings) if Array(misses).any?
   end
 
   def validate_string_array(attribute)
@@ -101,7 +101,7 @@ class SalesBriefing < ApplicationRecord
     return if value.blank?
 
     unless value.is_a?(Array) && value.all? { |entry| entry.is_a?(String) && entry.present? }
-      errors.add(attribute, "must be an array of strings")
+      errors.add(attribute, :must_be_array_of_strings)
     end
   end
 end

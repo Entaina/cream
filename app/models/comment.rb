@@ -25,7 +25,7 @@ class Comment < ApplicationRecord
   def commentable_type_allowed
     return if COMMENTABLE_TYPES.include?(commentable_type)
 
-    errors.add(:commentable_type, "is not allowed")
+    errors.add(:commentable_type, :commentable_not_allowed)
   end
 
   def track_on_record

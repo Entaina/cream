@@ -33,6 +33,6 @@ class BeehiivPublication < ApplicationRecord
     return if subscription_type.blank? || beehiiv_connection.blank?
     return if subscription_type.workspace_id == beehiiv_connection.workspace_id
 
-    errors.add(:subscription_type, "must belong to the same workspace")
+    errors.add(:subscription_type, :must_belong_to_same_workspace)
   end
 end

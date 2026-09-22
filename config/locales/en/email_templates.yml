@@ -25,6 +25,10 @@ en:
         starting point. This does not create a new global template.
       blank_template: Compose without template
       body: Body
+      client:
+        load_failed: Could not load the template.
+        replace_template_confirm: Replace the current subject and body with the selected
+          template?
       layout: Layout (optional)
       layout_hint: The layout must include <code class="font-mono">{{ content }}</code>
         or <code class="font-mono">{content}</code> where the email body goes.

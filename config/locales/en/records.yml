@@ -40,13 +40,13 @@ en:
       search_placeholder: Search companies...
     merge:
       cancel: Cancel
+      companies_to_merge: Companies to merge in
+      company_to_keep: Company to keep
+      confirm: Merge the selected companies into %{name}? This cannot be undone.
       errors:
         no_secondaries: Select at least one company to merge.
         same_primary: Cannot merge a company into itself.
         same_workspace: All companies must belong to the same workspace.
-      companies_to_merge: Companies to merge in
-      company_to_keep: Company to keep
-      confirm: Merge the selected companies into %{name}? This cannot be undone.
       merge: Merge companies
       merging: Merging…
       no_domain: No domain
@@ -261,14 +261,6 @@ en:
       converted: Converted
       dismissed: Dismissed
       pending: Pending
-    lifecycle:
-      customer: Customer
-      evangelist: Evangelist
-      lead: Lead
-      mql: MQL
-      opportunity: Opportunity
-      sql: SQL
-      subscriber: Subscriber
     lead_submission:
       back_to_person: Back to person
       capture_destination: Capture destination
@@ -277,16 +269,24 @@ en:
       page_title: Form submission
       person: Person
       responses: Responses
+    lifecycle:
+      customer: Customer
+      evangelist: Evangelist
+      lead: Lead
+      mql: MQL
+      opportunity: Opportunity
+      sql: SQL
+      subscriber: Subscriber
     merge:
       cancel: Cancel
       confirm: Merge the selected contacts into %{name}? This cannot be undone.
       contact_to_keep: Contact to keep
+      contacts_to_merge: Contacts to merge in
       errors:
         merge_failed: Could not merge contacts. Please try again or contact support.
         no_secondaries: Select at least one contact to merge.
         same_primary: Cannot merge a contact into itself.
         same_workspace: All contacts must belong to the same workspace.
-      contacts_to_merge: Contacts to merge in
       merge: Merge contacts
       merging: Merging…
       no_email: No email
@@ -415,17 +415,6 @@ en:
     add_person: Add person
     ai:
       actionable: Actionable suggestions
-      draft_email: Draft email
-      email_goal: Email goal (optional)
-      email_goal_placeholder: e.g. Follow up after demo
-      intro: Summarize this record, suggest next steps, or draft a follow-up email.
-      missing_data: Missing data / suggestions
-      next_steps: Next steps
-      risks: Risks
-      suggest_fields: Suggest fields
-      suggested_next_steps: Suggested next steps
-      summarize: Summarize
-      summary: Summary
       client:
         create_task: Create task
         create_task_failed: Could not create task.
@@ -445,13 +434,20 @@ en:
         no_suggestions: No suggestions available.
         no_summary: No summary available.
         risk_badge: 'Risk: %{level}'
-        task_created: 'Task “%{title}” created.'
+        task_created: Task “%{title}” created.
+      draft_email: Draft email
+      email_goal: Email goal (optional)
+      email_goal_placeholder: e.g. Follow up after demo
+      intro: Summarize this record, suggest next steps, or draft a follow-up email.
+      missing_data: Missing data / suggestions
+      next_steps: Next steps
+      risks: Risks
+      suggest_fields: Suggest fields
+      suggested_next_steps: Suggested next steps
+      summarize: Summarize
+      summary: Summary
     ai_assistant: AI Assistant
     at_a_glance: At a glance
-    record_workspace:
-      leave_page_confirm: Leave this page? Your unsaved changes and drafts will be
-        lost.
-      other_drafts_confirm: You have other unsaved drafts. Leave them and continue?
     boolean:
       'false': 'No'
       'true': 'Yes'
@@ -527,6 +523,10 @@ en:
     open_deals: Open deals
     open_menu: Open menu
     profile_link: Profile
+    record_workspace:
+      leave_page_confirm: Leave this page? Your unsaved changes and drafts will be
+        lost.
+      other_drafts_confirm: You have other unsaved drafts. Leave them and continue?
     sections_aria:
       company: Company sections
       deal: Deal sections

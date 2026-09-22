@@ -380,9 +380,6 @@ es:
           la página de formulario que los importa.
         system_fields_summary: Metadatos y campos de sistema (%{count})
     lead_forms:
-      public:
-        privacy_title: Política de privacidad
-        success_title: Gracias
       edit:
         page_title: Editar formulario de captación
       form:
@@ -484,6 +481,9 @@ es:
         templates: Plantillas de formulario
       new:
         page_title: Nuevo formulario de captación
+      public:
+        privacy_title: Política de privacidad
+        success_title: Gracias
       show:
         col_date: Fecha
         col_destination: Destino

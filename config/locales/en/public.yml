@@ -1,13 +1,9 @@
 ---
 en:
   public:
-    lead_forms:
-      default_title: Form
-      gdpr_required: You must accept the privacy policy to submit the form.
-      turnstile_failed: We could not verify you are human. Please try again.
     email_preferences:
-      greeting_html: Hi <strong>%{name}</strong>, choose which communications you want
-        to receive from %{workspace}.
+      greeting_html: Hi <strong>%{name}</strong>, choose which communications you
+        want to receive from %{workspace}.
       page_title: Email preferences
       save: Save preferences
       title: Email preferences
@@ -18,3 +14,9 @@ en:
         emails in this category.
       page_title: Unsubscribe confirmed
       title: Unsubscribe confirmed
+    lead_forms:
+      default_title: Form
+      gdpr_required: You must accept the privacy policy to submit the form.
+      submit_failed: The form could not be submitted.
+      submitted: Thank you. We have received your request.
+      turnstile_failed: We could not verify you are human. Please try again.

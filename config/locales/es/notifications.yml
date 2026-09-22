@@ -3,23 +3,23 @@ es:
   notifications:
     events:
       booking:
-        body: '%{event}: %{name} (%{email}) — %{when}'
+        body: "%{event}: %{name} (%{email}) — %{when}"
         title: Nueva reserva
       email_followup:
         body: Sin respuesta de %{address} al email «%{subject}»
         title: Seguimiento
       email_opened:
-        body: '%{address} abrió «%{subject}»'
+        body: "%{address} abrió «%{subject}»"
         title: Email abierto
       email_replied:
-        body: '%{address} respondió a «%{subject}»'
+        body: "%{address} respondió a «%{subject}»"
         title: Respuesta al email
       journey_automation:
         default_body: Paso del journey completado para %{person}
       lead_submission:
-        body: '%{form}: %{person} (%{email})'
+        body: "%{form}: %{person} (%{email})"
         title: Nuevo lead
       mention:
-        title: '%{actor} te mencionó'
+        title: "%{actor} te mencionó"
       task_overdue:
         title: Tarea vencida

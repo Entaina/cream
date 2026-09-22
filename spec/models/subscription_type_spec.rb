@@ -36,7 +36,7 @@ RSpec.describe SubscriptionType do
       type = workspace.subscription_types.build(name: "Test", slug: "test", consent_field_key: "gdpr_consent")
 
       expect(type).not_to be_valid
-      expect(type.errors[:consent_field_key]).to include("is reserved")
+      expect(type.errors[:consent_field_key]).to include(I18n.t("activerecord.errors.messages.reserved_consent_field_key"))
     end
 
     it "requires unique consent field keys per workspace" do

@@ -27,7 +27,7 @@ RSpec.describe Invitation, type: :model do
       )
 
       expect(invitation).not_to be_valid
-      expect(invitation.errors[:email_address]).to include("is already a member of this workspace")
+      expect(invitation.errors[:email_address]).to include(I18n.t("activerecord.errors.messages.invitation_already_member"))
     end
 
     it "rejects duplicate pending invitations" do
@@ -44,7 +44,7 @@ RSpec.describe Invitation, type: :model do
       )
 
       expect(duplicate).not_to be_valid
-      expect(duplicate.errors[:email_address]).to include("already has a pending invitation")
+      expect(duplicate.errors[:email_address]).to include(I18n.t("activerecord.errors.messages.invitation_pending"))
     end
   end
 

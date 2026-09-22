@@ -31,6 +31,7 @@ en:
       datetime_with_zone: "%{datetime} (%{timezone})"
     errors:
       availability_params_required: month or date is required.
+      calendar_not_connected: Calendar not connected.
       event_type_not_found: Event type not found.
       invalid_datetime: The selected date or time is invalid.
       name_i18n_es_required: must include a name in Spanish

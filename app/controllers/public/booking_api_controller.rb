@@ -102,7 +102,7 @@ module Public
       @calendar_client = optional_calendar_client
       unless @calendar_client
         connection = @booking_page.calendar_connection
-        error = connection&.missing_scopes_message || "calendar not connected"
+        error = connection&.missing_scopes_message || I18n.t("booking.errors.calendar_not_connected")
         render json: {error: "not_connected", message: error}, status: :service_unavailable
         throw :abort
       end

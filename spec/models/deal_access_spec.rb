@@ -30,6 +30,6 @@ RSpec.describe DealAccess, type: :model do
     access = deal.deal_accesses.build(user: outsider)
 
     expect(access).not_to be_valid
-    expect(access.errors[:user]).to include("must belong to the deal workspace")
+    expect(access.errors[:user]).to include(I18n.t("activerecord.errors.messages.must_belong_to_deal_workspace"))
   end
 end

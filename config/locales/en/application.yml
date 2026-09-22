@@ -15,11 +15,13 @@ en:
         owner_id: Owner
         twitter_url: X / Twitter URL
       deal:
+        company_id: Company
         currency: Currency
         expected_close_date: Expected close date
         invoice_number: Invoice number
         name: Name
         owner_id: Owner
+        partner_id: Partner company
         pipeline_id: Pipeline
         pipeline_stage_id: Stage
         probability: Probability (%)
@@ -27,6 +29,7 @@ en:
       person:
         company_id: Company
         description: About
+        email: Email
         first_name: First name
         job_title: Job title
         last_name: Last name
@@ -34,9 +37,11 @@ en:
         location: Location
         owner_id: Owner
         phone: Phone
+        source: Source
         twitter_url: X / Twitter URL
       person_email:
         address: Email address
+        primary: Primary
       task:
         due_on: Due date
         title: Task
@@ -269,15 +274,15 @@ en:
     destroyed: "%{actor} deleted this deal"
     empty: No changes recorded yet.
     history: Version history
-    index_intro: Field changes, notes, comments, stage moves, contacts, products
-      and other events on this deal.
-    index_page_title: '%{deal} — Version history'
-    index_title: 'Version history · %{deal}'
+    index_intro: Field changes, notes, comments, stage moves, contacts, products and
+      other events on this deal.
+    index_page_title: "%{deal} — Version history"
+    index_title: Version history · %{deal}
     initial_version: Initial version when the deal was created.
-    show_page_title: '%{deal} — Version at %{time}'
-    show_title: '%{deal} · %{time}'
+    show_page_title: "%{deal} — Version at %{time}"
+    show_title: "%{deal} · %{time}"
     snapshot: Snapshot
-    time_ago: '%{time} ago'
+    time_ago: "%{time} ago"
     updated: "%{actor} updated %{fields}"
     updated_deal: the deal
   editions:
@@ -450,20 +455,6 @@ en:
       delete_confirm: Delete this note?
       title: Notes
       title_placeholder: Note title (optional)
-    pagination:
-      aria_label: Pagination
-      next: Next
-      page_of: Page %{page} of %{pages}
-      previous: Previous
-      range_html: <span class="font-medium text-ink">%{from}</span>–<span class="font-medium
-        text-ink">%{to}</span> of <span class="font-medium text-ink">%{count}</span>
-    record_picker:
-      create: + Create "%{name}"
-      create_failed: Could not create
-      network_error: Network error, please try again
-      no_results: No results
-      search_placeholder: Type to search…
-    someone: Someone
     okm_chat:
       action_failed: Could not execute the action.
       cancel: Cancel
@@ -482,6 +473,20 @@ en:
       shrink: Shrink chat
       thinking: Thinking…
       title: Knowledge base
+    pagination:
+      aria_label: Pagination
+      next: Next
+      page_of: Page %{page} of %{pages}
+      previous: Previous
+      range_html: <span class="font-medium text-ink">%{from}</span>–<span class="font-medium
+        text-ink">%{to}</span> of <span class="font-medium text-ink">%{count}</span>
+    record_picker:
+      create: + Create "%{name}"
+      create_failed: Could not create
+      network_error: Network error, please try again
+      no_results: No results
+      search_placeholder: Type to search…
+    someone: Someone
     tasks:
       add: Add
       assignee: Assignee
@@ -516,13 +521,6 @@ en:
       update_view: Update view
       view_name_placeholder: View name
   tasks:
-    next_task_prompt:
-      add: Add task
-      body_html: You completed the last task for <strong class="font-medium text-ink">%{name}</strong>.
-        What’s next?
-      placeholder: Add a task…
-      skip: Skip
-      title: Next task
     index:
       add_task: Add task
       all: All
@@ -533,6 +531,13 @@ en:
       my_tasks: My tasks
       open: Open
       title: Tasks
+    next_task_prompt:
+      add: Add task
+      body_html: You completed the last task for <strong class="font-medium text-ink">%{name}</strong>.
+        What’s next?
+      placeholder: Add a task…
+      skip: Skip
+      title: Next task
   time:
     formats:
       default: "%m/%d/%Y %I:%M %p"

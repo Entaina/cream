@@ -22,7 +22,7 @@ RSpec.describe PersonRelationship, type: :model do
     relationship = build_relationship(from: alice, to: alice, type: "invited")
 
     expect(relationship).not_to be_valid
-    expect(relationship.errors[:to_person]).to include("cannot be the same person")
+    expect(relationship.errors[:to_person]).to include(I18n.t("activerecord.errors.messages.cannot_be_same_person"))
   end
 
   it "rejects people from different workspaces" do
@@ -31,7 +31,7 @@ RSpec.describe PersonRelationship, type: :model do
     relationship = build_relationship(from: alice, to: outsider, type: "invited")
 
     expect(relationship).not_to be_valid
-    expect(relationship.errors[:to_person]).to include("must belong to the same workspace")
+    expect(relationship.errors[:to_person]).to include(I18n.t("activerecord.errors.messages.must_belong_to_same_workspace"))
   end
 
   it "rejects duplicate symmetric pairs in the opposite direction" do
@@ -39,7 +39,7 @@ RSpec.describe PersonRelationship, type: :model do
     duplicate = build_relationship(from: bob, to: alice, type: "worked_with")
 
     expect(duplicate).not_to be_valid
-    expect(duplicate.errors[:base]).to include("this relationship already exists in the opposite direction")
+    expect(duplicate.errors[:base]).to include(I18n.t("activerecord.errors.messages.relationship_exists_opposite"))
   end
 
   describe "#label_for" do

@@ -43,6 +43,6 @@ class Edition < ApplicationRecord
     return if starts_on.blank? || ends_on.blank?
     return if ends_on >= starts_on
 
-    errors.add(:ends_on, "must be on or after the start date")
+    errors.add(:ends_on, :ends_on_before_starts)
   end
 end

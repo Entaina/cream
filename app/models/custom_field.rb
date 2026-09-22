@@ -102,21 +102,21 @@ class CustomField < ApplicationRecord
     return unless select?
     return if options.is_a?(Array) && options.any?
 
-    errors.add(:options, "must include at least one option for select fields")
+    errors.add(:options, :select_options_required)
   end
 
   def formula_expression_present_for_formula
     return unless formula?
     return if formula_expression.present?
 
-    errors.add(:formula_expression, "is required for formula fields")
+    errors.add(:formula_expression, :formula_required)
   end
 
   def reference_type_present_for_record_reference
     return unless reference?
     return if reference_type.in?(RECORD_TYPES)
 
-    errors.add(:reference_type, "must be Person, Company, or Deal for record reference fields")
+    errors.add(:reference_type, :record_reference_types_invalid)
   end
 
   def none_scope

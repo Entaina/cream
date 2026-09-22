@@ -116,20 +116,20 @@ class EmailTemplate < ApplicationRecord
     return unless attachments.attached?
 
     if attachments.count > EmailMessage::MAX_ATTACHMENTS
-      errors.add(:attachments, "cannot exceed #{EmailMessage::MAX_ATTACHMENTS} files")
+      errors.add(:attachments, :attachment_count_exceeded, count: EmailMessage::MAX_ATTACHMENTS)
       return
     end
 
     total = 0
     attachments.each do |file|
       if file.byte_size > EmailMessage::MAX_ATTACHMENT_SIZE
-        errors.add(:attachments, "#{file.filename} exceeds #{EmailMessage::MAX_ATTACHMENT_SIZE / 1.megabyte} MB")
+        errors.add(:attachments, :attachment_file_too_large, filename: file.filename, megabytes: EmailMessage::MAX_ATTACHMENT_SIZE / 1.megabyte)
       end
       total += file.byte_size
     end
 
     if total > EmailMessage::MAX_TOTAL_ATTACHMENT_SIZE
-      errors.add(:attachments, "total size cannot exceed #{EmailMessage::MAX_TOTAL_ATTACHMENT_SIZE / 1.megabyte} MB")
+      errors.add(:attachments, :attachment_total_too_large, megabytes: EmailMessage::MAX_TOTAL_ATTACHMENT_SIZE / 1.megabyte)
     end
   end
 end

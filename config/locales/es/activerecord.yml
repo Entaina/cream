@@ -1,0 +1,191 @@
+---
+es:
+  activerecord:
+    attributes:
+      booking_page:
+        active: Activo
+        avatar_url: URL del avatar
+        booking_window_days: Ventana de reserva (días)
+        host_id: Anfitrión
+        logo_url: URL del logo
+        name: Nombre
+        pipeline_id: Pipeline CRM
+        reuse_existing_deal: Reutilizar oportunidad abierta
+        slug: Slug
+        timezone: Zona horaria
+        welcome_message: Mensaje de bienvenida
+      campaign:
+        goal: Objetivo
+        name: Nombre
+        starts_on: Fecha de inicio
+        status: Estado
+        utm_campaign: UTM campaign
+        utm_content: UTM content
+        utm_medium: UTM medium
+        utm_source: UTM source
+        utm_term: UTM term
+      company:
+        base: Empresa
+      custom_field:
+        field_type: Tipo
+        formula_expression: Expresión de fórmula
+        name: Nombre
+        options: Opciones
+        record_type: Objeto
+        reference_type: Tipo de referencia
+        required: Obligatorio
+      deal:
+        base: Oportunidad
+        campaign_id: Campaña
+      edition:
+        ends_on: Fecha de fin
+        name: Nombre
+        starts_on: Fecha de inicio
+      email_message:
+        attachments: Adjuntos
+        body: Cuerpo
+        subject: Asunto
+        to_address: Destinatario
+      invitation:
+        email_address: Email
+        role: Rol
+      journey:
+        active: Activo
+        name: Nombre
+        product_id: Producto
+      lead_form:
+        active: Activo
+        destination: Destino
+        email_template_id: Plantilla de email
+        hidden_field_keys: Campos ocultos
+        name: Nombre
+        pipeline_id: Pipeline
+        pipeline_routes: Rutas por pipeline
+        pipeline_stage_id: Etapa
+        product_id: Producto
+        responsible_id: Responsable
+        slug: Slug
+        subscription_type_id: Tipo de suscripción
+        success_redirect_url: URL de redirección
+        template_key: Plantilla
+      lead_form_template:
+        body: Cuerpo
+        kind: Tipo
+        page_slug: Slug de página
+        slug: Identificador
+      membership:
+        current_pipeline_id: Pipeline por defecto
+        role: Rol
+      person:
+        base: Contacto
+        brought_by_id: Traído por
+        first_contact_on: Primer contacto
+        lifecycle_stage: Etapa del ciclo de vida
+      product:
+        description: Descripción
+        name: Nombre
+        price: Precio
+        segment: Segmento
+      segment:
+        filters: Filtros
+        name: Nombre
+        record_type: Tipo de registro
+      subscription_type:
+        consent_field_key: Clave de consentimiento
+        description: Descripción
+        name: Nombre
+        slug: Slug
+      task:
+        assignee_id: Responsable
+        user_id: Creado por
+      user:
+        email_address: Email
+        locale: Idioma
+        name: Nombre
+        password: Contraseña
+        password_confirmation: Confirmación de contraseña
+        theme: Tema
+        timezone: Zona horaria
+      workspace:
+        name: Nombre
+        okm_service_account_key: Clave de cuenta de servicio OKM
+        slug: Slug
+    models:
+      alert_rule:
+        one: Regla de alerta
+        other: Reglas de alerta
+      booking:
+        one: Reserva
+        other: Reservas
+      booking_page:
+        one: Página de reservas
+        other: Páginas de reservas
+      campaign:
+        one: Campaña
+        other: Campañas
+      company:
+        one: Empresa
+        other: Empresas
+      custom_field:
+        one: Campo personalizado
+        other: Campos personalizados
+      deal:
+        one: Oportunidad
+        other: Oportunidades
+      edition:
+        one: Edición
+        other: Ediciones
+      email_layout:
+        one: Layout de email
+        other: Layouts de email
+      email_message:
+        one: Email
+        other: Emails
+      email_template:
+        one: Plantilla de email
+        other: Plantillas de email
+      invitation:
+        one: Invitación
+        other: Invitaciones
+      journey:
+        one: Recorrido
+        other: Recorridos
+      lead_form:
+        one: Formulario de captación
+        other: Formularios de captación
+      lead_form_template:
+        one: Plantilla de formulario
+        other: Plantillas de formulario
+      list:
+        one: Lista
+        other: Listas
+      membership:
+        one: Miembro
+        other: Miembros
+      person:
+        one: Contacto
+        other: Contactos
+      person_email:
+        one: Email del contacto
+        other: Emails del contacto
+      product:
+        one: Producto
+        other: Productos
+      segment:
+        one: Segmento
+        other: Segmentos
+      subscription_type:
+        one: Tipo de suscripción
+        other: Tipos de suscripción
+      task:
+        one: Tarea
+        other: Tareas
+      user:
+        one: Usuario
+        other: Usuarios
+      webhook:
+        one: Webhook
+        other: Webhooks
+      workspace:
+        one: Workspace
+        other: Workspaces

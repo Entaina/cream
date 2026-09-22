@@ -46,18 +46,18 @@ module Marketing
     def references_belong_to_workspace
       return if workspace.nil?
 
-      errors.add(:person, "must belong to the workspace") if person && person.workspace_id != workspace_id
-      errors.add(:product, "must belong to the workspace") if product && product.workspace_id != workspace_id
+      errors.add(:person, :must_belong_to_workspace) if person && person.workspace_id != workspace_id
+      errors.add(:product, :must_belong_to_workspace) if product && product.workspace_id != workspace_id
       if lead_submission && lead_submission.workspace_id != workspace_id
-        errors.add(:lead_submission, "must belong to the workspace")
+        errors.add(:lead_submission, :must_belong_to_workspace)
       end
     end
 
     def converted_fields_consistent
       return unless converted?
 
-      errors.add(:deal, "is required when converted") if deal_id.blank?
-      errors.add(:converted_at, "is required when converted") if converted_at.blank?
+      errors.add(:deal, :deal_converted_requires_attribute) if deal_id.blank?
+      errors.add(:converted_at, :deal_converted_requires_attribute) if converted_at.blank?
     end
   end
 end

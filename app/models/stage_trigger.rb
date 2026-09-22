@@ -33,7 +33,7 @@ class StageTrigger < ApplicationRecord
   def stage_belongs_to_workspace
     return if pipeline_stage.nil? || pipeline_stage.workspace_id == workspace_id
 
-    errors.add(:pipeline_stage, "must belong to the same workspace")
+    errors.add(:pipeline_stage, :must_belong_to_same_workspace)
   end
 
   # Keep only the params declared by the selected function (the form submits

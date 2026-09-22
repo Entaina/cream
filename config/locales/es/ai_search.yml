@@ -1,8 +1,8 @@
 ---
 es:
   ai_search:
-    empty_subtitle: Prueba oportunidades estancadas, tareas vencidas, seguimientos pendientes
-      o una palabra clave.
+    empty_subtitle: Prueba oportunidades estancadas, tareas vencidas, seguimientos
+      pendientes o una palabra clave.
     empty_title: Sin resultados para «%{query}»
     interpretations:
       default: Búsqueda por palabra clave en personas, empresas y oportunidades
@@ -16,7 +16,8 @@ es:
       tasks_linked_to_record: Tareas vinculadas a %{type} «%{name}»
       won_deals: Oportunidades en etapa ganada
     page_title: Búsqueda IA
-    placeholder: 'Prueba: oportunidades estancadas, tareas vencidas, seguimientos pendientes…'
+    placeholder: 'Prueba: oportunidades estancadas, tareas vencidas, seguimientos
+      pendientes…'
     record_types:
       company: empresa
       person: persona

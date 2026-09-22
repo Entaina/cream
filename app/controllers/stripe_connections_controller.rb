@@ -11,7 +11,7 @@ class StripeConnectionsController < ApplicationController
   def create
     @connection = current_workspace.stripe_connections.new(connection_params.merge(user: current_user))
     authorize @connection
-    save_with_verified_key(@connection, "Stripe connected.")
+    save_with_verified_key(@connection, t("flashes.stripe.connected"))
   end
 
   def update
@@ -22,7 +22,7 @@ class StripeConnectionsController < ApplicationController
     # A blank key field on the form means "keep the stored key".
     attrs = attrs.except(:api_key) if attrs[:api_key].blank?
     @connection.assign_attributes(attrs)
-    save_with_verified_key(@connection, "Stripe settings updated.")
+    save_with_verified_key(@connection, t("flashes.stripe.updated"))
   end
 
   def sync
@@ -65,17 +65,17 @@ class StripeConnectionsController < ApplicationController
       # (production-only) made a freshly connected account look broken.
       if connection.connected?
         StripeSyncJob.perform_later(connection.id)
-        notice += " Importing payments…"
+        notice = [notice, t("flashes.stripe.importing_payments")].join(" ")
       end
       redirect_to stripe_connection_path, notice: notice
     else
       render :show, status: :unprocessable_entity
     end
   rescue StripeClient::AuthenticationError
-    connection.errors.add(:api_key, "was rejected by Stripe — check the key")
+    connection.errors.add(:api_key, t("flashes.stripe.api_key_rejected"))
     render :show, status: :unprocessable_entity
   rescue StripeClient::Error => e
-    connection.errors.add(:base, "Could not verify the key with Stripe: #{e.message}")
+    connection.errors.add(:base, "#{t('flashes.stripe.verify_failed')}: #{e.message}")
     render :show, status: :unprocessable_entity
   end
 end

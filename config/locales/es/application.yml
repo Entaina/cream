@@ -15,11 +15,13 @@ es:
         owner_id: Propietario
         twitter_url: URL de X / Twitter
       deal:
+        company_id: Empresa
         currency: Moneda
         expected_close_date: Fecha de cierre prevista
         invoice_number: Nº factura
         name: Nombre
         owner_id: Propietario
+        partner_id: Empresa partner
         pipeline_id: Pipeline
         pipeline_stage_id: Etapa
         probability: Probabilidad (%)
@@ -27,6 +29,7 @@ es:
       person:
         company_id: Empresa
         description: Acerca de
+        email: Email
         first_name: Nombre
         job_title: Cargo
         last_name: Apellidos
@@ -34,9 +37,11 @@ es:
         location: Ubicación
         owner_id: Propietario
         phone: Teléfono
+        source: Origen
         twitter_url: URL de X / Twitter
       person_email:
         address: Dirección de email
+        primary: Principal
       task:
         due_on: Fecha límite
         title: Tarea
@@ -270,11 +275,11 @@ es:
     history: Historial de versiones
     index_intro: Cambios de campos, notas, comentarios, movimientos de etapa, contactos,
       productos y otros eventos en esta oportunidad.
-    index_page_title: '%{deal} — Historial de versiones'
-    index_title: 'Historial de versiones · %{deal}'
+    index_page_title: "%{deal} — Historial de versiones"
+    index_title: Historial de versiones · %{deal}
     initial_version: Versión inicial cuando se creó la oportunidad.
-    show_page_title: '%{deal} — Versión del %{time}'
-    show_title: '%{deal} · %{time}'
+    show_page_title: "%{deal} — Versión del %{time}"
+    show_title: "%{deal} · %{time}"
     snapshot: Instantánea
     time_ago: hace %{time}
     updated: "%{actor} actualizó %{fields}"
@@ -451,20 +456,6 @@ es:
       delete_confirm: "¿Eliminar esta nota?"
       title: Notas
       title_placeholder: Título de la nota (opcional)
-    pagination:
-      aria_label: Paginación
-      next: Siguiente
-      page_of: Página %{page} de %{pages}
-      previous: Anterior
-      range_html: <span class="font-medium text-ink">%{from}</span>–<span class="font-medium
-        text-ink">%{to}</span> de <span class="font-medium text-ink">%{count}</span>
-    record_picker:
-      create: + Crear "%{name}"
-      create_failed: No se pudo crear
-      network_error: Error de red, inténtalo de nuevo
-      no_results: Sin resultados
-      search_placeholder: Escribe para buscar…
-    someone: Alguien
     okm_chat:
       action_failed: No se pudo ejecutar la acción.
       cancel: Cancelar
@@ -483,6 +474,20 @@ es:
       shrink: Reducir chat
       thinking: Pensando…
       title: Base de conocimiento
+    pagination:
+      aria_label: Paginación
+      next: Siguiente
+      page_of: Página %{page} de %{pages}
+      previous: Anterior
+      range_html: <span class="font-medium text-ink">%{from}</span>–<span class="font-medium
+        text-ink">%{to}</span> de <span class="font-medium text-ink">%{count}</span>
+    record_picker:
+      create: + Crear "%{name}"
+      create_failed: No se pudo crear
+      network_error: Error de red, inténtalo de nuevo
+      no_results: Sin resultados
+      search_placeholder: Escribe para buscar…
+    someone: Alguien
     tasks:
       add: Añadir
       assignee: Asignado a
@@ -517,13 +522,6 @@ es:
       update_view: Actualizar vista
       view_name_placeholder: Nombre de la vista
   tasks:
-    next_task_prompt:
-      add: Añadir tarea
-      body_html: Completaste la última tarea de <strong class="font-medium text-ink">%{name}</strong>.
-        ¿Cuál es la siguiente?
-      placeholder: Añadir tarea…
-      skip: Omitir
-      title: Siguiente tarea
     index:
       add_task: Añadir tarea
       all: Todas
@@ -534,6 +532,13 @@ es:
       my_tasks: Mis tareas
       open: Abiertas
       title: Tareas
+    next_task_prompt:
+      add: Añadir tarea
+      body_html: Completaste la última tarea de <strong class="font-medium text-ink">%{name}</strong>.
+        ¿Cuál es la siguiente?
+      placeholder: Añadir tarea…
+      skip: Omitir
+      title: Siguiente tarea
   time:
     formats:
       default: "%d/%m/%Y %H:%M"

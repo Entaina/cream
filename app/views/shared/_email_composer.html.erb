@@ -1,7 +1,8 @@
 <%# locals: (composer_id:, source_form_id:, email_templates:, email_layouts:, subject_name:, body_name:, body_editor_name:, email_layout_id_name:, email_template_id_name:, subject: nil, body: nil, body_editor: "quill", email_layout_id: nil, email_template_id: nil, show_template_picker: true, show_preview: true) %>
 <div class="space-y-3 border border-line rounded-lg p-3"
      data-controller="email-composer"
-     data-email-composer-template-url-value="<%= email_templates_path %>">
+     data-email-composer-template-url-value="<%= email_templates_path %>"
+     data-email-composer-copy-value="<%= json_escape(I18n.t("email_templates.composer.client")) %>">
   <% if show_template_picker %>
     <div>
       <label class="label" for="<%= composer_id %>_template"><%= t("email_templates.composer.base_template") %></label>

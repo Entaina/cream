@@ -49,6 +49,6 @@ class CampaignSend < ApplicationRecord
     return unless enrolls_in_journey?
     return if journey_id.present?
 
-    errors.add(:journey, "must be present for journey delivery")
+    errors.add(:journey, :journey_required_for_delivery)
   end
 end

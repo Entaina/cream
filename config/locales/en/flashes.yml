@@ -10,9 +10,11 @@ en:
       updated: Automation updated.
     beehiiv:
       configure_first: Configure the API key and at least one publication first.
+      connected: Beehiiv connected.
       disconnected: Beehiiv disconnected.
       publication_deleted: Beehiiv publication removed.
       sync_started: Beehiiv sync started.
+      updated: Beehiiv settings updated.
     booking_pages:
       created: Booking page created.
       deleted: Booking page deleted.
@@ -90,8 +92,10 @@ en:
       revoked: Invitation revoked.
       sent: Invitation sent to %{email}.
     journeys:
+      activated: Journey activated.
       created: Journey created.
       deleted: Journey deleted.
+      paused: Journey paused.
       updated: Journey updated.
     lead_form_templates:
       created: Template created.
@@ -113,7 +117,12 @@ en:
       no_recipients: No recipients matched the selected source.
       queued: Mail merge queued for %{count} recipients.
     mailjet:
+      connected: Mailjet connected.
       disconnected: Mailjet disconnected.
+      updated: Mailjet settings updated.
+      webhook_failed: Mailjet connected, but Event Tracking could not be registered.
+        Check the webhook URL and try again.
+      webhook_registered: Event Tracking registered in Mailjet.
     memberships:
       removed: Member removed from workspace.
       role_updated: Member role updated.
@@ -197,12 +206,17 @@ en:
       updated: Trigger updated.
     stripe:
       add_api_key_first: Add a Stripe API key first.
+      api_key_rejected: Stripe rejected the key — check the key.
+      connected: Stripe connected.
       disconnected: Stripe disconnected.
       ignored: Payment ignored.
+      importing_payments: Importing payments…
       linked: Payment linked to %{deal}.
       pick_deal: Pick a deal to link this payment to.
       review: Payment back in review.
       sync_started: Payment sync started.
+      updated: Stripe settings updated.
+      verify_failed: Could not verify the key with Stripe.
     subscription_types:
       created: Subscription type created.
       deleted: Subscription type deleted.

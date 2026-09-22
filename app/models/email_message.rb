@@ -129,7 +129,7 @@ class EmailMessage < ApplicationRecord
     return if to_address.blank?
     return if to_address.match?(URI::MailTo::EMAIL_REGEXP)
 
-    errors.add(:to_address, "is invalid")
+    errors.add(:to_address, :invalid)
   end
 
   def sent_activity_recorded?
@@ -140,20 +140,20 @@ class EmailMessage < ApplicationRecord
     return unless attachments.attached?
 
     if attachments.count > MAX_ATTACHMENTS
-      errors.add(:attachments, "cannot exceed #{MAX_ATTACHMENTS} files")
+      errors.add(:attachments, :attachment_count_exceeded, count: MAX_ATTACHMENTS)
       return
     end
 
     total = 0
     attachments.each do |file|
       if file.byte_size > MAX_ATTACHMENT_SIZE
-        errors.add(:attachments, "#{file.filename} exceeds #{MAX_ATTACHMENT_SIZE / 1.megabyte} MB")
+        errors.add(:attachments, :attachment_file_too_large, filename: file.filename, megabytes: MAX_ATTACHMENT_SIZE / 1.megabyte)
       end
       total += file.byte_size
     end
 
     if total > MAX_TOTAL_ATTACHMENT_SIZE
-      errors.add(:attachments, "total size cannot exceed #{MAX_TOTAL_ATTACHMENT_SIZE / 1.megabyte} MB")
+      errors.add(:attachments, :attachment_total_too_large, megabytes: MAX_TOTAL_ATTACHMENT_SIZE / 1.megabyte)
     end
   end
 end

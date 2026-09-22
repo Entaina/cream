@@ -31,6 +31,7 @@ es:
       datetime_with_zone: "%{datetime} (%{timezone})"
     errors:
       availability_params_required: Indica month o date.
+      calendar_not_connected: Calendario no conectado.
       event_type_not_found: Tipo de evento no encontrado.
       invalid_datetime: La fecha u hora seleccionada no es válida.
       name_i18n_es_required: debe incluir nombre en español

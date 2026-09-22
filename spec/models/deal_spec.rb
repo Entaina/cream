@@ -237,7 +237,7 @@ RSpec.describe Deal, type: :model do
       invalid = workspace.deals.new(name: "X", pipeline: pipeline, pipeline_stage: pipeline.first_stage)
       expect(invalid).not_to be_valid
       expect(invalid.errors[:company]).to be_present
-      expect(invalid.errors[:base].join).to match(/next action/)
+      expect(invalid.errors[:base].join).to match(/siguiente acción|next action/)
     end
 
     it "allows a deal with only a company and a future task" do
@@ -253,7 +253,7 @@ RSpec.describe Deal, type: :model do
         company: company, contacts: [outsider],
         tasks: [Task.new(title: "t", due_on: Date.current + 1, workspace: workspace, user: actor, assignee: actor)])
       expect(deal).not_to be_valid
-      expect(deal.errors[:base].join).to match(/must belong to/)
+      expect(deal.errors[:base].join).to match(/pertenecer|must belong/)
     end
 
     it "allows a contact from the partner company when partner is set" do
@@ -282,7 +282,7 @@ RSpec.describe Deal, type: :model do
         company: company, partner: partner, contacts: [outsider],
         tasks: [Task.new(title: "t", due_on: Date.current + 1, workspace: workspace, user: actor, assignee: actor)])
       expect(deal).not_to be_valid
-      expect(deal.errors[:base].join).to match(/must belong to/)
+      expect(deal.errors[:base].join).to match(/pertenecer|must belong/)
     end
 
     it "rejects the partner being the same as the client company" do
@@ -290,7 +290,7 @@ RSpec.describe Deal, type: :model do
         company: company, partner: company,
         tasks: [Task.new(title: "t", due_on: Date.current + 1, workspace: workspace, user: actor, assignee: actor)])
       expect(deal).not_to be_valid
-      expect(deal.errors[:partner].join).to match(/different from the client company/)
+      expect(deal.errors[:partner].join).to match(/distinta de la empresa cliente|different from the client company/)
     end
 
     it "allows a next action due today" do
@@ -305,7 +305,7 @@ RSpec.describe Deal, type: :model do
         company: company, contacts: [create_person!(workspace, company: company)],
         tasks: [Task.new(title: "t", due_on: Date.current - 1, workspace: workspace, user: actor, assignee: actor)])
       expect(deal).not_to be_valid
-      expect(deal.errors[:base].join).to match(/next action/)
+      expect(deal.errors[:base].join).to match(/siguiente acción|next action/)
     end
   end
 

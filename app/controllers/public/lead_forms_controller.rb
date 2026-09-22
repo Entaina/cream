@@ -49,7 +49,7 @@ module Public
       )
       redirect_after_submission(prefill: (redirect_prefill if result))
     rescue ActiveRecord::RecordInvalid => e
-      flash.now[:alert] = e.record.errors.full_messages.to_sentence.presence || "No se pudo enviar el formulario."
+      flash.now[:alert] = e.record.errors.full_messages.to_sentence.presence || t("public.lead_forms.submit_failed")
       render_show_or_not_found(status: :unprocessable_entity)
     end
 
@@ -179,7 +179,7 @@ module Public
     # Sin prefill (bots, rate limit, descarte silencioso) la redirección va limpia:
     # los datos del envío solo viajan cuando el lead se ha creado de verdad.
     def redirect_after_submission(prefill: nil)
-      notice = "Gracias. Hemos recibido tu solicitud."
+      notice = t("public.lead_forms.submitted")
       if (location = @lead_form.success_redirect_location(prefill: prefill))
         redirect_to location, notice: notice, allow_other_host: true
       else

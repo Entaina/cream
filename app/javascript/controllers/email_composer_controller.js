@@ -4,7 +4,12 @@ export default class extends Controller {
   static targets = [ "templateSelect", "layoutSelect", "subjectInput" ]
 
   static values = {
-    templateUrl: String
+    templateUrl: String,
+    copy: Object
+  }
+
+  get c() {
+    return this.copyValue || {}
   }
 
   templateSelected(event) {
@@ -15,9 +20,7 @@ export default class extends Controller {
       this.readBodyValue().trim().length > 0
 
     if (hasContent) {
-      const proceed = window.confirm(
-        "¿Sustituir el asunto y cuerpo actuales por los de la plantilla seleccionada?"
-      )
+      const proceed = window.confirm(this.c.replace_template_confirm || "")
       if (!proceed) {
         event.target.value = event.target.dataset.previousValue || ""
         return
@@ -37,7 +40,7 @@ export default class extends Controller {
       .then((data) => this.applyTemplate(data))
       .catch((error) => {
         console.error("Failed to load email template", error)
-        window.alert("No se pudo cargar la plantilla.")
+        window.alert(this.c.load_failed || "")
       })
   }
 

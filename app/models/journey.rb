@@ -36,12 +36,12 @@ class Journey < ApplicationRecord
   def product_required_when_stop_on_open_deal
     return unless stop_on_open_deal?
 
-    errors.add(:product, "is required when stop on open deal is enabled") if product_id.blank?
+    errors.add(:product, :product_required_stop_open_deal) if product_id.blank?
   end
 
   def product_belongs_to_workspace
     return if product.nil? || workspace.nil?
 
-    errors.add(:product, "must belong to the workspace") if product.workspace_id != workspace_id
+    errors.add(:product, :must_belong_to_workspace) if product.workspace_id != workspace_id
   end
 end

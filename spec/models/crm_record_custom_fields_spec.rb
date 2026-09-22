@@ -28,7 +28,7 @@ RSpec.describe "CrmRecord custom fields", type: :model do
     company.custom_fields = {"vertical" => ""}
 
     expect(company).not_to be_valid
-    expect(company.errors[:base]).to include("Vertical is required")
+    expect(company.errors[:base]).to include(I18n.t("activerecord.errors.messages.custom_field_required", name: "Vertical"))
   end
 
   describe ".apply_custom_field_filters" do

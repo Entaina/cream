@@ -47,7 +47,7 @@ RSpec.describe Membership, type: :model do
       membership.current_pipeline = other_pipeline
 
       expect(membership).not_to be_valid
-      expect(membership.errors[:current_pipeline]).to include("must belong to the workspace")
+      expect(membership.errors[:current_pipeline]).to include(I18n.t("activerecord.errors.messages.must_belong_to_workspace"))
     end
   end
 
@@ -117,14 +117,14 @@ RSpec.describe Membership, type: :model do
       membership = memberships(:one_one)
 
       expect(membership.update(role: "salesperson")).to be false
-      expect(membership.errors[:role]).to include("cannot demote the last admin")
+      expect(membership.errors[:role]).to include(I18n.t("activerecord.errors.messages.cannot_demote_last_admin"))
     end
 
     it "prevents removing the last admin" do
       membership = memberships(:one_one)
 
       expect(membership.destroy).to be false
-      expect(membership.errors[:base]).to include("Cannot remove the last admin from the workspace")
+      expect(membership.errors[:base]).to include(I18n.t("activerecord.errors.messages.cannot_remove_last_admin"))
     end
   end
 end

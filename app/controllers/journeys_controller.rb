@@ -86,7 +86,7 @@ class JourneysController < ApplicationController
   def toggle_active
     authorize @journey, :update?
     @journey.update!(active: !@journey.active?)
-    redirect_to @journey, notice: @journey.active? ? "Recorrido activado." : "Recorrido pausado."
+    redirect_to @journey, notice: @journey.active? ? t("flashes.journeys.activated") : t("flashes.journeys.paused")
   end
 
   private

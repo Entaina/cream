@@ -26,14 +26,14 @@ class PersonEmail < ApplicationRecord
     scope = scope.where.not(id: id) if persisted?
     return unless scope.exists?
 
-    errors.add(:address, "is already on this contact")
+    errors.add(:address, :is_already_on_contact)
   end
 
   def person_belongs_to_workspace
     return if person.nil? || workspace.nil?
     return if person.workspace_id == workspace_id
 
-    errors.add(:person, "must belong to the same workspace")
+    errors.add(:person, :must_belong_to_same_workspace)
   end
 
   def demote_other_primaries

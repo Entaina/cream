@@ -274,6 +274,6 @@ module FieldCondition
     return if field.blank? || workspace.nil?
     return if self.class.allowed_field_keys(workspace).include?(field)
 
-    errors.add(:field, "is not available in this workspace")
+    errors.add(:field, :field_not_in_workspace)
   end
 end

@@ -3,17 +3,17 @@ en:
   mail_merges:
     body: Body
     form:
-      body_default: 'Hi {first_name},'
-      subject_default: 'Hello {name}'
+      body_default: Hi {first_name},
+      subject_default: Hello {name}
     manual_source: Enter record IDs manually
     page_title: Mail merge
     recipients: Recipients
     recipients_count:
-      loading: …
+      loading: "…"
       one: 1 recipient
-      other: '%{count} recipients'
+      other: "%{count} recipients"
     record_ids: Record IDs (comma-separated)
-    record_ids_placeholder: 1,2,3
+    record_ids_placeholder: 123
     record_type: Record type
     saved_views: Saved views
     send: Send mail merge

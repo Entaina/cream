@@ -6,7 +6,7 @@ class MailjetConnectionsController < ApplicationController
   def create
     @mailjet_connection = current_workspace.build_mailjet_connection(connection_params.merge(user: current_user))
     authorize @mailjet_connection
-    save_connection("Mailjet conectado.")
+    save_connection(t("flashes.mailjet.connected"))
   end
 
   def update
@@ -17,7 +17,7 @@ class MailjetConnectionsController < ApplicationController
     attrs = attrs.except(:api_key) if attrs[:api_key].blank?
     attrs = attrs.except(:secret_key) if attrs[:secret_key].blank?
     @mailjet_connection.assign_attributes(attrs)
-    save_connection("Ajustes de Mailjet actualizados.")
+    save_connection(t("flashes.mailjet.updated"))
   end
 
   def destroy
@@ -51,10 +51,10 @@ class MailjetConnectionsController < ApplicationController
 
   def sync_mailjet_webhooks!
     Marketing::Esp::MailjetWebhookRegistrar.sync!(@mailjet_connection)
-    "Event Tracking registrado en Mailjet."
+    t("flashes.mailjet.webhook_registered")
   rescue => e
     Rails.logger.warn("[MailjetWebhookRegistrar] sync failed: #{e.message}")
-    "Mailjet conectado, pero no se pudo registrar el Event Tracking. Revisa la URL del webhook e inténtalo de nuevo."
+    t("flashes.mailjet.webhook_failed")
   end
 
   def remove_mailjet_webhooks!

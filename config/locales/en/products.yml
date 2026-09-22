@@ -1,6 +1,19 @@
 ---
 en:
+  imports:
+    intro: Upload a CSV file to import %{type}.
+    page_title: Import %{type}
+    record_types_plural:
+      Company: companies
+      Deal: deals
+      Person: people
+    submit: Import CSV
+    title: Import %{type}
   products:
+    edit:
+      page_title: Edit %{name}
+      title: Edit %{name}
+      view_deals: View deals
     editions:
       columns:
         dates: Dates
@@ -8,6 +21,7 @@ en:
         name: Name
       create: Create edition
       delete_confirm: Delete %{name}?
+      edit_page_title: Edit %{name} · %{product}
       empty: No editions yet. Add one to offer variants or cohorts for this product.
       form:
         end_date: End date
@@ -16,7 +30,6 @@ en:
         start_date: Start date
       new: New edition
       new_page_title: New edition · %{product}
-      edit_page_title: Edit %{name} · %{product}
       title: Editions
     form:
       create: Create product
@@ -38,22 +51,9 @@ en:
       search_placeholder: Search products...
       segment_all: All segments
       title: Products
-    edit:
-      page_title: Edit %{name}
-      title: Edit %{name}
-      view_deals: View deals
     new:
       page_title: New product
       title: New product
     segments:
       b2b: B2B
       b2c: B2C
-  imports:
-    intro: Upload a CSV file to import %{type}.
-    page_title: Import %{type}
-    record_types_plural:
-      Company: companies
-      Deal: deals
-      Person: people
-    submit: Import CSV
-    title: Import %{type}

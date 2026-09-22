@@ -14,6 +14,6 @@ class SlackIntegration < ApplicationRecord
     invalid = Array(notify_events) - NOTIFY_EVENTS
     return if invalid.empty?
 
-    errors.add(:notify_events, "contain invalid values: #{invalid.join(", ")}")
+    errors.add(:notify_events, :contain_invalid_values, values: invalid.join(", "))
   end
 end

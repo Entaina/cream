@@ -102,13 +102,13 @@ class Booking < ApplicationRecord
   def guest_emails_valid
     emails = Array(guest_emails).map(&:to_s).reject(&:blank?)
     if emails.size > MAX_GUESTS
-      errors.add(:guest_emails, "allows at most #{MAX_GUESTS} guests")
+      errors.add(:guest_emails, :guest_count_exceeded, count: MAX_GUESTS)
       return
     end
 
     emails.each do |guest_email|
       unless guest_email.match?(URI::MailTo::EMAIL_REGEXP)
-        errors.add(:guest_emails, "contains an invalid email")
+        errors.add(:guest_emails, :guest_invalid_email)
         break
       end
     end

@@ -77,6 +77,6 @@ class SubscriptionType < ApplicationRecord
     return if consent_field_key.blank?
     return unless RESERVED_CONSENT_FIELD_KEYS.include?(consent_field_key)
 
-    errors.add(:consent_field_key, "is reserved")
+    errors.add(:consent_field_key, :reserved_consent_field_key)
   end
 end

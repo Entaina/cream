@@ -48,14 +48,14 @@ class PersonRelationship < ApplicationRecord
     return if from_person_id.blank? || to_person_id.blank?
     return unless from_person_id == to_person_id
 
-    errors.add(:to_person, "cannot be the same person")
+    errors.add(:to_person, :cannot_be_same_person)
   end
 
   def same_workspace
     return if from_person.blank? || to_person.blank?
     return if from_person.workspace_id == to_person.workspace_id
 
-    errors.add(:to_person, "must belong to the same workspace")
+    errors.add(:to_person, :must_belong_to_same_workspace)
   end
 
   def no_duplicate_symmetric_pair
@@ -70,6 +70,6 @@ class PersonRelationship < ApplicationRecord
     duplicate = duplicate.where.not(id: id) if persisted?
     return unless duplicate.exists?
 
-    errors.add(:base, "this relationship already exists in the opposite direction")
+    errors.add(:base, :relationship_exists_opposite)
   end
 end

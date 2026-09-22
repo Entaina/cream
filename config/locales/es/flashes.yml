@@ -10,9 +10,11 @@ es:
       updated: Automatización actualizada.
     beehiiv:
       configure_first: Configura la API key y al menos una publicación primero.
+      connected: Beehiiv conectado.
       disconnected: Beehiiv desconectado.
       publication_deleted: Publicación Beehiiv eliminada.
       sync_started: Sincronización con Beehiiv iniciada.
+      updated: Ajustes de Beehiiv actualizados.
     booking_pages:
       created: Página de reservas creada.
       deleted: Página de reservas eliminada.
@@ -93,8 +95,10 @@ es:
       revoked: Invitación revocada.
       sent: Invitación enviada a %{email}.
     journeys:
+      activated: Recorrido activado.
       created: Recorrido creado.
       deleted: Recorrido eliminado.
+      paused: Recorrido pausado.
       updated: Recorrido actualizado.
     lead_form_templates:
       created: Plantilla creada.
@@ -116,7 +120,12 @@ es:
       no_recipients: Ningún destinatario coincide con el origen seleccionado.
       queued: Mail merge encolado para %{count} destinatarios.
     mailjet:
+      connected: Mailjet conectado.
       disconnected: Mailjet desconectado.
+      updated: Ajustes de Mailjet actualizados.
+      webhook_failed: Mailjet conectado, pero no se pudo registrar el Event Tracking.
+        Revisa la URL del webhook e inténtalo de nuevo.
+      webhook_registered: Event Tracking registrado en Mailjet.
     memberships:
       removed: Miembro eliminado del workspace.
       role_updated: Rol del miembro actualizado.
@@ -201,12 +210,17 @@ es:
       updated: Disparador actualizado.
     stripe:
       add_api_key_first: Añade primero una API key de Stripe.
+      api_key_rejected: Stripe ha rechazado la clave — comprueba la key.
+      connected: Stripe conectado.
       disconnected: Stripe desconectado.
       ignored: Pago ignorado.
+      importing_payments: Importando pagos…
       linked: Pago vinculado a %{deal}.
       pick_deal: Elige una oportunidad para vincular este pago.
       review: Pago de nuevo en revisión.
       sync_started: Sincronización de pagos iniciada.
+      updated: Ajustes de Stripe actualizados.
+      verify_failed: No se pudo verificar la clave con Stripe.
     subscription_types:
       created: Tipo de suscripción creado.
       deleted: Tipo de suscripción eliminado.

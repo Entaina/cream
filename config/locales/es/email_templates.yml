@@ -25,6 +25,10 @@ es:
         como punto de partida. No se crea una plantilla global nueva.
       blank_template: Redactar sin plantilla
       body: Cuerpo
+      client:
+        load_failed: No se pudo cargar la plantilla.
+        replace_template_confirm: "¿Sustituir el asunto y cuerpo actuales por los
+          de la plantilla seleccionada?"
       layout: Layout (opcional)
       layout_hint: El layout debe incluir <code class="font-mono">{{ content }}</code>
         o <code class="font-mono">{content}</code> donde irá el cuerpo del email.

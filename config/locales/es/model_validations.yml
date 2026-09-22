@@ -1,0 +1,89 @@
+---
+es:
+  activerecord:
+    errors:
+      messages:
+        attachable_not_allowed: no está permitido
+        attachment_count_exceeded: no puede superar %{count} archivos
+        attachment_file_too_large: "%{filename} supera %{megabytes} MB"
+        attachment_total_too_large: el tamaño total no puede superar %{megabytes}
+          MB
+        calendar_ids_required: selecciona al menos un calendario
+        cannot_be_changed: no se puede cambiar
+        cannot_be_same_person: no puede ser la misma persona
+        cannot_demote_last_admin: no se puede degradar al último administrador
+        cannot_remove_last_admin: no se puede eliminar al último administrador del
+          workspace
+        commentable_not_allowed: no está permitido
+        contain_invalid_values: 'contiene valores no válidos: %{values}'
+        custom_field_required: "%{name} es obligatorio"
+        deal_converted_requires_attribute: es obligatorio cuando está convertido
+        deal_required_for_capture: es obligatorio para destino de captura en oportunidad
+        ends_on_before_starts: debe ser igual o posterior a la fecha de inicio
+        event_types_required: configura al menos un tipo de evento
+        field_not_in_workspace: no está disponible en este workspace
+        formula_required: es obligatorio para campos de fórmula
+        group_by_invalid: no es válido para %{record_type}
+        guest_count_exceeded: admite como máximo %{count} invitados
+        guest_invalid_email: contiene un email no válido
+        invalid: no es válido
+        invalid_json: debe ser JSON válido
+        invalid_priority: contiene una prioridad no válida
+        invalid_service_account_json: debe ser un JSON de cuenta de servicio válido
+          con client_email y private_key
+        invitation_already_member: ya es miembro de este workspace
+        invitation_pending: ya tiene una invitación pendiente
+        is_already_on_contact: ya está en este contacto
+        item_must_include_text: cada elemento debe incluir texto
+        journey_required_for_delivery: debe estar presente para envío por recorrido
+        metric_deals_only: solo está disponible para oportunidades
+        must_be_array_of_objects: debe ser un array de objetos
+        must_be_array_of_strings: debe ser un array de cadenas
+        must_be_empty_for_team_briefings: debe estar vacío en briefings de equipo
+        must_be_workspace_member: debe ser miembro del workspace
+        must_belong_to_deal_workspace: debe pertenecer al workspace de la oportunidad
+        must_belong_to_same_product: debe pertenecer al mismo producto
+        must_belong_to_same_workspace: debe pertenecer al mismo workspace
+        must_belong_to_selected_pipeline: debe pertenecer al pipeline seleccionado
+        must_belong_to_workspace: debe pertenecer al workspace
+        must_differ_from_client_company: debe ser distinta de la empresa cliente
+        partner_must_differ_from_company: debe ser distinta de la empresa cliente
+        pipeline_id_deals_only: solo es válido para oportunidades
+        pipeline_id_invalid_workspace: no es válido para este workspace
+        product_required_stop_open_deal: es obligatorio cuando «parar en oportunidad
+          abierta» está activo
+        record_reference_types_invalid: debe ser Person, Company u Deal para campos
+          de referencia a registro
+        reference_syntax_error: 'error de sintaxis: %{message}'
+        relationship_exists_opposite: esta relación ya existe en la dirección opuesta
+        requires_mql_features: requiere el pool MQL y las funciones de consentimiento
+          de marketing
+        reserved_consent_field_key: está reservada
+        select_options_required: debe incluir al menos una opción para campos de selección
+        single_primary_email: solo un email puede ser principal
+      models:
+        deal:
+          attributes:
+            base:
+              contacts_must_belong_to_companies: Todos los contactos deben pertenecer
+                a %{names}
+              needs_next_action: Una oportunidad necesita una siguiente acción (una
+                tarea con fecha límite hoy o posterior)
+        lead_form:
+          attributes:
+            destination:
+              requires_mql_features: requiere el pool MQL y las funciones de consentimiento
+                de marketing
+            hidden_field_keys:
+              invalid_key: 'clave no válida: %{key}'
+              reserved_key: 'clave reservada: %{key}'
+            pipeline:
+              required_for_deal_destination: es obligatorio para formularios con destino
+                oportunidad
+            pipeline_routes:
+              invalid_key: 'clave no válida: %{key}'
+              invalid_pipeline: pipeline no válido para %{help_type}
+        lead_form_template:
+          attributes:
+            slug:
+              invalid_format: solo letras minúsculas, números, guiones y guiones bajos

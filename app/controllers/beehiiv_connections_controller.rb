@@ -6,7 +6,7 @@ class BeehiivConnectionsController < ApplicationController
   def create
     @beehiiv_connection = current_workspace.build_beehiiv_connection(connection_params.merge(user: current_user))
     authorize @beehiiv_connection
-    save_connection("Beehiiv conectado.")
+    save_connection(t("flashes.beehiiv.connected"))
   end
 
   def update
@@ -16,7 +16,7 @@ class BeehiivConnectionsController < ApplicationController
     attrs = connection_params
     attrs = attrs.except(:api_key) if attrs[:api_key].blank?
     @beehiiv_connection.assign_attributes(attrs)
-    save_connection("Ajustes de Beehiiv actualizados.")
+    save_connection(t("flashes.beehiiv.updated"))
   end
 
   def sync
