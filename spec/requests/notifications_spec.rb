@@ -12,7 +12,7 @@ RSpec.describe "Notifications", type: :request do
     get notifications_path
 
     expect(response).to have_http_status(:success)
-    expect(response.body).to include("mentioned you")
+    expect(response.body).to include(notifications(:mention).title)
   end
 
   it "does not duplicate task_overdue notifications after marking one as read" do

@@ -27,8 +27,8 @@ RSpec.describe "Settings::Workspace", type: :request do
       get settings_workspace_path
 
       expect(response).to have_http_status(:success)
-      expect(response.body).to include("Settings")
-      expect(response.body).to include("General")
+      expect(response.body).to include(I18n.t("integrations.workspace.title"))
+      expect(response.body).to include(I18n.t("integrations.workspace.general.title"))
     end
 
     it "forbids members from viewing workspace settings" do

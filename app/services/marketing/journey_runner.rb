@@ -162,13 +162,16 @@ module Marketing
       recipient = workspace.users.find_by(id: step.config["user_id"]) || person.owner
       return move_next! unless recipient
 
-      recipient.notifications.create!(
-        workspace: workspace,
-        kind: "automation",
-        title: journey.name,
-        body: step.config["message"].presence || "Journey step completed for #{person.display_name}",
-        url: Rails.application.routes.url_helpers.person_path(person)
-      )
+      NotificationService.with_recipient_locale(recipient) do
+        default_body = I18n.t("notifications.events.journey_automation.default_body", person: person.display_name)
+        recipient.notifications.create!(
+          workspace: workspace,
+          kind: "automation",
+          title: journey.name,
+          body: step.config["message"].presence || default_body,
+          url: Rails.application.routes.url_helpers.person_path(person)
+        )
+      end
       move_next!
     end
 

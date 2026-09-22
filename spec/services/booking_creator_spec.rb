@@ -95,7 +95,7 @@ RSpec.describe BookingCreator, type: :service do
     notification = user.notifications.order(:id).last
     expect(notification).to be_present
     expect(notification.kind).to eq("booking")
-    expect(notification.title).to eq("New booking")
+    expect(notification.title).to eq(I18n.t("notifications.events.booking.title", locale: user.locale))
     expect(notification.body).to include("Ana Lopez")
     expect(notification.body).to include("ana@example.com")
     expect(notification.url).to eq(Rails.application.routes.url_helpers.deal_path(result.booking.deal))

@@ -3,5 +3,5 @@ mention:
   user: two
   actor: one
   kind: mention
-  title: User One mentioned you
+  title: User One te mencionó
   body: Hey @two check this

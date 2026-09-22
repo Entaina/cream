@@ -1,0 +1,25 @@
+---
+en:
+  notifications:
+    events:
+      booking:
+        body: '%{event}: %{name} (%{email}) — %{when}'
+        title: New booking
+      email_followup:
+        body: No reply yet from %{address} to “%{subject}”
+        title: Follow up
+      email_opened:
+        body: '%{address} opened “%{subject}”'
+        title: Email opened
+      email_replied:
+        body: '%{address} replied to “%{subject}”'
+        title: Email replied
+      journey_automation:
+        default_body: Journey step completed for %{person}
+      lead_submission:
+        body: '%{form}: %{person} (%{email})'
+        title: New lead
+      mention:
+        title: '%{actor} mentioned you'
+      task_overdue:
+        title: Task overdue
