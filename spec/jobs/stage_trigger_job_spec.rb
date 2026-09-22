@@ -30,6 +30,21 @@ RSpec.describe StageTriggerJob, type: :job do
       .with(hash_including(deal: deal, user: user, trigger: trigger))
   end
 
+  it "executes handlers in the acting user's locale" do
+    user.update!(locale: "en")
+    ui = instance_double(StageTriggers::UiEmitter, show_toast: nil)
+    allow(StageTriggers::UiEmitter).to receive(:new).and_return(ui)
+
+    described_class.perform_now(trigger, deal, user)
+
+    expect(ui).to have_received(:show_toast).with(
+      message: I18n.t("stage_triggers.native_handlers.won_celebration.message", locale: :en, name: deal.name),
+      kind: "success"
+    )
+  ensure
+    user.update!(locale: "es")
+  end
+
   it "marks the run as failed when the handler raises, without re-raising" do
     allow(StageTriggers::Native::WonCelebration).to receive(:call).and_raise("boom")
 

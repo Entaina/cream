@@ -1,0 +1,95 @@
+---
+es:
+  stage_triggers:
+    badges:
+      active: Activo
+      inactive: Inactivo
+      llm: IA
+      native: Nativo
+    edit:
+      page_title: Editar disparador
+      title: Editar disparador — %{name}
+    errors:
+      param_required: «%{label}» es obligatorio
+    execution_modes:
+      llm: Agente IA (instrucción en lenguaje natural)
+      native: Función nativa (Ruby)
+    form:
+      active: Activo
+      execution_mode: Modo de ejecución
+      function: Función
+      function_prompt: — Elegir función —
+      instructions: Instrucción
+      instructions_hint: La IA puede consultar el deal, su empresa y contactos (solo lectura)
+        y mostrar toasts, alertas, confirmaciones o un panel dentro del deal.
+      instructions_placeholder: 'Ej.: Resume el estado del deal y muéstralo en el panel.
+        Si el valor supera 10.000 €, avisa con un toast.'
+      name: Nombre
+      name_placeholder: Avisar al comercial
+      submit_create: Crear disparador
+      submit_update: Guardar
+    index:
+      back_pipeline: Pipeline
+      destroy: Eliminar
+      destroy_confirm: "¿Eliminar el disparador «%{name}»?"
+      edit: Editar
+      empty: No hay disparadores para esta etapa todavía.
+      intro_html: Se ejecutan cuando un deal entra en la etapa <strong>%{stage}</strong>.
+        Las acciones se muestran en el navegador del usuario que movió el deal.
+      last_run: 'último run: %{status}'
+      native_function: 'Función nativa: %{name}'
+      new: Nuevo disparador
+      page_title: Disparadores — %{stage}
+      runs: Runs
+      title: Disparadores — %{stage} (%{pipeline})
+    native_functions:
+      show_toast:
+        description: Muestra una notificación breve con el texto configurado.
+        label: Mostrar toast
+        params:
+          kind:
+            label: Estilo
+            options:
+              info: Información
+              success: Éxito
+              warning: Aviso
+          message:
+            label: Texto
+            placeholder: 'Ej.: Recuerda pedir el NIF en esta etapa'
+      stage_checklist_panel:
+        description: Muestra un panel en el deal recordando los siguientes pasos de
+          la etapa.
+        label: Checklist de la etapa en el deal
+      won_celebration:
+        description: Muestra un toast de felicitación con el nombre y el valor del deal.
+        label: Celebración de deal ganado
+    native_handlers:
+      stage_checklist_panel:
+        entered_stage: El deal acaba de entrar en **%{stage}**.
+        no_pending_tasks: No hay tareas pendientes. Considera crear la siguiente acción.
+        pending_tasks: 'Tareas pendientes:'
+        task_due: "- %{title} (vence %{date})"
+        task_item: "- %{title}"
+        title: Checklist — %{stage}
+      won_celebration:
+        message: 🎉 ¡Enhorabuena! «%{name}» ganado
+        message_with_value: 🎉 ¡Enhorabuena! «%{name}» ganado (%{amount})
+    new:
+      page_title: Nuevo disparador
+      title: Nuevo disparador — %{stage}
+    run_statuses:
+      failed: fallido
+      running: en curso
+      succeeded: correcto
+    show:
+      back_triggers: Disparadores
+      edit: Editar
+      empty_runs: Este disparador no se ha ejecutado todavía.
+      intro_html: Etapa <strong>%{stage}</strong> (%{pipeline}) · modo <strong>%{mode}</strong>
+        · últimas %{count} ejecuciones.
+      mode_llm: IA
+      mode_native: nativo
+      run_by: por %{name}
+      transcript_steps:
+        one: Transcript (%{count} paso)
+        other: Transcript (%{count} pasos)

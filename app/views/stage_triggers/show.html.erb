@@ -1,28 +1,33 @@
 <% page_title @stage_trigger.name %>
 <% actions = capture do %>
   <%= link_to pipeline_stage_stage_triggers_path(@stage_trigger.pipeline_stage), class: "btn-secondary" do %>
-    <%= icon :arrow_left, classes: "size-3.5" %> Disparadores
+    <%= icon :arrow_left, classes: "size-3.5" %> <%= t("stage_triggers.show.back_triggers") %>
   <% end %>
-  <%= link_to "Editar", edit_stage_trigger_path(@stage_trigger), class: "btn-primary" %>
+  <%= link_to t("stage_triggers.show.edit"), edit_stage_trigger_path(@stage_trigger), class: "btn-primary" %>
 <% end %>
 <%= render "shared/page_header", title: @stage_trigger.name, icon_name: :zap, count: @runs.size, actions: actions %>
 
 <div class="flex-1 overflow-y-auto scrollbar-subtle p-5 space-y-3">
+  <% mode_label = @stage_trigger.llm? ? t("stage_triggers.show.mode_llm") : t("stage_triggers.show.mode_native") %>
   <p class="text-sm text-ink-faint">
-    Etapa <strong><%= @stage_trigger.pipeline_stage.name %></strong> (<%= @stage_trigger.pipeline.name %>) ·
-    modo <strong><%= @stage_trigger.llm? ? "IA" : "nativo" %></strong> · últimas <%= @runs.size %> ejecuciones.
+    <%= t("stage_triggers.show.intro_html",
+          stage: @stage_trigger.pipeline_stage.name,
+          pipeline: @stage_trigger.pipeline.name,
+          mode: mode_label,
+          count: @runs.size) %>
   </p>
   <% if @runs.empty? %>
-    <p class="text-base text-ink-soft">Este disparador no se ha ejecutado todavía.</p>
+    <p class="text-base text-ink-soft"><%= t("stage_triggers.show.empty_runs") %></p>
   <% end %>
   <% @runs.each do |run| %>
     <article class="card p-4 space-y-1">
       <div class="flex items-center gap-2">
-        <%= badge run.status, color: { "succeeded" => "green", "failed" => "red", "running" => "golden" }.fetch(run.status, "chicago") %>
+        <% status_label = t("stage_triggers.run_statuses.#{run.status}", default: run.status) %>
+        <%= badge status_label, color: { "succeeded" => "green", "failed" => "red", "running" => "golden" }.fetch(run.status, "chicago") %>
         <%= link_to run.deal.name, deal_path(run.deal), class: "text-base font-medium hover:underline" %>
         <span class="text-sm text-ink-faint">
-          <%= run.created_at.strftime("%d/%m/%Y %H:%M") %>
-          <% if run.user %> · por <%= run.user.name %><% end %>
+          <%= l(run.created_at, format: :short) %>
+          <% if run.user %> · <%= t("stage_triggers.show.run_by", name: run.user.name) %><% end %>
           <% if run.duration %> · <%= number_with_precision(run.duration, precision: 1) %>s<% end %>
         </span>
       </div>
@@ -31,7 +36,9 @@
       <% end %>
       <% if run.transcript.present? %>
         <details class="text-sm text-ink-faint">
-          <summary class="cursor-pointer select-none">Transcript (<%= run.transcript.size %> pasos)</summary>
+          <summary class="cursor-pointer select-none">
+            <%= t("stage_triggers.show.transcript_steps", count: run.transcript.size) %>
+          </summary>
           <pre class="mt-1 p-2 rounded bg-canvas-sunken overflow-x-auto text-xs"><%= JSON.pretty_generate(run.transcript) %></pre>
         </details>
       <% end %>

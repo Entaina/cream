@@ -24,6 +24,17 @@ RSpec.describe "StageTriggers", type: :request do
     get pipeline_stage_stage_triggers_path(stage)
     expect(response).to have_http_status(:ok)
     expect(response.body).to include("Aviso al comercial")
+    expect(response.body).to include(I18n.t("stage_triggers.index.new"))
+  end
+
+  it "renders in English when the user locale is en" do
+    create_trigger(name: "Heads up")
+    member.update!(locale: "en")
+    get pipeline_stage_stage_triggers_path(stage)
+    expect(response.body).to include(I18n.t("stage_triggers.index.new", locale: :en))
+    expect(response.body).not_to include(I18n.t("stage_triggers.index.new", locale: :es))
+  ensure
+    member.update!(locale: "es")
   end
 
   it "creates an llm trigger" do
@@ -95,7 +106,7 @@ RSpec.describe "StageTriggers", type: :request do
 
     get stage_trigger_path(trigger)
     expect(response).to have_http_status(:ok)
-    expect(response.body).to include("succeeded")
+    expect(response.body).to include(I18n.t("stage_triggers.run_statuses.succeeded"))
   end
 
   it "is not reachable when the feature is disabled" do

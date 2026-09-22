@@ -1,44 +1,46 @@
-<% page_title "Disparadores — #{@stage.name}" %>
+<% page_title t("stage_triggers.index.page_title", stage: @stage.name) %>
 <% actions = capture do %>
   <%= link_to edit_pipeline_path(@stage.pipeline), class: "btn-secondary" do %>
-    <%= icon :arrow_left, classes: "size-3.5" %> Pipeline
+    <%= icon :arrow_left, classes: "size-3.5" %> <%= t("stage_triggers.index.back_pipeline") %>
   <% end %>
   <%= link_to new_pipeline_stage_stage_trigger_path(@stage), class: "btn-primary" do %>
-    <%= icon :plus, classes: "size-3.5" %> Nuevo disparador
+    <%= icon :plus, classes: "size-3.5" %> <%= t("stage_triggers.index.new") %>
   <% end %>
 <% end %>
-<%= render "shared/page_header", title: "Disparadores — #{@stage.name} (#{@stage.pipeline.name})",
+<%= render "shared/page_header", title: t("stage_triggers.index.title", stage: @stage.name, pipeline: @stage.pipeline.name),
       icon_name: :zap, count: @stage_triggers.size, actions: actions %>
 
 <div class="flex-1 overflow-y-auto scrollbar-subtle p-5 space-y-3">
   <p class="text-sm text-ink-faint">
-    Se ejecutan cuando un deal entra en la etapa <strong><%= @stage.name %></strong>. Las acciones se muestran
-    en el navegador del usuario que movió el deal.
+    <%= t("stage_triggers.index.intro_html", stage: @stage.name) %>
   </p>
   <% if @stage_triggers.empty? %>
-    <p class="text-base text-ink-soft">No hay disparadores para esta etapa todavía.</p>
+    <p class="text-base text-ink-soft"><%= t("stage_triggers.index.empty") %></p>
   <% end %>
   <% @stage_triggers.each do |trigger| %>
     <article class="card p-4">
       <div class="flex items-center gap-2">
         <h2 class="font-semibold text-base"><%= link_to trigger.name, stage_trigger_path(trigger), class: "hover:underline" %></h2>
-        <%= badge trigger.llm? ? "IA" : "Nativo", color: trigger.llm? ? "hoki" : "copperfield" %>
-        <%= badge trigger.active? ? "Activo" : "Inactivo", color: trigger.active? ? "green" : "chicago" %>
+        <%= badge trigger.llm? ? t("stage_triggers.badges.llm") : t("stage_triggers.badges.native"),
+              color: trigger.llm? ? "hoki" : "copperfield" %>
+        <%= badge trigger.active? ? t("stage_triggers.badges.active") : t("stage_triggers.badges.inactive"),
+              color: trigger.active? ? "green" : "chicago" %>
         <% if (last_run = trigger.runs.recent_first.first) %>
-          <span class="text-sm text-ink-faint">último run: <%= last_run.status %></span>
+          <% run_status = t("stage_triggers.run_statuses.#{last_run.status}", default: last_run.status) %>
+          <span class="text-sm text-ink-faint"><%= t("stage_triggers.index.last_run", status: run_status) %></span>
         <% end %>
         <div class="ml-auto flex gap-2">
-          <%= link_to "Runs", stage_trigger_path(trigger), class: "btn-ghost" %>
-          <%= link_to "Editar", edit_stage_trigger_path(trigger), class: "btn-secondary" %>
-          <%= button_to "Eliminar", stage_trigger_path(trigger), method: :delete, class: "btn-danger",
-                data: { turbo_confirm: "¿Eliminar el disparador «#{trigger.name}»?" } %>
+          <%= link_to t("stage_triggers.index.runs"), stage_trigger_path(trigger), class: "btn-ghost" %>
+          <%= link_to t("stage_triggers.index.edit"), edit_stage_trigger_path(trigger), class: "btn-secondary" %>
+          <%= button_to t("stage_triggers.index.destroy"), stage_trigger_path(trigger), method: :delete, class: "btn-danger",
+                data: { turbo_confirm: t("stage_triggers.index.destroy_confirm", name: trigger.name) } %>
         </div>
       </div>
       <p class="text-sm text-ink-faint mt-1">
         <% if trigger.llm? %>
           <%= truncate(trigger.instructions, length: 180) %>
         <% else %>
-          Función nativa: <strong><%= StageTriggers::NativeRegistry.fetch(trigger.native_function).label %></strong>
+          <%= t("stage_triggers.index.native_function", name: StageTriggers::NativeRegistry.fetch(trigger.native_function).label) %>
         <% end %>
       </p>
     </article>

@@ -1,0 +1,94 @@
+---
+en:
+  stage_triggers:
+    badges:
+      active: Active
+      inactive: Inactive
+      llm: AI
+      native: Native
+    edit:
+      page_title: Edit trigger
+      title: Edit trigger — %{name}
+    errors:
+      param_required: «%{label}» is required
+    execution_modes:
+      llm: AI agent (natural language instruction)
+      native: Native function (Ruby)
+    form:
+      active: Active
+      execution_mode: Execution mode
+      function: Function
+      function_prompt: — Choose function —
+      instructions: Instruction
+      instructions_hint: The AI can read the deal, its company and contacts and show
+        toasts, alerts, confirmations or a panel on the deal page.
+      instructions_placeholder: 'e.g. Summarize the deal in the panel. If value exceeds
+        €10,000, show a toast.'
+      name: Name
+      name_placeholder: Notify the rep
+      submit_create: Create trigger
+      submit_update: Save
+    index:
+      back_pipeline: Pipeline
+      destroy: Delete
+      destroy_confirm: Delete trigger «%{name}»?
+      edit: Edit
+      empty: No triggers for this stage yet.
+      intro_html: Run when a deal enters stage <strong>%{stage}</strong>. Actions appear
+        in the browser of the user who moved the deal.
+      last_run: 'last run: %{status}'
+      native_function: 'Native function: %{name}'
+      new: New trigger
+      page_title: Triggers — %{stage}
+      runs: Runs
+      title: Triggers — %{stage} (%{pipeline})
+    native_functions:
+      show_toast:
+        description: Shows a short notification with the configured text.
+        label: Show toast
+        params:
+          kind:
+            label: Style
+            options:
+              info: Info
+              success: Success
+              warning: Warning
+          message:
+            label: Text
+            placeholder: 'e.g. Remember to ask for tax ID at this stage'
+      stage_checklist_panel:
+        description: Shows a panel on the deal with the next steps for the stage.
+        label: Stage checklist on deal
+      won_celebration:
+        description: Shows a congratulations toast with the deal name and value.
+        label: Won deal celebration
+    native_handlers:
+      stage_checklist_panel:
+        entered_stage: The deal just entered **%{stage}**.
+        no_pending_tasks: No pending tasks. Consider creating the next action.
+        pending_tasks: 'Pending tasks:'
+        task_due: "- %{title} (due %{date})"
+        task_item: "- %{title}"
+        title: Checklist — %{stage}
+      won_celebration:
+        message: 🎉 Congratulations! «%{name}» won
+        message_with_value: 🎉 Congratulations! «%{name}» won (%{amount})
+    new:
+      page_title: New trigger
+      title: New trigger — %{stage}
+    run_statuses:
+      failed: failed
+      running: running
+      succeeded: succeeded
+    show:
+      back_triggers: Triggers
+      edit: Edit
+      empty_runs: This trigger has not run yet.
+      intro_html: Stage <strong>%{stage}</strong> (%{pipeline}) · mode <strong>%{mode}</strong>
+        · last %{count} runs.
+      mode_llm: AI
+      mode_native: native
+      run_by: by %{name}
+      transcript_steps:
+        one: Transcript (%{count} step)
+        other: Transcript (%{count} steps)

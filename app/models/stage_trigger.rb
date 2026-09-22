@@ -46,7 +46,9 @@ class StageTrigger < ApplicationRecord
 
   def required_native_params_present
     registry_entry&.params&.select(&:required)&.each do |param|
-      errors.add(:native_params, "«#{param.label}» es obligatorio") if native_params[param.key].blank?
+      if native_params[param.key].blank?
+        errors.add(:native_params, I18n.t("stage_triggers.errors.param_required", label: param.label))
+      end
     end
   end
 end

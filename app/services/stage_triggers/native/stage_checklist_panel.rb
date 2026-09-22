@@ -1,18 +1,26 @@
 module StageTriggers
   module Native
     class StageChecklistPanel
+      SCOPE = "stage_triggers.native_handlers.stage_checklist_panel"
+
       def self.call(deal:, user:, trigger:, ui:, params: {})
         stage = deal.pipeline_stage
         pending = deal.tasks.pending.order(:due_on).limit(5)
-        lines = ["El deal acaba de entrar en **#{stage.name}**."]
+        lines = [I18n.t("#{SCOPE}.entered_stage", stage: stage.name)]
         lines << ""
         if pending.any?
-          lines << "Tareas pendientes:"
-          pending.each { |task| lines << "- #{task.title}#{" (vence #{task.due_on.strftime("%d/%m/%Y")})" if task.due_on}" }
+          lines << I18n.t("#{SCOPE}.pending_tasks")
+          pending.each do |task|
+            lines << if task.due_on
+              I18n.t("#{SCOPE}.task_due", title: task.title, date: I18n.l(task.due_on, format: :short))
+            else
+              I18n.t("#{SCOPE}.task_item", title: task.title)
+            end
+          end
         else
-          lines << "No hay tareas pendientes. Considera crear la siguiente acción."
+          lines << I18n.t("#{SCOPE}.no_pending_tasks")
         end
-        ui.show_deal_panel(title: "Checklist — #{stage.name}", markdown: lines.join("\n"))
+        ui.show_deal_panel(title: I18n.t("#{SCOPE}.title", stage: stage.name), markdown: lines.join("\n"))
       end
     end
   end

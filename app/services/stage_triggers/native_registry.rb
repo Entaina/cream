@@ -7,41 +7,58 @@ module StageTriggers
   # (type "string" | "text" | "select"), the values are stored in the
   # trigger's native_params jsonb and passed to the handler as `params:`.
   module NativeRegistry
-    Param = Data.define(:key, :label, :type, :required, :placeholder, :options) do
-      def initialize(key:, label:, type: "string", required: false, placeholder: nil, options: nil)
+    Param = Data.define(:function_key, :key, :type, :required, :select_values) do
+      def initialize(function_key:, key:, type: "string", required: false, select_values: nil)
         super
+      end
+
+      def label
+        I18n.t("stage_triggers.native_functions.#{function_key}.params.#{key}.label")
+      end
+
+      def placeholder
+        I18n.t("stage_triggers.native_functions.#{function_key}.params.#{key}.placeholder", default: "")
+      end
+
+      def options
+        return nil unless select_values
+
+        select_values.map do |value|
+          [I18n.t("stage_triggers.native_functions.#{function_key}.params.#{key}.options.#{value}"), value]
+        end
       end
     end
 
-    Entry = Data.define(:key, :label, :description, :handler, :params) do
-      def initialize(key:, label:, description:, handler:, params: [])
+    Entry = Data.define(:key, :handler, :params) do
+      def initialize(key:, handler:, params: [])
         super
+      end
+
+      def label
+        I18n.t("stage_triggers.native_functions.#{key}.label")
+      end
+
+      def description
+        I18n.t("stage_triggers.native_functions.#{key}.description")
       end
     end
 
     FUNCTIONS = {
       "show_toast" => Entry.new(
         key: "show_toast",
-        label: "Mostrar toast",
-        description: "Muestra una notificación breve con el texto configurado.",
         handler: "StageTriggers::Native::ShowToast",
         params: [
-          Param.new(key: "message", label: "Texto", type: "text", required: true,
-            placeholder: "Ej.: Recuerda pedir el NIF en esta etapa"),
-          Param.new(key: "kind", label: "Estilo", type: "select",
-            options: [["Información", "info"], ["Éxito", "success"], ["Aviso", "warning"]])
+          Param.new(function_key: "show_toast", key: "message", type: "text", required: true),
+          Param.new(function_key: "show_toast", key: "kind", type: "select",
+            select_values: %w[info success warning])
         ]
       ),
       "won_celebration" => Entry.new(
         key: "won_celebration",
-        label: "Celebración de deal ganado",
-        description: "Muestra un toast de felicitación con el nombre y el valor del deal.",
         handler: "StageTriggers::Native::WonCelebration"
       ),
       "stage_checklist_panel" => Entry.new(
         key: "stage_checklist_panel",
-        label: "Checklist de la etapa en el deal",
-        description: "Muestra un panel en el deal recordando los siguientes pasos de la etapa.",
         handler: "StageTriggers::Native::StageChecklistPanel"
       )
     }.freeze
