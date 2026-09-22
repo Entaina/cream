@@ -8,13 +8,13 @@
     <%= f.text_field :secret, class: "input w-full" %>
   </div>
   <div>
-    <span class="label">Events</span>
+    <span class="label"><%= t("integrations.webhooks.events") %></span>
     <% Webhook::EVENTS.each do |event| %>
       <label class="flex items-center gap-2 text-base">
         <%= check_box_tag "webhook[events][]", event, webhook.events.include?(event) %> <%= event %>
       </label>
     <% end %>
   </div>
-  <label class="flex items-center gap-2 text-base"><%= f.check_box :active %> Active</label>
+  <label class="flex items-center gap-2 text-base"><%= f.check_box :active %> <%= t("integrations.webhooks.form.active") %></label>
   <%= f.submit class: "btn-primary" %>
 <% end %>

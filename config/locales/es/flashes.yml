@@ -89,7 +89,9 @@ es:
     imports:
       completed: Se importaron %{count} registros.
     invitations:
+      resent: Invitación reenviada a %{email}.
       revoked: Invitación revocada.
+      sent: Invitación enviada a %{email}.
     journeys:
       created: Recorrido creado.
       deleted: Recorrido eliminado.

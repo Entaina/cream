@@ -120,19 +120,54 @@ es:
       sync_now: Sincronizar ahora
       title: Conexión Gmail
     lists:
+      edit_page_title: Editar %{name}
       empty_subtitle: Agrupa personas, empresas u oportunidades para campañas, segmentos
         o lo que necesites.
       empty_title: Aún no hay listas
       entry_count:
         one: 1 %{type}
         other: "%{count} %{type}"
+      form:
+        create: Crear lista
+        name_placeholder: Objetivos Q3
+        record_type: Tipo de registro
+        record_type_locked: El tipo de registro no se puede cambiar después de crear
+          la lista.
+        save: Guardar cambios
       new: Nueva lista
       new_list: Nueva lista
+      new_page_title: Nueva lista
       page_title: Listas
+      record_type_options:
+        Company: Empresas
+        Deal: Oportunidades
+        Person: Personas
       record_types:
         company: empresa
         deal: oportunidad
         person: persona
+      show:
+        add: Añadir
+        add_blank: Añadir %{type} a la lista…
+        columns:
+          added: Añadido
+          company: Empresa
+          domain: Dominio
+          email: Email
+          industry: Sector
+          name: Nombre
+          stage: Etapa
+          value: Importe
+        delete: Eliminar
+        delete_confirm: "¿Eliminar la lista «%{name}»? Los registros no se eliminarán."
+        edit: Editar
+        empty_subtitle: Usa el selector de arriba para añadir %{types} a esta lista.
+        empty_title: Esta lista está vacía
+        record_types_plural:
+          company: empresas
+          deal: oportunidades
+          person: personas
+        remove_from_list: Quitar de la lista
       title: Listas
     notifications:
       empty: Aún no hay notificaciones.
@@ -145,6 +180,8 @@ es:
       active: Activa
       edit: Editar
       edit_page_title: Editar integración con Slack
+      form:
+        active: Activa
       new: Nueva integración
       new_integration: Nueva integración
       new_page_title: Nueva integración con Slack
@@ -182,23 +219,70 @@ es:
         sync_now: Sincronizar ahora
         title: Conexión Stripe
       payments:
+        accept: Aceptar
+        accept_suggestion: Aceptar sugerencia
         actions: Acciones
         amount: Importe
+        back_to_payments: Pagos
+        badges:
+          partially_refunded: Reembolso parcial (%{amount})
+          refunded: Reembolsado
+          test: Prueba
+          test_mode: Modo prueba
+        confidence:
+          high: alta
+          low: baja
+          medium: media
         connect_link: Conectar Stripe
+        create_deal: Crear oportunidad
         customer: Cliente
         date: Fecha
         deal: Oportunidad
         description: Descripción
+        detail_page_title: Pago Stripe
         empty: No hay pagos aquí.
+        full_stripe_data: Datos completos de Stripe
+        ignore: Ignorar
+        ignored_message: Este pago está ignorado.
+        link: Vincular
+        link_deal_placeholder: Buscar oportunidad…
+        linked_by: " por %{name}"
+        linked_html: Vinculado a %{deal_link}%{matched_by}%{matched_at}.
+        linked_on: " el %{time}"
+        match_confidence: 'Sugerencia (%{confidence}):'
+        metadata_heading: Metadatos de Stripe
+        no_match: Sin coincidencia
+        no_open_deal: sin oportunidad abierta
+        no_person_match: Ninguna persona del CRM coincide con el email del pagador.
         not_connected: Stripe aún no está conectado.
         not_connected_hint: para importar pagos.
         page_title: Pagos Stripe
+        payer_identified_html: Pagador identificado como %{person_link}, pero no se
+          encontró oportunidad abierta.
+        reconciliation: Conciliación
+        restore: Restaurar
+        restore_to_review: Restaurar para revisar
         search_placeholder: Buscar email, nombre, descripción…
         settings: Ajustes Stripe
+        show_title: Pago %{amount} — %{customer}
+        sidebar:
+          address: Dirección
+          amount: Importe
+          charge_id: ID del cargo
+          customer_id: ID del cliente
+          description: Descripción
+          email: Email
+          intent_id: ID del intent
+          name: Nombre
+          paid_at: Pagado el
+          paid_with: Pagado con
+          phone: Teléfono
+          risk_check: Comprobación de riesgo
         status:
           ignored: Ignorados
           matched: Emparejados
           pending_review: Por revisar
+        stripe_receipt: Recibo de Stripe
         title: Pagos Stripe
     team:
       clear: Limpiar
@@ -233,6 +317,8 @@ es:
       edit: Editar
       edit_page_title: Editar webhook
       events: Eventos
+      form:
+        active: Activa
       inactive: Inactiva
       new: Nuevo webhook
       new_page_title: Nuevo webhook

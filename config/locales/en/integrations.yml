@@ -115,19 +115,53 @@ en:
       sync_now: Sync now
       title: Gmail connection
     lists:
+      edit_page_title: Edit %{name}
       empty_subtitle: Group people, companies or deals for campaigns, segments or
         anything else.
       empty_title: No lists yet
       entry_count:
         one: 1 %{type}
         other: "%{count} %{type}"
+      form:
+        create: Create list
+        name_placeholder: Q3 outreach targets
+        record_type: Record type
+        record_type_locked: The record type can't be changed after creation.
+        save: Save changes
       new: New list
       new_list: New list
+      new_page_title: New list
       page_title: Lists
+      record_type_options:
+        Company: Companies
+        Deal: Deals
+        Person: People
       record_types:
         company: company
         deal: deal
         person: person
+      show:
+        add: Add
+        add_blank: Add %{type} to list…
+        columns:
+          added: Added
+          company: Company
+          domain: Domain
+          email: Email
+          industry: Industry
+          name: Name
+          stage: Stage
+          value: Value
+        delete: Delete
+        delete_confirm: Delete the list “%{name}”? Records themselves won't be deleted.
+        edit: Edit
+        empty_subtitle: Use the selector above to add %{types} to this list.
+        empty_title: This list is empty
+        record_types_plural:
+          company: companies
+          deal: deals
+          person: people
+        remove_from_list: Remove from list
       title: Lists
     notifications:
       empty: No notifications yet.
@@ -140,6 +174,8 @@ en:
       active: Active
       edit: Edit
       edit_page_title: Edit Slack integration
+      form:
+        active: Active
       new: New integration
       new_integration: New integration
       new_page_title: New Slack integration
@@ -177,23 +213,70 @@ en:
         sync_now: Sync now
         title: Stripe connection
       payments:
+        accept: Accept
+        accept_suggestion: Accept suggestion
         actions: Actions
         amount: Amount
+        back_to_payments: Payments
+        badges:
+          partially_refunded: Partially refunded (%{amount})
+          refunded: Refunded
+          test: Test
+          test_mode: Test mode
+        confidence:
+          high: high
+          low: low
+          medium: medium
         connect_link: Connect Stripe
+        create_deal: Create deal
         customer: Customer
         date: Date
         deal: Deal
         description: Description
+        detail_page_title: Stripe payment
         empty: No payments here.
+        full_stripe_data: Full Stripe data
+        ignore: Ignore
+        ignored_message: This payment is ignored.
+        link: Link
+        link_deal_placeholder: Search deal…
+        linked_by: " by %{name}"
+        linked_html: Linked to %{deal_link}%{matched_by}%{matched_at}.
+        linked_on: " on %{time}"
+        match_confidence: 'Suggestion (%{confidence}):'
+        metadata_heading: Stripe metadata
+        no_match: No match
+        no_open_deal: no open deal
+        no_person_match: No person in the CRM matches this payer's email.
         not_connected: Stripe is not connected yet.
         not_connected_hint: to import payments.
         page_title: Stripe payments
+        payer_identified_html: Payer identified as %{person_link}, but no open deal
+          was found.
+        reconciliation: Reconciliation
+        restore: Restore
+        restore_to_review: Restore to review
         search_placeholder: Search email, name, description…
         settings: Stripe settings
+        show_title: Payment %{amount} — %{customer}
+        sidebar:
+          address: Address
+          amount: Amount
+          charge_id: Charge id
+          customer_id: Customer id
+          description: Description
+          email: Email
+          intent_id: Intent id
+          name: Name
+          paid_at: Paid at
+          paid_with: Paid with
+          phone: Phone
+          risk_check: Risk check
         status:
           ignored: Ignored
           matched: Matched
           pending_review: To review
+        stripe_receipt: Stripe receipt
         title: Stripe payments
     team:
       clear: Clear
@@ -228,6 +311,8 @@ en:
       edit: Edit
       edit_page_title: Edit webhook
       events: Events
+      form:
+        active: Active
       inactive: Inactive
       new: New webhook
       new_page_title: New webhook

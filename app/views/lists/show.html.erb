@@ -1,10 +1,11 @@
 <% page_title @list.name %>
+<% list_type_key = @list.record_type.downcase %>
 <% actions = capture do %>
   <%= link_to edit_list_path(@list), class: "btn-secondary" do %>
-    <%= icon :pencil, classes: "size-3.5" %> Edit
+    <%= icon :pencil, classes: "size-3.5" %> <%= t("integrations.lists.show.edit") %>
   <% end %>
-  <%= button_to list_path(@list), method: :delete, form: { data: { turbo_confirm: "Delete the list “#{@list.name}”? Records themselves won't be deleted." } }, class: "btn-danger" do %>
-    <%= icon :trash, classes: "size-3.5" %> Delete
+  <%= button_to list_path(@list), method: :delete, form: { data: { turbo_confirm: t("integrations.lists.show.delete_confirm", name: @list.name) } }, class: "btn-danger" do %>
+    <%= icon :trash, classes: "size-3.5" %> <%= t("integrations.lists.show.delete") %>
   <% end %>
 <% end %>
 <%= render "shared/page_header", title: @list.name, icon_name: :list, count: @entries.size, actions: actions %>
@@ -13,8 +14,9 @@
   <%= form_with url: list_entries_path(@list), method: :post, class: "flex flex-wrap items-center gap-2" do %>
     <%= select_tag :record_id,
           options_from_collection_for_select(@candidates, :id, :display_name),
-          include_blank: "Add #{@list.record_type.downcase} to list...", class: "input w-64 max-w-full" %>
-    <%= submit_tag "Add", class: "btn-secondary" %>
+          include_blank: t("integrations.lists.show.add_blank", type: t("integrations.lists.record_types.#{list_type_key}")),
+          class: "input w-64 max-w-full" %>
+    <%= submit_tag t("integrations.lists.show.add"), class: "btn-secondary" %>
   <% end %>
 </div>
 
@@ -23,18 +25,18 @@
     <table class="table-base">
       <thead>
         <tr>
-          <th>Name</th>
+          <th><%= t("integrations.lists.show.columns.name") %></th>
           <% if @list.record_type == "Deal" %>
-            <th>Stage</th>
-            <th>Value</th>
+            <th><%= t("integrations.lists.show.columns.stage") %></th>
+            <th><%= t("integrations.lists.show.columns.value") %></th>
           <% elsif @list.record_type == "Person" %>
-            <th>Email</th>
-            <th>Company</th>
+            <th><%= t("integrations.lists.show.columns.email") %></th>
+            <th><%= t("integrations.lists.show.columns.company") %></th>
           <% else %>
-            <th>Domain</th>
-            <th>Industry</th>
+            <th><%= t("integrations.lists.show.columns.domain") %></th>
+            <th><%= t("integrations.lists.show.columns.industry") %></th>
           <% end %>
-          <th>Added</th>
+          <th><%= t("integrations.lists.show.columns.added") %></th>
           <th></th>
         </tr>
       </thead>
@@ -61,7 +63,7 @@
             <td class="text-ink-faint text-sm"><%= l entry.created_at, format: :short %></td>
             <td class="text-right">
               <%= button_to list_entry_path(@list, entry), method: :delete,
-                    class: "text-ink-faint hover:text-danger p-1 rounded cursor-pointer", title: "Remove from list" do %>
+                    class: "text-ink-faint hover:text-danger p-1 rounded cursor-pointer", title: t("integrations.lists.show.remove_from_list") do %>
                 <%= icon :x, classes: "size-3.5" %>
               <% end %>
             </td>
@@ -70,7 +72,7 @@
       </tbody>
     </table>
   <% else %>
-    <%= render "shared/empty_state", icon_name: :list, title: "This list is empty",
-          subtitle: "Use the selector above to add #{@list.record_type.downcase.pluralize} to this list.", action: nil %>
+    <%= render "shared/empty_state", icon_name: :list, title: t("integrations.lists.show.empty_title"),
+          subtitle: t("integrations.lists.show.empty_subtitle", types: t("integrations.lists.show.record_types_plural.#{list_type_key}")), action: nil %>
   <% end %>
 </div>

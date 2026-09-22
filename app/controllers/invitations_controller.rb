@@ -13,7 +13,7 @@ class InvitationsController < ApplicationController
 
     if invitation.save
       InvitationMailer.invite(invitation, invitation.plaintext_token).deliver_later
-      flash[:notice] = "Invitation sent to #{invitation.email_address}."
+      flash[:notice] = t("flashes.invitations.sent", email: invitation.email_address)
       flash[:invitation_link] = invitation.accept_url
       redirect_to settings_team_path
     else
@@ -34,7 +34,7 @@ class InvitationsController < ApplicationController
 
     invitation.regenerate_token!
     InvitationMailer.invite(invitation, invitation.plaintext_token).deliver_later
-    flash[:notice] = "Invitation resent to #{invitation.email_address}."
+    flash[:notice] = t("flashes.invitations.resent", email: invitation.email_address)
     flash[:invitation_link] = invitation.accept_url
     redirect_to settings_team_path
   end

@@ -1,5 +1,5 @@
-<% page_title "New list" %>
-<%= render "shared/page_header", title: "New list", icon_name: :list, count: nil, actions: nil %>
+<% page_title t("integrations.lists.new_page_title") %>
+<%= render "shared/page_header", title: t("integrations.lists.new_page_title"), icon_name: :list, count: nil, actions: nil %>
 <div class="flex-1 overflow-y-auto p-5">
   <div class="max-w-xl">
     <%= render "form", list: @list %>
