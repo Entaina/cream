@@ -65,15 +65,15 @@ class JourneysController < ApplicationController
     outcome = Marketing::JourneyTrigger.enroll!(journey: @journey, person: person)
     notice = case outcome
     when :enrolled
-      "#{person.display_name} inscrito en el recorrido."
+      t("flashes.journeys.enrolled", name: person.display_name)
     when :blocked
-      "No se puede inscribir: hay una oportunidad abierta para este producto."
+      t("flashes.journeys.enroll_blocked")
     when :max_reenrollments
-      "Se alcanzó el límite de reinscripciones para este contacto."
+      t("flashes.journeys.enroll_max_reenrollments")
     when :no_steps
-      "El recorrido no tiene pasos activos."
+      t("flashes.journeys.enroll_no_steps")
     else
-      "No se pudo inscribir al contacto."
+      t("flashes.journeys.enroll_failed")
     end
 
     if outcome == :enrolled

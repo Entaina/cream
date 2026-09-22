@@ -2,12 +2,12 @@ import { Controller } from "@hotwired/stimulus"
 
 // Opens LinkedIn search in a new tab with keywords from the person/company form.
 export default class extends Controller {
-  static values = { entity: String }
+  static values = { entity: String, emptyTitle: String }
 
   search(event) {
     const keywords = this.keywords()
     if (!keywords) {
-      event.currentTarget.title = "Escribe un nombre antes de buscar"
+      event.currentTarget.title = this.emptyTitleValue
       return
     }
 

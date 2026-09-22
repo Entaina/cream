@@ -24,13 +24,13 @@ class JourneyEnrollmentsController < ApplicationController
   def move_notice_for(outcome, enrollment)
     case outcome
     when :moved
-      "#{enrollment.person.display_name} se ha movido al paso seleccionado."
+      t("flashes.journey_enrollments.moved", name: enrollment.person.display_name)
     when :not_in_progress
-      "Solo se puede cambiar el paso de inscripciones activas o en espera."
+      t("flashes.journey_enrollments.not_in_progress")
     when :invalid_step
-      "El paso no pertenece a este recorrido."
+      t("flashes.journey_enrollments.invalid_step")
     else
-      "No se pudo cambiar el paso."
+      t("flashes.journey_enrollments.move_failed")
     end
   end
 end

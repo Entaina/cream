@@ -15,8 +15,8 @@ RSpec.describe StageFieldFormat, type: :model do
 
   describe ".field_label and .operator_label" do
     it "follows the current locale" do
-      expect(described_class.field_label("value")).to eq("Importe")
-      expect(described_class.operator_label("eq")).to eq("es igual a")
+      expect(described_class.field_label("value")).to eq(I18n.t("activerecord.attributes.deal.value"))
+      expect(described_class.operator_label("eq")).to eq(I18n.t("eq", scope: "stage_field_formats.operators"))
 
       I18n.with_locale(:en) do
         expect(described_class.field_label("value")).to eq("Value")

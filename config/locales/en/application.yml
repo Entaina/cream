@@ -297,6 +297,7 @@ en:
     customize_menu: Customize menu
     dashboard: Dashboard
     deals: Deals
+    drag_reorder: Drag to reorder
     features:
       alerts: Alerts
       automations: Automations
@@ -319,6 +320,7 @@ en:
       marketing: Marketing
       profile: My profile
       settings: Settings
+    hide_from_menu: Hide from menu
     language: Language
     lists: My lists
     menu: Menu
@@ -328,6 +330,7 @@ en:
     products: Products
     profile: Profile
     search: Search...
+    show_in_menu: Show in menu
     sign_out: Sign out
     tasks: Tasks
     team: Team
@@ -363,6 +366,10 @@ en:
       on the server.
     sales_director_team: Team
     save: Save
+    theme_titles:
+      dark: 'Theme: dark'
+      light: 'Theme: light'
+      system: 'Theme: system'
     time_zone: Time zone
     time_zone_blank: Workspace default (%{workspace_zone})
     time_zone_hint: Datetimes are shown in this zone. Leave blank to use the workspace
@@ -448,6 +455,7 @@ en:
       show_closed: Show closed
       table: Table
       unassigned: Unassigned
+    more_information: More information
     notes:
       add: Add note
       body_placeholder: Write a note...

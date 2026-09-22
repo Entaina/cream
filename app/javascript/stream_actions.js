@@ -56,7 +56,7 @@ Turbo.StreamActions.stage_trigger_alert = function () {
     title: this.getAttribute("title"),
     message: this.getAttribute("message") || ""
   })
-  const ok = button("Aceptar", "btn-primary")
+  const ok = button(this.getAttribute("accept") || "OK", "btn-primary")
   ok.addEventListener("click", () => dialog.close())
   actions.appendChild(ok)
   dialog.showModal()
@@ -71,9 +71,9 @@ Turbo.StreamActions.stage_trigger_confirm = function () {
     title: this.getAttribute("title"),
     message: this.getAttribute("message") || ""
   })
-  const cancel = button("Cancelar", "btn-secondary")
+  const cancel = button(this.getAttribute("cancel") || "Cancel", "btn-secondary")
   cancel.addEventListener("click", () => dialog.close())
-  const confirm = button("Aceptar", "btn-primary")
+  const confirm = button(this.getAttribute("accept") || "OK", "btn-primary")
   confirm.addEventListener("click", () => {
     dialog.close()
     if (followUpType === "visit" && followUpUrl && followUpUrl.startsWith("/")) {

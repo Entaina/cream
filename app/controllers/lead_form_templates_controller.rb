@@ -68,7 +68,7 @@ class LeadFormTemplatesController < ApplicationController
     )
     render :preview, layout: "public_lead_form"
   rescue Liquid::SyntaxError, Liquid::FileSystemError => e
-    render plain: "No se pudo renderizar la plantilla: #{e.message}", status: :unprocessable_entity
+    render plain: t("flashes.lead_form_templates.render_failed", message: e.message), status: :unprocessable_entity
   end
 
   private

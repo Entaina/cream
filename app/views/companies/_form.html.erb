@@ -6,7 +6,7 @@
 ] %>
 <% sections << ["custom", t("companies.form.custom.title"), t("companies.form.custom.description")] if company.custom_field_definitions.any? %>
 <% sections.select! { |key, _, _| key == @edit_section } if @edit_section %>
-<%= form_with model: company, class: "space-y-5", data: { controller: "linkedin-suggest record-workspace", linkedin_suggest_entity_value: "company", record_workspace_copy: I18n.t("records.record_workspace"), action: "input->record-workspace#markDirty change->record-workspace#markDirty submit->record-workspace#submit turbo:submit-end->record-workspace#submitted turbo:before-visit@document->record-workspace#beforeVisit beforeunload@window->record-workspace#beforeUnload" } do |f| %>
+<%= form_with model: company, class: "space-y-5", data: { controller: "linkedin-suggest record-workspace", linkedin_suggest_entity_value: "company", linkedin_suggest_empty_title_value: t("companies.form.profile.search_linkedin_empty"), record_workspace_copy: I18n.t("records.record_workspace"), action: "input->record-workspace#markDirty change->record-workspace#markDirty submit->record-workspace#submit turbo:submit-end->record-workspace#submitted turbo:before-visit@document->record-workspace#beforeVisit beforeunload@window->record-workspace#beforeUnload" } do |f| %>
   <%= hidden_field_tag :section, @edit_section if @edit_section %>
   <% if company.errors.any? %>
     <div role="alert" class="rounded-lg bg-danger-soft ring-1 ring-danger-line px-4 py-3 text-sm text-danger-strong">

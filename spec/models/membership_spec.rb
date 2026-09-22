@@ -14,14 +14,14 @@ RSpec.describe Membership, type: :model do
       expect(admin_membership.admin?).to be true
       expect(admin_membership.sales_director?).to be false
       expect(admin_membership.salesperson?).to be false
-      expect(admin_membership.role_label).to eq("Admin")
+      expect(admin_membership.role_label).to eq(I18n.t("integrations.team.roles.admin"))
 
       expect(salesperson_membership.admin?).to be false
       expect(salesperson_membership.salesperson?).to be true
-      expect(salesperson_membership.role_label).to eq("Vendedor")
+      expect(salesperson_membership.role_label).to eq(I18n.t("integrations.team.roles.salesperson"))
 
       expect(director_membership.sales_director?).to be true
-      expect(director_membership.role_label).to eq("Director comercial")
+      expect(director_membership.role_label).to eq(I18n.t("integrations.team.roles.sales_director"))
     end
   end
 

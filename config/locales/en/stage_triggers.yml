@@ -6,6 +6,9 @@ en:
       inactive: Inactive
       llm: AI
       native: Native
+    dialog:
+      accept: Accept
+      cancel: Cancel
     edit:
       page_title: Edit trigger
       title: Edit trigger — %{name}

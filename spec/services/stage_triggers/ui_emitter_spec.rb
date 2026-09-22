@@ -41,7 +41,8 @@ RSpec.describe StageTriggers::UiEmitter do
 
     expect(Turbo::StreamsChannel).to have_received(:broadcast_action_to)
       .with(user, :ui, action: "stage_trigger_alert", target: "toasts",
-        attributes: {message: "Ojo", title: "Aviso"})
+        attributes: hash_including(message: "Ojo", title: "Aviso",
+          accept: I18n.t("stage_triggers.dialog.accept"), cancel: I18n.t("stage_triggers.dialog.cancel")))
   end
 
   it "broadcasts confirms with their client-side follow-up" do

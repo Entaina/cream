@@ -20,4 +20,5 @@ end
 
 RSpec.configure do |config|
   config.include I18nHelper
+  config.after { I18n.locale = I18n.default_locale }
 end

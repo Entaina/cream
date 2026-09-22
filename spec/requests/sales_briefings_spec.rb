@@ -21,7 +21,7 @@ RSpec.describe "Sales briefings", type: :request do
 
     expect(response).to redirect_to(root_path)
     follow_redirect!
-    expect(response.body).to include("Sales briefing is being generated")
+    expect(response.body).to include(I18n.t("flashes.sales_briefings.generating"))
   end
 
   it "redirects when AI is not configured" do
@@ -43,7 +43,7 @@ RSpec.describe "Sales briefings", type: :request do
 
     expect(response).to redirect_to(root_path)
     follow_redirect!
-    expect(response.body).to include("no está habilitado para este workspace")
+    expect(response.body).to include(I18n.t("flashes.sales_briefings.not_enabled"))
   end
 
   it "redirects when the user disabled the briefing in profile" do
@@ -55,7 +55,7 @@ RSpec.describe "Sales briefings", type: :request do
 
     expect(response).to redirect_to(root_path)
     follow_redirect!
-    expect(response.body).to include("Has desactivado el briefing del director de ventas")
+    expect(response.body).to include(I18n.t("flashes.sales_briefings.disabled_for_user"))
   end
 
   it "allows regeneration when a briefing already exists" do
@@ -74,7 +74,7 @@ RSpec.describe "Sales briefings", type: :request do
 
     expect(response).to redirect_to(root_path)
     follow_redirect!
-    expect(response.body).to include("El briefing se está regenerando")
+    expect(response.body).to include(I18n.t("flashes.sales_briefings.regenerating"))
     expect(memberships(:one_one).reload.sales_briefing_regenerations_today).to eq(1)
   end
 
@@ -106,6 +106,6 @@ RSpec.describe "Sales briefings", type: :request do
 
     expect(response).to redirect_to(root_path)
     follow_redirect!
-    expect(response.body).to include("Has alcanzado el límite de 5 regeneraciones diarias")
+    expect(response.body).to include(I18n.t("flashes.sales_briefings.daily_limit"))
   end
 end

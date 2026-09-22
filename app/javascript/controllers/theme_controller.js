@@ -1,17 +1,12 @@
 import { Controller } from "@hotwired/stimulus"
 
 const THEMES = ["light", "dark", "system"]
-const TITLES = {
-  light: "Theme: light",
-  dark: "Theme: dark",
-  system: "Theme: system"
-}
 
 // Cycles the color theme (light → dark → system), applies it instantly on
 // <html data-theme> and persists it to the user preference.
 export default class extends Controller {
   static targets = ["option"]
-  static values = { url: String, theme: String }
+  static values = { url: String, theme: String, copy: Object }
 
   connect() {
     this.render()
@@ -46,6 +41,6 @@ export default class extends Controller {
     this.optionTargets.forEach((option) => {
       option.classList.toggle("hidden", option.dataset.theme !== this.themeValue)
     })
-    this.element.title = TITLES[this.themeValue]
+    this.element.title = (this.copyValue || {})[this.themeValue] || this.themeValue
   }
 }

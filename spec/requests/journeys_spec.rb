@@ -105,7 +105,7 @@ RSpec.describe "Journeys", type: :request do
 
       expect(response).to redirect_to(journey)
       follow_redirect!
-      expect(response.body).to include("se ha movido al paso seleccionado")
+      expect(response.body).to include(I18n.t("flashes.journey_enrollments.moved", name: person.display_name))
       expect(enrollment.reload.current_step).to eq(second_step)
       expect(enrollment.state).to eq("active")
     end
@@ -125,7 +125,7 @@ RSpec.describe "Journeys", type: :request do
 
       expect(response).to redirect_to(journey)
       follow_redirect!
-      expect(response.body).to include("activas o en espera")
+      expect(response.body).to include(I18n.t("flashes.journey_enrollments.not_in_progress"))
       expect(enrollment.reload.state).to eq("completed")
     end
 

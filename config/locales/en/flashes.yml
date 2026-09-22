@@ -76,6 +76,7 @@ en:
     email_templates:
       created: Template created.
       deleted: Template deleted.
+      preview_failed: 'Could not render the preview: %{message}'
       updated: Template updated.
     gmail:
       connect_first: Connect Gmail first.
@@ -91,16 +92,27 @@ en:
       resent: Invitation resent to %{email}.
       revoked: Invitation revoked.
       sent: Invitation sent to %{email}.
+    journey_enrollments:
+      invalid_step: The step does not belong to this journey.
+      move_failed: Could not change the step.
+      moved: "%{name} has been moved to the selected step."
+      not_in_progress: You can only change the step of active or waiting enrollments.
     journeys:
       activated: Journey activated.
       created: Journey created.
       deleted: Journey deleted.
+      enroll_blocked: 'Cannot enroll: there is an open deal for this product.'
+      enroll_failed: Could not enroll the contact.
+      enroll_max_reenrollments: Re-enrollment limit reached for this contact.
+      enroll_no_steps: The journey has no active steps.
+      enrolled: "%{name} enrolled in the journey."
       paused: Journey paused.
       updated: Journey updated.
     lead_form_templates:
       created: Template created.
       deleted: Template deleted.
       preview_pages_only: Only full pages support preview.
+      render_failed: 'Could not render the template: %{message}'
       updated: Template updated.
     lead_forms:
       created: Form created.
@@ -177,7 +189,9 @@ en:
       ai_not_configured: AI is not configured. Set CREAM_AI_API_KEY.
       daily_limit: You have reached the limit of 5 daily regenerations.
       disabled_for_user: You have disabled the sales director briefing in your profile.
+      generating: Sales briefing is being generated. Refresh in a moment.
       not_enabled: Sales director is not enabled for this workspace.
+      regenerating: The briefing is being regenerated. Refresh in a moment.
     saved_views:
       deleted: View deleted.
       saved: View saved.

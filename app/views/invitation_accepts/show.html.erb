@@ -74,7 +74,7 @@
         <div>
           <label for="user_name" class="label"><%= t("auth.registration.name") %></label>
           <input type="text" name="user[name]" id="user_name" required autofocus
-                value="<%= @user&.name %>" placeholder="Jane Doe" class="input">
+                value="<%= @user&.name %>" placeholder="<%= t("auth.registration.name_placeholder") %>" class="input">
         </div>
         <div>
           <label for="user_email" class="label"><%= t("auth.sign_in.email") %></label>
@@ -84,7 +84,7 @@
         <div>
           <label for="user_password" class="label"><%= t("auth.sign_in.password") %></label>
           <input type="password" name="user[password]" id="user_password" required
-                autocomplete="new-password" placeholder="At least 8 characters" maxlength="72" class="input">
+                autocomplete="new-password" placeholder="<%= t("auth.registration.password_placeholder") %>" maxlength="72" class="input">
         </div>
         <div>
           <label for="user_password_confirmation" class="label"><%= t("auth.registration.password_confirmation") %></label>

@@ -35,7 +35,7 @@ RSpec.describe "Person relationships", type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include("Alice")
-      expect(response.body).to include("invitado por")
+      expect(response.body).to include(I18n.t("people.relationships.types.invited.to"))
     end
 
     it "rejects creating a relationship with the same person" do
@@ -74,7 +74,7 @@ RSpec.describe "Person relationships", type: :request do
 
       get person_path(alice)
 
-      expect(response.body).not_to include("invitó a")
+      expect(response.body).not_to include(I18n.t("people.relationships.types.invited.from"))
     end
   end
 end

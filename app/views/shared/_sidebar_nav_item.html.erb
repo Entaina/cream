@@ -4,8 +4,8 @@
      class="<%= 'hidden' if item[:hidden] %>">
   <div class="flex items-center gap-0.5">
     <button type="button"
-            title="Drag to reorder"
-            aria-label="Drag to reorder"
+            title="<%= t("nav.drag_reorder") %>"
+            aria-label="<%= t("nav.drag_reorder") %>"
             data-sidebar-edit-target="handle"
             data-action="pointerdown->sidebar-edit#pointerDown"
             class="hidden shrink-0 cursor-grab active:cursor-grabbing text-ink-faint hover:text-ink p-1 rounded-md hover:bg-accent-soft/70 touch-none">
@@ -19,8 +19,8 @@
       <span class="truncate"><%= item[:label] %></span>
     <% end %>
     <button type="button"
-            title="<%= item[:hidden] ? 'Show in menu' : 'Hide from menu' %>"
-            aria-label="<%= item[:hidden] ? 'Show in menu' : 'Hide from menu' %>"
+            title="<%= item[:hidden] ? t("nav.show_in_menu") : t("nav.hide_from_menu") %>"
+            aria-label="<%= item[:hidden] ? t("nav.show_in_menu") : t("nav.hide_from_menu") %>"
             data-sidebar-edit-target="visibilityBtn"
             data-action="click->sidebar-edit#toggleVisibility"
             class="hidden shrink-0 text-ink-faint hover:text-ink p-1 rounded-md hover:bg-accent-soft/70">

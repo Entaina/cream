@@ -29,7 +29,7 @@ class OkmChatsController < ApplicationController
       on_status: ->(message) { stream_event(type: "status", message: message) }
     ).call
 
-    stream_event(type: "reply", content: result.reply.presence || "No pude generar una respuesta.")
+    stream_event(type: "reply", content: result.reply.presence || t("shared.okm_chat.no_reply"))
     stream_event(type: "session", session_id: result.session_id) if result.session_id.present?
 
     result.pending_actions.each do |action|

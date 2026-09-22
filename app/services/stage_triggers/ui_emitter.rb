@@ -27,7 +27,7 @@ module StageTriggers
       return unless @user
 
       Turbo::StreamsChannel.broadcast_action_to(@user, :ui, action: "stage_trigger_alert",
-        target: "toasts", attributes: {message: message, title: title}.compact)
+        target: "toasts", attributes: dialog_attributes(message: message, title: title))
     end
 
     def show_confirm(message:, follow_up_type:, follow_up_url: nil, follow_up_message: nil, title: nil)
@@ -43,10 +43,10 @@ module StageTriggers
       return unless @user
 
       Turbo::StreamsChannel.broadcast_action_to(@user, :ui, action: "stage_trigger_confirm",
-        target: "toasts", attributes: {
+        target: "toasts", attributes: dialog_attributes(
           message: message, title: title, "follow-up-type": follow_up_type,
           "follow-up-url": follow_up_url, "follow-up-message": follow_up_message
-        }.compact)
+        ))
     end
 
     def show_deal_panel(markdown:, title: nil)
@@ -63,6 +63,13 @@ module StageTriggers
     def record(action, **params)
       @run.ui_actions << {"action" => action, "params" => params.compact.stringify_keys, "at" => Time.current.iso8601}
       @run.save!
+    end
+
+    def dialog_attributes(**attrs)
+      attrs.merge(
+        accept: I18n.t("stage_triggers.dialog.accept"),
+        cancel: I18n.t("stage_triggers.dialog.cancel")
+      ).compact
     end
   end
 end

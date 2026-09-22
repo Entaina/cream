@@ -8,7 +8,7 @@ module EmailPreviewActions
     @preview_body = body
     render "email_previews/show", layout: "email_preview"
   rescue => e
-    render plain: "No se pudo renderizar la vista previa: #{e.message}", status: :unprocessable_entity
+    render plain: t("flashes.email_templates.preview_failed", message: e.message), status: :unprocessable_entity
   end
 
   def preview_tokens_param

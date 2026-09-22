@@ -117,7 +117,7 @@ module ApplicationHelper
     parts << l(task.due_on, format: :short) if task.due_on
     parts << task.assignee.name if task.assignee
     label = parts.join(" · ")
-    label += " (+#{extra_count} more)" if extra_count.positive?
+    label += " (#{t("records.more_pending_short", count: extra_count)})" if extra_count.positive?
     label
   end
 
@@ -142,7 +142,7 @@ module ApplicationHelper
              end)
           ].compact)
         end,
-        (tag.p("+#{extra_count} more pending", class: "text-xs text-ink-faint mt-1.5") if extra_count.positive?)
+        (tag.p(t("records.more_pending", count: extra_count), class: "text-xs text-ink-faint mt-1.5") if extra_count.positive?)
       ].compact)
     end
   end
@@ -151,7 +151,7 @@ module ApplicationHelper
     t("marketing.lead_forms.form.email_tokens_hint")
   end
 
-  def info_tooltip(content, label: "Más información", width: "w-72")
+  def info_tooltip(content, label: t("shared.more_information"), width: "w-72")
     tag.span(class: "relative group shrink-0 inline-flex") do
       safe_join([
         tag.button(

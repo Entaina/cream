@@ -33,7 +33,7 @@ class SalesBriefingsController < ApplicationController
     end
 
     SalesDirectorBriefingJob.perform_later(current_workspace.id)
-    notice = briefing_exists ? "El briefing se está regenerando. Actualiza en un momento." : "Sales briefing is being generated. Refresh in a moment."
+    notice = briefing_exists ? t("flashes.sales_briefings.regenerating") : t("flashes.sales_briefings.generating")
     redirect_to root_path, notice: notice
   end
 

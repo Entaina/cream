@@ -130,8 +130,8 @@ RSpec.describe StageCondition, type: :model do
 
   describe ".field_label_for" do
     it "follows the current locale" do
-      expect(FieldCondition.field_label_for(workspace, "value")).to eq("Importe")
-      expect(FieldCondition.operator_label("eq")).to eq("es igual a")
+      expect(FieldCondition.field_label_for(workspace, "value")).to eq(I18n.t("activerecord.attributes.deal.value"))
+      expect(FieldCondition.operator_label("eq")).to eq(I18n.t("eq", scope: "field_conditions.operators"))
 
       I18n.with_locale(:en) do
         expect(FieldCondition.field_label_for(workspace, "value")).to eq("Value")
@@ -152,7 +152,9 @@ RSpec.describe StageCondition, type: :model do
   describe "#describe_requirement" do
     it "phrases the rule as something the deal must satisfy" do
       condition = build_condition(operator: "gt", compare_value: "1000")
-      expect(condition.describe_requirement).to eq("Importe debe ser mayor que 1000")
+      expect(condition.describe_requirement).to eq(
+        "#{I18n.t("activerecord.attributes.deal.value")} #{I18n.t("gt", scope: "field_conditions.requirement_operators")} 1000"
+      )
     end
   end
 
@@ -167,10 +169,15 @@ RSpec.describe StageCondition, type: :model do
       }.to raise_error(ActiveRecord::RecordInvalid) { |error|
         messages = error.record.errors.full_messages
         expect(messages.size).to eq(1)
-        expect(messages.first).to include("No se puede pasar a «Qualified»")
-        expect(messages.first).to include("Importe debe ser mayor que 1000")
-        expect(messages.first).to include("Fecha de cierre prevista debe tener valor")
-        expect(messages.first.scan("No se puede pasar").size).to eq(1)
+        blocked = I18n.t("field_conditions.stage_move_blocked", stage: "Qualified", requirements: "*")
+        expect(messages.first).to start_with(blocked.split("*").first)
+        expect(messages.first).to include(
+          "#{I18n.t("activerecord.attributes.deal.value")} #{I18n.t("gt", scope: "field_conditions.requirement_operators")} 1000"
+        )
+        expect(messages.first).to include(
+          "#{I18n.t("activerecord.attributes.deal.expected_close_date")} #{I18n.t("present", scope: "field_conditions.requirement_operators")}"
+        )
+        expect(messages.first.scan("«Qualified»").size).to eq(1)
       }
     end
 

@@ -297,6 +297,7 @@ es:
     customize_menu: Personalizar menú
     dashboard: Panel
     deals: Oportunidades
+    drag_reorder: Arrastrar para reordenar
     features:
       alerts: Alertas
       automations: Automatizaciones
@@ -319,6 +320,7 @@ es:
       marketing: Marketing
       profile: Mi perfil
       settings: Configuración
+    hide_from_menu: Ocultar del menú
     language: Idioma
     lists: Mis listas
     menu: Menú
@@ -328,6 +330,7 @@ es:
     products: Productos
     profile: Perfil
     search: Buscar...
+    show_in_menu: Mostrar en el menú
     sign_out: Cerrar sesión
     tasks: Tareas
     team: Equipo
@@ -364,6 +367,10 @@ es:
       en el servidor.
     sales_director_team: Equipo
     save: Guardar
+    theme_titles:
+      dark: 'Tema: oscuro'
+      light: 'Tema: claro'
+      system: 'Tema: sistema'
     time_zone: Zona horaria
     time_zone_blank: Por defecto del workspace (%{workspace_zone})
     time_zone_hint: Las fechas con hora se muestran en esta zona. Si no eliges ninguna,
@@ -449,6 +456,7 @@ es:
       show_closed: Mostrar cerradas
       table: Tabla
       unassigned: Sin asignar
+    more_information: Más información
     notes:
       add: Añadir nota
       body_placeholder: Escribe una nota...

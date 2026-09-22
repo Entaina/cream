@@ -56,8 +56,8 @@ RSpec.describe Pipeline, type: :model do
 
   describe ".card_field_label" do
     it "follows the current locale" do
-      expect(described_class.card_field_label("value")).to eq("Importe")
-      expect(described_class.card_field_label("products")).to eq("Productos y ediciones")
+      expect(described_class.card_field_label("value")).to eq(I18n.t("records.fields.value"))
+      expect(described_class.card_field_label("products")).to eq(I18n.t("pipelines.card_fields.products"))
 
       I18n.with_locale(:en) do
         expect(described_class.card_field_label("value")).to eq("Value")

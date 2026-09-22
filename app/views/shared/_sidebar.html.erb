@@ -85,7 +85,8 @@
             data-controller="theme"
             data-action="theme#cycle"
             data-theme-url-value="<%= theme_preference_path %>"
-            data-theme-theme-value="<%= current_user.theme %>">
+            data-theme-theme-value="<%= current_user.theme %>"
+            data-theme-copy-value="<%= json_escape(I18n.t("profile.theme_titles").to_json) %>">
       <span data-theme-target="option" data-theme="light" class="hidden"><%= icon :sun, classes: "size-4" %></span>
       <span data-theme-target="option" data-theme="dark" class="hidden"><%= icon :moon, classes: "size-4" %></span>
       <span data-theme-target="option" data-theme="system" class="hidden"><%= icon :monitor, classes: "size-4" %></span>

@@ -32,6 +32,7 @@ es:
         industry_placeholder: SaaS, Fintech...
         location_placeholder: Ciudad, País
         search_linkedin: Buscar en LinkedIn
+        search_linkedin_empty: Escribe un nombre antes de buscar
         title: Datos de la empresa
     index:
       empty_search: Prueba con otra búsqueda.
@@ -242,6 +243,7 @@ es:
         description: Su rol, empresa y trayectoria.
         linkedin_placeholder: https://linkedin.com/in/…
         search_linkedin: Buscar en LinkedIn
+        search_linkedin_empty: Escribe un nombre antes de buscar
         title: Perfil profesional
     index:
       empty_search: Prueba con otra búsqueda.
@@ -522,6 +524,8 @@ es:
       twitter: X / Twitter
       value: Importe
     more_actions: Más acciones
+    more_pending: "+%{count} más pendientes"
+    more_pending_short: "+%{count} más"
     next_tasks: Próximas tareas
     no_open_deals: No hay oportunidades abiertas.
     no_pending_tasks: No hay tareas pendientes. Crea una tarea para planificar el

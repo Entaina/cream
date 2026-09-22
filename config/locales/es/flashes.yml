@@ -77,6 +77,7 @@ es:
     email_templates:
       created: Plantilla creada.
       deleted: Plantilla eliminada.
+      preview_failed: 'No se pudo renderizar la vista previa: %{message}'
       updated: Plantilla actualizada.
     gmail:
       connect_first: Conecta Gmail primero.
@@ -94,16 +95,30 @@ es:
       resent: Invitación reenviada a %{email}.
       revoked: Invitación revocada.
       sent: Invitación enviada a %{email}.
+    journey_enrollments:
+      invalid_step: El paso no pertenece a este recorrido.
+      move_failed: No se pudo cambiar el paso.
+      moved: "%{name} se ha movido al paso seleccionado."
+      not_in_progress: Solo se puede cambiar el paso de inscripciones activas o en
+        espera.
     journeys:
       activated: Recorrido activado.
       created: Recorrido creado.
       deleted: Recorrido eliminado.
+      enroll_blocked: 'No se puede inscribir: hay una oportunidad abierta para este
+        producto.'
+      enroll_failed: No se pudo inscribir al contacto.
+      enroll_max_reenrollments: Se alcanzó el límite de reinscripciones para este
+        contacto.
+      enroll_no_steps: El recorrido no tiene pasos activos.
+      enrolled: "%{name} inscrito en el recorrido."
       paused: Recorrido pausado.
       updated: Recorrido actualizado.
     lead_form_templates:
       created: Plantilla creada.
       deleted: Plantilla eliminada.
       preview_pages_only: Solo las páginas completas admiten vista previa.
+      render_failed: 'No se pudo renderizar la plantilla: %{message}'
       updated: Plantilla actualizada.
     lead_forms:
       created: Formulario creado.
@@ -181,7 +196,9 @@ es:
       daily_limit: Has alcanzado el límite de 5 regeneraciones diarias.
       disabled_for_user: Has desactivado el briefing del director de ventas en tu
         perfil.
+      generating: Se está generando el briefing de ventas. Actualiza en un momento.
       not_enabled: El director de ventas no está habilitado para este workspace.
+      regenerating: El briefing se está regenerando. Actualiza en un momento.
     saved_views:
       deleted: Vista eliminada.
       saved: Vista guardada.

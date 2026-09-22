@@ -6,6 +6,9 @@ es:
       inactive: Inactivo
       llm: IA
       native: Nativo
+    dialog:
+      accept: Aceptar
+      cancel: Cancelar
     edit:
       page_title: Editar disparador
       title: Editar disparador — %{name}
