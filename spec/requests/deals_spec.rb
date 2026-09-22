@@ -439,6 +439,21 @@ RSpec.describe "Deals", type: :request do
     end
   end
 
+  describe "DELETE /deals/:id" do
+    it "deletes the deal without deleting its contacts or leaving contact-removed activity" do
+      sign_in_as(member)
+      contact = deal.contacts.first
+
+      expect {
+        delete deal_path(deal)
+      }.to change(Deal, :count).by(-1)
+
+      expect(response).to redirect_to(board_deals_path)
+      expect(Person.find_by(id: contact.id)).to eq(contact)
+      expect(workspace.activities.where(action: "contacts_changed")).to be_empty
+    end
+  end
+
   describe "GET /deals/board (all pipelines)" do
     it "groups columns by stage name and shows the pipeline on each card" do
       sign_in_as(member)

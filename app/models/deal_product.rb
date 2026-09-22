@@ -64,6 +64,8 @@ class DealProduct < ApplicationRecord
   end
 
   def track_product_removed
+    return if destroyed_by_association
+
     deal.track_activity("products_changed", metadata: product_metadata("removed"))
   end
 

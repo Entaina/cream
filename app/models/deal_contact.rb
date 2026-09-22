@@ -15,6 +15,8 @@ class DealContact < ApplicationRecord
   end
 
   def track_contact_removed
+    return if destroyed_by_association
+
     deal.track_activity("contacts_changed", metadata: contact_metadata("removed"))
   end
 

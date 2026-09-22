@@ -363,4 +363,30 @@ RSpec.describe Deal, type: :model do
       expect(copy.save).to be(true)
     end
   end
+
+  describe "destroy" do
+    it "does not destroy linked people or leave contact-removed activities" do
+      contact = deal.contacts.first
+      expect(contact).to be_present
+      product = workspace.products.create!(name: "Plan Pro", price: 100)
+      deal.deal_products.create!(product: product, quantity: 1)
+
+      expect { deal.destroy! }.to change(Deal, :count).by(-1)
+
+      expect(Person.find_by(id: contact.id)).to eq(contact)
+      expect(workspace.activities.where(action: "contacts_changed", subject_type: "Deal")).to be_empty
+      expect(workspace.activities.where(action: "products_changed", subject_type: "Deal")).to be_empty
+    end
+
+    it "still logs when a contact is unlinked from a living deal" do
+      contact = deal.contacts.first
+
+      expect {
+        deal.deal_contacts.find_by!(person: contact).destroy!
+      }.to change { deal.activities.where(action: "contacts_changed").count }.by(1)
+
+      expect(Person.find_by(id: contact.id)).to eq(contact)
+      expect(deal.activities.where(action: "contacts_changed").last.metadata["change"]).to eq("removed")
+    end
+  end
 end

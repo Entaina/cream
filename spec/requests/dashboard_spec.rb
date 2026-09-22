@@ -201,6 +201,20 @@ RSpec.describe "Dashboard active pipeline", type: :request do
     end
   end
 
+  describe "recent activity" do
+    it "shows deal activity together with people activity" do
+      company = create_company!(workspace, name: "Dashboard Co")
+      person = create_person!(workspace, company: company, first_name: "Dana")
+      create_deal!(workspace, pipeline: pipeline, company: company, contacts: [person], name: "Dashboard deal")
+
+      get root_path
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("Dashboard deal")
+      expect(response.body).to include("Dana")
+    end
+  end
+
   describe "My tasks" do
     it "shows only pending tasks assigned to the current user" do
       workspace.tasks.create!(
