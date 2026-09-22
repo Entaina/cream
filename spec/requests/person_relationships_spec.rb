@@ -44,7 +44,7 @@ RSpec.describe "Person relationships", type: :request do
       }
 
       expect(response).to redirect_to(person_path(alice))
-      expect(flash[:alert]).to include("cannot be the same person")
+      expect(flash[:alert]).to include(I18n.t("activerecord.errors.messages.cannot_be_same_person"))
       expect(PersonRelationship.count).to eq(0)
     end
 

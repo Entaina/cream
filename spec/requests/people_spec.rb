@@ -555,7 +555,7 @@ RSpec.describe "People", type: :request do
       }, as: :json
 
       expect(response).to have_http_status(:unprocessable_content)
-      expect(JSON.parse(response.body)["errors"]).to include(blank_error_for(Person, :brought_by))
+      expect(JSON.parse(response.body)["errors"]).to include(blank_error_for(Person, :brought_by_id))
     end
 
     it "creates a person with team member source" do
