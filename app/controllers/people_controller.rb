@@ -162,7 +162,7 @@ class PeopleController < ApplicationController
     render :merge, status: :unprocessable_entity
   rescue ActiveRecord::ActiveRecordError => e
     Rails.logger.error("[PeopleController#merge] #{e.class}: #{e.message}\n#{e.backtrace&.first(5)&.join("\n")}")
-    flash.now[:alert] = "Could not merge contacts. Please try again or contact support."
+    flash.now[:alert] = t("people.merge.errors.merge_failed")
     render :merge, status: :unprocessable_entity
   end
 

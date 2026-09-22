@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="h-full" data-theme="system">
   <head>
-    <title><%= content_for(:title) || @lead_form&.name || "Formulario" %></title>
+    <title><%= content_for(:title) || @lead_form&.name || t("public.lead_forms.default_title") %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>

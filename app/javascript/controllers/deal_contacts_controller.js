@@ -8,7 +8,8 @@ export default class extends Controller {
     peopleUrl: String,
     pickCompanyError: String,
     selectTeamMemberError: String,
-    networkError: String
+    networkError: String,
+    createFailed: String
   }
 
   connect() {
@@ -128,7 +129,7 @@ export default class extends Controller {
       })
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
-        this.error((data.errors || ["Could not create"]).join(", "))
+        this.error((data.errors || [this.createFailedValue]).join(", "))
         return
       }
       const created = await res.json()

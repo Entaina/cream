@@ -373,6 +373,9 @@ en:
           compiling the form page that imports them.
         system_fields_summary: Metadata and system fields (%{count})
     lead_forms:
+      public:
+        privacy_title: Privacy policy
+        success_title: Thank you
       edit:
         page_title: Edit lead capture form
       form:

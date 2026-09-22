@@ -2,6 +2,11 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = ["tab", "panel", "composer"]
+  static values = { copy: Object }
+
+  get c() {
+    return this.copyValue || {}
+  }
 
   connect() {
     this.dirtyForms = new Set()
@@ -60,7 +65,7 @@ export default class extends Controller {
 
   submit(event) {
     const others = [...this.dirtyForms].filter(form => form !== event.target)
-    if (others.length && !window.confirm("You have other unsaved drafts. Leave them and continue?")) {
+    if (others.length && !window.confirm(this.c.other_drafts_confirm || "")) {
       event.preventDefault()
       return
     }
@@ -73,7 +78,7 @@ export default class extends Controller {
   }
 
   beforeVisit(event) {
-    if (this.dirtyForms.size && !this.submitting && !window.confirm("Leave this page? Your unsaved changes and drafts will be lost.")) event.preventDefault()
+    if (this.dirtyForms.size && !this.submitting && !window.confirm(this.c.leave_page_confirm || "")) event.preventDefault()
   }
 
   beforeUnload(event) {

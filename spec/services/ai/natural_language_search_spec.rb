@@ -28,7 +28,7 @@ RSpec.describe Ai::NaturalLanguageSearch do
 
     result = search("overdue tasks")
 
-    expect(result.interpretation).to include("Pending tasks")
+    expect(result.interpretation).to eq(I18n.t("ai_search.interpretations.overdue_tasks"))
     expect(result.tasks.map(&:title)).to include("Late task")
   end
 
@@ -84,7 +84,7 @@ RSpec.describe Ai::NaturalLanguageSearch do
 
     result = search("tareas de Acme Corp")
 
-    expect(result.interpretation).to include("company")
+    expect(result.interpretation).to include(I18n.t("ai_search.record_types.company"))
     expect(result.tasks.map(&:title)).to include("Company follow-up")
     expect(result.tasks.map(&:title)).not_to include("Person follow-up")
     deal_titles = result.open_deal_tasks.flat_map { |group| group[:tasks].map(&:title) }

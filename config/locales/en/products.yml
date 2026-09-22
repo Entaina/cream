@@ -1,0 +1,59 @@
+---
+en:
+  products:
+    editions:
+      columns:
+        dates: Dates
+        lines_in_use: Lines in use
+        name: Name
+      create: Create edition
+      delete_confirm: Delete %{name}?
+      empty: No editions yet. Add one to offer variants or cohorts for this product.
+      form:
+        end_date: End date
+        name_placeholder: Madrid 2026
+        save: Save changes
+        start_date: Start date
+      new: New edition
+      new_page_title: New edition · %{product}
+      edit_page_title: Edit %{name} · %{product}
+      title: Editions
+    form:
+      create: Create product
+      name_placeholder: Plan Pro (annual)
+      price: Price (€)
+      save: Save changes
+    index:
+      clear: Clear
+      columns:
+        description: Description
+        name: Name
+        price: Price
+        segment: Segment
+      delete_confirm: Delete %{name}?
+      empty_subtitle: Build a catalogue to add as line items on your deals.
+      empty_title: No products yet
+      new: New product
+      page_title: Products
+      search_placeholder: Search products...
+      segment_all: All segments
+      title: Products
+    edit:
+      page_title: Edit %{name}
+      title: Edit %{name}
+      view_deals: View deals
+    new:
+      page_title: New product
+      title: New product
+    segments:
+      b2b: B2B
+      b2c: B2C
+  imports:
+    intro: Upload a CSV file to import %{type}.
+    page_title: Import %{type}
+    record_types_plural:
+      Company: companies
+      Deal: deals
+      Person: people
+    submit: Import CSV
+    title: Import %{type}

@@ -1,0 +1,21 @@
+---
+en:
+  legal:
+    footer:
+      aria: Legal and support
+      go_to_crm: Go to CRM
+      privacy: Privacy
+      sign_in: Sign in
+      support: Support
+      terms: Terms
+    last_updated: 'Last updated: %{date}'
+    privacy:
+      page_title: Privacy policy
+      title: Privacy policy
+    support:
+      page_title: Support
+      subtitle: Help for teams using Cream
+      title: Support
+    terms:
+      page_title: Terms and conditions
+      title: Terms and conditions

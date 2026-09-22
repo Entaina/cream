@@ -10,8 +10,10 @@ export default class extends Controller {
     createUrl: String,
     createParam: String,
     records: Array,
-    noResults: { type: String, default: "No results" },
-    createLabel: { type: String, default: '+ Create "%{name}"' }
+    noResults: String,
+    createLabel: String,
+    createFailed: String,
+    networkError: String
   }
 
   connect() {
@@ -242,7 +244,7 @@ export default class extends Controller {
 
       if (!response.ok) {
         const data = await response.json().catch(() => ({}))
-        this.showError((data.errors || ["Could not create"]).join(", "))
+        this.showError((data.errors || [this.createFailedValue]).join(", "))
         return
       }
 
@@ -250,7 +252,7 @@ export default class extends Controller {
       if (this.inlineMode) this.inlineRecords.push({ id: record.id, name: record.name, hint: record.hint || null })
       this.selectRecord(record)
     } catch {
-      this.showError("Network error, please try again")
+      this.showError(this.networkErrorValue || "")
     }
   }
 

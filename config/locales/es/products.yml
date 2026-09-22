@@ -1,0 +1,60 @@
+---
+es:
+  products:
+    editions:
+      columns:
+        dates: Fechas
+        lines_in_use: Líneas en uso
+        name: Nombre
+      create: Crear edición
+      delete_confirm: "¿Eliminar «%{name}»?"
+      empty: Aún no hay ediciones. Añade una para ofrecer variantes o cohortes de
+        este producto.
+      form:
+        end_date: Fecha fin
+        name_placeholder: Madrid 2026
+        save: Guardar cambios
+        start_date: Fecha inicio
+      new: Nueva edición
+      new_page_title: Nueva edición · %{product}
+      edit_page_title: Editar %{name} · %{product}
+      title: Ediciones
+    form:
+      create: Crear producto
+      name_placeholder: Plan Pro (anual)
+      price: Precio (€)
+      save: Guardar cambios
+    index:
+      clear: Limpiar
+      columns:
+        description: Descripción
+        name: Nombre
+        price: Precio
+        segment: Segmento
+      delete_confirm: "¿Eliminar %{name}?"
+      empty_subtitle: Crea un catálogo para añadir líneas en tus oportunidades.
+      empty_title: Aún no hay productos
+      new: Nuevo producto
+      page_title: Productos
+      search_placeholder: Buscar productos…
+      segment_all: Todos los segmentos
+      title: Productos
+    edit:
+      page_title: Editar %{name}
+      title: Editar %{name}
+      view_deals: Ver oportunidades
+    new:
+      page_title: Nuevo producto
+      title: Nuevo producto
+    segments:
+      b2b: B2B
+      b2c: B2C
+  imports:
+    intro: Sube un CSV para importar %{type}.
+    page_title: Importar %{type}
+    record_types_plural:
+      Company: empresas
+      Deal: oportunidades
+      Person: personas
+    submit: Importar CSV
+    title: Importar %{type}

@@ -247,8 +247,8 @@ es:
         link: Vincular
         link_deal_placeholder: Buscar oportunidad…
         linked_by: " por %{name}"
-        linked_html: Vinculado a %{deal_link}%{matched_by}%{matched_at}.
         linked_on: " el %{time}"
+        linked_to: Vinculado a
         match_confidence: 'Sugerencia (%{confidence}):'
         metadata_heading: Metadatos de Stripe
         no_match: Sin coincidencia

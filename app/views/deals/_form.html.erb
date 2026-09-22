@@ -6,7 +6,7 @@
 <% sections << ["custom", t("deals.form.custom.title"), t("deals.form.custom.description")] if deal.custom_field_definitions.any? %>
 <% sections.select! { |key, _, _| key == @edit_section } if @edit_section %>
 <% workspace_actions = "input->record-workspace#markDirty change->record-workspace#markDirty nested-form:changed->record-workspace#markDirty submit->record-workspace#submit turbo:submit-end->record-workspace#submitted turbo:before-visit@document->record-workspace#beforeVisit beforeunload@window->record-workspace#beforeUnload" %>
-<% form_data = { controller: "record-workspace", action: workspace_actions } %>
+<% form_data = { controller: "record-workspace", action: workspace_actions, record_workspace_copy: I18n.t("records.record_workspace") } %>
 <% if deal.persisted? %>
   <% form_data[:controller] = "deal-stage-celebration record-workspace" %>
   <% form_data[:deal_stage_celebration_initial_stage_id_value] = deal.pipeline_stage_id %>

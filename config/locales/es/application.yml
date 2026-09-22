@@ -460,9 +460,29 @@ es:
         text-ink">%{to}</span> de <span class="font-medium text-ink">%{count}</span>
     record_picker:
       create: + Crear "%{name}"
+      create_failed: No se pudo crear
+      network_error: Error de red, inténtalo de nuevo
       no_results: Sin resultados
       search_placeholder: Escribe para buscar…
     someone: Alguien
+    okm_chat:
+      action_failed: No se pudo ejecutar la acción.
+      cancel: Cancelar
+      close: Cerrar chat
+      confirm: Confirmar
+      context: 'Contexto: %{label}'
+      executing_action: Ejecutando acción…
+      expand: Expandir chat
+      general_knowledge: Conocimiento general
+      new_conversation: Nueva
+      no_reply: Sin respuesta.
+      open: Abrir chat de base de conocimiento
+      placeholder: Pregunta sobre clientes, ventas o estrategia…
+      request_failed: No se pudo obtener respuesta.
+      send: Enviar
+      shrink: Reducir chat
+      thinking: Pensando…
+      title: Base de conocimiento
     tasks:
       add: Añadir
       assignee: Asignado a
@@ -497,6 +517,13 @@ es:
       update_view: Actualizar vista
       view_name_placeholder: Nombre de la vista
   tasks:
+    next_task_prompt:
+      add: Añadir tarea
+      body_html: Completaste la última tarea de <strong class="font-medium text-ink">%{name}</strong>.
+        ¿Cuál es la siguiente?
+      placeholder: Añadir tarea…
+      skip: Omitir
+      title: Siguiente tarea
     index:
       add_task: Añadir tarea
       all: Todas

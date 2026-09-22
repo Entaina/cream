@@ -6,7 +6,8 @@ export default class extends Controller {
   static targets = ["input", "menu", "list", "submit"]
   static values = {
     searchUrl: String,
-    excludeId: Number
+    excludeId: Number,
+    noResults: String
   }
 
   connect() {
@@ -149,7 +150,7 @@ export default class extends Controller {
 
   renderMenu() {
     if (this.results.length === 0) {
-      this.menuTarget.innerHTML = `<li class="px-3 py-1.5 text-sm text-ink-faint">No results</li>`
+      this.menuTarget.innerHTML = `<li class="px-3 py-1.5 text-sm text-ink-faint">${this.escape(this.noResultsValue || "")}</li>`
       this.menuTarget.classList.remove("hidden")
       this.activeIndex = -1
       return

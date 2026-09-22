@@ -241,8 +241,8 @@ en:
         link: Link
         link_deal_placeholder: Search deal…
         linked_by: " by %{name}"
-        linked_html: Linked to %{deal_link}%{matched_by}%{matched_at}.
         linked_on: " on %{time}"
+        linked_to: Linked to
         match_confidence: 'Suggestion (%{confidence}):'
         metadata_heading: Stripe metadata
         no_match: No match

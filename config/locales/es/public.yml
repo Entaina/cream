@@ -1,0 +1,20 @@
+---
+es:
+  public:
+    lead_forms:
+      default_title: Formulario
+      gdpr_required: Debes aceptar la política de privacidad para enviar el formulario.
+      turnstile_failed: No hemos podido verificar que eres una persona. Vuelve a intentarlo.
+    email_preferences:
+      greeting_html: Hola <strong>%{name}</strong>, elige qué comunicaciones quieres
+        recibir de %{workspace}.
+      page_title: Preferencias de email
+      save: Guardar preferencias
+      title: Preferencias de email
+      unsubscribe_all: Darse de baja de todas las comunicaciones
+      unsubscribe_all_confirm: "¿Dejar de recibir cualquier email de marketing de %{workspace}?"
+    email_unsubscribed:
+      body: Has sido dado de baja correctamente. No recibirás más emails de marketing
+        en esta categoría.
+      page_title: Baja confirmada
+      title: Baja confirmada

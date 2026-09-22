@@ -1,0 +1,30 @@
+---
+en:
+  ai_search:
+    empty_subtitle: Try stalled deals, overdue tasks, pending follow up, or a keyword.
+    empty_title: No results for “%{query}”
+    interpretations:
+      default: Keyword search across people, companies and deals
+      due_today_tasks: Pending tasks due today
+      inactive_records: Records with no activity in the last 14 days
+      overdue_tasks: Pending tasks past their due date
+      pending_follow_ups: Sent emails with a pending follow-up reminder
+      stalled_deals: Open deals that have been in the current stage for 7+ days
+      tasks_assigned_to: Tasks assigned to %{name}
+      tasks_due_today_or_overdue: Pending tasks due today or past their due date
+      tasks_linked_to_record: Tasks linked to %{type} '%{name}'
+      won_deals: Deals in a won stage
+    page_title: AI Search
+    placeholder: 'Try: stalled deals, overdue tasks, pending follow up…'
+    record_types:
+      company: company
+      person: person
+    sections:
+      companies: Companies
+      deals: Deals
+      follow_ups: Follow-ups
+      people: People
+      tasks: Tasks
+    task_due: due %{date}
+    task_follow_up: follow up %{date}
+    title: AI Search

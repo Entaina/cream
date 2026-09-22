@@ -1,0 +1,21 @@
+---
+es:
+  legal:
+    footer:
+      aria: Legal y soporte
+      go_to_crm: Ir al CRM
+      privacy: Privacidad
+      sign_in: Iniciar sesión
+      support: Asistencia
+      terms: Términos
+    last_updated: 'Última actualización: %{date}'
+    privacy:
+      page_title: Política de privacidad
+      title: Política de privacidad
+    support:
+      page_title: Asistencia
+      subtitle: Ayuda para equipos que usan Cream
+      title: Asistencia
+    terms:
+      page_title: Términos y condiciones
+      title: Términos y condiciones

@@ -4,7 +4,7 @@
       <p class="text-sm font-medium text-accent"><%= @workspace.name %></p>
       <h1 class="text-2xl font-display font-semibold"><%= t("public.email_preferences.title") %></h1>
       <p class="text-sm text-ink-faint">
-        <%= t("public.email_preferences.greeting_html", name: @person.display_name, workspace: @workspace.name).html_safe %>
+        <%= t("public.email_preferences.greeting_html", name: h(@person.display_name), workspace: h(@workspace.name)).html_safe %>
       </p>
     </header>
 

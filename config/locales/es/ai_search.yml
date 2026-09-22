@@ -1,0 +1,31 @@
+---
+es:
+  ai_search:
+    empty_subtitle: Prueba oportunidades estancadas, tareas vencidas, seguimientos pendientes
+      o una palabra clave.
+    empty_title: Sin resultados para «%{query}»
+    interpretations:
+      default: Búsqueda por palabra clave en personas, empresas y oportunidades
+      due_today_tasks: Tareas pendientes con vencimiento hoy
+      inactive_records: Registros sin actividad en los últimos 14 días
+      overdue_tasks: Tareas pendientes con fecha de vencimiento pasada
+      pending_follow_ups: Emails enviados con recordatorio de seguimiento pendiente
+      stalled_deals: Oportunidades abiertas en la etapa actual 7+ días
+      tasks_assigned_to: Tareas asignadas a %{name}
+      tasks_due_today_or_overdue: Tareas pendientes con vencimiento hoy o pasado
+      tasks_linked_to_record: Tareas vinculadas a %{type} «%{name}»
+      won_deals: Oportunidades en etapa ganada
+    page_title: Búsqueda IA
+    placeholder: 'Prueba: oportunidades estancadas, tareas vencidas, seguimientos pendientes…'
+    record_types:
+      company: empresa
+      person: persona
+    sections:
+      companies: Empresas
+      deals: Oportunidades
+      follow_ups: Seguimientos
+      people: Personas
+      tasks: Tareas
+    task_due: vence el %{date}
+    task_follow_up: seguimiento el %{date}
+    title: Búsqueda IA

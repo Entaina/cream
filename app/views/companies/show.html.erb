@@ -1,5 +1,6 @@
 <% page_title @company.name %>
 <div class="record-workspace" data-controller="record-workspace"
+     data-record-workspace-copy-value="<%= json_escape(I18n.t("records.record_workspace")) %>"
      data-action="turbo:before-visit@document->record-workspace#beforeVisit beforeunload@window->record-workspace#beforeUnload input->record-workspace#markDirty change->record-workspace#markDirty submit->record-workspace#submit turbo:submit-end->record-workspace#submitted">
   <header class="record-header">
     <div class="flex items-center gap-2 text-sm text-ink-soft mb-5">

@@ -23,24 +23,43 @@ export default class extends Controller {
     draftEmailUrl: String,
     createTaskUrl: String,
     enrichUrl: String,
-    enrichmentEnabled: Boolean
+    enrichmentEnabled: Boolean,
+    copy: Object
+  }
+
+  get c() {
+    return this.copyValue || {}
+  }
+
+  label(key) {
+    return this.c.labels?.[key] || key
+  }
+
+  interpolate(template, vars = {}) {
+    if (!template) return ""
+    return Object.entries(vars).reduce(
+      (text, [key, value]) => text.replace(new RegExp(`%\\{${key}\\}`, "g"), value ?? ""),
+      template
+    )
   }
 
   async summarize() {
-    await this.run("summary", this.summaryUrlValue, (data) => {
+    await this.run(this.label("summary"), this.summaryUrlValue, (data) => {
       this.summaryPanelTarget.hidden = false
-      this.summaryTextTarget.textContent = data.summary || "No summary available."
-      this.renderList(this.risksListTarget, data.risks, "No risks identified.")
-      this.renderList(this.nextStepsListTarget, data.next_steps, "No next steps suggested.")
-      this.renderList(this.missingListTarget, data.missing_data, "No missing data flagged.")
+      this.summaryTextTarget.textContent = data.summary || this.c.no_summary
+      this.renderList(this.risksListTarget, data.risks, this.c.no_risks)
+      this.renderList(this.nextStepsListTarget, data.next_steps, this.c.no_next_steps)
+      this.renderList(this.missingListTarget, data.missing_data, this.c.no_missing_data)
     })
   }
 
   async suggestNextSteps() {
-    await this.run("next steps", this.nextStepsUrlValue, (data) => {
+    await this.run(this.label("next_steps"), this.nextStepsUrlValue, (data) => {
       this.suggestionsPanelTarget.hidden = false
       if (this.hasRiskBadgeTarget) {
-        this.riskBadgeTarget.textContent = `Risk: ${data.deal_risk || "medium"}`
+        this.riskBadgeTarget.textContent = this.interpolate(this.c.risk_badge, {
+          level: data.deal_risk || "medium"
+        })
         this.riskBadgeTarget.hidden = false
       }
       this.renderSuggestions(data.suggestions || [])
@@ -52,22 +71,22 @@ export default class extends Controller {
 
   async draftEmail() {
     const goal = this.hasGoalTarget ? this.goalTarget.value.trim() : ""
-    await this.run("email draft", this.draftEmailUrlValue, (data) => {
+    await this.run(this.label("email_draft"), this.draftEmailUrlValue, (data) => {
       this.fillEmailComposer(data.subject, data.body)
-      this.statusTarget.textContent = "Email draft ready in the editor."
+      this.statusTarget.textContent = this.c.email_draft_ready
     }, { goal })
   }
 
   async enrich() {
     if (!this.enrichmentEnabledValue) return
 
-    await this.run("enrichment", this.enrichUrlValue, (data) => {
+    await this.run(this.label("enrichment"), this.enrichUrlValue, (data) => {
       this.summaryPanelTarget.hidden = false
-      this.summaryTextTarget.textContent = data.summary || "No enrichment suggestions."
+      this.summaryTextTarget.textContent = data.summary || this.c.no_enrichment
       const suggestions = (data.suggestions || []).map((item) =>
         `${item.field}: ${item.current || "—"} → ${item.suggested}${item.reason ? ` (${item.reason})` : ""}`
       )
-      this.renderList(this.missingListTarget, suggestions, "No enrichment suggestions.")
+      this.renderList(this.missingListTarget, suggestions, this.c.no_enrichment)
     })
   }
 
@@ -78,15 +97,17 @@ export default class extends Controller {
     const reason = button.dataset.reason
 
     button.disabled = true
-    this.setStatus("Creating task…")
+    this.setStatus(this.c.creating_task)
 
     try {
       const response = await this.postJson(this.createTaskUrlValue, { title, due_on: dueOn, reason })
       const data = await response.json()
-      if (!response.ok) throw new Error(data.error || data.errors?.join(", ") || "Could not create task.")
+      if (!response.ok) {
+        throw new Error(data.error || data.errors?.join(", ") || this.c.create_task_failed)
+      }
 
       button.replaceWith(this.createdTaskLabel(data.task.title))
-      this.setStatus(`Task “${data.task.title}” created.`)
+      this.setStatus(this.interpolate(this.c.task_created, { title: data.task.title }))
     } catch (error) {
       button.disabled = false
       this.setStatus(error.message, true)
@@ -94,12 +115,14 @@ export default class extends Controller {
   }
 
   async run(label, url, onSuccess, body = {}) {
-    this.setStatus(`Generating ${label}…`)
+    this.setStatus(this.interpolate(this.c.generating, { label }))
 
     try {
       const response = await this.postJson(url, body)
       const data = await response.json()
-      if (!response.ok) throw new Error(data.error || `Could not generate ${label}.`)
+      if (!response.ok) {
+        throw new Error(data.error || this.interpolate(this.c.generate_failed, { label }))
+      }
 
       onSuccess(data)
       this.setStatus("")
@@ -144,7 +167,7 @@ export default class extends Controller {
     if (suggestions.length === 0) {
       const empty = document.createElement("p")
       empty.className = "text-sm text-ink-faint"
-      empty.textContent = "No suggestions available."
+      empty.textContent = this.c.no_suggestions
       this.suggestionsListTarget.appendChild(empty)
       return
     }
@@ -169,7 +192,7 @@ export default class extends Controller {
         const button = document.createElement("button")
         button.type = "button"
         button.className = "btn-secondary text-sm"
-        button.textContent = "Create task"
+        button.textContent = this.c.create_task
         button.dataset.title = suggestion.title
         button.dataset.dueOn = suggestion.due_on || ""
         button.dataset.reason = suggestion.reason || ""
@@ -210,7 +233,7 @@ export default class extends Controller {
   createdTaskLabel(title) {
     const span = document.createElement("span")
     span.className = "text-sm text-green-700 dark:text-green-300"
-    span.textContent = `Task created: ${title}`
+    span.textContent = this.interpolate(this.c.task_created, { title })
     return span
   }
 

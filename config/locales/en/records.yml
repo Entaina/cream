@@ -104,6 +104,7 @@ en:
         create: Create contact
         create_contact: New contact
         errors:
+          create_failed: Could not create
           network: Network error, please try again
           pick_company: Pick a company first.
           select_team_member: Select a team member.
@@ -281,6 +282,7 @@ en:
       confirm: Merge the selected contacts into %{name}? This cannot be undone.
       contact_to_keep: Contact to keep
       errors:
+        merge_failed: Could not merge contacts. Please try again or contact support.
         no_secondaries: Select at least one contact to merge.
         same_primary: Cannot merge a contact into itself.
         same_workspace: All contacts must belong to the same workspace.
@@ -424,8 +426,32 @@ en:
       suggested_next_steps: Suggested next steps
       summarize: Summarize
       summary: Summary
+      client:
+        create_task: Create task
+        create_task_failed: Could not create task.
+        creating_task: Creating task…
+        email_draft_ready: Email draft ready in the editor.
+        generate_failed: Could not generate %{label}.
+        generating: Generating %{label}…
+        labels:
+          email_draft: email draft
+          enrichment: enrichment
+          next_steps: next steps
+          summary: summary
+        no_enrichment: No enrichment suggestions.
+        no_missing_data: No missing data flagged.
+        no_next_steps: No next steps suggested.
+        no_risks: No risks identified.
+        no_suggestions: No suggestions available.
+        no_summary: No summary available.
+        risk_badge: 'Risk: %{level}'
+        task_created: 'Task “%{title}” created.'
     ai_assistant: AI Assistant
     at_a_glance: At a glance
+    record_workspace:
+      leave_page_confirm: Leave this page? Your unsaved changes and drafts will be
+        lost.
+      other_drafts_confirm: You have other unsaved drafts. Leave them and continue?
     boolean:
       'false': 'No'
       'true': 'Yes'

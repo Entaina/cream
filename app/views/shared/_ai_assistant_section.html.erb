@@ -10,7 +10,8 @@
   data-ai-assistant-draft-email-url-value="<%= record_ai_draft_email_path(record_type: route_type, record_id: record.id) %>"
   data-ai-assistant-create-task-url-value="<%= record_ai_create_task_path(record_type: route_type, record_id: record.id) %>"
   data-ai-assistant-enrich-url-value="<%= record_ai_enrich_path(record_type: route_type, record_id: record.id) %>"
-  data-ai-assistant-enrichment-enabled-value="<%= feature_enabled?(:ai_enrichment) %>">
+  data-ai-assistant-enrichment-enabled-value="<%= feature_enabled?(:ai_enrichment) %>"
+  data-ai-assistant-copy-value="<%= json_escape(I18n.t("records.ai.client")) %>">
   <div class="flex items-start justify-between gap-3 flex-wrap mb-3">
     <div>
       <h3 class="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-ink-faint">

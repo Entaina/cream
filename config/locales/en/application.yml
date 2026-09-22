@@ -459,9 +459,29 @@ en:
         text-ink">%{to}</span> of <span class="font-medium text-ink">%{count}</span>
     record_picker:
       create: + Create "%{name}"
+      create_failed: Could not create
+      network_error: Network error, please try again
       no_results: No results
       search_placeholder: Type to search…
     someone: Someone
+    okm_chat:
+      action_failed: Could not execute the action.
+      cancel: Cancel
+      close: Close chat
+      confirm: Confirm
+      context: 'Context: %{label}'
+      executing_action: Executing action…
+      expand: Expand chat
+      general_knowledge: General knowledge
+      new_conversation: New
+      no_reply: No reply.
+      open: Open knowledge base chat
+      placeholder: Ask about customers, sales or strategy…
+      request_failed: Could not get a response.
+      send: Send
+      shrink: Shrink chat
+      thinking: Thinking…
+      title: Knowledge base
     tasks:
       add: Add
       assignee: Assignee
@@ -496,6 +516,13 @@ en:
       update_view: Update view
       view_name_placeholder: View name
   tasks:
+    next_task_prompt:
+      add: Add task
+      body_html: You completed the last task for <strong class="font-medium text-ink">%{name}</strong>.
+        What’s next?
+      placeholder: Add a task…
+      skip: Skip
+      title: Next task
     index:
       add_task: Add task
       all: All

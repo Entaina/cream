@@ -149,7 +149,7 @@ RSpec.describe "People merge", type: :request do
       post merge_person_path(primary), params: {secondary_ids: [secondary.id]}
 
       expect(response).to have_http_status(:unprocessable_content)
-      expect(response.body).to include("Could not merge contacts")
+      expect(response.body).to include(I18n.t("people.merge.errors.merge_failed"))
       expect(Person.exists?(secondary.id)).to be(true)
     end
   end

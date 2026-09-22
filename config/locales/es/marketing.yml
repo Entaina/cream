@@ -380,6 +380,9 @@ es:
           la página de formulario que los importa.
         system_fields_summary: Metadatos y campos de sistema (%{count})
     lead_forms:
+      public:
+        privacy_title: Política de privacidad
+        success_title: Gracias
       edit:
         page_title: Editar formulario de captación
       form:

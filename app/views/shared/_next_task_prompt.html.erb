@@ -2,10 +2,9 @@
   <dialog data-controller="modal"
           class="rounded-xl shadow-xl ring-1 ring-line p-0 w-full max-w-md backdrop:bg-ink/20 m-auto">
     <div class="p-5 space-y-4 bg-canvas-raised rounded-xl">
-      <h3 class="text-base font-semibold text-ink">Siguiente tarea</h3>
+      <h3 class="text-base font-semibold text-ink"><%= t("tasks.next_task_prompt.title") %></h3>
       <p class="text-base text-ink-soft">
-        Completaste la última tarea de <strong class="font-medium text-ink"><%= prompt["name"] %></strong>.
-        ¿Cuál es la siguiente?
+        <%= t("tasks.next_task_prompt.body_html", name: prompt["name"]).html_safe %>
       </p>
 
       <%= form_with model: Task.new(due_on: Task.default_due_on), url: tasks_path, class: "space-y-3" do |f| %>
@@ -13,13 +12,13 @@
         <%= hidden_field_tag :taskable_id, prompt["id"] %>
 
         <div class="flex flex-col sm:flex-row gap-2">
-          <%= mention_text_field f, :title, placeholder: "Añadir tarea...", class: "input flex-1", autofocus: true %>
+          <%= mention_text_field f, :title, placeholder: t("tasks.next_task_prompt.placeholder"), class: "input flex-1", autofocus: true %>
           <%= f.date_field :due_on, class: "input w-full sm:w-36" %>
         </div>
 
         <div class="flex justify-end gap-2 pt-1">
-          <button type="button" class="btn-secondary" data-action="modal#close">Omitir</button>
-          <%= f.submit "Añadir tarea", class: "btn-primary" %>
+          <button type="button" class="btn-secondary" data-action="modal#close"><%= t("tasks.next_task_prompt.skip") %></button>
+          <%= f.submit t("tasks.next_task_prompt.add"), class: "btn-primary" %>
         </div>
       <% end %>
     </div>

@@ -48,13 +48,11 @@
     <section class="card p-4 space-y-3">
       <h2 class="text-base font-semibold"><%= t("integrations.stripe.payments.reconciliation") %></h2>
       <% if @payment.matched? && @payment.deal %>
-        <% matched_by = @payment.matched_by ? t("integrations.stripe.payments.linked_by", name: @payment.matched_by.name) : "" %>
+        <% matched_by = @payment.matched_by ? t("integrations.stripe.payments.linked_by", name: h(@payment.matched_by.name)) : "" %>
         <% matched_at = @payment.matched_at ? t("integrations.stripe.payments.linked_on", time: l(@payment.matched_at, format: :short)) : "" %>
         <p class="text-base text-ink-soft">
-          <%= t("integrations.stripe.payments.linked_html",
-                deal_link: link_to(@payment.deal.name, deal_path(@payment.deal), class: "text-accent hover:underline"),
-                matched_by: matched_by,
-                matched_at: matched_at).html_safe %>
+          <%= t("integrations.stripe.payments.linked_to") %>
+          <%= link_to @payment.deal.name, deal_path(@payment.deal), class: "text-accent hover:underline" %><%= matched_by %><%= matched_at %>.
         </p>
       <% elsif @payment.ignored? %>
         <p class="text-base text-ink-soft"><%= t("integrations.stripe.payments.ignored_message") %></p>

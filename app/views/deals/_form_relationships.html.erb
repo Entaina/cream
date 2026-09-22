@@ -3,6 +3,7 @@
      data-deal-contacts-pick-company-error-value="<%= t("deals.form.contacts.errors.pick_company") %>"
      data-deal-contacts-select-team-member-error-value="<%= t("deals.form.contacts.errors.select_team_member") %>"
      data-deal-contacts-network-error-value="<%= t("deals.form.contacts.errors.network") %>"
+     data-deal-contacts-create-failed-value="<%= t("deals.form.contacts.errors.create_failed") %>"
      class="space-y-4">
   <%= render "shared/company_select", form: f,
         select_data: {"deal-contacts-target": "companySelect", action: "change->deal-contacts#companyChanged"} %>

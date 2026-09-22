@@ -12,7 +12,20 @@ export default class extends Controller {
     actionsUrl: String,
     recordType: String,
     recordId: String,
-    recordLabel: String
+    recordLabel: String,
+    copy: Object
+  }
+
+  get c() {
+    return this.copyValue || {}
+  }
+
+  interpolate(template, vars = {}) {
+    if (!template) return ""
+    return Object.entries(vars).reduce(
+      (text, [key, value]) => text.replace(new RegExp(`%\\{${key}\\}`, "g"), value ?? ""),
+      template
+    )
   }
 
   connect() {
@@ -63,7 +76,7 @@ export default class extends Controller {
     if (this.hasExpandButtonTarget) {
       this.expandButtonTarget.setAttribute(
         "aria-label",
-        this.expanded ? "Reducir chat" : "Expandir chat"
+        this.expanded ? this.c.shrink : this.c.expand
       )
     }
 
@@ -99,7 +112,7 @@ export default class extends Controller {
     this.saveHistory()
     this.inputTarget.value = ""
     this.setBusy(true)
-    this.setStatus("Pensando…")
+    this.setStatus(this.c.thinking || "")
 
     try {
       const { reply, confirmActions, sessionId } = await this.streamChat({
@@ -144,14 +157,14 @@ export default class extends Controller {
 
     if (!response.ok && !response.body) {
       const data = await response.json().catch(() => ({}))
-      throw new Error(data.error || "No se pudo obtener respuesta.")
+      throw new Error(data.error || this.c.request_failed)
     }
 
     const reader = response.body?.getReader()
     if (!reader) {
       const data = await response.json()
-      if (!response.ok) throw new Error(data.error || "No se pudo obtener respuesta.")
-      return { reply: data.reply || "Sin respuesta.", confirmActions: [], sessionId: null }
+      if (!response.ok) throw new Error(data.error || this.c.request_failed)
+      return { reply: data.reply || this.c.no_reply, confirmActions: [], sessionId: null }
     }
 
     const decoder = new TextDecoder()
@@ -176,20 +189,20 @@ export default class extends Controller {
         if (event.type === "status" && event.message) {
           this.setStatus(event.message)
         } else if (event.type === "reply") {
-          reply = event.content || "Sin respuesta."
+          reply = event.content || this.c.no_reply
         } else if (event.type === "session" && event.session_id) {
           sessionId = event.session_id
         } else if (event.type === "confirm_action") {
           confirmActions.push({ description: event.description, token: event.token })
         } else if (event.type === "error") {
-          error = event.message || "No se pudo obtener respuesta."
+          error = event.message || this.c.request_failed
         }
       }
     }
 
     if (error) throw new Error(error)
-    if (!response.ok) throw new Error(error || "No se pudo obtener respuesta.")
-    return { reply: reply || "Sin respuesta.", confirmActions, sessionId }
+    if (!response.ok) throw new Error(error || this.c.request_failed)
+    return { reply: reply || this.c.no_reply, confirmActions, sessionId }
   }
 
   appendConfirmAction(action) {
@@ -210,13 +223,13 @@ export default class extends Controller {
     const confirmBtn = document.createElement("button")
     confirmBtn.type = "button"
     confirmBtn.className = "btn-primary text-xs px-2 py-1"
-    confirmBtn.textContent = "Confirmar"
+    confirmBtn.textContent = this.c.confirm || ""
     confirmBtn.addEventListener("click", () => this.executeAction(action, wrapper, confirmBtn))
 
     const cancelBtn = document.createElement("button")
     cancelBtn.type = "button"
     cancelBtn.className = "btn-ghost text-xs px-2 py-1"
-    cancelBtn.textContent = "Cancelar"
+    cancelBtn.textContent = this.c.cancel || ""
     cancelBtn.addEventListener("click", () => wrapper.remove())
 
     buttons.appendChild(confirmBtn)
@@ -229,7 +242,7 @@ export default class extends Controller {
 
   async executeAction(action, wrapper, button) {
     button.disabled = true
-    this.setStatus("Ejecutando acción…")
+    this.setStatus(this.c.executing_action || "")
 
     try {
       const response = await fetch(this.actionsUrlValue, {
@@ -243,7 +256,7 @@ export default class extends Controller {
 
       const data = await response.json()
       if (!response.ok || !data.success) {
-        throw new Error(data.message || data.error || "No se pudo ejecutar la acción.")
+        throw new Error(data.message || data.error || this.c.action_failed)
       }
 
       wrapper.remove()
@@ -284,8 +297,8 @@ export default class extends Controller {
 
     const label = this.recordLabelValue?.trim()
     this.contextLabelTarget.textContent = label
-      ? `Contexto: ${label}`
-      : "Conocimiento general"
+      ? this.interpolate(this.c.context, { label })
+      : this.c.general_knowledge
   }
 
   setBusy(busy) {

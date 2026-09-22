@@ -31,12 +31,12 @@ module Public
       end
 
       unless gdpr_consent_given?
-        flash.now[:alert] = "Debes aceptar la política de privacidad para enviar el formulario."
+        flash.now[:alert] = t("public.lead_forms.gdpr_required")
         return render_show_or_not_found(status: :unprocessable_entity)
       end
 
       unless turnstile_passed?
-        flash.now[:alert] = "No hemos podido verificar que eres una persona. Vuelve a intentarlo."
+        flash.now[:alert] = t("public.lead_forms.turnstile_failed")
         return render_show_or_not_found(status: :unprocessable_entity)
       end
 

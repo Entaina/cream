@@ -105,6 +105,7 @@ es:
         create: Crear contacto
         create_contact: Nuevo contacto
         errors:
+          create_failed: No se pudo crear
           network: Error de red, inténtalo de nuevo
           pick_company: Selecciona primero una empresa.
           select_team_member: Selecciona un miembro del equipo.
@@ -283,6 +284,8 @@ es:
         puede deshacer."
       contact_to_keep: Contacto a conservar
       errors:
+        merge_failed: No se pudieron fusionar los contactos. Inténtalo de nuevo o contacta
+          con soporte.
         no_secondaries: Selecciona al menos un contacto para fusionar.
         same_primary: No puedes fusionar un contacto consigo mismo.
         same_workspace: Todos los contactos deben pertenecer al mismo workspace.
@@ -428,8 +431,32 @@ es:
       suggested_next_steps: Siguientes pasos sugeridos
       summarize: Resumir
       summary: Resumen
+      client:
+        create_task: Crear tarea
+        create_task_failed: No se pudo crear la tarea.
+        creating_task: Creando tarea…
+        email_draft_ready: Borrador de email listo en el editor.
+        generate_failed: No se pudo generar %{label}.
+        generating: Generando %{label}…
+        labels:
+          email_draft: borrador de email
+          enrichment: enriquecimiento
+          next_steps: siguientes pasos
+          summary: resumen
+        no_enrichment: Sin sugerencias de enriquecimiento.
+        no_missing_data: Sin datos faltantes señalados.
+        no_next_steps: Sin siguientes pasos sugeridos.
+        no_risks: Sin riesgos identificados.
+        no_suggestions: Sin sugerencias disponibles.
+        no_summary: Sin resumen disponible.
+        risk_badge: 'Riesgo: %{level}'
+        task_created: 'Tarea «%{title}» creada.'
     ai_assistant: Asistente IA
     at_a_glance: De un vistazo
+    record_workspace:
+      leave_page_confirm: "¿Salir de esta página? Se perderán los cambios y borradores
+        sin guardar."
+      other_drafts_confirm: Tienes otros borradores sin guardar. ¿Descartarlos y continuar?
     boolean:
       'false': 'No'
       'true': Sí

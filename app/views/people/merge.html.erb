@@ -19,6 +19,7 @@
             controller: "merge-person-search",
             merge_person_search_exclude_id_value: @person.id,
             merge_person_search_search_url_value: people_path(format: :json),
+            merge_person_search_no_results_value: t("shared.record_picker.no_results"),
             turbo_confirm: t("people.merge.confirm", name: @person.display_name)
           } do %>
       <section class="card p-4">
