@@ -181,7 +181,7 @@ GEM
     herb (0.10.4-x86_64-linux-musl)
     i18n (1.15.2)
       concurrent-ruby (~> 1.0)
-    image_processing (2.0.3)
+    image_processing (2.1.0)
     importmap-rails (2.2.3)
       actionpack (>= 6.0.0)
       activesupport (>= 6.0.0)
@@ -547,7 +547,7 @@ DEPENDENCIES
   dotenv-rails
   google-apis-drive_v3
   herb (~> 0.10.4)
-  image_processing (~> 2.0)
+  image_processing (~> 2.1)
   importmap-rails
   json (< 3)
   liquid (~> 5.13)
@@ -650,7 +650,7 @@ CHECKSUMS
   herb (0.10.4-x86_64-linux-gnu) sha256=36591472b92e0f601e512b108bf25dbb761f32636703cb79d3f5388425476b1b
   herb (0.10.4-x86_64-linux-musl) sha256=3b5fc05c0224f156bb05993703c309d53c52a1385d37c65a956cb4d40695d70c
   i18n (1.15.2) sha256=00f9eb62412fe593b2a65a97daa75300d37abb8f7202ec748e94b6d46a9dd1b5
-  image_processing (2.0.3) sha256=793e33f38470edd0a2d6bfd00acf8cb239c76284ba2e3dfb76633ac2b457f23a
+  image_processing (2.1.0) sha256=ca3814b1b909fc5fab68b261c50eaffef11e29a6907143e9cf1efc14b6dc6f47
   importmap-rails (2.2.3) sha256=7101be2a4dc97cf1558fb8f573a718404c5f6bcfe94f304bf1f39e444feeb16a
   io-console (0.9.3) sha256=f555049461b0afb78a5448b5be8e7c7b48371347cd48abfc22814764160000dd
   irb (1.18.0) sha256=de9454a0703a54704b9811a5ef31a60c86949fbf4013fcf244fabc7c775248e3
