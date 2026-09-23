@@ -16,7 +16,8 @@ export default class extends Controller {
 
   static values = {
     mode: String,
-    supportedTags: { type: Array, default: DEFAULT_SUPPORTED_TAGS }
+    supportedTags: { type: Array, default: DEFAULT_SUPPORTED_TAGS },
+    unsupportedTagsConfirm: String
   }
 
   connect() {
@@ -62,9 +63,7 @@ export default class extends Controller {
     const html = this.bodyInputTarget.value
     const unsupported = this.unsupportedTags(html)
     if (unsupported.length > 0) {
-      const message =
-        `El HTML contiene etiquetas que el editor enriquecido no conserva (${unsupported.join(", ")}). ` +
-        "Si continúas, se perderán. ¿Cambiar al editor enriquecido?"
+      const message = this.unsupportedTagsConfirmValue.replaceAll("%{tags}", unsupported.join(", "))
       if (!window.confirm(message)) {
         event.preventDefault()
         this.htmlModeRadioTarget.checked = true

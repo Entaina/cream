@@ -4,7 +4,7 @@ import { Controller } from "@hotwired/stimulus"
 // Queries /deals/picker.json (open + won deals) and fills a hidden deal_id.
 export default class extends Controller {
   static targets = ["input", "hidden", "menu", "submit"]
-  static values = { url: String }
+  static values = { url: String, empty: String }
 
   connect() {
     this.activeIndex = -1
@@ -38,7 +38,7 @@ export default class extends Controller {
 
   renderMenu() {
     if (this.results.length === 0) {
-      this.menuTarget.innerHTML = `<li class="px-3 py-1.5 text-sm text-ink-faint">No deals found</li>`
+      this.menuTarget.innerHTML = `<li class="px-3 py-1.5 text-sm text-ink-faint">${this.escape(this.emptyValue)}</li>`
       this.menuTarget.classList.remove("hidden")
       return
     }

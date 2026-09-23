@@ -491,6 +491,17 @@ en:
         recent_submissions: Recent submissions
         submissions_empty: No submissions yet.
         'true': 'Yes'
+    mql_conversions:
+      already_converted: Interest already converted
+      created: Opportunity created
+      deal_inaccessible: Converted deal is no longer accessible
+      incompatible_retry: Interest already converted with different parameters
+      invalid_opportunity: Selected opportunity is not valid for this product
+      linked: Linked to existing opportunity
+      multiple_open: Multiple open opportunities exist; select one explicitly
+      not_eligible: Person is not marketing eligible
+      not_pending: Interest is not pending
+      open_inaccessible: An open opportunity exists but is not accessible
     mqls:
       index:
         col_forms: Forms

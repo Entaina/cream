@@ -19,6 +19,8 @@ es:
         y Liquid <code class="font-mono">{{ name }}</code>.'
       mode_html: HTML
       mode_quill: Editor enriquecido
+      unsupported_tags_confirm: El HTML contiene etiquetas que el editor enriquecido
+        no conserva (%{tags}). Si continúas, se perderán. ¿Cambiar al editor enriquecido?
     composer:
       base_template: Plantilla base (opcional)
       base_template_hint: Elige una plantilla del workspace para copiar asunto y cuerpo

@@ -80,7 +80,7 @@ class OkmChatsController < ApplicationController
   def ensure_okm_chat_workspace!
     return if current_workspace&.okm_chat_enabled? && current_workspace.okm_configured?
 
-    render json: {error: "OKM chat is not available for this workspace."}, status: :not_found
+    render json: {error: CreamFeatures.unavailable_in_workspace_message(:okm_chat)}, status: :not_found
   end
 
   def resolve_record

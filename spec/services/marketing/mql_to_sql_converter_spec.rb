@@ -81,7 +81,7 @@ RSpec.describe Marketing::MqlToSqlConverter do
     )
 
     expect(result.status).to eq("conflict")
-    expect(result.message).to include("Multiple open opportunities")
+    expect(result.message).to eq(I18n.t("marketing.mql_conversions.multiple_open"))
   end
 
   it "links to a selected open deal when several exist" do
@@ -127,6 +127,6 @@ RSpec.describe Marketing::MqlToSqlConverter do
     )
 
     expect(result.status).to eq("conflict")
-    expect(result.message).to include("different parameters")
+    expect(result.message).to eq(I18n.t("marketing.mql_conversions.incompatible_retry"))
   end
 end

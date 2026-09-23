@@ -19,6 +19,9 @@ en:
         variables and Liquid <code class="font-mono">{{ name }}</code>.'
       mode_html: HTML
       mode_quill: Rich text editor
+      unsupported_tags_confirm: The HTML contains tags the rich text editor does not
+        keep (%{tags}). If you continue, they will be lost. Switch to the rich text
+        editor?
     composer:
       base_template: Base template (optional)
       base_template_hint: Pick a workspace template to copy subject and body as a

@@ -29,6 +29,7 @@ en:
         invalid_priority: contains an invalid priority
         invalid_service_account_json: must be a valid service account JSON with client_email
           and private_key
+        invalid_stripe_key: must be a Stripe secret or restricted key (sk_… / rk_…)
         invitation_already_member: is already a member of this workspace
         invitation_pending: already has a pending invitation
         is_already_on_contact: is already on this contact

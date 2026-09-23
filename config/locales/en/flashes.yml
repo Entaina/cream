@@ -12,7 +12,11 @@ en:
       configure_first: Configure the API key and at least one publication first.
       connected: Beehiiv connected.
       disconnected: Beehiiv disconnected.
+      publication_created: Beehiiv publication added.
+      publication_created_syncing: Beehiiv publication added. Syncing subscribers…
       publication_deleted: Beehiiv publication removed.
+      publication_updated: Beehiiv publication updated.
+      publication_updated_syncing: Beehiiv publication updated. Syncing subscribers…
       sync_started: Beehiiv sync started.
       updated: Beehiiv settings updated.
     booking_pages:

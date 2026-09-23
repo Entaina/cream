@@ -287,6 +287,49 @@ es:
   editions:
     from: Desde %{date}
     until: Hasta %{date}
+  features:
+    labels:
+      ai_assistant: Asistente de IA
+      ai_automations: Automatizaciones de IA
+      ai_enrichment: Enriquecimiento con IA
+      alerts: Alertas
+      api_v1: API REST v1
+      attachments: Adjuntos
+      automations: Automatizaciones
+      calendar_booking: Reservas
+      comments: Comentarios
+      csv_import_export: Importar y exportar CSV
+      custom_fields: Campos personalizados
+      email_templates: Plantillas
+      email_tracking: Seguimiento de aperturas y clics
+      formula_fields: Campos de fórmula
+      gmail_addon: Complemento de Gmail
+      gmail_sync: Gmail
+      journeys: Recorridos
+      lead_forms: Formularios
+      lead_scoring: Puntuación de leads
+      magic_columns: Columnas mágicas
+      mail_merge: Combinar correspondencia
+      marketing_attribution: Atribución
+      marketing_campaigns: Campañas
+      marketing_consent: Suscripciones
+      marketing_segments: Segmentos
+      mql_pool: MQLs
+      notifications: Notificaciones
+      okm_chat: Chat contextual OKM
+      pipeline_templates: Plantillas de pipeline
+      record_email: Enviar email desde fichas
+      reports: Informes
+      sales_director: Director comercial
+      slack_integrations: Slack
+      stage_conditions: Condiciones de etapa
+      stage_field_formats: Formatos de campos de etapa
+      stage_triggers: Disparadores de etapa
+      stripe_payments: Stripe
+      web_tracking: Seguimiento web
+      webhooks: Webhooks
+    unavailable: "%{label} no está disponible todavía."
+    unavailable_in_workspace: "%{label} no está disponible en este workspace."
   lead_forms:
     corporate_email_required: Por favor, utiliza tu email corporativo para descargar
       este recurso
@@ -335,6 +378,14 @@ es:
     tasks: Tareas
     team: Equipo
     workspace_settings: Ajustes
+  number:
+    currency:
+      format:
+        delimiter: "."
+        format: "%n %u"
+        precision: 2
+        separator: ","
+        unit: "€"
   profile:
     alert_email: Email
     alert_in_app: Notificación in-app (campana)

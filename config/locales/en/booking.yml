@@ -30,13 +30,29 @@ en:
     display:
       datetime_with_zone: "%{datetime} (%{timezone})"
     errors:
+      api_disabled: The Google Calendar API is not enabled on the Google Cloud OAuth
+        project. An admin must enable it in Google Cloud Console; it can take a few
+        minutes to propagate.
+      api_failed: "%{operation} failed (%{code}): %{detail}"
       availability_params_required: month or date is required.
       calendar_not_connected: Calendar not connected.
       event_type_not_found: Event type not found.
+      google_not_connected: Google Calendar is not connected.
+      insufficient_scopes: Insufficient permissions for %{operation}. Reconnect Google
+        Calendar.
       invalid_datetime: The selected date or time is invalid.
+      missing_refresh_token: Missing refresh token.
+      missing_scopes: Missing permissions for %{operations}. Reconnect Google Calendar.
       name_i18n_es_required: must include a name in Spanish
+      operations:
+        check_availability: check availability
+        create_events: create events
+        delete_events: delete events
+        list_calendars: list calendars
       rate_limited: Too many requests. Please try again in a minute.
       slot_unavailable: That time slot is no longer available.
+      timeout: Google Calendar did not respond in time. Try again in a few minutes.
+      token_refresh_failed: Token refresh failed (%{code}).
     location_types:
       google_meet: Google Meet
       physical: In person

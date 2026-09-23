@@ -388,6 +388,18 @@ module CreamFeatures
     Entry.new(key: key, **meta)
   end
 
+  def self.localized_label(key)
+    I18n.t("features.labels.#{key}")
+  end
+
+  def self.unavailable_message(key)
+    I18n.t("features.unavailable", label: localized_label(key))
+  end
+
+  def self.unavailable_in_workspace_message(key)
+    I18n.t("features.unavailable_in_workspace", label: localized_label(key))
+  end
+
   def self.all_entries
     REGISTRY.map { |key, meta| Entry.new(key: key, **meta) }
   end

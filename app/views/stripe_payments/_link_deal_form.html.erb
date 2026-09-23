@@ -1,7 +1,7 @@
 <%# locals: (payment:, input_class: "input h-7 text-sm w-44") %>
 <%= form_with url: match_stripe_payment_path(payment, status: params[:status], q: params[:q].presence),
       method: :post, class: "relative flex items-center gap-1",
-      data: { controller: "deal-search", deal_search_url_value: picker_deals_path } do %>
+      data: { controller: "deal-search", deal_search_url_value: picker_deals_path, deal_search_empty_value: t("integrations.stripe.payments.no_deals") } do %>
   <input type="text" placeholder="<%= t("integrations.stripe.payments.link_deal_placeholder") %>" autocomplete="off"
          class="<%= local_assigns.fetch(:input_class, "input h-7 text-sm w-44") %>"
          data-deal-search-target="input"

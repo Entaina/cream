@@ -31,6 +31,8 @@ es:
         invalid_priority: contiene una prioridad no válida
         invalid_service_account_json: debe ser un JSON de cuenta de servicio válido
           con client_email y private_key
+        invalid_stripe_key: debe ser una clave secreta o restringida de Stripe (sk_…
+          / rk_…)
         invitation_already_member: ya es miembro de este workspace
         invitation_pending: ya tiene una invitación pendiente
         is_already_on_contact: ya está en este contacto

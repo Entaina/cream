@@ -152,7 +152,7 @@ module Api
 
       def create_email_for!(deal)
         unless CreamFeatures.enabled?(:record_email)
-          raise Api::DealEmailCreator::RecordEmailDisabled, "#{CreamFeatures.entry(:record_email).label} is not available yet."
+          raise Api::DealEmailCreator::RecordEmailDisabled, CreamFeatures.unavailable_message(:record_email)
         end
 
         email_data = nested_email_params

@@ -191,10 +191,7 @@ module ApplicationHelper
     number = amount.to_d
     number_to_currency(number,
       unit: (currency == "EUR") ? "€" : "$",
-      precision: number.frac.zero? ? 0 : 2,
-      delimiter: ".",
-      separator: ",",
-      format: "%n %u")
+      precision: number.frac.zero? ? 0 : 2)
   end
 
   # Formatted deal field for display, honouring the per-stage display rules
@@ -309,7 +306,7 @@ module ApplicationHelper
     when "payment_received"
       amount = number_to_currency(activity.metadata["amount"],
         unit: (activity.metadata["currency"] == "EUR") ? "€" : activity.metadata["currency"],
-        precision: 2, delimiter: ".", separator: ",", format: "%n %u")
+        precision: 2)
       suffix = activity.metadata["customer_email"].present? ? t("activities.payment_received_from", email: activity.metadata["customer_email"]) : ""
       t("activities.payment_received", actor: actor, amount: "#{amount}#{suffix}")
     else t("activities.generic", actor: actor, action: activity.action.humanize.downcase)

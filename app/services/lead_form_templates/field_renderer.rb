@@ -114,7 +114,7 @@ module LeadFormTemplates
         blank: nil,
         selected: submitted_value(:phone_prefix).presence || selected_prefix
       )
-      prefix_attrs = input_attrs(:phone_prefix, required: false, class_name: "input w-auto shrink-0", aria_label: "Prefijo de país")
+      prefix_attrs = input_attrs(:phone_prefix, required: false, class_name: "input w-auto shrink-0", aria_label: I18n.t("public.lead_forms.phone_prefix_aria"))
       phone_attrs = input_attrs(:phone, required: required, class_name: "input w-full min-w-0", autocomplete: "tel-national", inputmode: "tel", value: submitted_value(:phone))
       <<~HTML
         <div class="flex gap-2">

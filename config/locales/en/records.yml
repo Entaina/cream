@@ -518,6 +518,12 @@ en:
       stage: Stage
       twitter: X / Twitter
       value: Value
+    magic_columns:
+      days_in_stage: Days in stage
+      last_activity_at: Last activity
+      notes_count: Notes
+      open_tasks_count: Open tasks
+      tasks_count: Tasks
     more_actions: More actions
     more_pending: "+%{count} more pending"
     more_pending_short: "+%{count} more"

@@ -288,6 +288,49 @@ en:
   editions:
     from: From %{date}
     until: Until %{date}
+  features:
+    labels:
+      ai_assistant: AI Assistant
+      ai_automations: AI automations
+      ai_enrichment: AI enrichment
+      alerts: Alerts
+      api_v1: REST API v1
+      attachments: Attachments
+      automations: Automations
+      calendar_booking: Bookings
+      comments: Comments
+      csv_import_export: CSV import/export
+      custom_fields: Custom fields
+      email_templates: Templates
+      email_tracking: Email open/click tracking
+      formula_fields: Formula custom fields
+      gmail_addon: Gmail add-on
+      gmail_sync: Gmail
+      journeys: Journeys
+      lead_forms: Lead forms
+      lead_scoring: Lead scoring
+      magic_columns: Magic columns
+      mail_merge: Mail merge
+      marketing_attribution: Attribution
+      marketing_campaigns: Campaigns
+      marketing_consent: Subscriptions
+      marketing_segments: Segments
+      mql_pool: MQLs
+      notifications: Notifications
+      okm_chat: OKM contextual chat
+      pipeline_templates: Pipeline templates
+      record_email: Send email from records
+      reports: Reports
+      sales_director: Sales director
+      slack_integrations: Slack
+      stage_conditions: Stage conditions
+      stage_field_formats: Stage field formats
+      stage_triggers: Stage triggers
+      stripe_payments: Stripe
+      web_tracking: Web tracking
+      webhooks: Webhooks
+    unavailable: "%{label} is not available yet."
+    unavailable_in_workspace: "%{label} is not available in this workspace."
   lead_forms:
     corporate_email_required: Please use your work email to download this resource
   nav:
@@ -335,6 +378,14 @@ en:
     tasks: Tasks
     team: Team
     workspace_settings: Settings
+  number:
+    currency:
+      format:
+        delimiter: ","
+        format: "%u%n"
+        precision: 2
+        separator: "."
+        unit: "€"
   profile:
     alert_email: Email
     alert_in_app: In-app notification (bell)

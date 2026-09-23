@@ -78,6 +78,6 @@ class RecordAiController < ApplicationController
   def requires_ai_enrichment!
     return if CreamFeatures.enabled?(:ai_enrichment)
 
-    render json: {error: "AI enrichment is not available yet."}, status: :not_found
+    render json: {error: CreamFeatures.unavailable_message(:ai_enrichment)}, status: :not_found
   end
 end

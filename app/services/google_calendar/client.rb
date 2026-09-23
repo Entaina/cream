@@ -35,7 +35,7 @@ module GoogleCalendar
         items: calendar_ids.map { |calendar_id| {id: calendar_id} }
       }
       response = post_json(URI("#{BASE_URI}/freeBusy"), payload, bearer: bearer)
-      raise Error.from_response("consultar disponibilidad", response) unless response.is_a?(Net::HTTPSuccess)
+      raise Error.from_response(:check_availability, response) unless response.is_a?(Net::HTTPSuccess)
 
       data = JSON.parse(response.body)
       busy = []
@@ -55,7 +55,7 @@ module GoogleCalendar
       uri = URI("#{BASE_URI}/calendars/#{CGI.escape(calendar_id)}/events")
       uri.query = URI.encode_www_form(conferenceDataVersion: 1, sendUpdates: "all")
       response = post_json(uri, event, bearer: bearer)
-      raise Error.from_response("crear eventos", response) unless response.is_a?(Net::HTTPSuccess)
+      raise Error.from_response(:create_events, response) unless response.is_a?(Net::HTTPSuccess)
 
       JSON.parse(response.body)
     end
@@ -68,14 +68,14 @@ module GoogleCalendar
       return if response.is_a?(Net::HTTPSuccess)
       return if response.is_a?(Net::HTTPNotFound) || response.is_a?(Net::HTTPGone)
 
-      raise Error.from_response("eliminar eventos", response)
+      raise Error.from_response(:delete_events, response)
     end
 
     def list_calendars
       bearer = ensure_access_token!(@connection)
       uri = URI("#{BASE_URI}/users/me/calendarList")
       response = get_json(uri, bearer: bearer)
-      raise Error.from_response("listar calendarios", response) unless response.is_a?(Net::HTTPSuccess)
+      raise Error.from_response(:list_calendars, response) unless response.is_a?(Net::HTTPSuccess)
 
       data = JSON.parse(response.body)
       Array(data["items"]).filter_map do |item|

@@ -17,6 +17,7 @@ en:
     lead_forms:
       default_title: Form
       gdpr_required: You must accept the privacy policy to submit the form.
+      phone_prefix_aria: Country prefix
       submit_failed: The form could not be submitted.
       submitted: Thank you. We have received your request.
       turnstile_failed: We could not verify you are human. Please try again.

@@ -3,7 +3,8 @@
 <div class="space-y-2"
      data-controller="email-template-body-editor"
      data-email-template-body-editor-mode-value="<%= effective_mode %>"
-     data-email-template-body-editor-supported-tags-value="<%= EmailTemplate::QUILL_SUPPORTED_TAGS.to_json %>">
+     data-email-template-body-editor-supported-tags-value="<%= EmailTemplate::QUILL_SUPPORTED_TAGS.to_json %>"
+     data-email-template-body-editor-unsupported-tags-confirm-value="<%= t("email_templates.body_editor.unsupported_tags_confirm") %>">
   <textarea name="<%= body_name %>" class="sr-only" data-email-template-body-editor-target="bodyInput"><%= body %></textarea>
   <input type="hidden" name="<%= body_editor_name %>" value="<%= effective_mode %>" data-email-template-body-editor-target="bodyEditorInput">
 

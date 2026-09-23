@@ -35,7 +35,7 @@ export default class extends Controller {
       if (!response.ok) throw new Error(response.statusText)
       const data = await response.json()
       const count = data.count ?? 0
-      this.countTarget.textContent = count.toLocaleString("es-ES")
+      this.countTarget.textContent = count.toLocaleString(document.documentElement.lang === "en" ? "en" : "es")
     } catch {
       this.countTarget.textContent = "—"
     }

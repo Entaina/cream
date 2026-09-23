@@ -5,7 +5,7 @@
   <td class="text-right tabular-nums font-medium whitespace-nowrap">
     <%= number_to_currency(payment.amount_decimal,
           unit: payment.currency.casecmp?("eur") ? "€" : payment.currency.upcase,
-          precision: 2, delimiter: ".", separator: ",", format: "%n %u") %>
+          precision: 2) %>
     <%= badge(t("integrations.stripe.payments.badges.refunded"), color: "red") if payment.refunded? %>
     <%= badge(t("integrations.stripe.payments.badges.test"), color: "chicago") unless payment.livemode? %>
   </td>

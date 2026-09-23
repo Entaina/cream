@@ -18,7 +18,7 @@ module Marketing
     end
 
     def call
-      return invalid("Person is not marketing eligible") unless MqlEligibility.eligible?(person)
+      return invalid(I18n.t("marketing.mql_conversions.not_eligible")) unless MqlEligibility.eligible?(person)
 
       ActiveRecord::Base.transaction do
         person.lock!
@@ -26,7 +26,7 @@ module Marketing
 
         interest.reload
         return already_converted_result if interest.converted?
-        return invalid("Interest is not pending") unless interest.pending?
+        return invalid(I18n.t("marketing.mql_conversions.not_pending")) unless interest.pending?
 
         existing = resolve_existing_open_deal
         return existing if existing.is_a?(Result)
@@ -43,10 +43,10 @@ module Marketing
 
     def already_converted_result
       deal = interest.deal
-      return conflict("Converted deal is no longer accessible") if deal && !deal_policy(deal).show?
-      return conflict("Interest already converted with different parameters") if incompatible_retry?
+      return conflict(I18n.t("marketing.mql_conversions.deal_inaccessible")) if deal && !deal_policy(deal).show?
+      return conflict(I18n.t("marketing.mql_conversions.incompatible_retry")) if incompatible_retry?
 
-      Result.new(status: "already_converted", deal: deal, interest: interest, message: "Interest already converted")
+      Result.new(status: "already_converted", deal: deal, interest: interest, message: I18n.t("marketing.mql_conversions.already_converted"))
     end
 
     def resolve_existing_open_deal
@@ -55,7 +55,7 @@ module Marketing
 
       if attributes["deal_id"].present?
         chosen = deals.find { |deal| deal.id == attributes["deal_id"].to_i }
-        return conflict("Selected opportunity is not valid for this product") unless chosen
+        return conflict(I18n.t("marketing.mql_conversions.invalid_opportunity")) unless chosen
 
         return link_to_existing_deal!(chosen)
       end
@@ -63,11 +63,11 @@ module Marketing
       visible = deals.select { |deal| deal_policy(deal).show? }
       case visible.size
       when 0
-        conflict("An open opportunity exists but is not accessible")
+        conflict(I18n.t("marketing.mql_conversions.open_inaccessible"))
       when 1
         link_to_existing_deal!(visible.first)
       else
-        conflict("Multiple open opportunities exist; select one explicitly")
+        conflict(I18n.t("marketing.mql_conversions.multiple_open"))
       end
     end
 
@@ -100,12 +100,12 @@ module Marketing
 
     def link_to_existing_deal!(deal)
       unless deal_policy(deal).update?
-        return conflict("An open opportunity exists but is not accessible")
+        return conflict(I18n.t("marketing.mql_conversions.open_inaccessible"))
       end
 
       mark_interest_converted!(deal:, linked: true)
       cancel_nurturing_journeys!(deal)
-      Result.new(status: "linked", deal: deal, interest: interest.reload, message: "Linked to existing opportunity")
+      Result.new(status: "linked", deal: deal, interest: interest.reload, message: I18n.t("marketing.mql_conversions.linked"))
     end
 
     def create_deal_from_interest!
@@ -138,7 +138,7 @@ module Marketing
       cancel_nurturing_journeys!(deal)
       Marketing::SegmentWatcher.sync_person!(person)
 
-      Result.new(status: "created", deal: deal, interest: interest.reload, message: "Opportunity created")
+      Result.new(status: "created", deal: deal, interest: interest.reload, message: I18n.t("marketing.mql_conversions.created"))
     end
 
     def mark_interest_converted!(deal:, linked:)

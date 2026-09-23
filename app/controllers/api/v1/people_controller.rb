@@ -84,8 +84,7 @@ module Api
       private
 
       def feature_unavailable!(flag)
-        label = CreamFeatures.entry(flag).label
-        render json: {error: "#{label} is not available yet."}, status: :not_found
+        render json: {error: CreamFeatures.unavailable_message(flag)}, status: :not_found
       end
 
       def subscription_params

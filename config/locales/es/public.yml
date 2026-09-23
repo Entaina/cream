@@ -18,6 +18,7 @@ es:
     lead_forms:
       default_title: Formulario
       gdpr_required: Debes aceptar la política de privacidad para enviar el formulario.
+      phone_prefix_aria: Prefijo de país
       submit_failed: No se pudo enviar el formulario.
       submitted: Gracias. Hemos recibido tu solicitud.
       turnstile_failed: No hemos podido verificar que eres una persona. Vuelve a intentarlo.

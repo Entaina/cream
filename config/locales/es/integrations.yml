@@ -251,6 +251,7 @@ es:
         linked_to: Vinculado a
         match_confidence: 'Sugerencia (%{confidence}):'
         metadata_heading: Metadatos de Stripe
+        no_deals: No hay oportunidades
         no_match: Sin coincidencia
         no_open_deal: sin oportunidad abierta
         no_person_match: Ninguna persona del CRM coincide con el email del pagador.

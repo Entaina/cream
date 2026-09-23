@@ -25,22 +25,29 @@ module GoogleCalendar
       if service_disabled?(reason, error)
         @code = :api_disabled
         @help_url = error_info&.dig("metadata", "activationUrl") || help_link(details)
-        @message = "La API de Google Calendar no está activada en el proyecto OAuth de Google Cloud. " \
-                   "Un administrador debe activarla en Google Cloud Console; puede tardar unos minutos en propagarse."
+        @message = I18n.t("booking.errors.api_disabled")
         return
       end
 
       if @http_code == 403
         @code = :insufficient_scopes
-        @message = "Permisos insuficientes para #{@operation}. Reconecta Google Calendar."
+        @message = I18n.t("booking.errors.insufficient_scopes", operation: operation_label)
         return
       end
 
       @code = :api_error
-      @message = "#{@operation} falló (#{@http_code}): #{error["message"].presence || @body.truncate(200)}"
+      @message = api_failed_message(error["message"].presence || @body.truncate(200))
     rescue JSON::ParserError
       @code = :api_error
-      @message = "#{@operation} falló (#{@http_code}): #{@body.truncate(200)}"
+      @message = api_failed_message(@body.truncate(200))
+    end
+
+    def operation_label
+      I18n.t("booking.errors.operations.#{@operation}", default: @operation.to_s)
+    end
+
+    def api_failed_message(detail)
+      I18n.t("booking.errors.api_failed", operation: operation_label, code: @http_code, detail: detail)
     end
 
     def service_disabled?(reason, error)

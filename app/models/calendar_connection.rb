@@ -36,11 +36,11 @@ class CalendarConnection < ApplicationRecord
 
   def missing_scopes_message
     missing = []
-    missing << "listar calendarios" unless can_list_calendars?
-    missing << "crear eventos" unless can_manage_events?
+    missing << I18n.t("booking.errors.operations.list_calendars") unless can_list_calendars?
+    missing << I18n.t("booking.errors.operations.create_events") unless can_manage_events?
     return if missing.empty?
 
-    "Faltan permisos para #{missing.to_sentence}. Vuelve a conectar Google Calendar."
+    I18n.t("booking.errors.missing_scopes", operations: missing.to_sentence)
   end
 
   def assign_oauth_credentials(auth)

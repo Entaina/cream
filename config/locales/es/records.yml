@@ -523,6 +523,12 @@ es:
       stage: Etapa
       twitter: X / Twitter
       value: Importe
+    magic_columns:
+      days_in_stage: Días en la etapa
+      last_activity_at: Última actividad
+      notes_count: Notas
+      open_tasks_count: Tareas abiertas
+      tasks_count: Tareas
     more_actions: Más acciones
     more_pending: "+%{count} más pendientes"
     more_pending_short: "+%{count} más"

@@ -501,6 +501,17 @@ es:
         recent_submissions: Envíos recientes
         submissions_empty: Sin envíos todavía.
         'true': Sí
+    mql_conversions:
+      already_converted: El interés ya se ha convertido
+      created: Oportunidad creada
+      deal_inaccessible: La oportunidad convertida ya no es accesible
+      incompatible_retry: El interés ya se convirtió con otros parámetros
+      invalid_opportunity: La oportunidad seleccionada no es válida para este producto
+      linked: Vinculada a una oportunidad existente
+      multiple_open: Hay varias oportunidades abiertas; selecciona una
+      not_eligible: La persona no es elegible para marketing
+      not_pending: El interés no está pendiente
+      open_inaccessible: Hay una oportunidad abierta, pero no es accesible
     mqls:
       index:
         col_forms: Formularios

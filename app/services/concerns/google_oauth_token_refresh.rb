@@ -7,8 +7,8 @@ module GoogleOauthTokenRefresh
   TIMEOUT = 8
 
   def ensure_access_token!(connection)
-    raise GoogleCalendar::Error, "Google Calendar not connected" unless connection.connected?
-    raise GoogleCalendar::Error, "missing refresh token" if connection.refresh_token.blank?
+    raise GoogleCalendar::Error, I18n.t("booking.errors.google_not_connected") unless connection.connected?
+    raise GoogleCalendar::Error, I18n.t("booking.errors.missing_refresh_token") if connection.refresh_token.blank?
 
     refresh_access_token!(connection) if connection.expired?
     connection.access_token
@@ -21,7 +21,7 @@ module GoogleOauthTokenRefresh
       refresh_token: connection.refresh_token,
       grant_type: "refresh_token"
     })
-    raise GoogleCalendar::Error, "token refresh failed (#{response.code})" unless response.is_a?(Net::HTTPSuccess)
+    raise GoogleCalendar::Error, I18n.t("booking.errors.token_refresh_failed", code: response.code) unless response.is_a?(Net::HTTPSuccess)
 
     data = JSON.parse(response.body)
     connection.update!(
@@ -63,6 +63,6 @@ module GoogleOauthTokenRefresh
       http.request(request)
     end
   rescue Net::OpenTimeout, Net::ReadTimeout
-    raise GoogleCalendar::Error, "Google Calendar no respondió a tiempo. Inténtalo de nuevo en unos minutos."
+    raise GoogleCalendar::Error, I18n.t("booking.errors.timeout")
   end
 end

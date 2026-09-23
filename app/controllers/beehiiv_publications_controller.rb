@@ -7,7 +7,7 @@ class BeehiivPublicationsController < ApplicationController
     @beehiiv_connection = find_connection
     @beehiiv_publication = @beehiiv_connection.beehiiv_publications.build(publication_params)
     authorize @beehiiv_publication
-    save_publication("Publicación Beehiiv añadida.")
+    save_publication("created")
   end
 
   def update
@@ -18,7 +18,7 @@ class BeehiivPublicationsController < ApplicationController
     attrs = publication_params
     attrs = attrs.except(:webhook_signing_secret) if attrs[:webhook_signing_secret].blank?
     @beehiiv_publication.assign_attributes(attrs)
-    save_publication("Publicación Beehiiv actualizada.")
+    save_publication("updated")
   end
 
   def destroy
@@ -39,13 +39,14 @@ class BeehiivPublicationsController < ApplicationController
     current_workspace.beehiiv_connection || raise(ActiveRecord::RecordNotFound)
   end
 
-  def save_publication(notice)
+  def save_publication(action)
     if @beehiiv_publication.save
+      notice_key = "flashes.beehiiv.publication_#{action}"
       if @beehiiv_connection.connected? && @beehiiv_connection.sync_enabled?
         BeehiivSyncJob.perform_later(@beehiiv_publication.id)
-        notice += " Sincronizando suscriptores…"
+        notice_key = "#{notice_key}_syncing"
       end
-      redirect_to settings_workspace_path, notice: notice
+      redirect_to settings_workspace_path, notice: t(notice_key)
     else
       load_settings_connections
       render "settings/workspace/show", status: :unprocessable_entity

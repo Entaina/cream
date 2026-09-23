@@ -3,11 +3,11 @@ module MagicColumns
   extend ActiveSupport::Concern
 
   MAGIC_COLUMNS = {
-    days_in_stage: {label: "Days in stage", types: %w[Deal]},
-    last_activity_at: {label: "Last activity", types: %w[Person Company Deal]},
-    notes_count: {label: "Notes", types: %w[Person Company Deal]},
-    tasks_count: {label: "Tasks", types: %w[Person Company Deal]},
-    open_tasks_count: {label: "Open tasks", types: %w[Person Company Deal]}
+    days_in_stage: {types: %w[Deal]},
+    last_activity_at: {types: %w[Person Company Deal]},
+    notes_count: {types: %w[Person Company Deal]},
+    tasks_count: {types: %w[Person Company Deal]},
+    open_tasks_count: {types: %w[Person Company Deal]}
   }.freeze
 
   def magic_column_value(key)

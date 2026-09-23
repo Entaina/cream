@@ -21,10 +21,10 @@ RSpec.describe GoogleCalendar::ApiError do
       }.to_json
       response = instance_double(Net::HTTPResponse, code: "403", body: body)
 
-      error = described_class.from_http_response("listar calendarios", response)
+      error = described_class.from_http_response(:list_calendars, response)
 
       expect(error.code).to eq(:api_disabled)
-      expect(error.message).to include("no está activada")
+      expect(error.message).to eq(I18n.t("booking.errors.api_disabled"))
       expect(error.help_url).to include("calendar-json.googleapis.com")
     end
   end

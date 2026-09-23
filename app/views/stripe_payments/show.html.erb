@@ -3,9 +3,9 @@
   status_color = { "pending_review" => "golden", "matched" => "green", "ignored" => "chicago" }.fetch(@payment.status)
   amount = number_to_currency(@payment.amount_decimal,
     unit: @payment.currency.casecmp?("eur") ? "€" : @payment.currency.upcase,
-    precision: 2, delimiter: ".", separator: ",", format: "%n %u")
+    precision: 2)
   customer_label = @payment.customer_name.presence || @payment.customer_email
-  refund_amount = number_to_currency(@payment.amount_refunded_decimal, unit: "€", format: "%n %u", delimiter: ".", separator: ",")
+  refund_amount = number_to_currency(@payment.amount_refunded_decimal, unit: "€", precision: 2)
 %>
 <% actions = capture do %>
   <%= link_to stripe_payments_path(status: @payment.status), class: "btn-secondary" do %>

@@ -245,6 +245,7 @@ en:
         linked_to: Linked to
         match_confidence: 'Suggestion (%{confidence}):'
         metadata_heading: Stripe metadata
+        no_deals: No deals found
         no_match: No match
         no_open_deal: no open deal
         no_person_match: No person in the CRM matches this payer's email.
