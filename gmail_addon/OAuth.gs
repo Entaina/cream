@@ -146,6 +146,10 @@ function onHomepage() {
 }
 
 function authorizeGmailAccess() {
+  ScriptApp.requireScopes(ScriptApp.AuthMode.FULL, [
+    "https://www.googleapis.com/auth/gmail.readonly",
+    "https://www.googleapis.com/auth/gmail.addons.current.message.readonly"
+  ]);
   Gmail.Users.getProfile("me");
 }
 

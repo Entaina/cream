@@ -29,26 +29,185 @@ function readOpenThread_(e) {
   var thread = message.getThread();
   var threadId = (e.gmail && e.gmail.threadId) || thread.getId();
   var apiMessages = gmailApiMessagesForThread_(threadId, e.gmail.messageId, message);
-  if (apiMessages.length) {
-    return threadPayload_(threadId, e.gmail.messageId, message.getSubject() || "", apiMessages);
+  var appMessages = gmailAppMessages_(thread, message);
+  var messages = apiMessages.length >= appMessages.length ? apiMessages : appMessages;
+  if (!messages.length) {
+    var current = serializeGmailMessage_(message);
+    if (current) messages = [current];
   }
+  var participants = messageParticipants_(message);
+  var related = relatedMessagesBySubject_(message.getSubject(), participants, messages);
+  var linked = relatedByHeadersAndCalendar_(e.gmail.messageId, messages.concat(related));
+  if (related.length || linked.length) {
+    messages = messages.concat(related).concat(linked);
+  }
+  return threadPayload_(threadId, e.gmail.messageId, message.getSubject() || "", messages);
+}
 
+function relatedMessagesBySubject_(subject, participants, already) {
+  var normalized = normalizedSubject_(subject);
+  var participantList = Object.keys(participants || {});
+  if (normalized.length < 3 || !participantList.length) return [];
+  var listed = gmailGet_("messages?maxResults=15&q=" + encodeURIComponent('subject:"' + normalized.replace(/"/g, "") + '"'));
+  var seen = {};
+  var seenThreads = {};
+  (already || []).forEach(function(item) {
+    seen[item.gmail_message_id] = true;
+  });
+  var extra = [];
+  ((listed && listed.messages) || []).forEach(function(item) {
+    if (!item.id || seen[item.id]) return;
+    var full = gmailGet_("messages/" + encodeURIComponent(item.id) + "?format=full");
+    if (!full || !full.threadId || seenThreads[full.threadId]) return;
+    seenThreads[full.threadId] = true;
+    var thread = gmailGet_("threads/" + encodeURIComponent(full.threadId) + "?format=full");
+    var threadMessages = (thread && thread.messages) || [full];
+    if (!sharesParticipant_(threadMessages, participants)) return;
+    var mapped = mapGmailMessages_(thread);
+    if (!mapped.length) mapped = mapGmailMessages_([full]);
+    mapped.forEach(function(message) {
+      if (seen[message.gmail_message_id]) return;
+      if (normalizedSubject_(message.subject) !== normalized) return;
+      seen[message.gmail_message_id] = true;
+      extra.push(message);
+    });
+  });
+  return extra;
+}
+
+function relatedByHeadersAndCalendar_(messageId, already) {
+  var full = gmailGet_("messages/" + encodeURIComponent(messageId) + "?format=full");
+  if (!full || !full.payload) return [];
+  var headers = headerMap_(full.payload.headers);
+  var references = referencedMessageIds_(headers.references, headers["in-reply-to"]);
+  var uid = calendarUid_(full.payload, full.id);
+  var token = calendarSearchToken_(uid);
+  var seen = {};
+  (already || []).forEach(function(item) { seen[item.gmail_message_id] = true; });
+  var extra = [];
+  var participants = messageParticipantsFromPayload_(full.payload);
+  references.forEach(function(reference) {
+    addThreadByQuery_('rfc822msgid:' + reference, seen, extra);
+  });
+  if (token) addThreadByQuery_(token, seen, extra);
+  var subject = normalizedSubject_(headers.subject);
+  if (subject.length >= 3) addThreadByQuery_('"' + subject.replace(/"/g, "") + '"', seen, extra, participants);
+  return extra;
+}
+
+function addThreadByQuery_(query, seen, extra, participants) {
+  var listed = gmailGet_("messages?maxResults=10&q=" + encodeURIComponent(query));
+  var seenThreads = {};
+  ((listed && listed.messages) || []).forEach(function(item) {
+    if (!item.id || seen[item.id]) return;
+    var full = gmailGet_("messages/" + encodeURIComponent(item.id) + "?format=full");
+    if (!full || !full.threadId || seenThreads[full.threadId]) return;
+    seenThreads[full.threadId] = true;
+    var thread = gmailGet_("threads/" + encodeURIComponent(full.threadId) + "?format=full");
+    var threadMessages = (thread && thread.messages) || [full];
+    if (participants && !sharesParticipant_(threadMessages, participants)) return;
+    var mapped = mapGmailMessages_(thread);
+    if (!mapped.length) mapped = mapGmailMessages_([full]);
+    mapped.forEach(function(message) {
+      if (seen[message.gmail_message_id]) return;
+      seen[message.gmail_message_id] = true;
+      extra.push(message);
+    });
+  });
+}
+
+function messageParticipantsFromPayload_(payload) {
+  var headers = headerMap_(payload && payload.headers);
+  return emailsIn_([headers.from, headers.to, headers.cc].join(","));
+}
+
+function calendarSearchToken_(uid) {
+  var marker = "040000008200E00074C5B7101A82E00800000000";
+  var rest = uid.indexOf(marker) === 0 ? uid.slice(marker.length) : uid;
+  return rest.slice(0, 16);
+}
+
+function referencedMessageIds_(references, inReplyTo) {
+  var ids = {};
+  (String(references || "") + " " + String(inReplyTo || "")).split(/\s+/).forEach(function(token) {
+    var id = token.replace(/^<|>$/g, "").trim();
+    if (id.indexOf("@") > 0) ids[id] = true;
+  });
+  return Object.keys(ids);
+}
+
+function unfoldIcs_(text) {
+  return String(text || "").replace(/\r?\n[ \t]/g, "");
+}
+
+function calendarUid_(payload, messageId) {
+  var collected = {plain: "", html: "", calendar: ""};
+  collectPayload_(payload, collected, messageId);
+  var match = unfoldIcs_(collected.calendar).match(/^UID:(.*)$/im);
+  return match ? match[1].trim() : "";
+}
+
+function messageParticipants_(gmailMessage) {
+  return emailsIn_([
+    safeMessageValue_(function() { return gmailMessage.getFrom(); }),
+    safeMessageValue_(function() { return gmailMessage.getTo(); }),
+    safeMessageValue_(function() { return gmailMessage.getCc(); })
+  ].join(","));
+}
+
+function sharesParticipant_(apiMessages, participants) {
+  var shared = false;
+  (apiMessages || []).forEach(function(message) {
+    if (shared) return;
+    var headers = headerMap_(message.payload && message.payload.headers);
+    var emails = emailsIn_([headers.from, headers.to, headers.cc].join(","));
+    Object.keys(emails).forEach(function(email) {
+      if (participants[email]) shared = true;
+    });
+  });
+  return shared;
+}
+
+function emailsIn_(raw) {
+  var found = {};
+  String(raw || "").split(/[,;]/).forEach(function(part) {
+    var email = emailAddress_(part);
+    if (email) found[email] = true;
+  });
+  return found;
+}
+
+function emailAddress_(raw) {
+  var match = String(raw || "").match(/<([^>]+)>/);
+  var email = (match ? match[1] : raw).trim().toLowerCase();
+  return email.indexOf("@") > 0 ? email : "";
+}
+
+function normalizedSubject_(subject) {
+  var text = String(subject || "").trim();
+  var prefix = /^(re|rv|fwd|fw|wg|cancelado|canceled|cancelled|invitacion|invitación|invitation|updated|actualizado|actualizacion|actualización|accepted|aceptado|declined|rechazado|tentative|provisional)\s*:\s*/i;
+  var previous = "";
+  while (text && text !== previous) {
+    previous = text;
+    text = text.replace(prefix, "").trim();
+  }
+  return text;
+}
+
+function gmailAppMessages_(thread, current) {
   var messages = [];
   try {
-    messages = thread.getMessages();
+    messages = thread.getMessages() || [];
   } catch (err) {
-    messages = [message];
+    messages = [];
   }
+  if (!messages.length) messages = [current];
   var serialized = [];
   messages.forEach(function(msg) {
     var item = serializeGmailMessage_(msg);
     if (item) serialized.push(item);
   });
-  if (!serialized.length) {
-    var current = serializeGmailMessage_(message);
-    if (current) serialized.push(current);
-  }
-  return threadPayload_(threadId, e.gmail.messageId, message.getSubject() || "", serialized);
+  return serialized;
 }
 
 function threadPayload_(threadId, messageId, subject, messages) {
@@ -69,29 +228,30 @@ function threadPayload_(threadId, messageId, subject, messages) {
 }
 
 function gmailApiMessagesForThread_(threadId, messageId, gmailMessage) {
-  var fromThread = mapGmailMessages_(gmailGet_("threads/" + encodeURIComponent(threadId) + "?format=full"));
-  if (fromThread.length > 1) return fromThread;
+  var best = mapGmailMessages_(gmailGet_("threads/" + encodeURIComponent(threadId) + "?format=full"));
 
   var single = gmailGet_("messages/" + encodeURIComponent(messageId) + "?format=full");
-  if (single && single.threadId && single.threadId !== threadId) {
+  if (single && single.threadId) {
     var linked = mapGmailMessages_(gmailGet_("threads/" + encodeURIComponent(single.threadId) + "?format=full"));
-    if (linked.length) return linked;
+    if (linked.length > best.length) best = linked;
   }
-  if (fromThread.length) return fromThread;
-  if (single && single.id) return mapGmailMessages_([single]);
 
   var rfc822 = safeMessageValue_(function() { return gmailMessage.getHeader("Message-ID"); });
   rfc822 = String(rfc822 || "").replace(/^<|>$/g, "").trim();
-  if (!rfc822) return [];
-  var listed = gmailGet_("messages?maxResults=1&q=" + encodeURIComponent("rfc822msgid:" + rfc822));
-  var foundId = listed && listed.messages && listed.messages[0] && listed.messages[0].id;
-  if (!foundId) return [];
-  var found = gmailGet_("messages/" + encodeURIComponent(foundId) + "?format=full");
-  if (found && found.threadId) {
-    var foundThread = mapGmailMessages_(gmailGet_("threads/" + encodeURIComponent(found.threadId) + "?format=full"));
-    if (foundThread.length) return foundThread;
+  if (rfc822) {
+    var listed = gmailGet_("messages?maxResults=1&q=" + encodeURIComponent("rfc822msgid:" + rfc822));
+    var foundId = listed && listed.messages && listed.messages[0] && listed.messages[0].id;
+    if (foundId) {
+      var found = gmailGet_("messages/" + encodeURIComponent(foundId) + "?format=full");
+      if (found && found.threadId) {
+        var foundThread = mapGmailMessages_(gmailGet_("threads/" + encodeURIComponent(found.threadId) + "?format=full"));
+        if (foundThread.length > best.length) best = foundThread;
+      }
+    }
   }
-  return found && found.id ? mapGmailMessages_([found]) : [];
+
+  if (best.length) return best;
+  return single && single.id ? mapGmailMessages_([single]) : [];
 }
 
 function gmailGet_(path) {
@@ -102,7 +262,7 @@ function gmailGet_(path) {
       headers: {Authorization: "Bearer " + ScriptApp.getOAuthToken()}
     });
     if (response.getResponseCode() !== 200) return null;
-    return JSON.parse(response.getContentText());
+    return JSON.parse(response.getContentText() || "");
   } catch (err) {
     return null;
   }
@@ -889,7 +1049,7 @@ function createDealFromThread(e) {
     });
     return refreshThreadCardAfterLink_(
       e,
-      "Created deal \"" + result.deal.name + "\" with " + result.imported_count + " message(s)"
+      "Imported " + result.imported_count + " message(s)."
     );
   } catch (err) {
     return CardService.newActionResponseBuilder()
