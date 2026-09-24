@@ -72,7 +72,7 @@ Rails.application.routes.draw do
       member do
         patch :dismiss
       end
-      resource :conversion, only: %i[new create], module: :people, controller: "interest_conversions"
+      resource :conversion, only: %i[new create], controller: "interest_conversions"
     end
   end
   resources :mqls, only: :index

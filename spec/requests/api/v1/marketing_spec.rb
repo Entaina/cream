@@ -148,6 +148,64 @@ RSpec.describe "Api::V1::Marketing", type: :request do
     end
   end
 
+  describe "GET /api/v1/marketing/segments" do
+    it "lists segments for admins" do
+      segment = workspace.segments.create!(name: "API segment", record_type: "Person", user: admin, filters: {})
+
+      get "/api/v1/marketing/segments", headers: headers
+
+      expect(response).to have_http_status(:success)
+      names = response.parsed_body.map { |row| row["name"] }
+      expect(names).to include("API segment")
+    end
+  end
+
+  describe "GET /api/v1/marketing/scoring_rules" do
+    before { workspace.update!(lead_scoring_enabled: true) }
+
+    it "lists scoring rules for admins" do
+      workspace.scoring_rules.create!(name: "Opens", points: 5, active: true)
+
+      get "/api/v1/marketing/scoring_rules", headers: headers
+
+      expect(response).to have_http_status(:success)
+      expect(response.parsed_body.first["name"]).to eq("Opens")
+    end
+  end
+
+  describe "GET /api/v1/people/:person_id/product_interests" do
+    before do
+      allow(CreamFeatures).to receive(:enabled?).with(:mql_pool).and_return(true)
+    end
+
+    it "returns product interests for a person" do
+      person = create_person!(workspace, email: "pi@example.com")
+      product = workspace.products.create!(name: "Pro")
+      Marketing::ProductInterest.create!(
+        workspace: workspace,
+        person: person,
+        product: product,
+        description: "Demo",
+        source_kind: "manual",
+        occurred_at: Time.current
+      )
+
+      get "/api/v1/people/#{person.id}/product_interests", headers: headers
+
+      expect(response).to have_http_status(:success)
+      expect(response.parsed_body.first["description"]).to eq("Demo")
+    end
+  end
+
+  describe "GET /api/v1/marketing/attribution" do
+    it "returns attribution rows for admins" do
+      get "/api/v1/marketing/attribution", headers: headers
+
+      expect(response).to have_http_status(:success)
+      expect(response.parsed_body).to include("rows", "totals")
+    end
+  end
+
   describe "PATCH /api/v1/people/:id/subscription" do
     it "subscribes a person" do
       person = create_person!(workspace, email: "sub-api@example.com")
