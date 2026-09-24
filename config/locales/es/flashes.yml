@@ -190,6 +190,7 @@ es:
     record_emails:
       follow_up_cleared: Marcado como respondido; recordatorio de seguimiento eliminado.
       scheduled_cancelled: Email programado cancelado.
+      sending: El email se está enviando.
     registrations:
       welcome: "¡Bienvenido a Cream!"
     reports:

@@ -485,6 +485,7 @@ es:
     delete_confirm: "¿Eliminar %{name}? Esta acción no se puede deshacer."
     edit: Editar
     email_message:
+      body_frame: Cuerpo del email
       cancel_send: Cancelar envío
       failed: Error al enviar
       follow_up: Seguimiento %{date}
@@ -494,7 +495,9 @@ es:
       opened: Abierto
       received: Recibido
       replied: Respondido
+      retry: Reintentar envío
       scheduled: Programado
+      sending: Enviando
       sent: Enviado
       to: 'Para: %{address}'
       unknown_sender: Remitente desconocido

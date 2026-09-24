@@ -39,6 +39,34 @@ RSpec.describe EmailHelper, type: :helper do
       expect(helper.email_body_html("")).to eq("")
       expect(helper.email_body_html(nil)).to eq("")
     end
+
+    it "turns newlines into breaks when the html has no block tags" do
+      html = helper.email_body_html("<strong>Hello</strong>\nWorld")
+
+      expect(html).to include("<strong>Hello</strong><br>World")
+    end
+  end
+
+  describe "#email_body_srcdoc" do
+    it "returns nil for plain text" do
+      expect(helper.email_body_srcdoc("Hello\nWorld")).to be_nil
+    end
+
+    it "wraps an html fragment and keeps line breaks and structure" do
+      srcdoc = helper.email_body_srcdoc("<p>Hello</p><ul><li>One</li></ul>")
+
+      expect(srcdoc).to include("<!DOCTYPE html>")
+      expect(srcdoc).to include("<p>Hello</p>")
+      expect(srcdoc).to include("<ul><li>One</li></ul>")
+      expect(srcdoc).to include('<base target="_blank">')
+    end
+
+    it "drops scripts from a full document" do
+      srcdoc = helper.email_body_srcdoc("<html><body><p>Hi</p><script>alert(1)</script></body></html>")
+
+      expect(srcdoc).to include("<p>Hi</p>")
+      expect(srcdoc).not_to include("<script>")
+    end
   end
 
   describe "#full_html_document?" do

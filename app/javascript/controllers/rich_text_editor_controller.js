@@ -51,7 +51,8 @@ export default class extends Controller {
     this.form = this.element.closest("form")
     if (this.form) {
       this.submitHandler = () => this.sync()
-      this.form.addEventListener("submit", this.submitHandler)
+      // Capture runs before Turbo reads the form, so the hidden field has the editor HTML.
+      this.form.addEventListener("submit", this.submitHandler, true)
     }
   }
 

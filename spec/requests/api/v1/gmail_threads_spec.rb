@@ -309,6 +309,24 @@ RSpec.describe "Api::V1::GmailThreads", type: :request do
       expect(deal.email_messages.pluck(:body)).to all(eq("(no body)"))
     end
 
+    it "keeps html and line breaks in the imported body" do
+      html_thread = thread_payload.deep_dup
+      html_thread[:messages].each { |message| message[:gmail_message_id] = "#{message[:gmail_message_id]}-html" }
+      html_thread[:messages].first[:body] = "<p>Hola</p>\n<p>Seguimos.</p>"
+
+      post "/api/v1/gmail/threads/link",
+        params: {
+          new_deal: {name: "Html body", pipeline_stage_id: pipeline.pipeline_stages.first.id, create_company: true},
+          thread: html_thread
+        },
+        headers: headers,
+        as: :json
+
+      expect(response).to have_http_status(:created)
+      deal = Deal.find(JSON.parse(response.body).dig("deal", "id"))
+      expect(deal.email_messages.order(:created_at).first.body).to eq("<p>Hola</p>\n<p>Seguimos.</p>")
+    end
+
     it "attaches an existing company when company_name matches" do
       post "/api/v1/gmail/threads/link",
         params: {

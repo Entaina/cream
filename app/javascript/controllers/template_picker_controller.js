@@ -15,19 +15,26 @@ export default class extends Controller {
 
   apply() {
     const option = this.selectTarget.selectedOptions[0]
-    if (!option || !option.value) return
+    if (!option || !option.value) {
+      this.clearTemplate()
+      return
+    }
 
     const subject = this.interpolate(option.dataset.subject || "")
     const body = this.interpolate(option.dataset.body || "")
 
-    if (subject && this.hasSubjectTarget) this.writeFieldValue(this.subjectTarget, subject)
+    if (this.hasSubjectTarget) this.writeFieldValue(this.subjectTarget, subject)
     if (this.hasBodyTarget) this.writeBodyValue(body)
 
     if (this.hasTemplateIdTarget) this.templateIdTarget.value = option.value
     this.showTemplateAttachments(option.dataset.attachments)
+  }
 
-    // Reset so the picker reads "Insertar plantilla…" again.
-    this.selectTarget.value = ""
+  clearTemplate() {
+    if (this.hasTemplateIdTarget) this.templateIdTarget.value = ""
+    this.showTemplateAttachments(null)
+    if (this.hasSubjectTarget) this.writeFieldValue(this.subjectTarget, "")
+    if (this.hasBodyTarget) this.writeBodyValue("")
   }
 
   showTemplateAttachments(raw) {
@@ -83,7 +90,7 @@ export default class extends Controller {
   writeFieldValue(field, value) {
     field.focus()
     field.setSelectionRange(0, field.value.length)
-    document.execCommand("insertText", false, value)
+    if (!document.execCommand("insertText", false, value)) field.value = value
   }
 
   writeBodyValue(value) {

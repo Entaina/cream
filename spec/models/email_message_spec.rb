@@ -120,16 +120,14 @@ RSpec.describe EmailMessage do
       )
     end
 
-    it "returns false in development so mail goes to Mailbin" do
-      allow(Rails).to receive(:env).and_return(ActiveSupport::StringInquirer.new("development"))
-
-      expect(message.route_via_gmail?).to eq(false)
+    it "returns true when Gmail send is enabled" do
+      expect(message.route_via_gmail?).to eq(true)
     end
 
-    it "returns true in production when Gmail send is enabled" do
-      allow(Rails).to receive(:env).and_return(ActiveSupport::StringInquirer.new("production"))
+    it "returns false when the connection cannot send" do
+      workspace.gmail_connections.find_by!(user: user).update!(send_enabled: false)
 
-      expect(message.route_via_gmail?).to eq(true)
+      expect(message.route_via_gmail?).to eq(false)
     end
   end
 end

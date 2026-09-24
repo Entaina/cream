@@ -4,7 +4,7 @@
 
 Cream is a **workspace**-based CRM for managing **people**, **companies** and **deals** (opportunities), with notes, tasks, lists and an activity history shared across the team.
 
-> **Last revision:** 2026-09-24 (execution duration on deals)
+> **Last revision:** 2026-09-24 (formatted email bodies)
 > This document describes the functionality **visible to the user**. Disabled features are listed at the end under "Coming soon".
 
 ---
@@ -575,10 +575,10 @@ For a person, click **Send email** in the header. For a company or deal, scroll 
 
 1. Fill in **To** (recipient), **Subject** and **Message body...**.
 2. Click **Send email**.
-3. The email is sent (from the workspace address via SMTP, or from **your Gmail** if you have it connected) and is saved in the record's history.
+3. The email stays in the history with the **Sending** label until it goes out (from the workspace address via SMTP, or from **your Gmail** if you have it connected). When delivery finishes, the label becomes **Sent**. If sending fails, the label is **Failed to send**: open the email and click **Retry send** to send it again. If the recipient, subject or body is missing, Cream says so and the draft stays in the editor.
 4. An entry of the form *"Your name sent “Subject” to recipient@…"* appears in the record's **Timeline**.
 
-For a person, read emails in **Activity → Emails**, with their subject, status and expandable body; use **Older / Newer** for the rest of the history. On companies and deals, the **last 10 emails** appear below the form. Both views include sent emails and, with Gmail, received replies.
+For a person, read emails in **Activity → Emails**, with their subject, status and expandable body; use **Older / Newer** for the rest of the history. On companies and deals, the **last 10 emails** appear below the form. Expanding an email shows the message with its formatting: line breaks, lists and the original HTML. Both views include sent emails and, with Gmail, received replies.
 
 ### Open and click tracking
 
@@ -589,7 +589,7 @@ Sent emails include automatic tracking:
 
 > **Notes**
 > - Sending uses the server's mail (SMTP) configuration; tracking requires the application to be reachable from the Internet (already configured in production).
-> - In development, emails are not actually sent: they show up in **Mailbin** (`/mailbin`).
+> - If **Send emails from records through Gmail** is on, the email leaves from your Gmail and appears in Sent, including in development. Otherwise, in development the email is not actually sent: it shows up in **Mailbin** (`/mailbin`).
 > - Tracking depends on the recipient's email client loading images; if images are blocked, the open may not be detected.
 
 ### Scheduling a send (Send later)
@@ -615,7 +615,7 @@ In the email list, emails with a pending reminder show the **Follow up \<date\>*
 
 Emails you send **from a client's record** (person, company or deal) are stored on that record. Any **workspace member** who can open the record sees:
 
-- the email list (sent and **Received** if applicable): subject, recipient or sender, body and labels such as **Sent**, **Opened**, **Replied** or **Received**
+- the email list (sent and **Received** if applicable): subject, recipient or sender, body and labels such as **Sending**, **Sent**, **Opened**, **Replied** or **Received**
 - the related activity in the **Timeline** (sends, opens, clicks, detected replies)
 
 The same applies to **Campaign** sends when each recipient is tracked on their record in the CRM.
@@ -704,7 +704,7 @@ account; do not share authorization links or tokens.
 - **Predefined templates (Example):** the organization workspace includes eight templates for the course cycle (first contact, confirmed booking, payment reminders, closing, etc.). You can edit them from **Plantillas** if you are an administrator.
 - **Variables:** use `{first_name}`, `{last_name}`, `{name}`, `{company}` and `{email}` in the subject or body; when inserted they are replaced with the record's data. Texts in square brackets such as `[Nombre del curso]` or `[fechas]` are placeholders you must fill in manually after loading the template.
 - **Preview:** when creating or editing a template or layout, and when composing an email on a record, you will see a **Vista previa** (Preview) block with optional variables (`{first_name}`, `{name}`, etc.). Leave them blank to use sample values or fill them in to check the result. Click **Vista previa** to open the rendered email in a new tab (without sending it).
-- **Use in an email:** in the **Send email** section of a record (Person, Company or Deal), open **Insertar plantilla…** (Insert template…) and pick one. The subject and body are filled in automatically with the variables already substituted for that contact. You can edit the message with the same rich text editor before sending. If there are no templates yet, you will see a link to create them.
+- **Use in an email:** in the **Send email** section of a record (Person, Company or Deal), the menu starts on **Sin plantilla** (No template): you write the subject and body yourself. Choosing a template fills the subject and body with the variables already substituted for that contact. You can switch back to **Sin plantilla** to clear them and write the email by hand. Edit the text with the same rich text editor before sending. If there are no templates yet, you will see a link to create them.
 
 ### Bulk sending
 

@@ -480,6 +480,7 @@ en:
     delete_confirm: Delete %{name}? This cannot be undone.
     edit: Edit
     email_message:
+      body_frame: Email body
       cancel_send: Cancel send
       failed: Failed to send
       follow_up: Follow up %{date}
@@ -489,7 +490,9 @@ en:
       opened: Opened
       received: Received
       replied: Replied
+      retry: Retry send
       scheduled: Scheduled
+      sending: Sending
       sent: Sent
       to: 'To: %{address}'
       unknown_sender: Unknown sender

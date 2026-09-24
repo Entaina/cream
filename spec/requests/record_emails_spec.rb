@@ -27,10 +27,11 @@ RSpec.describe "Record emails", type: :request do
         expect {
           post record_emails_path, params: valid_params
         }.to change(EmailMessage, :count).by(1)
-          .and have_enqueued_mail(RecordMailer, :tracked_email)
-          .and change { company.activities.where(action: "email_sent").count }.by(1)
+          .and have_enqueued_job(SendViaGmailJob)
+          .and change { company.activities.where(action: "email_sent").count }.by(0)
 
         message = EmailMessage.order(:id).last
+        expect(message).to be_queued
         expect(message.record).to eq(company)
         expect(message.user).to eq(member)
         expect(message.workspace).to eq(workspace)
@@ -45,6 +46,19 @@ RSpec.describe "Record emails", type: :request do
         }.not_to change(EmailMessage, :count)
 
         expect(response).to redirect_to(company_path(company))
+      end
+
+      it "keeps the composer open and shows why a turbo submit was rejected" do
+        sign_in_as(member)
+
+        expect {
+          post record_emails_path, params: valid_params.deep_merge(email_message: {body: ""}), as: :turbo_stream
+        }.not_to change(EmailMessage, :count)
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response.media_type).to eq(Mime[:turbo_stream])
+        expect(response.body).to include("toasts")
+        expect(response.body).to include(I18n.t("errors.messages.blank"))
       end
 
       it "does not allow emailing a record from another workspace" do
@@ -79,10 +93,10 @@ RSpec.describe "Record emails", type: :request do
         Time.use_zone(member.effective_time_zone(workspace)) do
           expect {
             post record_emails_path, params: valid_params.merge(scheduled_at: 1.hour.ago.strftime("%Y-%m-%dT%H:%M"))
-          }.to have_enqueued_mail(RecordMailer, :tracked_email)
+          }.to have_enqueued_job(SendViaGmailJob)
         end
 
-        expect(EmailMessage.order(:id).last.status).to eq("sent")
+        expect(EmailMessage.order(:id).last).to be_queued
       end
 
       it "sets a follow-up reminder and enqueues the follow-up job" do
@@ -231,6 +245,34 @@ RSpec.describe "Record emails", type: :request do
       message = build_message(status: "sent")
 
       expect { delete record_email_path(message) }.not_to change(EmailMessage, :count)
+    end
+  end
+
+  describe "POST /record_emails/:id/retry" do
+    before do
+      allow(CreamFeatures).to receive(:enabled?).and_call_original
+      allow(CreamFeatures).to receive(:enabled?).with(:record_email).and_return(true)
+      sign_in_as(member)
+    end
+
+    it "queues a failed email again" do
+      message = workspace.email_messages.create!(user: member, record: company, to_address: "a@b.com",
+        subject: "S", body: "B", status: "failed")
+
+      expect {
+        post retry_record_email_path(message)
+      }.to have_enqueued_job(SendViaGmailJob).with(message.id)
+
+      expect(message.reload).to be_queued
+      expect(response).to redirect_to(company_path(company))
+    end
+
+    it "does not resend an email that already went out" do
+      message = workspace.email_messages.create!(user: member, record: company, to_address: "a@b.com",
+        subject: "S", body: "B", status: "sent")
+
+      expect { post retry_record_email_path(message) }.not_to have_enqueued_job(SendViaGmailJob)
+      expect(message.reload.status).to eq("sent")
     end
   end
 

@@ -134,11 +134,11 @@ class GmailReader
   end
 
   def extract_body_text(payload, snippet)
+    html = find_part_body(payload, "text/html")
+    return html if html.present?
+
     plain = find_part_body(payload, "text/plain")
     return plain if plain.present?
-
-    html = find_part_body(payload, "text/html")
-    return ActionView::Base.full_sanitizer.sanitize(html).strip if html.present?
 
     single = decode_body(payload)
     return single if single.present?

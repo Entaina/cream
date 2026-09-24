@@ -21,7 +21,7 @@ class RecordEmailsController < ApplicationController
     @message = current_workspace.email_messages.new(email_params.merge(user: current_user, record: record))
     scheduled_at = parse_scheduled_at
     @message.scheduled_at = scheduled_at
-    @message.status = "scheduled" if scheduled_at
+    @message.status = scheduled_at ? "scheduled" : "queued"
     @message.follow_up_at = follow_up_at_for(scheduled_at)
     authorize @message
     attach_record_files(record)
@@ -31,7 +31,14 @@ class RecordEmailsController < ApplicationController
       schedule_follow_up
       deliver_or_schedule(scheduled_at)
     else
-      redirect_back fallback_location: polymorphic_path(record), alert: @message.errors.full_messages.to_sentence
+      alert = @message.errors.full_messages.to_sentence
+      respond_to do |format|
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.append("toasts", partial: "shared/toast", locals: {message: alert, kind: "alert"}),
+            status: :unprocessable_entity
+        end
+        format.html { redirect_back fallback_location: polymorphic_path(record), alert: alert }
+      end
     end
   end
 
@@ -40,6 +47,18 @@ class RecordEmailsController < ApplicationController
     authorize @message
     @message.destroy if @message.scheduled?
     redirect_back fallback_location: polymorphic_path(@message.record), notice: t("flashes.record_emails.scheduled_cancelled")
+  end
+
+  def retry
+    @message = policy_scope(current_workspace.email_messages).find(params[:id])
+    authorize @message, :update?
+    notice = nil
+    if @message.failed? && @message.outbound?
+      @message.update!(status: "queued")
+      SendViaGmailJob.perform_later(@message.id)
+      notice = t("flashes.record_emails.sending")
+    end
+    redirect_back fallback_location: polymorphic_path(@message.record), notice: notice
   end
 
   def mark_replied
@@ -55,13 +74,9 @@ class RecordEmailsController < ApplicationController
     if scheduled_at
       SendScheduledEmailJob.set(wait_until: scheduled_at).perform_later(@message.id)
       notice = "Email scheduled for #{format_time(scheduled_at)}."
-    elsif @message.route_via_gmail?
-      SendViaGmailJob.perform_later(@message.id)
-      notice = "Email sent via Gmail."
     else
-      RecordMailer.tracked_email(message: @message).deliver_later
-      @message.track_sent!
-      notice = "Email sent."
+      SendViaGmailJob.perform_later(@message.id)
+      notice = t("flashes.record_emails.sending")
     end
     notice += " Follow-up reminder set for #{format_time(@message.follow_up_at)}." if @message.follow_up_at
     redirect_back fallback_location: polymorphic_path(@message.record), notice: notice

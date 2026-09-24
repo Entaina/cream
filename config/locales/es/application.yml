@@ -463,6 +463,7 @@ es:
         two_days: en 2 días
         two_weeks: en 2 semanas
       insert_template: Insertar plantilla…
+      without_template: Sin plantilla
       no_templates: No hay plantillas disponibles
       send: Enviar email
       send_later: Enviar más tarde

@@ -137,7 +137,7 @@ RSpec.describe "Email templates", type: :request do
 
       expect(response.body).to include('data-controller="template-picker"')
       expect(response.body).to include('data-controller="rich-text-editor"')
-      expect(response.body).to include(I18n.t("shared.email.insert_template"))
+      expect(response.body).to include(I18n.t("shared.email.without_template"))
       expect(response.body).to include("Hi {first_name}")
     end
 
@@ -147,7 +147,9 @@ RSpec.describe "Email templates", type: :request do
       get person_path(person)
 
       expect(response.body).to include('data-controller="template-picker"')
-      expect(response.body).to include(I18n.t("shared.email.no_templates"))
+      expect(response.body).to include(I18n.t("shared.email.without_template"))
+      select = Nokogiri::HTML(response.body).at_css("[data-template-picker-target='select']")
+      expect(select["disabled"]).to be_nil
       expect(response.body).to include(I18n.t("shared.email.create_templates_link"))
     end
 

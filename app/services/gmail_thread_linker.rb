@@ -342,9 +342,7 @@ class GmailThreadLinker
   end
 
   def message_body(raw)
-    text = raw.to_s.gsub(/[\u00A0\u200B\u200C\u200D\uFEFF]/, " ").strip
-    text = ActionController::Base.helpers.strip_tags(text) if text.include?("<")
-    text = text.gsub(/\s+/, " ").strip
+    text = raw.to_s.gsub(/[\u00A0\u200B\u200C\u200D\uFEFF]/, " ").gsub(/\r\n?/, "\n").strip
     text.presence || "(no body)"
   end
 

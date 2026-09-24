@@ -183,6 +183,7 @@ en:
     record_emails:
       follow_up_cleared: Marked as replied; follow-up reminder cleared.
       scheduled_cancelled: Scheduled email cancelled.
+      sending: The email is being sent.
     registrations:
       welcome: Welcome to Cream!
     reports:

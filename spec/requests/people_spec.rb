@@ -281,6 +281,41 @@ RSpec.describe "People", type: :request do
       end
     end
 
+    describe "email body" do
+      let(:company) { create_company!(workspace) }
+      let(:person) { create_person!(workspace, company: company, email: "pat@example.com") }
+
+      before { sign_in_as(member) }
+
+      it "renders html email structure in an isolated frame" do
+        workspace.email_messages.create!(
+          user: member, record: person, to_address: person.email,
+          subject: "Formatted", body: "<p>Hola</p><ul><li>Uno</li></ul>", status: "sent"
+        )
+
+        get person_path(person), params: {tab: "activity", activity_filter: "emails"}
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include("email-body-frame")
+        expect(response.body).to include("&lt;p&gt;Hola&lt;/p&gt;")
+        expect(response.body).to include("&lt;ul&gt;&lt;li&gt;Uno&lt;/li&gt;&lt;/ul&gt;")
+      end
+
+      it "keeps plain-text line breaks" do
+        workspace.email_messages.create!(
+          user: member, record: person, to_address: person.email,
+          subject: "Plain", body: "Primera\nSegunda", status: "sent"
+        )
+
+        get person_path(person), params: {tab: "activity", activity_filter: "emails"}
+
+        expect(response.body).to include("email-body")
+        expect(response.body).to include("Primera")
+        expect(response.body).to include("<br")
+        expect(response.body).not_to include("email-body-frame")
+      end
+    end
+
     describe "campaign history" do
       let(:company) { create_company!(workspace) }
       let(:person) { create_person!(workspace, company: company, email: "pat@example.com") }

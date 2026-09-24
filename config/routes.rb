@@ -146,7 +146,10 @@ Rails.application.routes.draw do
 
   resources :record_emails, only: %i[create destroy] do
     collection { post :preview }
-    member { patch :mark_replied }
+    member do
+      patch :mark_replied
+      post :retry
+    end
   end
   resources :reports, only: %i[index create update destroy]
   resources :email_templates do

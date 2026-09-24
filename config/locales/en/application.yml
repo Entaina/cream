@@ -462,6 +462,7 @@ en:
         two_days: in 2 days
         two_weeks: in 2 weeks
       insert_template: Insert template…
+      without_template: No template
       no_templates: No templates available
       send: Send email
       send_later: Send later

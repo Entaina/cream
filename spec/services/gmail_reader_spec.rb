@@ -127,6 +127,30 @@ RSpec.describe GmailReader do
     expect(full.from).to include("alex@example.com")
   end
 
+  it "prefers the html part over plain text" do
+    html = Base64.urlsafe_encode64("<p>Hello<br>there</p>")
+    plain = Base64.urlsafe_encode64("Hello there")
+    payload = {
+      id: "m4",
+      threadId: "t4",
+      labelIds: ["INBOX"],
+      snippet: "Hello",
+      payload: {
+        mimeType: "multipart/alternative",
+        headers: [{name: "Subject", value: "Hi"}],
+        parts: [
+          {mimeType: "text/plain", body: {data: plain}},
+          {mimeType: "text/html", body: {data: html}}
+        ]
+      }
+    }
+    allow(http_double).to receive(:request).and_return(success(payload))
+
+    full = described_class.new(connection).get_full("m4")
+
+    expect(full.body_text).to eq("<p>Hello<br>there</p>")
+  end
+
   it "falls back to snippet when body is missing" do
     payload = {
       id: "m3",

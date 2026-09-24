@@ -30,8 +30,7 @@
                 attachment_meta = template.attachments.map { |file| { id: file.id, filename: file.filename.to_s, byte_size: file.byte_size } }
                 tag.option(template.name, value: template.id, data: { subject: template.subject, body: template.picker_body, attachments: attachment_meta.to_json })
               }),
-              include_blank: templates.any? ? t("shared.email.insert_template") : t("shared.email.no_templates"),
-              disabled: templates.none?,
+              include_blank: t("shared.email.without_template"),
               class: "input w-full",
               data: { "template-picker-target" => "select", action: "template-picker#apply" } %>
         <%= hidden_field_tag :email_template_id, nil, data: { "template-picker-target" => "templateId" } %>

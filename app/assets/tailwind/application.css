@@ -734,3 +734,19 @@
   .record-tab { @apply px-1 gap-1; font-size: 12px; }
   .record-tab .record-count { display: none; }
 }
+
+.email-body-frame { height: 8rem; min-height: 3rem; }
+.email-body { line-height: 1.55; overflow-wrap: anywhere; }
+.email-body :where(p, ul, ol, blockquote, pre, h1, h2, h3, h4) { margin-block: 0.75em; }
+.email-body :where(p:first-child, ul:first-child, ol:first-child, blockquote:first-child, h1:first-child, h2:first-child, h3:first-child, h4:first-child) { margin-top: 0; }
+.email-body :where(p:last-child, ul:last-child, ol:last-child, blockquote:last-child) { margin-bottom: 0; }
+.email-body :where(ul) { list-style: disc; padding-inline-start: 1.25rem; }
+.email-body :where(ol) { list-style: decimal; padding-inline-start: 1.25rem; }
+.email-body :where(h1) { font-size: 1.35em; font-weight: 700; }
+.email-body :where(h2) { font-size: 1.2em; font-weight: 700; }
+.email-body :where(h3, h4) { font-size: 1.05em; font-weight: 700; }
+.email-body :where(a) { color: var(--color-accent); text-decoration: underline; }
+.email-body :where(blockquote) { border-inline-start: 3px solid var(--color-line-strong); padding-inline-start: 0.75rem; color: var(--color-ink-soft); }
+.email-body :where(img) { max-width: 100%; height: auto; }
+.email-body :where(table) { max-width: 100%; border-collapse: collapse; }
+.email-body :where(pre, code) { white-space: pre-wrap; }
