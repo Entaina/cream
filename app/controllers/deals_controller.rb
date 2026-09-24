@@ -7,7 +7,7 @@ class DealsController < ApplicationController
   before_action :set_deal, only: %i[show edit update destroy move move_pipeline duplicate]
   before_action :set_edit_section, only: %i[edit update]
 
-  SORTABLE = %w[name value expected_close_date invoice_number created_at].freeze
+  SORTABLE = %w[name value expected_close_date execution_duration_days invoice_number created_at].freeze
 
   def index
     load_saved_views("Deal")
@@ -280,7 +280,7 @@ class DealsController < ApplicationController
 
   def deal_params
     params.require(:deal).permit(:name, :pipeline_id, :pipeline_stage_id, :value, :currency, :probability,
-      :expected_close_date, :invoice_number, :company_id, :partner_id, :owner_id,
+      :expected_close_date, :execution_duration_days, :invoice_number, :company_id, :partner_id, :owner_id,
       contact_ids: [], tasks_attributes: %i[title due_on], custom_fields: {},
       deal_products_attributes: %i[id product_id edition_id edition_name quantity unit_price _destroy])
   end

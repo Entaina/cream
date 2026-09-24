@@ -4,7 +4,7 @@
 
 Cream es un CRM por **workspaces** para gestionar **personas**, **empresas** y **deals** (oportunidades), con notas, tareas, listas y un historial de actividad compartido en el equipo.
 
-> **Última revisión:** 2026-09-24 (empresa al crear un deal desde el add-on de Gmail)
+> **Última revisión:** 2026-09-24 (duración de la ejecución en deals)
 > Este documento describe la funcionalidad **visible para el usuario**. Las funcionalidades desactivadas aparecen al final en «Próximamente».
 
 ---
@@ -293,7 +293,7 @@ Al fusionar, los contactos, deals, notas, tareas, emails y actividad del timelin
 
 ### Deals
 
-- Representan oportunidades de venta con **valor**, **moneda**, **etapa**, **probabilidad**, **fecha de cierre prevista** y, opcionalmente, **número de factura** (*Nº factura*). El valor se escribe con la cifra exacta (incluido céntimos) y se muestra igual en la **ficha**, la **tabla** y el **tablero**; si no hay céntimos, no se añaden ceros.
+- Representan oportunidades de venta con **valor**, **moneda**, **etapa**, **probabilidad**, **fecha de cierre prevista**, **duración de la ejecución** (días, opcional) y, opcionalmente, **número de factura** (*Nº factura*). El valor se escribe con la cifra exacta (incluido céntimos) y se muestra igual en la **ficha**, la **tabla** y el **tablero**; si no hay céntimos, no se añaden ceros.
 - Se asocian a una **empresa** y un **propietario**; los **contactos** son opcionales.
 - Pueden incluir **líneas de producto** (productos del catálogo con cantidad y precio).
 - Al **crear un deal** (`New deal`):
@@ -302,10 +302,10 @@ Al fusionar, los contactos, deals, notas, tareas, emails y actividad del timelin
   - En el diálogo **New contact** puedes indicar **First name** (obligatorio), **Last name**, **Email**, **Phone**, **Contact source** (*Formulario web*, *Recomendado*, *Lo trae alguien del equipo*) y **First contact date**.
   - En **Products of interest** puedes añadir productos del catálogo con **Edition** (buscador con selección de una existente o **+ Create "…"**) y cantidad antes de guardar.
   - Debes definir una **Next action** (tarea con fecha futura) para poder crear el deal.
-  - Opcionalmente puedes indicar **Nº factura** si ya lo tienes; también puedes añadirlo o cambiarlo al editar el deal.
+  - Opcionalmente puedes indicar **Duración de la ejecución (días)** y **Nº factura** si ya los tienes; también puedes añadirlos o cambiarlos al editar el deal.
 - Tienen un **Version history** (historial de versiones) que guarda cada cambio de atributos del deal (valor, nombre, probabilidad, etc.) y permite consultar cómo estaba el deal en un momento concreto.
 - Al **editar** un deal y guardar un cambio de etapa a **Won**, se muestra una breve animación de celebración en pantalla antes de volver a la ficha. Si la nueva etapa es **cerrada** pero no de ganancia (p. ej. *Lost*), se muestra una animación de derrota. Lo mismo ocurre al cambiar de etapa con los botones **Move to stage** de la ficha del deal. No ocurre al mover tarjetas en el tablero kanban. Si la etapa destino tiene **condiciones de entrada** que el deal no cumple, el cambio se rechaza, se muestra un aviso de error y el deal permanece en la etapa original.
-- Desde la ficha de un deal puedes **Duplicar** el deal con un clic: se crea una copia con el mismo nombre más «(copia)», empresa, contactos, etapa, valor, moneda, probabilidad, fecha de cierre, responsable, campos personalizados y tareas en curso. **No se copia el número de factura**. No se copian las líneas de producto, notas, adjuntos, emails ni el historial de actividad.
+- Desde la ficha de un deal puedes **Duplicar** el deal con un clic: se crea una copia con el mismo nombre más «(copia)», empresa, contactos, etapa, valor, moneda, probabilidad, fecha de cierre, duración de la ejecución, responsable, campos personalizados y tareas en curso. **No se copia el número de factura**. No se copian las líneas de producto, notas, adjuntos, emails ni el historial de actividad.
 - En la ficha del deal, la sección **Colaboradores** permite al **Owner**, a un **Admin** o a un **Director comercial** añadir o quitar **vendedores** con acceso a ese deal. Un colaborador puede ver y editar el deal aunque no sea el propietario. Los vendedores que no son owner ni colaboradores no verán ese deal en listados, tablero ni dashboard.
 
 ### Filtros en deals {#filtros-en-deals}
@@ -405,7 +405,7 @@ En **Pipelines** puedes:
 - Editar etapas, probabilidades y colores.
 - **Reordenar etapas** arrastrando la fila por el asa (icono de puntos) al editar un pipeline; guarda los cambios con **Save changes**.
 - Marcar un pipeline como **por defecto** (el que usan los deals nuevos).
-- Elegir qué **campos visibles en las tarjetas del tablero** (checkboxes al editar el pipeline): valor, empresa, responsable, fecha de cierre, probabilidad, **número de factura**, contactos, productos y ediciones. Por defecto: valor, empresa, fecha de cierre y responsable.
+- Elegir qué **campos visibles en las tarjetas del tablero** (checkboxes al editar el pipeline): valor, empresa, responsable, fecha de cierre, probabilidad, **duración de la ejecución**, **número de factura**, contactos, productos y ediciones. Por defecto: valor, empresa, fecha de cierre y responsable.
 - **Duplicar** un pipeline (copia etapas y la selección de campos del tablero, no los deals).
 - Crear desde **plantillas** predefinidas (Sales, Recruiting, etc.).
 - Configurar **disparadores por etapa** (icono ⚡ junto a cada etapa guardada): acciones de IA o funciones predefinidas que se ejecutan al entrar un deal en la etapa — ver [Automatizaciones](#16-automatizaciones).
@@ -423,7 +423,7 @@ En **Deals** (vista board):
 - **Reordena las columnas** arrastrando la cabecera de una etapa por el icono de puntos; el nuevo orden se guarda al soltar.
 - Si hay varios pipelines, también puedes cambiar el pipeline activo desde el selector de la cabecera. Con **Todos los pipelines**, el tablero agrupa las columnas **por nombre de etapa** y cada tarjeta muestra el **pipeline** al que pertenece; al arrastrar un deal a otra columna, se mueve a la etapa homónima **dentro de su pipeline** (no cambia de pipeline).
 - Las tarjetas con **tareas pendientes** muestran un icono de tarea en la esquina superior derecha: **rojo** si alguna tarea está vencida, **azul** si todas están al día o sin fecha límite. **Pasa el cursor** sobre el icono para ver la próxima tarea pendiente (título, fecha límite y asignado) sin abrir la ficha del deal; si hay varias pendientes, también indica cuántas quedan.
-- Los campos visibles en cada tarjeta (valor, empresa, responsable, fecha de cierre, probabilidad, número de factura, contactos, productos y ediciones) dependen de la configuración del pipeline activo — ver [Gestionar pipelines](#gestionar-pipelines).
+- Los campos visibles en cada tarjeta (valor, empresa, responsable, fecha de cierre, probabilidad, duración de la ejecución, número de factura, contactos, productos y ediciones) dependen de la configuración del pipeline activo — ver [Gestionar pipelines](#gestionar-pipelines).
 - Desde la ficha de un deal también puedes cambiar etapa (botones **Move to stage**; el selector se actualiza al instante) o **mover a otro pipeline** (empezará en la primera etapa del pipeline destino).
 
 ### Etapas cerradas (won / lost)

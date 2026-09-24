@@ -28,6 +28,8 @@
             value: @snapshot.probability.present? ? "#{@snapshot.probability}%" : nil %>
       <%= render "shared/attribute", label: Deal.human_attribute_name(:expected_close_date), icon_name: :calendar,
             value: @snapshot.expected_close_date && l(@snapshot.expected_close_date, format: :short) %>
+      <%= render "shared/attribute", label: Deal.human_attribute_name(:execution_duration_days), icon_name: :clock,
+            value: format_execution_duration(@snapshot.execution_duration_days) %>
       <%= render "shared/attribute", label: Deal.human_attribute_name(:currency), icon_name: :banknote, value: @snapshot.currency %>
       <%= render "shared/attribute", label: Deal.human_attribute_name(:owner_id), icon_name: :users, value: @snapshot.owner&.name %>
     </div>

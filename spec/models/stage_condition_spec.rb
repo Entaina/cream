@@ -118,6 +118,15 @@ RSpec.describe StageCondition, type: :model do
       expect(condition.met?(deal)).to be(true)
     end
 
+    it "compares execution duration as a number" do
+      condition = build_condition(field: "execution_duration_days", operator: "gte", compare_value: "30")
+      condition.save!
+      expect(condition.met?(deal)).to be(false)
+
+      deal.update_column(:execution_duration_days, 30)
+      expect(condition.reload.met?(deal)).to be(true)
+    end
+
     it "evaluates invoice_number present/blank" do
       condition = build_condition(field: "invoice_number", operator: "present", compare_value: nil)
       condition.save!
@@ -145,7 +154,7 @@ RSpec.describe StageCondition, type: :model do
     it "includes invoice_number among deal fields" do
       deal_group = described_class.field_options(workspace).find { |label, _| label == FieldCondition.group_label(:deal) }
       keys = deal_group.last.map(&:last)
-      expect(keys).to include("invoice_number")
+      expect(keys).to include("invoice_number", "execution_duration_days")
     end
   end
 

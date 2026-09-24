@@ -5,6 +5,7 @@
       <%= render "shared/attribute", label: t("records.fields.value"), icon_name: :banknote, value: deal_field_display(@deal, :value) %>
       <%= render "shared/attribute", label: t("records.fields.probability"), icon_name: :activity, value: deal_field_display(@deal, :probability) %>
       <%= render "shared/attribute", label: t("records.fields.close_date"), icon_name: :calendar, value: deal_field_display(@deal, :expected_close_date) %>
+      <%= render "shared/attribute", label: t("records.fields.execution_duration"), icon_name: :clock, value: deal_field_display(@deal, :execution_duration_days) %>
       <%= render "shared/attribute", label: t("records.fields.invoice_number"), icon_name: :note, value: deal_field_display(@deal, :invoice_number) %>
       <%= render "shared/attribute", label: t("records.fields.stage"), icon_name: :activity, value: @deal.stage_label %>
       <%= render "shared/attribute", label: t("records.fields.pipeline"), icon_name: :activity, value: @deal.pipeline&.name %>

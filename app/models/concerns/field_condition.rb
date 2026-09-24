@@ -2,7 +2,7 @@
 module FieldCondition
   extend ActiveSupport::Concern
 
-  DEAL_FIELD_KEYS = %w[value probability expected_close_date name invoice_number open].freeze
+  DEAL_FIELD_KEYS = %w[value probability expected_close_date execution_duration_days name invoice_number open].freeze
 
   COMPANY_FIELD_KEYS = {
     "company.name" => :name,
@@ -266,7 +266,7 @@ module FieldCondition
   end
 
   def numeric_field?
-    field.in?(%w[value probability company.annual_revenue]) ||
+    field.in?(%w[value probability execution_duration_days company.annual_revenue]) ||
       custom_field_definition&.field_type&.in?(%w[number currency])
   end
 

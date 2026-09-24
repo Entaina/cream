@@ -25,6 +25,17 @@ RSpec.describe "Api::V1::Deals", type: :request do
   end
 
   describe "POST /api/v1/deals" do
+    it "stores an optional execution duration in days" do
+      post "/api/v1/deals",
+        params: valid_create_params(deal: {execution_duration_days: 90}),
+        headers: json_headers,
+        as: :json
+
+      expect(response).to have_http_status(:created)
+      expect(response.parsed_body["execution_duration_days"]).to eq(90)
+      expect(workspace.deals.find(response.parsed_body["id"]).execution_duration_days).to eq(90)
+    end
+
     it "creates a deal with product lines and edition" do
       product = workspace.products.create!(name: "Premium", price: 1200)
       edition = product.editions.create!(name: "2026")
@@ -394,6 +405,26 @@ RSpec.describe "Api::V1::Deals", type: :request do
       expect(response).to have_http_status(:success)
       expect(deal.reload.contacts).to contain_exactly(contact)
       expect(response.parsed_body["contact_ids"]).to eq([contact.id])
+    end
+
+    it "updates and clears the execution duration" do
+      patch "/api/v1/deals/#{deal.id}", params: {deal: {execution_duration_days: 60}}, headers: json_headers, as: :json
+
+      expect(response).to have_http_status(:success)
+      expect(response.parsed_body["execution_duration_days"]).to eq(60)
+
+      patch "/api/v1/deals/#{deal.id}", params: {deal: {execution_duration_days: nil}}, headers: json_headers, as: :json
+
+      expect(response).to have_http_status(:success)
+      expect(response.parsed_body["execution_duration_days"]).to be_nil
+      expect(deal.reload.execution_duration_days).to be_nil
+    end
+
+    it "rejects a non-positive execution duration" do
+      patch "/api/v1/deals/#{deal.id}", params: {deal: {execution_duration_days: 0}}, headers: json_headers, as: :json
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(deal.reload.execution_duration_days).to be_nil
     end
 
     it "updates plain fields without logging a stage change" do

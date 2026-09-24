@@ -457,6 +457,11 @@ components:
               type: number
             currency:
               type: string
+            execution_duration_days:
+              type: integer
+              nullable: true
+              minimum: 1
+              description: Optional execution duration in days.
             company_id:
               type: integer
             contact_ids:
@@ -502,6 +507,11 @@ components:
         expected_close_date:
           type: string
           format: date
+        execution_duration_days:
+          type: integer
+          minimum: 1
+          nullable: true
+          description: Optional execution duration in days.
         contact_ids:
           type: array
           items:

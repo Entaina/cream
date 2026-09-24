@@ -54,7 +54,7 @@
   </div>
 </div>
 
-<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+<div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
   <div>
     <%= f.label :probability, t("activerecord.attributes.deal.probability"), class: "label" %>
     <%= f.number_field :probability, class: "input", min: 0, max: 100, step: 5 %>
@@ -62,5 +62,10 @@
   <div>
     <%= f.label :expected_close_date, t("activerecord.attributes.deal.expected_close_date"), class: "label" %>
     <%= f.date_field :expected_close_date, class: "input" %>
+  </div>
+  <div>
+    <%= f.label :execution_duration_days, t("activerecord.attributes.deal.execution_duration_days"), class: "label" %>
+    <%= f.number_field :execution_duration_days, class: "input", min: 1, step: 1,
+          placeholder: t("deals.form.overview.execution_duration_placeholder") %>
   </div>
 </div>

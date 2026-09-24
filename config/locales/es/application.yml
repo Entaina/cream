@@ -19,6 +19,7 @@ es:
         currency: Moneda
         expected_close_date: Fecha de cierre prevista
         invoice_number: Nº factura
+        execution_duration_days: Duración de la ejecución (días)
         name: Nombre
         owner_id: Propietario
         partner_id: Empresa partner

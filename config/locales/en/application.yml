@@ -19,6 +19,7 @@ en:
         currency: Currency
         expected_close_date: Expected close date
         invoice_number: Invoice number
+        execution_duration_days: Execution duration (days)
         name: Name
         owner_id: Owner
         partner_id: Partner company

@@ -83,6 +83,9 @@ en:
       overview: Company overview
       people_empty: No people linked to this company yet.
   deals:
+    execution_duration:
+      one: "%{count} day"
+      other: "%{count} days"
     board:
       next_stage: Next stage
       previous_stage: Previous stage
@@ -129,6 +132,7 @@ en:
       overview:
         description: Name, value, stage and key dates.
         invoice_placeholder: FAC-2026-001
+        execution_duration_placeholder: "90"
         name_placeholder: Acme — Annual plan
         title: Deal details
       products:
@@ -500,6 +504,7 @@ en:
       employees: Employees
       industry: Industry
       invoice_number: Invoice number
+      execution_duration: Execution duration
       job_title: Job title
       lead_score: Lead score
       lifecycle: Lifecycle

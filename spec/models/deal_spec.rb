@@ -309,6 +309,19 @@ RSpec.describe Deal, type: :model do
     end
   end
 
+  describe "execution duration" do
+    it "is optional and must be a positive integer when set" do
+      deal.execution_duration_days = nil
+      expect(deal).to be_valid
+
+      deal.execution_duration_days = 0
+      expect(deal).not_to be_valid
+
+      deal.execution_duration_days = 45
+      expect(deal).to be_valid
+    end
+  end
+
   describe "#duplicate" do
     let(:actor) { workspace.users.first }
     let(:company) { create_company!(workspace) }
@@ -318,7 +331,7 @@ RSpec.describe Deal, type: :model do
       create_deal!(workspace, pipeline: pipeline,
         name: "ACME renewal", company: company, partner: partner, contacts: [contact],
         value: 12_000, currency: "USD", probability: 60,
-        expected_close_date: Date.current + 30, owner: actor)
+        expected_close_date: Date.current + 30, execution_duration_days: 90, owner: actor)
     end
 
     before do
@@ -345,6 +358,7 @@ RSpec.describe Deal, type: :model do
       expect(copy.currency).to eq("USD")
       expect(copy.probability).to eq(60)
       expect(copy.expected_close_date).to eq(Date.current + 30)
+      expect(copy.execution_duration_days).to eq(90)
       expect(copy.owner).to eq(actor)
       expect(copy.invoice_number).to be_nil
       expect(copy.contact_ids).to eq(source.contact_ids)

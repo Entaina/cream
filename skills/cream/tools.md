@@ -32,7 +32,7 @@ Tool names exposed by the **Cream MCP server** (see `tools/list` in your MCP cli
 |------|---------------|-------|
 | `create_company` | `name` | Optional: domain, industry, employee_range, location, revenue, fiscal_information, description, custom_fields |
 | `create_person` | `first_name`, `company_id` | Optional: last_name, email, phone, job_title, location, description, custom_fields |
-| `create_deal` | `name`, `company_id`, `next_action_title`, `next_action_due_on` | Optional: person_ids, value, currency, pipeline, stage, probability, expected_close_date, custom_fields, `email` object |
+| `create_deal` | `name`, `company_id`, `next_action_title`, `next_action_due_on` | Optional: person_ids, value, currency, pipeline, stage, probability, expected_close_date, execution_duration_days, custom_fields, `email` object |
 | `create_product` | `name` | Optional: price, segment (b2b/b2c), description |
 | `create_task` | `title` | Optional: `due_on`, `record_type`, `record_id` |
 
@@ -42,7 +42,7 @@ Tool names exposed by the **Cream MCP server** (see `tools/list` in your MCP cli
 |------|---------------|-------|
 | `update_person` | `person_id` | Partial fields; empty string clears |
 | `update_company` | `company_id` | Partial fields |
-| `update_deal` | `deal_id` | Optional: name, value, currency, probability, expected_close_date, company_id, person_ids (replaces contacts), pipeline, stage |
+| `update_deal` | `deal_id` | Optional: name, value, currency, probability, expected_close_date, execution_duration_days, company_id, person_ids (replaces contacts), pipeline, stage |
 | `update_deal_stage` | `deal_id`, `stage` | Stage name within deal’s pipeline |
 | `update_product` | `product_id` | Partial fields |
 | `update_deal_product` | `line_item_id` | Quantity, unit_price, edition, etc. |

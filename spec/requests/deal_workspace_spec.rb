@@ -70,11 +70,12 @@ RSpec.describe "Deal workspace", type: :request do
   end
 
   it "keeps the overview block and submitted values when validation fails" do
-    patch deal_path(deal), params: {section: "overview", deal: {name: "", invoice_number: "FAC-TEST"}}
+    patch deal_path(deal), params: {section: "overview", deal: {name: "", invoice_number: "FAC-TEST", execution_duration_days: "90"}}
 
     expect(response).to have_http_status(:unprocessable_content)
     expect(document.at_css('[role="alert"]').text).to include(blank_error_for(Deal, :name))
     expect(document.at_css('[name="deal[invoice_number]"]')["value"]).to eq("FAC-TEST")
+    expect(document.at_css('[name="deal[execution_duration_days]"]')["value"]).to eq("90")
     expect(document.at_css('[name="deal[owner_id]"]')).to be_nil
   end
 

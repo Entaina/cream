@@ -66,6 +66,7 @@
           <th><%= t("records.fields.email") %></th>
           <th><%= t("records.fields.phone") %></th>
           <th><%= sort_link t("records.fields.close_date"), :expected_close_date %></th>
+          <th><%= sort_link t("records.fields.execution_duration"), :execution_duration_days %></th>
           <th><%= sort_link t("records.fields.invoice_number"), :invoice_number %></th>
           <th><%= t("records.fields.owner") %></th>
           <%= render "shared/magic_column_headers", record_type: "Deal" %>
@@ -99,6 +100,7 @@
             <td class="text-ink-soft select-text cursor-text" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()"><%= deal_contact_attribute(deal, :email) %></td>
             <td class="text-ink-soft select-text cursor-text" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()"><%= deal_contact_attribute(deal, :phone) %></td>
             <td class="text-ink-soft"><%= deal.expected_close_date && l(deal.expected_close_date, format: :short) %></td>
+            <td class="text-ink-soft tabular-nums"><%= deal_field_display(deal, :execution_duration_days) %></td>
             <td class="text-ink-soft select-text cursor-text" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()"><%= deal.invoice_number %></td>
             <td><%= avatar(deal.owner, size: "size-5", text: "text-2xs") if deal.owner %></td>
             <%= render "shared/magic_column_cells", record: deal %>

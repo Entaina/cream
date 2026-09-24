@@ -33,6 +33,7 @@ class Deal < ApplicationRecord
   validates :name, presence: true
   validates :value, numericality: {greater_than_or_equal_to: 0}
   validates :probability, numericality: {in: 0..100}, allow_nil: true
+  validates :execution_duration_days, numericality: {only_integer: true, greater_than: 0}, allow_nil: true
   validate :stage_belongs_to_pipeline
   validate :stage_entry_conditions_met, if: -> { persisted? && will_save_change_to_pipeline_stage_id? }
   validate :contacts_belong_to_company
@@ -172,6 +173,7 @@ class Deal < ApplicationRecord
       value: value, currency: currency,
       probability: probability,
       expected_close_date: expected_close_date,
+      execution_duration_days: execution_duration_days,
       owner: owner
     )
     copy.duplicating = true

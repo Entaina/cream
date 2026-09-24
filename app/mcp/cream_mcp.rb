@@ -148,6 +148,7 @@ module CreamMcp
      value: d.value.to_f, currency: d.currency, probability: d.probability,
      products: line_items.map { |lp| {line_item_id: lp.id, product_id: lp.product_id, name: lp.product.name, edition: lp.edition&.name, quantity: lp.quantity, unit_price: lp.unit_price.to_f, subtotal: lp.subtotal.to_f}.compact }.presence,
      expected_close_date: d.expected_close_date&.iso8601,
+     execution_duration_days: d.execution_duration_days,
      company_id: d.company_id, company: d.company&.name, company_url: record_url(d.company),
      contacts: d.contacts.map { |p| record_ref_json(p) }.presence, owner: d.owner&.name, url: record_url(d),
      custom_fields: custom_fields_json(d),
@@ -669,6 +670,7 @@ module CreamMcp
                                 stage: {type: "string", description: "Pipeline stage name (defaults to the first stage)"},
                                 probability: {type: "integer", minimum: 0, maximum: 100},
                                 expected_close_date: {type: "string", description: "ISO date (YYYY-MM-DD)"},
+                                execution_duration_days: {type: "integer", minimum: 1, description: "Optional execution duration in days"},
                                 custom_fields: {type: "object", description: "Workspace-defined custom fields keyed by field key (see list_custom_fields)"},
                                 email: DEAL_EMAIL_SCHEMA.merge(description: "Optional email to send after the deal is created")},
                    required: ["name", "company_id", "next_action_title", "next_action_due_on"]}
@@ -685,7 +687,7 @@ module CreamMcp
       stage_name = CreamMcp.arg(args, "stage")
       stage = (stage_name && pipeline&.pipeline_stages&.find_by("name ILIKE ?", stage_name)) || pipeline&.first_stage
       deal = ws.deals.new(
-        CreamMcp.picked(args, "name", "value", "currency", "probability", "expected_close_date", "company_id")
+        CreamMcp.picked(args, "name", "value", "currency", "probability", "expected_close_date", "execution_duration_days", "company_id")
           .merge(owner: pundit_ctx.user, workspace: ws, pipeline: pipeline, pipeline_stage: stage)
       )
       deal.contact_ids = Array(CreamMcp.arg(args, "person_ids"))
@@ -777,6 +779,7 @@ module CreamMcp
                                 currency: {type: "string", enum: %w[EUR USD]},
                                 probability: {type: "integer", minimum: 0, maximum: 100},
                                 expected_close_date: {type: "string", description: "ISO date (YYYY-MM-DD)"},
+                                execution_duration_days: {type: "integer", minimum: 1, description: "Optional execution duration in days"},
                                 company_id: {type: "integer", description: "Move the deal to another existing company"},
                                 person_ids: {type: "array", items: {type: "integer"},
                                              description: "Replaces the deal's contacts — must belong to the deal's company"},
@@ -789,7 +792,7 @@ module CreamMcp
       ws = ctx.workspace
       deal = ws.deals.find(CreamMcp.arg(args, "deal_id"))
       CreamMcp.authorize!(ctx, deal, :update?)
-      attrs = CreamMcp.picked(args, "name", "value", "currency", "probability", "expected_close_date", "company_id")
+      attrs = CreamMcp.picked(args, "name", "value", "currency", "probability", "expected_close_date", "execution_duration_days", "company_id")
       deal.contact_ids = Array(CreamMcp.arg(args, "person_ids")) unless CreamMcp.arg(args, "person_ids").nil?
       deal.update!(attrs)
       pipeline_name = CreamMcp.arg(args, "pipeline")

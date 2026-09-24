@@ -84,6 +84,9 @@ es:
       overview: Resumen de la empresa
       people_empty: Todavía no hay personas vinculadas a esta empresa.
   deals:
+    execution_duration:
+      one: "%{count} día"
+      other: "%{count} días"
     board:
       next_stage: Etapa siguiente
       previous_stage: Etapa anterior
@@ -130,6 +133,7 @@ es:
       overview:
         description: Nombre, importe, etapa y fechas clave.
         invoice_placeholder: FAC-2026-001
+        execution_duration_placeholder: "90"
         name_placeholder: Acme — Plan anual
         title: Datos de la oportunidad
       products:
@@ -505,6 +509,7 @@ es:
       employees: Empleados
       industry: Sector
       invoice_number: Nº factura
+      execution_duration: Duración de la ejecución
       job_title: Cargo
       lead_score: Puntuación
       lifecycle: Ciclo de vida

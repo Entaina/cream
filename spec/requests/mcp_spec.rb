@@ -630,11 +630,13 @@ RSpec.describe "Mcp", type: :request do
 
       result = call_tool("update_deal",
         {deal_id: deal.id, value: 900, expected_close_date: (Date.current + 30).iso8601,
-         person_ids: [new_contact.id]})
+         execution_duration_days: 90, person_ids: [new_contact.id]})
 
       expect(result.dig("updated", "value")).to eq(900.0)
+      expect(result.dig("updated", "execution_duration_days")).to eq(90)
       deal.reload
       expect(deal.expected_close_date).to eq(Date.current + 30)
+      expect(deal.execution_duration_days).to eq(90)
       expect(deal.contacts).to eq([new_contact])
     end
 

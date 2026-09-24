@@ -24,7 +24,8 @@ RSpec.describe "Exports", type: :request do
     product = workspace.products.create!(name: "Premium", price: 100)
     edition = product.editions.create!(name: "2026")
     contact = create_person!(workspace, company: company, first_contact_on: Date.new(2026, 1, 10))
-    match = create_deal!(workspace, pipeline: pipeline, name: "Export match", company: company, contacts: [contact])
+    match = create_deal!(workspace, pipeline: pipeline, name: "Export match", company: company,
+      contacts: [contact], execution_duration_days: 45)
     match.deal_products.create!(product: product, edition: edition, quantity: 1)
     create_deal!(workspace, pipeline: pipeline, name: "Export other", company: company)
 
@@ -32,7 +33,9 @@ RSpec.describe "Exports", type: :request do
       first_contact_from: "2026-01-01", first_contact_to: "2026-01-31")
 
     expect(response).to have_http_status(:success)
+    expect(response.body).to include("execution_duration_days")
     expect(response.body).to include("Export match")
+    expect(response.body).to include("45")
     expect(response.body).not_to include("Export other")
   end
 end

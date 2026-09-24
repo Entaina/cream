@@ -206,8 +206,15 @@ module ApplicationHelper
     when "value" then money(deal.value, deal.currency)
     when "probability" then deal.probability.present? ? "#{deal.probability}%" : nil
     when "expected_close_date" then deal.expected_close_date && l(deal.expected_close_date, format: :short)
+    when "execution_duration_days" then format_execution_duration(deal.execution_duration_days)
     when "invoice_number" then deal.invoice_number.presence
     end
+  end
+
+  def format_execution_duration(days)
+    return if days.blank?
+
+    t("deals.execution_duration", count: days)
   end
 
   # Sortable table header link preserving current filters.

@@ -725,6 +725,20 @@ RSpec.describe "Deals", type: :request do
       expect(card).to include("590,50 €")
     end
 
+    it "shows the execution duration on cards only when that field is selected" do
+      sign_in_as(member)
+      deal = create_deal!(workspace, pipeline: pipeline, name: "Long delivery", execution_duration_days: 90)
+
+      get board_deals_path
+
+      expect(board_card_html(deal.id)).not_to include("90 días")
+
+      pipeline.update!(card_fields: pipeline.card_fields + ["execution_duration_days"])
+      get board_deals_path
+
+      expect(board_card_html(deal.id)).to include("90 días")
+    end
+
     it "hides company on cards when company is not selected" do
       sign_in_as(member)
       pipeline.update!(card_fields: %w[value owner])
@@ -859,6 +873,38 @@ RSpec.describe "Deals", type: :request do
 
       expect(response).to redirect_to(deal_path(deal))
       expect(deal.reload.invoice_number).to eq("FAC-2026-099")
+    end
+
+    it "updates the optional execution duration" do
+      sign_in_as(member)
+
+      patch deal_path(deal), params: {deal: {execution_duration_days: "120"}}
+
+      expect(response).to redirect_to(deal_path(deal))
+      expect(deal.reload.execution_duration_days).to eq(120)
+
+      get deal_path(deal)
+      expect(response.body).to include("120 días")
+    end
+
+    it "clears the execution duration when the field is left blank" do
+      sign_in_as(member)
+      deal.update!(execution_duration_days: 30)
+
+      patch deal_path(deal), params: {deal: {execution_duration_days: ""}}
+
+      expect(response).to redirect_to(deal_path(deal))
+      expect(deal.reload.execution_duration_days).to be_nil
+    end
+
+    it "rejects a non-positive execution duration" do
+      sign_in_as(member)
+      deal.update!(execution_duration_days: 30)
+
+      patch deal_path(deal), params: {deal: {execution_duration_days: "0"}}
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(deal.reload.execution_duration_days).to eq(30)
     end
 
     it "accepts an exact value with cents" do
