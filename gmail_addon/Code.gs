@@ -28,13 +28,9 @@ function readOpenThread_(e) {
   var message = GmailApp.getMessageById(e.gmail.messageId);
   var thread = message.getThread();
   var threadId = (e.gmail && e.gmail.threadId) || thread.getId();
-  var fromApi = threadMessagesFromApi_(e.gmail.accessToken, threadId);
-  if (fromApi.length < 2) {
-    var fromService = threadMessagesFromService_(threadId);
-    if (fromService.length > fromApi.length) fromApi = fromService;
-  }
-  if (fromApi.length) {
-    return threadPayload_(threadId, e.gmail.messageId, message.getSubject() || "", fromApi);
+  var apiMessages = gmailApiMessagesForThread_(threadId, e.gmail.messageId, message);
+  if (apiMessages.length) {
+    return threadPayload_(threadId, e.gmail.messageId, message.getSubject() || "", apiMessages);
   }
 
   var messages = [];
@@ -72,57 +68,62 @@ function threadPayload_(threadId, messageId, subject, messages) {
   };
 }
 
-function threadMessagesFromService_(threadId) {
-  if (!threadId || typeof Gmail === "undefined" || !Gmail.Users) return [];
+function gmailApiMessagesForThread_(threadId, messageId, gmailMessage) {
+  var fromThread = mapGmailMessages_(gmailGet_("threads/" + encodeURIComponent(threadId) + "?format=full"));
+  if (fromThread.length > 1) return fromThread;
+
+  var single = gmailGet_("messages/" + encodeURIComponent(messageId) + "?format=full");
+  if (single && single.threadId && single.threadId !== threadId) {
+    var linked = mapGmailMessages_(gmailGet_("threads/" + encodeURIComponent(single.threadId) + "?format=full"));
+    if (linked.length) return linked;
+  }
+  if (fromThread.length) return fromThread;
+  if (single && single.id) return mapGmailMessages_([single]);
+
+  var rfc822 = safeMessageValue_(function() { return gmailMessage.getHeader("Message-ID"); });
+  rfc822 = String(rfc822 || "").replace(/^<|>$/g, "").trim();
+  if (!rfc822) return [];
+  var listed = gmailGet_("messages?maxResults=1&q=" + encodeURIComponent("rfc822msgid:" + rfc822));
+  var foundId = listed && listed.messages && listed.messages[0] && listed.messages[0].id;
+  if (!foundId) return [];
+  var found = gmailGet_("messages/" + encodeURIComponent(foundId) + "?format=full");
+  if (found && found.threadId) {
+    var foundThread = mapGmailMessages_(gmailGet_("threads/" + encodeURIComponent(found.threadId) + "?format=full"));
+    if (foundThread.length) return foundThread;
+  }
+  return found && found.id ? mapGmailMessages_([found]) : [];
+}
+
+function gmailGet_(path) {
   try {
-    var thread = Gmail.Users.Threads.get("me", threadId, {format: "full"});
-    return (thread.messages || []).map(function(message) {
-      var headers = headerMap_(message.payload && message.payload.headers);
-      var sentAt = message.internalDate ? new Date(Number(message.internalDate)).toISOString() : new Date().toISOString();
-      return {
-        gmail_message_id: message.id,
-        rfc822_message_id: headers["message-id"] || "",
-        from: headers.from || "",
-        to: headers.to || "",
-        subject: headers.subject || "",
-        body: payloadBody_(message.payload),
-        sent_at: sentAt
-      };
-    }).filter(function(item) { return item.gmail_message_id; });
+    var response = UrlFetchApp.fetch("https://gmail.googleapis.com/gmail/v1/users/me/" + path, {
+      method: "get",
+      muteHttpExceptions: true,
+      headers: {Authorization: "Bearer " + ScriptApp.getOAuthToken()}
+    });
+    if (response.getResponseCode() !== 200) return null;
+    return JSON.parse(response.getContentText());
   } catch (err) {
-    return [];
+    return null;
   }
 }
 
-function threadMessagesFromApi_(accessToken, threadId) {
-  if (!accessToken || !threadId) return [];
-  try {
-    var response = UrlFetchApp.fetch(
-      "https://gmail.googleapis.com/gmail/v1/users/me/threads/" + encodeURIComponent(threadId) + "?format=full",
-      {
-        method: "get",
-        muteHttpExceptions: true,
-        headers: { Authorization: "Bearer " + accessToken }
-      }
-    );
-    if (response.getResponseCode() !== 200) return [];
-    var thread = JSON.parse(response.getContentText());
-    return (thread.messages || []).map(function(message) {
-      var headers = headerMap_(message.payload && message.payload.headers);
-      var sentAt = message.internalDate ? new Date(Number(message.internalDate)).toISOString() : new Date().toISOString();
-      return {
-        gmail_message_id: message.id,
-        rfc822_message_id: headers["message-id"] || "",
-        from: headers.from || "",
-        to: headers.to || "",
-        subject: headers.subject || "",
-        body: payloadBody_(message.payload),
-        sent_at: sentAt
-      };
-    }).filter(function(item) { return item.gmail_message_id; });
-  } catch (err) {
-    return [];
-  }
+function mapGmailMessages_(threadOrNull) {
+  var list = threadOrNull && threadOrNull.messages ? threadOrNull.messages : threadOrNull;
+  if (!list || !list.length) return [];
+  return list.map(function(message) {
+    var headers = headerMap_(message.payload && message.payload.headers);
+    var sentAt = message.internalDate ? new Date(Number(message.internalDate)).toISOString() : new Date().toISOString();
+    return {
+      gmail_message_id: message.id,
+      rfc822_message_id: headers["message-id"] || "",
+      from: headers.from || "",
+      to: headers.to || "",
+      subject: headers.subject || "",
+      body: payloadBody_(message.payload, message.id),
+      sent_at: sentAt
+    };
+  }).filter(function(item) { return item.gmail_message_id; });
 }
 
 function headerMap_(headers) {
@@ -133,37 +134,48 @@ function headerMap_(headers) {
   return map;
 }
 
-function payloadBody_(payload) {
+function payloadBody_(payload, gmailMessageId) {
   var collected = { plain: "", html: "", calendar: "" };
-  collectPayload_(payload, collected);
-  if (collected.calendar) {
-    var summary = icsSummary_(collected.calendar);
-    if (summary) return clipBody_(summary);
-  }
-  if (collected.plain) return clipBody_(visibleText_(collected.plain));
-  if (collected.html) return clipBody_(visibleText_(stripHtml_(collected.html)));
-  return "(no body)";
+  collectPayload_(payload, collected, gmailMessageId);
+  var text = visibleText_(collected.plain) || visibleText_(stripHtml_(collected.html));
+  var summary = collected.calendar ? icsSummary_(collected.calendar) : "";
+  if (text && summary) return clipBody_(text + "\n\n" + summary);
+  return clipBody_(text || summary || "(no body)");
 }
 
-function collectPayload_(part, collected) {
+function collectPayload_(part, collected, gmailMessageId) {
   if (!part) return;
   var type = String(part.mimeType || "").toLowerCase();
   var filename = String(part.filename || "");
   var decoded = decodeGmailBody_(part.body && part.body.data);
-  if (decoded && (type === "text/calendar" || type === "application/ics" || /\.ics$/i.test(filename))) {
+  if (!decoded && part.body && part.body.attachmentId && gmailMessageId) {
+    decoded = attachmentText_(gmailMessageId, part.body.attachmentId);
+  }
+  var calendarPart = type === "text/calendar" || type === "application/ics" || /\.ics$/i.test(filename);
+  if (decoded && calendarPart) {
     collected.calendar = collected.calendar || decoded;
   } else if (decoded && type === "text/plain" && !collected.plain) {
     collected.plain = decoded;
   } else if (decoded && type === "text/html" && !collected.html) {
     collected.html = decoded;
   }
-  (part.parts || []).forEach(function(child) { collectPayload_(child, collected); });
+  (part.parts || []).forEach(function(child) {
+    collectPayload_(child, collected, gmailMessageId);
+  });
+}
+
+function attachmentText_(messageId, attachmentId) {
+  var attachment = gmailGet_(
+    "messages/" + encodeURIComponent(messageId) + "/attachments/" + encodeURIComponent(attachmentId)
+  );
+  return decodeGmailBody_(attachment && attachment.data);
 }
 
 function decodeGmailBody_(data) {
   if (!data) return "";
   try {
     var normalized = String(data).replace(/-/g, "+").replace(/_/g, "/");
+    while (normalized.length % 4) normalized += "=";
     return Utilities.newBlob(Utilities.base64Decode(normalized)).getDataAsString();
   } catch (err) {
     return "";

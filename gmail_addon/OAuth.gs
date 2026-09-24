@@ -145,6 +145,10 @@ function onHomepage() {
   return [ buildConnectedHomeCard_() ];
 }
 
+function authorizeGmailAccess() {
+  Gmail.Users.getProfile("me");
+}
+
 function authCallback(request) {
   var authorized = getCreamOAuthService_().handleCallback(request);
   var message = authorized
