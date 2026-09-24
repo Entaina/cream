@@ -33,22 +33,33 @@ function readOpenThread_(e) {
   var participants = [];
 
   messages.forEach(function(msg) {
-    var from = msg.getFrom() || "";
-    var to = msg.getTo() || "";
-    var messageId = msg.getHeader("Message-ID") || "";
-    participants.push(from, to);
-    if (messageId) {
-      rfc822Ids.push(messageId);
+    try {
+      var from = safeMessageValue_(function() { return msg.getFrom(); });
+      var to = safeMessageValue_(function() { return msg.getTo(); });
+      var messageId = safeMessageValue_(function() { return msg.getHeader("Message-ID"); });
+      participants.push(from, to);
+      if (messageId) {
+        rfc822Ids.push(messageId);
+      }
+      serialized.push({
+        gmail_message_id: msg.getId(),
+        rfc822_message_id: messageId,
+        from: from,
+        to: to,
+        subject: safeMessageValue_(function() { return msg.getSubject(); }),
+        body: messageBody_(msg),
+        sent_at: msg.getDate().toISOString()
+      });
+    } catch (err) {
+      serialized.push({
+        gmail_message_id: msg.getId(),
+        from: "",
+        to: "",
+        subject: "",
+        body: "(no body)",
+        sent_at: new Date().toISOString()
+      });
     }
-    serialized.push({
-      gmail_message_id: msg.getId(),
-      rfc822_message_id: messageId,
-      from: from,
-      to: to,
-      subject: msg.getSubject() || "",
-      body: messageBody_(msg),
-      sent_at: msg.getDate().toISOString()
-    });
   });
 
   return {
@@ -62,14 +73,129 @@ function readOpenThread_(e) {
 }
 
 function messageBody_(msg) {
-  var plain = visibleText_(msg.getPlainBody());
-  if (plain) return plain;
-  var html = String(msg.getBody() || "")
+  var plain = safeMessageValue_(function() { return visibleText_(msg.getPlainBody()); });
+  if (plain) return clipBody_(plain);
+  var html = safeMessageValue_(function() { return visibleText_(stripHtml_(msg.getBody())); });
+  if (html) return clipBody_(html);
+  var raw = safeMessageValue_(function() { return bodyFromRaw_(msg.getRawContent()); });
+  if (raw) return clipBody_(raw);
+  var ics = safeMessageValue_(function() { return bodyFromIcsAttachments_(msg); });
+  if (ics) return clipBody_(ics);
+  return "(no body)";
+}
+
+function safeMessageValue_(fn) {
+  try {
+    return fn() || "";
+  } catch (err) {
+    return "";
+  }
+}
+
+function stripHtml_(html) {
+  return String(html || "")
     .replace(/<style[\s\S]*?<\/style>/gi, " ")
     .replace(/<script[\s\S]*?<\/script>/gi, " ")
     .replace(/<[^>]+>/g, " ")
     .replace(/&nbsp;/gi, " ");
-  return visibleText_(html) || "(no body)";
+}
+
+function clipBody_(text) {
+  text = String(text || "");
+  if (text.length <= 20000) return text;
+  return text.slice(0, 20000);
+}
+
+function bodyFromRaw_(raw) {
+  var source = String(raw || "");
+  if (!source) return "";
+  var calendar = mimePart_(source, "text/calendar") || mimePart_(source, "application/ics");
+  var fromCalendar = icsSummary_(calendar);
+  if (fromCalendar) return fromCalendar;
+  var plain = visibleText_(mimePart_(source, "text/plain"));
+  if (plain) return plain;
+  return visibleText_(stripHtml_(mimePart_(source, "text/html")));
+}
+
+function mimePart_(raw, contentType) {
+  var marker = "content-type: " + contentType;
+  var lower = raw.toLowerCase();
+  var start = lower.indexOf(marker);
+  if (start < 0) return "";
+  var headerEnd = raw.indexOf("\r\n\r\n", start);
+  var sepLength = 4;
+  if (headerEnd < 0) {
+    headerEnd = raw.indexOf("\n\n", start);
+    sepLength = 2;
+  }
+  if (headerEnd < 0) return "";
+  var headers = raw.slice(start, headerEnd);
+  var next = lower.indexOf("\r\n--", headerEnd + sepLength);
+  if (next < 0) next = lower.indexOf("\n--", headerEnd + sepLength);
+  var body = next < 0 ? raw.slice(headerEnd + sepLength) : raw.slice(headerEnd + sepLength, next);
+  if (/content-transfer-encoding:\s*quoted-printable/i.test(headers)) {
+    body = decodeQuotedPrintable_(body);
+  } else if (/content-transfer-encoding:\s*base64/i.test(headers)) {
+    try {
+      body = Utilities.newBlob(Utilities.base64Decode(body.replace(/\s/g, ""))).getDataAsString();
+    } catch (err) {
+      body = "";
+    }
+  }
+  return body;
+}
+
+function decodeQuotedPrintable_(value) {
+  return String(value || "")
+    .replace(/=\r?\n/g, "")
+    .replace(/=([0-9A-Fa-f]{2})/g, function(_, hex) {
+      return String.fromCharCode(parseInt(hex, 16));
+    });
+}
+
+function bodyFromIcsAttachments_(msg) {
+  var files = msg.getAttachments({includeInlineImages: false, includeAttachments: true}) || [];
+  var text = "";
+  files.forEach(function(file) {
+    if (text) return;
+    var name = String(file.getName() || "");
+    var type = String(file.getContentType() || "");
+    if (!/\.ics$/i.test(name) && type.indexOf("calendar") === -1 && type.indexOf("ics") === -1) return;
+    text = icsSummary_(file.getDataAsString());
+  });
+  return text;
+}
+
+function icsSummary_(ics) {
+  var fields = icsFields_(ics);
+  if (!fields.SUMMARY && !fields.DESCRIPTION && !fields.LOCATION) return "";
+  var lines = [];
+  if (fields.STATUS) lines.push(fields.STATUS);
+  if (fields.SUMMARY) lines.push(fields.SUMMARY);
+  var when = formatIcsDate_(fields.DTSTART);
+  var end = formatIcsDate_(fields.DTEND);
+  if (when && end) lines.push(when + " – " + end);
+  else if (when) lines.push(when);
+  if (fields.LOCATION) lines.push(fields.LOCATION);
+  if (fields.DESCRIPTION) lines.push(fields.DESCRIPTION);
+  return visibleText_(lines.join("\n"));
+}
+
+function icsFields_(ics) {
+  var fields = {};
+  String(ics || "").replace(/\r\n[ \t]/g, "").replace(/\n[ \t]/g, "").split(/\r?\n/).forEach(function(line) {
+    var split = line.indexOf(":");
+    if (split < 1) return;
+    var name = line.slice(0, split).split(";")[0].toUpperCase();
+    if (!fields[name]) fields[name] = line.slice(split + 1).replace(/\\n/g, "\n").replace(/\\,/g, ",");
+  });
+  return fields;
+}
+
+function formatIcsDate_(value) {
+  var match = String(value || "").match(/(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})/);
+  if (!match) return visibleText_(value);
+  return match[1] + "-" + match[2] + "-" + match[3] + " " + match[4] + ":" + match[5];
 }
 
 function visibleText_(value) {
