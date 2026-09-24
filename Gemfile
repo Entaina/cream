@@ -88,4 +88,4 @@ gem "llmemory"
 
 gem "rspec-rails", "~> 8.0", groups: [:development, :test]
 
-gem "liquid", "~> 5.13"
+gem "liquid", "~> 5.14"
