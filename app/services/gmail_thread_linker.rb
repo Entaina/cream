@@ -1,8 +1,22 @@
 # Links Gmail threads to CRM deals by importing EmailMessage rows from an add-on payload.
 class GmailThreadLinker
+  class CompanyRequired < StandardError
+    attr_reader :name, :domain
+
+    def initialize(name: nil, domain: nil)
+      @name = name
+      @domain = domain
+      super("Company doesn't exist")
+    end
+  end
+
   DEAL_INCLUDES = [
     :company, :pipeline, :pipeline_stage, :owner, :contacts, :tasks,
     {deal_products: [:product, :edition]}
+  ].freeze
+  FREE_EMAIL_DOMAINS = %w[
+    gmail.com googlemail.com hotmail.com outlook.com live.com yahoo.com yahoo.es
+    icloud.com me.com proton.me protonmail.com aol.com
   ].freeze
 
   EmailAddressParser = Class.new do
@@ -32,28 +46,32 @@ class GmailThreadLinker
 
     {
       linked: linked_deals.map { |deal| deal_payload(deal) },
-      suggestions: suggestions.first(5).map { |deal| deal_payload(deal) }
+      suggestions: suggestions.first(5).map { |deal| deal_payload(deal) },
+      suggested_companies: suggested_companies_for(participant_emails: participant_emails)
     }
   end
 
   def link(thread:, deal_id: nil, new_deal: nil)
-    deal = reload_deal!(resolve_deal(deal_id: deal_id, new_deal: new_deal, thread: thread))
-    imported = import_messages!(deal: deal, thread: thread)
-    deal.track_activity(
-      "email_linked",
-      user: @user,
-      metadata: {
-        gmail_thread_id: thread[:gmail_thread_id],
-        messages_imported: imported.size,
-        subject: thread.dig(:messages, 0, :subject)
+    result = nil
+    ActiveRecord::Base.transaction do
+      deal = reload_deal!(resolve_deal(deal_id: deal_id, new_deal: new_deal, thread: thread))
+      imported = import_messages!(deal: deal, thread: thread)
+      deal.track_activity(
+        "email_linked",
+        user: @user,
+        metadata: {
+          gmail_thread_id: thread[:gmail_thread_id],
+          messages_imported: imported.size,
+          subject: thread.dig(:messages, 0, :subject)
+        }
+      )
+      result = {
+        deal: deal_payload(deal),
+        imported_count: imported.size,
+        messages: imported.map { |message| message_payload(message) }
       }
-    )
-
-    {
-      deal: deal_payload(deal),
-      imported_count: imported.size,
-      messages: imported.map { |message| message_payload(message) }
-    }
+    end
+    result
   end
 
   private
@@ -104,7 +122,7 @@ class GmailThreadLinker
     name = attrs[:name].presence || thread.dig(:messages, 0, :subject).presence || "Deal from email"
     pipeline_stage = resolve_pipeline_stage(attrs[:pipeline_stage_id])
     external_email = first_external_email(thread)
-    company = find_or_create_company(external_email)
+    company = resolve_company!(external_email, attrs)
     person = find_or_create_person(external_email, company: company)
 
     deal = @workspace.deals.new(
@@ -147,15 +165,103 @@ class GmailThreadLinker
     participant_emails.find { |email| !owned_email?(email) }
   end
 
-  def find_or_create_company(external_email)
-    domain = external_email&.split("@")&.last
-    if domain.present?
-      company = @workspace.companies.find_by(domain: domain)
-      return company if company
+  def suggested_companies_for(participant_emails:)
+    domains = external_domains(participant_emails)
+    return [] if domains.empty?
+
+    matches = domains.flat_map { |domain| companies_like_domain(domain) }
+    matches.uniq.first(5).map { |company| company_suggestion(company) }
+  end
+
+  def resolve_company!(external_email, attrs)
+    domain = storable_domain(external_email)
+    if attrs[:company_id].present?
+      company = @workspace.companies.find(attrs[:company_id])
+      assign_domain_if_blank!(company, domain)
+      return company
     end
 
-    name = domain.present? ? domain.split(".").first.to_s.capitalize : "Unknown company"
-    @workspace.companies.create!(name: name, domain: domain)
+    named = attrs[:company_name].to_s.strip
+    if named.present?
+      existing = @workspace.companies.where("LOWER(companies.name) = ?", named.downcase).first
+      if existing
+        assign_domain_if_blank!(existing, domain)
+        return existing
+      end
+
+      raise CompanyRequired.new(name: named, domain: domain) unless confirmed_create?(attrs[:create_company])
+
+      return @workspace.companies.create!(name: named, domain: domain)
+    end
+
+    if domain.present?
+      existing = @workspace.companies.where(
+        "LOWER(REGEXP_REPLACE(companies.domain, '\\Awww\\.', '')) = ?",
+        domain
+      ).first
+      return existing if existing
+    end
+
+    raise CompanyRequired.new(name: company_name_from_domain(domain), domain: domain) unless confirmed_create?(attrs[:create_company])
+
+    @workspace.companies.create!(name: company_name_from_domain(domain), domain: domain)
+  end
+
+  def external_domains(raw_emails)
+    Array(raw_emails).filter_map { |raw| EmailAddressParser.extract(raw) }
+      .reject { |email| owned_email?(email) }
+      .filter_map { |email| storable_domain(email) }
+      .uniq
+  end
+
+  def companies_like_domain(domain)
+    normalized = CompanyNameNormalizer.normalize_domain(domain)
+    label = normalized.split(".").first.to_s
+    exact = @workspace.companies.where(
+      "LOWER(REGEXP_REPLACE(companies.domain, '\\Awww\\.', '')) = ?",
+      normalized
+    )
+    return exact.to_a if label.length < 3
+
+    like = "%#{Company.sanitize_sql_like(label)}%"
+    similar = @workspace.companies.where(
+      "companies.name ILIKE :q OR companies.domain ILIKE :q",
+      q: like
+    ).limit(5)
+    (exact.to_a + similar.to_a).uniq
+  end
+
+  def company_suggestion(company)
+    {id: company.id, name: company.name, domain: company.domain}
+  end
+
+  def storable_domain(email_or_domain)
+    raw = email_or_domain.to_s.strip.downcase
+    return nil if raw.blank?
+
+    domain = raw.include?("@") ? raw.split("@").last : raw
+    return nil if domain.blank? || free_email_domain?(domain)
+
+    domain
+  end
+
+  def free_email_domain?(domain)
+    FREE_EMAIL_DOMAINS.include?(domain.to_s.downcase)
+  end
+
+  def company_name_from_domain(domain)
+    domain.present? ? domain.split(".").first.to_s.capitalize : "Unknown company"
+  end
+
+  def confirmed_create?(value)
+    ActiveModel::Type::Boolean.new.cast(value)
+  end
+
+  def assign_domain_if_blank!(company, domain)
+    return company if domain.blank? || company.domain.present?
+
+    company.update!(domain: domain)
+    company
   end
 
   def find_or_create_person(external_email, company:)
@@ -198,7 +304,7 @@ class GmailThreadLinker
         from_address: EmailAddressParser.extract(attrs[:from]) || attrs[:from].to_s,
         to_address: first_recipient(attrs[:to]) || "unknown@example.com",
         subject: attrs[:subject].presence || "(no subject)",
-        body: attrs[:body].presence || "",
+        body: message_body(attrs[:body]),
         gmail_message_id: attrs[:gmail_message_id],
         gmail_thread_id: thread[:gmail_thread_id],
         rfc822_message_id: attrs[:rfc822_message_id],
@@ -233,6 +339,13 @@ class GmailThreadLinker
 
     connection = @workspace.gmail_connections.find_by(user_id: @user.id)
     connection&.email&.downcase == email
+  end
+
+  def message_body(raw)
+    text = raw.to_s.gsub(/[\u00A0\u200B\u200C\u200D\uFEFF]/, " ").strip
+    text = ActionController::Base.helpers.strip_tags(text) if text.include?("<")
+    text = text.gsub(/\s+/, " ").strip
+    text.presence || "(no body)"
   end
 
   def first_recipient(to_raw)

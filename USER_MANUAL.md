@@ -4,7 +4,7 @@
 
 Cream is a **workspace**-based CRM for managing **people**, **companies** and **deals** (opportunities), with notes, tasks, lists and an activity history shared across the team.
 
-> **Last revision:** 2026-09-21 (edit linked deals in Gmail add-on)
+> **Last revision:** 2026-09-24 (company when creating a deal from the Gmail add-on)
 > This document describes the functionality **visible to the user**. Disabled features are listed at the end under "Coming soon".
 
 ---
@@ -673,8 +673,12 @@ From the **CReaM add-on in Gmail** (sidebar when opening an email) you can:
    proposed). New deals are created in the first stage of the pipeline.
 4. **Link the thread** to an existing deal (suggestions and search are limited
    to the selected workspace).
-5. **Create a new deal** from the thread — all messages are imported into its
-   **Emails** section and the card switches to the deal summary.
+5. **Create a new deal** from the thread. Enter the **deal name** and the
+   **company**. If the email domain (for example `ing.es`) matches a company,
+   the add-on **suggests** it. If the name does not exist, it asks whether to
+   **create** the company and stores that domain on it. All messages are
+   imported into its **Emails** section and the card switches to the deal
+   summary.
 
 To install it (users):
 

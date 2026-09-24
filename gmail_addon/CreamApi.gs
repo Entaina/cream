@@ -76,6 +76,11 @@ function creamThreadLink_(payload) {
   return creamApiRequest_("post", "/api/v1/gmail/threads/link", payload);
 }
 
+function creamSearchCompanies_(query) {
+  var encoded = encodeURIComponent(query || "");
+  return creamApiRequest_("get", "/api/v1/companies?q=" + encoded);
+}
+
 function creamSearchDeals_(query) {
   var encoded = encodeURIComponent(query || "");
   return creamApiRequest_("get", "/api/v1/deals?q=" + encoded);

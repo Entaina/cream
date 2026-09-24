@@ -830,6 +830,19 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/GmailDealSummary"
+        suggested_companies:
+          type: array
+          description: Companies whose name or email domain resembles an external participant domain, such as ing.es.
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              name:
+                type: string
+              domain:
+                type: string
+                nullable: true
 
     GmailThreadMessage:
       type: object
@@ -875,6 +888,15 @@ components:
               type: string
             pipeline_stage_id:
               type: integer
+            company_name:
+              type: string
+              description: Existing company name. A new company is created only when create_company is true.
+            company_id:
+              type: integer
+              description: Attach this company. Takes precedence over company_name.
+            create_company:
+              type: boolean
+              description: Confirm creation when company_name does not match an existing company. The external email domain is stored on the new company.
         thread:
           $ref: "#/components/schemas/GmailThread"
 

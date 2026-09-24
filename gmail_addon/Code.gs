@@ -46,7 +46,7 @@ function readOpenThread_(e) {
       from: from,
       to: to,
       subject: msg.getSubject() || "",
-      body: msg.getPlainBody() || "",
+      body: messageBody_(msg),
       sent_at: msg.getDate().toISOString()
     });
   });
@@ -59,6 +59,24 @@ function readOpenThread_(e) {
     rfc822_message_ids: rfc822Ids,
     participant_emails: participants
   };
+}
+
+function messageBody_(msg) {
+  var plain = visibleText_(msg.getPlainBody());
+  if (plain) return plain;
+  var html = String(msg.getBody() || "")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/gi, " ");
+  return visibleText_(html) || "(no body)";
+}
+
+function visibleText_(value) {
+  return String(value || "")
+    .replace(/[\u00a0\u200b\u200c\u200d\ufeff]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 function userProperty_(key) {
@@ -433,6 +451,37 @@ function buildLinkActionsCard_(threadData, status, context) {
       .setTitle("Deal name")
       .setValue(threadData.subject || "Deal from email")
   );
+  var matchedCompany = companyForOpenMessage_(threadData, status);
+  var companyInput = CardService.newTextInput()
+    .setFieldName("company_name")
+    .setTitle("Company")
+    .setHint("Existing company, or a new name to confirm");
+  if (matchedCompany) {
+    companyInput.setValue(matchedCompany.name);
+  }
+  createSection.addWidget(companyInput);
+  var suggestedCompanies = (status && status.suggested_companies) || [];
+  if (!suggestedCompanies.length && matchedCompany) {
+    suggestedCompanies = [ matchedCompany ];
+  }
+  suggestedCompanies = suggestedCompanies.filter(function(company) {
+    return !matchedCompany || String(company.id) !== String(matchedCompany.id);
+  });
+  suggestedCompanies.forEach(function(company) {
+    var label = company.domain ? company.name + " (" + company.domain + ")" : company.name;
+    createSection.addWidget(
+      CardService.newTextButton()
+        .setText("Use " + label)
+        .setOnClickAction(
+          CardService.newAction()
+            .setFunctionName("createDealFromThread")
+            .setParameters({
+              gmail_thread_id: threadData.gmail_thread_id,
+              company_id: String(company.id)
+            })
+        )
+    );
+  });
   createSection.addWidget(
     CardService.newTextButton()
       .setText("Create deal from thread")
@@ -559,10 +608,28 @@ function linkToDeal(e) {
 function createDealFromThread(e) {
   try {
     var threadData = readOpenThread_(e);
-    var dealName = formValue_(e, "deal_name") || threadData.subject || "Deal from email";
+    var dealName = formValue_(e, "deal_name") || e.parameters.deal_name || threadData.subject || "Deal from email";
     var destination = resolveDestination_(creamContext_());
+    var newDeal = { name: dealName, pipeline_stage_id: Number(destination.stage.id) };
+    var companyId = e.parameters.company_id;
+    if (companyId) {
+      newDeal.company_id = Number(companyId);
+    } else {
+      var companyName = formValue_(e, "company_name") || e.parameters.company_name;
+      if (companyName && String(companyName).trim()) {
+        newDeal.company_name = String(companyName).trim();
+      }
+      if (e.parameters.create_company === "true") {
+        newDeal.create_company = true;
+      } else if (!companyId) {
+        var confirmation = companyConfirmationCard_(threadData, dealName, newDeal.company_name);
+        if (confirmation) {
+          return confirmation;
+        }
+      }
+    }
     var result = creamThreadLink_({
-      new_deal: { name: dealName, pipeline_stage_id: Number(destination.stage.id) },
+      new_deal: newDeal,
       thread: {
         gmail_thread_id: threadData.gmail_thread_id,
         messages: threadData.messages
@@ -577,6 +644,148 @@ function createDealFromThread(e) {
       .setNotification(CardService.newNotification().setText(String(err.message)))
       .build();
   }
+}
+
+function companyConfirmationCard_(threadData, dealName, companyName) {
+  var domain = externalCompanyDomain_(threadData);
+  var matches = [];
+  if (companyName) {
+    matches = matches.concat(creamSearchCompanies_(companyName) || []);
+  }
+  if (domain && domain !== companyName) {
+    matches = matches.concat(creamSearchCompanies_(domain) || []);
+  }
+  var seen = {};
+  matches = matches.filter(function(company) {
+    if (seen[company.id]) return false;
+    seen[company.id] = true;
+    return true;
+  });
+  var exact = matches.filter(function(company) {
+    return companyName && String(company.name).toLowerCase() === String(companyName).toLowerCase();
+  })[0];
+  if (exact) {
+    return null;
+  }
+  if (!companyName && !domain && !(matches || []).length) {
+    throw new Error("Company is required.");
+  }
+
+  var proposed = companyName || domainLabel_(domain) || "Unknown company";
+  var card = CardService.newCardBuilder()
+    .setHeader(CardService.newCardHeader().setTitle("Company"));
+  var section = CardService.newCardSection();
+  var prompt = "No company named \"" + proposed + "\".";
+  if (domain) {
+    prompt += " Create it with email domain " + domain + "?";
+  } else {
+    prompt += " Create it?";
+  }
+  section.addWidget(CardService.newTextParagraph().setText(prompt));
+  section.addWidget(
+    CardService.newTextButton()
+      .setText("Create \"" + proposed + "\"")
+      .setOnClickAction(
+        CardService.newAction()
+          .setFunctionName("createDealFromThread")
+          .setParameters({
+            gmail_thread_id: threadData.gmail_thread_id,
+            deal_name: dealName,
+            company_name: proposed,
+            create_company: "true"
+          })
+      )
+  );
+  (matches || []).filter(function(company) {
+    return !exact || company.id !== exact.id;
+  }).slice(0, 5).forEach(function(company) {
+    var label = company.domain ? company.name + " (" + company.domain + ")" : company.name;
+    section.addWidget(
+      CardService.newTextButton()
+        .setText("Use " + label)
+        .setOnClickAction(
+          CardService.newAction()
+            .setFunctionName("createDealFromThread")
+            .setParameters({
+              gmail_thread_id: threadData.gmail_thread_id,
+              deal_name: dealName,
+              company_id: String(company.id)
+            })
+        )
+    );
+  });
+  card.addSection(section);
+  return CardService.newActionResponseBuilder()
+    .setNavigation(CardService.newNavigation().pushCard(card.build()))
+    .build();
+}
+
+function companyForOpenMessage_(threadData, status) {
+  var domain = openMessageDomain_(threadData) || externalCompanyDomain_(threadData);
+  if (!domain) return null;
+  var suggested = (status && status.suggested_companies) || [];
+  var exact = suggested.filter(function(company) {
+    return domainsMatch_(company.domain, domain);
+  })[0];
+  if (exact) return exact;
+  var found = creamSearchCompanies_(domain) || [];
+  return found.filter(function(company) {
+    return domainsMatch_(company.domain, domain);
+  })[0] || null;
+}
+
+function openMessageDomain_(threadData) {
+  var current = (threadData.messages || []).filter(function(message) {
+    return message.gmail_message_id === threadData.gmail_message_id;
+  })[0];
+  return domainFromRaw_(current && current.from);
+}
+
+function domainFromRaw_(raw) {
+  if (!raw) return null;
+  var domain = null;
+  String(raw).split(/[,;]/).forEach(function(part) {
+    if (domain) return;
+    var match = String(part).match(/<([^>]+)>/);
+    var email = (match ? match[1] : part).trim().toLowerCase();
+    var at = email.lastIndexOf("@");
+    if (at < 1) return;
+    var candidate = normalizeDomain_(email.slice(at + 1));
+    if (candidate && !freeEmailDomain_(candidate)) domain = candidate;
+  });
+  return domain;
+}
+
+function normalizeDomain_(domain) {
+  return String(domain || "").trim().toLowerCase().replace(/^www\./, "");
+}
+
+function domainsMatch_(stored, emailDomain) {
+  var left = normalizeDomain_(stored);
+  var right = normalizeDomain_(emailDomain);
+  return !!left && !!right && left === right;
+}
+
+function externalCompanyDomain_(threadData) {
+  var domain = null;
+  (threadData.messages || []).forEach(function(message) {
+    if (domain) return;
+    domain = domainFromRaw_(message.from) || domainFromRaw_(message.to);
+  });
+  return domain;
+}
+
+function freeEmailDomain_(domain) {
+  return [
+    "gmail.com", "googlemail.com", "hotmail.com", "outlook.com", "live.com",
+    "yahoo.com", "yahoo.es", "icloud.com", "me.com", "proton.me", "protonmail.com", "aol.com"
+  ].indexOf(String(domain || "").toLowerCase()) !== -1;
+}
+
+function domainLabel_(domain) {
+  if (!domain) return "";
+  var label = String(domain).split(".")[0];
+  return label ? label.charAt(0).toUpperCase() + label.slice(1) : "";
 }
 
 function searchDeals(e) {

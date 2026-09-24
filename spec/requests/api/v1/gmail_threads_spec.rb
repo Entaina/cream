@@ -175,6 +175,23 @@ RSpec.describe "Api::V1::GmailThreads", type: :request do
       expect(body["linked"].map { |d| d["name"] }).not_to include("Orphan thread opp")
     end
 
+    it "suggests companies that match an external email domain" do
+      company.update!(domain: "ing.es", name: "ING")
+
+      post "/api/v1/gmail/threads/status",
+        params: {
+          gmail_thread_id: "thread-ing",
+          rfc822_message_ids: [],
+          participant_emails: ["Ana <ana@ing.es>", user.email_address]
+        },
+        headers: headers,
+        as: :json
+
+      body = JSON.parse(response.body)
+      expect(body["suggested_companies"].map { |item| item["id"] }).to include(company.id)
+      expect(body["suggested_companies"].first["domain"]).to eq("ing.es")
+    end
+
     it "does not match deals when rfc822_message_ids contains blank values" do
       deal = create_deal!(workspace, company: company, name: "Blank message id opp")
       workspace.email_messages.create!(
@@ -253,7 +270,7 @@ RSpec.describe "Api::V1::GmailThreads", type: :request do
       expect {
         post "/api/v1/gmail/threads/link",
           params: {
-            new_deal: {name: "From Gmail thread", pipeline_stage_id: selected_stage.id},
+            new_deal: {name: "From Gmail thread", pipeline_stage_id: selected_stage.id, create_company: true},
             thread: thread_payload
           },
           headers: headers,
@@ -271,6 +288,103 @@ RSpec.describe "Api::V1::GmailThreads", type: :request do
       expect(deal.pipeline_stage).to eq(selected_stage)
       expect(deal.contacts.map(&:email)).to include("client@example.com")
       expect(deal.email_messages.pluck(:gmail_message_id)).to contain_exactly("msg-1", "msg-2")
+    end
+
+    it "imports messages whose body is blank" do
+      blank_thread = thread_payload.deep_dup
+      blank_thread[:messages].each { |message| message[:body] = "   " }
+
+      expect {
+        post "/api/v1/gmail/threads/link",
+          params: {
+            new_deal: {name: "Empty body", pipeline_stage_id: pipeline.pipeline_stages.first.id, create_company: true},
+            thread: blank_thread
+          },
+          headers: headers,
+          as: :json
+      }.to change(Deal, :count).by(1)
+
+      expect(response).to have_http_status(:created)
+      deal = Deal.find(JSON.parse(response.body).dig("deal", "id"))
+      expect(deal.email_messages.pluck(:body)).to all(eq("(no body)"))
+    end
+
+    it "attaches an existing company when company_name matches" do
+      post "/api/v1/gmail/threads/link",
+        params: {
+          new_deal: {
+            name: "Named company",
+            pipeline_stage_id: pipeline.pipeline_stages.first.id,
+            company_name: "acme corp"
+          },
+          thread: thread_payload
+        },
+        headers: headers,
+        as: :json
+
+      expect(response).to have_http_status(:created)
+      deal = Deal.find(JSON.parse(response.body).dig("deal", "id"))
+      expect(deal.company).to eq(company)
+    end
+
+    it "creates the company named in the request" do
+      expect {
+        post "/api/v1/gmail/threads/link",
+          params: {
+            new_deal: {
+              name: "New company",
+              pipeline_stage_id: pipeline.pipeline_stages.first.id,
+              company_name: "Northwind",
+              create_company: true
+            },
+            thread: thread_payload
+          },
+          headers: headers,
+          as: :json
+      }.to change(Company, :count).by(1)
+
+      expect(response).to have_http_status(:created)
+      deal = Deal.find(JSON.parse(response.body).dig("deal", "id"))
+      expect(deal.company.name).to eq("Northwind")
+      expect(deal.company.domain).to eq("example.com")
+    end
+
+    it "does not create a company until it is confirmed" do
+      expect {
+        post "/api/v1/gmail/threads/link",
+          params: {
+            new_deal: {
+              name: "Needs confirmation",
+              pipeline_stage_id: pipeline.pipeline_stages.first.id,
+              company_name: "Northwind"
+            },
+            thread: thread_payload
+          },
+          headers: headers,
+          as: :json
+      }.not_to change(Company, :count)
+
+      expect(response).to have_http_status(:unprocessable_entity)
+      body = JSON.parse(response.body)
+      expect(body["errors"]).to include("Company doesn't exist")
+      expect(body["domain"]).to eq("example.com")
+    end
+
+    it "stores the email domain on a company matched by name when it has none" do
+      post "/api/v1/gmail/threads/link",
+        params: {
+          new_deal: {
+            name: "Named company",
+            pipeline_stage_id: pipeline.pipeline_stages.first.id,
+            company_name: "Acme Corp"
+          },
+          thread: thread_payload
+        },
+        headers: headers,
+        as: :json
+
+      expect(response).to have_http_status(:created)
+      expect(company.reload.domain).to eq("example.com")
     end
 
     it "returns 404 for a deal outside the workspace" do
