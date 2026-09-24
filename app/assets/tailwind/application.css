@@ -719,6 +719,7 @@
 .record-menu > summary::-webkit-details-marker { display: none; }
 .record-menu-items { @apply absolute right-0 top-full mt-2 z-20 w-52 rounded-xl border border-line bg-canvas-raised p-2 shadow-lg flex flex-col gap-1; }
 .record-composer { @apply fixed inset-0 m-auto w-[calc(100%-2rem)] max-w-2xl max-h-[calc(100%-2rem)] overflow-y-auto rounded-2xl border border-line bg-canvas-raised p-0 text-ink shadow-xl; }
+.record-composer[data-composer="email"] { @apply max-w-6xl; }
 .record-composer::backdrop { background: rgb(0 0 0 / 0.35); }
 .record-composer-header { @apply sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-line bg-canvas-raised px-5 py-4 sm:px-6; }
 .record-composer-footer { @apply sticky bottom-0 flex justify-end gap-2 border-t border-line bg-canvas-raised py-4; }

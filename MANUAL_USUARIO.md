@@ -4,7 +4,7 @@
 
 Cream es un CRM por **workspaces** para gestionar **personas**, **empresas** y **deals** (oportunidades), con notas, tareas, listas y un historial de actividad compartido en el equipo.
 
-> **Última revisión:** 2026-09-24 (cuerpo de los emails con formato)
+> **Última revisión:** 2026-09-24 (HTML al enviar correo desde un registro)
 > Este documento describe la funcionalidad **visible para el usuario**. Las funcionalidades desactivadas aparecen al final en «Próximamente».
 
 ---
@@ -573,7 +573,7 @@ En una persona, pulsa **Send email** en la cabecera. En una empresa o deal, baja
 
 ### Enviar un email
 
-1. Rellena **To** (destinatario), **Subject** (asunto) y **Message body...** (cuerpo del mensaje).
+1. Rellena **To** (destinatario) y **Subject** (asunto). El cuerpo puedes escribirlo con **editor enriquecido** o con **HTML** (tablas, imágenes, documento completo). Si pasas de HTML al editor enriquecido y el contenido tiene etiquetas que no se conservan, verás un aviso y podrás cancelar.
 2. Pulsa **Send email**.
 3. El correo queda en el historial con la etiqueta **Sending** hasta que sale (desde la dirección del workspace por SMTP, o desde **tu Gmail** si lo tienes conectado). Cuando la entrega termina, la etiqueta pasa a **Sent**. Si el envío falla, la etiqueta es **Failed to send**: abre el correo y pulsa **Reintentar envío** para volver a mandarlo. Si falta el destinatario, el asunto o el cuerpo, Cream lo indica y el borrador sigue en el editor.
 4. En el **Timeline** del registro aparece una entrada del tipo *«Tu nombre sent “Asunto” to destinatario@…»*.
@@ -704,7 +704,7 @@ Las **plantillas** te ahorran reescribir correos frecuentes (presentación, segu
 - **Plantillas predefinidas (Example):** el workspace de organización incluye ocho plantillas del ciclo de curso (primer contacto, reserva confirmada, recordatorios de pago, cierre, etc.). Puedes editarlas desde **Plantillas** si eres administrador.
 - **Variables:** usa `{first_name}`, `{last_name}`, `{name}`, `{company}` y `{email}` en el asunto o el cuerpo; al insertarlas se sustituyen por los datos del registro. Los textos entre corchetes como `[Nombre del curso]` o `[fechas]` son marcadores que debes completar manualmente tras cargar la plantilla.
 - **Vista previa:** al crear o editar una plantilla o layout, y también al redactar un email en una ficha, verás un bloque **Vista previa** con variables opcionales (`{first_name}`, `{name}`, etc.). Déjalas vacías para usar valores de ejemplo o rellénalas para comprobar el resultado. Pulsa **Vista previa** para abrir el correo renderizado en una pestaña nueva (sin enviarlo).
-- **Usar en un email:** en la sección **Send email** de una ficha (Person, Company o Deal), el desplegable empieza en **Sin plantilla**: escribes asunto y cuerpo tú. Si eliges una plantilla, el asunto y el cuerpo se rellenan con las variables ya sustituidas para ese contacto. Puedes volver a **Sin plantilla** para vaciarlos y redactar el correo a mano. El texto se edita con el mismo editor enriquecido antes de enviar. Si aún no hay plantillas, verás un enlace para crearlas.
+- **Usar en un email:** en la sección **Send email** de una ficha (Person, Company o Deal), el desplegable empieza en **Sin plantilla**: escribes asunto y cuerpo tú. Si eliges una plantilla, el asunto y el cuerpo se rellenan con las variables ya sustituidas para ese contacto. Una plantilla HTML o con layout se abre en el modo **HTML** para no perder tablas ni el documento. Puedes volver a **Sin plantilla** para vaciarlos y redactar el correo a mano. Si aún no hay plantillas, verás un enlace para crearlas.
 
 ### Envío masivo
 

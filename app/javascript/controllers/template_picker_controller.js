@@ -22,9 +22,10 @@ export default class extends Controller {
 
     const subject = this.interpolate(option.dataset.subject || "")
     const body = this.interpolate(option.dataset.body || "")
+    const mode = option.dataset.bodyEditor || "quill"
 
     if (this.hasSubjectTarget) this.writeFieldValue(this.subjectTarget, subject)
-    if (this.hasBodyTarget) this.writeBodyValue(body)
+    if (this.hasBodyTarget) this.writeBodyValue(body, mode)
 
     if (this.hasTemplateIdTarget) this.templateIdTarget.value = option.value
     this.showTemplateAttachments(option.dataset.attachments)
@@ -34,7 +35,7 @@ export default class extends Controller {
     if (this.hasTemplateIdTarget) this.templateIdTarget.value = ""
     this.showTemplateAttachments(null)
     if (this.hasSubjectTarget) this.writeFieldValue(this.subjectTarget, "")
-    if (this.hasBodyTarget) this.writeBodyValue("")
+    if (this.hasBodyTarget) this.writeBodyValue("", "quill")
   }
 
   showTemplateAttachments(raw) {
@@ -93,7 +94,16 @@ export default class extends Controller {
     if (!document.execCommand("insertText", false, value)) field.value = value
   }
 
-  writeBodyValue(value) {
+  writeBodyValue(value, mode = "quill") {
+    const bodyEditor = this.bodyTarget.closest('[data-controller~="email-template-body-editor"]')
+    if (bodyEditor) {
+      const eventName = mode === "html"
+        ? "email-template-body-editor:set-html"
+        : "email-template-body-editor:set-quill"
+      bodyEditor.dispatchEvent(new CustomEvent(eventName, { detail: { body: value } }))
+      return
+    }
+
     const editorWrapper = this.bodyTarget.closest('[data-controller~="rich-text-editor"]')
     if (editorWrapper) {
       editorWrapper.dispatchEvent(new CustomEvent("rich-text-editor:set", {

@@ -38,6 +38,23 @@ RSpec.describe "Record emails", type: :request do
         expect(response).to redirect_to(company_path(company))
       end
 
+      it "stores an HTML body when sending from a deal" do
+        sign_in_as(member)
+        pipeline = Pipeline.create_default!(workspace)
+        deal = create_deal!(workspace, pipeline: pipeline)
+        html = "<html><body><table><tr><td>Hola</td></tr></table></body></html>"
+
+        expect {
+          post record_emails_path, params: {
+            record_type: "Deal", record_id: deal.id,
+            email_message: {to_address: "lead@example.com", subject: "Hi", body: html}
+          }
+        }.to change(EmailMessage, :count).by(1).and have_enqueued_job(SendViaGmailJob)
+
+        expect(EmailMessage.order(:id).last.body).to eq(html)
+        expect(response).to redirect_to(deal_path(deal))
+      end
+
       it "rejects an invalid email without sending" do
         sign_in_as(member)
 

@@ -4,7 +4,7 @@
 
 Cream is a **workspace**-based CRM for managing **people**, **companies** and **deals** (opportunities), with notes, tasks, lists and an activity history shared across the team.
 
-> **Last revision:** 2026-09-24 (formatted email bodies)
+> **Last revision:** 2026-09-24 (HTML when sending email from a record)
 > This document describes the functionality **visible to the user**. Disabled features are listed at the end under "Coming soon".
 
 ---
@@ -573,7 +573,7 @@ For a person, click **Send email** in the header. For a company or deal, scroll 
 
 ### Sending an email
 
-1. Fill in **To** (recipient), **Subject** and **Message body...**.
+1. Fill in **To** (recipient) and **Subject**. Write the body with the **rich text editor** or with **HTML** (tables, images, a full document). If you switch from HTML to the rich text editor and the content uses tags that would be lost, you will see a warning and can cancel.
 2. Click **Send email**.
 3. The email stays in the history with the **Sending** label until it goes out (from the workspace address via SMTP, or from **your Gmail** if you have it connected). When delivery finishes, the label becomes **Sent**. If sending fails, the label is **Failed to send**: open the email and click **Retry send** to send it again. If the recipient, subject or body is missing, Cream says so and the draft stays in the editor.
 4. An entry of the form *"Your name sent “Subject” to recipient@…"* appears in the record's **Timeline**.
@@ -704,7 +704,7 @@ account; do not share authorization links or tokens.
 - **Predefined templates (Example):** the organization workspace includes eight templates for the course cycle (first contact, confirmed booking, payment reminders, closing, etc.). You can edit them from **Plantillas** if you are an administrator.
 - **Variables:** use `{first_name}`, `{last_name}`, `{name}`, `{company}` and `{email}` in the subject or body; when inserted they are replaced with the record's data. Texts in square brackets such as `[Nombre del curso]` or `[fechas]` are placeholders you must fill in manually after loading the template.
 - **Preview:** when creating or editing a template or layout, and when composing an email on a record, you will see a **Vista previa** (Preview) block with optional variables (`{first_name}`, `{name}`, etc.). Leave them blank to use sample values or fill them in to check the result. Click **Vista previa** to open the rendered email in a new tab (without sending it).
-- **Use in an email:** in the **Send email** section of a record (Person, Company or Deal), the menu starts on **Sin plantilla** (No template): you write the subject and body yourself. Choosing a template fills the subject and body with the variables already substituted for that contact. You can switch back to **Sin plantilla** to clear them and write the email by hand. Edit the text with the same rich text editor before sending. If there are no templates yet, you will see a link to create them.
+- **Use in an email:** in the **Send email** section of a record (Person, Company or Deal), the menu starts on **Sin plantilla** (No template): you write the subject and body yourself. Choosing a template fills the subject and body with the variables already substituted for that contact. An HTML template, or one with a layout, opens in **HTML** mode so tables and the document are kept. You can switch back to **Sin plantilla** to clear them and write the email by hand. If there are no templates yet, you will see a link to create them.
 
 ### Bulk sending
 

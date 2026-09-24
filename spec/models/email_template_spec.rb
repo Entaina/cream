@@ -30,6 +30,20 @@ RSpec.describe EmailTemplate, type: :model do
     end
   end
 
+  describe "#picker_body_editor" do
+    it "uses html when the template has a layout" do
+      layout = workspace.email_layouts.create!(
+        name: "Shell",
+        body: "<html><body>{{ content }}</body></html>"
+      )
+      template = workspace.email_templates.create!(
+        user: user, name: "Wrapped", subject: "Hi", body: "<p>Hello</p>", email_layout: layout
+      )
+
+      expect(template.picker_body_editor).to eq("html")
+    end
+  end
+
   describe "#render_for" do
     it "interpolates brace tokens without layout" do
       template = workspace.email_templates.create!(

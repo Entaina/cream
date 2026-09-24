@@ -28,7 +28,7 @@
         <%= select_tag :template_picker,
               safe_join(templates.map { |template|
                 attachment_meta = template.attachments.map { |file| { id: file.id, filename: file.filename.to_s, byte_size: file.byte_size } }
-                tag.option(template.name, value: template.id, data: { subject: template.subject, body: template.picker_body, attachments: attachment_meta.to_json })
+                tag.option(template.name, value: template.id, data: { subject: template.subject, body: template.picker_body, body_editor: template.picker_body_editor, attachments: attachment_meta.to_json })
               }),
               include_blank: t("shared.email.without_template"),
               class: "input w-full",
@@ -44,7 +44,13 @@
     <%= f.email_field :to_address, placeholder: t("shared.email.to"), class: "input w-full mb-2" %>
     <%= f.text_field :subject, placeholder: t("shared.email.subject"), class: "input w-full mb-2", data: { "template-picker-target" => "subject" } %>
     <div class="mb-2">
-      <%= render "shared/rich_text_editor", form: f, field: :body, placeholder: t("shared.email.body_placeholder"), compact: true, input_data: { data: { "template-picker-target" => "body" } } %>
+      <%= render "shared/email_body_editor",
+            body_name: "email_message[body]",
+            body_editor_name: "body_editor",
+            body: email_message.body.to_s,
+            body_editor: "quill",
+            editor_id: email_form_id,
+            body_data: { template_picker_target: "body" } %>
     </div>
     <div class="mb-2">
       <label class="label"><%= t("shared.email.attachments") %></label>

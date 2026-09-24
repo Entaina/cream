@@ -214,12 +214,21 @@ export default class extends Controller {
 
     if (subjectField && subject) this.writeFieldValue(subjectField, subject)
     if (bodyField && body) {
-      const editor = bodyField.closest('[data-controller~="rich-text-editor"]')
-      if (editor) {
-        editor.dispatchEvent(new CustomEvent("rich-text-editor:set", { detail: { html: body } }))
-        bodyField.dispatchEvent(new Event("input", { bubbles: true }))
+      const bodyEditor = bodyField.closest('[data-controller~="email-template-body-editor"]')
+      if (bodyEditor) {
+        const htmlMode = /<!DOCTYPE|<\s*html\b|<\s*(table|img|style)\b/i.test(body)
+        bodyEditor.dispatchEvent(new CustomEvent(
+          htmlMode ? "email-template-body-editor:set-html" : "email-template-body-editor:set-quill",
+          { detail: { body } }
+        ))
       } else {
-        this.writeFieldValue(bodyField, body)
+        const editor = bodyField.closest('[data-controller~="rich-text-editor"]')
+        if (editor) {
+          editor.dispatchEvent(new CustomEvent("rich-text-editor:set", { detail: { html: body } }))
+          bodyField.dispatchEvent(new Event("input", { bubbles: true }))
+        } else {
+          this.writeFieldValue(bodyField, body)
+        }
       }
     }
   }

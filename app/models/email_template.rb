@@ -44,6 +44,13 @@ class EmailTemplate < ApplicationRecord
     email_layout ? email_layout.preview_body_for(body) : body
   end
 
+  def picker_body_editor
+    return "html" if email_layout || effective_body_editor == "html"
+    return "html" if self.class.quill_unsupported_tags(picker_body).any?
+
+    "quill"
+  end
+
   def render_for(record, extra_tokens: {})
     wrap_with_layout(interpolate(render_body(record, extra_tokens), record, extra_tokens), record, extra_tokens)
   end

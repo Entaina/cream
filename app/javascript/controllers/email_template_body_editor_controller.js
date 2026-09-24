@@ -25,7 +25,7 @@ export default class extends Controller {
     this.form = this.element.closest("form")
     if (this.form) {
       this.submitHandler = () => this.syncToBodyInput()
-      this.form.addEventListener("submit", this.submitHandler)
+      this.form.addEventListener("submit", this.submitHandler, true)
     }
     this.syncRequestHandler = () => this.syncToBodyInput()
     this.element.addEventListener("email-template-body-editor:sync", this.syncRequestHandler)
@@ -43,7 +43,7 @@ export default class extends Controller {
 
   disconnect() {
     if (this.form && this.submitHandler) {
-      this.form.removeEventListener("submit", this.submitHandler)
+      this.form.removeEventListener("submit", this.submitHandler, true)
     }
     if (this.syncRequestHandler) {
       this.element.removeEventListener("email-template-body-editor:sync", this.syncRequestHandler)

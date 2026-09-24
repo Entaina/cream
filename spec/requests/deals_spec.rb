@@ -995,6 +995,18 @@ RSpec.describe "Deals", type: :request do
     end
   end
 
+  describe "GET /deals/:id (send email)" do
+    it "offers an HTML body editor in the deal email composer" do
+      sign_in_as(member)
+
+      get deal_path(deal)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(I18n.t("email_templates.body_editor.mode_html"))
+      expect(response.body).to include('name="email_message[body]"')
+    end
+  end
+
   describe "GET /deals/:id (value display)" do
     it "shows cents on the deal page when the value is not a whole number" do
       sign_in_as(member)

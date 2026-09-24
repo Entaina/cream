@@ -1,11 +1,12 @@
-<%# locals: (body_name:, body_editor_name:, body:, body_editor:, editor_id:) %>
+<%# locals: (body_name:, body_editor_name:, body:, body_editor:, editor_id:, body_data: {}) %>
 <% effective_mode = body_editor == "quill" && EmailTemplate.quill_unsupported_tags(body).any? ? "html" : body_editor %>
 <div class="space-y-2"
      data-controller="email-template-body-editor"
      data-email-template-body-editor-mode-value="<%= effective_mode %>"
      data-email-template-body-editor-supported-tags-value="<%= EmailTemplate::QUILL_SUPPORTED_TAGS.to_json %>"
      data-email-template-body-editor-unsupported-tags-confirm-value="<%= t("email_templates.body_editor.unsupported_tags_confirm") %>">
-  <textarea name="<%= body_name %>" class="sr-only" data-email-template-body-editor-target="bodyInput"><%= body %></textarea>
+  <%= tag.textarea body, name: body_name, class: "sr-only",
+        data: { email_template_body_editor_target: "bodyInput" }.merge(body_data) %>
   <input type="hidden" name="<%= body_editor_name %>" value="<%= effective_mode %>" data-email-template-body-editor-target="bodyEditorInput">
 
   <fieldset class="flex flex-wrap gap-4 text-sm">
