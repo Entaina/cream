@@ -1,7 +1,13 @@
 {
   "timeZone": "Europe/Madrid",
   "dependencies": {
-    "enabledAdvancedServices": [],
+    "enabledAdvancedServices": [
+      {
+        "userSymbol": "Gmail",
+        "version": "v1",
+        "serviceId": "gmail"
+      }
+    ],
     "libraries": [
       {
         "userSymbol": "OAuth2",
@@ -14,11 +20,13 @@
   "oauthScopes": [
     "https://www.googleapis.com/auth/gmail.addons.execute",
     "https://www.googleapis.com/auth/gmail.addons.current.message.readonly",
+    "https://www.googleapis.com/auth/gmail.readonly",
     "https://www.googleapis.com/auth/script.external_request",
     "https://www.googleapis.com/auth/script.scriptapp"
   ],
   "urlFetchWhitelist": [
-    "https://crm.entaina.ai/"
+    "https://crm.entaina.ai/",
+    "https://gmail.googleapis.com/"
   ],
   "runtimeVersion": "V8",
   "addOns": {

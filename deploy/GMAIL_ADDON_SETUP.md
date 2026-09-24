@@ -116,7 +116,7 @@ The default Apps Script GCP project **does not allow publishing** to Marketplace
 2. Apps Script → **Project Settings → GCP → Change project** → enter the project **number** (not the textual ID).
 3. **Google Auth Platform → Branding**: name "CReaM", support email.
 4. **Audience → Internal** (only `example.com` users).
-5. **Data Access**: scopes from the manifest (`gmail.addons.*`, `script.external_request`, etc.).
+5. **Data Access**: scopes from the manifest (`gmail.addons.*`, `gmail.readonly`, `script.external_request`, etc.). `gmail.readonly` is required to import every message in the open thread, including the one that forwarded an `.ics`.
 
 Do not manually create a Web/Desktop-type "OAuth client ID": Apps Script generates its own when the project is linked.
 

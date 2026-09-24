@@ -27,49 +27,163 @@ function readOpenThread_(e) {
   GmailApp.setCurrentMessageAccessToken(e.gmail.accessToken);
   var message = GmailApp.getMessageById(e.gmail.messageId);
   var thread = message.getThread();
-  var messages = thread.getMessages();
+  var threadId = (e.gmail && e.gmail.threadId) || thread.getId();
+  var fromApi = threadMessagesFromApi_(e.gmail.accessToken, threadId);
+  if (fromApi.length < 2) {
+    var fromService = threadMessagesFromService_(threadId);
+    if (fromService.length > fromApi.length) fromApi = fromService;
+  }
+  if (fromApi.length) {
+    return threadPayload_(threadId, e.gmail.messageId, message.getSubject() || "", fromApi);
+  }
+
+  var messages = [];
+  try {
+    messages = thread.getMessages();
+  } catch (err) {
+    messages = [message];
+  }
   var serialized = [];
+  messages.forEach(function(msg) {
+    var item = serializeGmailMessage_(msg);
+    if (item) serialized.push(item);
+  });
+  if (!serialized.length) {
+    var current = serializeGmailMessage_(message);
+    if (current) serialized.push(current);
+  }
+  return threadPayload_(threadId, e.gmail.messageId, message.getSubject() || "", serialized);
+}
+
+function threadPayload_(threadId, messageId, subject, messages) {
   var rfc822Ids = [];
   var participants = [];
-
-  messages.forEach(function(msg) {
-    try {
-      var from = safeMessageValue_(function() { return msg.getFrom(); });
-      var to = safeMessageValue_(function() { return msg.getTo(); });
-      var messageId = safeMessageValue_(function() { return msg.getHeader("Message-ID"); });
-      participants.push(from, to);
-      if (messageId) {
-        rfc822Ids.push(messageId);
-      }
-      serialized.push({
-        gmail_message_id: msg.getId(),
-        rfc822_message_id: messageId,
-        from: from,
-        to: to,
-        subject: safeMessageValue_(function() { return msg.getSubject(); }),
-        body: messageBody_(msg),
-        sent_at: msg.getDate().toISOString()
-      });
-    } catch (err) {
-      serialized.push({
-        gmail_message_id: msg.getId(),
-        from: "",
-        to: "",
-        subject: "",
-        body: "(no body)",
-        sent_at: new Date().toISOString()
-      });
-    }
+  messages.forEach(function(item) {
+    participants.push(item.from, item.to);
+    if (item.rfc822_message_id) rfc822Ids.push(item.rfc822_message_id);
   });
-
   return {
-    gmail_thread_id: (e.gmail && e.gmail.threadId) || thread.getId(),
-    gmail_message_id: e.gmail.messageId,
-    subject: message.getSubject() || "",
-    messages: serialized,
+    gmail_thread_id: threadId,
+    gmail_message_id: messageId,
+    subject: subject,
+    messages: messages,
     rfc822_message_ids: rfc822Ids,
     participant_emails: participants
   };
+}
+
+function threadMessagesFromService_(threadId) {
+  if (!threadId || typeof Gmail === "undefined" || !Gmail.Users) return [];
+  try {
+    var thread = Gmail.Users.Threads.get("me", threadId, {format: "full"});
+    return (thread.messages || []).map(function(message) {
+      var headers = headerMap_(message.payload && message.payload.headers);
+      var sentAt = message.internalDate ? new Date(Number(message.internalDate)).toISOString() : new Date().toISOString();
+      return {
+        gmail_message_id: message.id,
+        rfc822_message_id: headers["message-id"] || "",
+        from: headers.from || "",
+        to: headers.to || "",
+        subject: headers.subject || "",
+        body: payloadBody_(message.payload),
+        sent_at: sentAt
+      };
+    }).filter(function(item) { return item.gmail_message_id; });
+  } catch (err) {
+    return [];
+  }
+}
+
+function threadMessagesFromApi_(accessToken, threadId) {
+  if (!accessToken || !threadId) return [];
+  try {
+    var response = UrlFetchApp.fetch(
+      "https://gmail.googleapis.com/gmail/v1/users/me/threads/" + encodeURIComponent(threadId) + "?format=full",
+      {
+        method: "get",
+        muteHttpExceptions: true,
+        headers: { Authorization: "Bearer " + accessToken }
+      }
+    );
+    if (response.getResponseCode() !== 200) return [];
+    var thread = JSON.parse(response.getContentText());
+    return (thread.messages || []).map(function(message) {
+      var headers = headerMap_(message.payload && message.payload.headers);
+      var sentAt = message.internalDate ? new Date(Number(message.internalDate)).toISOString() : new Date().toISOString();
+      return {
+        gmail_message_id: message.id,
+        rfc822_message_id: headers["message-id"] || "",
+        from: headers.from || "",
+        to: headers.to || "",
+        subject: headers.subject || "",
+        body: payloadBody_(message.payload),
+        sent_at: sentAt
+      };
+    }).filter(function(item) { return item.gmail_message_id; });
+  } catch (err) {
+    return [];
+  }
+}
+
+function headerMap_(headers) {
+  var map = {};
+  (headers || []).forEach(function(header) {
+    if (header && header.name) map[String(header.name).toLowerCase()] = header.value || "";
+  });
+  return map;
+}
+
+function payloadBody_(payload) {
+  var collected = { plain: "", html: "", calendar: "" };
+  collectPayload_(payload, collected);
+  if (collected.calendar) {
+    var summary = icsSummary_(collected.calendar);
+    if (summary) return clipBody_(summary);
+  }
+  if (collected.plain) return clipBody_(visibleText_(collected.plain));
+  if (collected.html) return clipBody_(visibleText_(stripHtml_(collected.html)));
+  return "(no body)";
+}
+
+function collectPayload_(part, collected) {
+  if (!part) return;
+  var type = String(part.mimeType || "").toLowerCase();
+  var filename = String(part.filename || "");
+  var decoded = decodeGmailBody_(part.body && part.body.data);
+  if (decoded && (type === "text/calendar" || type === "application/ics" || /\.ics$/i.test(filename))) {
+    collected.calendar = collected.calendar || decoded;
+  } else if (decoded && type === "text/plain" && !collected.plain) {
+    collected.plain = decoded;
+  } else if (decoded && type === "text/html" && !collected.html) {
+    collected.html = decoded;
+  }
+  (part.parts || []).forEach(function(child) { collectPayload_(child, collected); });
+}
+
+function decodeGmailBody_(data) {
+  if (!data) return "";
+  try {
+    var normalized = String(data).replace(/-/g, "+").replace(/_/g, "/");
+    return Utilities.newBlob(Utilities.base64Decode(normalized)).getDataAsString();
+  } catch (err) {
+    return "";
+  }
+}
+
+function serializeGmailMessage_(msg) {
+  try {
+    return {
+      gmail_message_id: msg.getId(),
+      rfc822_message_id: safeMessageValue_(function() { return msg.getHeader("Message-ID"); }),
+      from: safeMessageValue_(function() { return msg.getFrom(); }),
+      to: safeMessageValue_(function() { return msg.getTo(); }),
+      subject: safeMessageValue_(function() { return msg.getSubject(); }),
+      body: messageBody_(msg),
+      sent_at: msg.getDate().toISOString()
+    };
+  } catch (err) {
+    return null;
+  }
 }
 
 function messageBody_(msg) {
