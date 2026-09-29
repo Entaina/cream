@@ -211,6 +211,7 @@ Rails.application.routes.draw do
 
   get "b/:slug", to: "public/bookings#show", as: :public_booking_page
   scope "b/:slug", as: :public_booking do
+    get "recibido", to: "public/bookings#received", as: :received
     get "api/event-types", to: "public/booking_api#event_types"
     get "api/availability", to: "public/booking_api#availability"
     post "api/book", to: "public/booking_api#book"

@@ -368,6 +368,10 @@ es:
         webhook_url: URL del webhook (registrar en Beehiiv → Settings → Webhooks)
       features:
         attribution: Atribución
+        ga_measurement_id: ID de medición GA4
+        ga_measurement_id_hint: Usado por el partial {% google_analytics %} en plantillas
+          (p. ej. acuse de reserva). Formato G-XXXXXXXX.
+        ga_measurement_id_placeholder: G-XXXXXXXXXX
         custom_fields: Campos personalizados
         intro: Activa las secciones del menú y la configuración que quieras usar en
           este workspace. Están desactivadas por defecto.

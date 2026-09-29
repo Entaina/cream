@@ -139,10 +139,44 @@ function buildConnectedHomeCard_() {
 }
 
 function onHomepage() {
+  var authCard = gmailAuthorizationCard_();
+  if (authCard) return [ authCard ];
   if (!hasCreamAccess_()) {
     return [ buildConnectCard_() ];
   }
   return [ buildConnectedHomeCard_() ];
+}
+
+var GMAIL_READONLY_SCOPE_ = "https://www.googleapis.com/auth/gmail.readonly";
+
+function gmailReadonlyGranted_() {
+  var info = ScriptApp.getAuthorizationInfo(ScriptApp.AuthMode.FULL, [GMAIL_READONLY_SCOPE_]);
+  return info.getAuthorizationStatus() === ScriptApp.AuthorizationStatus.NOT_REQUIRED;
+}
+
+/** Card shown when gmail.readonly is missing. Calling Gmail or ScriptApp.getOAuthToken() without it aborts with an uncaught authorization page. */
+function gmailAuthorizationCard_() {
+  var info = ScriptApp.getAuthorizationInfo(ScriptApp.AuthMode.FULL, [GMAIL_READONLY_SCOPE_]);
+  if (info.getAuthorizationStatus() === ScriptApp.AuthorizationStatus.NOT_REQUIRED) {
+    return null;
+  }
+  var url = info.getAuthorizationUrl();
+  var section = CardService.newCardSection().addWidget(
+    CardService.newTextParagraph().setText(
+      "CReaM needs permission to read this email thread. Choose Authorize and accept the Google prompt, then return to Gmail."
+    )
+  );
+  if (url) {
+    section.addWidget(
+      CardService.newTextButton()
+        .setText("Authorize")
+        .setAuthorizationAction(CardService.newAuthorizationAction().setAuthorizationUrl(url))
+    );
+  }
+  return CardService.newCardBuilder()
+    .setHeader(CardService.newCardHeader().setTitle("CReaM"))
+    .addSection(section)
+    .build();
 }
 
 function authorizeGmailAccess() {

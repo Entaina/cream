@@ -182,6 +182,61 @@ RSpec.describe Public::BookingApiController, type: :request do
       expect(response.parsed_body).not_to have_key("confirmation_email")
     end
 
+    it "includes redirect_url when a success template is configured" do
+      template = workspace.lead_form_templates.create!(
+        kind: "booking",
+        partial: false,
+        slug: "acuse",
+        body: "<p>Gracias</p>"
+      )
+      booking_page.update!(success_template: template)
+      allow(BookingCreator).to receive(:call).and_return(BookingCreator::Result.new(booking: booking))
+
+      post public_booking_api_book_path(booking_page.slug),
+        params: valid_booking_params,
+        as: :json
+
+      expect(response.parsed_body["redirect_url"]).to eq(
+        public_booking_received_path(booking_page.slug, evento: event_type.slug)
+      )
+      expect(response.parsed_body["redirect_url"]).not_to include("ana@")
+      expect(response.parsed_body["redirect_url"]).not_to include("Ana")
+    end
+
+    it "prefers the event type success template over the page default" do
+      page_template = workspace.lead_form_templates.create!(
+        kind: "booking",
+        partial: false,
+        slug: "page-acuse",
+        body: "<p>Página</p>"
+      )
+      type_template = workspace.lead_form_templates.create!(
+        kind: "booking",
+        partial: false,
+        slug: "tipo-acuse",
+        body: "<p>Tipo</p>"
+      )
+      booking_page.update!(success_template: page_template)
+      event_type.update!(success_template: type_template)
+      allow(BookingCreator).to receive(:call).and_return(BookingCreator::Result.new(booking: booking))
+
+      post public_booking_api_book_path(booking_page.slug),
+        params: valid_booking_params,
+        as: :json
+
+      expect(response.parsed_body).to have_key("redirect_url")
+    end
+
+    it "omits redirect_url without a success template" do
+      allow(BookingCreator).to receive(:call).and_return(BookingCreator::Result.new(booking: booking))
+
+      post public_booking_api_book_path(booking_page.slug),
+        params: valid_booking_params,
+        as: :json
+
+      expect(response.parsed_body).not_to have_key("redirect_url")
+    end
+
     it "silently accepts honeypot submissions" do
       expect(BookingCreator).not_to receive(:call)
 

@@ -1,6 +1,6 @@
 module LeadFormTemplates
   class Renderer
-    def initialize(workspace:, lead_form:, view_context:, params:, product: nil, open_editions: [], source: nil, privacy_policy_hash: nil, submission_key: nil)
+    def initialize(workspace:, lead_form:, view_context:, params:, product: nil, open_editions: [], source: nil, privacy_policy_hash: nil, submission_key: nil, extra_assigns: {})
       @workspace = workspace
       @lead_form = lead_form
       @view_context = view_context
@@ -9,8 +9,14 @@ module LeadFormTemplates
       @open_editions = open_editions
       @privacy_policy_hash = privacy_policy_hash
       @submission_key = submission_key
+      @extra_assigns = extra_assigns.stringify_keys
       @source = source || Source.new(workspace: workspace)
-      @field_renderer = FieldRenderer.new(view_context: view_context, params: params, open_editions: open_editions)
+      @field_renderer = FieldRenderer.new(
+        view_context: view_context,
+        params: params,
+        open_editions: open_editions,
+        workspace: workspace
+      )
       @environment = self.class.build_environment
     end
 
@@ -33,7 +39,7 @@ module LeadFormTemplates
         "lead_form" => Drops::LeadFormDrop.new(@lead_form),
         "product" => Drops::ProductDrop.new(@product),
         "open_editions" => @open_editions.map { |edition| Drops::EditionDrop.new(edition) }
-      }
+      }.merge(@extra_assigns)
     end
 
     def build_registers

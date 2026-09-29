@@ -4,6 +4,8 @@
 var CREAM_PIPELINE_KEY = "cream.pipeline_id";
 
 function onGmailMessageOpen(e) {
+  var authCard = gmailAuthorizationCard_();
+  if (authCard) return [ authCard ];
   if (!hasCreamAccess_()) {
     return [ buildConnectCard_() ];
   }
@@ -26,8 +28,14 @@ function onGmailMessageOpen(e) {
 function readOpenThread_(e) {
   GmailApp.setCurrentMessageAccessToken(e.gmail.accessToken);
   var message = GmailApp.getMessageById(e.gmail.messageId);
+  var threadId = (e.gmail && e.gmail.threadId) || "";
+  if (!gmailReadonlyGranted_()) {
+    var currentOnly = serializeCurrentMessage_(message);
+    var subject = safeMessageValue_(function() { return message.getSubject(); });
+    return threadPayload_(threadId || message.getId(), e.gmail.messageId, subject, currentOnly ? [currentOnly] : []);
+  }
   var thread = message.getThread();
-  var threadId = (e.gmail && e.gmail.threadId) || thread.getId();
+  if (!threadId) threadId = thread.getId();
   var apiMessages = gmailApiMessagesForThread_(threadId, e.gmail.messageId, message);
   var appMessages = gmailAppMessages_(thread, message);
   var messages = apiMessages.length >= appMessages.length ? apiMessages : appMessages;
@@ -255,6 +263,7 @@ function gmailApiMessagesForThread_(threadId, messageId, gmailMessage) {
 }
 
 function gmailGet_(path) {
+  if (!gmailReadonlyGranted_()) return null;
   try {
     var response = UrlFetchApp.fetch("https://gmail.googleapis.com/gmail/v1/users/me/" + path, {
       method: "get",
@@ -339,6 +348,28 @@ function decodeGmailBody_(data) {
     return Utilities.newBlob(Utilities.base64Decode(normalized)).getDataAsString();
   } catch (err) {
     return "";
+  }
+}
+
+function serializeCurrentMessage_(msg) {
+  try {
+    var plain = safeMessageValue_(function() { return visibleText_(msg.getPlainBody()); });
+    var body = plain ? clipBody_(plain) : "";
+    if (!body) {
+      var html = safeMessageValue_(function() { return visibleText_(stripHtml_(msg.getBody())); });
+      body = html ? clipBody_(html) : "(no body)";
+    }
+    return {
+      gmail_message_id: msg.getId(),
+      rfc822_message_id: safeMessageValue_(function() { return msg.getHeader("Message-ID"); }),
+      from: safeMessageValue_(function() { return msg.getFrom(); }),
+      to: safeMessageValue_(function() { return msg.getTo(); }),
+      subject: safeMessageValue_(function() { return msg.getSubject(); }),
+      body: body,
+      sent_at: msg.getDate().toISOString()
+    };
+  } catch (err) {
+    return null;
   }
 }
 

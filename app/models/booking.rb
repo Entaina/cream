@@ -94,6 +94,12 @@ class Booking < ApplicationRecord
       payload[:reminder_minutes_before] = booking_event_type.reminder_minutes_before
     end
     payload[:confirmation_email] = true if booking_event_type.confirmation_email_enabled?
+    if booking_event_type.resolved_success_template
+      payload[:redirect_url] = Rails.application.routes.url_helpers.public_booking_received_path(
+        booking_page.slug,
+        evento: booking_event_type.slug
+      )
+    end
     payload
   end
 

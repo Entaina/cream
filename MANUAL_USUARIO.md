@@ -4,7 +4,7 @@
 
 Cream es un CRM por **workspaces** para gestionar **personas**, **empresas** y **deals** (oportunidades), con notas, tareas, listas y un historial de actividad compartido en el equipo.
 
-> **Última revisión:** 2026-09-24 (HTML al enviar correo desde un registro)
+> **Última revisión:** 2026-09-29 (plantillas de acuse en reservas de calendario)
 > Este documento describe la funcionalidad **visible para el usuario**. Las funcionalidades desactivadas aparecen al final en «Próximamente».
 
 ---
@@ -661,7 +661,7 @@ Cuando tienes **full reply logging** activo y la conexión es correcta, las resp
 
 Desde el **add-on de CReaM en Gmail** (barra lateral al abrir un correo) puedes:
 
-1. **Conectar con CReaM** — autoriza con tu cuenta de CReaM (OAuth).
+1. **Authorize** — si Google aún no ha permitido a CReaM leer el hilo, acepta ese permiso. Después **Connect with CReaM** para autorizar con tu cuenta de CReaM (OAuth).
 2. Si el hilo **ya está vinculado** a un deal, verás una **ficha del deal** con
    etapa, pipeline, empresa, valor, propietario, contactos, fecha de cierre,
    tareas pendientes y productos, además de un enlace **Open in CReaM**. Desde
@@ -686,7 +686,8 @@ Para instalarlo (usuarios):
    o entra en [Apps internas de Marketplace](https://workspace.google.com/marketplace/mydomainapps).
 2. Pulsa **Instalar** y acepta los permisos de Gmail solicitados.
 3. Abre Gmail, selecciona un hilo y pulsa el icono **CReaM** de la barra lateral derecha.
-4. Pulsa **Connect with CReaM**, inicia sesión en `crm.example.com` y autoriza el acceso.
+4. Si el add-on muestra **Authorize**, acepta el permiso de Gmail y vuelve a Gmail.
+5. Pulsa **Connect with CReaM**, inicia sesión en `crm.example.com` y autoriza el acceso.
 
 **Administradores de Example:** la guía completa para publicar el add-on en Marketplace,
 instalarlo para todo el dominio y resolver incidencias está en
@@ -883,6 +884,7 @@ Activa las secciones opcionales del menú y la configuración para este workspac
 - **Puntuación de leads** — reglas de scoring y lifecycle en fichas de contacto.
 - **Webhooks** — integraciones salientes HTTP.
 - **Campos personalizados** — gestión de campos extra en personas, empresas y deals.
+- **ID de medición GA4** (`G-…`) — propiedad de Google Analytics 4 de este workspace; lo usa el partial `{% google_analytics %}` en plantillas (p. ej. acuse de reserva). Si se deja vacío, el tag no inserta script.
 
 ### OKM
 
@@ -1202,10 +1204,10 @@ Desde el listado, **Ver** abre el detalle del formulario:
 La **apariencia y los campos** de cada página pública se definen en plantillas **Liquid** guardadas en el workspace, no en el propio registro del formulario.
 
 1. Desde **Formularios**, pulsa **Plantillas de formulario** (solo administradores).
-2. Filtra por **Páginas** (formularios completos), **Parciales** (bloques reutilizables: contacto, consentimiento RGPD…) o **Landing page** (páginas de marketing en `/p/slug-workspace/slug-landing`; ver [§29](#29-marketing)). Cada workspace guarda sus propias plantillas en la base de datos; no dependen del código fuente del servidor.
-3. **Editar** abre un editor con resaltado Liquid. Las páginas usan etiquetas como `{% field %}`, `{% partial 'contact_fields' %}`, `{% form_open %}` y variables como `{{ lead_form.name }}`.
-4. **Nueva plantilla**: indica un **nombre** corto, el **tipo** (formulario de lead o landing) y, si aplica, marca **Es un parcial**.
-5. Tras crear o cambiar una plantilla de **página** de formulario, elige ese nombre en **Plantilla del formulario** al configurar un formulario de captación. La plantilla `privacy` define la política enlazada desde cada formulario público.
+2. Filtra por **Páginas** (formularios completos), **Reservas** (acuse tras confirmar una cita en `/b/…`), **Parciales** (bloques reutilizables: contacto, consentimiento RGPD, analítica…) o **Landing page** (páginas de marketing en `/p/slug-workspace/slug-landing`; ver [§29](#29-marketing)). Cada workspace guarda sus propias plantillas en la base de datos; no dependen del código fuente del servidor.
+3. **Editar** abre un editor con resaltado Liquid. Las páginas de formulario usan etiquetas como `{% field %}`, `{% partial 'contact_fields' %}`, `{% form_open %}` y variables como `{{ lead_form.name }}`. Las plantillas de **acuse de reserva** pueden usar `{% partial 'google_analytics' %}` (o `{% google_analytics %}`) para medición en GA4 si el workspace tiene configurado el **ID de medición GA4** en **Settings → Workspace** ([§21](#21-ajustes-del-workspace)); la variable `{{ evento }}` lleva el slug del tipo de cita (sin datos personales).
+4. **Nueva plantilla**: indica un **nombre** corto, el **tipo** (formulario de lead, acuse de reserva o landing) y, si aplica, marca **Es un parcial**.
+5. Tras crear o cambiar una plantilla de **página** de formulario, elige ese nombre en **Plantilla del formulario** al configurar un formulario de captación. La plantilla `privacy` define la política enlazada desde cada formulario público. Las plantillas de tipo **acuse de reserva** se eligen en **Reservas** ([§28](#28-reservas-de-calendario)).
 
 Si la plantilla de una página no existe en el workspace, la URL pública `/f/slug` responderá con error.
 
@@ -1275,6 +1277,7 @@ Toda la configuración se hace desde **Reservas** (no hace falta usar seeds ni d
 | Zona horaria | Zona de las **franjas horarias** del anfitrión. Quien reserva ve los huecos convertidos a su zona; Google Calendar guarda el mismo instante. |
 | Ventana de reserva (días) | Cuántos días hacia adelante se pueden elegir fechas |
 | Calendarios | Calendarios de Google donde comprobar huecos; arrastra para ordenarlos — el primero marcado con escritura recibe las reservas (badge «Recibe nuevas citas») |
+| Plantilla de acuse | Opcional. Tras confirmar, abre `/b/slug/recibido?evento=slug-tipo` con esa plantilla Liquid (sin nombre, email ni teléfono en la URL). Si se deja vacía, la confirmación sigue en Cream (Meet, `.ics`) |
 | Página activa | Si está desmarcada, la URL pública no acepta reservas |
 
 **Tipos de evento** (al menos uno obligatorio; arrastra el asa ⋮⋮ para cambiar el orden)
@@ -1292,6 +1295,7 @@ Toda la configuración se hace desde **Reservas** (no hace falta usar seeds ni d
 | Dirección (presencial) | Lugar si la ubicación es presencial |
 | Color en calendario | Color del evento en Google Calendar |
 | Visible | Si aparece en la página pública |
+| Plantilla de acuse | Opcional. Sustituye la plantilla de la página para este tipo concreto |
 
 Usa **Añadir tipo** para crear tipos nuevos o el icono de papelera para eliminarlos. Guarda la página para aplicar los cambios.
 
@@ -1307,7 +1311,7 @@ Copia la **URL pública** y compártela con clientes. Si la página tiene varios
 
 ### Página pública (visitante)
 
-Flujo en tres pasos: elegir tipo de evento → calendario y hora (el selector de zona horaria convierte los huecos del anfitrión a la zona del visitante; fecha y hora se muestran siempre con el identificador IANA, p. ej. `Europe/Madrid`) → formulario y confirmación con enlace Meet y descarga `.ics` (hora en UTC). Con una **URL directa de tipo** (`/b/slug-página/slug-tipo`), el visitante salta el primer paso y entra directamente en el calendario de ese tipo.
+Flujo en tres pasos: elegir tipo de evento → calendario y hora (el selector de zona horaria convierte los huecos del anfitrión a la zona del visitante; fecha y hora se muestran siempre con el identificador IANA, p. ej. `Europe/Madrid`) → formulario y confirmación. Si hay **plantilla de acuse** configurada, al confirmar se abre esa página (`/b/slug/recibido?evento=slug-tipo`); si no, la confirmación en Cream incluye enlace Meet y descarga `.ics` (hora en UTC). Con una **URL directa de tipo** (`/b/slug-página/slug-tipo`), el visitante salta el primer paso y entra directamente en el calendario de ese tipo.
 
 ---
 

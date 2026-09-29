@@ -165,6 +165,16 @@
     </div>
 
     <div class="space-y-3">
+      <p class="text-xs font-medium text-ink-soft uppercase tracking-wide"><%= t("booking.pages.event_type.success_section") %></p>
+      <div>
+        <%= form.label :success_template_id, t("booking.pages.event_type.success_template"), class: "label" %>
+        <%= form.collection_select :success_template_id, @booking_success_templates, :id, :display_name,
+              { include_blank: t("booking.pages.event_type.success_template_blank") }, class: "input mt-1 w-full" %>
+        <p class="mt-1 text-xs text-ink-faint"><%= t("booking.pages.event_type.success_template_hint") %></p>
+      </div>
+    </div>
+
+    <div class="space-y-3">
       <p class="text-xs font-medium text-ink-soft uppercase tracking-wide"><%= t("booking.pages.event_type.location_appearance_section") %></p>
       <div class="grid gap-3 sm:grid-cols-2">
         <div>

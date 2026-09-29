@@ -86,6 +86,7 @@ class BookingPagesController < ApplicationController
     @hosts = current_workspace.users.order(:name)
     @pipelines = current_workspace.pipelines.ordered
     @email_templates = current_workspace.email_templates.visible_to(current_user).ordered
+    @booking_success_templates = current_workspace.lead_form_templates.booking_pages.ordered
     host = @booking_page.host || current_user
     @host_calendar_connection = current_workspace.calendar_connections.find_by(user: host)
     calendar_result = load_host_calendars(@host_calendar_connection)
@@ -134,12 +135,12 @@ class BookingPagesController < ApplicationController
   def booking_page_params
     params.require(:booking_page).permit(
       :name, :slug, :host_id, :pipeline_id, :reuse_existing_deal, :welcome_message, :avatar_url, :logo_url,
-      :timezone, :booking_window_days, :active,
+      :timezone, :booking_window_days, :active, :success_template_id,
       calendar_ids: [],
       event_types_attributes: [
         :id, :slug, :color, :duration_minutes, :location_type, :location_address,
         :buffer_before_minutes, :buffer_after_minutes, :slot_increment_minutes,
-        :min_notice_hours, :reminder_minutes_before, :email_template_id, :visible, :position, :weekly_hours, :_destroy,
+        :min_notice_hours, :reminder_minutes_before, :email_template_id, :success_template_id, :visible, :position, :weekly_hours, :_destroy,
         {name_i18n: {}, description_i18n: {}}
       ]
     ).tap do |permitted|

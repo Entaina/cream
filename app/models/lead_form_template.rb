@@ -1,8 +1,9 @@
 class LeadFormTemplate < ApplicationRecord
-  KINDS = %w[form page].freeze
-  PATH_FORMAT = /\Apublic\/(?:lead_forms|pages)(?:\/[a-z0-9_]+)+\z/
+  KINDS = %w[form page booking].freeze
+  PATH_FORMAT = /\Apublic\/(?:lead_forms|pages|bookings)(?:\/[a-z0-9_]+)+\z/
   ROOT_PREFIX = "public/lead_forms/".freeze
   PAGE_PREFIX = "public/pages/".freeze
+  BOOKING_PREFIX = "public/bookings/".freeze
   PARTIALS_PREFIX = "public/lead_forms/partials/".freeze
   SYSTEM_VIEW_PATHS = %w[public/lead_forms/success public/lead_forms/privacy].freeze
 
@@ -21,6 +22,7 @@ class LeadFormTemplate < ApplicationRecord
   scope :views, -> { where(partial: false) }
   scope :form_pages, -> { views.where(kind: "form").where.not(path: SYSTEM_VIEW_PATHS) }
   scope :landing_pages, -> { views.where(kind: "page") }
+  scope :booking_pages, -> { views.where(kind: "booking") }
 
   def self.form_page_path_for(template_key)
     "#{ROOT_PREFIX}#{template_key}"
@@ -47,6 +49,8 @@ class LeadFormTemplate < ApplicationRecord
       path.to_s.delete_prefix(PARTIALS_PREFIX)
     elsif page?
       page_slug.presence || path.to_s.delete_prefix(PAGE_PREFIX)
+    elsif booking?
+      path.to_s.delete_prefix(BOOKING_PREFIX)
     else
       path.to_s.delete_prefix(ROOT_PREFIX)
     end
@@ -64,12 +68,16 @@ class LeadFormTemplate < ApplicationRecord
     kind == "page"
   end
 
+  def booking?
+    kind == "booking"
+  end
+
   before_validation :assign_path_from_slug
-  before_validation :normalize_page_kind
+  before_validation :normalize_non_form_kind
   after_save :refresh_submission_schema!, if: :form_page?
 
   def form_page?
-    !partial? && !page? && template_key.present?
+    kind == "form" && !partial? && template_key.present?
   end
 
   def previewable?
@@ -101,6 +109,8 @@ class LeadFormTemplate < ApplicationRecord
       normalized = segment.tr("_", "-")
       self.page_slug = normalized
       self.path = "#{PAGE_PREFIX}#{normalized.tr("-", "_")}"
+    elsif booking?
+      self.path = "#{BOOKING_PREFIX}#{segment.tr("-", "_")}"
     else
       self.path = "#{ROOT_PREFIX}#{segment.tr("-", "_")}"
     end
@@ -112,8 +122,8 @@ class LeadFormTemplate < ApplicationRecord
     errors.add(:page_slug, :blank) if page_slug.blank?
   end
 
-  def normalize_page_kind
-    self.partial = false if page?
+  def normalize_non_form_kind
+    self.partial = false if page? || booking?
   end
 
   def body_must_have_valid_liquid_syntax

@@ -581,6 +581,10 @@ export default class extends Controller {
     }
 
     const data = await response.json()
+    if (data.redirect_url) {
+      window.location.assign(data.redirect_url)
+      return
+    }
     this.showConfirmation(data)
   }
 

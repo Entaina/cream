@@ -36,7 +36,8 @@ module Settings
         :marketing_attribution_enabled,
         :lead_scoring_enabled,
         :webhooks_enabled,
-        :custom_fields_enabled
+        :custom_fields_enabled,
+        :ga_measurement_id
       )
       permitted.delete(:okm_service_account_key) if permitted[:okm_service_account_key].blank?
       permitted

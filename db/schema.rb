@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_24_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_29_170000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -169,12 +169,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_24_120000) do
     t.integer "reminder_minutes_before", default: 60
     t.integer "slot_increment_minutes", default: 15, null: false
     t.string "slug", null: false
+    t.bigint "success_template_id"
     t.datetime "updated_at", null: false
     t.boolean "visible", default: true, null: false
     t.jsonb "weekly_hours", default: {}, null: false
     t.index ["booking_page_id", "slug"], name: "index_booking_event_types_on_booking_page_id_and_slug", unique: true
     t.index ["booking_page_id"], name: "index_booking_event_types_on_booking_page_id"
     t.index ["email_template_id"], name: "index_booking_event_types_on_email_template_id"
+    t.index ["success_template_id"], name: "index_booking_event_types_on_success_template_id"
   end
 
   create_table "booking_pages", force: :cascade do |t|
@@ -189,6 +191,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_24_120000) do
     t.bigint "pipeline_id", null: false
     t.boolean "reuse_existing_deal", default: true, null: false
     t.string "slug", null: false
+    t.bigint "success_template_id"
     t.string "timezone", default: "Europe/Madrid", null: false
     t.datetime "updated_at", null: false
     t.text "welcome_message"
@@ -196,6 +199,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_24_120000) do
     t.index ["host_id"], name: "index_booking_pages_on_host_id"
     t.index ["pipeline_id"], name: "index_booking_pages_on_pipeline_id"
     t.index ["slug"], name: "index_booking_pages_on_slug", unique: true
+    t.index ["success_template_id"], name: "index_booking_pages_on_success_template_id"
     t.index ["workspace_id"], name: "index_booking_pages_on_workspace_id"
   end
 
@@ -1607,6 +1611,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_24_120000) do
   create_table "workspaces", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.boolean "custom_fields_enabled", default: false, null: false
+    t.string "ga_measurement_id"
     t.boolean "lead_scoring_enabled", default: false, null: false
     t.boolean "marketing_attribution_enabled", default: false, null: false
     t.string "name", null: false
@@ -1643,6 +1648,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_24_120000) do
   add_foreign_key "beehiiv_publications", "subscription_types"
   add_foreign_key "booking_event_types", "booking_pages"
   add_foreign_key "booking_event_types", "email_templates", on_delete: :nullify
+  add_foreign_key "booking_event_types", "lead_form_templates", column: "success_template_id"
+  add_foreign_key "booking_pages", "lead_form_templates", column: "success_template_id"
   add_foreign_key "booking_pages", "pipelines"
   add_foreign_key "booking_pages", "users", column: "host_id"
   add_foreign_key "booking_pages", "workspaces"

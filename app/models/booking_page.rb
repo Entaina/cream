@@ -1,4 +1,6 @@
 class BookingPage < ApplicationRecord
+  include BookingSuccessTemplateAssignable
+
   HONEYPOT_FIELD = "_honeypot".freeze
   TIMESTAMP_FIELD = "_ts".freeze
   MIN_SECONDS_TO_SUBMIT = 3

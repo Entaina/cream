@@ -71,7 +71,10 @@ class Workspace < ApplicationRecord
   validates :name, presence: true
   validates :slug, presence: true, uniqueness: true, format: {with: /\A[a-z0-9-]+\z/}
   validates :time_zone, presence: true
+  validates :ga_measurement_id, format: {with: GoogleAnalytics::GA4_ID_FORMAT}, allow_blank: true
   validate :okm_service_account_key_format, if: -> { okm_service_account_key.present? }
+
+  before_validation :normalize_ga_measurement_id
 
   scope :sales_director_enabled, -> { where(sales_director_enabled: true) }
   scope :okm_chat_enabled, -> { where(okm_chat_enabled: true) }
@@ -113,6 +116,10 @@ class Workspace < ApplicationRecord
 
   def create_default_pipeline
     Pipeline.create_default!(self)
+  end
+
+  def normalize_ga_measurement_id
+    self.ga_measurement_id = ga_measurement_id.to_s.strip.presence
   end
 
   def okm_service_account_key_format

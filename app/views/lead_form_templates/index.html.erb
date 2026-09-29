@@ -15,6 +15,7 @@
     <% {
       "all" => t("marketing.lead_form_templates.index.filter_all"),
       "view" => t("marketing.lead_form_templates.index.filter_view"),
+      "booking" => t("marketing.lead_form_templates.index.filter_booking"),
       "partial" => t("marketing.lead_form_templates.index.filter_partial")
     }.each do |key, label| %>
       <%= link_to label, lead_form_templates_path(kind: key == "all" ? nil : key),
@@ -36,7 +37,16 @@
     <article class="card p-4">
       <div class="flex items-center gap-2 mb-2">
         <h2 class="font-semibold text-base font-mono"><%= template.display_name %></h2>
-        <%= badge template.partial? ? t("marketing.lead_form_templates.index.badge_partial") : t("marketing.lead_form_templates.index.badge_page"), color: template.partial? ? "hoki" : "green" %>
+        <% badge_label, badge_color = if template.partial?
+             [t("marketing.lead_form_templates.index.badge_partial"), "hoki"]
+           elsif template.booking?
+             [t("marketing.lead_form_templates.index.badge_booking"), "copperfield"]
+           elsif template.page?
+             [t("marketing.lead_form_templates.index.badge_landing"), "golden"]
+           else
+             [t("marketing.lead_form_templates.index.badge_form"), "green"]
+           end %>
+        <%= badge badge_label, color: badge_color %>
         <div class="ml-auto flex gap-2">
           <% if template.previewable? %>
             <%= link_to t("marketing.lead_form_templates.index.preview"), preview_lead_form_template_path(template),

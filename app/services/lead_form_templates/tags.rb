@@ -163,6 +163,12 @@ module LeadFormTemplates
       end
     end
 
+    class GoogleAnalyticsTag < BaseTag
+      def render(context)
+        renderer(context).google_analytics_field
+      end
+    end
+
     class SubmitTag < BaseTag
       def initialize(tag_name, markup, parse_context)
         super
@@ -279,6 +285,7 @@ module LeadFormTemplates
       "hidden_fields" => HiddenFieldsTag,
       "honeypot" => HoneypotTag,
       "turnstile" => TurnstileTag,
+      "google_analytics" => GoogleAnalyticsTag,
       "submit" => SubmitTag,
       "privacy_link" => PrivacyLinkTag,
       "required_marker" => RequiredMarkerTag,

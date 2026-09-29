@@ -1,4 +1,6 @@
 class BookingEventType < ApplicationRecord
+  include BookingSuccessTemplateAssignable
+
   LOCATION_TYPES = %w[google_meet physical to_be_decided].freeze
   COLORS = %w[hoki copperfield golden chicago green blue].freeze
   WEEKDAYS = %w[monday tuesday wednesday thursday friday saturday sunday].freeze
@@ -93,6 +95,10 @@ class BookingEventType < ApplicationRecord
       slug,
       **booking_page.public_url_options
     )
+  end
+
+  def resolved_success_template
+    success_template || booking_page.success_template
   end
 
   def payload(locale: I18n.locale)

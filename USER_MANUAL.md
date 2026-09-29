@@ -4,7 +4,7 @@
 
 Cream is a **workspace**-based CRM for managing **people**, **companies** and **deals** (opportunities), with notes, tasks, lists and an activity history shared across the team.
 
-> **Last revision:** 2026-09-24 (HTML when sending email from a record)
+> **Last revision:** 2026-09-29 (booking acknowledgment templates)
 > This document describes the functionality **visible to the user**. Disabled features are listed at the end under "Coming soon".
 
 ---
@@ -661,7 +661,7 @@ When you have **full reply logging** active and the connection is correct, the c
 
 From the **CReaM add-on in Gmail** (sidebar when opening an email) you can:
 
-1. **Connect with CReaM** — authorize with your CReaM account (OAuth).
+1. **Authorize** — if Google has not yet allowed CReaM to read the thread, accept that permission. Then **Connect with CReaM** to authorize with your CReaM account (OAuth).
 2. If the thread is **already linked** to a deal, you see a **deal summary** with
    stage, pipeline, company, value, owner, contacts, close date, pending tasks
    and products, plus an **Open in CReaM** link. From that summary you can **Edit
@@ -686,7 +686,8 @@ To install it (users):
    or go to [Internal Marketplace apps](https://workspace.google.com/marketplace/mydomainapps).
 2. Click **Instalar** (Install) and accept the requested Gmail permissions.
 3. Open Gmail, select a thread and click the **CReaM** icon in the right sidebar.
-4. Click **Connect with CReaM**, sign in at `crm.example.com` and authorize access.
+4. If the add-on shows **Authorize**, accept the Gmail permission and return to Gmail.
+5. Click **Connect with CReaM**, sign in at `crm.example.com` and authorize access.
 
 **Example administrators:** the complete guide to publishing the add-on on Marketplace,
 installing it for the whole domain and troubleshooting is in
@@ -883,6 +884,7 @@ Enable optional menu and settings sections for this workspace (off by default):
 - **Puntuación de leads** (Lead scoring) — scoring rules and lifecycle on contact records.
 - **Webhooks** — outgoing HTTP integrations.
 - **Campos personalizados** (Custom fields) — extra fields on people, companies and deals.
+- **GA4 measurement ID** (`G-…`) — this workspace's Google Analytics 4 property; used by the `{% google_analytics %}` partial in templates (e.g. booking acknowledgment). If blank, the tag outputs nothing.
 
 ### OKM
 
@@ -1202,10 +1204,10 @@ From the list, **Ver** (View) opens the form detail:
 The **layout and fields** of each public page are defined in **Liquid** templates stored in the workspace, not in the form record itself.
 
 1. From **Formularios** (Forms), click **Plantillas de formulario** (Form templates) — administrators only.
-2. Filter by **Páginas** (Pages — full forms), **Parciales** (Partials — contact fields, GDPR consent…) or **Landing page** (marketing pages at `/p/workspace-slug/landing-slug`; see [§29](#29-marketing)). Each workspace stores its own templates in the database; they are not tied to server source files.
-3. **Edit** opens a syntax-highlighted Liquid editor. Pages use tags such as `{% field %}`, `{% partial 'contact_fields' %}`, `{% form_open %}`, and variables like `{{ lead_form.name }}`.
-4. **New template**: enter a short **name**, choose **type** (lead form or landing) and, if applicable, check **Es un parcial** (Is a partial).
-5. After creating or changing a **lead page** template, select that name in **Plantilla del formulario** (Form template) when configuring a capture form. The `privacy` template defines the policy linked from each public form.
+2. Filter by **Páginas** (Pages — full forms), **Reservas** (Bookings — acknowledgment after confirming at `/b/…`), **Parciales** (Partials — contact fields, GDPR consent, analytics…) or **Landing page** (marketing pages at `/p/workspace-slug/landing-slug`; see [§29](#29-marketing)). Each workspace stores its own templates in the database; they are not tied to server source files.
+3. **Edit** opens a syntax-highlighted Liquid editor. Lead form pages use tags such as `{% field %}`, `{% partial 'contact_fields' %}`, `{% form_open %}`, and variables like `{{ lead_form.name }}`. **Booking acknowledgment** templates may use `{% partial 'google_analytics' %}` (or `{% google_analytics %}`) for GA4 when the workspace has a **GA4 measurement ID** set under **Settings → Workspace** ([§21](#21-workspace-settings)); `{{ evento }}` is the event type slug (no personal data).
+4. **New template**: enter a short **name**, choose **type** (lead form, booking acknowledgment or landing) and, if applicable, check **Es un parcial** (Is a partial).
+5. After creating or changing a **lead page** template, select that name in **Plantilla del formulario** (Form template) when configuring a capture form. The `privacy` template defines the policy linked from each public form. **Booking acknowledgment** templates are selected under **Reservas** ([§28](#28-calendar-bookings)).
 
 If a page template does not exist in the workspace, the public URL `/f/slug` will return an error.
 
@@ -1275,6 +1277,7 @@ All the configuration is done from **Reservas** (no need to use seeds or preload
 | Zona horaria (Time zone) | Time zone of the host’s **weekly hours**. Visitors see slots converted to their zone; Google Calendar stores the same instant. |
 | Ventana de reserva (días) (Booking window, days) | How many days ahead dates can be chosen |
 | Calendarios (Calendars) | Google calendars where slots are checked; drag to reorder — the first one marked writable receives the bookings ("Recibe nuevas citas" badge) |
+| Plantilla de acuse (Acknowledgment template) | Optional. After booking, opens `/b/slug/recibido?evento=type-slug` with that Liquid template (no name, email or phone in the URL). If blank, confirmation stays in Cream (Meet, `.ics`) |
 | Página activa (Page active) | If unchecked, the public URL does not accept bookings |
 
 **Event types** (at least one is required; drag the ⋮⋮ handle to change the order)
@@ -1292,6 +1295,7 @@ All the configuration is done from **Reservas** (no need to use seeds or preload
 | Dirección (presencial) (Address, in person) | Location if the meeting is in person |
 | Color en calendario (Calendar color) | Color of the event in Google Calendar |
 | Visible | Whether it appears on the public page |
+| Plantilla de acuse (Acknowledgment template) | Optional. Overrides the page acknowledgment template for this event type |
 
 Use **Añadir tipo** (Add type) to create new types or the trash icon to remove them. Save the page to apply the changes.
 
@@ -1307,7 +1311,7 @@ Copy the **public URL** and share it with clients. If the page has several types
 
 ### Public page (visitor)
 
-Three-step flow: choose event type → calendar and time (the time zone selector converts the host’s slots into the visitor’s zone; date and time always include the IANA label, e.g. `Europe/Madrid`) → form and confirmation with a Meet link and `.ics` download (times in UTC). With a **direct event type URL** (`/b/page-slug/type-slug`), the visitor skips the first step and lands on that type's calendar.
+Three-step flow: choose event type → calendar and time (the time zone selector converts the host’s slots into the visitor’s zone; date and time always include the IANA label, e.g. `Europe/Madrid`) → form and confirmation. If an **acknowledgment template** is configured, confirming opens that page (`/b/slug/recibido?evento=type-slug`); otherwise Cream shows confirmation with a Meet link and `.ics` download (times in UTC). With a **direct event type URL** (`/b/page-slug/type-slug`), the visitor skips the first step and lands on that type's calendar.
 
 ---
 

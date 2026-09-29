@@ -284,6 +284,7 @@ If you change the Script ID or the `/usercallback` URI, register a new OAuth cli
 
 | Symptom | Likely cause | Solution |
 |---------|----------------|----------|
+| **Se necesita autorización para realizar esta acción** / Authorization is required to perform that action | The user has not granted `gmail.readonly` (added so the add-on can load the full thread and calendar invites). Apps Script then aborts instead of showing a consent dialog | Deploy the version that shows **Authorize** before any Gmail API call. The user opens CReaM, clicks **Authorize** and accepts the prompt. Confirm `gmail.readonly` is on Google Auth Platform → Data Access. After an admin install, the admin must accept the new permission |
 | **not_connected** when creating/linking a deal | No OAuth or invalid token | **Connect with CReaM**; check the Script Properties |
 | **not_connected** after a few hours (older add-on) | Expired access token cleared session on first API 401 | Deploy the latest add-on (`clasp push` + new deployment version); it refreshes automatically. Reconnect only if it persists |
 | **not_connected** after connecting | Wrong `client_id` or redirect URI | Re-run `logCreamRedirectUri`, register OAuth again |

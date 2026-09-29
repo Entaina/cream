@@ -57,6 +57,11 @@
           <%= f.check_box :marketing_attribution_enabled %>
           <%= t("integrations.workspace.features.attribution") %>
         </label>
+        <div>
+          <%= f.label :ga_measurement_id, t("integrations.workspace.features.ga_measurement_id"), class: "block text-sm font-medium text-ink-soft mb-1" %>
+          <%= f.text_field :ga_measurement_id, class: "input w-full font-mono", placeholder: t("integrations.workspace.features.ga_measurement_id_placeholder") %>
+          <p class="mt-1 text-sm text-ink-faint"><%= t("integrations.workspace.features.ga_measurement_id_hint") %></p>
+        </div>
         <label class="flex items-center gap-2 text-base">
           <%= f.check_box :lead_scoring_enabled %>
           <%= t("integrations.workspace.features.lead_scoring") %>

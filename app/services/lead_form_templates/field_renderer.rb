@@ -1,9 +1,10 @@
 module LeadFormTemplates
   class FieldRenderer
-    def initialize(view_context:, params:, open_editions: [])
+    def initialize(view_context:, params:, open_editions: [], workspace: nil)
       @view_context = view_context
       @params = params
       @open_editions = open_editions
+      @workspace = workspace
     end
 
     def render(type:, name:, **options)
@@ -151,6 +152,10 @@ module LeadFormTemplates
           <input type="text" name="lead[#{name}]" id="lead_#{name}" tabindex="-1" autocomplete="off" />
         </div>
       HTML
+    end
+
+    def google_analytics_field
+      GoogleAnalytics.script_tag(workspace: @workspace)
     end
 
     def turnstile_field

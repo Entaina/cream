@@ -51,6 +51,7 @@ en:
         list_calendars: list calendars
       rate_limited: Too many requests. Please try again in a minute.
       slot_unavailable: That time slot is no longer available.
+      success_template_invalid: must be a booking acknowledgment template in this workspace
       timeout: Google Calendar did not respond in time. Try again in a few minutes.
       token_refresh_failed: Token refresh failed (%{code}).
     location_types:
@@ -104,6 +105,11 @@ en:
         duration_min: Duration (min)
         duration_minutes_abbr: "%{count} min"
         email_blank: No email
+        success_section: Post-booking acknowledgment
+        success_template: Acknowledgment template
+        success_template_blank: Use page default
+        success_template_hint: When set, overrides the public page template for this
+          event type.
         email_section: Confirmation email
         email_template: Guest email template
         email_tokens_hint: 'Sent when the booking is confirmed. Available tokens:
@@ -175,6 +181,10 @@ en:
         timezone_hint: Each event type's windows use this zone. Guests see slots in
           their zone; the Google Calendar event is the same instant.
         welcome_message: Welcome message
+        success_template: Acknowledgment template
+        success_template_blank: Confirmation in Cream (Meet, .ics)
+        success_template_hint: After booking, opens /b/slug/recibido?evento=… with this
+          template. No personal data in the URL.
       form_js:
         activate_api_link: Enable Google Calendar API
         api_disabled: Google Calendar API is not enabled on the Google Cloud OAuth

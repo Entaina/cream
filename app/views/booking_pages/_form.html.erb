@@ -110,6 +110,12 @@
         </p>
       </div>
       <div>
+        <%= f.label :success_template_id, t("booking.pages.form.success_template"), class: "label" %>
+        <%= f.collection_select :success_template_id, @booking_success_templates, :id, :display_name,
+              { include_blank: t("booking.pages.form.success_template_blank") }, class: "input mt-1 w-full" %>
+        <p class="mt-1 text-xs text-ink-faint"><%= t("booking.pages.form.success_template_hint") %></p>
+      </div>
+      <div>
         <%= f.label :active, class: "inline-flex items-center gap-2" do %>
           <%= f.check_box :active %>
           <span><%= t("booking.pages.form.active_page") %></span>

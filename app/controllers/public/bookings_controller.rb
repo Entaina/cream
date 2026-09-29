@@ -12,10 +12,29 @@ module Public
     before_action :set_event_type, if: -> { params[:event_type].present? }
     before_action :set_public_booking_locale, only: :show
 
-    rate_limit to: 60, within: 1.minute, only: :show, name: "booking_page_show"
+    rate_limit to: 60, within: 1.minute, only: %i[show received], name: "booking_page_show"
 
     def show
       response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    end
+
+    def received
+      event_type = @booking_page.event_types.visible.find_by!(slug: params[:evento])
+      template = event_type.resolved_success_template
+      return head :not_found if template.blank?
+
+      @locale = resolved_locale
+      I18n.locale = @locale.to_sym
+      @received_page_html = BookingTemplates::ReceivedRenderer.render(
+        workspace: @booking_page.workspace,
+        template: template,
+        view_context: view_context,
+        event_slug: event_type.slug,
+        booking_page: @booking_page
+      )
+      render :received, layout: "public_lead_form"
+    rescue ActiveRecord::RecordNotFound, Liquid::Error
+      head :not_found
     end
 
     private

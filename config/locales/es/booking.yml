@@ -52,6 +52,7 @@ es:
         list_calendars: listar calendarios
       rate_limited: Demasiadas peticiones. Inténtalo de nuevo en un minuto.
       slot_unavailable: Ese horario ya no está disponible.
+      success_template_invalid: debe ser una plantilla de acuse de reserva de este workspace
       timeout: Google Calendar no respondió a tiempo. Inténtalo de nuevo en unos minutos.
       token_refresh_failed: No se pudo renovar el token (%{code}).
     location_types:
@@ -106,6 +107,11 @@ es:
         duration_min: Duración (min)
         duration_minutes_abbr: "%{count} min"
         email_blank: Sin email
+        success_section: Acuse tras reservar
+        success_template: Plantilla de acuse
+        success_template_blank: Usar la de la página
+        success_template_hint: Si se elige, sustituye a la plantilla de la página pública
+          para este tipo de evento.
         email_section: Email de confirmación
         email_template: Plantilla de email al invitado
         email_tokens_hint: 'Se envía al confirmar la reserva. Tokens disponibles:
@@ -178,6 +184,10 @@ es:
           Quien reserva ve los huecos convertidos a la suya; el evento en Google Calendar
           es el mismo instante.
         welcome_message: Mensaje de bienvenida
+        success_template: Plantilla de acuse
+        success_template_blank: Confirmación en Cream (Meet, .ics)
+        success_template_hint: Tras confirmar la reserva, se abre /b/slug/recibido?evento=…
+          con esta plantilla. Sin datos personales en la URL.
       form_js:
         activate_api_link: Activar Google Calendar API
         api_disabled: La API de Google Calendar no está activada en el proyecto OAuth

@@ -5,10 +5,11 @@ class LeadFormTemplatesController < ApplicationController
   before_action :set_template, only: %i[edit update destroy preview]
 
   def index
-    @kind = params[:kind].presence_in(%w[partial view]) || "all"
+    @kind = params[:kind].presence_in(%w[partial view booking]) || "all"
     scope = policy_scope(current_workspace.lead_form_templates).ordered
     scope = scope.partials if @kind == "partial"
-    scope = scope.views if @kind == "view"
+    scope = scope.views.where.not(kind: "booking") if @kind == "view"
+    scope = scope.booking_pages if @kind == "booking"
     @templates = scope
     authorize LeadFormTemplate
   end
