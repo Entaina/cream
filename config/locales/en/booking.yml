@@ -240,6 +240,7 @@ en:
       availableSlots: Available times
       availableSlotsInZone: Available times (%{timezone})
       backToSchedule: "← Back to calendar"
+      backToStart: Back to the first step
       backToTypes: "← Back to event types"
       bookAnother: Schedule another meeting
       calendarEstimated: Showing times from the configured schedule. Google Calendar

@@ -294,7 +294,15 @@
 }
 
 .public-booking-profile {
-  @apply flex items-center gap-4;
+  @apply flex cursor-pointer items-center gap-4 rounded-lg text-left;
+}
+
+.public-booking-profile:hover .public-booking-host-name {
+  @apply underline decoration-accent/40 underline-offset-4;
+}
+
+.public-booking-profile:focus-visible {
+  @apply outline-none ring-2 ring-accent/40;
 }
 
 .public-booking-profile .public-booking-avatar {
@@ -353,6 +361,28 @@
   @apply text-ink-soft;
 }
 
+.public-booking-progress-jump {
+  @apply inline-flex items-center gap-2 border-0 bg-transparent p-0 text-inherit;
+  font: inherit;
+  cursor: inherit;
+}
+
+.public-booking-progress-step.is-complete .public-booking-progress-jump {
+  @apply cursor-pointer;
+}
+
+.public-booking-progress-step.is-complete .public-booking-progress-jump:hover {
+  @apply text-ink;
+}
+
+.public-booking-progress-jump:focus-visible {
+  @apply rounded-md outline-none ring-2 ring-accent/40;
+}
+
+.public-booking-progress-jump:disabled {
+  cursor: default;
+}
+
 .public-booking-progress-number {
   @apply flex size-6 shrink-0 items-center justify-center rounded-full bg-canvas-soft text-xs font-semibold ring-1 ring-line transition-colors;
 }
@@ -367,6 +397,12 @@
 
 .public-booking-progress-separator {
   @apply hidden h-px w-6 bg-line sm:block sm:w-10;
+}
+
+/* Component display rules come after Tailwind utilities, so `.hidden` alone does not hide these steps. */
+.public-booking-progress-step.hidden,
+.public-booking-progress-separator.hidden {
+  display: none;
 }
 
 .public-booking-content {

@@ -52,7 +52,7 @@ export default class extends Controller {
     this.applyCopy()
     this.updateLocaleButtons()
     this.updateDeepLinkProgress()
-    this.updateProgress(this.deepLinkedEventType ? "schedule" : "eventTypes")
+    this.showStep(this.deepLinkedEventType ? "schedule" : "eventTypes")
     this.applyPrefill()
     this.loadEventTypes()
   }
@@ -154,6 +154,7 @@ export default class extends Controller {
     if (this.hasProgressEventLabelTarget) this.progressEventLabelTarget.textContent = this.copy.stepEvent
     if (this.hasProgressScheduleLabelTarget) this.progressScheduleLabelTarget.textContent = this.copy.stepSchedule
     if (this.hasProgressDetailsLabelTarget) this.progressDetailsLabelTarget.textContent = this.copy.stepDetails
+    this.updateProfileHomeLabel()
   }
 
   updateLocaleButtons() {
@@ -163,31 +164,33 @@ export default class extends Controller {
     this.localeEnTarget.classList.toggle("is-active", this.localeValue === "en")
   }
 
+  progressOrder() {
+    return this.deepLinkedEventType
+      ? [ "schedule", "form", "confirmation" ]
+      : [ "eventTypes", "schedule", "form", "confirmation" ]
+  }
+
   updateProgress(step) {
     if (!this.hasProgressTarget) return
 
-    const steps = this.deepLinkedEventType
-      ? [
-        { name: "schedule", target: "progressScheduleTarget" },
-        { name: "form", target: "progressDetailsTarget" }
-      ]
-      : [
-        { name: "eventTypes", target: "progressEventTarget" },
-        { name: "schedule", target: "progressScheduleTarget" },
-        { name: "form", target: "progressDetailsTarget" }
-      ]
-    const order = this.deepLinkedEventType
-      ? [ "schedule", "form", "confirmation" ]
-      : [ "eventTypes", "schedule", "form", "confirmation" ]
+    const order = this.progressOrder()
+    const steps = [
+      { name: "eventTypes", target: "progressEventTarget" },
+      { name: "schedule", target: "progressScheduleTarget" },
+      { name: "form", target: "progressDetailsTarget" }
+    ].filter(({ name }) => order.includes(name))
     const currentIndex = order.indexOf(step)
 
     for (const { name, target } of steps) {
       const element = this[target]
       if (!element) continue
 
-      const stepIndex = order.indexOf(name)
+      const canReturn = currentIndex > order.indexOf(name)
       element.classList.toggle("is-active", step === name)
-      element.classList.toggle("is-complete", currentIndex > stepIndex)
+      element.classList.toggle("is-complete", canReturn)
+      if (step === name) element.setAttribute("aria-current", "step")
+      else element.removeAttribute("aria-current")
+      element.querySelector(".public-booking-progress-jump")?.toggleAttribute("disabled", !canReturn)
     }
 
     this.progressTarget.classList.toggle("hidden", step === "confirmation")
@@ -231,6 +234,40 @@ export default class extends Controller {
       </div>
       ${this.profile.logo_url ? `<img src="${this.escape(this.profile.logo_url)}" alt="" class="public-booking-logo">` : ""}
     `
+    this.updateProfileHomeLabel()
+  }
+
+  updateProfileHomeLabel() {
+    if (!this.hasProfileTarget || !this.copy?.backToStart) return
+
+    const name = this.profile?.name
+    this.profileTarget.setAttribute("aria-label", name ? `${name}. ${this.copy.backToStart}` : this.copy.backToStart)
+  }
+
+  profileKeydown(event) {
+    if (event.key !== "Enter" && event.key !== " ") return
+
+    event.preventDefault()
+    this.goToFirstStep()
+  }
+
+  goToFirstStep() {
+    if (this.currentStep === "eventTypes" && !this.deepLinkedEventType) return
+
+    if (this.currentStep === "confirmation") this.resetDraftForm()
+    this.deepLinkedEventType = null
+    this.backToEventTypes()
+    this.updateDeepLinkProgress()
+  }
+
+  goToStep(event) {
+    const step = event.currentTarget.dataset.step
+    const order = this.progressOrder()
+    const targetIndex = order.indexOf(step)
+    if (targetIndex < 0 || targetIndex >= order.indexOf(this.currentStep)) return
+
+    if (step === "eventTypes") this.backToEventTypes()
+    else if (step === "schedule") this.backToSchedule()
   }
 
   renderEventTypes() {
@@ -257,7 +294,9 @@ export default class extends Controller {
     const eventType = this.eventTypes.find((item) => item.slug === slug)
     if (!eventType) {
       this.deepLinkedEventType = null
+      this.updateDeepLinkProgress()
       this.updateBackToTypesVisibility()
+      this.showStep("eventTypes")
       return
     }
 
@@ -631,15 +670,19 @@ export default class extends Controller {
     return `data:text/calendar;charset=utf-8,${encodeURIComponent(body)}`
   }
 
-  restart() {
-    this.selectedDate = null
-    this.selectedSlot = null
+  resetDraftForm() {
     this.formTarget.reset()
     this.applyPrefill()
     this.formFieldsTarget.classList.remove("hidden")
     this.confirmPanelTarget.classList.add("hidden")
     this.applyFieldVisibility()
     this.formErrorTarget.classList.add("hidden")
+  }
+
+  restart() {
+    this.selectedDate = null
+    this.selectedSlot = null
+    this.resetDraftForm()
 
     if (this.deepLinkedEventType) {
       this.selectEventTypeBySlug(this.deepLinkedEventType, { updateUrl: false })

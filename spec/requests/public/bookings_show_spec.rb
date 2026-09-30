@@ -73,13 +73,23 @@ RSpec.describe "Public booking page", type: :request do
     expect(response.body).to include('name="email"')
   end
 
-  it "renders direct event type link with data attribute" do
+  it "renders a direct event type link on the calendar step" do
     get public_booking_event_type_path(booking_page.slug, "video", lang: "es")
 
     expect(response).to have_http_status(:ok)
     expect(response.body).to include('data-booking-event-type-value="video"')
-    expect(response.body).to include('data-booking-target="backToTypesWrap"')
-    expect(response.body).to include('data-booking-target="progressEventSeparator"')
+    expect(response.body).to include('data-booking-target="stepEventTypes" class="public-booking-step hidden"')
+    expect(response.body).to include('data-booking-target="stepSchedule" class="public-booking-step"')
+    expect(response.body).to include('data-booking-target="progressEvent" class="public-booking-progress-step hidden"')
+    expect(response.body).to include('data-booking-target="progressEventSeparator" class="public-booking-progress-separator hidden"')
+    expect(response.body).to include('data-booking-target="backToTypesWrap" class="hidden"')
+    expect(response.body).to include('data-action="click->booking#goToFirstStep keydown->booking#profileKeydown"')
+    expect(response.body).to include('data-action="booking#goToStep" data-step="eventTypes" disabled')
+    expect(response.body).to include('data-action="booking#goToStep" data-step="schedule" disabled')
+    expect(response.body).to include('data-booking-target="progressSchedule" class="public-booking-progress-step is-active"')
+    expect(response.body).to include('<span class="public-booking-progress-number">1</span>')
+    expect(response.body).to include('<span class="public-booking-progress-number">2</span>')
+    expect(response.body).not_to include('<span class="public-booking-progress-number">3</span>')
   end
 
   it "returns not found for unknown event type" do

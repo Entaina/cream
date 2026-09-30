@@ -4,7 +4,7 @@
 
 Cream is a **workspace**-based CRM for managing **people**, **companies** and **deals** (opportunities), with notes, tasks, lists and an activity history shared across the team.
 
-> **Last revision:** 2026-09-30 (bookings: the host email .ics is the same Google Calendar meeting)
+> **Last revision:** 2026-09-30 (bookings: the host name returns to the first step, and completed steps can be revisited)
 > This document describes the functionality **visible to the user**. Disabled features are listed at the end under "Coming soon".
 
 ---
@@ -1311,7 +1311,7 @@ Copy the **public URL** and share it with clients. If the page has several types
 
 ### Public page (visitor)
 
-Three-step flow: choose event type → calendar and time (the time zone selector converts the host’s slots into the visitor’s zone; date and time always include the IANA label, e.g. `Europe/Madrid`) → form and confirmation. If an **acknowledgment template** is configured, confirming opens that page (`/b/slug/recibido?evento=type-slug`); otherwise Cream shows confirmation with a Meet link and `.ics` download (times in UTC). With a **direct event type URL** (`/b/page-slug/type-slug`), the visitor skips the first step and lands on that type's calendar.
+Three-step flow: choose event type → calendar and time (the time zone selector converts the host’s slots into the visitor’s zone; date and time always include the IANA label, e.g. `Europe/Madrid`) → form and confirmation. If an **acknowledgment template** is configured, confirming opens that page (`/b/slug/recibido?evento=type-slug`); otherwise Cream shows confirmation with a Meet link and `.ics` download (times in UTC). With a **direct event type URL** (`/b/page-slug/type-slug`), the visitor skips the first step and lands on that type's calendar. Clicking the host name (or their avatar or logo, when present) returns to that first step. Completed steps in the step bar can be clicked to go back.
 
 ---
 

@@ -244,6 +244,7 @@ es:
       availableSlots: Horarios disponibles
       availableSlotsInZone: Horarios disponibles (%{timezone})
       backToSchedule: "← Volver al calendario"
+      backToStart: Volver al primer paso
       backToTypes: "← Volver a tipos de evento"
       bookAnother: Agendar otra reunión
       calendarEstimated: Mostrando horarios según la agenda configurada. Google Calendar

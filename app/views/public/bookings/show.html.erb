@@ -12,7 +12,7 @@
      <% if @event_type.present? %>data-booking-event-type-value="<%= @event_type.slug %>"<% end %>>
   <div class="public-booking-shell">
     <header class="public-booking-hero">
-      <div data-booking-target="profile" class="public-booking-profile min-w-0 flex-1"></div>
+      <div data-booking-target="profile" data-action="click->booking#goToFirstStep keydown->booking#profileKeydown" role="button" tabindex="0" class="public-booking-profile min-w-0 flex-1"></div>
       <div class="public-booking-locale shrink-0" role="group" aria-label="<%= t("booking.public_ui.aria.language") %>">
         <button type="button" data-action="booking#setLocale" data-locale="es" data-booking-target="localeEs" class="public-booking-locale-btn">ES</button>
         <button type="button" data-action="booking#setLocale" data-locale="en" data-booking-target="localeEn" class="public-booking-locale-btn">EN</button>
@@ -21,31 +21,37 @@
 
     <nav data-booking-target="progress" class="public-booking-progress" aria-label="<%= t("booking.public_ui.aria.booking_steps") %>">
       <ol class="public-booking-progress-list">
-        <li data-booking-target="progressEvent" class="public-booking-progress-step" data-step="eventTypes">
-          <span class="public-booking-progress-number">1</span>
-          <span data-booking-target="progressEventLabel" class="public-booking-progress-label"></span>
+        <li data-booking-target="progressEvent" class="public-booking-progress-step<%= " hidden" if @event_type.present? %>" data-step="eventTypes">
+          <button type="button" class="public-booking-progress-jump" data-action="booking#goToStep" data-step="eventTypes" disabled>
+            <span class="public-booking-progress-number">1</span>
+            <span data-booking-target="progressEventLabel" class="public-booking-progress-label"></span>
+          </button>
         </li>
-        <li data-booking-target="progressEventSeparator" class="public-booking-progress-separator" aria-hidden="true"></li>
-        <li data-booking-target="progressSchedule" class="public-booking-progress-step" data-step="schedule">
-          <span class="public-booking-progress-number">2</span>
-          <span data-booking-target="progressScheduleLabel" class="public-booking-progress-label"></span>
+        <li data-booking-target="progressEventSeparator" class="public-booking-progress-separator<%= " hidden" if @event_type.present? %>" aria-hidden="true"></li>
+        <li data-booking-target="progressSchedule" class="public-booking-progress-step<%= " is-active" if @event_type.present? %>" data-step="schedule">
+          <button type="button" class="public-booking-progress-jump" data-action="booking#goToStep" data-step="schedule" disabled>
+            <span class="public-booking-progress-number"><%= @event_type.present? ? 1 : 2 %></span>
+            <span data-booking-target="progressScheduleLabel" class="public-booking-progress-label"></span>
+          </button>
         </li>
         <li class="public-booking-progress-separator" aria-hidden="true"></li>
         <li data-booking-target="progressDetails" class="public-booking-progress-step" data-step="form">
-          <span class="public-booking-progress-number">3</span>
-          <span data-booking-target="progressDetailsLabel" class="public-booking-progress-label"></span>
+          <button type="button" class="public-booking-progress-jump" data-action="booking#goToStep" data-step="form" disabled>
+            <span class="public-booking-progress-number"><%= @event_type.present? ? 2 : 3 %></span>
+            <span data-booking-target="progressDetailsLabel" class="public-booking-progress-label"></span>
+          </button>
         </li>
       </ol>
     </nav>
 
     <div class="public-booking-content">
-      <div data-booking-target="stepEventTypes" class="public-booking-step">
+      <div data-booking-target="stepEventTypes" class="public-booking-step<%= " hidden" if @event_type.present? %>">
         <h1 class="public-booking-heading" data-booking-target="headingChoose"></h1>
         <div data-booking-target="eventTypeGrid" class="public-booking-event-grid"></div>
       </div>
 
-      <div data-booking-target="stepSchedule" class="public-booking-step hidden">
-        <div data-booking-target="backToTypesWrap">
+      <div data-booking-target="stepSchedule" class="public-booking-step<%= " hidden" unless @event_type.present? %>">
+        <div data-booking-target="backToTypesWrap"<% if @event_type.present? %> class="hidden"<% end %>>
           <button type="button" data-action="booking#backToEventTypes" class="public-booking-back" data-booking-target="backToTypesLabel"></button>
         </div>
         <div class="public-booking-two-col public-booking-two-col--schedule">

@@ -4,7 +4,7 @@
 
 Cream es un CRM por **workspaces** para gestionar **personas**, **empresas** y **deals** (oportunidades), con notas, tareas, listas y un historial de actividad compartido en el equipo.
 
-> **Última revisión:** 2026-09-30 (reservas: el .ics del email al anfitrión es la misma cita de Google Calendar)
+> **Última revisión:** 2026-09-30 (reservas: el nombre del anfitrión vuelve al primer paso y los pasos completados permiten retroceder)
 > Este documento describe la funcionalidad **visible para el usuario**. Las funcionalidades desactivadas aparecen al final en «Próximamente».
 
 ---
@@ -1311,7 +1311,7 @@ Copia la **URL pública** y compártela con clientes. Si la página tiene varios
 
 ### Página pública (visitante)
 
-Flujo en tres pasos: elegir tipo de evento → calendario y hora (el selector de zona horaria convierte los huecos del anfitrión a la zona del visitante; fecha y hora se muestran siempre con el identificador IANA, p. ej. `Europe/Madrid`) → formulario y confirmación. Si hay **plantilla de acuse** configurada, al confirmar se abre esa página (`/b/slug/recibido?evento=slug-tipo`); si no, la confirmación en Cream incluye enlace Meet y descarga `.ics` (hora en UTC). Con una **URL directa de tipo** (`/b/slug-página/slug-tipo`), el visitante salta el primer paso y entra directamente en el calendario de ese tipo.
+Flujo en tres pasos: elegir tipo de evento → calendario y hora (el selector de zona horaria convierte los huecos del anfitrión a la zona del visitante; fecha y hora se muestran siempre con el identificador IANA, p. ej. `Europe/Madrid`) → formulario y confirmación. Si hay **plantilla de acuse** configurada, al confirmar se abre esa página (`/b/slug/recibido?evento=slug-tipo`); si no, la confirmación en Cream incluye enlace Meet y descarga `.ics` (hora en UTC). Con una **URL directa de tipo** (`/b/slug-página/slug-tipo`), el visitante salta el primer paso y entra directamente en el calendario de ese tipo. Pulsar el nombre del anfitrión (o su avatar o logo, si los hay) vuelve a ese primer paso. En la barra de pasos, los ya completados se pueden pulsar para volver atrás.
 
 ---
 
