@@ -54,5 +54,18 @@ RSpec.describe BookingMailer, type: :mailer do
       expect(mail.to).to eq([user.email_address])
       expect(mail.subject).to include("Ana")
     end
+
+    it "attaches an ics file for the booking" do
+      booking.update!(meet_link: "https://meet.google.com/abc-defg-hij", phone: "600000000")
+      mail = described_class.host_notification(booking: booking, host: user)
+      ics = mail.attachments["event.ics"]
+
+      expect(ics).to be_present
+      expect(ics.mime_type).to include("text/calendar")
+      body = ics.body.decoded
+      expect(body).to include("BEGIN:VCALENDAR", "METHOD:PUBLISH", "SUMMARY:Online — Ana Lopez")
+      expect(body).to include("ana@example.com", "600000000", "https://meet.google.com/abc-defg-hij")
+      expect(body).to include("DTSTART:#{booking.starts_at.utc.strftime("%Y%m%dT%H%M%SZ")}")
+    end
   end
 end

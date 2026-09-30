@@ -19,6 +19,10 @@ class BookingMailer < ApplicationMailer
     @deal_url = booking.deal && deal_url(booking.deal)
 
     with_mailer_locale(host.locale) do
+      attachments["event.ics"] = {
+        mime_type: "text/calendar; charset=UTF-8; method=PUBLISH",
+        content: BookingIcs.build(booking)
+      }
       mail(to: host.email_address, subject: host_notification_subject)
     end
   end
