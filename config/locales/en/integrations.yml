@@ -374,6 +374,14 @@ en:
         save: Save features
         title: Features
         webhooks: Webhooks
+      public_booking_layout:
+        hint: Edit the template under Forms → Templates. It must include {{ content
+          }} where the booking calendar appears.
+        intro: Optional. Wraps public /b/… pages with your site header and footer.
+        none: No layout (booking widget only)
+        save: Save layout
+        template: Layout template
+        title: Public booking layout
       general:
         edit_hint: If you only enable edit, salespeople can also view those deals.
         name: Workspace name

@@ -304,6 +304,8 @@ en:
         kind_form: Lead form
         kind_page: Landing page (/p/:slug)
         kind_booking: Booking acknowledgment
+        kind_layout: Booking page layout ({{ content }})
+        layout_body_hint: Include {{ content }} where the booking widget should appear.
         page_slug: Public slug (landing only)
         page_slug_hint: 'Public URL:'
         page_slug_placeholder: my-landing
@@ -315,6 +317,8 @@ en:
           and in <code class="font-mono">{% partial 'name' %}</code>.
         slug_label: Name
         slug_placeholder: contact
+      errors:
+        content_placeholder: must include {{ content }}
       index:
         back_to_forms: Back to forms
         badge_page: Page
@@ -329,6 +333,8 @@ en:
         filter_partial: Partials
         filter_view: Pages
         filter_booking: Bookings
+        filter_layout: Layouts
+        badge_layout: Layout
         new_template: New template
         page_title: Public form templates
         preview: Preview

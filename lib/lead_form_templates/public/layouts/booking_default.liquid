@@ -1,0 +1,18 @@
+<header class="border-b border-line bg-canvas-raised">
+  <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4 sm:px-8">
+    <a href="/" class="font-display text-lg font-semibold text-ink no-underline hover:text-accent">
+      {{ lead_form.name }}
+    </a>
+    <nav class="hidden items-center gap-6 text-sm text-ink-soft sm:flex" aria-label="Site">
+      <a href="/" class="hover:text-ink">Home</a>
+    </nav>
+  </div>
+</header>
+
+{{ content }}
+
+<footer class="border-t border-line bg-canvas-soft">
+  <div class="mx-auto max-w-7xl px-6 py-8 text-center text-sm text-ink-soft sm:px-8">
+    <p>{{ lead_form.name }}</p>
+  </div>
+</footer>

@@ -29,6 +29,7 @@ module LeadFormTemplates
           updated += 1
         end
         record.partial = partial
+        record.kind = infer_kind(path, partial:)
         record.body = body
         record.save!
       end
@@ -39,7 +40,22 @@ module LeadFormTemplates
     private
 
     def repository_partial?(path)
-      path.start_with?(LeadFormTemplate::PARTIALS_PREFIX)
+      path.start_with?(LeadFormTemplate::PARTIALS_PREFIX) ||
+        path.start_with?(LeadFormTemplate::LAYOUT_PARTIALS_PREFIX)
+    end
+
+    def infer_kind(path, partial:)
+      return "form" if partial
+
+      if path.start_with?(LeadFormTemplate::PAGE_PREFIX)
+        "page"
+      elsif path.start_with?(LeadFormTemplate::BOOKING_PREFIX)
+        "booking"
+      elsif path.start_with?(LeadFormTemplate::LAYOUT_PREFIX)
+        "layout"
+      else
+        "form"
+      end
     end
   end
 end

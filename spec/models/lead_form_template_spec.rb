@@ -64,6 +64,18 @@ RSpec.describe LeadFormTemplate, type: :model do
       expect(duplicate.errors[:path]).to be_present
     end
 
+    it "requires {{ content }} for layout templates" do
+      template = workspace.lead_form_templates.build(
+        kind: "layout",
+        slug: "booking_wrap",
+        partial: false,
+        body: "<header>Site</header>"
+      )
+
+      expect(template).not_to be_valid
+      expect(template.errors[:body]).to be_present
+    end
+
     it "rejects invalid Liquid syntax" do
       template = workspace.lead_form_templates.build(
         path: "public/lead_forms/contacto",

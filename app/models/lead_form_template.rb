@@ -1,9 +1,12 @@
 class LeadFormTemplate < ApplicationRecord
-  KINDS = %w[form page booking].freeze
-  PATH_FORMAT = /\Apublic\/(?:lead_forms|pages|bookings)(?:\/[a-z0-9_]+)+\z/
+  KINDS = %w[form page booking layout].freeze
+  CONTENT_PLACEHOLDER = /\{\{\s*content\s*\}\}/
+  PATH_FORMAT = /\Apublic\/(?:lead_forms|pages|bookings|layouts)(?:\/[a-z0-9_]+)+\z/
   ROOT_PREFIX = "public/lead_forms/".freeze
   PAGE_PREFIX = "public/pages/".freeze
   BOOKING_PREFIX = "public/bookings/".freeze
+  LAYOUT_PREFIX = "public/layouts/".freeze
+  LAYOUT_PARTIALS_PREFIX = "public/layouts/partials/".freeze
   PARTIALS_PREFIX = "public/lead_forms/partials/".freeze
   SYSTEM_VIEW_PATHS = %w[public/lead_forms/success public/lead_forms/privacy].freeze
 
@@ -16,6 +19,7 @@ class LeadFormTemplate < ApplicationRecord
   validates :page_slug, uniqueness: {scope: :workspace_id}, allow_nil: true
   validate :body_must_have_valid_liquid_syntax
   validate :page_slug_required_for_pages
+  validate :layout_body_must_include_content_placeholder
 
   scope :ordered, -> { order(:path, :id) }
   scope :partials, -> { where(partial: true) }
@@ -23,6 +27,7 @@ class LeadFormTemplate < ApplicationRecord
   scope :form_pages, -> { views.where(kind: "form").where.not(path: SYSTEM_VIEW_PATHS) }
   scope :landing_pages, -> { views.where(kind: "page") }
   scope :booking_pages, -> { views.where(kind: "booking") }
+  scope :public_layouts, -> { views.where(kind: "layout") }
 
   def self.form_page_path_for(template_key)
     "#{ROOT_PREFIX}#{template_key}"
@@ -45,12 +50,16 @@ class LeadFormTemplate < ApplicationRecord
   end
 
   def display_name
-    if partial? || path.to_s.start_with?(PARTIALS_PREFIX)
+    if path.to_s.start_with?(LAYOUT_PARTIALS_PREFIX)
+      path.to_s.delete_prefix(LAYOUT_PARTIALS_PREFIX)
+    elsif partial? || path.to_s.start_with?(PARTIALS_PREFIX)
       path.to_s.delete_prefix(PARTIALS_PREFIX)
     elsif page?
       page_slug.presence || path.to_s.delete_prefix(PAGE_PREFIX)
     elsif booking?
       path.to_s.delete_prefix(BOOKING_PREFIX)
+    elsif layout?
+      path.to_s.delete_prefix(LAYOUT_PREFIX)
     else
       path.to_s.delete_prefix(ROOT_PREFIX)
     end
@@ -70,6 +79,10 @@ class LeadFormTemplate < ApplicationRecord
 
   def booking?
     kind == "booking"
+  end
+
+  def layout?
+    kind == "layout"
   end
 
   before_validation :assign_path_from_slug
@@ -104,13 +117,16 @@ class LeadFormTemplate < ApplicationRecord
     end
 
     if partial?
-      self.path = "#{PARTIALS_PREFIX}#{segment.tr("-", "_")}"
+      prefix = (layout? || path.to_s.start_with?(LAYOUT_PARTIALS_PREFIX)) ? LAYOUT_PARTIALS_PREFIX : PARTIALS_PREFIX
+      self.path = "#{prefix}#{segment.tr("-", "_")}"
     elsif page?
       normalized = segment.tr("_", "-")
       self.page_slug = normalized
       self.path = "#{PAGE_PREFIX}#{normalized.tr("-", "_")}"
     elsif booking?
       self.path = "#{BOOKING_PREFIX}#{segment.tr("-", "_")}"
+    elsif layout?
+      self.path = "#{LAYOUT_PREFIX}#{segment.tr("-", "_")}"
     else
       self.path = "#{ROOT_PREFIX}#{segment.tr("-", "_")}"
     end
@@ -124,6 +140,15 @@ class LeadFormTemplate < ApplicationRecord
 
   def normalize_non_form_kind
     self.partial = false if page? || booking?
+  end
+
+  def layout_body_must_include_content_placeholder
+    return unless layout? && !partial?
+    return if body.blank?
+
+    return if body.match?(CONTENT_PLACEHOLDER)
+
+    errors.add(:body, I18n.t("marketing.lead_form_templates.errors.content_placeholder"))
   end
 
   def body_must_have_valid_liquid_syntax

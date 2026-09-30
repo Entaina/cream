@@ -42,6 +42,9 @@
               required: true,
               preview_form_id: (template.persisted? && template.previewable? ? "lead-form-template-preview-form" : nil) %>
         <p class="mt-1 text-xs text-ink-faint"><%= t("marketing.lead_form_templates.form.body_hint") %></p>
+        <% if template.layout? %>
+          <p class="mt-1 text-xs text-ink-faint"><%= t("marketing.lead_form_templates.form.layout_body_hint") %></p>
+        <% end %>
       </div>
     <% end %>
 

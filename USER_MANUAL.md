@@ -4,7 +4,7 @@
 
 Cream is a **workspace**-based CRM for managing **people**, **companies** and **deals** (opportunities), with notes, tasks, lists and an activity history shared across the team.
 
-> **Last revision:** 2026-09-30 (bookings: the host name returns to the first step, and completed steps can be revisited)
+> **Last revision:** 2026-09-30 (bookings: optional per-workspace public layout in Settings)
 > This document describes the functionality **visible to the user**. Disabled features are listed at the end under "Coming soon".
 
 ---
@@ -1204,7 +1204,7 @@ From the list, **Ver** (View) opens the form detail:
 The **layout and fields** of each public page are defined in **Liquid** templates stored in the workspace, not in the form record itself.
 
 1. From **Formularios** (Forms), click **Plantillas de formulario** (Form templates) — administrators only.
-2. Filter by **Páginas** (Pages — full forms), **Reservas** (Bookings — acknowledgment after confirming at `/b/…`), **Parciales** (Partials — contact fields, GDPR consent, analytics…) or **Landing page** (marketing pages at `/p/workspace-slug/landing-slug`; see [§29](#29-marketing)). Each workspace stores its own templates in the database; they are not tied to server source files.
+2. Filter by **Páginas** (Pages — full forms), **Reservas** (Bookings — acknowledgment after confirming at `/b/…`), **Layouts** (header/footer around the `/b/…` widget; must include `{{ content }}`), **Parciales** (Partials — contact fields, GDPR consent, analytics…) or **Landing page** (marketing pages at `/p/workspace-slug/landing-slug`; see [§29](#29-marketing)). Each workspace stores its own templates in the database; they are not tied to server source files.
 3. **Edit** opens a syntax-highlighted Liquid editor. Lead form pages use tags such as `{% field %}`, `{% partial 'contact_fields' %}`, `{% form_open %}`, and variables like `{{ lead_form.name }}`. **Booking acknowledgment** templates may use `{% partial 'google_analytics' %}` (or `{% google_analytics %}`) for GA4 when the workspace has a **GA4 measurement ID** set under **Settings → Workspace** ([§21](#21-workspace-settings)); `{{ evento }}` is the event type slug (no personal data).
 4. **New template**: enter a short **name**, choose **type** (lead form, booking acknowledgment or landing) and, if applicable, check **Es un parcial** (Is a partial).
 5. After creating or changing a **lead page** template, select that name in **Plantilla del formulario** (Form template) when configuring a capture form. The `privacy` template defines the policy linked from each public form. **Booking acknowledgment** templates are selected under **Reservas** ([§28](#28-calendar-bookings)).
@@ -1300,6 +1300,8 @@ All the configuration is done from **Reservas** (no need to use seeds or preload
 Use **Añadir tipo** (Add type) to create new types or the trash icon to remove them. Save the page to apply the changes.
 
 Copy the **public URL** and share it with clients. If the page has several types, use the **direct event type URL** (in the **Reservas** list under **URLs directas por tipo**, or when editing a type under **URL directa del tipo**) so visitors go straight to that type's calendar without the selection screen.
+
+Under **Settings → Workspace**, you can optionally pick a **public booking layout template** (*Layout* type under **Forms → Templates**). It must include `{{ content }}` where the booking widget goes, so `/b/…` pages show your site header and footer around the calendar.
 
 ### What happens when someone books
 

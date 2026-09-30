@@ -8,6 +8,7 @@ module Settings
       authorize [:settings, :workspace]
       load_mailjet_connection
       load_beehiiv_connection
+      load_public_layout_templates
     end
 
     def update
@@ -37,7 +38,8 @@ module Settings
         :lead_scoring_enabled,
         :webhooks_enabled,
         :custom_fields_enabled,
-        :ga_measurement_id
+        :ga_measurement_id,
+        :public_layout_template_id
       )
       permitted.delete(:okm_service_account_key) if permitted[:okm_service_account_key].blank?
       permitted
@@ -48,6 +50,12 @@ module Settings
 
       @mailjet_connection = current_workspace.mailjet_connection ||
         current_workspace.build_mailjet_connection(user: current_user)
+    end
+
+    def load_public_layout_templates
+      return unless CreamFeatures.enabled?(:calendar_booking)
+
+      @public_layout_templates = current_workspace.lead_form_templates.public_layouts.ordered
     end
 
     def load_beehiiv_connection

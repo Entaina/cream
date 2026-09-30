@@ -1,4 +1,19 @@
 module BookingPagesHelper
+  def public_booking_page_body(&block)
+    content_html = capture(&block)
+    template = @booking_page&.workspace&.public_layout_template
+    return content_html if template.blank?
+
+    PublicLayoutTemplates::Renderer.render(
+      template: template,
+      content_html: content_html,
+      workspace: @booking_page.workspace,
+      view_context: self
+    )
+  rescue Liquid::Error
+    content_html
+  end
+
   BOOKING_TIMEZONES = [
     "Europe/Madrid",
     "Europe/London",

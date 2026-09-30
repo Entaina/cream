@@ -12,8 +12,10 @@
     <%= javascript_importmap_tags %>
   </head>
   <body class="public-booking-page min-h-full">
-    <main class="public-booking-main">
-      <%= yield %>
-    </main>
+    <%= public_booking_page_body do %>
+      <main class="public-booking-main">
+        <%= yield %>
+      </main>
+    <% end %>
   </body>
 </html>

@@ -4,7 +4,7 @@
 
 Cream es un CRM por **workspaces** para gestionar **personas**, **empresas** y **deals** (oportunidades), con notas, tareas, listas y un historial de actividad compartido en el equipo.
 
-> **Última revisión:** 2026-09-30 (reservas: el nombre del anfitrión vuelve al primer paso y los pasos completados permiten retroceder)
+> **Última revisión:** 2026-09-30 (reservas: layout público opcional por workspace en Ajustes)
 > Este documento describe la funcionalidad **visible para el usuario**. Las funcionalidades desactivadas aparecen al final en «Próximamente».
 
 ---
@@ -1204,7 +1204,7 @@ Desde el listado, **Ver** abre el detalle del formulario:
 La **apariencia y los campos** de cada página pública se definen en plantillas **Liquid** guardadas en el workspace, no en el propio registro del formulario.
 
 1. Desde **Formularios**, pulsa **Plantillas de formulario** (solo administradores).
-2. Filtra por **Páginas** (formularios completos), **Reservas** (acuse tras confirmar una cita en `/b/…`), **Parciales** (bloques reutilizables: contacto, consentimiento RGPD, analítica…) o **Landing page** (páginas de marketing en `/p/slug-workspace/slug-landing`; ver [§29](#29-marketing)). Cada workspace guarda sus propias plantillas en la base de datos; no dependen del código fuente del servidor.
+2. Filtra por **Páginas** (formularios completos), **Reservas** (acuse tras confirmar una cita en `/b/…`), **Layouts** (cabecera/pie alrededor del widget en `/b/…`; incluye `{{ content }}`), **Parciales** (bloques reutilizables: contacto, consentimiento RGPD, analítica…) o **Landing page** (páginas de marketing en `/p/slug-workspace/slug-landing`; ver [§29](#29-marketing)). Cada workspace guarda sus propias plantillas en la base de datos; no dependen del código fuente del servidor.
 3. **Editar** abre un editor con resaltado Liquid. Las páginas de formulario usan etiquetas como `{% field %}`, `{% partial 'contact_fields' %}`, `{% form_open %}` y variables como `{{ lead_form.name }}`. Las plantillas de **acuse de reserva** pueden usar `{% partial 'google_analytics' %}` (o `{% google_analytics %}`) para medición en GA4 si el workspace tiene configurado el **ID de medición GA4** en **Settings → Workspace** ([§21](#21-ajustes-del-workspace)); la variable `{{ evento }}` lleva el slug del tipo de cita (sin datos personales).
 4. **Nueva plantilla**: indica un **nombre** corto, el **tipo** (formulario de lead, acuse de reserva o landing) y, si aplica, marca **Es un parcial**.
 5. Tras crear o cambiar una plantilla de **página** de formulario, elige ese nombre en **Plantilla del formulario** al configurar un formulario de captación. La plantilla `privacy` define la política enlazada desde cada formulario público. Las plantillas de tipo **acuse de reserva** se eligen en **Reservas** ([§28](#28-reservas-de-calendario)).
@@ -1300,6 +1300,8 @@ Toda la configuración se hace desde **Reservas** (no hace falta usar seeds ni d
 Usa **Añadir tipo** para crear tipos nuevos o el icono de papelera para eliminarlos. Guarda la página para aplicar los cambios.
 
 Copia la **URL pública** y compártela con clientes. Si la página tiene varios tipos, usa la **URL directa del tipo** (en el listado de **Reservas** o al editar el tipo en **URL directa del tipo**) para que el visitante vaya al calendario de ese tipo sin pasar por la pantalla de selección.
+
+En **Ajustes → Workspace**, opcionalmente elige una **plantilla de layout de reservas públicas** (tipo *Layout* en **Formularios → Plantillas**). Debe incluir `{{ content }}` donde irá el widget; así la página `/b/…` muestra la cabecera y el pie de tu web alrededor del calendario.
 
 ### Qué ocurre al reservar
 

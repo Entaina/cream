@@ -67,12 +67,14 @@ class Workspace < ApplicationRecord
   has_many :page_views, dependent: :destroy
   has_many :product_interests, class_name: "Marketing::ProductInterest", dependent: :destroy
   has_many :privacy_policy_versions, dependent: :destroy
+  belongs_to :public_layout_template, class_name: "LeadFormTemplate", optional: true
 
   validates :name, presence: true
   validates :slug, presence: true, uniqueness: true, format: {with: /\A[a-z0-9-]+\z/}
   validates :time_zone, presence: true
   validates :ga_measurement_id, format: {with: GoogleAnalytics::GA4_ID_FORMAT}, allow_blank: true
   validate :okm_service_account_key_format, if: -> { okm_service_account_key.present? }
+  validate :public_layout_template_must_belong_to_workspace
 
   before_validation :normalize_ga_measurement_id
 
@@ -120,6 +122,15 @@ class Workspace < ApplicationRecord
 
   def normalize_ga_measurement_id
     self.ga_measurement_id = ga_measurement_id.to_s.strip.presence
+  end
+
+  def public_layout_template_must_belong_to_workspace
+    return if public_layout_template_id.blank?
+
+    template = public_layout_template
+    if template.blank? || template.workspace_id != id || !template.layout?
+      errors.add(:public_layout_template_id, :invalid)
+    end
   end
 
   def okm_service_account_key_format

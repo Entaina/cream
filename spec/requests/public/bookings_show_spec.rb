@@ -105,4 +105,20 @@ RSpec.describe "Public booking page", type: :request do
 
     expect(response).to have_http_status(:not_found)
   end
+
+  it "wraps the booking widget in the workspace public layout template" do
+    layout = workspace.lead_form_templates.create!(
+      kind: "layout",
+      path: "public/layouts/agenda_wrap",
+      partial: false,
+      body: '<div data-test="public-layout-header">Header</div>{{ content }}'
+    )
+    workspace.update!(public_layout_template: layout)
+
+    get public_booking_page_path(booking_page.slug, lang: "es")
+
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include('data-test="public-layout-header"')
+    expect(response.body).to include('class="public-booking-shell"')
+  end
 end

@@ -310,6 +310,8 @@ es:
         kind_form: Formulario de lead
         kind_page: Landing page (/p/:slug)
         kind_booking: Acuse de reserva
+        kind_layout: Layout de reservas ({{ content }})
+        layout_body_hint: Incluye {{ content }} donde debe aparecer el widget de reserva.
         page_slug: Slug público (solo landing)
         page_slug_hint: 'URL pública:'
         page_slug_placeholder: mi-landing
@@ -321,6 +323,8 @@ es:
           formularios y en <code class="font-mono">{% partial 'nombre' %}</code>.
         slug_label: Nombre
         slug_placeholder: contacto
+      errors:
+        content_placeholder: debe incluir {{ content }}
       index:
         back_to_forms: Volver a formularios
         badge_page: Página
@@ -335,6 +339,8 @@ es:
         filter_partial: Parciales
         filter_view: Páginas
         filter_booking: Reservas
+        filter_layout: Layouts
+        badge_layout: Layout
         new_template: Nueva plantilla
         page_title: Plantillas de formularios públicos
         preview: Vista previa

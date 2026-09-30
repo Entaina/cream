@@ -16,6 +16,7 @@
       "all" => t("marketing.lead_form_templates.index.filter_all"),
       "view" => t("marketing.lead_form_templates.index.filter_view"),
       "booking" => t("marketing.lead_form_templates.index.filter_booking"),
+      "layout" => t("marketing.lead_form_templates.index.filter_layout"),
       "partial" => t("marketing.lead_form_templates.index.filter_partial")
     }.each do |key, label| %>
       <%= link_to label, lead_form_templates_path(kind: key == "all" ? nil : key),
@@ -41,6 +42,8 @@
              [t("marketing.lead_form_templates.index.badge_partial"), "hoki"]
            elsif template.booking?
              [t("marketing.lead_form_templates.index.badge_booking"), "copperfield"]
+           elsif template.layout?
+             [t("marketing.lead_form_templates.index.badge_layout"), "hoki"]
            elsif template.page?
              [t("marketing.lead_form_templates.index.badge_landing"), "golden"]
            else

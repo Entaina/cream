@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_30_101000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_30_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -1619,6 +1619,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_30_101000) do
     t.boolean "okm_chat_enabled", default: false, null: false
     t.string "okm_drive_id"
     t.text "okm_service_account_key"
+    t.bigint "public_layout_template_id"
     t.boolean "reports_enabled", default: false, null: false
     t.boolean "sales_director_enabled", default: false, null: false
     t.boolean "salespeople_can_edit_all_deals", default: false, null: false
@@ -1627,6 +1628,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_30_101000) do
     t.string "time_zone", default: "Europe/Madrid", null: false
     t.datetime "updated_at", null: false
     t.boolean "webhooks_enabled", default: false, null: false
+    t.index ["public_layout_template_id"], name: "index_workspaces_on_public_layout_template_id"
     t.index ["slug"], name: "index_workspaces_on_slug", unique: true
   end
 
@@ -1826,4 +1828,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_30_101000) do
   add_foreign_key "webhook_deliveries", "webhooks"
   add_foreign_key "webhooks", "users"
   add_foreign_key "webhooks", "workspaces"
+  add_foreign_key "workspaces", "lead_form_templates", column: "public_layout_template_id", on_delete: :nullify
 end

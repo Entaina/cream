@@ -380,6 +380,15 @@ es:
         save: Guardar funcionalidades
         title: Funcionalidades
         webhooks: Webhooks
+      public_booking_layout:
+        hint: Edita la plantilla en Formularios → Plantillas. Debe incluir {{ content
+          }} donde va el calendario de reserva.
+        intro: Opcional. Envuelve las páginas públicas /b/… con cabecera y pie de
+          tu sitio.
+        none: Sin layout (solo el widget de reserva)
+        save: Guardar layout
+        template: Plantilla de layout
+        title: Layout de reservas públicas
       general:
         edit_hint: Si solo activas editar, los vendedores también podrán ver esas
           oportunidades.
