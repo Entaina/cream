@@ -94,5 +94,11 @@ RSpec.describe LeadForm, type: :model do
         "gdpr_consent" => "1"
       )
     end
+
+    it "keeps the MQL submission key" do
+      filtered = described_class.filter_submission_params("_submission_key" => SecureRandom.uuid)
+
+      expect(filtered.keys).to eq(["_submission_key"])
+    end
   end
 end

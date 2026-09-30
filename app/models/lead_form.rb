@@ -183,7 +183,7 @@ class LeadForm < ApplicationRecord
 
   def self.field_key?(key)
     key = key.to_s
-    return true if key.in?([HONEYPOT_FIELD, TIMESTAMP_FIELD])
+    return true if key.in?([HONEYPOT_FIELD, TIMESTAMP_FIELD, "_submission_key"])
 
     key.match?(FIELD_KEY_FORMAT)
   end

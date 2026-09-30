@@ -1,7 +1,9 @@
-{% partial 'layouts/site_header' %}
+<div class="flex min-h-screen flex-col">
+  {% partial 'layouts/site_header' %}
 
-<div class="pt-20">
-  {{ content }}
+  <div class="flex-1 pt-20">
+    {{ content }}
+  </div>
+
+  {% partial 'layouts/site_footer' %}
 </div>
-
-{% partial 'layouts/site_footer' %}

@@ -380,6 +380,32 @@ RSpec.describe "Public lead forms", type: :request do
     end
   end
 
+  describe "POST /f/:slug for an MQL form" do
+    let(:lead_form) do
+      create_lead_form!(workspace, user: member, slug: "mql-contacto", destination: "mql", pipeline: nil)
+    end
+
+    before do
+      allow(CreamFeatures).to receive(:enabled?).and_call_original
+      allow(CreamFeatures).to receive(:enabled?).with(:mql_pool).and_return(true)
+      allow(CreamFeatures).to receive(:enabled?).with(:marketing_consent).and_return(true)
+    end
+
+    it "accepts the submission key rendered on the form" do
+      key = submission_key_for(lead_form)
+
+      expect {
+        post public_lead_form_path(lead_form.slug), params: {
+          lead: contacto_lead_params_with_privacy(lead_form, "_submission_key" => key)
+        }
+      }.to change(LeadSubmission, :count).by(1)
+        .and change(Deal, :count).by(0)
+
+      expect(response).to redirect_to(public_lead_form_success_path(lead_form.slug))
+      expect(LeadSubmission.order(:id).last.submission_key).to eq(key)
+    end
+  end
+
   describe "GET /f/:slug with corporate email" do
     it "embeds Stimulus values when corporate email is required" do
       lead_form.update!(require_corporate_email: true)
