@@ -135,6 +135,18 @@ RSpec.describe LeadFormTemplate, type: :model do
       expect(template.errors[:path]).to be_empty
     end
 
+    it "keeps partial checked after a failed validation" do
+      template = workspace.lead_form_templates.build(
+        slug: "",
+        partial: true,
+        kind: "form",
+        body: "<p>ok</p>"
+      )
+
+      expect(template).not_to be_valid
+      expect(template.partial).to be(true)
+    end
+
     it "reports blank slug for partials with empty page_slug field, not page_slug uniqueness" do
       workspace.lead_form_templates.create!(
         slug: "existing_partial",

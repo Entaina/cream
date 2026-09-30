@@ -88,7 +88,7 @@ class LeadFormTemplate < ApplicationRecord
 
   before_validation :normalize_page_slug
   before_validation :assign_path_from_slug
-  before_validation :normalize_non_form_kind
+  before_save :normalize_non_form_kind
   after_save :refresh_submission_schema!, if: :form_page?
 
   def form_page?
@@ -130,7 +130,7 @@ class LeadFormTemplate < ApplicationRecord
       return
     end
 
-    if partial?
+    if partial? && !page? && !booking?
       prefix = (layout? || path.to_s.start_with?(LAYOUT_PARTIALS_PREFIX)) ? LAYOUT_PARTIALS_PREFIX : PARTIALS_PREFIX
       self.path = "#{prefix}#{segment.tr("-", "_")}"
     elsif page?

@@ -1,7 +1,14 @@
 <% edit_form_id = dom_id(template, :edit) %>
 <div class="max-w-6xl grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] xl:items-start">
   <div class="card space-y-4 p-4 min-w-0">
-    <%= form_with model: template, html: { id: edit_form_id } do |f| %>
+    <%= form_with model: template,
+          html: {
+            id: edit_form_id,
+            data: {
+              controller: "lead-form-template-form",
+              action: "change->lead-form-template-form#syncPageSlugVisibility"
+            }
+          } do |f| %>
       <% if template.errors.any? %>
         <div class="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-950 dark:text-red-200">
           <%= template.errors.full_messages.to_sentence %>
@@ -24,7 +31,7 @@
               LeadFormTemplate::KINDS.map { |k| [t("marketing.lead_form_templates.form.kind_#{k}"), k] },
               {}, class: "input w-full" %>
       </div>
-      <div>
+      <div data-lead-form-template-form-target="pageSlugField" class="<%= "hidden" if template.partial? || !template.page? %>">
         <%= f.label :page_slug, t("marketing.lead_form_templates.form.page_slug"), class: "label" %>
         <%= f.text_field :page_slug, class: "input w-full font-mono", placeholder: t("marketing.lead_form_templates.form.page_slug_placeholder") %>
         <p class="mt-1 text-xs text-ink-faint">
