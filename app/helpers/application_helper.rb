@@ -320,6 +320,33 @@ module ApplicationHelper
     end
   end
 
+  def person_history_activity_html(activity)
+    if activity.action == "stage_changed" && activity.subject_type == "Deal" && activity.subject.is_a?(Deal)
+      deal = activity.subject
+      actor = activity.user&.name || t("shared.someone")
+      deal_link = link_to(deal.name, deal_path(deal), class: "font-medium text-accent hover:underline")
+      if activity_stage_change_won?(activity)
+        t("activities.person_deal_won_html", actor: actor, deal_link: deal_link)
+      else
+        t("activities.person_deal_stage_changed_html",
+          actor: actor, deal_link: deal_link,
+          from: activity.metadata["from"], to: activity.metadata["to"])
+      end.html_safe
+    else
+      activity_sentence(activity)
+    end
+  end
+
+  def activity_stage_change_won?(activity)
+    meta = activity.metadata
+    return ActiveModel::Type::Boolean.new.cast(meta["won"]) if meta.key?("won")
+
+    deal = activity.subject
+    return false unless deal.is_a?(Deal) && meta["to"].present?
+
+    deal.pipeline.pipeline_stages.find_by(name: meta["to"])&.won?
+  end
+
   def version_actor(version)
     return t("shared.someone") if version.whodunnit.blank?
 

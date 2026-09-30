@@ -22,7 +22,7 @@ RSpec.describe Deal, type: :model do
     won = pipeline.pipeline_stages.find_by(name: "Won")
 
     expect { deal.move_to_stage!(won.id) }.to change { deal.reload.stage_label }.from("Lead").to("Won")
-    expect(deal.activities.where(action: "stage_changed").last.metadata).to include("from" => "Lead", "to" => "Won")
+    expect(deal.activities.where(action: "stage_changed").last.metadata).to include("from" => "Lead", "to" => "Won", "won" => true)
   end
 
   it "moves to a stage by name" do

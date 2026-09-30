@@ -281,6 +281,40 @@ RSpec.describe "People", type: :request do
       end
     end
 
+    describe "activity tab layout and history" do
+      let(:pipeline) { Pipeline.create_default!(workspace) }
+      let(:company) { create_company!(workspace) }
+      let(:person) { create_person!(workspace, company: company) }
+      let!(:deal) { create_deal!(workspace, pipeline: pipeline, company: company, contacts: [person], name: "Overview deal") }
+
+      before { sign_in_as(member) }
+
+      it "shows deals before tasks and Histórico with linked deal stage changes" do
+        deal.track_activity("stage_changed", user: member, metadata: {from: "Lead", to: "Qualified", won: false})
+
+        get person_path(person)
+
+        expect(response).to have_http_status(:ok)
+        body = response.body
+        expect(body.index("Overview deal")).to be < body.index(I18n.t("records.next_tasks"))
+        expect(body.index(I18n.t("records.next_tasks"))).to be < body.index(I18n.t("records.history.title"))
+        expect(body).to include(I18n.t("records.history.title"))
+        expect(body).not_to include(I18n.t("records.open_deals"))
+        expect(body).to include(deal_path(deal))
+        expect(body).to include("Qualified")
+      end
+
+      it "shows won wording for a winning stage change" do
+        deal.track_activity("stage_changed", user: member, metadata: {from: "Lead", to: "Won", won: true})
+
+        get person_path(person)
+
+        expect(response.body).to include(
+          I18n.t("activities.person_deal_won_html", actor: member.name, deal_link: "PLACEHOLDER").sub(" PLACEHOLDER", "")
+        )
+      end
+    end
+
     describe "email body" do
       let(:company) { create_company!(workspace) }
       let(:person) { create_person!(workspace, company: company, email: "pat@example.com") }

@@ -4,7 +4,7 @@
 
 Cream is a **workspace**-based CRM for managing **people**, **companies** and **deals** (opportunities), with notes, tasks, lists and an activity history shared across the team.
 
-> **Last revision:** 2026-09-29 (booking acknowledgment templates)
+> **Last revision:** 2026-09-30 (person record: deals, tasks and history)
 > This document describes the functionality **visible to the user**. Disabled features are listed at the end under "Coming soon".
 
 ---
@@ -510,7 +510,7 @@ In the people, companies and deals tables, Cream adds automatically calculated c
 
 The contact header shows their name, company and main contact details. Use **Send email**, **Add note**, **Create task** or **Add deal** when you need them: the editors open on demand. **Edit** opens the grouped contact form; **Merge duplicates** and **Delete contact** are in the **•••** menu.
 
-- **Activity** opens by default. **Next tasks** puts overdue tasks first, followed by upcoming tasks; expand the remaining or completed tasks when needed. The history combines notes, emails, comments and record changes. Filter by type and use **Older / Newer** to browse the history. In the context column, **Campañas enviadas** (Campaigns sent) lists the latest marketing campaigns this contact received; **Recorridos** (Journeys) shows enrollments (active, waiting, completed or cancelled) with the current step. **Ver más** (View more) opens the full history (see [§29](#29-marketing)).
+- **Activity** opens by default. The main column shows, in order: **Deals** (every deal linked to this contact that you can see, with stage, date and products; if there are more than five, the rest appear in a disclosure), **Next tasks** (overdue first, then upcoming; expand the rest or completed tasks when needed) and **History** (notes, emails, comments, contact changes and **stage changes on their deals**, including when a deal is won, each linking to the deal). Filter history by type and use **Older / Newer** to paginate. In the context column, **Campañas enviadas** (Campaigns sent) lists the latest marketing campaigns this contact received; **Recorridos** (Journeys) shows enrollments (active, waiting, completed or cancelled) with the current step. **Ver más** (View more) opens the full history (see [§29](#29-marketing)).
 - **Opportunities** contains deals and the product filter, plus product interests and form submissions when enabled. Expand **Registrar interés** to add an interest.
 - **Information** groups contact details, professional profile, ownership, relationships, custom fields, email preferences and, when submissions exist, **Formularios enviados** (Form submissions) with a **Ver consentimiento** link to the accepted policy and statement. Each editable block has its own **Edit** link. Expand **Add relationship** to link another person.
 - **Files**, when enabled, contains the upload form and existing attachments.
@@ -578,7 +578,7 @@ For a person, click **Send email** in the header. For a company or deal, scroll 
 3. The email stays in the history with the **Sending** label until it goes out (from the workspace address via SMTP, or from **your Gmail** if you have it connected). When delivery finishes, the label becomes **Sent**. If sending fails, the label is **Failed to send**: open the email and click **Retry send** to send it again. If the recipient, subject or body is missing, Cream says so and the draft stays in the editor.
 4. An entry of the form *"Your name sent “Subject” to recipient@…"* appears in the record's **Timeline**.
 
-For a person, read emails in **Activity → Emails**, with their subject, status and expandable body; use **Older / Newer** for the rest of the history. On companies and deals, the **last 10 emails** appear below the form. Expanding an email shows the message with its formatting: line breaks, lists and the original HTML. Both views include sent emails and, with Gmail, received replies.
+For a person, read emails in **History → Emails**, with their subject, status and expandable body; use **Older / Newer** to paginate. On companies and deals, the **last 10 emails** appear below the form. Expanding an email shows the message with its formatting: line breaks, lists and the original HTML. Both views include sent emails and, with Gmail, received replies.
 
 ### Open and click tracking
 

@@ -73,4 +73,32 @@ RSpec.describe RecordActivityFeed do
 
     expect(described_class.new(company, filter: "notes").entries).to eq([note])
   end
+
+  describe "deal stage changes on a person feed" do
+    let(:pipeline) { Pipeline.create_default!(workspace) }
+    let(:company) { create_company!(workspace) }
+    let(:contact) { create_person!(workspace, company: company) }
+    let(:deal) { create_deal!(workspace, pipeline: pipeline, company: company, contacts: [contact], name: "Person deal") }
+
+    it "includes stage_changed from linked deals in all and changes filters" do
+      deal.track_activity("stage_changed", user: user, metadata: {from: "Lead", to: "Qualified", won: false})
+
+      all_entries = described_class.new(contact, deal_ids: [deal.id], filter: "all").entries
+      changes_entries = described_class.new(contact, deal_ids: [deal.id], filter: "changes").entries
+      notes_entries = described_class.new(contact, deal_ids: [deal.id], filter: "notes").entries
+
+      expect(all_entries.grep(Activity).map(&:action)).to include("stage_changed")
+      expect(changes_entries.grep(Activity).map(&:action)).to include("stage_changed")
+      expect(notes_entries).to be_empty
+    end
+
+    it "excludes stage changes from deals not in deal_ids" do
+      other_deal = create_deal!(workspace, pipeline: pipeline, name: "Other deal")
+      other_deal.track_activity("stage_changed", user: user, metadata: {from: "Lead", to: "Qualified"})
+
+      entries = described_class.new(contact, deal_ids: [deal.id]).entries
+      foreign_stage_changes = entries.grep(Activity).select { |a| a.action == "stage_changed" && a.subject_id == other_deal.id }
+      expect(foreign_stage_changes).to be_empty
+    end
+  end
 end

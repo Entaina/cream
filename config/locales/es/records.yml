@@ -418,6 +418,24 @@ es:
       pages_aria: Páginas de actividad
       title: Actividad
       view_changes: Ver cambios
+    history:
+      actions: Acciones
+      added_note: añadió una nota
+      commented: comentó
+      empty_hint: Prueba otro filtro, o añade una nota para empezar el historial.
+      empty_title: No hay entradas en esta vista.
+      filter_aria: Filtrar histórico
+      filters:
+        all: Todo
+        changes: Cambios
+        comments: Comentarios
+        emails: Emails
+        notes: Notas
+      newer: Más recientes
+      older: Más antiguas
+      pages_aria: Páginas del histórico
+      title: Histórico
+      view_changes: Ver cambios
     add: Añadir
     add_comment: Añadir comentario
     add_deal: Añadir oportunidad
@@ -556,6 +574,7 @@ es:
       deal: Secciones de la oportunidad
       person: Secciones del contacto
     send_email: Enviar email
+    show_more_deals: Mostrar %{count} oportunidades más
     show_more_pending: Mostrar %{count} tareas pendientes más
     tabs:
       activity: Actividad

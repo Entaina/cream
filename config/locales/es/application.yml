@@ -70,6 +70,8 @@ es:
     product_removed: "%{actor} eliminó la línea de producto %{product}"
     product_updated: "%{actor} actualizó la línea de producto %{product}"
     products_updated: "%{actor} actualizó productos (%{product})"
+    person_deal_stage_changed_html: '%{actor} movió la oportunidad %{deal_link} de %{from} a %{to}'
+    person_deal_won_html: '%{actor} ganó la oportunidad %{deal_link}'
     stage_changed: "%{actor} movió el deal de %{from} a %{to}"
     task_completed: '%{actor} completó la tarea "%{title}"'
     updated: "%{actor} actualizó %{fields}"

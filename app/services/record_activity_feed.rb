@@ -6,7 +6,7 @@ class RecordActivityFeed
 
   attr_reader :filter, :page, :pages
 
-  def initialize(record, filter: nil, page: nil, emails: true, comments: true)
+  def initialize(record, filter: nil, page: nil, emails: true, comments: true, deal_ids: nil)
     @filter = filter.presence_in(FILTERS) || "all"
     @scopes = []
     @scopes << record.notes.includes(:user) if %w[all notes].include?(@filter)
@@ -19,6 +19,12 @@ class RecordActivityFeed
       activities = activities.where("action LIKE 'email_%'") if @filter == "emails"
       activities = activities.where("action NOT LIKE 'email_%'") if @filter == "changes"
       @scopes << activities
+
+      if deal_ids.present? && %w[all changes].include?(@filter)
+        deal_stage_changes = Activity.where(subject_type: "Deal", subject_id: deal_ids, action: "stage_changed")
+          .includes(:user, :subject)
+        @scopes << deal_stage_changes
+      end
     end
 
     @pages = [(@scopes.sum(&:count).to_f / PAGE_SIZE).ceil, 1].max

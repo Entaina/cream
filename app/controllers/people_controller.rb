@@ -75,7 +75,8 @@ class PeopleController < ApplicationController
         .to_a
     end
     @activity_feed = RecordActivityFeed.new(@person, filter: params[:activity_filter], page: params[:activity_page],
-      emails: CreamFeatures.enabled?(:record_email), comments: CreamFeatures.enabled?(:comments))
+      emails: CreamFeatures.enabled?(:record_email), comments: CreamFeatures.enabled?(:comments),
+      deal_ids: @deals.map(&:id))
     @okm_chat_record = @person
     @note = Note.new
     @comment = Comment.new

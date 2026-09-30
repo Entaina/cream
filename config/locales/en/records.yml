@@ -414,6 +414,24 @@ en:
       pages_aria: Activity pages
       title: Activity
       view_changes: View changes
+    history:
+      actions: Actions
+      added_note: added a note
+      commented: commented
+      empty_hint: Try another filter, or add a note to start the history.
+      empty_title: No entries in this view.
+      filter_aria: Filter history
+      filters:
+        all: All
+        changes: Changes
+        comments: Comments
+        emails: Emails
+        notes: Notes
+      newer: Newer
+      older: Older
+      pages_aria: History pages
+      title: History
+      view_changes: View changes
     add: Add
     add_comment: Add comment
     add_deal: Add deal
@@ -550,6 +568,7 @@ en:
       deal: Deal sections
       person: Contact sections
     send_email: Send email
+    show_more_deals: Show %{count} more deals
     show_more_pending: Show %{count} more pending tasks
     tabs:
       activity: Activity

@@ -4,7 +4,7 @@
 
 Cream es un CRM por **workspaces** para gestionar **personas**, **empresas** y **deals** (oportunidades), con notas, tareas, listas y un historial de actividad compartido en el equipo.
 
-> **Última revisión:** 2026-09-29 (plantillas de acuse en reservas de calendario)
+> **Última revisión:** 2026-09-30 (ficha de persona: oportunidades, tareas e histórico)
 > Este documento describe la funcionalidad **visible para el usuario**. Las funcionalidades desactivadas aparecen al final en «Próximamente».
 
 ---
@@ -510,7 +510,7 @@ En las tablas de personas, empresas y deals, Cream añade columnas calculadas au
 
 La cabecera muestra el nombre, la empresa y los datos principales de contacto. Usa **Send email**, **Add note**, **Create task** o **Add deal** cuando lo necesites: los editores se abren bajo demanda. **Edit** abre el formulario de contacto agrupado; **Merge duplicates** y **Delete contact** están en el menú **•••**.
 
-- **Activity** se abre por defecto. **Next tasks** muestra primero las tareas vencidas y después las próximas; despliega las restantes o completadas cuando lo necesites. El historial reúne notas, correos, comentarios y cambios del registro. Filtra por tipo y usa **Older / Newer** para consultar entradas anteriores o más recientes. En la columna de contexto, **Campañas enviadas** lista las últimas campañas de marketing recibidas por el contacto; **Recorridos** muestra las inscripciones (activas, en espera, completadas o canceladas) con el paso actual. **Ver más** abre el historial completo (ver [§29](#29-marketing)).
+- **Actividad** se abre por defecto. En la columna principal verás, en este orden: **Oportunidades** (todas las del contacto que puedes ver, con etapa, fecha y productos; si hay más de cinco, el resto en un desplegable), **Próximas tareas** (primero vencidas y después las próximas; despliega las restantes o completadas cuando lo necesites) e **Histórico** (notas, correos, comentarios, cambios del contacto y **cambios de etapa de sus oportunidades**, incluido cuándo se ganan, con enlace a cada oportunidad). Filtra el histórico por tipo y usa **Más antiguas / Más recientes** para paginar. En la columna de contexto, **Campañas enviadas** lista las últimas campañas de marketing recibidas por el contacto; **Recorridos** muestra las inscripciones (activas, en espera, completadas o canceladas) con el paso actual. **Ver más** abre el historial completo (ver [§29](#29-marketing)).
 - **Opportunities** contiene los deals y el filtro por producto, además de intereses por producto y formularios enviados cuando están habilitados. Despliega **Registrar interés** para añadir un interés.
 - **Information** agrupa contacto, perfil profesional, responsable, relaciones, campos personalizados, preferencias de correo y, si hay envíos, **Formularios enviados** (enlace **Ver consentimiento** a la política y la frase aceptadas). Cada bloque editable tiene su enlace **Edit**. Despliega **Add relationship** para vincular a otra persona.
 - **Files**, cuando está habilitado, contiene el formulario de subida y los archivos adjuntos.
@@ -578,7 +578,7 @@ En una persona, pulsa **Send email** en la cabecera. En una empresa o deal, baja
 3. El correo queda en el historial con la etiqueta **Sending** hasta que sale (desde la dirección del workspace por SMTP, o desde **tu Gmail** si lo tienes conectado). Cuando la entrega termina, la etiqueta pasa a **Sent**. Si el envío falla, la etiqueta es **Failed to send**: abre el correo y pulsa **Reintentar envío** para volver a mandarlo. Si falta el destinatario, el asunto o el cuerpo, Cream lo indica y el borrador sigue en el editor.
 4. En el **Timeline** del registro aparece una entrada del tipo *«Tu nombre sent “Asunto” to destinatario@…»*.
 
-En una persona, consulta los correos en **Activity → Emails**, con asunto, estado y cuerpo desplegable; usa **Older / Newer** para recorrer el historial. En empresas y deals aparecen los **últimos 10 emails** debajo del formulario. Al desplegar un correo se ve el mensaje con su formato: saltos de línea, listas y el HTML del original. Ambas vistas incluyen envíos y, con Gmail, respuestas recibidas.
+En una persona, consulta los correos en **Histórico → Emails**, con asunto, estado y cuerpo desplegable; usa **Más antiguas / Más recientes** para paginar. En empresas y deals aparecen los **últimos 10 emails** debajo del formulario. Al desplegar un correo se ve el mensaje con su formato: saltos de línea, listas y el HTML del original. Ambas vistas incluyen envíos y, con Gmail, respuestas recibidas.
 
 ### Seguimiento de aperturas y clics
 

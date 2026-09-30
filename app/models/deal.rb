@@ -125,7 +125,9 @@ class Deal < ApplicationRecord
     update!(pipeline_stage: target, pipeline: target.pipeline,
       position: position || (workspace.deals.where(pipeline_stage_id: target.id).maximum(:position) || 0) + 1)
     reposition_in_stage!(target, position) unless position.nil?
-    track_activity("stage_changed", metadata: {from: old_stage&.name, to: target.name}) if old_stage != target
+    if old_stage != target
+      track_activity("stage_changed", metadata: {from: old_stage&.name, to: target.name, won: target.won?})
+    end
     if old_stage != target
       if old_pipeline.id != target.pipeline_id
         track_activity("pipeline_changed", metadata: {from: old_pipeline.name, to: target.pipeline.name})
