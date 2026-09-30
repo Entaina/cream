@@ -26,4 +26,20 @@ RSpec.describe PublicLayoutTemplates::Renderer do
     expect(html).to include("<footer>End</footer>")
     expect(html).not_to include("{{ content }}")
   end
+
+  it "renders the default entaina-style layout from the repository" do
+    LeadFormTemplates::Importer.import!(workspace)
+    template = workspace.lead_form_templates.find_by!(path: "public/layouts/booking_default")
+
+    html = described_class.render(
+      template: template,
+      content_html: "<div data-test=\"widget\">Calendario</div>",
+      workspace: workspace,
+      view_context: LeadFormTemplates::NullViewContext.new
+    )
+
+    expect(html).to include("logo-header.png")
+    expect(html).to include("Entaina Digital SL")
+    expect(html).to include('data-test="widget"')
+  end
 end

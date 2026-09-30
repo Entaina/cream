@@ -37,7 +37,11 @@ module LeadFormTemplates
 
       def resolve_path(_context)
         path = @path
-        return path if path.start_with?("public/lead_forms/")
+        return path if path.match?(/\Apublic\/(?:lead_forms|layouts)\//)
+
+        if path.start_with?("layouts/")
+          return "public/layouts/partials/#{path.delete_prefix("layouts/")}"
+        end
 
         "public/lead_forms/partials/#{path}"
       end

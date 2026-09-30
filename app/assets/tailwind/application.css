@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* Dynamic color classes interpolated from record color names. */
-@source inline("bg-hoki-300 bg-hoki-400 bg-hoki-500 bg-hoki-600 bg-copperfield-300 bg-copperfield-400 bg-copperfield-500 bg-copperfield-600 bg-golden-300 bg-golden-500 bg-golden-600 bg-green-300 bg-green-500 bg-green-600 bg-red-300 bg-red-500 bg-red-600 bg-chicago-300 bg-chicago-400 bg-chicago-500 bg-chicago-600 bg-blue-500 dark:bg-hoki-300 dark:bg-hoki-400 dark:bg-copperfield-300 dark:bg-copperfield-400 dark:bg-chicago-400 dark:bg-golden-500 dark:bg-green-500 dark:bg-red-500");
+@source inline("bg-hoki-300 bg-hoki-400 bg-hoki-500 bg-hoki-600 bg-copperfield-300 bg-copperfield-400 bg-copperfield-500 bg-copperfield-600 bg-golden-300 bg-golden-500 bg-golden-600 bg-green-300 bg-green-500 bg-green-600 bg-red-300 bg-red-500 bg-red-600 bg-chicago-300 bg-chicago-400 bg-chicago-500 bg-chicago-600 bg-chicago-800 bg-chicago-900 border-chicago-800 text-hoki-200 text-hoki-300 text-hoki-400 text-hoki-500 bg-blue-500 dark:bg-hoki-300 dark:bg-hoki-400 dark:bg-copperfield-300 dark:bg-copperfield-400 dark:bg-chicago-400 dark:bg-golden-500 dark:bg-green-500 dark:bg-red-500");
 
 /*
  * Cream design tokens, theme "Technology":
@@ -290,7 +290,7 @@
 }
 
 .public-booking-hero {
-  @apply flex items-start justify-between gap-4 border-b border-line bg-gradient-to-br from-hoki-50/80 to-canvas-raised px-6 py-6 sm:px-8 sm:py-7;
+  @apply flex items-center justify-between gap-4 border-b border-line bg-gradient-to-br from-hoki-50/80 to-canvas-raised px-6 py-6 sm:px-8 sm:py-7;
 }
 
 .public-booking-profile {
