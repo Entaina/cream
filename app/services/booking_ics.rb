@@ -33,7 +33,13 @@ class BookingIcs
 
   private
 
+  # Gmail matches an attached .ics to an existing Calendar event by UID.
+  # Events created via the Calendar API use iCalUID "{id}@google.com" unless
+  # the API response stores a different one on the booking.
   def uid
+    return @booking.google_ical_uid if @booking.google_ical_uid.present?
+    return "#{@booking.google_event_id}@google.com" if @booking.google_event_id.present?
+
     "booking-#{@booking.id}@cream"
   end
 

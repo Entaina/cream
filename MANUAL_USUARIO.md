@@ -4,7 +4,7 @@
 
 Cream es un CRM por **workspaces** para gestionar **personas**, **empresas** y **deals** (oportunidades), con notas, tareas, listas y un historial de actividad compartido en el equipo.
 
-> **Última revisión:** 2026-09-30 (reservas: el email al anfitrión adjunta un .ics)
+> **Última revisión:** 2026-09-30 (reservas: el .ics del email al anfitrión es la misma cita de Google Calendar)
 > Este documento describe la funcionalidad **visible para el usuario**. Las funcionalidades desactivadas aparecen al final en «Próximamente».
 
 ---
@@ -1306,7 +1306,7 @@ Copia la **URL pública** y compártela con clientes. Si la página tiene varios
 - Se consulta la **disponibilidad real** contra los calendarios configurados (por defecto `primary`).
 - Al confirmar, se crea el **evento en Google Calendar** con quien reserva, los invitados opcionales (hasta 5) y el anfitrión como asistentes.
 - En Cream se crea o reutiliza la **persona** (por email) y se crea o reutiliza el **deal** en el pipeline indicado según la opción **Reutilizar deal existente**, con tarea de seguimiento para el anfitrión cuando el deal es nuevo.
-- El anfitrión recibe aviso según sus canales en **Settings → Profile → Alertas** (campana y/o email), con los datos de la reserva y un enlace al deal. El email adjunta un archivo `.ics` para añadir la cita al calendario.
+- El anfitrión recibe aviso según sus canales en **Settings → Profile → Alertas** (campana y/o email), con los datos de la reserva y un enlace al deal. El email adjunta un archivo `.ics` de la misma cita que ya está en Google Calendar, para que no se cree una segunda reunión.
 - En la ficha del **deal** y del **contacto**, el timeline de **Actividad** registra la reserva (invitado, tipo de cita y fecha/hora), también cuando se reutiliza un deal existente.
 
 ### Página pública (visitante)

@@ -58,6 +58,7 @@ class BookingCreator
       ends_at:,
       timezone: @timezone_name,
       google_event_id: google_event["id"],
+      google_ical_uid: google_event["iCalUID"].presence || "#{google_event["id"]}@google.com",
       google_event_link: google_event["htmlLink"],
       meet_link: extract_meet_link(google_event),
       metadata: Booking.build_tracking_metadata(

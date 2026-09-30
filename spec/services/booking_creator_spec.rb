@@ -38,6 +38,7 @@ RSpec.describe BookingCreator, type: :service do
     allow(BookingAvailabilityService).to receive(:slot_available?).and_return(true)
     allow(client).to receive(:create_event).and_return(
       "id" => "evt1",
+      "iCalUID" => "evt1@google.com",
       "htmlLink" => "https://calendar.google.com/event/1",
       "conferenceData" => {
         "entryPoints" => [{"entryPointType" => "video", "uri" => "https://meet.google.com/abc"}]
@@ -101,6 +102,7 @@ RSpec.describe BookingCreator, type: :service do
     )
 
     expect(result.booking).to be_persisted
+    expect(result.booking.google_ical_uid).to eq("evt1@google.com")
     expect(result.booking.meet_link).to eq("https://meet.google.com/abc")
     expect(result.booking.metadata).to include(
       "booking_page_slug" => "creator-test",
