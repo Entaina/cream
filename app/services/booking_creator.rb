@@ -225,6 +225,18 @@ class BookingCreator
     Array(@params["guests"]).map { |email| email.to_s.strip.downcase }.reject(&:blank?).uniq
   end
 
+  def google_event_attendees
+    emails = [normalized_email, *normalized_guests]
+    host_email = organizer_email
+    emails << host_email if host_email.present? && emails.exclude?(host_email)
+
+    emails.map { |email| {email:} }
+  end
+
+  def organizer_email
+    @booking_page.calendar_connection&.email.to_s.strip.downcase.presence
+  end
+
   def create_google_event!(starts_at:, ends_at:)
     calendar_id = @booking_page.event_calendar_id
     summary = "#{@event_type.localized_name} — #{@params["first_name"]} #{@params["last_name"]}".strip
@@ -238,7 +250,7 @@ class BookingCreator
       description: description_lines.join("\n\n"),
       start: google_event_time(starts_at),
       end: google_event_time(ends_at),
-      attendees: normalized_guests.map { |email| {email:} }.prepend({email: normalized_email})
+      attendees: google_event_attendees
     }
 
     if @event_type.google_meet?

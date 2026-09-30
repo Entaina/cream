@@ -86,8 +86,23 @@ Al añadir o cambiar eventos en `Activity` / `activity_sentence`, actualizar **M
 | `email_opened` | «dest@… opened “Asunto”» |
 | `email_clicked` | «Link clicked in “Asunto”» |
 | `email_replied` | «Someone replied to “Asunto”» |
+| `stage_changed` en el **Histórico** de una persona | «Ana movió la oportunidad Nombre de Propuesta a Negociación»; si la etapa es de ganancia, «Ana ganó la oportunidad Nombre» (EN: “Ana moved deal Name from Proposal to Negotiation” / “Ana won deal Name”). El nombre enlaza a la oportunidad. Solo en filtros **Todo** / **All** y **Cambios** / **Changes** |
 
 Los nombres de badges en la lista de emails (**Sent**, **Opened**, **Replied**, **Received**, **Scheduled**, **Follow up**) deben coincidir con `_email_section.html.erb`.
+
+## Ficha de persona (referencia para §5 y §13)
+
+Al cambiar la pestaña **Actividad**, el listado de oportunidades o el histórico de un contacto, actualizar **MANUAL_USUARIO.md** §5 («Oportunidades de la persona») y §13, y **USER_MANUAL.md** §5 / §13. Nombres de la UI en el idioma del manual.
+
+| Pieza | Ubicación en código | Manual (usuario) |
+|-------|---------------------|------------------|
+| Pestaña **Actividad** | `people/show` — columna principal | §13: **Oportunidades**, **Próximas tareas**, **Histórico** |
+| Cinco primeras + **Mostrar N oportunidades más** | `people/_overview_deals_section` | §5 y §13 |
+| **Ver oportunidades (N)** (si hay más de cinco) | mismo partial; cambia a la pestaña deals | §5 y §13 |
+| Lista completa y filtro **Todos los productos** | `people/_deals_panel` (solo si hay más de un producto) | §5 y §13 pestaña **Oportunidades** |
+| Cambios de etapa de esas oportunidades | `RecordActivityFeed` con `deal_ids`, filtros `all` y `changes` | §13 frases de movimiento y de ganancia |
+
+No documentar `person_history_activity_html`, `deal_ids` ni `policy_scope` en el manual.
 
 ## Menciones `@usuario`
 

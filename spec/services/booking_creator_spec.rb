@@ -45,6 +45,43 @@ RSpec.describe BookingCreator, type: :service do
     )
   end
 
+  it "adds the organizer to the Google event attendees" do
+    workspace.calendar_connections.create!(
+      user: user,
+      email: "Host@Gmail.com",
+      refresh_token: "rt",
+      access_token: "at",
+      expires_at: 1.hour.from_now
+    )
+
+    described_class.call(
+      booking_page: booking_page,
+      event_type: event_type,
+      params: {
+        datetime: "2026-07-28T10:00:00",
+        timezone: "Europe/Madrid",
+        first_name: "Ana",
+        last_name: "Lopez",
+        email: "ana@example.com",
+        guests: ["extra@example.com"]
+      },
+      request: request,
+      client: client
+    )
+
+    expect(client).to have_received(:create_event).with(
+      hash_including(
+        event: hash_including(
+          attendees: [
+            {email: "ana@example.com"},
+            {email: "extra@example.com"},
+            {email: "host@gmail.com"}
+          ]
+        )
+      )
+    )
+  end
+
   it "creates booking and CRM records" do
     result = described_class.call(
       booking_page: booking_page,

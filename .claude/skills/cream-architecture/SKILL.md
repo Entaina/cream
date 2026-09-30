@@ -9,7 +9,7 @@ Cream replicates Attio's CRM: workspace-scoped records (People, Companies, Deals
 
 ## Domain model
 
-- Core records: `Company`, `Person` (belongs_to company), `Deal` (stage machine in `Deal::STAGES`: lead/qualified/proposal/negotiation/won/lost, each with label+color; `move_to_stage!` handles kanban moves and logs a `stage_changed` activity).
+- Core records: `Company`, `Person` (belongs_to company), `Deal` (stage machine in `Deal::STAGES`: lead/qualified/proposal/negotiation/won/lost, each with label+color; `move_to_stage!` handles kanban moves and logs a `stage_changed` activity with metadata `{ from:, to:, won: }`, where `won` is true when the target stage is a won stage).
 - Shared concerns: `CrmRecord` (workspace, owner, notes/tasks/list_entries associations) and `Trackable` (auto-logs `created`/`updated` activities with field diffs; per-model `tracked_ignored_attributes`).
 - `Note` / `Task` are polymorphic (`notable` / `taskable`) and log activities on their parent record.
 - **`Task` assignee:** optional `assignee_id`; default on create is the current user. If the title contains `@handle` for a workspace member, `before_save` assigns the first match via `MentionParser` (same parser as comments).
@@ -17,7 +17,7 @@ Cream replicates Attio's CRM: workspace-scoped records (People, Companies, Deals
 - **`Edition`**: belongs to **`Product`** (and denormalized `workspace` for policies/scoping). Unique `name` per product (`[product_id, name]`). Optional `starts_on` / `ends_on`. `has_many :deal_products` (`restrict_with_error` on delete).
 - **`DealProduct`**: deal line — `product`, optional `edition` (must belong to the same product). `edition_name` resolves via `product.editions.find_or_create_by(name:)`. Value rolls up to `deal.value`.
 - `List` + `ListEntry`: typed lists (record_type Person|Company|Deal) shown in the sidebar.
-- `Activity`: polymorphic timeline (`subject`), rendered by `ApplicationHelper#activity_sentence`.
+- `Activity`: polymorphic timeline (`subject`), rendered by `ApplicationHelper#activity_sentence`. On a person, `RecordActivityFeed` accepts `deal_ids:` and, when the filter is `all` or `changes`, also includes those deals' `stage_changed` rows. The person history renders them with `person_history_activity_html`: won stages use `activities.person_deal_won_html`; other moves use `activities.person_deal_stage_changed_html` (the deal name links to the deal). Rows without `metadata["won"]` fall back to whether the named target stage is `won?`.
 
 ## Workspaces & multi-tenancy
 
@@ -71,6 +71,7 @@ Per-user, per-workspace bearer tokens for programmatic access (MCP, REST API, et
 
 - Layout: fixed left sidebar (`shared/_sidebar`), pages are flex columns: `shared/_page_header` (h-13 title bar with actions capture) + scrollable content.
 - Record show pages: left attributes panel (w-80, `shared/_attribute` rows) + main column with `shared/_notes_section`, `shared/_tasks_section`, `shared/_timeline`.
+- **Person show** is tabbed (`activity` / `deals` / `information` / `files`). Activity main column: `people/_overview_deals_section` (first 5 of `@deals`, remainder in a disclosure; **View deals** jumps to the deals tab when there are more than 5), next tasks, then `people/_activity_feed` (**History**). Deals tab: `people/_deals_panel` (full list; product `<select>` when more than one product) and, if `:mql_pool`, product interests and lead submissions. `@deals` is the policy scope of deals that have this person as a contact, newest first; a `product_id` query filters that set and opens the deals tab. `PeopleController#show` passes those deal ids into `RecordActivityFeed`.
 - Components are CSS classes in `app/assets/tailwind/application.css`: `.btn-primary/.btn-secondary/.btn-ghost/.btn-danger`, `.input`, `.label`, `.table-base`, `.card`.
 - **ViewComponents** (`gem "view_component"`, `app/components/`): reusable UI pieces with Ruby class + ERB template. Use `RecordPickerComponent` for searchable form pickers with optional on-the-fly creation (companies, editions per product, etc.). Hybrid search: embeds full list when `scope.count` is between 1 and `RecordPickerComponent::INLINE_LIMIT` (200); **empty scope** → remote-only (never embed an empty inline list). Otherwise queries `search_url` (e.g. `GET /companies/picker.json?q=`, `GET /products/:id/editions/picker.json?q=`). Stimulus: `record_picker_controller.js`; edition lines on deals also use `product_edition_picker_controller.js` to reload editions when the product `<select>` changes.
 - Theme tokens (`@theme`): `ink` (text), `ink-soft`, `ink-faint`, `line` (borders), `canvas` (bg), `canvas-soft`, `canvas-sunken`, `canvas-tint` (sidebar), `accent`/`accent-dark`/`accent-soft` (Hoki), `on-dark`. Typography scale: `text-base` 15px (body), `text-sm` 14px (buttons/inputs), `text-xs` 13px (labels/meta), `text-2xs` 12px (badges/kbd). Fonts: Lato body, Comfortaa display.
