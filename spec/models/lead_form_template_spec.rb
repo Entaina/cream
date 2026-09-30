@@ -134,6 +134,26 @@ RSpec.describe LeadFormTemplate, type: :model do
       expect(template.errors[:slug]).to be_present
       expect(template.errors[:path]).to be_empty
     end
+
+    it "reports blank slug for partials with empty page_slug field, not page_slug uniqueness" do
+      workspace.lead_form_templates.create!(
+        slug: "existing_partial",
+        partial: true,
+        page_slug: "",
+        body: "<p>ok</p>"
+      )
+
+      template = workspace.lead_form_templates.build(
+        slug: "",
+        partial: true,
+        page_slug: "",
+        body: "<p>new</p>"
+      )
+
+      expect(template).not_to be_valid
+      expect(template.errors[:slug]).to be_present
+      expect(template.errors[:page_slug]).to be_empty
+    end
   end
 
   describe ".template_key_for" do

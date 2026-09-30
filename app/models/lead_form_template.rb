@@ -16,8 +16,8 @@ class LeadFormTemplate < ApplicationRecord
     unless: -> { errors[:slug].present? }
   validates :body, presence: true
   validates :kind, inclusion: {in: KINDS}
-  validates :page_slug, format: {with: /\A[a-z0-9_-]+\z/}, allow_blank: true
-  validates :page_slug, uniqueness: {scope: :workspace_id}, allow_nil: true
+  validates :page_slug, format: {with: /\A[a-z0-9_-]+\z/}, allow_blank: true, if: :page?
+  validates :page_slug, uniqueness: {scope: :workspace_id}, allow_nil: true, if: :page?
   validate :body_must_have_valid_liquid_syntax
   validate :page_slug_required_for_pages
   validate :layout_body_must_include_content_placeholder
@@ -86,6 +86,7 @@ class LeadFormTemplate < ApplicationRecord
     kind == "layout"
   end
 
+  before_validation :normalize_page_slug
   before_validation :assign_path_from_slug
   before_validation :normalize_non_form_kind
   after_save :refresh_submission_schema!, if: :form_page?
@@ -149,6 +150,14 @@ class LeadFormTemplate < ApplicationRecord
     return unless page?
 
     errors.add(:page_slug, :blank) if page_slug.blank?
+  end
+
+  def normalize_page_slug
+    if page?
+      self.page_slug = page_slug.presence
+    else
+      self.page_slug = nil
+    end
   end
 
   def normalize_non_form_kind
