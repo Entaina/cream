@@ -12,7 +12,8 @@ class LeadFormTemplate < ApplicationRecord
 
   belongs_to :workspace
 
-  validates :path, presence: true, format: {with: PATH_FORMAT}, uniqueness: {scope: :workspace_id}
+  validates :path, presence: true, format: {with: PATH_FORMAT}, uniqueness: {scope: :workspace_id},
+    unless: -> { errors[:slug].present? }
   validates :body, presence: true
   validates :kind, inclusion: {in: KINDS}
   validates :page_slug, format: {with: /\A[a-z0-9_-]+\z/}, allow_blank: true
@@ -51,7 +52,7 @@ class LeadFormTemplate < ApplicationRecord
 
   def display_name
     if path.to_s.start_with?(LAYOUT_PARTIALS_PREFIX)
-      path.to_s.delete_prefix(LAYOUT_PARTIALS_PREFIX)
+      "layouts/#{path.to_s.delete_prefix(LAYOUT_PARTIALS_PREFIX)}"
     elsif partial? || path.to_s.start_with?(PARTIALS_PREFIX)
       path.to_s.delete_prefix(PARTIALS_PREFIX)
     elsif page?
@@ -105,9 +106,21 @@ class LeadFormTemplate < ApplicationRecord
   private
 
   def assign_path_from_slug
-    segment = (@slug.presence || page_slug.presence || display_name.presence).to_s.strip.downcase
+    segment = slug_segment_for_path_assignment.to_s.strip.downcase
     if segment.blank?
       errors.add(:slug, :blank) unless path.present?
+      return
+    end
+
+    if segment.start_with?("layouts/")
+      layout_partial_name = segment.delete_prefix("layouts/")
+      unless layout_partial_name.match?(/\A[a-z][a-z0-9_-]*\z/)
+        errors.add(:slug, :invalid_format)
+        return
+      end
+
+      self.partial = true
+      self.path = "#{LAYOUT_PARTIALS_PREFIX}#{layout_partial_name.tr("-", "_")}"
       return
     end
 
@@ -149,6 +162,14 @@ class LeadFormTemplate < ApplicationRecord
     return if body.match?(CONTENT_PLACEHOLDER)
 
     errors.add(:body, I18n.t("marketing.lead_form_templates.errors.content_placeholder"))
+  end
+
+  def slug_segment_for_path_assignment
+    return @slug if @slug.present?
+    return page_slug if page_slug.present?
+    return display_name if path.to_s.start_with?("public/")
+
+    nil
   end
 
   def body_must_have_valid_liquid_syntax

@@ -49,13 +49,13 @@ RSpec.describe LeadFormTemplate, type: :model do
 
     it "enforces unique path per workspace" do
       workspace.lead_form_templates.create!(
-        path: "public/lead_forms/contacto",
-        partial: false,
+        slug: "contact_fields",
+        partial: true,
         body: "<p>contacto</p>"
       )
 
       duplicate = workspace.lead_form_templates.build(
-        path: "public/lead_forms/contacto",
+        slug: "contact_fields",
         partial: true,
         body: "<p>other</p>"
       )
@@ -108,6 +108,31 @@ RSpec.describe LeadFormTemplate, type: :model do
 
       expect(template).to be_valid
       expect(template.path).to eq("public/lead_forms/partials/contact_fields")
+    end
+
+    it "builds layout partial path from layouts/name slug" do
+      template = workspace.lead_form_templates.build(
+        slug: "layouts/site_footer",
+        body: "<footer>Site</footer>"
+      )
+
+      expect(template).to be_valid
+      expect(template.partial).to be(true)
+      expect(template.path).to eq("public/layouts/partials/site_footer")
+      expect(template.display_name).to eq("layouts/site_footer")
+      expect(template.slug).to eq("layouts/site_footer")
+    end
+
+    it "does not duplicate path errors when slug format is invalid" do
+      template = workspace.lead_form_templates.build(
+        slug: "Bad Name",
+        partial: true,
+        body: "<p>ok</p>"
+      )
+
+      expect(template).not_to be_valid
+      expect(template.errors[:slug]).to be_present
+      expect(template.errors[:path]).to be_empty
     end
   end
 
