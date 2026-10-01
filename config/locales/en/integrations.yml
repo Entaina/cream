@@ -362,11 +362,11 @@ en:
         webhook_url: Webhook URL (register in Beehiiv → Settings → Webhooks)
       features:
         attribution: Attribution
+        custom_fields: Custom fields
         ga_measurement_id: GA4 measurement ID
         ga_measurement_id_hint: Used by the {% google_analytics %} partial in templates
           (e.g. booking acknowledgment). Format G-XXXXXXXX.
         ga_measurement_id_placeholder: G-XXXXXXXXXX
-        custom_fields: Custom fields
         intro: Enable menu sections and settings you want in this workspace. They
           are off by default.
         lead_scoring: Lead scoring
@@ -374,14 +374,6 @@ en:
         save: Save features
         title: Features
         webhooks: Webhooks
-      public_booking_layout:
-        hint: Edit the template under Forms → Templates. It must include {{ content
-          }} where the booking calendar appears.
-        intro: Optional. Wraps public /b/… pages with your site header and footer.
-        none: No layout (booking widget only)
-        save: Save layout
-        template: Layout template
-        title: Public booking layout
       general:
         edit_hint: If you only enable edit, salespeople can also view those deals.
         name: Workspace name
@@ -443,4 +435,12 @@ en:
           to the drive…
         title: OKM
       page_title: Settings
+      public_booking_layout:
+        hint: Edit the template under Forms → Templates. It must include {{ content
+          }} where the booking calendar appears.
+        intro: Optional. Wraps public /b/… pages with your site header and footer.
+        none: No layout (booking widget only)
+        save: Save layout
+        template: Layout template
+        title: Public booking layout
       title: Settings

@@ -84,6 +84,59 @@ RSpec.describe "Pipelines", type: :request do
       expect(response).to redirect_to(pipelines_path)
       expect(pipeline.reload.pipeline_stages.ordered.first(3).map(&:name)).to eq(%w[Proposal Lead Qualified])
     end
+
+    it "refuses to remove a stage targeted by a lead form and names the form" do
+      sign_in_as(member)
+      pipeline = Pipeline.create_default!(workspaces(:one))
+      stage = pipeline.pipeline_stages.ordered.first
+      lead_form = create_lead_form!(workspaces(:one), user: member, pipeline: pipeline, pipeline_stage: stage)
+
+      patch pipeline_path(pipeline), params: {
+        pipeline: {
+          name: pipeline.name,
+          pipeline_stages_attributes: {"0" => {id: stage.id, _destroy: "1"}}
+        }
+      }
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to include(ERB::Util.html_escape(lead_form.name))
+      expect(PipelineStage.exists?(stage.id)).to be(true)
+      expect(lead_form.reload.pipeline_stage_id).to eq(stage.id)
+    end
+
+    it "refuses to remove a stage that has deals and reports how many" do
+      sign_in_as(member)
+      pipeline = Pipeline.create_default!(workspaces(:one))
+      stage = pipeline.pipeline_stages.ordered.first
+      create_deal!(workspaces(:one), pipeline: pipeline, stage: stage)
+
+      patch pipeline_path(pipeline), params: {
+        pipeline: {
+          name: pipeline.name,
+          pipeline_stages_attributes: {"0" => {id: stage.id, _destroy: "1"}}
+        }
+      }
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to include(ERB::Util.html_escape(I18n.t("pipelines.validation.stage_has_deals", stage: stage.name, count: 1)))
+      expect(PipelineStage.exists?(stage.id)).to be(true)
+    end
+
+    it "removes a stage that no lead form uses" do
+      sign_in_as(member)
+      pipeline = Pipeline.create_default!(workspaces(:one))
+      stage = pipeline.pipeline_stages.ordered.first
+
+      patch pipeline_path(pipeline), params: {
+        pipeline: {
+          name: pipeline.name,
+          pipeline_stages_attributes: {"0" => {id: stage.id, _destroy: "1"}}
+        }
+      }
+
+      expect(response).to redirect_to(pipelines_path)
+      expect(PipelineStage.exists?(stage.id)).to be(false)
+    end
   end
 
   describe "PATCH /pipelines/:id/reorder_stages" do

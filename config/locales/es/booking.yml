@@ -35,6 +35,7 @@ es:
         puede tardar unos minutos en propagarse.
       api_failed: "%{operation} falló (%{code}): %{detail}"
       availability_params_required: Indica month o date.
+      booking_not_modifiable: Esta reserva ya no se puede modificar.
       calendar_not_connected: Calendario no conectado.
       event_type_not_found: Tipo de evento no encontrado.
       google_not_connected: Google Calendar no está conectado.
@@ -52,9 +53,9 @@ es:
         list_calendars: listar calendarios
         update_events: actualizar eventos
       rate_limited: Demasiadas peticiones. Inténtalo de nuevo en un minuto.
-      booking_not_modifiable: Esta reserva ya no se puede modificar.
       slot_unavailable: Ese horario ya no está disponible.
-      success_template_invalid: debe ser una plantilla de acuse de reserva de este workspace
+      success_template_invalid: debe ser una plantilla de acuse de reserva de este
+        workspace
       timeout: Google Calendar no respondió a tiempo. Inténtalo de nuevo en unos minutos.
       token_refresh_failed: No se pudo renovar el token (%{code}).
     location_types:
@@ -91,6 +92,16 @@ es:
         location: Ubicación
         subject: 'Recordatorio: %{event_name} · %{date}'
         time: Hora
+    manage:
+      cancel_confirm: Sí, cancelar reserva
+      cancel_confirm_prompt: "¿Seguro que quieres cancelar esta reserva? Se eliminará
+        el evento del calendario y se avisará a los asistentes."
+      cancel_title: Cancelar reserva
+      cancelled_body: Tu reserva ha quedado cancelada.
+      cancelled_title: Reserva cancelada
+      keep_booking: Mantener la reserva
+      not_modifiable_body: Esta reserva ya ha pasado o fue cancelada.
+      not_modifiable_title: No se puede modificar
     pages:
       edit:
         page_title: Editar página de reservas
@@ -100,6 +111,10 @@ es:
         availability_section: Disponibilidad y reserva
         buffer_after: Buffer después (min)
         buffer_before: Buffer antes (min)
+        confirmation_message_en: Mensaje de confirmación (EN)
+        confirmation_message_es: Mensaje de confirmación (ES)
+        confirmation_message_hint: Opcional. Se inserta con {confirmation_message}
+          en la plantilla. Si está vacío, se usa el texto por defecto.
         copied: Copiado
         copy_aria: Copiar al portapapeles
         copy_title: Copiar al portapapeles
@@ -112,22 +127,14 @@ es:
         duration_min: Duración (min)
         duration_minutes_abbr: "%{count} min"
         email_blank: Sin email
-        success_section: Acuse tras reservar
-        success_template: Plantilla de acuse
-        success_template_blank: Usar la de la página
-        success_template_hint: Si se elige, sustituye a la plantilla de la página pública
-          para este tipo de evento.
         email_section: Email de confirmación
         email_template: Plantilla de email al invitado
-        confirmation_message_en: Mensaje de confirmación (EN)
-        confirmation_message_es: Mensaje de confirmación (ES)
-        confirmation_message_hint: 'Opcional. Se inserta con {confirmation_message} en la plantilla.
-          Si está vacío, se usa el texto por defecto.'
-        email_tokens_hint: 'Se envía al confirmar la reserva. Tokens: {first_name}, {last_name},
-          {name}, {email}, {company}, {locale}, {event_name}, {date}, {time}, {date_time},
-          {duration}, {timezone}, {location}, {location_address}, {location_type}, {meet_link},
-          {confirmation_message}, {phone}, {guest_message}, {host_name}, {cancel_url}, {reschedule_url}.
-          Liquid: {% if locale == "en" %}…{% endif %}, {% if meet_link != "" %}…{% endif %}.'
+        email_tokens_hint: 'Se envía al confirmar la reserva. Tokens: {first_name},
+          {last_name}, {name}, {email}, {company}, {locale}, {event_name}, {date},
+          {time}, {date_time}, {duration}, {timezone}, {location}, {location_address},
+          {location_type}, {meet_link}, {confirmation_message}, {phone}, {guest_message},
+          {host_name}, {cancel_url}, {reschedule_url}. Liquid: {% if locale == "en"
+          %}…{% endif %}, {% if meet_link != "" %}…{% endif %}.'
         hidden: Oculto
         identification_section: Identificación
         increment: Incremento (min)
@@ -149,6 +156,11 @@ es:
         reorder_title: Arrastrar para reordenar
         slug: Slug (URL)
         slug_placeholder: consultoria
+        success_section: Acuse tras reservar
+        success_template: Plantilla de acuse
+        success_template_blank: Usar la de la página
+        success_template_hint: Si se elige, sustituye a la plantilla de la página
+          pública para este tipo de evento.
         visible: Visible
         weekly_hours: Franjas horarias semanales
       form:
@@ -190,15 +202,15 @@ es:
         slug_placeholder: alex
         submit_create: Crear
         submit_update: Guardar
+        success_template: Plantilla de acuse
+        success_template_blank: Confirmación en Cream (Meet, .ics)
+        success_template_hint: Tras confirmar la reserva, se abre /b/slug/recibido?evento=…
+          con esta plantilla. Sin datos personales en la URL.
         timezone: Zona horaria
         timezone_hint: Las franjas de cada tipo de evento se interpretan en esta zona.
           Quien reserva ve los huecos convertidos a la suya; el evento en Google Calendar
           es el mismo instante.
         welcome_message: Mensaje de bienvenida
-        success_template: Plantilla de acuse
-        success_template_blank: Confirmación en Cream (Meet, .ics)
-        success_template_hint: Tras confirmar la reserva, se abre /b/slug/recibido?evento=…
-          con esta plantilla. Sin datos personales en la URL.
       form_js:
         activate_api_link: Activar Google Calendar API
         api_disabled: La API de Google Calendar no está activada en el proyecto OAuth
@@ -244,16 +256,6 @@ es:
       weekly_hours_js:
         remove_window: Quitar franja
         unavailable: No disponible
-    manage:
-      cancel_confirm: Sí, cancelar reserva
-      cancel_confirm_prompt: "¿Seguro que quieres cancelar esta reserva? Se eliminará
-        el evento del calendario y se avisará a los asistentes."
-      cancel_title: Cancelar reserva
-      cancelled_body: Tu reserva ha quedado cancelada.
-      cancelled_title: Reserva cancelada
-      keep_booking: Mantener la reserva
-      not_modifiable_body: Esta reserva ya ha pasado o fue cancelada.
-      not_modifiable_title: No se puede modificar
     public_ui:
       addGuests: Añadir invitados
       aria:
@@ -294,9 +296,9 @@ es:
       reminderNotice: Te enviaremos un recordatorio por email %{minutes} minutos antes
         de la reunión.
       rescheduleCurrent: 'Cita actual: %{datetime}'
-      rescheduled: "¡Reserva reprogramada!"
       rescheduleSubmit: Confirmar nueva fecha
       rescheduleTitle: Reprogramar reserva
+      rescheduled: "¡Reserva reprogramada!"
       rescheduling: Reprogramando…
       schedule: Programar evento
       scheduleSummary: "%{datetime} (%{timezone})"

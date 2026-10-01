@@ -84,9 +84,6 @@ es:
       overview: Resumen de la empresa
       people_empty: Todavía no hay personas vinculadas a esta empresa.
   deals:
-    execution_duration:
-      one: "%{count} día"
-      other: "%{count} días"
     board:
       next_stage: Etapa siguiente
       previous_stage: Etapa anterior
@@ -104,6 +101,9 @@ es:
     edit:
       back: "← Volver a la oportunidad"
       title: Editar %{name}
+    execution_duration:
+      one: "%{count} día"
+      other: "%{count} días"
     form:
       contacts:
         create: Crear contacto
@@ -132,8 +132,8 @@ es:
         title: Siguiente acción (obligatoria)
       overview:
         description: Nombre, importe, etapa y fechas clave.
+        execution_duration_placeholder: '90'
         invoice_placeholder: FAC-2026-001
-        execution_duration_placeholder: "90"
         name_placeholder: Acme — Plan anual
         title: Datos de la oportunidad
       products:
@@ -418,24 +418,6 @@ es:
       pages_aria: Páginas de actividad
       title: Actividad
       view_changes: Ver cambios
-    history:
-      actions: Acciones
-      added_note: añadió una nota
-      commented: comentó
-      empty_hint: Prueba otro filtro, o añade una nota para empezar el historial.
-      empty_title: No hay entradas en esta vista.
-      filter_aria: Filtrar histórico
-      filters:
-        all: Todo
-        changes: Cambios
-        comments: Comentarios
-        emails: Emails
-        notes: Notas
-      newer: Más recientes
-      older: Más antiguas
-      pages_aria: Páginas del histórico
-      title: Histórico
-      view_changes: Ver cambios
     add: Añadir
     add_comment: Añadir comentario
     add_deal: Añadir oportunidad
@@ -528,9 +510,9 @@ es:
       domain: Dominio
       email: Email
       employees: Empleados
+      execution_duration: Duración de la ejecución
       industry: Sector
       invoice_number: Nº factura
-      execution_duration: Duración de la ejecución
       job_title: Cargo
       lead_score: Puntuación
       lifecycle: Ciclo de vida
@@ -549,6 +531,24 @@ es:
       stage: Etapa
       twitter: X / Twitter
       value: Importe
+    history:
+      actions: Acciones
+      added_note: añadió una nota
+      commented: comentó
+      empty_hint: Prueba otro filtro, o añade una nota para empezar el historial.
+      empty_title: No hay entradas en esta vista.
+      filter_aria: Filtrar histórico
+      filters:
+        all: Todo
+        changes: Cambios
+        comments: Comentarios
+        emails: Emails
+        notes: Notas
+      newer: Más recientes
+      older: Más antiguas
+      pages_aria: Páginas del histórico
+      title: Histórico
+      view_changes: Ver cambios
     magic_columns:
       days_in_stage: Días en la etapa
       last_activity_at: Última actividad

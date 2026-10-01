@@ -296,15 +296,17 @@ en:
     lead_form_templates:
       edit:
         page_title: Edit form template
+      errors:
+        content_placeholder: must include {{ content }}
       form:
         body: Liquid content
         body_hint: Use tags like {% field ... %}, {% partial 'name' %}, {% form_open
           %}, and variables {{ lead_form.name }}.
         kind: Type
-        kind_form: Lead form
-        kind_page: Landing page (/p/:slug)
         kind_booking: Booking acknowledgment
+        kind_form: Lead form
         kind_layout: Booking page layout ({{ content }})
+        kind_page: Landing page (/p/:slug)
         layout_body_hint: Include {{ content }} where the booking widget should appear.
         page_slug: Public slug (landing only)
         page_slug_hint: 'Public URL:'
@@ -317,24 +319,22 @@ en:
           and in <code class="font-mono">{% partial 'name' %}</code>.
         slug_label: Name
         slug_placeholder: contact
-      errors:
-        content_placeholder: must include {{ content }}
       index:
         back_to_forms: Back to forms
-        badge_page: Page
+        badge_booking: Booking
         badge_form: Form
         badge_landing: Landing
-        badge_booking: Booking
+        badge_layout: Layout
+        badge_page: Page
         badge_partial: Partial
         delete_confirm: Delete template «%{name}»?
         empty_all: No templates in this workspace yet.
         empty_kind: No templates of this type.
         filter_all: All
-        filter_partial: Partials
-        filter_view: Pages
         filter_booking: Bookings
         filter_layout: Layouts
-        badge_layout: Layout
+        filter_partial: Partials
+        filter_view: Pages
         new_template: New template
         page_title: Public form templates
         preview: Preview

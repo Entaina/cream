@@ -22,6 +22,8 @@ class Pipeline < ApplicationRecord
 
   validates :name, presence: true
   validate :must_have_a_stage
+  validate :removed_stages_not_used_by_lead_forms
+  validate :removed_stages_without_deals
 
   before_validation :assign_workspace_to_stages
   before_validation :normalize_card_fields
@@ -115,5 +117,27 @@ class Pipeline < ApplicationRecord
     return if pipeline_stages.reject(&:marked_for_destruction?).any?
 
     errors.add(:base, I18n.t("pipelines.validation.needs_stage"))
+  end
+
+  def removed_stages_not_used_by_lead_forms
+    pipeline_stages.select(&:marked_for_destruction?).each do |stage|
+      next if stage.new_record?
+
+      names = stage.lead_forms.order(:name).pluck(:name)
+      next if names.empty?
+
+      errors.add(:base, I18n.t("pipelines.validation.stage_used_by_lead_forms", stage: stage.name, forms: names.to_sentence))
+    end
+  end
+
+  def removed_stages_without_deals
+    pipeline_stages.select(&:marked_for_destruction?).each do |stage|
+      next if stage.new_record?
+
+      count = stage.deals.count
+      next if count.zero?
+
+      errors.add(:base, I18n.t("pipelines.validation.stage_has_deals", stage: stage.name, count: count))
+    end
   end
 end

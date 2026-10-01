@@ -17,9 +17,9 @@ es:
       deal:
         company_id: Empresa
         currency: Moneda
+        execution_duration_days: Duración de la ejecución (días)
         expected_close_date: Fecha de cierre prevista
         invoice_number: Nº factura
-        execution_duration_days: Duración de la ejecución (días)
         name: Nombre
         owner_id: Propietario
         partner_id: Empresa partner
@@ -65,13 +65,14 @@ es:
     note_added: "%{actor} añadió una nota"
     payment_received: "%{actor} vinculó un pago de Stripe de %{amount}"
     payment_received_from: " de %{email}"
+    person_deal_stage_changed_html: "%{actor} movió la oportunidad %{deal_link} de
+      %{from} a %{to}"
+    person_deal_won_html: "%{actor} ganó la oportunidad %{deal_link}"
     pipeline_changed: "%{actor} movió el deal al pipeline %{to}"
     product_added: "%{actor} añadió la línea de producto %{product}"
     product_removed: "%{actor} eliminó la línea de producto %{product}"
     product_updated: "%{actor} actualizó la línea de producto %{product}"
     products_updated: "%{actor} actualizó productos (%{product})"
-    person_deal_stage_changed_html: '%{actor} movió la oportunidad %{deal_link} de %{from} a %{to}'
-    person_deal_won_html: '%{actor} ganó la oportunidad %{deal_link}'
     stage_changed: "%{actor} movió el deal de %{from} a %{to}"
     task_completed: '%{actor} completó la tarea "%{title}"'
     updated: "%{actor} actualizó %{fields}"
@@ -465,13 +466,13 @@ es:
         two_days: en 2 días
         two_weeks: en 2 semanas
       insert_template: Insertar plantilla…
-      without_template: Sin plantilla
       no_templates: No hay plantillas disponibles
       send: Enviar email
       send_later: Enviar más tarde
       subject: Asunto
       title: Enviar email
       to: Para
+      without_template: Sin plantilla
     empty_value: "—"
     filters:
       all_name: Todos los %{name}

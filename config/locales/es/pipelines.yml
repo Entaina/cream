@@ -53,3 +53,7 @@ es:
       stage_triggers: Disparadores de esta etapa
     validation:
       needs_stage: Un pipeline necesita al menos una etapa.
+      stage_has_deals: La etapa "%{stage}" no se puede eliminar porque tiene %{count}
+        deals. Muévelos a otra etapa antes de eliminarla.
+      stage_used_by_lead_forms: 'La etapa "%{stage}" no se puede eliminar porque la
+        usan estos formularios: %{forms}. Cambia su etapa destino antes de eliminarla.'

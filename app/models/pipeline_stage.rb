@@ -4,6 +4,7 @@ class PipelineStage < ApplicationRecord
   belongs_to :pipeline
   belongs_to :workspace
   has_many :deals, dependent: :restrict_with_error
+  has_many :lead_forms, dependent: :restrict_with_error
   has_many :stage_triggers, dependent: :destroy
   has_many :stage_field_formats, dependent: :destroy
   has_many :stage_conditions, dependent: :destroy

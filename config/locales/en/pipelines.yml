@@ -53,3 +53,7 @@ en:
       stage_triggers: Triggers for this stage
     validation:
       needs_stage: A pipeline needs at least one stage.
+      stage_has_deals: The stage "%{stage}" cannot be removed because it has %{count}
+        deals. Move them to another stage before removing it.
+      stage_used_by_lead_forms: 'The stage "%{stage}" cannot be removed because these
+        lead forms use it: %{forms}. Change their target stage before removing it.'

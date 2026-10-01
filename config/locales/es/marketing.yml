@@ -302,15 +302,17 @@ es:
     lead_form_templates:
       edit:
         page_title: Editar plantilla de formulario
+      errors:
+        content_placeholder: debe incluir {{ content }}
       form:
         body: Contenido Liquid
         body_hint: Usa etiquetas como {% field ... %}, {% partial 'nombre' %}, {%
           form_open %} y variables {{ lead_form.name }}.
         kind: Tipo
-        kind_form: Formulario de lead
-        kind_page: Landing page (/p/:slug)
         kind_booking: Acuse de reserva
+        kind_form: Formulario de lead
         kind_layout: Layout de reservas ({{ content }})
+        kind_page: Landing page (/p/:slug)
         layout_body_hint: Incluye {{ content }} donde debe aparecer el widget de reserva.
         page_slug: Slug público (solo landing)
         page_slug_hint: 'URL pública:'
@@ -323,24 +325,22 @@ es:
           formularios y en <code class="font-mono">{% partial 'nombre' %}</code>.
         slug_label: Nombre
         slug_placeholder: contacto
-      errors:
-        content_placeholder: debe incluir {{ content }}
       index:
         back_to_forms: Volver a formularios
-        badge_page: Página
+        badge_booking: Reserva
         badge_form: Formulario
         badge_landing: Landing
-        badge_booking: Reserva
+        badge_layout: Layout
+        badge_page: Página
         badge_partial: Parcial
         delete_confirm: "¿Eliminar la plantilla «%{name}»?"
         empty_all: Todavía no hay plantillas en este workspace.
         empty_kind: No hay plantillas de este tipo.
         filter_all: Todas
-        filter_partial: Parciales
-        filter_view: Páginas
         filter_booking: Reservas
         filter_layout: Layouts
-        badge_layout: Layout
+        filter_partial: Parciales
+        filter_view: Páginas
         new_template: Nueva plantilla
         page_title: Plantillas de formularios públicos
         preview: Vista previa

@@ -35,6 +35,7 @@ en:
         minutes to propagate.
       api_failed: "%{operation} failed (%{code}): %{detail}"
       availability_params_required: month or date is required.
+      booking_not_modifiable: This booking can no longer be modified.
       calendar_not_connected: Calendar not connected.
       event_type_not_found: Event type not found.
       google_not_connected: Google Calendar is not connected.
@@ -51,9 +52,9 @@ en:
         list_calendars: list calendars
         update_events: update events
       rate_limited: Too many requests. Please try again in a minute.
-      booking_not_modifiable: This booking can no longer be modified.
       slot_unavailable: That time slot is no longer available.
-      success_template_invalid: must be a booking acknowledgment template in this workspace
+      success_template_invalid: must be a booking acknowledgment template in this
+        workspace
       timeout: Google Calendar did not respond in time. Try again in a few minutes.
       token_refresh_failed: Token refresh failed (%{code}).
     location_types:
@@ -62,8 +63,8 @@ en:
       to_be_decided: To be arranged
     mailer:
       confirmation:
-        default_message: Unless we agree otherwise, we'll meet via the Google Meet link
-          in your calendar invitation.
+        default_message: Unless we agree otherwise, we'll meet via the Google Meet
+          link in your calendar invitation.
       datetime: Date and time
       host_notification:
         body_html: A booking was made for <strong>%{event_name}</strong> with <strong>%{guest_name}</strong>
@@ -90,6 +91,16 @@ en:
         location: Location
         subject: 'Reminder: %{event_name} · %{date}'
         time: Time
+    manage:
+      cancel_confirm: Yes, cancel booking
+      cancel_confirm_prompt: Are you sure you want to cancel this booking? The calendar
+        event will be removed and attendees will be notified.
+      cancel_title: Cancel booking
+      cancelled_body: Your booking has been cancelled.
+      cancelled_title: Booking cancelled
+      keep_booking: Keep booking
+      not_modifiable_body: This booking has already passed or was cancelled.
+      not_modifiable_title: Cannot be modified
     pages:
       edit:
         page_title: Edit booking page
@@ -99,6 +110,10 @@ en:
         availability_section: Availability and booking
         buffer_after: Buffer after (min)
         buffer_before: Buffer before (min)
+        confirmation_message_en: Confirmation message (EN)
+        confirmation_message_es: Confirmation message (ES)
+        confirmation_message_hint: Optional. Use {confirmation_message} in the template.
+          When empty, the default message is used.
         copied: Copied
         copy_aria: Copy to clipboard
         copy_title: Copy to clipboard
@@ -110,22 +125,14 @@ en:
         duration_min: Duration (min)
         duration_minutes_abbr: "%{count} min"
         email_blank: No email
-        success_section: Post-booking acknowledgment
-        success_template: Acknowledgment template
-        success_template_blank: Use page default
-        success_template_hint: When set, overrides the public page template for this
-          event type.
         email_section: Confirmation email
         email_template: Guest email template
-        confirmation_message_en: Confirmation message (EN)
-        confirmation_message_es: Confirmation message (ES)
-        confirmation_message_hint: 'Optional. Use {confirmation_message} in the template.
-          When empty, the default message is used.'
-        email_tokens_hint: 'Sent when the booking is confirmed. Tokens: {first_name}, {last_name},
-          {name}, {email}, {company}, {locale}, {event_name}, {date}, {time}, {date_time},
-          {duration}, {timezone}, {location}, {location_address}, {location_type}, {meet_link},
-          {confirmation_message}, {phone}, {guest_message}, {host_name}, {cancel_url}, {reschedule_url}.
-          Liquid: {% if locale == "en" %}…{% endif %}, {% if meet_link != "" %}…{% endif %}.'
+        email_tokens_hint: 'Sent when the booking is confirmed. Tokens: {first_name},
+          {last_name}, {name}, {email}, {company}, {locale}, {event_name}, {date},
+          {time}, {date_time}, {duration}, {timezone}, {location}, {location_address},
+          {location_type}, {meet_link}, {confirmation_message}, {phone}, {guest_message},
+          {host_name}, {cancel_url}, {reschedule_url}. Liquid: {% if locale == "en"
+          %}…{% endif %}, {% if meet_link != "" %}…{% endif %}.'
         hidden: Hidden
         identification_section: Identification
         increment: Slot increment (min)
@@ -147,6 +154,11 @@ en:
         reorder_title: Drag to reorder
         slug: Slug (URL)
         slug_placeholder: consulting
+        success_section: Post-booking acknowledgment
+        success_template: Acknowledgment template
+        success_template_blank: Use page default
+        success_template_hint: When set, overrides the public page template for this
+          event type.
         visible: Visible
         weekly_hours: Weekly time windows
       form:
@@ -188,14 +200,14 @@ en:
         slug_placeholder: alex
         submit_create: Create
         submit_update: Save
+        success_template: Acknowledgment template
+        success_template_blank: Confirmation in Cream (Meet, .ics)
+        success_template_hint: After booking, opens /b/slug/recibido?evento=… with
+          this template. No personal data in the URL.
         timezone: Time zone
         timezone_hint: Each event type's windows use this zone. Guests see slots in
           their zone; the Google Calendar event is the same instant.
         welcome_message: Welcome message
-        success_template: Acknowledgment template
-        success_template_blank: Confirmation in Cream (Meet, .ics)
-        success_template_hint: After booking, opens /b/slug/recibido?evento=… with this
-          template. No personal data in the URL.
       form_js:
         activate_api_link: Enable Google Calendar API
         api_disabled: Google Calendar API is not enabled on the Google Cloud OAuth
@@ -240,16 +252,6 @@ en:
       weekly_hours_js:
         remove_window: Remove window
         unavailable: Unavailable
-    manage:
-      cancel_confirm: Yes, cancel booking
-      cancel_confirm_prompt: Are you sure you want to cancel this booking? The calendar
-        event will be removed and attendees will be notified.
-      cancel_title: Cancel booking
-      cancelled_body: Your booking has been cancelled.
-      cancelled_title: Booking cancelled
-      keep_booking: Keep booking
-      not_modifiable_body: This booking has already passed or was cancelled.
-      not_modifiable_title: Cannot be modified
     public_ui:
       addGuests: Add guests
       aria:
@@ -290,9 +292,9 @@ en:
       reminderNotice: We will send you an email reminder %{minutes} minutes before
         the meeting.
       rescheduleCurrent: 'Current appointment: %{datetime}'
-      rescheduled: Booking rescheduled!
       rescheduleSubmit: Confirm new time
       rescheduleTitle: Reschedule booking
+      rescheduled: Booking rescheduled!
       rescheduling: Rescheduling…
       schedule: Schedule event
       scheduleSummary: "%{datetime} (%{timezone})"

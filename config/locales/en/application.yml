@@ -17,9 +17,9 @@ en:
       deal:
         company_id: Company
         currency: Currency
+        execution_duration_days: Execution duration (days)
         expected_close_date: Expected close date
         invoice_number: Invoice number
-        execution_duration_days: Execution duration (days)
         name: Name
         owner_id: Owner
         partner_id: Partner company
@@ -65,13 +65,14 @@ en:
     note_added: "%{actor} added a note"
     payment_received: "%{actor} linked a Stripe payment of %{amount}"
     payment_received_from: " from %{email}"
+    person_deal_stage_changed_html: "%{actor} moved deal %{deal_link} from %{from}
+      to %{to}"
+    person_deal_won_html: "%{actor} won deal %{deal_link}"
     pipeline_changed: "%{actor} moved the deal to the %{to} pipeline"
     product_added: "%{actor} added product line %{product}"
     product_removed: "%{actor} removed product line %{product}"
     product_updated: "%{actor} updated product line %{product}"
     products_updated: "%{actor} updated products (%{product})"
-    person_deal_stage_changed_html: '%{actor} moved deal %{deal_link} from %{from} to %{to}'
-    person_deal_won_html: '%{actor} won deal %{deal_link}'
     stage_changed: "%{actor} moved the deal from %{from} to %{to}"
     task_completed: '%{actor} completed the task "%{title}"'
     updated: "%{actor} updated %{fields}"
@@ -464,13 +465,13 @@ en:
         two_days: in 2 days
         two_weeks: in 2 weeks
       insert_template: Insert template…
-      without_template: No template
       no_templates: No templates available
       send: Send email
       send_later: Send later
       subject: Subject
       title: Send email
       to: To
+      without_template: No template
     empty_value: "—"
     filters:
       all_name: All %{name}

@@ -83,9 +83,6 @@ en:
       overview: Company overview
       people_empty: No people linked to this company yet.
   deals:
-    execution_duration:
-      one: "%{count} day"
-      other: "%{count} days"
     board:
       next_stage: Next stage
       previous_stage: Previous stage
@@ -103,6 +100,9 @@ en:
     edit:
       back: "← Back to deal"
       title: Edit %{name}
+    execution_duration:
+      one: "%{count} day"
+      other: "%{count} days"
     form:
       contacts:
         create: Create contact
@@ -131,8 +131,8 @@ en:
         title: Next action (required)
       overview:
         description: Name, value, stage and key dates.
+        execution_duration_placeholder: '90'
         invoice_placeholder: FAC-2026-001
-        execution_duration_placeholder: "90"
         name_placeholder: Acme — Annual plan
         title: Deal details
       products:
@@ -414,24 +414,6 @@ en:
       pages_aria: Activity pages
       title: Activity
       view_changes: View changes
-    history:
-      actions: Actions
-      added_note: added a note
-      commented: commented
-      empty_hint: Try another filter, or add a note to start the history.
-      empty_title: No entries in this view.
-      filter_aria: Filter history
-      filters:
-        all: All
-        changes: Changes
-        comments: Comments
-        emails: Emails
-        notes: Notes
-      newer: Newer
-      older: Older
-      pages_aria: History pages
-      title: History
-      view_changes: View changes
     add: Add
     add_comment: Add comment
     add_deal: Add deal
@@ -523,9 +505,9 @@ en:
       domain: Domain
       email: Email
       employees: Employees
+      execution_duration: Execution duration
       industry: Industry
       invoice_number: Invoice number
-      execution_duration: Execution duration
       job_title: Job title
       lead_score: Lead score
       lifecycle: Lifecycle
@@ -544,6 +526,24 @@ en:
       stage: Stage
       twitter: X / Twitter
       value: Value
+    history:
+      actions: Actions
+      added_note: added a note
+      commented: commented
+      empty_hint: Try another filter, or add a note to start the history.
+      empty_title: No entries in this view.
+      filter_aria: Filter history
+      filters:
+        all: All
+        changes: Changes
+        comments: Comments
+        emails: Emails
+        notes: Notes
+      newer: Newer
+      older: Older
+      pages_aria: History pages
+      title: History
+      view_changes: View changes
     magic_columns:
       days_in_stage: Days in stage
       last_activity_at: Last activity

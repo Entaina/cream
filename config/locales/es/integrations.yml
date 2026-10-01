@@ -368,11 +368,11 @@ es:
         webhook_url: URL del webhook (registrar en Beehiiv → Settings → Webhooks)
       features:
         attribution: Atribución
+        custom_fields: Campos personalizados
         ga_measurement_id: ID de medición GA4
         ga_measurement_id_hint: Usado por el partial {% google_analytics %} en plantillas
           (p. ej. acuse de reserva). Formato G-XXXXXXXX.
         ga_measurement_id_placeholder: G-XXXXXXXXXX
-        custom_fields: Campos personalizados
         intro: Activa las secciones del menú y la configuración que quieras usar en
           este workspace. Están desactivadas por defecto.
         lead_scoring: Puntuación de leads
@@ -380,15 +380,6 @@ es:
         save: Guardar funcionalidades
         title: Funcionalidades
         webhooks: Webhooks
-      public_booking_layout:
-        hint: Edita la plantilla en Formularios → Plantillas. Debe incluir {{ content
-          }} donde va el calendario de reserva.
-        intro: Opcional. Envuelve las páginas públicas /b/… con cabecera y pie de
-          tu sitio.
-        none: Sin layout (solo el widget de reserva)
-        save: Guardar layout
-        template: Plantilla de layout
-        title: Layout de reservas públicas
       general:
         edit_hint: Si solo activas editar, los vendedores también podrán ver esas
           oportunidades.
@@ -452,4 +443,13 @@ es:
           de lectura al drive…
         title: OKM
       page_title: Ajustes
+      public_booking_layout:
+        hint: Edita la plantilla en Formularios → Plantillas. Debe incluir {{ content
+          }} donde va el calendario de reserva.
+        intro: Opcional. Envuelve las páginas públicas /b/… con cabecera y pie de
+          tu sitio.
+        none: Sin layout (solo el widget de reserva)
+        save: Guardar layout
+        template: Plantilla de layout
+        title: Layout de reservas públicas
       title: Ajustes
