@@ -1,7 +1,4 @@
 
-
-https://github.com/user-attachments/assets/a36b1480-3f1b-4452-ad5a-466899bf6b84
-
 # Cream 🍦
 
 **An open source CRM for teams**: people, companies and deals organized by workspace, with notes, tasks, lists and a shared activity timeline.
@@ -11,11 +8,13 @@ https://github.com/user-attachments/assets/a36b1480-3f1b-4452-ad5a-466899bf6b84
 [![Ruby](https://img.shields.io/badge/Ruby-3.4-cc342d?logo=ruby&logoColor=white)](.ruby-version)
 [![Rails](https://img.shields.io/badge/Rails-8.1-cc0000?logo=rubyonrails&logoColor=white)](Gemfile)
 
+https://github.com/user-attachments/assets/a36b1480-3f1b-4452-ad5a-466899bf6b84
+
 Built with **Rails 8.1**, **Hotwire (Turbo + Stimulus)**, **Tailwind CSS v4** and **PostgreSQL 16**. No Node build step — just importmap and tailwindcss-rails. Self-hosted with a single Docker image.
 
 ![Cream kanban pipeline board](docs/screenshots/kanban-board.png)
 
-🎬 **[Watch the promo video](docs/cream-0.1-720p.mp4)**
+
 ## Quick start
 
 Requirements: Ruby 3.4 and Docker (full details in [INSTALL.md](INSTALL.md)).
