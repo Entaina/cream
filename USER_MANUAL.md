@@ -661,7 +661,7 @@ When you have **full reply logging** active and the connection is correct, the c
 
 From the **CReaM add-on in Gmail** (sidebar when opening an email) you can:
 
-1. **Authorize** — if Google has not yet allowed CReaM to read the thread, accept that permission. Then **Connect with CReaM** to authorize with your CReaM account (OAuth).
+1. **Connect with CReaM** to authorize with your CReaM account (OAuth).
 2. If the thread is **already linked** to a deal, you see a **deal summary** with
    stage, pipeline, company, value, owner, contacts, close date, pending tasks
    and products, plus an **Open in CReaM** link. From that summary you can **Edit
@@ -686,8 +686,7 @@ To install it (users):
    or go to [Internal Marketplace apps](https://workspace.google.com/marketplace/mydomainapps).
 2. Click **Instalar** (Install) and accept the requested Gmail permissions.
 3. Open Gmail, select a thread and click the **CReaM** icon in the right sidebar.
-4. If the add-on shows **Authorize**, accept the Gmail permission and return to Gmail.
-5. Click **Connect with CReaM**, sign in at `crm.example.com` and authorize access.
+4. Click **Connect with CReaM**, sign in at `crm.example.com` and authorize access.
 
 **Example administrators:** the complete guide to publishing the add-on on Marketplace,
 installing it for the whole domain and troubleshooting is in
@@ -1296,6 +1295,8 @@ All the configuration is done from **Reservas** (no need to use seeds or preload
 | Color en calendario (Calendar color) | Color of the event in Google Calendar |
 | Visible | Whether it appears on the public page |
 | Plantilla de acuse (Acknowledgment template) | Optional. Overrides the page acknowledgment template for this event type |
+| Guest email template | Optional. Sent on confirmation (from the host’s Gmail) with tokens such as `{event_name}`, `{date_time}`, `{meet_link}`, `{confirmation_message}`, `{cancel_url}`, `{reschedule_url}`, `{locale}`. Supports Liquid for bilingual copy |
+| Confirmation message (ES/EN) | Calendly-style note; empty uses the default; use `{confirmation_message}` in the template |
 
 Use **Añadir tipo** (Add type) to create new types or the trash icon to remove them. Save the page to apply the changes.
 
@@ -1309,6 +1310,7 @@ Under **Settings → Workspace**, you can optionally pick a **public booking lay
 - Upon confirmation, the **event is created in Google Calendar** with the person who booked, optional guests (up to 5), and the host as attendees.
 - In Cream, the **person** is created or reused (by email) and the **deal** is created or reused in the specified pipeline according to **Reuse existing deal**, with a follow-up task for the host when the deal is new.
 - The host is notified according to their channels in **Settings → Profile → Alertas** (bell and/or email), with the booking details and a link to the deal. The email attaches an `.ics` file for the same meeting already on Google Calendar, so it is not added as a second event.
+- If the event type has a **guest email template**, the invitee also gets a Calendly-style confirmation (Meet button, custom message, **Cancel** and **Reschedule** links at `/b/slug/cancelar/…` and `/b/slug/reprogramar/…`). Without a template, they only receive the Google Calendar invitation.
 - On the **deal** and **contact** record pages, the **Activity** timeline logs the booking (guest, meeting type and date/time), including when an existing deal is reused.
 
 ### Public page (visitor)

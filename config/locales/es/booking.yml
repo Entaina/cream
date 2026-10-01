@@ -50,7 +50,9 @@ es:
         create_events: crear eventos
         delete_events: eliminar eventos
         list_calendars: listar calendarios
+        update_events: actualizar eventos
       rate_limited: Demasiadas peticiones. Inténtalo de nuevo en un minuto.
+      booking_not_modifiable: Esta reserva ya no se puede modificar.
       slot_unavailable: Ese horario ya no está disponible.
       success_template_invalid: debe ser una plantilla de acuse de reserva de este workspace
       timeout: Google Calendar no respondió a tiempo. Inténtalo de nuevo en unos minutos.
@@ -60,6 +62,9 @@ es:
       physical: Presencial
       to_be_decided: A coordinar
     mailer:
+      confirmation:
+        default_message: Salvo que acordemos lo contrario nos vemos en el enlace de
+          Google Meet que recibirás en la invitación de calendario.
       datetime: Fecha y hora
       host_notification:
         body_html: Se ha hecho una reserva de <strong>%{event_name}</strong> con <strong>%{guest_name}</strong>
@@ -114,9 +119,15 @@ es:
           para este tipo de evento.
         email_section: Email de confirmación
         email_template: Plantilla de email al invitado
-        email_tokens_hint: 'Se envía al confirmar la reserva. Tokens disponibles:
-          {first_name}, {last_name}, {name}, {email}, {company}, {event_name}, {date},
-          {time}, {duration}, {timezone}, {location}, {meet_link}.'
+        confirmation_message_en: Mensaje de confirmación (EN)
+        confirmation_message_es: Mensaje de confirmación (ES)
+        confirmation_message_hint: 'Opcional. Se inserta con {confirmation_message} en la plantilla.
+          Si está vacío, se usa el texto por defecto.'
+        email_tokens_hint: 'Se envía al confirmar la reserva. Tokens: {first_name}, {last_name},
+          {name}, {email}, {company}, {locale}, {event_name}, {date}, {time}, {date_time},
+          {duration}, {timezone}, {location}, {location_address}, {location_type}, {meet_link},
+          {confirmation_message}, {phone}, {guest_message}, {host_name}, {cancel_url}, {reschedule_url}.
+          Liquid: {% if locale == "en" %}…{% endif %}, {% if meet_link != "" %}…{% endif %}.'
         hidden: Oculto
         identification_section: Identificación
         increment: Incremento (min)
@@ -233,6 +244,16 @@ es:
       weekly_hours_js:
         remove_window: Quitar franja
         unavailable: No disponible
+    manage:
+      cancel_confirm: Sí, cancelar reserva
+      cancel_confirm_prompt: "¿Seguro que quieres cancelar esta reserva? Se eliminará
+        el evento del calendario y se avisará a los asistentes."
+      cancel_title: Cancelar reserva
+      cancelled_body: Tu reserva ha quedado cancelada.
+      cancelled_title: Reserva cancelada
+      keep_booking: Mantener la reserva
+      not_modifiable_body: Esta reserva ya ha pasado o fue cancelada.
+      not_modifiable_title: No se puede modificar
     public_ui:
       addGuests: Añadir invitados
       aria:
@@ -272,6 +293,11 @@ es:
       phone: Teléfono (opcional)
       reminderNotice: Te enviaremos un recordatorio por email %{minutes} minutos antes
         de la reunión.
+      rescheduleCurrent: 'Cita actual: %{datetime}'
+      rescheduled: "¡Reserva reprogramada!"
+      rescheduleSubmit: Confirmar nueva fecha
+      rescheduleTitle: Reprogramar reserva
+      rescheduling: Reprogramando…
       schedule: Programar evento
       scheduleSummary: "%{datetime} (%{timezone})"
       scheduling: Programando…

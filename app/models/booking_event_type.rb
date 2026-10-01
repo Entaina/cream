@@ -70,6 +70,15 @@ class BookingEventType < ApplicationRecord
     fetch_i18n(description_i18n, locale)
   end
 
+  def localized_confirmation_message(locale = I18n.locale)
+    message = fetch_i18n(confirmation_message_i18n, locale)
+    return message if message.present?
+
+    I18n.with_locale(locale) do
+      I18n.t("booking.mailer.confirmation.default_message")
+    end
+  end
+
   def google_meet?
     location_type == "google_meet"
   end

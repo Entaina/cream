@@ -162,6 +162,19 @@
           <%= t("booking.pages.event_type.email_tokens_hint") %>
         </p>
       </div>
+      <div class="grid gap-3 sm:grid-cols-2">
+        <div>
+          <%= label_tag nil, t("booking.pages.event_type.confirmation_message_es"), class: "label" %>
+          <%= text_area_tag "booking_page[event_types_attributes][#{form.index}][confirmation_message_i18n][es]",
+                event_type.confirmation_message_i18n["es"], rows: 3, class: "input mt-1 w-full" %>
+        </div>
+        <div>
+          <%= label_tag nil, t("booking.pages.event_type.confirmation_message_en"), class: "label" %>
+          <%= text_area_tag "booking_page[event_types_attributes][#{form.index}][confirmation_message_i18n][en]",
+                event_type.confirmation_message_i18n["en"], rows: 3, class: "input mt-1 w-full" %>
+        </div>
+      </div>
+      <p class="text-xs text-ink-faint"><%= t("booking.pages.event_type.confirmation_message_hint") %></p>
     </div>
 
     <div class="space-y-3">

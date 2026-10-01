@@ -58,6 +58,14 @@ module GoogleOauthTokenRefresh
     execute(uri, request)
   end
 
+  def patch_json(uri, payload, bearer:)
+    request = Net::HTTP::Patch.new(uri)
+    request["Authorization"] = "Bearer #{bearer}"
+    request["Content-Type"] = "application/json"
+    request.body = payload.to_json
+    execute(uri, request)
+  end
+
   def execute(uri, request)
     Net::HTTP.start(uri.host, uri.port, use_ssl: true, open_timeout: TIMEOUT, read_timeout: TIMEOUT, write_timeout: TIMEOUT) do |http|
       http.request(request)

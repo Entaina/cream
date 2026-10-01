@@ -17,7 +17,7 @@ export default class extends Controller {
     "submitLabel", "confirmedHeading", "confirmationDetails", "icsDownload", "bookAnotherLabel",
     "firstNameInput", "lastNameInput", "emailInput", "phoneInput", "messageInput", "honeypotInput", "honeypotLabel",
     "localeEs", "localeEn", "progress", "progressEvent", "progressEventSeparator", "progressSchedule", "progressDetails",
-    "progressEventLabel", "progressScheduleLabel", "progressDetailsLabel"
+    "progressEventLabel", "progressScheduleLabel", "progressDetailsLabel", "rescheduleBanner"
   ]
 
   static values = {
@@ -29,7 +29,12 @@ export default class extends Controller {
     availabilityUrl: String,
     bookUrl: String,
     timestamp: String,
-    copy: Object
+    copy: Object,
+    rescheduleMode: Boolean,
+    rescheduleToken: String,
+    rescheduleUrl: String,
+    reschedulePrefill: Object,
+    rescheduleCurrentStartsAt: String
   }
 
   connect() {
@@ -45,9 +50,11 @@ export default class extends Controller {
     this.availabilityRequestId = 0
     this.availabilityAbortController = null
     this.currentStep = "eventTypes"
+    this.rescheduleFlow = this.hasRescheduleModeValue && this.rescheduleModeValue
     this.deepLinkedEventType = this.hasEventTypeValue ? this.eventTypeValue : null
     this.tracking = this.captureTracking()
     this.parseUrlParams()
+    this.applyReschedulePrefill()
     this.detectTimezone()
     this.applyCopy()
     this.updateLocaleButtons()
@@ -82,6 +89,31 @@ export default class extends Controller {
     }
 
     this.hideKnown = [ "true", "1" ].includes(params.get("hide_known")?.toLowerCase())
+  }
+
+  applyReschedulePrefill() {
+    if (!this.rescheduleFlow) return
+
+    const prefill = this.reschedulePrefillValue || {}
+    this.prefill = {
+      first_name: prefill.first_name,
+      last_name: prefill.last_name,
+      email: prefill.email,
+      phone: prefill.phone,
+      message: prefill.message,
+      guests: prefill.guests
+    }
+    this.knownFields = new Set(Object.keys(this.prefill).filter((key) => {
+      const value = this.prefill[key]
+      return Array.isArray(value) ? value.length > 0 : value != null && String(value).trim() !== ""
+    }))
+    this.hideKnown = true
+    if (prefill.lang && [ "es", "en" ].includes(prefill.lang)) {
+      this.localeValue = prefill.lang
+    }
+    if (prefill.event_type) {
+      this.deepLinkedEventType = prefill.event_type
+    }
   }
 
   applyPrefill() {
@@ -145,16 +177,27 @@ export default class extends Controller {
     this.phoneLabelTarget.textContent = this.copy.phone
     this.messageLabelTarget.textContent = this.copy.message
     this.addGuestsLabelTarget.textContent = this.copy.addGuests
-    this.submitLabelTarget.textContent = this.copy.schedule
-    this.confirmedHeadingTarget.textContent = this.copy.confirmed
+    this.submitLabelTarget.textContent = this.rescheduleFlow ? this.copy.rescheduleSubmit : this.copy.schedule
+    this.confirmedHeadingTarget.textContent = this.rescheduleFlow ? this.copy.rescheduled : this.copy.confirmed
     this.icsDownloadTarget.textContent = this.copy.downloadIcs
     this.bookAnotherLabelTarget.textContent = this.copy.bookAnother
+    if (this.hasBookAnotherLabelTarget) {
+      this.bookAnotherLabelTarget.classList.toggle("hidden", this.rescheduleFlow)
+    }
     if (this.hasConfirmHeadingTarget) this.confirmHeadingTarget.textContent = this.copy.attendeeDetails
     if (this.hasHoneypotLabelTarget) this.honeypotLabelTarget.textContent = this.copy.doNotFill
     if (this.hasProgressEventLabelTarget) this.progressEventLabelTarget.textContent = this.copy.stepEvent
     if (this.hasProgressScheduleLabelTarget) this.progressScheduleLabelTarget.textContent = this.copy.stepSchedule
     if (this.hasProgressDetailsLabelTarget) this.progressDetailsLabelTarget.textContent = this.copy.stepDetails
     this.updateProfileHomeLabel()
+    this.updateRescheduleBanner()
+  }
+
+  updateRescheduleBanner() {
+    if (!this.rescheduleFlow || !this.hasRescheduleBannerTarget || !this.copy?.rescheduleCurrent) return
+
+    const datetime = this.hasRescheduleCurrentStartsAtValue ? this.rescheduleCurrentStartsAtValue : ""
+    this.rescheduleBannerTarget.textContent = this.copy.rescheduleCurrent.replace("%{datetime}", datetime)
   }
 
   updateLocaleButtons() {
@@ -340,6 +383,7 @@ export default class extends Controller {
         timezone: this.timezoneValue,
         lang: this.localeValue
       })
+      this.appendRescheduleToken(params)
       const { response, data } = await this.fetchAvailability(params)
       if (requestId !== this.availabilityRequestId) return
 
@@ -427,6 +471,7 @@ export default class extends Controller {
         timezone: this.timezoneValue,
         lang: this.localeValue
       })
+      this.appendRescheduleToken(params)
       const { response, data } = await this.fetchAvailability(params)
       if (requestId !== this.availabilityRequestId) return
 
@@ -470,7 +515,7 @@ export default class extends Controller {
     this.renderFormSummary()
     this.formErrorTarget.classList.add("hidden")
 
-    if (this.hideKnown && this.requiredFieldsComplete()) {
+    if (this.rescheduleFlow || (this.hideKnown && this.requiredFieldsComplete())) {
       this.showConfirmOnly()
     } else {
       this.showFormStep()
@@ -586,15 +631,31 @@ export default class extends Controller {
     }
   }
 
+  buildReschedulePayload() {
+    return {
+      token: this.rescheduleTokenValue,
+      datetime: `${this.selectedDate}T${this.selectedSlot}:00`,
+      timezone: this.timezoneValue,
+      lang: this.localeValue
+    }
+  }
+
+  appendRescheduleToken(params) {
+    if (this.rescheduleFlow && this.hasRescheduleTokenValue) {
+      params.set("reschedule_token", this.rescheduleTokenValue)
+    }
+  }
+
   async submitBooking(event) {
     event.preventDefault()
     this.formErrorTarget.classList.add("hidden")
-    this.submitLabelTarget.textContent = this.copy.scheduling
+    this.submitLabelTarget.textContent = this.rescheduleFlow ? this.copy.rescheduling : this.copy.scheduling
     this.submitLabelTarget.disabled = true
 
-    const payload = this.buildPayload()
+    const payload = this.rescheduleFlow ? this.buildReschedulePayload() : this.buildPayload()
+    const url = this.rescheduleFlow ? this.rescheduleUrlValue : this.bookUrlValue
 
-    const response = await fetch(this.bookUrlValue, {
+    const response = await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -604,7 +665,7 @@ export default class extends Controller {
     })
 
     this.submitLabelTarget.disabled = false
-    this.submitLabelTarget.textContent = this.copy.schedule
+    this.submitLabelTarget.textContent = this.rescheduleFlow ? this.copy.rescheduleSubmit : this.copy.schedule
 
     if (response.status === 409) {
       this.formErrorTarget.textContent = this.copy.slotTaken
@@ -629,6 +690,7 @@ export default class extends Controller {
 
   showConfirmation(data) {
     this.showStep("confirmation")
+    this.confirmedHeadingTarget.textContent = this.rescheduleFlow ? this.copy.rescheduled : this.copy.confirmed
     const whenLabel = data.display_starts_at ||
       this.formatInstantInZone(data.starts_at, data.timezone)
     const lines = [

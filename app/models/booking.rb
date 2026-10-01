@@ -1,5 +1,6 @@
 class Booking < ApplicationRecord
   STATUSES = %w[confirmed cancelled].freeze
+  GUEST_MANAGE_PURPOSE = :guest_manage
   MAX_GUESTS = 5
   TRACKING_METADATA_FIELDS = %w[
     booking_page_slug booking_page_name source_page referrer
@@ -72,6 +73,44 @@ class Booking < ApplicationRecord
 
   def all_attendee_emails
     [email, *guest_emails].map { |value| value.to_s.strip.downcase }.uniq
+  end
+
+  def manage_token_expires_at
+    ends_at + 1.day
+  end
+
+  def manage_token
+    signed_id(purpose: GUEST_MANAGE_PURPOSE, expires_at: manage_token_expires_at)
+  end
+
+  def self.find_by_manage_token(token)
+    find_signed(token.to_s, purpose: GUEST_MANAGE_PURPOSE)
+  rescue ActiveSupport::MessageVerifier::InvalidSignature, ActiveRecord::RecordNotFound
+    nil
+  end
+
+  def cancellable?
+    status == "confirmed" && starts_at > Time.current
+  end
+
+  def reschedulable?
+    cancellable?
+  end
+
+  def cancel_url
+    Rails.application.routes.url_helpers.public_booking_cancel_url(
+      booking_page.slug,
+      manage_token,
+      **booking_page.public_url_options
+    )
+  end
+
+  def reschedule_url
+    Rails.application.routes.url_helpers.public_booking_reschedule_url(
+      booking_page.slug,
+      manage_token,
+      **booking_page.public_url_options
+    )
   end
 
   def confirmation_payload(locale: I18n.locale)

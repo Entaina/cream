@@ -212,9 +212,13 @@ Rails.application.routes.draw do
   get "b/:slug", to: "public/bookings#show", as: :public_booking_page
   scope "b/:slug", as: :public_booking do
     get "recibido", to: "public/bookings#received", as: :received
+    get "cancelar/:token", to: "public/booking_managements#cancel", as: :cancel
+    post "cancelar/:token", to: "public/booking_managements#destroy"
+    get "reprogramar/:token", to: "public/booking_managements#reschedule", as: :reschedule
     get "api/event-types", to: "public/booking_api#event_types"
     get "api/availability", to: "public/booking_api#availability"
     post "api/book", to: "public/booking_api#book"
+    post "api/reschedule", to: "public/booking_api#reschedule"
   end
   get "b/:slug/:event_type", to: "public/bookings#show", as: :public_booking_event_type,
     constraints: {event_type: /[a-z0-9-]+/}

@@ -53,7 +53,7 @@ Namespace `config/routes.rb` → `namespace :api > :v1`:
 | Deal notes | `POST /deals/:deal_id/notes` | `{ note: { title, body } }` |
 | Deal emails | `POST /deals/:deal_id/emails` | `{ email: { to_address?, subject, body, attachments[] } }` — JSON (Base64) o `multipart/form-data` (`email[attachments][]`); Gmail si hay conexión, si no SMTP |
 | Tasks | CRUD | `taskable_type`/`taskable_id`; `completed` dispara side effects |
-| Gmail add-on | `GET gmail/context`, `POST gmail/threads/status`, `POST gmail/threads/link` | Requiere `:gmail_addon` |
+| Gmail add-on | `GET gmail/context`, `POST gmail/threads/status`, `POST gmail/threads/link` | Requiere `:gmail_addon`. La instalación en la organización de Google Workspace está más abajo |
 | Marketing | Ver tabla abajo | Paridad operativa con MCP marketing (lectura + acciones clave); presenter en [`api_presenter.rb`](../../../app/services/marketing/api_presenter.rb) |
 
 ### Marketing (`/api/v1/marketing/…` y rutas anidadas en people)
@@ -75,6 +75,44 @@ Namespace `config/routes.rb` → `namespace :api > :v1`:
 | Plantillas / formularios | `GET marketing/email_templates`, `GET marketing/lead_forms` | `:email_templates` / ninguno |
 
 Fuera de este API (ver skill **`cream-mcp`** para `/mcp` y OAuth scope `mcp`): booking público, metadata OAuth compartida.
+
+## Add-on de Gmail — instalación en la organización
+
+El código está en [`gmail_addon/`](../../../gmail_addon/). La guía larga es [`deploy/GMAIL_ADDON_SETUP.md`](../../../deploy/GMAIL_ADDON_SETUP.md). Publicar la ficha privada del Marketplace e instalarla para la organización son pasos distintos. El mismo procedimiento está en el README y en la skill `cream-dev`.
+
+El propietario del proyecto de Cloud puede publicar la ficha. Solo un **administrador de Marketplace** de Google Workspace puede instalarla para el dominio. Ese privilegio no es el de superadministrador ni el de propietario del proyecto de Cloud.
+
+### Dónde aparece
+
+| Sitio | Significado |
+|-------|-------------|
+| [mydomainapps](https://workspace.google.com/marketplace/mydomainapps) | La ficha privada está **publicada**. La gente del dominio puede instalarla por su cuenta. No significa que un administrador la haya instalado para la organización. |
+| Consola de administración → **Aplicaciones → Aplicaciones de Google Workspace Marketplace → Lista de aplicaciones** | Apps que un administrador **instaló para la organización** o **permitió**. Si CReaM no está, no hay instalación de dominio. Sin el privilegio de administrador de Marketplace la lista sale vacía. |
+
+Un **despliegue de prueba** (Apps Script → Implementar → Implementaciones de prueba) no sale en ninguna de las dos. Solo lo ejecuta el propietario del script. Cualquier otra cuenta ve **Necesitas acceso** con **Lector** / **Editor**. Esa página es el uso compartido del archivo del proyecto, no el consentimiento de Gmail. No hay que aprobarla ni compartir el proyecto. Lector puede leer el código. Editor puede cambiar el código y las propiedades del script (`CREAM_CLIENT_ID`).
+
+### Instalar para el dominio
+
+1. Entra con una cuenta de administrador de Marketplace.
+2. Abre [mydomainapps](https://workspace.google.com/marketplace/mydomainapps), o Consola de administración → **Aplicaciones → Aplicaciones de Google Workspace Marketplace → Lista de aplicaciones** → **Instalar aplicación**.
+3. Abre **CReaM** → **Instalación de administrador** → toda la organización, una OU o grupos.
+4. Acepta los permisos.
+
+Si la política bloquea las apps internas: Consola de administración → **Aplicaciones → Aplicaciones de Google Workspace Marketplace → Configuración** → permitir apps internas, o añade CReaM a la lista de permitidas.
+
+CReaM pasa a **Aplicaciones instaladas en el dominio**. Cada persona sigue pulsando **Connect with CReaM** una vez. La instalación de la organización no sustituye ese OAuth con Cream. Instalarla cada usuario desde `mydomainapps` es una instalación individual y no crea el botón de dominio **Conceder acceso**.
+
+### Scopes
+
+| Scope | Qué cubre |
+|-------|-----------|
+| `gmail.addons.execute` | Ejecutar el addon |
+| `gmail.addons.current.message.readonly` | El mensaje abierto y el resto de mensajes de **ese mismo hilo** de Gmail |
+| `script.external_request` | Llamar al API de Cream |
+
+El manifiesto no pide `gmail.readonly`. La instalación de dominio no comparte el proyecto de Apps Script. Pedir ese scope abre el archivo del proyecto (`getAuthorizationUrl()`), así que los usuarios siguen viendo **Necesitas acceso** (Lector/Editor) después de instalarlo para la organización. No compartas el proyecto. Con el hilo abierto basta para vincular o crear el deal.
+
+Si una versión posterior añade otro scope OAuth, Google no avisa al administrador. **Acceso a los datos** pasa a **Concedido parcialmente** y se concede en la consola de administración ([gestionar el acceso a los datos](https://support.google.com/a/answer/172983)). Cloud no puede hacerlo, y esa concesión tampoco da acceso al archivo del script. Hay que publicar una versión nueva de la **misma** implementación. Hasta entonces Gmail sigue ejecutando el script antiguo, que abre la página de acceso de Apps Script.
 
 ## Crear deals por API
 

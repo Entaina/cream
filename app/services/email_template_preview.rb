@@ -5,7 +5,24 @@ class EmailTemplatePreview
     "last_name" => "García",
     "name" => "María García",
     "company" => "Acme Corp",
-    "email" => "maria@example.com"
+    "email" => "maria@example.com",
+    "locale" => "es",
+    "event_name" => "Reunión online",
+    "date" => "28 de septiembre de 2026",
+    "time" => "11:45",
+    "date_time" => "lunes, 28 de septiembre de 2026, 11:45 (Europe/Madrid)",
+    "duration" => "30",
+    "timezone" => "Europe/Madrid",
+    "location" => "Google Meet",
+    "location_address" => "",
+    "location_type" => "Google Meet",
+    "meet_link" => "https://meet.google.com/abc-defg-hij",
+    "confirmation_message" => "Salvo que acordemos lo contrario nos vemos en el enlace de Google Meet.",
+    "phone" => "600 000 000",
+    "guest_message" => "Quiero hablar del proyecto X",
+    "host_name" => "Equipo Cream",
+    "cancel_url" => "https://example.com/b/demo/cancelar/token",
+    "reschedule_url" => "https://example.com/b/demo/reprogramar/token"
   }.freeze
   SAMPLE_CONTENT = <<~HTML.strip
     <p>Hola {first_name},</p>

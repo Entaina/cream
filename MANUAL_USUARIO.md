@@ -661,7 +661,7 @@ Cuando tienes **full reply logging** activo y la conexión es correcta, las resp
 
 Desde el **add-on de CReaM en Gmail** (barra lateral al abrir un correo) puedes:
 
-1. **Authorize** — si Google aún no ha permitido a CReaM leer el hilo, acepta ese permiso. Después **Connect with CReaM** para autorizar con tu cuenta de CReaM (OAuth).
+1. **Connect with CReaM** para autorizar con tu cuenta de CReaM (OAuth).
 2. Si el hilo **ya está vinculado** a un deal, verás una **ficha del deal** con
    etapa, pipeline, empresa, valor, propietario, contactos, fecha de cierre,
    tareas pendientes y productos, además de un enlace **Open in CReaM**. Desde
@@ -686,8 +686,7 @@ Para instalarlo (usuarios):
    o entra en [Apps internas de Marketplace](https://workspace.google.com/marketplace/mydomainapps).
 2. Pulsa **Instalar** y acepta los permisos de Gmail solicitados.
 3. Abre Gmail, selecciona un hilo y pulsa el icono **CReaM** de la barra lateral derecha.
-4. Si el add-on muestra **Authorize**, acepta el permiso de Gmail y vuelve a Gmail.
-5. Pulsa **Connect with CReaM**, inicia sesión en `crm.example.com` y autoriza el acceso.
+4. Pulsa **Connect with CReaM**, inicia sesión en `crm.example.com` y autoriza el acceso.
 
 **Administradores de Example:** la guía completa para publicar el add-on en Marketplace,
 instalarlo para todo el dominio y resolver incidencias está en
@@ -1296,6 +1295,8 @@ Toda la configuración se hace desde **Reservas** (no hace falta usar seeds ni d
 | Color en calendario | Color del evento en Google Calendar |
 | Visible | Si aparece en la página pública |
 | Plantilla de acuse | Opcional. Sustituye la plantilla de la página para este tipo concreto |
+| Plantilla de email al invitado | Opcional. Se envía al confirmar (desde el Gmail del anfitrión) con variables `{event_name}`, `{date_time}`, `{meet_link}`, `{confirmation_message}`, `{cancel_url}`, `{reschedule_url}`, `{locale}`, etc. Soporta Liquid (`{% if locale == "en" %}…{% endif %}`) para una plantilla bilingüe |
+| Mensaje de confirmación (ES/EN) | Texto tipo Calendly («Salvo que acordemos…»). Vacío = mensaje por defecto; se inserta con `{confirmation_message}` en la plantilla |
 
 Usa **Añadir tipo** para crear tipos nuevos o el icono de papelera para eliminarlos. Guarda la página para aplicar los cambios.
 
@@ -1309,6 +1310,7 @@ En **Ajustes → Workspace**, opcionalmente elige una **plantilla de layout de r
 - Al confirmar, se crea el **evento en Google Calendar** con quien reserva, los invitados opcionales (hasta 5) y el anfitrión como asistentes.
 - En Cream se crea o reutiliza la **persona** (por email) y se crea o reutiliza el **deal** en el pipeline indicado según la opción **Reutilizar deal existente**, con tarea de seguimiento para el anfitrión cuando el deal es nuevo.
 - El anfitrión recibe aviso según sus canales en **Settings → Profile → Alertas** (campana y/o email), con los datos de la reserva y un enlace al deal. El email adjunta un archivo `.ics` de la misma cita que ya está en Google Calendar, para que no se cree una segunda reunión.
+- Si el tipo de evento tiene **plantilla de email al invitado**, el invitado recibe además un correo de confirmación (estilo Calendly) con botón Meet, fecha, mensaje personalizado y enlaces **Cancelar** (`/b/slug/cancelar/…`) y **Reprogramar** (`/b/slug/reprogramar/…`). Sin plantilla, solo recibe la invitación de Google Calendar.
 - En la ficha del **deal** y del **contacto**, el timeline de **Actividad** registra la reserva (invitado, tipo de cita y fecha/hora), también cuando se reutiliza un deal existente.
 
 ### Página pública (visitante)

@@ -175,4 +175,31 @@ RSpec.describe BookingAvailabilityService do
     # Tuesday 10:00 Madrid (UTC+2) is Monday 22:00 in Honolulu (UTC-10).
     expect(result.slots).to include("22:00", "22:30", "23:00", "23:30")
   end
+
+  it "ignores the rescheduled booking's own busy block when checking availability" do
+    ignore_booking = Booking.create!(
+      workspace: workspace,
+      booking_page: booking_page,
+      booking_event_type: event_type,
+      first_name: "Ana",
+      last_name: "Lopez",
+      email: "ana@example.com",
+      starts_at: ActiveSupport::TimeZone["Europe/Madrid"].parse("2026-07-07 10:00"),
+      ends_at: ActiveSupport::TimeZone["Europe/Madrid"].parse("2026-07-07 10:30"),
+      timezone: "Europe/Madrid"
+    )
+    busy_period = {start: ignore_booking.starts_at, end: ignore_booking.ends_at}
+    allow(client).to receive(:free_busy).and_return([busy_period])
+
+    available = described_class.slot_available?(
+      booking_page: booking_page,
+      event_type: event_type,
+      starts_at: ignore_booking.starts_at.in_time_zone("Europe/Madrid"),
+      timezone: "Europe/Madrid",
+      client: client,
+      ignore_booking: ignore_booking
+    )
+
+    expect(available).to be(true)
+  end
 end

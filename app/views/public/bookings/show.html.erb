@@ -1,15 +1,34 @@
-<% content_for :title, @booking_page.name %>
+<% content_for :title, @reschedule_mode ? t("booking.public_ui.rescheduleTitle") : @booking_page.name %>
+<% reschedule_prefill = @reschedule_mode ? {
+  event_type: @booking.booking_event_type.slug,
+  first_name: @booking.first_name,
+  last_name: @booking.last_name,
+  email: @booking.email,
+  phone: @booking.phone,
+  message: @booking.message,
+  guests: @booking.guest_emails,
+  lang: @locale
+} : nil %>
 <div class="public-booking mx-auto w-full max-w-7xl"
      data-controller="booking"
      data-booking-slug-value="<%= @booking_page.slug %>"
      data-booking-locale-value="<%= @locale %>"
-     data-booking-timezone-value="<%= @booking_page.timezone %>"
+     data-booking-timezone-value="<%= @reschedule_mode ? @booking.timezone : @booking_page.timezone %>"
      data-booking-event-types-url-value="<%= public_booking_api_event_types_path(@booking_page.slug) %>"
      data-booking-availability-url-value="<%= public_booking_api_availability_path(@booking_page.slug) %>"
      data-booking-book-url-value="<%= public_booking_api_book_path(@booking_page.slug) %>"
      data-booking-timestamp-value="<%= BookingPage.signed_timestamp %>"
      data-booking-copy-value="<%= public_booking_stimulus_copy_json %>"
-     <% if @event_type.present? %>data-booking-event-type-value="<%= @event_type.slug %>"<% end %>>
+     <% if @reschedule_mode %>
+     data-booking-reschedule-mode-value="true"
+     data-booking-reschedule-token-value="<%= params[:token] %>"
+     data-booking-reschedule-url-value="<%= public_booking_api_reschedule_path(@booking_page.slug) %>"
+     data-booking-reschedule-prefill-value="<%= reschedule_prefill.to_json %>"
+     data-booking-reschedule-current-starts-at-value="<%= @booking.localized_starts_at_with_zone(locale: @locale) %>"
+     data-booking-event-type-value="<%= @booking.booking_event_type.slug %>"
+     <% elsif @event_type.present %>
+     data-booking-event-type-value="<%= @event_type.slug %>"
+     <% end %>>
   <div class="public-booking-shell">
     <header class="public-booking-hero">
       <div data-booking-target="profile" data-action="click->booking#goToFirstStep keydown->booking#profileKeydown" role="button" tabindex="0" class="public-booking-profile min-w-0 flex-1"></div>
@@ -50,8 +69,11 @@
         <div data-booking-target="eventTypeGrid" class="public-booking-event-grid"></div>
       </div>
 
-      <div data-booking-target="stepSchedule" class="public-booking-step<%= " hidden" unless @event_type.present? %>">
-        <div data-booking-target="backToTypesWrap"<% if @event_type.present? %> class="hidden"<% end %>>
+      <div data-booking-target="stepSchedule" class="public-booking-step<%= " hidden" unless @event_type.present? || @reschedule_mode %>">
+        <% if @reschedule_mode %>
+          <p data-booking-target="rescheduleBanner" class="mb-4 rounded-md border border-line bg-canvas px-4 py-3 text-sm text-ink-soft"></p>
+        <% end %>
+        <div data-booking-target="backToTypesWrap"<% if @event_type.present? || @reschedule_mode %> class="hidden"<% end %>>
           <button type="button" data-action="booking#backToEventTypes" class="public-booking-back" data-booking-target="backToTypesLabel"></button>
         </div>
         <div class="public-booking-two-col public-booking-two-col--schedule">

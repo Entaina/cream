@@ -13,6 +13,18 @@ RSpec.describe Booking, type: :model do
     end
   end
 
+  describe "guest manage token" do
+    it "reports cancellable only for confirmed future bookings" do
+      future = Booking.new(status: "confirmed", starts_at: 1.hour.from_now)
+      past = Booking.new(status: "confirmed", starts_at: 1.hour.ago)
+      cancelled = Booking.new(status: "cancelled", starts_at: 1.hour.from_now)
+
+      expect(future.cancellable?).to be(true)
+      expect(past.cancellable?).to be(false)
+      expect(cancelled.cancellable?).to be(false)
+    end
+  end
+
   describe ".display_starts_at_with_zone" do
     it "formats the instant in the booking timezone with the IANA label" do
       starts_at = Time.find_zone("UTC").local(2026, 7, 28, 8, 0)

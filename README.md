@@ -50,7 +50,7 @@ Log in with the demo credentials: `admin@example.com` / `creamcream` (or `member
 
 - **Automations** (trigger + conditions + actions), **stage triggers** and **webhooks**.
 - **Stripe payment reconciliation** — import charges and match them to deals.
-- **Gmail add-on** to link Gmail threads to deals from the Gmail sidebar ([gmail_addon/](gmail_addon/)).
+- **Gmail add-on** to link Gmail threads to deals from the Gmail sidebar ([gmail_addon/](gmail_addon/)). Organization install: [below](#gmail-add-on-install-for-the-organization).
 - **REST API with token authentication** and an **MCP server** so AI agents can operate the CRM.
 
 ### AI (optional)
@@ -82,12 +82,53 @@ bin/rubocop         # style (rubocop-rails-omakase)
 | [USER_MANUAL.md](USER_MANUAL.md) | End-user documentation (English) |
 | [MANUAL_USUARIO.md](MANUAL_USUARIO.md) | End-user documentation (Spanish) |
 | [deploy/README.md](deploy/README.md) | Production deployment (Docker, GitHub Actions, Traefik) |
+| [deploy/GMAIL_ADDON_SETUP.md](deploy/GMAIL_ADDON_SETUP.md) | Gmail add-on: Apps Script, Marketplace listing, organization install |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute |
 | [SECURITY.md](SECURITY.md) | Reporting vulnerabilities |
 
 ## Deployment
 
 Production runs as a Docker Compose stack (app + PostgreSQL + Traefik with Let's Encrypt), with images published to GHCR and automatic deployment on push to `main` via GitHub Actions. See [deploy/README.md](deploy/README.md).
+
+## Gmail add-on: install for the organization
+
+The add-on is a **private** Google Workspace Marketplace app. Publishing the listing and installing it for the organization are different steps. Full guide: [deploy/GMAIL_ADDON_SETUP.md](deploy/GMAIL_ADDON_SETUP.md).
+
+A Cloud project Owner can publish the listing. Only a Google Workspace **Marketplace administrator** can install it for the domain. That privilege is not the super-admin role and it is not the Cloud project Owner.
+
+### Where it shows up
+
+| Place | Meaning |
+|---|---|
+| [mydomainapps](https://workspace.google.com/marketplace/mydomainapps) | The private listing is **published**. People in the domain can install it themselves. This does not mean an admin installed it for the organization. |
+| Admin console → **Apps → Google Workspace Marketplace apps → Apps list** | Apps an administrator **installed for the organization** or **allowlisted**. CReaM missing here means there is no domain install. Without the Marketplace administrator privilege the list is empty. |
+
+A **test deployment** (Apps Script → Deploy → Test deployments) appears in neither list. It runs for the script owner only. Any other account sees **You need access** / **Necesitas acceso** with **Viewer** / **Editor**. That page is Drive sharing for the Apps Script project, not the Gmail consent screen. Do not approve it and do not share the project. Viewer can read the source. Editor can change the code and the script properties (`CREAM_CLIENT_ID`).
+
+### Install for the domain
+
+1. Sign in with a Marketplace administrator account.
+2. Open [mydomainapps](https://workspace.google.com/marketplace/mydomainapps), or Admin console → **Apps → Google Workspace Marketplace apps → Apps list** → **Install app**.
+3. Open **CReaM** → **Admin install** → the whole organization, an OU, or groups.
+4. Accept the permissions.
+
+If policy blocks internal apps: Admin console → **Apps → Google Workspace Marketplace apps → Settings** → allow internal Marketplace apps, or add CReaM to the allowlist.
+
+CReaM then appears under **Domain installed apps**. Each person still clicks **Connect with CReaM** once. The organization install does not replace that per-user OAuth to Cream.
+
+An install done by each user from `mydomainapps` is an individual install. It does not create a domain **Grant access** button.
+
+### Scopes
+
+| Scope | What it covers |
+|---|---|
+| `gmail.addons.execute` | Run the add-on |
+| `gmail.addons.current.message.readonly` | The open message and the other messages in that same Gmail thread |
+| `script.external_request` | Call the Cream API |
+
+The manifest does not request `gmail.readonly`. A domain install does not share the Apps Script project. Requesting that scope opens the project file, so users still see **You need access** (Viewer/Editor) after the organization install. Do not share the project. Search outside the open thread (same subject, other threads, calendar files the message itself does not carry) is not part of the add-on.
+
+If a later version adds some other OAuth scope, Google does not notify the admin. **Data access** shows **Partially granted** and an administrator grants it in the Admin console. Cloud Console cannot do that, and that grant still does not give access to the script file.
 
 ## Contributing
 

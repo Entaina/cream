@@ -8,12 +8,12 @@ module Public
     before_action :ensure_feature_enabled
     before_action :set_booking_page
     before_action :silently_accept_if_abusive, only: :book
-    before_action :set_calendar_client, only: :book
+    before_action :set_calendar_client, only: %i[book reschedule]
 
     rate_limit to: 60, within: 1.minute, only: %i[event_types availability],
       name: "booking_api_read",
       with: -> { render_rate_limited }
-    rate_limit to: 10, within: 1.minute, only: :book,
+    rate_limit to: 10, within: 1.minute, only: %i[book reschedule],
       name: "booking_api_book",
       with: -> { render_rate_limited }
 
@@ -34,13 +34,16 @@ module Public
         event_type = find_event_type!
         timezone = params[:timezone].presence || @booking_page.timezone
 
+        ignore_booking = booking_to_ignore_for_availability
+
         if params[:month].present?
           result = BookingAvailabilityService.monthly(
             booking_page: @booking_page,
             event_type:,
             month: params[:month],
             timezone:,
-            client: optional_calendar_client
+            client: optional_calendar_client,
+            ignore_booking:
           )
           render json: availability_payload(result)
         elsif params[:date].present?
@@ -49,7 +52,8 @@ module Public
             event_type:,
             date: params[:date],
             timezone:,
-            client: optional_calendar_client
+            client: optional_calendar_client,
+            ignore_booking:
           )
           render json: availability_payload(result)
         else
@@ -86,6 +90,28 @@ module Public
       end
     end
 
+    def reschedule
+      I18n.with_locale(resolved_locale) do
+        booking = find_booking_for_manage_token!
+        result = BookingRescheduler.call(
+          booking:,
+          params: reschedule_params,
+          client: @calendar_client
+        )
+        render json: result.booking.confirmation_payload(locale: resolved_locale), status: :ok
+      rescue BookingRescheduler::Unauthorized => e
+        render json: {error: e.message}, status: :forbidden
+      rescue BookingRescheduler::Conflict => e
+        render json: {error: e.message}, status: :conflict
+      rescue BookingRescheduler::ValidationError => e
+        render json: {error: e.message}, status: :bad_request
+      rescue GoogleCalendar::Error => e
+        render json: {error: e.message}, status: :service_unavailable
+      rescue ActiveRecord::RecordNotFound
+        head :not_found
+      end
+    end
+
     private
 
     def ensure_feature_enabled
@@ -117,6 +143,28 @@ module Public
 
     def find_event_type!
       @booking_page.event_types.visible.find_by!(slug: params[:event_type])
+    end
+
+    def find_booking_for_manage_token!
+      booking = Booking.find_by_manage_token(reschedule_params["token"])
+      raise ActiveRecord::RecordNotFound if booking.blank? || booking.booking_page_id != @booking_page.id
+
+      booking
+    end
+
+    def booking_to_ignore_for_availability
+      token = params[:reschedule_token].presence
+      return nil if token.blank?
+
+      booking = Booking.find_by_manage_token(token)
+      return nil unless booking&.booking_page_id == @booking_page.id
+      return nil unless booking.reschedulable?
+
+      booking
+    end
+
+    def reschedule_params
+      params.permit(:token, :datetime, :timezone, :lang).to_h
     end
 
     def resolved_locale

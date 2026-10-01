@@ -128,60 +128,11 @@ class BookingCreator
     remind_at = booking.starts_at - @event_type.reminder_minutes_before.minutes
     return if remind_at <= Time.current
 
-    BookingReminderJob.set(wait_until: remind_at).perform_later(booking.id)
+    BookingReminderJob.set(wait_until: remind_at).perform_later(booking.id, booking.starts_at.iso8601)
   end
 
   def enqueue_confirmation!(booking)
-    template = @event_type.email_template
-    return unless template
-    return unless booking.deal
-
-    extra_tokens = booking_confirmation_tokens(booking)
-    rendered_body = template.render_for(booking, extra_tokens:)
-    rendered_subject = template.render_subject_for(booking, extra_tokens:)
-
-    message = @booking_page.workspace.email_messages.create!(
-      user: @booking_page.host,
-      record: booking.deal,
-      to_address: booking.email,
-      subject: rendered_subject,
-      body: rendered_body
-    )
-    attach_template_files(message, template)
-    SendViaGmailJob.perform_later(message.id)
-  rescue => e
-    Rails.logger.error("Booking confirmation email failed for Booking##{booking.id}: #{e.class}: #{e.message}")
-  end
-
-  def attach_template_files(message, template)
-    return unless template.attachments.attached?
-
-    template.attachments.each { |file| message.attachments.attach(file.blob) }
-  end
-
-  def booking_confirmation_tokens(booking)
-    zone = ActiveSupport::TimeZone[booking.timezone] || Time.zone
-    starts_at = booking.starts_at.in_time_zone(zone)
-    locale = booking.guest_locale
-
-    location = if @event_type.location_address.present?
-      @event_type.location_address
-    else
-      BookingEventType.location_type_label(@event_type.location_type)
-    end
-
-    I18n.with_locale(locale) do
-      {
-        "event_name" => @event_type.localized_name(locale),
-        "date" => I18n.l(starts_at.to_date, format: :long),
-        "time" => starts_at.strftime("%H:%M"),
-        "duration" => @event_type.duration_minutes.to_s,
-        "timezone" => booking.timezone,
-        "location" => location,
-        "meet_link" => booking.meet_link.to_s,
-        "company" => booking.person&.company&.name.to_s
-      }
-    end
+    BookingConfirmationEmail.call(booking)
   end
 
   def validate!

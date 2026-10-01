@@ -15,6 +15,7 @@ module Public
     rate_limit to: 60, within: 1.minute, only: %i[show received], name: "booking_page_show"
 
     def show
+      @reschedule_mode = false
       response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
     end
 

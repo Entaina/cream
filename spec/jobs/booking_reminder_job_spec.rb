@@ -88,6 +88,15 @@ RSpec.describe BookingReminderJob, type: :job do
       .not_to change { ActionMailer::Base.deliveries.size }
   end
 
+  it "is a no-op when the booking was rescheduled after the job was enqueued" do
+    original = booking.starts_at.iso8601
+    booking.update!(starts_at: booking.starts_at + 1.hour, ends_at: booking.ends_at + 1.hour)
+
+    expect(BookingMailer).not_to receive(:reminder)
+    expect { described_class.perform_now(booking.id, original) }
+      .not_to change { ActionMailer::Base.deliveries.size }
+  end
+
   it "is a no-op when reminder is disabled on the event type" do
     event_type.update!(reminder_minutes_before: 0)
 

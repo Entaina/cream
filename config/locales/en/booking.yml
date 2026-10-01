@@ -49,7 +49,9 @@ en:
         create_events: create events
         delete_events: delete events
         list_calendars: list calendars
+        update_events: update events
       rate_limited: Too many requests. Please try again in a minute.
+      booking_not_modifiable: This booking can no longer be modified.
       slot_unavailable: That time slot is no longer available.
       success_template_invalid: must be a booking acknowledgment template in this workspace
       timeout: Google Calendar did not respond in time. Try again in a few minutes.
@@ -59,6 +61,9 @@ en:
       physical: In person
       to_be_decided: To be arranged
     mailer:
+      confirmation:
+        default_message: Unless we agree otherwise, we'll meet via the Google Meet link
+          in your calendar invitation.
       datetime: Date and time
       host_notification:
         body_html: A booking was made for <strong>%{event_name}</strong> with <strong>%{guest_name}</strong>
@@ -112,9 +117,15 @@ en:
           event type.
         email_section: Confirmation email
         email_template: Guest email template
-        email_tokens_hint: 'Sent when the booking is confirmed. Available tokens:
-          {first_name}, {last_name}, {name}, {email}, {company}, {event_name}, {date},
-          {time}, {duration}, {timezone}, {location}, {meet_link}.'
+        confirmation_message_en: Confirmation message (EN)
+        confirmation_message_es: Confirmation message (ES)
+        confirmation_message_hint: 'Optional. Use {confirmation_message} in the template.
+          When empty, the default message is used.'
+        email_tokens_hint: 'Sent when the booking is confirmed. Tokens: {first_name}, {last_name},
+          {name}, {email}, {company}, {locale}, {event_name}, {date}, {time}, {date_time},
+          {duration}, {timezone}, {location}, {location_address}, {location_type}, {meet_link},
+          {confirmation_message}, {phone}, {guest_message}, {host_name}, {cancel_url}, {reschedule_url}.
+          Liquid: {% if locale == "en" %}…{% endif %}, {% if meet_link != "" %}…{% endif %}.'
         hidden: Hidden
         identification_section: Identification
         increment: Slot increment (min)
@@ -229,6 +240,16 @@ en:
       weekly_hours_js:
         remove_window: Remove window
         unavailable: Unavailable
+    manage:
+      cancel_confirm: Yes, cancel booking
+      cancel_confirm_prompt: Are you sure you want to cancel this booking? The calendar
+        event will be removed and attendees will be notified.
+      cancel_title: Cancel booking
+      cancelled_body: Your booking has been cancelled.
+      cancelled_title: Booking cancelled
+      keep_booking: Keep booking
+      not_modifiable_body: This booking has already passed or was cancelled.
+      not_modifiable_title: Cannot be modified
     public_ui:
       addGuests: Add guests
       aria:
@@ -268,6 +289,11 @@ en:
       phone: Phone (optional)
       reminderNotice: We will send you an email reminder %{minutes} minutes before
         the meeting.
+      rescheduleCurrent: 'Current appointment: %{datetime}'
+      rescheduled: Booking rescheduled!
+      rescheduleSubmit: Confirm new time
+      rescheduleTitle: Reschedule booking
+      rescheduling: Rescheduling…
       schedule: Schedule event
       scheduleSummary: "%{datetime} (%{timezone})"
       scheduling: Scheduling…

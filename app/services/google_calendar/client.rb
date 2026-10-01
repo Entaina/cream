@@ -60,6 +60,16 @@ module GoogleCalendar
       JSON.parse(response.body)
     end
 
+    def update_event(calendar_id:, event_id:, event:)
+      bearer = ensure_access_token!(@connection)
+      uri = URI("#{BASE_URI}/calendars/#{CGI.escape(calendar_id)}/events/#{CGI.escape(event_id)}")
+      uri.query = URI.encode_www_form(sendUpdates: "all")
+      response = patch_json(uri, event, bearer: bearer)
+      raise Error.from_response(:update_events, response) unless response.is_a?(Net::HTTPSuccess)
+
+      JSON.parse(response.body)
+    end
+
     def delete_event(calendar_id:, event_id:)
       bearer = ensure_access_token!(@connection)
       uri = URI("#{BASE_URI}/calendars/#{CGI.escape(calendar_id)}/events/#{CGI.escape(event_id)}")

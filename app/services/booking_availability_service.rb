@@ -4,24 +4,25 @@ class BookingAvailabilityService
   Result = Data.define(:days, :slots, :warning)
   GOOGLE_BUSY_TIMEOUT = 8
 
-  def self.monthly(booking_page:, event_type:, month:, timezone:, client:)
-    new(booking_page:, event_type:, timezone:, client:).monthly(month)
+  def self.monthly(booking_page:, event_type:, month:, timezone:, client:, ignore_booking: nil)
+    new(booking_page:, event_type:, timezone:, client:, ignore_booking:).monthly(month)
   end
 
-  def self.daily(booking_page:, event_type:, date:, timezone:, client:)
-    new(booking_page:, event_type:, timezone:, client:).daily(date)
+  def self.daily(booking_page:, event_type:, date:, timezone:, client:, ignore_booking: nil)
+    new(booking_page:, event_type:, timezone:, client:, ignore_booking:).daily(date)
   end
 
-  def self.slot_available?(booking_page:, event_type:, starts_at:, timezone:, client:)
-    new(booking_page:, event_type:, timezone:, client:).slot_available?(starts_at)
+  def self.slot_available?(booking_page:, event_type:, starts_at:, timezone:, client:, ignore_booking: nil)
+    new(booking_page:, event_type:, timezone:, client:, ignore_booking:).slot_available?(starts_at)
   end
 
-  def initialize(booking_page:, event_type:, timezone:, client:)
+  def initialize(booking_page:, event_type:, timezone:, client:, ignore_booking: nil)
     @booking_page = booking_page
     @event_type = event_type
     @guest_timezone = ActiveSupport::TimeZone[timezone] || ActiveSupport::TimeZone["UTC"]
     @host_timezone = ActiveSupport::TimeZone[booking_page.timezone] || @guest_timezone
     @client = client
+    @ignore_booking = ignore_booking
   end
 
   def monthly(month_string)
@@ -153,10 +154,27 @@ class BookingAvailabilityService
     local_beginning_of_day(zone, date).end_of_day
   end
 
+  def filter_ignored_booking_busy(busy)
+    return busy if @ignore_booking.blank?
+
+    ignored_range = ignored_booking_busy_range
+    return busy if ignored_range.nil?
+
+    busy.reject do |period|
+      period[:start] >= ignored_range[:start] && period[:end] <= ignored_range[:end]
+    end
+  end
+
+  def ignored_booking_busy_range
+    booking = @ignore_booking
+    host_start = booking.starts_at.in_time_zone(@host_timezone)
+    slot_range(host_start)
+  end
+
   def fetch_busy(range_start, range_end)
     return [] if @client.nil?
 
-    Timeout.timeout(GOOGLE_BUSY_TIMEOUT) do
+    busy = Timeout.timeout(GOOGLE_BUSY_TIMEOUT) do
       @client.free_busy(
         time_min: range_start,
         time_max: range_end,
@@ -164,6 +182,7 @@ class BookingAvailabilityService
         timezone: @host_timezone.tzinfo.name
       )
     end
+    filter_ignored_booking_busy(busy)
   rescue Timeout::Error
     @calendar_warning ||= I18n.t("booking.warnings.calendar_timeout")
     []
