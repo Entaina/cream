@@ -1,3 +1,7 @@
+
+
+https://github.com/user-attachments/assets/a36b1480-3f1b-4452-ad5a-466899bf6b84
+
 # Cream 🍦
 
 **An open source CRM for teams**: people, companies and deals organized by workspace, with notes, tasks, lists and a shared activity timeline.
