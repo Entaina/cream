@@ -382,7 +382,7 @@ RSpec.describe "Api::V1::GmailThreads", type: :request do
           as: :json
       }.not_to change(Company, :count)
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       body = JSON.parse(response.body)
       expect(body["errors"]).to include("Company doesn't exist")
       expect(body["domain"]).to eq("example.com")

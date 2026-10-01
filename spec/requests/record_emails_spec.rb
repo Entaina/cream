@@ -72,7 +72,7 @@ RSpec.describe "Record emails", type: :request do
           post record_emails_path, params: valid_params.deep_merge(email_message: {body: ""}), as: :turbo_stream
         }.not_to change(EmailMessage, :count)
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.media_type).to eq(Mime[:turbo_stream])
         expect(response.body).to include("toasts")
         expect(response.body).to include(I18n.t("errors.messages.blank"))
