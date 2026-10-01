@@ -26,7 +26,7 @@
      data-booking-reschedule-prefill-value="<%= reschedule_prefill.to_json %>"
      data-booking-reschedule-current-starts-at-value="<%= @booking.localized_starts_at_with_zone(locale: @locale) %>"
      data-booking-event-type-value="<%= @booking.booking_event_type.slug %>"
-     <% elsif @event_type.present %>
+     <% elsif @event_type.present? %>
      data-booking-event-type-value="<%= @event_type.slug %>"
      <% end %>>
   <div class="public-booking-shell">
