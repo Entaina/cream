@@ -11,6 +11,7 @@ Built with **Rails 8.1**, **Hotwire (Turbo + Stimulus)**, **Tailwind CSS v4** an
 
 ![Cream kanban pipeline board](docs/screenshots/kanban-board.png)
 
+🎬 **[Watch the promo video](docs/cream-0.1-720p.mp4)**
 ## Quick start
 
 Requirements: Ruby 3.4 and Docker (full details in [INSTALL.md](INSTALL.md)).
