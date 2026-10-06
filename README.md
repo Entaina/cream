@@ -9,10 +9,7 @@
 [![Ruby](https://img.shields.io/badge/Ruby-3.4-cc342d?logo=ruby&logoColor=white)](.ruby-version)
 [![Rails](https://img.shields.io/badge/Rails-8.1-cc0000?logo=rubyonrails&logoColor=white)](Gemfile)
 
-https://github.com/user-attachments/assets/a36b1480-3f1b-4452-ad5a-466899bf6b84
-
 https://github.com/user-attachments/assets/7b656f1e-d443-4b66-bf28-c129932e4ee3
-
 
 
 Built with **Rails 8.1**, **Hotwire (Turbo + Stimulus)**, **Tailwind CSS v4** and **PostgreSQL 16**. No Node build step — just importmap and tailwindcss-rails. Self-hosted with a single Docker image.
