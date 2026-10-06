@@ -48,8 +48,10 @@ class McpController < ActionController::API
       return unauthorized! unless @mcp_user
 
       @mcp_workspace = @mcp_user.default_workspace
-      unauthorized! unless @mcp_workspace
+      return unauthorized! unless @mcp_workspace
     end
+
+    set_request_actor!
   end
 
   def mcp_allowed_hosts
@@ -60,6 +62,12 @@ class McpController < ActionController::API
     end
     hosts << ENV["CREAM_DOMAIN"].strip if ENV["CREAM_DOMAIN"].present?
     hosts.uniq
+  end
+
+  def set_request_actor!
+    Current.user = @mcp_user
+    Current.workspace = @mcp_workspace
+    PaperTrail.request.whodunnit = @mcp_user.id.to_s
   end
 
   def bearer_token
