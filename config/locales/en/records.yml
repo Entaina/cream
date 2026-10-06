@@ -106,6 +106,10 @@ en:
     execution_duration:
       one: "%{count} day"
       other: "%{count} days"
+    payment_methods:
+      blank: Not specified
+      cash: Cash
+      deferred: Deferred
     form:
       contacts:
         create: Create contact
@@ -509,8 +513,12 @@ en:
       email: Email
       employees: Employees
       execution_duration: Execution duration
+      execution_starts_on: Execution start
+      execution_ends_on: Execution end
       industry: Industry
       invoice_number: Invoice number
+      payment_method: Payment method
+      payment_on: Payment date
       job_title: Job title
       lead_score: Lead score
       lifecycle: Lifecycle

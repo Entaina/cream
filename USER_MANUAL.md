@@ -4,7 +4,7 @@
 
 Cream is a **workspace**-based CRM for managing **people**, **companies** and **deals** (opportunities), with notes, tasks, lists and an activity history shared across the team.
 
-> **Last revision:** 2026-10-06 (Gmail add-on: Mark done completes a task and requires the next one)
+> **Last revision:** 2026-10-06 (deals: execution dates, payment method and payment date)
 > This document describes the functionality **visible to the user**. Disabled features are listed at the end under "Coming soon".
 
 ---
@@ -293,7 +293,7 @@ When merging, the contacts, deals, notes, tasks, emails and timeline activity of
 
 ### Deals
 
-- They represent sales opportunities with **value**, **currency**, **stage**, **probability**, **expected close date**, optional **execution duration** (days) and optional **invoice number** (*Nº factura*). You enter the exact amount (including cents) and it is shown the same way on the **record page**, **table** and **board**; whole euros are shown without trailing zeros.
+- They represent sales opportunities with **value**, **currency**, **stage**, **probability**, **expected close date**, optional **execution duration** (days), optional **execution start and end dates**, optional **payment method** (*Cash* or *Deferred*), optional **payment date** and optional **invoice number** (*Nº factura*). When the payment method is **Cash**, the payment date is set to the **execution start date** on save. You enter the exact amount (including cents) and it is shown the same way on the **record page**, **table** and **board**; whole euros are shown without trailing zeros.
 - They are linked to a **company** and an **owner**; **contacts** are optional.
 - They can include **product lines** (catalog products with quantity and price).
 - When **creating a deal** (`New deal`):
@@ -302,10 +302,10 @@ When merging, the contacts, deals, notes, tasks, emails and timeline activity of
   - In the **New contact** dialog you can enter **First name** (required), **Last name**, **Email**, **Phone**, **Contact source** (*Formulario web*, *Recomendado*, *Lo trae alguien del equipo* — web form, referral, brought in by a team member) and **First contact date**.
   - In **Products of interest** you can add catalog products with **Edition** (searchable picker: select an existing one or **+ Create "…"**) and quantity before saving.
   - You must define a **Next action** (a task with a future date) to be able to create the deal.
-  - Optionally set **Execution duration (days)** and **Nº factura** (invoice number) when you already have them; you can also add or change them later when editing the deal.
+  - Optionally set **Execution duration (days)**, **Execution start date**, **Execution end date**, **Payment method**, **Payment date** and **Nº factura** (invoice number) when you already have them; you can also add or change them later when editing the deal.
 - They have a **Version history** that stores every change to the deal's attributes (value, name, probability, etc.) and lets you check what the deal looked like at a specific moment.
 - When **editing** a deal and saving a stage change to **Won**, a brief celebration animation is shown on screen before returning to the record. If the new stage is **closed** but not a winning one (e.g. *Lost*), a defeat animation is shown. The same happens when changing stage with the **Move to stage** buttons on the deal page. It does not happen when moving cards on the kanban board. If the target stage has **entry conditions** that the deal does not meet, the change is rejected, an error notice is shown and the deal remains in its original stage.
-- From a deal's page you can **Duplicar** (duplicate) the deal with one click: a copy is created with the same name plus «(copia)» (copy), company, contacts, stage, value, currency, probability, close date, execution duration, owner, custom fields and in-progress tasks. The **invoice number is not copied**. Product lines, notes, attachments, emails and the activity history are not copied.
+- From a deal's page you can **Duplicar** (duplicate) the deal with one click: a copy is created with the same name plus «(copia)» (copy), company, contacts, stage, value, currency, probability, close date, execution duration, execution dates, payment method, payment date, owner, custom fields and in-progress tasks. The **invoice number is not copied**. Product lines, notes, attachments, emails and the activity history are not copied.
 - On the deal page, the **Colaboradores** (collaborators) section lets the **Owner**, an **Admin** or a **Director comercial** add or remove **salespeople** with access to that deal. A collaborator can view and edit the deal even if they are not the owner. Salespeople who are neither owner nor collaborators will not see that deal in lists, board or dashboard.
 
 ### Deal filters {#deal-filters}

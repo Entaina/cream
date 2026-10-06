@@ -10,7 +10,8 @@ class Pipeline < ApplicationRecord
   ].freeze
 
   CARD_FIELD_KEYS = %w[
-    value company owner expected_close_date probability execution_duration_days invoice_number contacts products
+    value company owner expected_close_date probability execution_duration_days execution_starts_on execution_ends_on
+    payment_method payment_on invoice_number contacts products
   ].freeze
 
   belongs_to :workspace
@@ -57,6 +58,10 @@ class Pipeline < ApplicationRecord
     when "expected_close_date" then I18n.t("records.fields.close_date")
     when "probability" then I18n.t("records.fields.probability")
     when "execution_duration_days" then I18n.t("records.fields.execution_duration")
+    when "execution_starts_on" then I18n.t("records.fields.execution_starts_on")
+    when "execution_ends_on" then I18n.t("records.fields.execution_ends_on")
+    when "payment_method" then I18n.t("records.fields.payment_method")
+    when "payment_on" then I18n.t("records.fields.payment_on")
     when "invoice_number" then I18n.t("records.fields.invoice_number")
     when "contacts" then I18n.t("records.fields.contacts")
     when "products" then I18n.t("pipelines.card_fields.products")

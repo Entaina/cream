@@ -18,8 +18,12 @@ es:
         company_id: Empresa
         currency: Moneda
         execution_duration_days: Duración de la ejecución (días)
+        execution_starts_on: Inicio de ejecución
+        execution_ends_on: Fin de ejecución
         expected_close_date: Fecha de cierre prevista
         invoice_number: Nº factura
+        payment_method: Forma de pago
+        payment_on: Fecha de pago
         name: Nombre
         owner_id: Propietario
         partner_id: Empresa partner

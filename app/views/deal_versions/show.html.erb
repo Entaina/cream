@@ -30,6 +30,14 @@
             value: @snapshot.expected_close_date && l(@snapshot.expected_close_date, format: :short) %>
       <%= render "shared/attribute", label: Deal.human_attribute_name(:execution_duration_days), icon_name: :clock,
             value: format_execution_duration(@snapshot.execution_duration_days) %>
+      <%= render "shared/attribute", label: Deal.human_attribute_name(:execution_starts_on), icon_name: :calendar,
+            value: @snapshot.execution_starts_on && l(@snapshot.execution_starts_on, format: :short) %>
+      <%= render "shared/attribute", label: Deal.human_attribute_name(:execution_ends_on), icon_name: :calendar,
+            value: @snapshot.execution_ends_on && l(@snapshot.execution_ends_on, format: :short) %>
+      <%= render "shared/attribute", label: Deal.human_attribute_name(:payment_method), icon_name: :credit_card,
+            value: format_deal_payment_method(@snapshot.payment_method) %>
+      <%= render "shared/attribute", label: Deal.human_attribute_name(:payment_on), icon_name: :calendar,
+            value: @snapshot.payment_on && l(@snapshot.payment_on, format: :short) %>
       <%= render "shared/attribute", label: Deal.human_attribute_name(:currency), icon_name: :banknote, value: @snapshot.currency %>
       <%= render "shared/attribute", label: Deal.human_attribute_name(:owner_id), icon_name: :users, value: @snapshot.owner&.name %>
     </div>

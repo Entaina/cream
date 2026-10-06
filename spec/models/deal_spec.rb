@@ -357,6 +357,45 @@ RSpec.describe Deal, type: :model do
     end
   end
 
+  describe "execution dates and payment" do
+    it "rejects an execution end date before the start date" do
+      deal.execution_starts_on = Date.new(2026, 6, 1)
+      deal.execution_ends_on = Date.new(2026, 5, 31)
+
+      expect(deal).not_to be_valid
+      expect(deal.errors[:execution_ends_on]).to be_present
+    end
+
+    it "sets payment_on to execution_starts_on for cash payment" do
+      deal.assign_attributes(
+        execution_starts_on: Date.new(2026, 7, 1),
+        payment_method: "cash",
+        payment_on: Date.new(2026, 12, 1)
+      )
+
+      expect(deal).to be_valid
+      expect(deal.payment_on).to eq(Date.new(2026, 7, 1))
+    end
+
+    it "clears payment_on for cash when execution start is blank" do
+      deal.assign_attributes(payment_method: "cash", payment_on: Date.new(2026, 12, 1))
+
+      expect(deal).to be_valid
+      expect(deal.payment_on).to be_nil
+    end
+
+    it "keeps a custom payment date for deferred payment" do
+      deal.assign_attributes(
+        execution_starts_on: Date.new(2026, 7, 1),
+        payment_method: "deferred",
+        payment_on: Date.new(2026, 12, 1)
+      )
+
+      expect(deal).to be_valid
+      expect(deal.payment_on).to eq(Date.new(2026, 12, 1))
+    end
+  end
+
   describe "#duplicate" do
     let(:actor) { workspace.users.first }
     let(:company) { create_company!(workspace) }
@@ -366,7 +405,9 @@ RSpec.describe Deal, type: :model do
       create_deal!(workspace, pipeline: pipeline,
         name: "ACME renewal", company: company, partner: partner, contacts: [contact],
         value: 12_000, currency: "USD", probability: 60,
-        expected_close_date: Date.current + 30, execution_duration_days: 90, owner: actor)
+        expected_close_date: Date.current + 30, execution_duration_days: 90,
+        execution_starts_on: Date.new(2026, 8, 1), execution_ends_on: Date.new(2026, 10, 31),
+        payment_method: "deferred", payment_on: Date.new(2026, 9, 15), owner: actor)
     end
 
     before do
@@ -394,6 +435,10 @@ RSpec.describe Deal, type: :model do
       expect(copy.probability).to eq(60)
       expect(copy.expected_close_date).to eq(Date.current + 30)
       expect(copy.execution_duration_days).to eq(90)
+      expect(copy.execution_starts_on).to eq(Date.new(2026, 8, 1))
+      expect(copy.execution_ends_on).to eq(Date.new(2026, 10, 31))
+      expect(copy.payment_method).to eq("deferred")
+      expect(copy.payment_on).to eq(Date.new(2026, 9, 15))
       expect(copy.owner).to eq(actor)
       expect(copy.invoice_number).to be_nil
       expect(copy.contact_ids).to eq(source.contact_ids)

@@ -959,6 +959,41 @@ RSpec.describe "Deals", type: :request do
       expect(deal.reload.execution_duration_days).to eq(30)
     end
 
+    it "updates execution dates and payment fields" do
+      sign_in_as(member)
+
+      patch deal_path(deal), params: {
+        deal: {
+          execution_starts_on: "2026-08-01",
+          execution_ends_on: "2026-10-31",
+          payment_method: "deferred",
+          payment_on: "2026-09-15"
+        }
+      }
+
+      expect(response).to redirect_to(deal_path(deal))
+      deal.reload
+      expect(deal.execution_starts_on).to eq(Date.new(2026, 8, 1))
+      expect(deal.execution_ends_on).to eq(Date.new(2026, 10, 31))
+      expect(deal.payment_method).to eq("deferred")
+      expect(deal.payment_on).to eq(Date.new(2026, 9, 15))
+    end
+
+    it "sets payment_on from execution start for cash payment" do
+      sign_in_as(member)
+
+      patch deal_path(deal), params: {
+        deal: {
+          execution_starts_on: "2026-08-01",
+          payment_method: "cash",
+          payment_on: "2026-12-01"
+        }
+      }
+
+      expect(response).to redirect_to(deal_path(deal))
+      expect(deal.reload.payment_on).to eq(Date.new(2026, 8, 1))
+    end
+
     it "accepts an exact value with cents" do
       sign_in_as(member)
 

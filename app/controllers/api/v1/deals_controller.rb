@@ -64,7 +64,7 @@ module Api
         raw = params.require(:deal)
         permitted = raw.permit(
           :name, :company_id, :pipeline_id, :pipeline_stage_id, :value, :currency, :probability, :expected_close_date,
-          :execution_duration_days,
+          :execution_duration_days, :execution_starts_on, :execution_ends_on, :payment_method, :payment_on,
           contact_ids: [],
           tasks_attributes: %i[title due_on],
           deal_products_attributes: [:id, :product_id, :edition_id, :edition_name, :quantity, :unit_price, :_destroy]
@@ -204,6 +204,10 @@ module Api
           value: deal.value.to_f,
           currency: deal.currency,
           execution_duration_days: deal.execution_duration_days,
+          execution_starts_on: deal.execution_starts_on&.iso8601,
+          execution_ends_on: deal.execution_ends_on&.iso8601,
+          payment_method: deal.payment_method,
+          payment_on: deal.payment_on&.iso8601,
           company_id: deal.company_id,
           contact_ids: deal.contact_ids,
           deal_products: deal.deal_products.map { |line| deal_product_json(line) },

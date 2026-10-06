@@ -71,6 +71,8 @@ es:
                 a %{names}
               needs_next_action: Una oportunidad necesita una siguiente acción (una
                 tarea con fecha límite hoy o posterior)
+            execution_ends_on:
+              must_be_on_or_after_start: debe ser igual o posterior al inicio de ejecución
         lead_form:
           attributes:
             destination:

@@ -18,8 +18,12 @@ en:
         company_id: Company
         currency: Currency
         execution_duration_days: Execution duration (days)
+        execution_starts_on: Execution start date
+        execution_ends_on: Execution end date
         expected_close_date: Expected close date
         invoice_number: Invoice number
+        payment_method: Payment method
+        payment_on: Payment date
         name: Name
         owner_id: Owner
         partner_id: Partner company

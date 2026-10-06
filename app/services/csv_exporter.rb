@@ -43,13 +43,15 @@ class CsvExporter
   end
 
   def export_deals
-    headers = %w[name company stage value currency probability expected_close_date execution_duration_days invoice_number] + custom_field_headers
+    headers = %w[name company stage value currency probability expected_close_date execution_duration_days
+                 execution_starts_on execution_ends_on payment_method payment_on invoice_number] + custom_field_headers
     CSV.generate do |csv|
       csv << headers
       @scope.includes(:company, :pipeline_stage, custom_field_values: :custom_field).find_each do |deal|
         csv << [
           deal.name, deal.company&.name, deal.stage_label, deal.value, deal.currency,
-          deal.probability, deal.expected_close_date, deal.execution_duration_days, deal.invoice_number
+          deal.probability, deal.expected_close_date, deal.execution_duration_days,
+          deal.execution_starts_on, deal.execution_ends_on, deal.payment_method, deal.payment_on, deal.invoice_number
         ] + custom_field_values(deal)
       end
     end

@@ -427,6 +427,43 @@ RSpec.describe "Api::V1::Deals", type: :request do
       expect(deal.reload.execution_duration_days).to be_nil
     end
 
+    it "updates execution dates and payment fields" do
+      patch "/api/v1/deals/#{deal.id}",
+        params: {
+          deal: {
+            execution_starts_on: "2026-08-01",
+            execution_ends_on: "2026-10-31",
+            payment_method: "deferred",
+            payment_on: "2026-09-15"
+          }
+        },
+        headers: json_headers, as: :json
+
+      expect(response).to have_http_status(:success)
+      expect(response.parsed_body).to include(
+        "execution_starts_on" => "2026-08-01",
+        "execution_ends_on" => "2026-10-31",
+        "payment_method" => "deferred",
+        "payment_on" => "2026-09-15"
+      )
+    end
+
+    it "sets payment_on from execution start for cash payment" do
+      patch "/api/v1/deals/#{deal.id}",
+        params: {
+          deal: {
+            execution_starts_on: "2026-08-01",
+            payment_method: "cash",
+            payment_on: "2026-12-01"
+          }
+        },
+        headers: json_headers, as: :json
+
+      expect(response).to have_http_status(:success)
+      expect(response.parsed_body["payment_on"]).to eq("2026-08-01")
+      expect(deal.reload.payment_on).to eq(Date.new(2026, 8, 1))
+    end
+
     it "updates plain fields without logging a stage change" do
       expect {
         patch "/api/v1/deals/#{deal.id}", params: {deal: {name: "Via API"}}, headers: headers

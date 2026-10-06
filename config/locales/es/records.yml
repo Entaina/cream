@@ -107,6 +107,10 @@ es:
     execution_duration:
       one: "%{count} día"
       other: "%{count} días"
+    payment_methods:
+      blank: Sin especificar
+      cash: Al contado
+      deferred: Aplazado
     form:
       contacts:
         create: Crear contacto
@@ -514,8 +518,12 @@ es:
       email: Email
       employees: Empleados
       execution_duration: Duración de la ejecución
+      execution_starts_on: Inicio de ejecución
+      execution_ends_on: Fin de ejecución
       industry: Sector
       invoice_number: Nº factura
+      payment_method: Forma de pago
+      payment_on: Fecha de pago
       job_title: Cargo
       lead_score: Puntuación
       lifecycle: Ciclo de vida

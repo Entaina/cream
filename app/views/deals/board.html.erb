@@ -122,6 +122,18 @@
               <% if deal.pipeline.show_card_field?(:execution_duration_days) && deal.execution_duration_days.present? %>
                 <p class="text-xs text-ink-faint tabular-nums mt-1"><%= deal_field_display(deal, :execution_duration_days) %></p>
               <% end %>
+              <% if deal.pipeline.show_card_field?(:execution_starts_on) && deal.execution_starts_on.present? %>
+                <p class="text-xs text-ink-faint tabular-nums mt-1"><%= deal_field_display(deal, :execution_starts_on) %></p>
+              <% end %>
+              <% if deal.pipeline.show_card_field?(:execution_ends_on) && deal.execution_ends_on.present? %>
+                <p class="text-xs text-ink-faint tabular-nums mt-1"><%= deal_field_display(deal, :execution_ends_on) %></p>
+              <% end %>
+              <% if deal.pipeline.show_card_field?(:payment_method) && deal.payment_method.present? %>
+                <p class="text-xs text-ink-faint mt-1"><%= deal_field_display(deal, :payment_method) %></p>
+              <% end %>
+              <% if deal.pipeline.show_card_field?(:payment_on) && deal.payment_on.present? %>
+                <p class="text-xs text-ink-faint tabular-nums mt-1"><%= deal_field_display(deal, :payment_on) %></p>
+              <% end %>
               <% if deal.pipeline.show_card_field?(:invoice_number) && deal.invoice_number.present? %>
                 <p class="text-xs text-ink-faint mt-1 truncate"><%= deal.invoice_number %></p>
               <% end %>

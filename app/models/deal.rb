@@ -1,6 +1,8 @@
 class Deal < ApplicationRecord
   include CrmRecord
 
+  PAYMENT_METHODS = %w[cash deferred].freeze
+
   attr_accessor :duplicating
 
   has_paper_trail meta: {workspace_id: :workspace_id}
@@ -34,12 +36,16 @@ class Deal < ApplicationRecord
   validates :value, numericality: {greater_than_or_equal_to: 0}
   validates :probability, numericality: {in: 0..100}, allow_nil: true
   validates :execution_duration_days, numericality: {only_integer: true, greater_than: 0}, allow_nil: true
+  validates :payment_method, inclusion: {in: PAYMENT_METHODS}, allow_nil: true
+  validate :execution_end_on_not_before_start
   validate :stage_belongs_to_pipeline
   validate :stage_entry_conditions_met, if: -> { persisted? && will_save_change_to_pipeline_stage_id? }
   validate :contacts_belong_to_company
   validate :partner_differs_from_company
   validate :has_a_future_task, on: :create, unless: :duplicating
 
+  before_validation :normalize_payment_method
+  before_validation :sync_cash_payment_on
   before_validation :set_default_pipeline_stage, on: :create
   before_validation :assign_task_defaults
 
@@ -191,6 +197,10 @@ class Deal < ApplicationRecord
       probability: probability,
       expected_close_date: expected_close_date,
       execution_duration_days: execution_duration_days,
+      execution_starts_on: execution_starts_on,
+      execution_ends_on: execution_ends_on,
+      payment_method: payment_method,
+      payment_on: payment_on,
       owner: owner
     )
     copy.duplicating = true
@@ -203,6 +213,23 @@ class Deal < ApplicationRecord
   end
 
   private
+
+  def normalize_payment_method
+    self.payment_method = payment_method.presence
+  end
+
+  def sync_cash_payment_on
+    return unless payment_method == "cash"
+
+    self.payment_on = execution_starts_on
+  end
+
+  def execution_end_on_not_before_start
+    return if execution_starts_on.blank? || execution_ends_on.blank?
+    return if execution_ends_on >= execution_starts_on
+
+    errors.add(:execution_ends_on, :must_be_on_or_after_start)
+  end
 
   def filled_custom_fields_hash
     custom_fields_hash.select do |_key, value|
