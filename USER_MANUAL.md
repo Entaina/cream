@@ -4,7 +4,7 @@
 
 Cream is a **workspace**-based CRM for managing **people**, **companies** and **deals** (opportunities), with notes, tasks, lists and an activity history shared across the team.
 
-> **Last revision:** 2026-09-30 (bookings: optional per-workspace public layout in Settings)
+> **Last revision:** 2026-10-06 (deals board: sort by next task and sort criteria selector)
 > This document describes the functionality **visible to the user**. Disabled features are listed at the end under "Coming soon".
 
 ---
@@ -418,7 +418,7 @@ In **Deals** (board view):
 
 - Each column is a stage; the header shows probability, number of deals and total value.
 - **On mobile**, the board shows **one stage at a time**. Swipe left or right to move to the next or previous stage. You can also use the arrows and the «etapa X / N» (stage X / N) indicator below the header.
-- **Filter bar** below the title: search, product, edition and **First contact date** range. There is no stage filter (the columns already represent the stages).
+- **Filter bar** below the title: search, product, edition, **First contact date** range and a **sort** selector (default **Next task**: within each column, deals with overdue or soonest tasks appear at the top). You can also sort by close date, name, value and the same criteria as the table view; **Manual order** keeps card order when you drag within a column. The arrow button toggles ascending/descending. There is no stage filter (the columns already represent the stages).
 - **Drag** a card to another column to move the deal to another stage. The change is saved instantly and the column counters and totals update on their own, without reloading the page. If the move cannot be saved (e.g. because of the target stage's entry conditions), the card returns to its original column and an **error notice** appears at the top of the screen.
 - **Reorder the columns** by dragging a stage header by the dots icon; the new order is saved on drop.
 - If there are several pipelines, you can also change the active pipeline from the header selector. With **Todos los pipelines**, the board groups columns **by stage name** and each card shows its **pipeline**; dragging a deal to another column moves it to the same-named stage **within its pipeline** (it does not change pipeline).

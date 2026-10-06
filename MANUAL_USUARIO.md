@@ -4,7 +4,7 @@
 
 Cream es un CRM por **workspaces** para gestionar **personas**, **empresas** y **deals** (oportunidades), con notas, tareas, listas y un historial de actividad compartido en el equipo.
 
-> **Última revisión:** 2026-09-30 (reservas: layout público opcional por workspace en Ajustes)
+> **Última revisión:** 2026-10-06 (tablero de oportunidades: ordenación por próxima tarea y selector de criterios)
 > Este documento describe la funcionalidad **visible para el usuario**. Las funcionalidades desactivadas aparecen al final en «Próximamente».
 
 ---
@@ -418,7 +418,7 @@ En **Deals** (vista board):
 
 - Cada columna es una etapa; la cabecera muestra probabilidad, número de deals y valor total.
 - **En móvil**, el tablero muestra **una etapa a la vez**. Desliza el dedo hacia la izquierda o la derecha para pasar a la etapa siguiente o anterior. También puedes usar las flechas y el indicador «etapa X / N» bajo la cabecera.
-- **Barra de filtros** bajo el título: búsqueda, producto, edición y rango de **First contact date**. No hay filtro por etapa (las columnas ya representan las etapas).
+- **Barra de filtros** bajo el título: búsqueda, producto, edición, rango de **First contact date** y un **selector de ordenación** (por defecto **Próxima tarea**: dentro de cada columna, las oportunidades con tareas vencidas o más próximas aparecen arriba). También puedes ordenar por fecha de cierre, nombre, importe y el resto de criterios de la vista tabla; **Orden manual** conserva el orden al arrastrar tarjetas dentro de la columna. El botón con flecha invierte ascendente/descendente. No hay filtro por etapa (las columnas ya representan las etapas).
 - **Arrastra** una tarjeta a otra columna para mover el deal de etapa. El cambio se guarda al instante y los contadores y totales de las columnas se actualizan solos, sin recargar la página. Si el movimiento no se puede guardar (p. ej. por condiciones de entrada de la etapa destino), la tarjeta vuelve a su columna de origen y aparece un **aviso de error** en la parte superior de la pantalla.
 - **Reordena las columnas** arrastrando la cabecera de una etapa por el icono de puntos; el nuevo orden se guarda al soltar.
 - Si hay varios pipelines, también puedes cambiar el pipeline activo desde el selector de la cabecera. Con **Todos los pipelines**, el tablero agrupa las columnas **por nombre de etapa** y cada tarjeta muestra el **pipeline** al que pertenece; al arrastrar un deal a otra columna, se mueve a la etapa homónima **dentro de su pipeline** (no cambia de pipeline).

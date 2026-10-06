@@ -56,6 +56,19 @@
       <%= text_field_tag :q, filter_value(:q), placeholder: t("deals.index.search_placeholder"), class: "input pl-8" %>
     </div>
     <%= render "filters", show_stage: false %>
+    <%= select_tag :sort,
+          options_for_select(board_deal_sort_options(pipeline: @pipeline, custom_fields: @custom_fields), board_sort_selected),
+          class: "input w-48",
+          onchange: "this.form.requestSubmit()" %>
+    <%= hidden_field_tag :dir, board_sort_direction %>
+    <button type="submit"
+            name="dir"
+            value="<%= board_sort_direction == "desc" ? "asc" : "desc" %>"
+            class="btn-ghost p-1.5"
+            title="<%= t("deals.board.sort_direction") %>"
+            aria-label="<%= t("deals.board.sort_direction") %>">
+      <%= icon(board_sort_direction == "desc" ? :chevron_down : :chevron_up, classes: "size-4") %>
+    </button>
     <% if filters_active? %>
       <%= link_to t("shared.lists.clear"), board_deals_path(clear_filters: 1), class: "btn-ghost" %>
     <% end %>
@@ -66,6 +79,7 @@
      data-controller="kanban"
      data-board-pager-target="track"
      data-kanban-url-value="/deals/:id/move"
+     data-kanban-persist-position-value="<%= @board_manual_sort %>"
      <% if @pipeline %>data-kanban-reorder-url-value="<%= reorder_stages_pipeline_path(@pipeline) %>"<% end %>>
   <div class="flex h-full gap-3 p-4 md:min-w-max" data-kanban-target="stageTrack">
     <% @board_stage_columns.each do |column| %>

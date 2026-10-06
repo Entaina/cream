@@ -73,6 +73,8 @@ class DealsController < ApplicationController
     end
     deals = filtered_deals(policy_scope(current_workspace.deals).includes(*includes))
     deals = deals.where(pipeline_id: @pipeline.id) if @pipeline
+    @custom_fields = current_workspace.custom_fields.where(record_type: "Deal").ordered
+    @board_manual_sort = board_sort_effective == "position"
     stages = if @pipeline
       @pipeline.pipeline_stages.ordered.to_a
     else
@@ -80,7 +82,7 @@ class DealsController < ApplicationController
     end
     stages = stages.reject(&:closed?) unless show_closed?
     @board_all_pipelines = @pipeline.nil?
-    @board_stage_columns = build_board_stage_columns(stages, deals)
+    @board_stage_columns = build_board_stage_columns(stages, apply_board_sorting(deals))
     load_deal_filter_options
   end
 
@@ -415,15 +417,17 @@ class DealsController < ApplicationController
   end
 
   def build_board_stage_columns(stages, deals)
+    ordered_deals = deals.to_a
     if @board_all_pipelines
       StageNameGroup.group(stages).map do |group|
+        ids = group.stages.map(&:id)
         {
           dom_id: helpers.stage_summary_dom_id(group.name),
           drop_key: group.name,
           name: group.name,
           color: group.stage_color,
           stage: group.representative_stage,
-          deals: group.stages.flat_map { |stage| deals.by_stage(stage.id) },
+          deals: ordered_deals.select { |deal| ids.include?(deal.pipeline_stage_id) },
           reorderable: false,
           show_pipeline_on_cards: true,
           show_probability: false
@@ -437,12 +441,35 @@ class DealsController < ApplicationController
           name: stage.name,
           color: stage.color,
           stage: stage,
-          deals: deals.by_stage(stage.id),
+          deals: ordered_deals.select { |deal| deal.pipeline_stage_id == stage.id },
           reorderable: true,
           show_pipeline_on_cards: false,
           show_probability: true
         }
       end
+    end
+  end
+
+  def board_sort_effective
+    sort_param = filter_value(:sort).to_s
+    return "next_task" if sort_param.blank? || sort_param == "next_task"
+
+    sort_param
+  end
+
+  def apply_board_sorting(scope)
+    sort_param = filter_value(:sort).to_s
+    direction = (filter_value(:dir) == "desc") ? :desc : :asc
+
+    case sort_param
+    when "", "next_task"
+      scope.sorted_by_next_task(direction)
+    when "position"
+      scope.order(position: direction, id: direction)
+    when "stage"
+      @pipeline ? scope.sorted_by_stage_order(direction) : scope.sorted_by_next_task(direction)
+    else
+      apply_sorting(scope, sortable: SORTABLE, default_column: "created_at")
     end
   end
 

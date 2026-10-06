@@ -71,6 +71,19 @@ RSpec.describe Deal, type: :model do
     end
   end
 
+  describe ".sorted_by_next_task" do
+    it "orders by earliest pending task due date" do
+      stage = pipeline.first_stage
+      overdue = create_deal!(workspace, pipeline: pipeline, stage: stage, name: "Overdue")
+      overdue.tasks.first.update!(due_on: Date.current - 2)
+      future = create_deal!(workspace, pipeline: pipeline, stage: stage, name: "Future")
+      future.tasks.first.update!(due_on: Date.current + 5)
+
+      ordered = workspace.deals.where(id: [overdue.id, future.id]).sorted_by_next_task(:asc)
+      expect(ordered.pluck(:id)).to eq([overdue.id, future.id])
+    end
+  end
+
   it "reorders within a stage when position is given" do
     stage = pipeline.first_stage
     first = create_deal!(workspace, pipeline: pipeline, stage: stage, name: "First", position: 0)

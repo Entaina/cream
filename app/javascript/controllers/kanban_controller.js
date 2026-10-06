@@ -3,7 +3,7 @@ import { Controller } from "@hotwired/stimulus"
 // Kanban board: drag deals between columns and reorder columns by their headers.
 export default class extends Controller {
   static targets = ["column", "card", "stageColumn", "stageTrack", "columnHandle"]
-  static values = { url: String, reorderUrl: String }
+  static values = { url: String, reorderUrl: String, persistPosition: { type: Boolean, default: false } }
 
   connect() {
     this.onDragStart = this.onDragStart.bind(this)
@@ -299,6 +299,9 @@ export default class extends Controller {
     const origin = this.draggedOrigin
     const nextSibling = this.draggedNextSibling
 
+    const payload = { pipeline_stage_id: stageId }
+    if (this.persistPositionValue) payload.position = position
+
     try {
       const response = await fetch(this.urlValue.replace(":id", dealId), {
         method: "PATCH",
@@ -307,7 +310,7 @@ export default class extends Controller {
           "Accept": "text/vnd.turbo-stream.html",
           "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content
         },
-        body: JSON.stringify({ pipeline_stage_id: stageId, position })
+        body: JSON.stringify(payload)
       })
 
       if (response.ok) {

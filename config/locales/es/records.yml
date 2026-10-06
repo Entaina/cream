@@ -89,6 +89,9 @@ es:
       previous_stage: Etapa anterior
       reorder_column: Reordenar columna
       reorder_column_title: Arrastrar para reordenar columna
+      sort_direction: Cambiar dirección de ordenación
+      sort_manual: Orden manual
+      sort_next_task: Próxima tarea
       title: Tablero de oportunidades
     consent:
       date: 'Fecha:'

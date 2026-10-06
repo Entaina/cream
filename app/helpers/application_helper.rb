@@ -217,6 +217,31 @@ module ApplicationHelper
     t("deals.execution_duration", count: days)
   end
 
+  def board_sort_selected
+    sort = filter_value(:sort).to_s
+    sort.blank? ? "next_task" : sort
+  end
+
+  def board_sort_direction
+    filter_value(:dir).presence || "asc"
+  end
+
+  def board_deal_sort_options(pipeline:, custom_fields:)
+    options = [
+      [t("deals.board.sort_next_task"), "next_task"],
+      [t("deals.board.sort_manual"), "position"],
+      [t("records.fields.name"), "name"],
+      [t("records.fields.value"), "value"],
+      [t("records.fields.close_date"), "expected_close_date"],
+      [t("records.fields.execution_duration"), "execution_duration_days"],
+      [t("records.fields.invoice_number"), "invoice_number"],
+      [t("records.fields.created"), "created_at"]
+    ]
+    options << [t("records.fields.stage"), "stage"] if pipeline
+    custom_fields.each { |field| options << [field.name, "cf:#{field.key}"] }
+    options
+  end
+
   # Sortable table header link preserving current filters.
   def sort_link(label, column)
     if respond_to?(:index_query_params, true) || respond_to?(:index_query_params)

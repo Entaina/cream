@@ -60,6 +60,20 @@ class Deal < ApplicationRecord
     dir = (direction.to_s == "desc") ? "DESC" : "ASC"
     joins(:pipeline_stage).order(Arel.sql("pipeline_stages.position #{dir}, deals.position #{dir}, deals.id #{dir}"))
   }
+  scope :sorted_by_next_task, ->(direction = :asc) {
+    dir = (direction.to_s == "desc") ? "DESC" : "ASC"
+    joins(<<~SQL.squish)
+      LEFT JOIN LATERAL (
+        SELECT MIN(tasks.due_on) AS next_due_on
+        FROM tasks
+        WHERE tasks.taskable_type = 'Deal'
+          AND tasks.taskable_id = deals.id
+          AND tasks.completed_at IS NULL
+          AND tasks.due_on IS NOT NULL
+      ) next_task ON true
+    SQL
+      .order(Arel.sql("next_task.next_due_on #{dir} NULLS LAST, deals.id #{dir}"))
+  }
 
   def self.filter_by(scope, filters)
     filters = filters.symbolize_keys

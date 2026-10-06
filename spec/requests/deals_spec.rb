@@ -798,6 +798,58 @@ RSpec.describe "Deals", type: :request do
     end
   end
 
+  describe "GET /deals/board (sort)" do
+    def board_column_deal_ids(stage_id)
+      column = response.body[/data-stage="#{stage_id}"[\s\S]*?<\/section>/m]
+      column.scan(/data-deal-id="(\d+)"/).flatten.map(&:to_i)
+    end
+
+    it "orders cards by next pending task due date by default" do
+      sign_in_as(member)
+      memberships(:one_one).update!(current_pipeline: pipeline)
+      stage = pipeline.first_stage
+      overdue = create_deal!(workspace, pipeline: pipeline, stage: stage, name: "Overdue sort")
+      overdue.tasks.first.update!(due_on: Date.current - 1)
+      future = create_deal!(workspace, pipeline: pipeline, stage: stage, name: "Future sort")
+      future.tasks.first.update!(due_on: Date.current + 10)
+      no_task = create_deal!(workspace, pipeline: pipeline, stage: stage, name: "No pending sort")
+      no_task.tasks.update_all(completed_at: Time.current)
+
+      get board_deals_path
+
+      subset = [overdue.id, future.id, no_task.id]
+      ordered_subset = board_column_deal_ids(stage.id).select { |id| subset.include?(id) }
+      expect(ordered_subset).to eq([overdue.id, future.id, no_task.id])
+    end
+
+    it "orders cards by expected close date when requested" do
+      sign_in_as(member)
+      memberships(:one_one).update!(current_pipeline: pipeline)
+      stage = pipeline.first_stage
+      later = create_deal!(workspace, pipeline: pipeline, stage: stage, name: "Later close",
+        expected_close_date: Date.current + 30)
+      sooner = create_deal!(workspace, pipeline: pipeline, stage: stage, name: "Sooner close",
+        expected_close_date: Date.current + 5)
+
+      get board_deals_path, params: {sort: "expected_close_date", dir: "asc"}
+
+      subset = [later.id, sooner.id]
+      ordered_subset = board_column_deal_ids(stage.id).select { |id| subset.include?(id) }
+      expect(ordered_subset).to eq([sooner.id, later.id])
+    end
+
+    it "renders the sort selector with next task and close date options" do
+      sign_in_as(member)
+
+      get board_deals_path
+
+      expect(response.body).to include('name="sort"')
+      expect(response.body).to include(I18n.t("deals.board.sort_next_task"))
+      expect(response.body).to include(I18n.t("records.fields.close_date"))
+      expect(response.body).to include(I18n.t("records.fields.name"))
+    end
+  end
+
   describe "PATCH /deals/:id/move (kanban)" do
     it "responds with a turbo stream that refreshes the stage summaries" do
       sign_in_as(member)

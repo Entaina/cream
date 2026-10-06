@@ -88,6 +88,9 @@ en:
       previous_stage: Previous stage
       reorder_column: Reorder column
       reorder_column_title: Drag to reorder column
+      sort_direction: Toggle sort direction
+      sort_manual: Manual order
+      sort_next_task: Next task
       title: Deals board
     consent:
       date: 'Date:'
