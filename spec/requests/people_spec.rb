@@ -627,6 +627,18 @@ RSpec.describe "People", type: :request do
       expect(JSON.parse(response.body)["errors"]).to include(blank_error_for(Person, :brought_by_id))
     end
 
+    it "defaults first contact date to today when omitted" do
+      sign_in_as(member)
+      company = create_company!(workspace)
+
+      post people_path(format: :json), params: {
+        person: {first_name: "Ana", company_id: company.id, source: "web_form"}
+      }, as: :json
+
+      expect(response).to have_http_status(:created)
+      expect(Person.order(:id).last.first_contact_on).to eq(Date.current)
+    end
+
     it "creates a person with team member source" do
       sign_in_as(member)
       company = create_company!(workspace)

@@ -26,6 +26,23 @@ RSpec.describe Person, type: :model do
     expect(person.errors[:brought_by_id]).to be_present
   end
 
+  it "defaults first_contact_on to today on create" do
+    person = workspace.people.create!(
+      first_name: "Pat",
+      company: create_company!(workspace)
+    )
+    expect(person.first_contact_on).to eq(Date.current)
+  end
+
+  it "does not override an explicit first_contact_on on create" do
+    person = workspace.people.create!(
+      first_name: "Pat",
+      company: create_company!(workspace),
+      first_contact_on: Date.new(2025, 3, 15)
+    )
+    expect(person.first_contact_on).to eq(Date.new(2025, 3, 15))
+  end
+
   it "clears brought_by when source is not team_member" do
     person = workspace.people.new(
       first_name: "Pat",

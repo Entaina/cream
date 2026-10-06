@@ -42,6 +42,7 @@ class Person < ApplicationRecord
   validate :at_most_one_primary_email
 
   before_validation :clear_brought_by_unless_team_source
+  before_validation :default_first_contact_on, on: :create
   before_validation :normalize_email_column
   before_validation :assign_workspace_to_person_emails
   before_validation :ensure_primary_email
@@ -113,6 +114,10 @@ class Person < ApplicationRecord
 
   def clear_brought_by_unless_team_source
     self.brought_by_id = nil unless source == "team_member"
+  end
+
+  def default_first_contact_on
+    self.first_contact_on = Date.current if first_contact_on.blank?
   end
 
   def brought_by_in_workspace

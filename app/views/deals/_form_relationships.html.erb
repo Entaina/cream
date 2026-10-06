@@ -4,6 +4,7 @@
      data-deal-contacts-select-team-member-error-value="<%= t("deals.form.contacts.errors.select_team_member") %>"
      data-deal-contacts-network-error-value="<%= t("deals.form.contacts.errors.network") %>"
      data-deal-contacts-create-failed-value="<%= t("deals.form.contacts.errors.create_failed") %>"
+     data-deal-contacts-today-value="<%= Date.current.iso8601 %>"
      class="space-y-4">
   <%= render "shared/company_select", form: f,
         select_data: {"deal-contacts-target": "companySelect", action: "change->deal-contacts#companyChanged"} %>
@@ -85,7 +86,7 @@
         </div>
         <div>
           <label class="label"><%= t("deals.form.contacts.first_contact_date") %></label>
-          <input type="date" data-deal-contacts-target="firstContactOn" class="input" />
+          <input type="date" data-deal-contacts-target="firstContactOn" class="input" value="<%= Date.current.iso8601 %>" />
         </div>
       </div>
       <div class="flex justify-end gap-2">

@@ -9,7 +9,8 @@ export default class extends Controller {
     pickCompanyError: String,
     selectTeamMemberError: String,
     networkError: String,
-    createFailed: String
+    createFailed: String,
+    today: String
   }
 
   connect() {
@@ -75,7 +76,7 @@ export default class extends Controller {
     this.sourceTarget.value = ""
     this.broughtByTarget.value = ""
     this.toggleBroughtBy()
-    this.firstContactOnTarget.value = ""
+    this.firstContactOnTarget.value = this.todayValue
     this.dialogTarget.showModal()
     this.firstNameTarget.focus()
   }
