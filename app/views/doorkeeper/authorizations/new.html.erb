@@ -1,7 +1,7 @@
 <% page_title t(".title") %>
 <div class="w-full max-w-sm">
   <div class="text-center mb-6">
-    <span class="inline-flex size-10 rounded-xl bg-accent text-on-dark items-center justify-center text-lg font-bold font-display mb-3">C</span>
+    <%= image_tag "/icon.svg", alt: "cream", class: "inline-block size-10 mb-3" %>
     <h1 class="text-xl font-semibold"><%= t(".title") %></h1>
     <p class="text-base text-ink-faint mt-1">
       Signed in as <strong><%= current_user.email_address %></strong>

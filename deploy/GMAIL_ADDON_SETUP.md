@@ -178,11 +178,7 @@ Fill in all required fields and click **Publish** ("Save draft" is not enough).
 - Application website: `https://crm.example.com`
 - Support URL: `https://crm.example.com`
 
-**Icons** (generated from the Cream design system):
-
-```bash
-bundle exec ruby script/fetch_design_system_icons.rb
-```
+**Icons** (already in the repo):
 
 | Use in the listing | File |
 |-----------------|---------|

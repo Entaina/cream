@@ -1,7 +1,7 @@
 <% page_title t("auth.invitation.accept_title") %>
 <div class="w-full max-w-sm">
   <div class="text-center mb-6">
-    <span class="inline-flex size-10 rounded-xl bg-accent text-on-dark items-center justify-center text-lg font-bold font-display mb-3">C</span>
+    <%= image_tag "/icon.svg", alt: "cream", class: "inline-block size-10 mb-3" %>
     <h1 class="text-xl font-semibold"><%= t("auth.invitation.join_workspace", workspace: @invitation.workspace.name) %></h1>
     <p class="text-base text-ink-faint mt-1">
       <%= t("auth.invitation.invited_as", inviter: @invitation.invited_by.name, role: @invitation.role) %>
