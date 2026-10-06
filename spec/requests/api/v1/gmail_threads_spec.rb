@@ -288,6 +288,9 @@ RSpec.describe "Api::V1::GmailThreads", type: :request do
       expect(deal.pipeline_stage).to eq(selected_stage)
       expect(deal.contacts.map(&:email)).to include("client@example.com")
       expect(deal.email_messages.pluck(:gmail_message_id)).to contain_exactly("msg-1", "msg-2")
+      expect(deal.activities.find_by!(action: "created").user).to eq(user)
+      expect(deal.activities.where(action: "contacts_changed")).to be_present
+      expect(deal.activities.where(action: "contacts_changed").pluck(:user_id).uniq).to eq([user.id])
     end
 
     it "creates a deal with extra contacts from contact_emails" do

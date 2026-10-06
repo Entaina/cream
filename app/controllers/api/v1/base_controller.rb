@@ -37,8 +37,10 @@ module Api
           else
             @current_user.default_workspace
           end
-          head(requested_workspace_id.present? ? :forbidden : :unauthorized) unless @current_workspace
+          return head(requested_workspace_id.present? ? :forbidden : :unauthorized) unless @current_workspace
         end
+
+        set_request_actor!
       end
 
       def requested_workspace_id
@@ -54,6 +56,12 @@ module Api
 
       attr_reader :current_user
       attr_reader :current_workspace
+
+      def set_request_actor!
+        Current.user = current_user
+        Current.workspace = current_workspace
+        PaperTrail.request.whodunnit = current_user.id.to_s
+      end
 
       def pundit_user
         UserContext.new(user: current_user, workspace: current_workspace)
