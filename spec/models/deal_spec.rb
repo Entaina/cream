@@ -82,6 +82,28 @@ RSpec.describe Deal, type: :model do
       ordered = workspace.deals.where(id: [overdue.id, future.id]).sorted_by_next_task(:asc)
       expect(ordered.pluck(:id)).to eq([overdue.id, future.id])
     end
+
+    it "orders after product and first-contact filters" do
+      stage = pipeline.first_stage
+      company = create_company!(workspace)
+      product = workspace.products.create!(name: "Filter product", price: 10)
+      edition = product.editions.create!(name: "2026")
+      contact = create_person!(workspace, company: company, first_contact_on: Date.new(2026, 1, 15))
+      overdue = create_deal!(workspace, pipeline: pipeline, stage: stage, name: "Overdue", company: company, contacts: [contact])
+      overdue.deal_products.create!(product: product, edition: edition, quantity: 1)
+      overdue.tasks.first.update!(due_on: Date.current - 2)
+      future = create_deal!(workspace, pipeline: pipeline, stage: stage, name: "Future", company: company, contacts: [contact])
+      future.deal_products.create!(product: product, edition: edition, quantity: 1)
+      future.tasks.first.update!(due_on: Date.current + 5)
+
+      ordered = Deal.filter_by(
+        workspace.deals.where(id: [overdue.id, future.id]),
+        product_id: product.id, edition_id: edition.id,
+        first_contact_from: "2026-01-01", first_contact_to: "2026-02-01"
+      ).sorted_by_next_task(:asc)
+
+      expect(ordered.pluck(:id)).to eq([overdue.id, future.id])
+    end
   end
 
   it "reorders within a stage when position is given" do

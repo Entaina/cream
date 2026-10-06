@@ -298,10 +298,15 @@ Rails.application.routes.draw do
         resources :notes, only: :create, controller: "deal_notes"
         resources :emails, only: :create, controller: "deal_emails"
       end
-      resources :tasks
+      resources :tasks do
+        member do
+          post :complete_and_replace
+        end
+      end
       get "gmail/context", to: "gmail_contexts#show"
       post "gmail/threads/status", to: "gmail_threads#status"
       post "gmail/threads/link", to: "gmail_threads#link"
+      post "gmail/deals/:deal_id/contacts", to: "gmail_deal_contacts#create"
     end
   end
 

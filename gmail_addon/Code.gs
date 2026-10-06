@@ -57,7 +57,7 @@ function threadPayload_(threadId, messageId, subject, messages) {
   var rfc822Ids = [];
   var participants = [];
   messages.forEach(function(item) {
-    participants.push(item.from, item.to);
+    participants.push(item.from, item.to, item.cc);
     if (item.rfc822_message_id) rfc822Ids.push(item.rfc822_message_id);
   });
   return {
@@ -77,6 +77,7 @@ function serializeGmailMessage_(msg) {
       rfc822_message_id: safeMessageValue_(function() { return msg.getHeader("Message-ID"); }),
       from: safeMessageValue_(function() { return msg.getFrom(); }),
       to: safeMessageValue_(function() { return msg.getTo(); }),
+      cc: safeMessageValue_(function() { return msg.getCc(); }),
       subject: safeMessageValue_(function() { return msg.getSubject(); }),
       body: messageBody_(msg),
       sent_at: msg.getDate().toISOString()
@@ -319,13 +320,24 @@ function buildDestinationSection_(context) {
 }
 
 function formValue_(e, fieldName) {
-  if (e.formInput && e.formInput[fieldName] !== undefined) {
-    return e.formInput[fieldName];
-  }
+  var values = formStringValues_(e, fieldName);
+  return values.length ? values[0] : null;
+}
+
+function formStringValues_(e, fieldName) {
   var formInputs = e.commonEventObject && e.commonEventObject.formInputs;
-  var values = formInputs && formInputs[fieldName] &&
-    formInputs[fieldName].stringInputs && formInputs[fieldName].stringInputs.value;
-  return values && values.length ? values[0] : null;
+  if (formInputs && formInputs[fieldName]) {
+    var field = formInputs[fieldName];
+    var bucket = field.stringInputs || (field[""] && field[""].stringInputs);
+    if (bucket && bucket.value && bucket.value.length) {
+      return bucket.value.slice();
+    }
+  }
+  if (e.formInput && e.formInput[fieldName] !== undefined) {
+    var raw = e.formInput[fieldName];
+    return Array.isArray(raw) ? raw.slice() : [raw];
+  }
+  return [];
 }
 
 function dateFormValue_(e, fieldName) {
@@ -494,15 +506,23 @@ function buildLinkedDealSection_(deal, multipleDeals) {
     }
     addDealField_(section, "Task", taskText);
     if (task.id) {
+      var taskParams = Object.assign({}, dealActionParams_(deal), { task_id: String(task.id) });
       section.addWidget(
         CardService.newTextButton()
           .setText("Edit task")
           .setOnClickAction(
             CardService.newAction()
               .setFunctionName("showEditTask")
-              .setParameters(
-                Object.assign({}, dealActionParams_(deal), { task_id: String(task.id) })
-              )
+              .setParameters(taskParams)
+          )
+      );
+      section.addWidget(
+        CardService.newTextButton()
+          .setText("Mark done")
+          .setOnClickAction(
+            CardService.newAction()
+              .setFunctionName("showCompleteAndReplaceTask")
+              .setParameters(taskParams)
           )
       );
     }
@@ -530,6 +550,13 @@ function buildLinkedDealSection_(deal, multipleDeals) {
       .setText("Add task")
       .setOnClickAction(
         CardService.newAction().setFunctionName("showAddTask").setParameters(params)
+      )
+  );
+  section.addWidget(
+    CardService.newTextButton()
+      .setText("Add contact")
+      .setOnClickAction(
+        CardService.newAction().setFunctionName("showAddContact").setParameters(params)
       )
   );
   if (deal.url) {
@@ -600,6 +627,7 @@ function buildLinkActionsCard_(threadData, status, context) {
     companyInput.setValue(matchedCompany.name);
   }
   createSection.addWidget(companyInput);
+  addContactSelectionWidgets_(createSection, threadData, []);
   var suggestedCompanies = (status && status.suggested_companies) || [];
   if (!suggestedCompanies.length && matchedCompany) {
     suggestedCompanies = [ matchedCompany ];
@@ -751,6 +779,7 @@ function createDealFromThread(e) {
     var dealName = formValue_(e, "deal_name") || e.parameters.deal_name || threadData.subject || "Deal from email";
     var destination = resolveDestination_(creamContext_());
     var newDeal = { name: dealName, pipeline_stage_id: Number(destination.stage.id) };
+    applyContactParamsToNewDeal_(newDeal, e, e.parameters);
     var companyId = e.parameters.company_id;
     if (companyId) {
       newDeal.company_id = Number(companyId);
@@ -762,7 +791,7 @@ function createDealFromThread(e) {
       if (e.parameters.create_company === "true") {
         newDeal.create_company = true;
       } else if (!companyId) {
-        var confirmation = companyConfirmationCard_(threadData, dealName, newDeal.company_name);
+        var confirmation = companyConfirmationCard_(threadData, dealName, newDeal.company_name, e);
         if (confirmation) {
           return confirmation;
         }
@@ -786,7 +815,7 @@ function createDealFromThread(e) {
   }
 }
 
-function companyConfirmationCard_(threadData, dealName, companyName) {
+function companyConfirmationCard_(threadData, dealName, companyName, e) {
   var domain = externalCompanyDomain_(threadData);
   var matches = [];
   if (companyName) {
@@ -828,12 +857,12 @@ function companyConfirmationCard_(threadData, dealName, companyName) {
       .setOnClickAction(
         CardService.newAction()
           .setFunctionName("createDealFromThread")
-          .setParameters({
+          .setParameters(mergeContactParamsIntoAction_({
             gmail_thread_id: threadData.gmail_thread_id,
             deal_name: dealName,
             company_name: proposed,
             create_company: "true"
-          })
+          }, e))
       )
   );
   (matches || []).filter(function(company) {
@@ -846,11 +875,11 @@ function companyConfirmationCard_(threadData, dealName, companyName) {
         .setOnClickAction(
           CardService.newAction()
             .setFunctionName("createDealFromThread")
-            .setParameters({
+            .setParameters(mergeContactParamsIntoAction_({
               gmail_thread_id: threadData.gmail_thread_id,
               deal_name: dealName,
               company_id: String(company.id)
-            })
+            }, e))
         )
     );
   });
@@ -858,6 +887,226 @@ function companyConfirmationCard_(threadData, dealName, companyName) {
   return CardService.newActionResponseBuilder()
     .setNavigation(CardService.newNavigation().pushCard(card.build()))
     .build();
+}
+
+function parseEmailParts_(raw) {
+  if (!raw) {
+    return [];
+  }
+  var parts = [];
+  String(raw).split(/[,;]/).forEach(function(segment) {
+    segment = segment.trim();
+    if (!segment) {
+      return;
+    }
+    var match = segment.match(/^(.*)<([^>]+)>$/);
+    if (match) {
+      var email = match[2].trim().toLowerCase();
+      var label = match[1].trim() || email;
+      parts.push({ label: label, email: email });
+    } else if (segment.indexOf("@") >= 0) {
+      parts.push({ label: segment, email: segment.toLowerCase() });
+    }
+  });
+  return parts;
+}
+
+function threadParticipantOptions_(threadData, excludedEmails) {
+  var excluded = {};
+  (excludedEmails || []).forEach(function(email) {
+    excluded[String(email).toLowerCase()] = true;
+  });
+  var seen = {};
+  var options = [];
+  (threadData.messages || []).forEach(function(message) {
+    [message.from, message.to, message.cc].forEach(function(raw) {
+      parseEmailParts_(raw).forEach(function(part) {
+        var key = part.email;
+        if (seen[key] || excluded[key]) {
+          return;
+        }
+        seen[key] = true;
+        options.push(part);
+      });
+    });
+  });
+  return options;
+}
+
+function addContactSelectionWidgets_(section, threadData, excludedEmails) {
+  var participants = threadParticipantOptions_(threadData, excludedEmails);
+  if (participants.length) {
+    var picker = CardService.newSelectionInput()
+      .setType(CardService.SelectionInputType.CHECK_BOX)
+      .setFieldName("participant_emails")
+      .setTitle("From this thread");
+    participants.forEach(function(part) {
+      var label = part.label === part.email ?
+        part.email :
+        part.label + " <" + part.email + ">";
+      picker.addItem(label, part.email, false);
+    });
+    section.addWidget(picker);
+  }
+  section.addWidget(
+    CardService.newTextInput()
+      .setFieldName("manual_contact_email")
+      .setTitle("Email")
+      .setHint("Or type an address")
+  );
+  section.addWidget(
+    CardService.newTextInput()
+      .setFieldName("manual_contact_name")
+      .setTitle("Name (optional)")
+  );
+}
+
+function parseContactEmailsParam_(value) {
+  if (!value) {
+    return [];
+  }
+  if (Array.isArray(value)) {
+    return value;
+  }
+  return String(value).split(",").map(function(item) {
+    return item.trim().toLowerCase();
+  }).filter(Boolean);
+}
+
+function collectContactEmailsFromForm_(e) {
+  var emails = formStringValues_(e, "participant_emails").slice();
+  var manual = formValue_(e, "manual_contact_email");
+  if (manual && String(manual).trim()) {
+    emails.push(String(manual).trim().toLowerCase());
+  }
+  var seen = {};
+  return emails.filter(function(email) {
+    email = String(email).toLowerCase().trim();
+    if (!email || seen[email]) {
+      return false;
+    }
+    seen[email] = true;
+    return true;
+  });
+}
+
+function contactParamsFromForm_(e) {
+  var emails = collectContactEmailsFromForm_(e);
+  var manual = formValue_(e, "manual_contact_email");
+  var manualEmail = manual && String(manual).trim().toLowerCase();
+  var name = formValue_(e, "manual_contact_name");
+  return {
+    contact_emails: emails,
+    contact_name: name && String(name).trim() ? String(name).trim() : null,
+    named_contact_email: manualEmail || null
+  };
+}
+
+function contactParamsFromParameters_(parameters) {
+  return {
+    contact_emails: parseContactEmailsParam_(parameters.contact_emails),
+    contact_name: parameters.contact_name || null,
+    named_contact_email: parameters.named_contact_email || null
+  };
+}
+
+function contactParamsFromEvent_(e) {
+  var fromForm = contactParamsFromForm_(e);
+  if (fromForm.contact_emails.length || fromForm.contact_name || fromForm.named_contact_email) {
+    return fromForm;
+  }
+  return contactParamsFromParameters_(e.parameters || {});
+}
+
+function mergeContactParamsIntoAction_(params, e) {
+  var cp = contactParamsFromEvent_(e);
+  if (cp.contact_emails.length) {
+    params.contact_emails = cp.contact_emails.join(",");
+  }
+  if (cp.contact_name) {
+    params.contact_name = cp.contact_name;
+  }
+  if (cp.named_contact_email) {
+    params.named_contact_email = cp.named_contact_email;
+  }
+  return params;
+}
+
+function applyContactParamsToNewDeal_(newDeal, e, parameters) {
+  var cp = contactParamsFromEvent_(e);
+  if (!cp.contact_emails.length && !cp.contact_name && !cp.named_contact_email) {
+    cp = contactParamsFromParameters_(parameters || {});
+  }
+  if (cp.contact_emails.length) {
+    newDeal.contact_emails = cp.contact_emails;
+  }
+  if (cp.contact_name) {
+    newDeal.contact_name = cp.contact_name;
+  }
+  if (cp.named_contact_email) {
+    newDeal.named_contact_email = cp.named_contact_email;
+  }
+}
+
+function buildAddContactCard_(deal, threadData) {
+  var card = CardService.newCardBuilder()
+    .setHeader(CardService.newCardHeader().setTitle("Add contact"));
+  var section = CardService.newCardSection().setHeader(deal.name);
+  addContactSelectionWidgets_(section, threadData, deal.contact_emails || []);
+  section.addWidget(
+    CardService.newTextButton()
+      .setText("Save contact")
+      .setOnClickAction(
+        CardService.newAction()
+          .setFunctionName("saveAddContact")
+          .setParameters(dealActionParams_(deal))
+      )
+  );
+  card.addSection(section);
+  return card.build();
+}
+
+function showAddContact(e) {
+  try {
+    var found = findLinkedDeal_(e);
+    var threadData = readOpenThread_(e);
+    return CardService.newActionResponseBuilder()
+      .setNavigation(
+        CardService.newNavigation().pushCard(buildAddContactCard_(found.deal, threadData))
+      )
+      .build();
+  } catch (err) {
+    return CardService.newActionResponseBuilder()
+      .setNotification(CardService.newNotification().setText(String(err.message)))
+      .build();
+  }
+}
+
+function saveAddContact(e) {
+  try {
+    var dealId = e.parameters.deal_id;
+    var workspaceId = e.parameters.workspace_id;
+    var emails = collectContactEmailsFromForm_(e);
+    if (!emails.length) {
+      throw new Error("Select a participant or enter an email.");
+    }
+    var manual = formValue_(e, "manual_contact_email");
+    var manualEmail = manual && String(manual).trim().toLowerCase();
+    var name = formValue_(e, "manual_contact_name");
+    var contacts = emails.map(function(email) {
+      var entry = { email: email };
+      if (manualEmail && email === manualEmail && name && String(name).trim()) {
+        entry.name = String(name).trim();
+      }
+      return entry;
+    });
+    creamAddDealContacts_(dealId, contacts, workspaceId);
+    return refreshThreadCardFromEdit_(e, "Contact added");
+  } catch (err) {
+    return CardService.newActionResponseBuilder()
+      .setNotification(CardService.newNotification().setText(String(err.message)))
+      .build();
+  }
 }
 
 function companyForOpenMessage_(threadData, status) {
@@ -1207,18 +1456,6 @@ function buildEditTaskCard_(deal, task) {
     duePicker.setValueInMsSinceEpoch(dueMs);
   }
   section.addWidget(duePicker);
-  section.addWidget(
-    CardService.newDecoratedText()
-      .setTopLabel("Completed")
-      .setText("Mark this task as done")
-      .setWrapText(true)
-      .setSwitchControl(
-        CardService.newSwitch()
-          .setFieldName("task_completed")
-          .setValue("true")
-          .setSelected(task.completed === true)
-      )
-  );
   var params = Object.assign({}, dealActionParams_(deal), { task_id: String(task.id) });
   section.addWidget(
     CardService.newTextButton()
@@ -1264,9 +1501,91 @@ function saveEditTask(e) {
     if (dueOn) {
       payload.due_on = formatDateForApi_(dueOn);
     }
-    payload.completed = switchFormValue_(e, "task_completed");
     creamUpdateTask_(taskId, payload, workspaceId);
     return refreshThreadCardFromEdit_(e, "Task updated");
+  } catch (err) {
+    return CardService.newActionResponseBuilder()
+      .setNotification(CardService.newNotification().setText(String(err.message)))
+      .build();
+  }
+}
+
+function buildCompleteAndReplaceTaskCard_(deal, task) {
+  var card = CardService.newCardBuilder()
+    .setHeader(CardService.newCardHeader().setTitle("Mark task done"));
+  var section = CardService.newCardSection().setHeader(deal.name);
+  var doneText = task.title || "";
+  if (task.due_on) {
+    doneText += " (due " + formatIsoDate_(task.due_on) + ")";
+  }
+  addDealField_(section, "Completing", doneText);
+  section.addWidget(
+    CardService.newTextInput()
+      .setFieldName("next_task_title")
+      .setTitle("Next task title")
+  );
+  var tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  section.addWidget(
+    CardService.newDatePicker()
+      .setFieldName("next_task_due_on")
+      .setTitle("Next task due date")
+      .setValueInMsSinceEpoch(tomorrow.getTime())
+  );
+  var params = Object.assign({}, dealActionParams_(deal), { task_id: String(task.id) });
+  section.addWidget(
+    CardService.newTextButton()
+      .setText("Complete and save next task")
+      .setOnClickAction(
+        CardService.newAction()
+          .setFunctionName("saveCompleteAndReplaceTask")
+          .setParameters(params)
+      )
+  );
+  card.addSection(section);
+  return card.build();
+}
+
+function showCompleteAndReplaceTask(e) {
+  try {
+    var found = findLinkedDeal_(e);
+    var taskId = e.parameters.task_id;
+    var task = findTaskOnDeal_(found.deal, taskId);
+    if (!task) {
+      throw new Error("Task not found.");
+    }
+    return CardService.newActionResponseBuilder()
+      .setNavigation(
+        CardService.newNavigation().pushCard(
+          buildCompleteAndReplaceTaskCard_(found.deal, task)
+        )
+      )
+      .build();
+  } catch (err) {
+    return CardService.newActionResponseBuilder()
+      .setNotification(CardService.newNotification().setText(String(err.message)))
+      .build();
+  }
+}
+
+function saveCompleteAndReplaceTask(e) {
+  try {
+    var taskId = e.parameters.task_id;
+    var workspaceId = e.parameters.workspace_id;
+    var title = formValue_(e, "next_task_title");
+    if (!title || !String(title).trim()) {
+      throw new Error("Next task title is required.");
+    }
+    var dueOn = dateFormValue_(e, "next_task_due_on");
+    if (!dueOn) {
+      throw new Error("Next task due date is required.");
+    }
+    var payload = {
+      title: String(title).trim(),
+      due_on: formatDateForApi_(dueOn)
+    };
+    creamCompleteAndReplaceTask_(taskId, payload, workspaceId);
+    return refreshThreadCardFromEdit_(e, "Task completed");
   } catch (err) {
     return CardService.newActionResponseBuilder()
       .setNotification(CardService.newNotification().setText(String(err.message)))

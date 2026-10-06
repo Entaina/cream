@@ -52,10 +52,69 @@ module Api
         head :no_content
       end
 
+      def complete_and_replace
+        task = policy_scope(current_workspace.tasks).find(params[:id])
+        authorize task, :update?
+
+        if task.completed?
+          return render json: {errors: ["Task is already completed"]}, status: :unprocessable_entity
+        end
+
+        next_attrs = next_task_params
+        validation_errors = validate_next_task(next_attrs)
+        if validation_errors.any?
+          return render json: {errors: validation_errors}, status: :unprocessable_entity
+        end
+
+        next_task = current_workspace.tasks.new(
+          title: next_attrs[:title].to_s.strip,
+          due_on: Date.iso8601(next_attrs[:due_on].to_s),
+          taskable: task.taskable
+        )
+        next_task.user = current_user
+        next_task.assignee ||= current_user
+        authorize next_task, :create?
+
+        completed_task = nil
+        ActiveRecord::Base.transaction do
+          next_task.save!
+          task.toggle_completed!
+          completed_task = task
+        end
+
+        render json: {
+          completed_task: task_json(completed_task.reload),
+          next_task: task_json(next_task.reload)
+        }, status: :created
+      rescue ActiveRecord::RecordInvalid => e
+        render json: {errors: e.record.errors.full_messages}, status: :unprocessable_entity
+      end
+
       private
 
       def task_params
         params.require(:task).permit(:title, :due_on, :assignee_id, :taskable_type, :taskable_id, :completed)
+      end
+
+      def next_task_params
+        params.require(:next_task).permit(:title, :due_on)
+      end
+
+      def validate_next_task(attrs)
+        errors = []
+        title = attrs[:title].to_s.strip
+        errors << "Title can't be blank" if title.blank?
+
+        due_on = attrs[:due_on]
+        if due_on.blank?
+          errors << "Due date can't be blank"
+        else
+          parsed = Date.iso8601(due_on.to_s)
+          errors << "Due date must be today or later" if parsed < Date.current
+        end
+        errors
+      rescue ArgumentError
+        ["Due date is invalid"]
       end
 
       def completed_param_provided?

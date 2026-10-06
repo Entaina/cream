@@ -86,17 +86,18 @@ class Deal < ApplicationRecord
     filters = filters.symbolize_keys
 
     if filters[:product_id].present? || filters[:edition_id].present?
-      scope = scope.joins(:deal_products)
-      scope = scope.where(deal_products: {product_id: filters[:product_id]}) if filters[:product_id].present?
-      scope = scope.where(deal_products: {edition_id: filters[:edition_id]}) if filters[:edition_id].present?
-      scope = scope.distinct
+      matching = scope.joins(:deal_products)
+      matching = matching.where(deal_products: {product_id: filters[:product_id]}) if filters[:product_id].present?
+      matching = matching.where(deal_products: {edition_id: filters[:edition_id]}) if filters[:edition_id].present?
+      # Subquery instead of DISTINCT so ORDER BY next_task / other joined columns stays valid in PostgreSQL.
+      scope = scope.where(id: matching.reselect("deals.id"))
     end
 
     if filters[:first_contact_from].present? || filters[:first_contact_to].present?
-      scope = scope.joins(:contacts)
-      scope = scope.where("people.first_contact_on >= ?", filters[:first_contact_from]) if filters[:first_contact_from].present?
-      scope = scope.where("people.first_contact_on <= ?", filters[:first_contact_to]) if filters[:first_contact_to].present?
-      scope = scope.distinct
+      matching = scope.joins(:contacts)
+      matching = matching.where("people.first_contact_on >= ?", filters[:first_contact_from]) if filters[:first_contact_from].present?
+      matching = matching.where("people.first_contact_on <= ?", filters[:first_contact_to]) if filters[:first_contact_to].present?
+      scope = scope.where(id: matching.reselect("deals.id"))
     end
 
     scope = ListFilters.apply_owner(scope, filters[:owner_id]) if filters[:owner_id].present?

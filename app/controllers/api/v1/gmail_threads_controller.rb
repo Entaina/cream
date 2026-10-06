@@ -19,6 +19,8 @@ module Api
         render json: {errors: e.record.errors.full_messages}, status: :unprocessable_entity
       rescue GmailThreadLinker::CompanyRequired => e
         render json: {errors: [e.message], company_name: e.name, domain: e.domain}, status: :unprocessable_entity
+      rescue GmailThreadLinker::ContactOutsideCompany => e
+        render json: {errors: [e.message], email: e.email, company_name: e.company_name}, status: :unprocessable_entity
       rescue ActiveRecord::RecordNotFound
         head :not_found
       end
@@ -49,9 +51,12 @@ module Api
       end
 
       def link_params
-        params.permit(:deal_id, new_deal: %i[name pipeline_stage_id company_id company_name create_company], thread: [
+        params.permit(:deal_id, new_deal: [
+          :name, :pipeline_stage_id, :company_id, :company_name, :create_company,
+          :contact_name, :named_contact_email, {contact_emails: []}
+        ], thread: [
           :gmail_thread_id,
-          {messages: %i[gmail_message_id rfc822_message_id from to subject body sent_at]}
+          {messages: %i[gmail_message_id rfc822_message_id from to cc subject body sent_at]}
         ])
       end
     end

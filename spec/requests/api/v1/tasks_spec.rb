@@ -125,6 +125,67 @@ RSpec.describe "Api::V1::Tasks", type: :request do
     end
   end
 
+  describe "POST /api/v1/tasks/:id/complete_and_replace" do
+    it "completes the task and creates the next one atomically" do
+      task = create_task!(due_on: Date.current + 2.days)
+
+      expect {
+        post "/api/v1/tasks/#{task.id}/complete_and_replace",
+          params: {next_task: {title: "Schedule demo", due_on: (Date.current + 1.day).iso8601}},
+          headers: headers
+      }.to change { company.activities.where(action: "task_completed").count }.by(1)
+        .and change { workspace.tasks.pending.count }.by(0)
+
+      expect(response).to have_http_status(:created)
+      body = response.parsed_body
+      expect(body["completed_task"]).to include("id" => task.id, "completed" => true)
+      expect(body["next_task"]).to include(
+        "title" => "Schedule demo",
+        "completed" => false,
+        "taskable_type" => "Company",
+        "taskable_id" => company.id
+      )
+      expect(task.reload.completed?).to be(true)
+    end
+
+    it "returns 422 and leaves the task pending when validation fails" do
+      task = create_task!
+
+      expect {
+        post "/api/v1/tasks/#{task.id}/complete_and_replace",
+          params: {next_task: {title: "", due_on: (Date.current + 1.day).iso8601}},
+          headers: headers
+      }.not_to change { workspace.tasks.count }
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.parsed_body["errors"]).to include("Title can't be blank")
+      expect(task.reload.completed?).to be(false)
+    end
+
+    it "rejects a past due date for the next task" do
+      task = create_task!
+
+      post "/api/v1/tasks/#{task.id}/complete_and_replace",
+        params: {next_task: {title: "Call back", due_on: (Date.current - 1.day).iso8601}},
+        headers: headers
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.parsed_body["errors"]).to include("Due date must be today or later")
+      expect(task.reload.completed?).to be(false)
+    end
+
+    it "rejects when the task is already completed" do
+      task = create_task!(completed_at: 1.hour.ago)
+
+      post "/api/v1/tasks/#{task.id}/complete_and_replace",
+        params: {next_task: {title: "Call back", due_on: (Date.current + 1.day).iso8601}},
+        headers: headers
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.parsed_body["errors"]).to include("Task is already completed")
+    end
+  end
+
   describe "DELETE /api/v1/tasks/:id" do
     it "destroys the task" do
       task = create_task!

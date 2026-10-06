@@ -76,6 +76,15 @@ function creamThreadLink_(payload) {
   return creamApiRequest_("post", "/api/v1/gmail/threads/link", payload);
 }
 
+function creamAddDealContacts_(dealId, contacts, workspaceId) {
+  return creamApiRequest_(
+    "post",
+    "/api/v1/gmail/deals/" + dealId + "/contacts",
+    { contacts: contacts },
+    workspaceId
+  );
+}
+
 function creamSearchCompanies_(query) {
   var encoded = encodeURIComponent(query || "");
   return creamApiRequest_("get", "/api/v1/companies?q=" + encoded);
@@ -113,6 +122,15 @@ function creamUpdateTask_(taskId, taskPayload, workspaceId) {
     "patch",
     "/api/v1/tasks/" + taskId,
     { task: taskPayload },
+    workspaceId
+  );
+}
+
+function creamCompleteAndReplaceTask_(taskId, nextTaskPayload, workspaceId) {
+  return creamApiRequest_(
+    "post",
+    "/api/v1/tasks/" + taskId + "/complete_and_replace",
+    { next_task: nextTaskPayload },
     workspaceId
   );
 }

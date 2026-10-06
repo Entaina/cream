@@ -688,6 +688,26 @@ components:
         completed:
           type: boolean
 
+    NextTaskInput:
+      type: object
+      required: [title, due_on]
+      properties:
+        title:
+          type: string
+        due_on:
+          type: string
+          format: date
+          description: Due date (today or later).
+
+    CompleteAndReplaceTaskResponse:
+      type: object
+      required: [completed_task, next_task]
+      properties:
+        completed_task:
+          $ref: "#/components/schemas/Task"
+        next_task:
+          $ref: "#/components/schemas/Task"
+
     GmailContext:
       type: object
       required: [selected_workspace_id, workspaces]
@@ -786,6 +806,12 @@ components:
           type: array
           items:
             type: string
+        contact_emails:
+          type: array
+          items:
+            type: string
+            format: email
+          description: Primary emails of contacts already linked to the deal.
         expected_close_date:
           type: string
           format: date
@@ -865,6 +891,8 @@ components:
           type: string
         to:
           type: string
+        cc:
+          type: string
         subject:
           type: string
         body:
@@ -872,6 +900,27 @@ components:
         sent_at:
           type: string
           format: date-time
+
+    GmailContactInput:
+      type: object
+      required: [email]
+      properties:
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+          description: Optional display name when creating a new person.
+
+    GmailDealContactsRequest:
+      type: object
+      required: [contacts]
+      properties:
+        contacts:
+          type: array
+          minItems: 1
+          items:
+            $ref: "#/components/schemas/GmailContactInput"
 
     GmailThread:
       type: object
@@ -907,6 +956,19 @@ components:
             create_company:
               type: boolean
               description: Confirm creation when company_name does not match an existing company. The external email domain is stored on the new company.
+            contact_emails:
+              type: array
+              items:
+                type: string
+                format: email
+              description: Additional thread participants or manually entered emails to link as deal contacts.
+            contact_name:
+              type: string
+              description: Optional name for the manually entered email (see named_contact_email).
+            named_contact_email:
+              type: string
+              format: email
+              description: Email address that should receive contact_name when creating a new person.
         thread:
           $ref: "#/components/schemas/GmailThread"
 
@@ -1609,6 +1671,43 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
 
+  /api/v1/tasks/{id}/complete_and_replace:
+    post:
+      tags: [Tasks]
+      summary: Complete a task and create its replacement
+      description: >-
+        Atomically marks the task completed (with completion side effects) and creates
+        the next pending task on the same record. Used by the Gmail add-on so a deal
+        never ends up with zero pending tasks.
+      parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
+        - $ref: "#/components/parameters/TaskId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [next_task]
+              properties:
+                next_task:
+                  $ref: "#/components/schemas/NextTaskInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CompleteAndReplaceTaskResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
   /api/v1/gmail/context:
     get:
       tags: [Gmail add-on]
@@ -1677,6 +1776,42 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GmailThreadLinkResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /api/v1/gmail/deals/{deal_id}/contacts:
+    post:
+      tags: [Gmail add-on]
+      summary: Add contacts to a deal from the Gmail add-on
+      description: >-
+        Finds or creates people on the deal's company and appends them as deal contacts.
+        Existing people must belong to the deal company (or partner).
+      parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
+        - name: deal_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GmailDealContactsRequest"
+      responses:
+        "200":
+          description: Updated deal summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GmailDealSummary"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "403":

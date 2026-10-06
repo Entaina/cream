@@ -290,6 +290,31 @@ RSpec.describe "Api::V1::GmailThreads", type: :request do
       expect(deal.email_messages.pluck(:gmail_message_id)).to contain_exactly("msg-1", "msg-2")
     end
 
+    it "creates a deal with extra contacts from contact_emails" do
+      extended_thread = thread_payload.deep_dup
+      extended_thread[:messages].first[:cc] = "Colleague <colleague@example.com>"
+
+      post "/api/v1/gmail/threads/link",
+        params: {
+          new_deal: {
+            name: "Multi contact",
+            pipeline_stage_id: pipeline.pipeline_stages.first.id,
+            create_company: true,
+            contact_emails: %w[colleague@example.com],
+            contact_name: "Colleague Name",
+            named_contact_email: "colleague@example.com"
+          },
+          thread: extended_thread
+        },
+        headers: headers,
+        as: :json
+
+      expect(response).to have_http_status(:created)
+      deal = Deal.find(JSON.parse(response.body).dig("deal", "id"))
+      expect(deal.contacts.map(&:email)).to contain_exactly("client@example.com", "colleague@example.com")
+      expect(deal.contacts.find_by(email: "colleague@example.com").first_name).to eq("Colleague")
+    end
+
     it "imports messages whose body is blank" do
       blank_thread = thread_payload.deep_dup
       blank_thread[:messages].each { |message| message[:body] = "   " }

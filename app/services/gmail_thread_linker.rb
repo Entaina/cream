@@ -10,6 +10,16 @@ class GmailThreadLinker
     end
   end
 
+  class ContactOutsideCompany < StandardError
+    attr_reader :email, :company_name
+
+    def initialize(email:, company_name:)
+      @email = email
+      @company_name = company_name
+      super("Contact #{email} belongs to another company (#{company_name})")
+    end
+  end
+
   DEAL_INCLUDES = [
     :company, :pipeline, :pipeline_stage, :owner, :contacts, :tasks,
     {deal_products: [:product, :edition]}
@@ -74,6 +84,32 @@ class GmailThreadLinker
     result
   end
 
+  def add_contacts!(deal:, contacts:)
+    entries = normalize_contact_entries(contacts)
+    deal = reload_deal!(deal)
+    company = deal.company
+
+    ActiveRecord::Base.transaction do
+      new_ids = entries.filter_map do |entry|
+        email = entry[:email]
+        next if owned_email?(email)
+
+        person = resolve_person_for_deal_company!(
+          email,
+          company: company,
+          partner_id: deal.partner_id,
+          name: entry[:name]
+        )
+        person.id unless deal.contact_ids.include?(person.id)
+      end
+
+      deal.contact_ids = (deal.contact_ids + new_ids).uniq
+      deal.save!
+    end
+
+    deal_payload(reload_deal!(deal))
+  end
+
   private
 
   def linked_deals_for(gmail_thread_id:, rfc822_message_ids:)
@@ -123,7 +159,7 @@ class GmailThreadLinker
     pipeline_stage = resolve_pipeline_stage(attrs[:pipeline_stage_id])
     external_email = first_external_email(thread)
     company = resolve_company!(external_email, attrs)
-    person = find_or_create_person(external_email, company: company)
+    people = people_for_new_deal(attrs, thread: thread, company: company, external_email: external_email)
 
     deal = @workspace.deals.new(
       name: name,
@@ -131,7 +167,7 @@ class GmailThreadLinker
       pipeline: pipeline_stage.pipeline,
       pipeline_stage: pipeline_stage,
       owner: @user,
-      contacts: [person],
+      contacts: people,
       tasks: [
         Task.new(
           title: "Next action",
@@ -158,11 +194,81 @@ class GmailThreadLinker
   end
 
   def first_external_email(thread)
-    participant_emails = Array(thread[:messages]).flat_map do |message|
+    thread_participant_emails(thread).find { |email| !owned_email?(email) }
+  end
+
+  def thread_participant_emails(thread)
+    Array(thread[:messages]).flat_map do |message|
       EmailAddressParser.extract_all(message[:from]) +
-        EmailAddressParser.extract_all(message[:to])
+        EmailAddressParser.extract_all(message[:to]) +
+        EmailAddressParser.extract_all(message[:cc])
     end.uniq
-    participant_emails.find { |email| !owned_email?(email) }
+  end
+
+  def people_for_new_deal(attrs, thread:, company:, external_email:)
+    entries = build_new_deal_contact_entries(attrs, thread: thread)
+    people = entries.filter_map do |entry|
+      next if owned_email?(entry[:email])
+
+      resolve_person_for_deal_company!(
+        entry[:email],
+        company: company,
+        partner_id: nil,
+        name: entry[:name]
+      )
+    end.uniq
+
+    return people if people.any?
+
+    [find_or_create_person(external_email, company: company)]
+  end
+
+  def build_new_deal_contact_entries(attrs, thread:)
+    emails = Array(attrs[:contact_emails]).filter_map { |raw| normalize_email(raw) }.uniq
+    emails.reject! { |email| owned_email?(email) }
+
+    primary = first_external_email(thread)
+    emails << primary if primary.present? && !emails.include?(primary)
+
+    named_email = normalize_email(attrs[:named_contact_email])
+    contact_name = attrs[:contact_name].to_s.strip.presence
+
+    emails.uniq.map do |email|
+      {email: email, name: (named_email.present? && email == named_email ? contact_name : nil)}
+    end
+  end
+
+  def normalize_contact_entries(contacts)
+    Array(contacts).filter_map do |entry|
+      hash = entry.symbolize_keys
+      email = normalize_email(hash[:email])
+      next if email.blank?
+
+      name = hash[:name].to_s.strip.presence
+      {email: email, name: name}
+    end.uniq { |entry| entry[:email] }
+  end
+
+  def normalize_email(raw)
+    return nil if raw.blank?
+
+    EmailAddressParser.extract(raw) || raw.to_s.strip.downcase.presence
+  end
+
+  def resolve_person_for_deal_company!(email, company:, partner_id:, name: nil)
+    email = normalize_email(email)
+    raise ArgumentError, "Invalid email" if email.blank?
+
+    person = @workspace.people.with_email(email).first
+    if person
+      allowed = [company.id, partner_id].compact
+      unless allowed.include?(person.company_id)
+        raise ContactOutsideCompany.new(email: email, company_name: person.company.name)
+      end
+      return person
+    end
+
+    find_or_create_person(email, company: company, name: name)
   end
 
   def suggested_companies_for(participant_emails:)
@@ -264,21 +370,31 @@ class GmailThreadLinker
     company
   end
 
-  def find_or_create_person(external_email, company:)
+  def find_or_create_person(external_email, company:, name: nil)
     return create_placeholder_person(company) if external_email.blank?
 
     person = @workspace.people.with_email(external_email).first
     return person if person
 
-    local_part = external_email.split("@").first
-    first_name, last_name = local_part.split(/[._-]/, 2)
+    first_name, last_name = names_from_contact(name, external_email)
     @workspace.people.create!(
       company: company,
       email: external_email,
-      first_name: first_name.to_s.capitalize.presence || "Contact",
-      last_name: last_name.to_s.capitalize,
+      first_name: first_name,
+      last_name: last_name,
       owner: @user
     )
+  end
+
+  def names_from_contact(name, email)
+    if name.present?
+      parts = name.strip.split(/\s+/, 2)
+      return [parts[0], parts[1].to_s]
+    end
+
+    local_part = email.split("@").first
+    first, last = local_part.split(/[._-]/, 2)
+    [first.to_s.capitalize.presence || "Contact", last.to_s.capitalize]
   end
 
   def create_placeholder_person(company)
@@ -379,6 +495,7 @@ class GmailThreadLinker
       currency: deal.currency,
       owner_name: deal.owner&.name,
       contacts: deal.contacts.map(&:display_name),
+      contact_emails: deal.contacts.filter_map { |person| person.email.presence&.downcase },
       expected_close_date: deal.expected_close_date&.iso8601,
       next_task: task ? task_summary(task) : nil,
       tasks: pending_tasks.map { |t| task_summary(t) },
