@@ -581,7 +581,7 @@ class LeadFormSubmissionProcessor
   def stringify_token_value(value)
     case value
     when Array
-      value.map(&:to_s).join(", ")
+      value.join(", ")
     when TrueClass, FalseClass
       value.to_s
     when nil

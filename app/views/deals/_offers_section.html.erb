@@ -1,0 +1,40 @@
+<%# locals: (deal:) %>
+<% offers = deal.offers.includes(:user, file_attachment: :blob).order(created_at: :desc) %>
+<section class="card">
+  <div class="flex items-center justify-between px-4 py-3 border-b border-line">
+    <h2 class="text-base font-semibold flex items-center gap-2">
+      <%= icon :banknote, classes: "size-4 text-ink-faint" %> <%= t("offers.title") %>
+    </h2>
+    <% if policy(deal).update? %>
+      <%= link_to new_deal_offer_path(deal), class: "btn-secondary" do %><%= icon :plus, classes: "size-4" %> <%= t("offers.add") %><% end %>
+    <% end %>
+  </div>
+
+  <% if offers.any? %>
+    <ul class="divide-y divide-line">
+      <% offers.each do |offer| %>
+        <li class="flex items-center gap-3 px-4 py-3">
+          <div class="min-w-0 flex-1">
+            <p class="font-medium truncate"><%= offer.name %></p>
+            <p class="text-xs text-ink-faint">
+              <%= offer.user.name %> · <%= l(offer.created_at.to_date, format: :short) %>
+              <% if offer.file.attached? %> · <%= number_to_human_size(offer.file.byte_size) %><% end %>
+            </p>
+          </div>
+          <%= badge(offer.pdf? ? t("offers.kind.pdf") : t("offers.kind.html"), color: offer.pdf? ? "red" : "hoki") %>
+          <%= link_to deal_offer_path(deal, offer), target: "_blank", rel: "noopener", class: "btn-secondary" do %>
+            <%= icon :external, classes: "size-3.5" %> <%= t("offers.preview") %>
+          <% end %>
+          <% if policy(deal).update? %>
+            <%= button_to deal_offer_path(deal, offer), method: :delete, class: "text-ink-faint hover:text-danger p-1",
+                  form: { data: { turbo_confirm: t("offers.remove_confirm", name: offer.name) } }, "aria-label": t("offers.remove") do %>
+              <%= icon :trash, classes: "size-3.5" %>
+            <% end %>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p class="px-4 py-3 text-base text-ink-faint"><%= t("offers.empty") %></p>
+  <% end %>
+</section>

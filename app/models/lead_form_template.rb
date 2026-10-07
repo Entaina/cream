@@ -153,10 +153,8 @@ class LeadFormTemplate < ApplicationRecord
   end
 
   def normalize_page_slug
-    if page?
-      self.page_slug = page_slug.presence
-    else
-      self.page_slug = nil
+    self.page_slug = if page?
+      page_slug.presence
     end
   end
 

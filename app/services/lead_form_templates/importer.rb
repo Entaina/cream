@@ -40,8 +40,7 @@ module LeadFormTemplates
     private
 
     def repository_partial?(path)
-      path.start_with?(LeadFormTemplate::PARTIALS_PREFIX) ||
-        path.start_with?(LeadFormTemplate::LAYOUT_PARTIALS_PREFIX)
+      path.start_with?(LeadFormTemplate::PARTIALS_PREFIX, LeadFormTemplate::LAYOUT_PARTIALS_PREFIX)
     end
 
     def infer_kind(path, partial:)

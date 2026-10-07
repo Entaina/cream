@@ -61,13 +61,15 @@ module Api
           evidence = ::Marketing::ConsentEvidence.parse(subscription_params)
           subscription = EmailSubscription.find_by(person: person, subscription_type: type)
           # An active subscription keeps the evidence it was originally obtained with.
-          subscription = ::Marketing::ConsentService.subscribe!(
-            person: person,
-            subscription_type: type,
-            source: "api",
-            legal_basis: "consent",
-            metadata: evidence.metadata(user: current_user)
-          ) unless subscription&.subscribed?
+          unless subscription&.subscribed?
+            subscription = ::Marketing::ConsentService.subscribe!(
+              person: person,
+              subscription_type: type,
+              source: "api",
+              legal_basis: "consent",
+              metadata: evidence.metadata(user: current_user)
+            )
+          end
         when "unsubscribe"
           ::Marketing::ConsentService.unsubscribe!(
             person: person,

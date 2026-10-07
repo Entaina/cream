@@ -160,6 +160,9 @@ en:
       google_sign_in_failed: Could not sign in with Google.
       sign_in_session_expired: Sign-in session expired. Open the app from the same
         URL you use in Google OAuth and try again.
+    offers:
+      created: Offer added.
+      removed: Offer removed.
     people:
       created: Person created.
       deleted: Person deleted.

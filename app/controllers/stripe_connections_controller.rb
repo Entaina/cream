@@ -75,7 +75,7 @@ class StripeConnectionsController < ApplicationController
     connection.errors.add(:api_key, t("flashes.stripe.api_key_rejected"))
     render :show, status: :unprocessable_entity
   rescue StripeClient::Error => e
-    connection.errors.add(:base, "#{t('flashes.stripe.verify_failed')}: #{e.message}")
+    connection.errors.add(:base, "#{t("flashes.stripe.verify_failed")}: #{e.message}")
     render :show, status: :unprocessable_entity
   end
 end

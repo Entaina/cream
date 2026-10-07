@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_07_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_07_130000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -992,6 +992,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_07_120000) do
     t.index ["uid"], name: "index_oauth_applications_on_uid", unique: true
   end
 
+  create_table "offers", force: :cascade do |t|
+    t.bigint "workspace_id", null: false
+    t.bigint "deal_id", null: false
+    t.bigint "user_id", null: false
+    t.string "name", null: false
+    t.text "html_body"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["deal_id"], name: "index_offers_on_deal_id"
+    t.index ["user_id"], name: "index_offers_on_user_id"
+    t.index ["workspace_id"], name: "index_offers_on_workspace_id"
+  end
+
   create_table "page_views", force: :cascade do |t|
     t.bigint "workspace_id", null: false
     t.bigint "person_id"
@@ -1769,6 +1782,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_07_120000) do
   add_foreign_key "notifications", "workspaces"
   add_foreign_key "oauth_access_grants", "oauth_applications", column: "application_id"
   add_foreign_key "oauth_access_tokens", "oauth_applications", column: "application_id"
+  add_foreign_key "offers", "deals"
+  add_foreign_key "offers", "users"
+  add_foreign_key "offers", "workspaces"
   add_foreign_key "page_views", "people"
   add_foreign_key "page_views", "workspaces"
   add_foreign_key "people", "companies"

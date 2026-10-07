@@ -94,7 +94,7 @@ RSpec.describe "Public booking management", type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include('data-booking-reschedule-mode-value="true"')
-      expect(response.body).to include('data-booking-reschedule-token-value')
+      expect(response.body).to include("data-booking-reschedule-token-value")
     end
   end
 end

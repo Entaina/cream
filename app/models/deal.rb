@@ -27,6 +27,7 @@ class Deal < ApplicationRecord
     foreign_key: :suggested_deal_id, dependent: :nullify, inverse_of: :suggested_deal
   has_many :lead_submissions, dependent: :destroy
   has_many :bookings, dependent: :nullify
+  has_many :offers, dependent: :destroy
   accepts_nested_attributes_for :deal_products, allow_destroy: true,
     reject_if: ->(attrs) { attrs[:product_id].blank? }
   accepts_nested_attributes_for :tasks,

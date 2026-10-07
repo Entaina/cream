@@ -50,7 +50,7 @@
   </header>
 
   <nav class="record-tabs" aria-label="<%= t("records.sections_aria.deal") %>" role="tablist">
-    <% tabs = [["activity", t("records.tabs.activity"), nil], ["pipeline", t("records.tabs.pipeline"), nil], ["products", t("records.tabs.products"), @line_items.size], ["information", t("records.tabs.information"), nil]] %>
+    <% tabs = [["activity", t("records.tabs.activity"), nil], ["pipeline", t("records.tabs.pipeline"), nil], ["products", t("records.tabs.products"), @line_items.size], ["offers", t("records.tabs.offers"), @deal.offers.size], ["information", t("records.tabs.information"), nil]] %>
     <% tabs << ["files", t("records.tabs.files"), @deal.record_attachments.count] if feature_enabled?(:attachments) %>
     <% tabs.each do |key, label, count| %>
       <%= link_to deal_path(@deal, tab: key), id: "record-tab-#{key}", role: "tab", class: "record-tab", tabindex: @deal_tab == key ? 0 : -1,
@@ -123,6 +123,10 @@
 
     <section id="record-panel-products" role="tabpanel" aria-labelledby="record-tab-products" tabindex="0" data-record-workspace-target="panel" <%= "hidden" unless @deal_tab == "products" %>>
       <%= render "products_section", deal: @deal, line_items: @line_items, products: @products %>
+    </section>
+
+    <section id="record-panel-offers" role="tabpanel" aria-labelledby="record-tab-offers" tabindex="0" data-record-workspace-target="panel" <%= "hidden" unless @deal_tab == "offers" %>>
+      <%= render "offers_section", deal: @deal %>
     </section>
 
     <section id="record-panel-information" role="tabpanel" aria-labelledby="record-tab-information" tabindex="0" data-record-workspace-target="panel" <%= "hidden" unless @deal_tab == "information" %>>

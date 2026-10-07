@@ -17,7 +17,7 @@ RSpec.describe "json 3 compatibility" do
     payload = {
       "error" => "not_found",
       "message" => "Missing record",
-      "items" => [ { "id" => 1, "name" => "Acme" } ],
+      "items" => [{"id" => 1, "name" => "Acme"}],
       "meta" => nil
     }
 
@@ -25,9 +25,9 @@ RSpec.describe "json 3 compatibility" do
   end
 
   it "parses JSON produced by Hash#to_json" do
-    payload = { Events: [ { event: "sent", email: "ada@example.com" } ] }
+    payload = {Events: [{event: "sent", email: "ada@example.com"}]}
 
-    expect(JSON.parse(payload.to_json)).to eq("Events" => [ { "event" => "sent", "email" => "ada@example.com" } ])
+    expect(JSON.parse(payload.to_json)).to eq("Events" => [{"event" => "sent", "email" => "ada@example.com"}])
   end
 
   it "parses fenced model output through Ai::JsonParser" do

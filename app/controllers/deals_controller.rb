@@ -88,7 +88,7 @@ class DealsController < ApplicationController
 
   def show
     authorize @deal
-    @deal_tab = params[:tab].presence_in(%w[activity pipeline products information files]) || "activity"
+    @deal_tab = params[:tab].presence_in(%w[activity pipeline products offers information files]) || "activity"
     @deal_tab = "activity" if @deal_tab == "files" && !CreamFeatures.enabled?(:attachments)
     @pending_tasks = @deal.tasks.pending.includes(:assignee).due_order
     @completed_tasks = @deal.tasks.completed.includes(:assignee).order(completed_at: :desc)

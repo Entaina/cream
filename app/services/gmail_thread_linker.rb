@@ -234,7 +234,7 @@ class GmailThreadLinker
     contact_name = attrs[:contact_name].to_s.strip.presence
 
     emails.uniq.map do |email|
-      {email: email, name: (named_email.present? && email == named_email ? contact_name : nil)}
+      {email: email, name: ((named_email.present? && email == named_email) ? contact_name : nil)}
     end
   end
 

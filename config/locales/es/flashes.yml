@@ -167,6 +167,9 @@ es:
       google_sign_in_failed: No se pudo iniciar sesión con Google.
       sign_in_session_expired: La sesión de inicio de sesión ha caducado. Abre la
         app desde la misma URL que usas en OAuth de Google e inténtalo de nuevo.
+    offers:
+      created: Oferta añadida.
+      removed: Oferta eliminada.
     people:
       created: Contacto creado.
       deleted: Contacto eliminado.

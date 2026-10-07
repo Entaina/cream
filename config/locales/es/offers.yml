@@ -1,0 +1,26 @@
+---
+es:
+  offers:
+    add: Añadir oferta
+    empty: Esta oportunidad todavía no tiene ofertas.
+    form:
+      file: Archivo PDF o HTML
+      file_hint: Adjunta la oferta como archivo PDF o HTML.
+      html_body: HTML
+      html_body_hint: El HTML se muestra tal cual, no como plantilla. Los scripts no se ejecutan.
+      html_body_placeholder: "<html>…</html>"
+      name: Nombre
+      name_hint: Opcional si adjuntas un archivo; se usará el nombre del archivo.
+      name_placeholder: Oferta para ACME, 2026
+      or: o pega el HTML
+      submit: Añadir oferta
+    kind:
+      html: HTML
+      pdf: PDF
+    new:
+      back: "← Volver a %{deal}"
+      title: Nueva oferta
+    preview: Previsualizar
+    remove: Eliminar oferta
+    remove_confirm: "¿Eliminar la oferta «%{name}»?"
+    title: Ofertas

@@ -45,7 +45,7 @@ RSpec.describe "Public booking page", type: :request do
     expect(response.body).to include('data-booking-target="localeEs"')
     expect(response.body).to include('data-booking-target="honeypotLabel"')
     expect(response.body).to include('lang="es"')
-    expect(response.body).to include('data-booking-copy-value=')
+    expect(response.body).to include("data-booking-copy-value=")
     expect(response.body).to include(I18n.t("booking.public_ui.chooseEvent", locale: :es))
   end
 

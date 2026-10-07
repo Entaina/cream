@@ -49,6 +49,9 @@ es:
         must_belong_to_selected_pipeline: debe pertenecer al pipeline seleccionado
         must_belong_to_workspace: debe pertenecer al workspace
         must_differ_from_client_company: debe ser distinta de la empresa cliente
+        offer_content_required: Adjunta un archivo PDF/HTML o pega el HTML de la oferta
+        offer_file_type: debe ser un archivo PDF o HTML
+        offer_single_source: Usa un archivo o HTML pegado, no ambos
         partner_must_differ_from_company: debe ser distinta de la empresa cliente
         pipeline_id_deals_only: solo es válido para oportunidades
         pipeline_id_invalid_workspace: no es válido para este workspace

@@ -6,7 +6,7 @@ class StageTriggerJob < ApplicationJob
     return unless CreamFeatures.enabled?(:stage_triggers) && trigger.active?
 
     run = trigger.runs.create!(workspace: trigger.workspace, deal: deal, user: user)
-    locale = user&.locale.presence_in(User::LOCALES) || I18n.default_locale
+    locale = user&.locale&.presence_in(User::LOCALES) || I18n.default_locale
     I18n.with_locale(locale) do
       StageTriggers::Runner.call(trigger: trigger, deal: deal, user: user, run: run)
     end

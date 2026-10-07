@@ -370,7 +370,7 @@ RSpec.describe "Api::V1::Marketing", type: :request do
 
   describe "GET /api/v1/marketing/segments" do
     it "lists segments for admins" do
-      segment = workspace.segments.create!(name: "API segment", record_type: "Person", user: admin, filters: {})
+      workspace.segments.create!(name: "API segment", record_type: "Person", user: admin, filters: {})
 
       get "/api/v1/marketing/segments", headers: headers
 

@@ -46,6 +46,9 @@ en:
         must_belong_to_selected_pipeline: must belong to the selected pipeline
         must_belong_to_workspace: must belong to the workspace
         must_differ_from_client_company: must be different from the client company
+        offer_content_required: Attach a PDF/HTML file or paste the offer HTML
+        offer_file_type: must be a PDF or HTML file
+        offer_single_source: Use either a file or pasted HTML, not both
         partner_must_differ_from_company: must be different from the client company
         pipeline_id_deals_only: is only valid for deals
         pipeline_id_invalid_workspace: is not valid for this workspace
