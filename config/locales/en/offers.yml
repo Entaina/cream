@@ -4,6 +4,8 @@ en:
     add: Add offer
     empty: This deal has no offers yet.
     form:
+      comment: Version note
+      comment_placeholder: What changed in this version? (optional)
       file: PDF or HTML file
       file_hint: Attach the offer as a PDF or HTML file.
       html_body: HTML
@@ -20,7 +22,18 @@ en:
     new:
       back: "← Back to %{deal}"
       title: New offer
+    new_version:
+      action: New version
+      hint: This will be saved as version %{number} and become the current one. Previous versions are kept.
+      submit: Add version
+      title: New version of "%{name}"
     preview: Preview
     remove: Remove offer
-    remove_confirm: Remove the offer "%{name}"?
+    remove_confirm: Remove the offer "%{name}" and all its versions?
+    remove_version: Remove version
+    remove_version_confirm: Remove version %{number}?
     title: Offers
+    version_label: Version %{number}
+    versions:
+      one: "%{count} version"
+      other: "%{count} versions"

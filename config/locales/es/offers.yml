@@ -4,6 +4,8 @@ es:
     add: Añadir oferta
     empty: Esta oportunidad todavía no tiene ofertas.
     form:
+      comment: Nota de la versión
+      comment_placeholder: "¿Qué cambia en esta versión? (opcional)"
       file: Archivo PDF o HTML
       file_hint: Adjunta la oferta como archivo PDF o HTML.
       html_body: HTML
@@ -20,7 +22,18 @@ es:
     new:
       back: "← Volver a %{deal}"
       title: Nueva oferta
+    new_version:
+      action: Nueva versión
+      hint: Se guardará como versión %{number} y pasará a ser la vigente. Las versiones anteriores se conservan.
+      submit: Añadir versión
+      title: Nueva versión de «%{name}»
     preview: Previsualizar
     remove: Eliminar oferta
-    remove_confirm: "¿Eliminar la oferta «%{name}»?"
+    remove_confirm: "¿Eliminar la oferta «%{name}» y todas sus versiones?"
+    remove_version: Eliminar versión
+    remove_version_confirm: "¿Eliminar la versión %{number}?"
     title: Ofertas
+    version_label: Versión %{number}
+    versions:
+      one: "%{count} versión"
+      other: "%{count} versiones"

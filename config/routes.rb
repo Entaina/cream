@@ -109,7 +109,9 @@ Rails.application.routes.draw do
     end
     resources :deal_accesses, only: %i[create destroy]
     resources :line_items, controller: :deal_products, only: %i[create update destroy]
-    resources :offers, only: %i[new create show destroy]
+    resources :offers, only: %i[new create show destroy] do
+      resources :versions, controller: :offer_versions, only: %i[new create show destroy]
+    end
     resources :versions, controller: :deal_versions, only: %i[index show]
   end
   resources :notes, only: %i[create update destroy]

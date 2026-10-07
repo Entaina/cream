@@ -1,11 +1,12 @@
 <%# locals: (deal:) %>
-<% offers = deal.offers.includes(:user, file_attachment: :blob).order(created_at: :desc) %>
+<% offers = deal.offers.includes(versions: [:user, {file_attachment: :blob}]).order(created_at: :desc) %>
+<% can_edit = policy(deal).update? %>
 <section class="card">
   <div class="flex items-center justify-between px-4 py-3 border-b border-line">
     <h2 class="text-base font-semibold flex items-center gap-2">
       <%= icon :banknote, classes: "size-4 text-ink-faint" %> <%= t("offers.title") %>
     </h2>
-    <% if policy(deal).update? %>
+    <% if can_edit %>
       <%= link_to new_deal_offer_path(deal), class: "btn-secondary" do %><%= icon :plus, classes: "size-4" %> <%= t("offers.add") %><% end %>
     <% end %>
   </div>
@@ -13,23 +14,59 @@
   <% if offers.any? %>
     <ul class="divide-y divide-line">
       <% offers.each do |offer| %>
-        <li class="flex items-center gap-3 px-4 py-3">
-          <div class="min-w-0 flex-1">
-            <p class="font-medium truncate"><%= offer.name %></p>
-            <p class="text-xs text-ink-faint">
-              <%= offer.user.name %> · <%= l(offer.created_at.to_date, format: :short) %>
-              <% if offer.file.attached? %> · <%= number_to_human_size(offer.file.byte_size) %><% end %>
-            </p>
-          </div>
-          <%= badge(offer.pdf? ? t("offers.kind.pdf") : t("offers.kind.html"), color: offer.pdf? ? "red" : "hoki") %>
-          <%= link_to deal_offer_path(deal, offer), target: "_blank", rel: "noopener", class: "btn-secondary" do %>
-            <%= icon :external, classes: "size-3.5" %> <%= t("offers.preview") %>
-          <% end %>
-          <% if policy(deal).update? %>
-            <%= button_to deal_offer_path(deal, offer), method: :delete, class: "text-ink-faint hover:text-danger p-1",
-                  form: { data: { turbo_confirm: t("offers.remove_confirm", name: offer.name) } }, "aria-label": t("offers.remove") do %>
-              <%= icon :trash, classes: "size-3.5" %>
+        <% versions = offer.versions.sort_by(&:number).reverse %>
+        <% current = versions.first %>
+        <li class="px-4 py-3">
+          <div class="flex items-center gap-3">
+            <div class="min-w-0 flex-1">
+              <p class="font-medium truncate"><%= offer.name %></p>
+              <p class="text-xs text-ink-faint">
+                <%= t("offers.version_label", number: current.number) %> · <%= current.user.name %> · <%= l(current.created_at.to_date, format: :short) %>
+                <% if current.file.attached? %> · <%= number_to_human_size(current.file.byte_size) %><% end %>
+              </p>
+            </div>
+            <%= badge(current.pdf? ? t("offers.kind.pdf") : t("offers.kind.html"), color: current.pdf? ? "red" : "hoki") %>
+            <%= link_to deal_offer_path(deal, offer), target: "_blank", rel: "noopener", class: "btn-secondary" do %>
+              <%= icon :external, classes: "size-3.5" %> <%= t("offers.preview") %>
             <% end %>
+            <% if can_edit %>
+              <%= link_to new_deal_offer_version_path(deal, offer), class: "btn-ghost" do %>
+                <%= icon :plus, classes: "size-3.5" %> <%= t("offers.new_version.action") %>
+              <% end %>
+              <%= button_to deal_offer_path(deal, offer), method: :delete, class: "text-ink-faint hover:text-danger p-1",
+                    form: { data: { turbo_confirm: t("offers.remove_confirm", name: offer.name) } }, "aria-label": t("offers.remove") do %>
+                <%= icon :trash, classes: "size-3.5" %>
+              <% end %>
+            <% end %>
+          </div>
+
+          <% if versions.size > 1 %>
+            <details class="record-disclosure mt-2">
+              <summary><%= t("offers.versions", count: versions.size) %></summary>
+              <ul class="mt-2 space-y-1">
+                <% versions.each do |version| %>
+                  <li class="flex items-center gap-3 rounded-md px-2 py-1.5 hover:bg-canvas-sunken text-sm">
+                    <span class="font-medium tabular-nums">v<%= version.number %></span>
+                    <span class="min-w-0 flex-1 truncate text-ink-soft">
+                      <%= version.comment.presence || t("shared.empty_value") %>
+                      <span class="text-xs text-ink-faint">· <%= version.user.name %> · <%= l(version.created_at.to_date, format: :short) %></span>
+                    </span>
+                    <%= badge(version.pdf? ? t("offers.kind.pdf") : t("offers.kind.html"), color: version.pdf? ? "red" : "hoki") %>
+                    <%= link_to deal_offer_version_path(deal, offer, version), target: "_blank", rel: "noopener", class: "btn-ghost" do %>
+                      <%= icon :external, classes: "size-3.5" %> <%= t("offers.preview") %>
+                    <% end %>
+                    <% if can_edit %>
+                      <%= button_to deal_offer_version_path(deal, offer, version), method: :delete, class: "text-ink-faint hover:text-danger p-1",
+                            form: { data: { turbo_confirm: t("offers.remove_version_confirm", number: version.number) } }, "aria-label": t("offers.remove_version") do %>
+                        <%= icon :trash, classes: "size-3.5" %>
+                      <% end %>
+                    <% end %>
+                  </li>
+                <% end %>
+              </ul>
+            </details>
+          <% elsif current.comment.present? %>
+            <p class="text-xs text-ink-soft mt-1"><%= current.comment %></p>
           <% end %>
         </li>
       <% end %>
