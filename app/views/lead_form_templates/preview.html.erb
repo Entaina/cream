@@ -1,32 +1,16 @@
 <% content_for :title, t("marketing.lead_form_templates.preview.title", name: @template.display_name) %>
 
-<div class="mx-auto max-w-xl space-y-4">
-  <div class="rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-100 space-y-3">
-    <div>
-      <p class="font-medium"><%= t("marketing.lead_form_templates.preview.heading") %></p>
-      <p class="mt-1">
-        <%= t("marketing.lead_form_templates.preview.intro_html", name: h(@template.display_name)).html_safe %>
-        <% if @preview_draft %>
-          <%= t("marketing.lead_form_templates.preview.draft_note") %>
-        <% end %>
-        <%= t("marketing.lead_form_templates.preview.no_submit") %>
-      </p>
-      <%= link_to t("marketing.lead_form_templates.preview.back_to_editor"), edit_lead_form_template_path(@template), class: "mt-2 inline-block text-accent hover:underline" %>
-    </div>
-
-    <% if @preview_draft %>
-      <% if @preview_product %>
-        <p class="text-xs"><%= t("marketing.lead_form_templates.preview.product_label") %> <strong><%= @preview_product.name %></strong></p>
-      <% end %>
-    <% elsif @preview_products.any? %>
-      <%= render "preview_product_field",
-            products: @preview_products,
-            selected_id: @preview_product&.id,
-            auto_submit: true,
-            form_url: preview_lead_form_template_path(@template),
-            form_method: :get %>
-    <% end %>
-  </div>
+<% if @template.layout? %>
+  <% content_for :full_width do %>true<% end %>
 
   <%= @lead_form_page_html %>
-</div>
+
+  <div class="pointer-events-none fixed inset-x-0 bottom-0 z-[100] p-4 sm:inset-x-auto sm:right-4 sm:bottom-4 sm:left-auto sm:p-0">
+    <%= render "preview_notice", floating: true %>
+  </div>
+<% else %>
+  <div class="mx-auto max-w-xl space-y-4">
+    <%= render "preview_notice" %>
+    <%= @lead_form_page_html %>
+  </div>
+<% end %>

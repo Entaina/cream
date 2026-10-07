@@ -91,7 +91,7 @@
           <section class="record-card">
             <h2 class="record-section-title mb-4"><%= t("records.at_a_glance") %></h2>
             <dl class="record-context-list">
-              <div><dt><%= t("records.fields.stage") %></dt><dd><%= @deal.stage_label %></dd></div>
+              <div><dt><%= t("records.fields.stage") %></dt><dd><%= render DealStageComponent.new(deal: @deal) %></dd></div>
               <div><dt><%= t("records.fields.probability") %></dt><dd><%= deal_field_display(@deal, :probability) %></dd></div>
               <div><dt><%= t("records.fields.company") %></dt><dd><%= @deal.company&.name || t("shared.empty_value") %></dd></div>
               <div><dt><%= t("records.fields.owner") %></dt><dd><%= @deal.owner&.name || t("shared.tasks.unassigned") %></dd></div>

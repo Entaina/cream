@@ -1,3 +1,1 @@
-<div id="deal_stage_badge">
-  <%= stage_badge deal %>
-</div>
+<%= render DealStageComponent.new(deal: deal, wrapper_id: "deal_stage_badge") %>

@@ -89,7 +89,7 @@
             <% unless @display_pipeline %>
               <td class="text-ink-soft"><%= deal.pipeline.name %></td>
             <% end %>
-            <td><%= stage_badge deal %></td>
+            <td><%= render DealStageComponent.new(deal: deal) %></td>
             <td class="text-ink-soft tabular-nums"><%= deal_field_display(deal, :value) %></td>
             <td>
               <% if deal.company %>

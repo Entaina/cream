@@ -347,6 +347,11 @@ en:
         preview: Preview
       new:
         page_title: New form template
+      layout_preview_content:
+        body: This block simulates public page content (booking, form, etc.) inside
+          the layout.
+        kicker: Sample content
+        title: Layout preview
       preview:
         back_to_editor: Back to editor
         draft_note: Includes unsaved editor changes.

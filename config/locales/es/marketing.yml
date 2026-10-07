@@ -353,6 +353,11 @@ es:
         preview: Vista previa
       new:
         page_title: Nueva plantilla de formulario
+      layout_preview_content:
+        body: Este bloque simula el contenido de una página pública (reserva, formulario,
+          etc.) dentro del layout.
+        kicker: Contenido de ejemplo
+        title: Vista previa del layout
       preview:
         back_to_editor: Volver al editor
         draft_note: Incluye cambios sin guardar del editor.

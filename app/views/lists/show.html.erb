@@ -51,7 +51,7 @@
               <% end %>
             </td>
             <% if @list.record_type == "Deal" %>
-              <td><%= stage_badge record %></td>
+              <td><%= render DealStageComponent.new(deal: record) %></td>
               <td class="text-ink-soft tabular-nums"><%= money(record.value, record.currency) %></td>
             <% elsif @list.record_type == "Person" %>
               <td class="text-ink-soft"><%= record.email %></td>

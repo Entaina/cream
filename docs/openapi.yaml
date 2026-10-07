@@ -211,7 +211,7 @@ components:
             internal_notes:
               type: string
               nullable: true
-              description: Free-text internal notes about the person.
+              description: Free-text internal notes about the person (up to 50,000 characters).
         - $ref: "#/components/schemas/Timestamps"
 
     PersonInput:
@@ -232,6 +232,7 @@ components:
           type: string
         internal_notes:
           type: string
+          maxLength: 50000
           description: Free-text internal notes about the person.
         company_id:
           type: integer
@@ -317,7 +318,8 @@ components:
           description: Company to find (case-insensitive) or create when `company_id` is omitted.
         internal_notes:
           type: string
-          description: Stored on the person; appended to existing notes when the person already exists.
+          maxLength: 50000
+          description: Stored on the person (up to 50,000 characters, including the notes already stored); appended to existing notes when the person already exists.
         product_id:
           type: integer
           description: Registers a pending product interest (requires `interest_description`).

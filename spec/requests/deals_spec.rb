@@ -915,6 +915,33 @@ RSpec.describe "Deals", type: :request do
       expect(response.body).to include("No se puede pasar")
       expect(deal.reload.pipeline_stage).to eq(original_stage)
     end
+
+    it "redirects back when moving from the inline stage dropdown" do
+      sign_in_as(member)
+      target = pipeline.pipeline_stages.find_by!(name: "Qualified")
+
+      patch move_deal_path(deal, source: "inline"), params: {pipeline_stage_id: target.id},
+        headers: {"HTTP_REFERER" => deals_path}
+
+      expect(response).to redirect_to(deals_path)
+      expect(deal.reload.stage_label).to eq("Qualified")
+    end
+
+    it "redirects back with an alert when inline move is blocked by stage conditions" do
+      sign_in_as(member)
+      target = pipeline.pipeline_stages.find_by!(name: "Qualified")
+      workspace.stage_conditions.create!(pipeline_stage: target, field: "value",
+        operator: "gt", compare_value: "10000")
+      deal.update_column(:value, 100)
+      original_stage = deal.pipeline_stage
+
+      patch move_deal_path(deal, source: "inline"), params: {pipeline_stage_id: target.id},
+        headers: {"HTTP_REFERER" => deals_path}
+
+      expect(response).to redirect_to(deals_path)
+      expect(flash[:alert]).to include("No se puede pasar")
+      expect(deal.reload.pipeline_stage).to eq(original_stage)
+    end
   end
 
   describe "PATCH /deals/:id (stage change through the edit form)" do

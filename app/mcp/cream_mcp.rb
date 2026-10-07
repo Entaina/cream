@@ -611,7 +611,7 @@ module CreamMcp
                                 job_title: {type: "string"}, location: {type: "string"},
                                 company_id: {type: "integer", description: "Existing company id (required — a person belongs to a company)"},
                                 description: {type: "string"},
-                                internal_notes: {type: "string", description: "Free-text internal notes about the person"},
+                                internal_notes: {type: "string", maxLength: Person::INTERNAL_NOTES_MAX_LENGTH, description: "Free-text internal notes about the person"},
                                 custom_fields: {type: "object", description: "Workspace-defined custom fields keyed by field key (see list_custom_fields)"}},
                    required: ["first_name", "company_id"]}
   ) do |server_context:, **args|
@@ -740,7 +740,7 @@ module CreamMcp
                                 email: {type: "string"}, phone: {type: "string"},
                                 job_title: {type: "string"}, location: {type: "string"},
                                 linkedin_url: {type: "string"}, description: {type: "string"},
-                                internal_notes: {type: "string"},
+                                internal_notes: {type: "string", maxLength: Person::INTERNAL_NOTES_MAX_LENGTH},
                                 company_id: {type: "integer", description: "Move the person to another existing company"}},
                    required: ["person_id"]}
   ) do |server_context:, **args|

@@ -98,7 +98,7 @@
             <% if open_deals.any? %>
               <ul class="space-y-4">
                 <% open_deals.first(3).each do |deal| %>
-                  <li><%= link_to deal.name, deal_path(deal), class: "block font-medium hover:text-accent break-words" %><div class="mt-2"><%= stage_badge deal %></div></li>
+                  <li><%= link_to deal.name, deal_path(deal), class: "block font-medium hover:text-accent break-words" %><div class="mt-2"><%= render DealStageComponent.new(deal: deal) %></div></li>
                 <% end %>
               </ul>
               <button type="button" class="btn-ghost mt-4 -ml-2" data-action="record-workspace#selectTab" data-tab="deals"><%= t("records.view_deals", count: @deals.size) %> <%= icon :chevron_right, classes: "size-3.5" %></button>

@@ -115,6 +115,17 @@ RSpec.describe "Api::V1::Marketing", type: :request do
       expect(subscription.consent_evidence).to eq("marketing_consent_text" => "Original text")
     end
 
+    it "rejects internal notes above the limit without creating anything" do
+      too_long = "a" * (Person::INTERNAL_NOTES_MAX_LENGTH + 1)
+
+      expect {
+        post "/api/v1/marketing/mqls", params: payload.merge(mql: payload[:mql].merge(internal_notes: too_long)), as: :json, headers: sales_headers
+      }.not_to change(workspace.people, :count)
+
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response.parsed_body["errors"].join).to include(Person.human_attribute_name(:internal_notes))
+    end
+
     it "requires the consent text and source on every subscription" do
       %i[consent_text consent_source].each do |field|
         subscriptions = [payload[:subscriptions].first.except(field)]

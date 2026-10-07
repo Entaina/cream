@@ -9,6 +9,7 @@ class Person < ApplicationRecord
     "beehiiv" => "Beehiiv"
   }.freeze
 
+  INTERNAL_NOTES_MAX_LENGTH = 50_000
   LIFECYCLE_STAGES = %w[subscriber lead mql sql opportunity customer evangelist].freeze
 
   belongs_to :company
@@ -34,6 +35,7 @@ class Person < ApplicationRecord
     reject_if: ->(attrs) { attrs[:address].blank? && attrs[:id].blank? }
 
   validates :lifecycle_stage, inclusion: {in: LIFECYCLE_STAGES}
+  validates :internal_notes, length: {maximum: INTERNAL_NOTES_MAX_LENGTH}
   validates :first_name, presence: true, unless: -> { last_name.present? }
   validates :email, format: {with: URI::MailTo::EMAIL_REGEXP}, allow_blank: true
   validates :source, inclusion: {in: SOURCES.keys}, allow_blank: true

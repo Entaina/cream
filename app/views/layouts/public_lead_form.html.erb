@@ -12,10 +12,15 @@
     <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
-  <body class="min-h-full bg-canvas text-ink">
-    <main class="min-h-full px-4 py-6 sm:py-8">
+  <body class="<%= content_for?(:full_width) ? "public-booking-page min-h-full" : "min-h-full bg-canvas text-ink" %>">
+    <% if content_for?(:full_width) %>
       <%= render "shared/flash" %>
       <%= yield %>
-    </main>
+    <% else %>
+      <main class="min-h-full px-4 py-6 sm:py-8">
+        <%= render "shared/flash" %>
+        <%= yield %>
+      </main>
+    <% end %>
   </body>
 </html>

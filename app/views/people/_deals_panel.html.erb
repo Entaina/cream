@@ -17,7 +17,7 @@
             <li class="rounded-md px-2 py-1.5 hover:bg-canvas-sunken">
               <div class="flex items-center justify-between gap-2">
                 <%= link_to deal.name, deal_path(deal), class: "truncate font-medium text-base hover:underline" %>
-                <%= stage_badge deal %>
+                <%= render DealStageComponent.new(deal: deal) %>
               </div>
               <p class="text-xs text-ink-faint mt-0.5 truncate">
                 <%= l(deal.created_at, format: :short) %>

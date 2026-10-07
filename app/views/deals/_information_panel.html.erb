@@ -11,7 +11,7 @@
       <%= render "shared/attribute", label: t("records.fields.payment_method"), icon_name: :credit_card, value: deal_field_display(@deal, :payment_method) %>
       <%= render "shared/attribute", label: t("records.fields.payment_on"), icon_name: :calendar, value: deal_field_display(@deal, :payment_on) %>
       <%= render "shared/attribute", label: t("records.fields.invoice_number"), icon_name: :note, value: deal_field_display(@deal, :invoice_number) %>
-      <%= render "shared/attribute", label: t("records.fields.stage"), icon_name: :activity, value: @deal.stage_label %>
+      <%= render "shared/attribute", label: t("records.fields.stage"), icon_name: :activity, value: render(DealStageComponent.new(deal: @deal)) %>
       <%= render "shared/attribute", label: t("records.fields.pipeline"), icon_name: :activity, value: @deal.pipeline&.name %>
     </div>
   </section>

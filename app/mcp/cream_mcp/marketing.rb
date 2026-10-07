@@ -653,7 +653,7 @@ module CreamMcp
               required: %w[subscription_type_id consent_text consent_source]
             }
           },
-          internal_notes: {type: "string", description: "Free-text internal notes stored on the person"},
+          internal_notes: {type: "string", maxLength: Person::INTERNAL_NOTES_MAX_LENGTH, description: "Free-text internal notes stored on the person"},
           notes: {type: "array", items: {type: "object", properties: {title: {type: "string"}, body: {type: "string"}}, required: ["body"]},
                   description: "Timeline notes"},
           attachments: {type: "array", items: CreamMcp::EMAIL_ATTACHMENT_SCHEMA},

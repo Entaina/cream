@@ -17,7 +17,8 @@ class DealsController < ApplicationController
     end
     @deals = apply_pipeline_scope(
       filtered_deals(
-        policy_scope(current_workspace.deals).includes(:company, :owner, :pipeline, :pipeline_stage, :contacts, custom_field_values: :custom_field)
+        policy_scope(current_workspace.deals).includes(:company, :owner, :pipeline_stage, :contacts,
+          pipeline: {pipeline_stages: :stage_conditions}, custom_field_values: :custom_field)
       )
     )
     @display_pipeline = pipeline_for_display
@@ -191,7 +192,9 @@ class DealsController < ApplicationController
       format.turbo_stream { render_move_success_streams }
       format.json { head :ok }
       format.html do
-        if params[:source] == "show"
+        if params[:source] == "inline"
+          redirect_back fallback_location: deal_path(@deal), status: :see_other
+        elsif params[:source] == "show"
           redirect_to @deal
         else
           redirect_to board_deals_path

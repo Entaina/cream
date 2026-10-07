@@ -35,6 +35,28 @@ RSpec.describe Deal, type: :model do
     expect(deal.reload.stage_label).to eq("Qualified")
   end
 
+  describe "#unmet_stage_conditions" do
+    let(:qualified) { pipeline.pipeline_stages.find_by!(name: "Qualified") }
+
+    it "returns active conditions the deal does not satisfy" do
+      workspace.stage_conditions.create!(pipeline_stage: qualified, field: "value", operator: "gt", compare_value: "1000")
+      deal.update_column(:value, 100)
+
+      failed = deal.unmet_stage_conditions(qualified)
+
+      expect(failed.size).to eq(1)
+      expect(failed.first.field).to eq("value")
+    end
+
+    it "blocks moving through move_to_stage! when conditions fail" do
+      workspace.stage_conditions.create!(pipeline_stage: qualified, field: "value", operator: "gt", compare_value: "1000")
+      deal.update_column(:value, 100)
+
+      expect { deal.move_to_stage!(qualified) }.to raise_error(ActiveRecord::RecordInvalid)
+      expect(deal.reload.stage_label).to eq("Lead")
+    end
+  end
+
   describe "stage triggers" do
     include ActiveJob::TestHelper
 

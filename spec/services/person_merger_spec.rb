@@ -113,6 +113,16 @@ RSpec.describe PersonMerger do
     expect(primary.reload.internal_notes).to eq("Prefers calls\n\nMet at expo")
   end
 
+  it "refuses to merge when the combined internal notes exceed the limit" do
+    half = "a" * (Person::INTERNAL_NOTES_MAX_LENGTH / 2 + 1)
+    primary = create_person!(workspace, company: company, email: "pat@acme.com", internal_notes: half)
+    secondary = create_person!(workspace, company: company, email: "other@acme.com", internal_notes: half.tr("a", "b"))
+
+    expect { merge(primary: primary, secondaries: [secondary]) }
+      .to raise_error(PersonMerger::Error, I18n.t("people.merge.errors.internal_notes_too_long", max: Person::INTERNAL_NOTES_MAX_LENGTH))
+    expect(Person.exists?(secondary.id)).to be(true)
+  end
+
   it "takes the secondary's internal notes when the primary has none" do
     primary = create_person!(workspace, company: company, email: "pat@acme.com")
     secondary = create_person!(workspace, company: company, email: "other@acme.com", internal_notes: "Met at expo")

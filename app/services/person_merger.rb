@@ -79,7 +79,12 @@ class PersonMerger
     return if secondary_notes.empty?
 
     combined = ([primary.internal_notes.to_s.strip] + secondary_notes).reject(&:blank?).uniq
-    primary.internal_notes = combined.join("\n\n")
+    merged = combined.join("\n\n")
+    if merged.length > Person::INTERNAL_NOTES_MAX_LENGTH
+      raise Error, I18n.t("people.merge.errors.internal_notes_too_long", max: Person::INTERNAL_NOTES_MAX_LENGTH)
+    end
+
+    primary.internal_notes = merged
   end
 
   def merge_person_emails!

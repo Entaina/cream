@@ -5,6 +5,17 @@ RSpec.describe Person, type: :model do
 
   let(:workspace) { workspaces(:one) }
 
+  it "limits the internal notes length" do
+    person = Person.new(workspace: workspace, first_name: "Pat", company: workspace.companies.create!(name: "Acme"))
+
+    person.internal_notes = "a" * Person::INTERNAL_NOTES_MAX_LENGTH
+    expect(person).to be_valid
+
+    person.internal_notes = "a" * (Person::INTERNAL_NOTES_MAX_LENGTH + 1)
+    expect(person).not_to be_valid
+    expect(person.errors[:internal_notes]).to be_present
+  end
+
   it "requires a company" do
     person = workspace.people.new(first_name: "Pat")
     expect(person).not_to be_valid

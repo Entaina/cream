@@ -93,6 +93,8 @@ es:
       sort_manual: Orden manual
       sort_next_task: Próxima tarea
       title: Tablero de oportunidades
+    stage_dropdown:
+      change_aria: Cambiar estado
     consent:
       date: 'Fecha:'
       hash: 'Hash:'
@@ -301,6 +303,7 @@ es:
       contact_to_keep: Contacto a conservar
       contacts_to_merge: Contactos a fusionar
       errors:
+        internal_notes_too_long: Las notas combinadas superarían los %{max} caracteres. Acorta las notas de los contactos antes de fusionarlos.
         merge_failed: No se pudieron fusionar los contactos. Inténtalo de nuevo o
           contacta con soporte.
         no_secondaries: Selecciona al menos un contacto para fusionar.

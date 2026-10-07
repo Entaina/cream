@@ -92,6 +92,8 @@ en:
       sort_manual: Manual order
       sort_next_task: Next task
       title: Deals board
+    stage_dropdown:
+      change_aria: Change stage
     consent:
       date: 'Date:'
       hash: 'Hash:'
@@ -299,6 +301,7 @@ en:
       contact_to_keep: Contact to keep
       contacts_to_merge: Contacts to merge in
       errors:
+        internal_notes_too_long: The combined notes would exceed %{max} characters. Shorten the notes of the contacts before merging.
         merge_failed: Could not merge contacts. Please try again or contact support.
         no_secondaries: Select at least one contact to merge.
         same_primary: Cannot merge a contact into itself.

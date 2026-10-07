@@ -126,6 +126,46 @@ RSpec.describe "Lead form templates", type: :request do
       expect(response.body).to include("Borrador")
     end
 
+    it "previews a saved layout template with sample content injected" do
+      template = workspace.lead_form_templates.create!(
+        kind: "layout",
+        path: "public/layouts/preview_spec_wrap",
+        partial: false,
+        body: '<div data-test="layout-wrap">{{ content }}</div>'
+      )
+
+      get preview_lead_form_template_path(template)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('data-test="layout-wrap"')
+      expect(response.body).to include("Contenido de ejemplo")
+      expect(response.body).to include("Vista previa del layout")
+      expect(response.body).not_to include("{{ content }}")
+      expect(response.body).not_to include(PublicLayoutTemplates::Renderer::CONTENT_INJECT_MARKER)
+      expect(response.body).to include("public-booking-page")
+    end
+
+    it "previews draft layout body from the editor" do
+      template = workspace.lead_form_templates.create!(
+        kind: "layout",
+        path: "public/layouts/preview_spec_draft",
+        partial: false,
+        body: "<div>saved</div>{{ content }}"
+      )
+
+      post preview_lead_form_template_path(template), params: {
+        lead_form_template: {
+          body: '<header data-test="draft-layout-marker">Draft header</header>{{ content }}'
+        }
+      }
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("Incluye cambios sin guardar")
+      expect(response.body).to include('data-test="draft-layout-marker"')
+      expect(response.body).to include("Contenido de ejemplo")
+      expect(response.body).not_to include("<div>saved</div>")
+    end
+
     it "shows preview link on index for pages only" do
       import_lead_form_templates!(workspace)
 

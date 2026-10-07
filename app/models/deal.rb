@@ -139,6 +139,12 @@ class Deal < ApplicationRecord
 
   def tracked_ignored_attributes = %w[pipeline_id pipeline_stage_id value]
 
+  def unmet_stage_conditions(stage)
+    return [] if stage.nil?
+
+    stage.stage_conditions.active.ordered.reject { |condition| condition.met?(self) }
+  end
+
   # Accepts a PipelineStage, its id, or its name (within the deal's pipeline).
   def move_to_stage!(stage, position: nil)
     target = resolve_stage(stage)
@@ -279,7 +285,7 @@ class Deal < ApplicationRecord
     stage = pipeline_stage
     return if stage.nil?
 
-    failed = stage.stage_conditions.active.ordered.reject { |condition| condition.met?(self) }
+    failed = unmet_stage_conditions(stage)
     return if failed.empty?
 
     requirements = failed.map(&:describe_requirement).join("; ")
