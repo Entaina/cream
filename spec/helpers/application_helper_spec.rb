@@ -17,4 +17,43 @@ RSpec.describe ApplicationHelper, type: :helper do
       end
     end
   end
+
+  describe "#activity_actor" do
+    fixtures :users, :workspaces, :memberships
+
+    let(:workspace) { workspaces(:one) }
+    let(:person) { create_person!(workspace) }
+
+    def build_activity(user: nil, metadata: {})
+      Activity.new(workspace: workspace, subject: person, user: user, action: "updated", metadata: metadata)
+    end
+
+    it "returns the user name when there is a user" do
+      user = workspace.users.first
+
+      expect(helper.activity_actor(build_activity(user: user))).to eq(user.name)
+    end
+
+    it "labels scoring automations" do
+      activity = build_activity(metadata: {"automation" => {"kind" => "scoring"}})
+
+      expect(helper.activity_actor(activity)).to eq("Automatización (scoring)")
+    end
+
+    it "labels form automations with the form name" do
+      activity = build_activity(metadata: {"automation" => {"kind" => "form", "name" => "Contacto"}})
+
+      expect(helper.activity_actor(activity)).to eq("Formulario: Contacto")
+    end
+
+    it "labels journey automations with the journey name" do
+      activity = build_activity(metadata: {"automation" => {"kind" => "journey", "name" => "Bienvenida"}})
+
+      expect(helper.activity_actor(activity)).to eq("Recorrido: Bienvenida")
+    end
+
+    it "falls back to someone when the actor is unknown" do
+      expect(helper.activity_actor(build_activity)).to eq("Alguien")
+    end
+  end
 end

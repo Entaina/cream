@@ -29,7 +29,7 @@ module Api
         person = policy_scope(current_workspace.people).find(params[:id])
         authorize person
 
-        if person.update(person_params)
+        if person.update(person_params(person: person))
           render json: person_json(person)
         else
           render json: {errors: person.errors.full_messages}, status: :unprocessable_entity
@@ -101,9 +101,14 @@ module Api
         )
       end
 
-      def person_params
+      def person_params(person: nil)
         params.require(:person).permit(:first_name, :last_name, :email, :phone, :job_title, :location, :internal_notes, :company_id,
-          person_emails_attributes: [:id, :address, :primary, :_destroy])
+          person_emails_attributes: [:id, :address, :primary, *nested_destroy_attribute(person)])
+      end
+
+      # Removing an email through nested attributes is a deletion, so it needs `destroy?`.
+      def nested_destroy_attribute(person)
+        (person.nil? || policy(person).destroy?) ? [:_destroy] : []
       end
 
       def person_json(person)

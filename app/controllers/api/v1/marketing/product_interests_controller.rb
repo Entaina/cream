@@ -15,7 +15,7 @@ module Api
 
         def create
           person = policy_scope(current_workspace.people).find(params[:person_id])
-          product = current_workspace.products.find(interest_params[:product_id])
+          product = policy_scope(current_workspace.products).find(interest_params[:product_id])
 
           interest = person.product_interests.build(
             workspace: current_workspace,

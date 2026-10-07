@@ -11,6 +11,7 @@ module Trackable
   end
 
   def track_activity(action, user: Current.user, metadata: {})
+    metadata = metadata.merge("automation" => Current.automation) if user.nil? && Current.automation.present?
     activities.create!(workspace: workspace, user: user, action: action, metadata: metadata)
   end
 

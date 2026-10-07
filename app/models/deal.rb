@@ -219,6 +219,14 @@ class Deal < ApplicationRecord
     copy
   end
 
+  # True when replacing the contacts with `ids` would unlink any current one.
+  # `nil` means the contacts are not being touched.
+  def removes_contacts?(ids)
+    return false if ids.nil?
+
+    (contact_ids - Array(ids).map(&:to_i)).any?
+  end
+
   private
 
   def normalize_payment_method

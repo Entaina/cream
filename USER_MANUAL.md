@@ -96,8 +96,9 @@ If you belong to more than one workspace, the sidebar header shows the name of t
 | Admin               | Full access to the workspace: invite members, change roles, edit the workspace name, manage custom fields and see **all** deals. |
 | Director comercial (sales director) | Sees and edits **all** deals; can add collaborators on any deal. Does not manage invitations, roles or workspace settings. |
 | Vendedor (salesperson) | Sees and edits only the deals they are **Owner** of or where they have been granted access as a **collaborator**. People, companies, tasks and all other records remain visible to the whole workspace. |
+| Vendedor IA (AI salesperson) | Meant for AI agents that sell on behalf of the team. Sees and edits only the deals they are **Owner** of (collaborator access and the workspace options that open deals to salespeople do not apply). **Cannot delete anything** (deals, people, companies, notes, tasks, offers, etc.) nor merge duplicates. |
 
-**Salespeople** only see their own or shared deals on the **Dashboard** and in **Deals**. **Admin** and **Director comercial** see all deals in the workspace.
+**Salespeople** only see their own or shared deals on the **Dashboard** and in **Deals**. **Admin** and **Director comercial** see all deals in the workspace. The **Vendedor IA** only sees deals they own.
 
 ---
 
@@ -838,7 +839,7 @@ In **Team**, administrators can also:
 #### Inviting members
 
 1. Your colleague's email.
-2. Role: **Admin**, **Director comercial** (Sales director) or **Vendedor** (Salesperson).
+2. Role: **Admin**, **Director comercial** (Sales director) **Vendedor** (Salesperson) or **Vendedor IA** (AI salesperson).
 3. **Send invitation** — an email with a link is sent (or the link is displayed to copy).
 
 #### Managing members

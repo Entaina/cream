@@ -18,19 +18,29 @@ module Marketing
       end
       return if delta.zero?
 
-      new_score = [person.lead_score + delta, 0].max
-      person.update!(lead_score: new_score, lead_score_decayed_at: nil)
-      maybe_transition_lifecycle!(person)
-      person.track_activity("score_changed", metadata: {"delta" => delta, "score" => new_score, "event" => event}) if person.respond_to?(:track_activity)
+      as_automation do
+        new_score = [person.lead_score + delta, 0].max
+        person.update!(lead_score: new_score, lead_score_decayed_at: nil)
+        maybe_transition_lifecycle!(person)
+        person.track_activity("score_changed", metadata: {"delta" => delta, "score" => new_score, "event" => event}) if person.respond_to?(:track_activity)
+      end
     end
 
     def self.recalculate!(workspace)
-      workspace.people.find_each do |person|
-        decayed = apply_decay(person)
-        person.update!(lead_score: decayed) if decayed != person.lead_score
-        maybe_transition_lifecycle!(person)
+      as_automation do
+        workspace.people.find_each do |person|
+          decayed = apply_decay(person)
+          person.update!(lead_score: decayed) if decayed != person.lead_score
+          maybe_transition_lifecycle!(person)
+        end
       end
     end
+
+    # Activities recorded without a signed-in user are labelled as scoring automation.
+    def self.as_automation(&block)
+      Current.set(automation: {"kind" => "scoring"}, &block)
+    end
+    private_class_method :as_automation
 
     def self.apply_decay(person)
       rules = person.workspace.scoring_rules.active.where.not(decay_days: nil)

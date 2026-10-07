@@ -284,8 +284,25 @@ module ApplicationHelper
     end
   end
 
+  # Name of whoever performed the activity: the user, the automation that ran
+  # it (scoring, journey) or a generic "Someone" when it cannot be determined.
+  def activity_actor(activity)
+    return activity.user.name if activity.user
+
+    automation = activity.metadata.to_h["automation"]
+    if automation.is_a?(Hash)
+      case automation["kind"]
+      when "form" then return t("activities.automation.form", name: automation["name"])
+      when "scoring" then return t("activities.automation.scoring")
+      when "journey" then return t("activities.automation.journey", name: automation["name"])
+      end
+    end
+
+    t("shared.someone")
+  end
+
   def activity_sentence(activity)
-    actor = activity.user&.name || t("shared.someone")
+    actor = activity_actor(activity)
     case activity.action
     when "created" then t("activities.created", actor: actor)
     when "updated"
@@ -362,7 +379,7 @@ module ApplicationHelper
   def person_history_activity_html(activity)
     if activity.action == "stage_changed" && activity.subject_type == "Deal" && activity.subject.is_a?(Deal)
       deal = activity.subject
-      actor = activity.user&.name || t("shared.someone")
+      actor = activity_actor(activity)
       deal_link = link_to(deal.name, deal_path(deal), class: "font-medium text-accent hover:underline")
       if activity_stage_change_won?(activity)
         t("activities.person_deal_won_html", actor: actor, deal_link: deal_link)

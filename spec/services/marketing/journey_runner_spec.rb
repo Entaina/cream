@@ -304,4 +304,25 @@ RSpec.describe Marketing::JourneyRunner do
       expect(email_enrollment.metadata["step_errors"]).to be_present
     end
   end
+
+  describe "set_field step" do
+    it "labels the lifecycle change activity with the journey name" do
+      field_step = journey.steps.create!(
+        position: 2, step_type: "set_field", active: true,
+        config: {"field" => "lifecycle_stage", "value" => "lead"}
+      )
+      enrollment = JourneyEnrollment.create!(
+        workspace: workspace, journey: journey, person: person, current_step: field_step,
+        state: "active", enrolled_at: Time.current, next_run_at: Time.current
+      )
+      person.activities.delete_all
+
+      described_class.new(enrollment).advance!
+
+      activity = person.activities.find_by!(action: "updated")
+      expect(activity.user).to be_nil
+      expect(activity.metadata["automation"]).to eq({"kind" => "journey", "name" => "Wait test"})
+      expect(Current.automation).to be_nil
+    end
+  end
 end

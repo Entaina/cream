@@ -87,30 +87,50 @@ RSpec.describe "Api::V1::GmailThreads", type: :request do
       expect(linked["tasks"].first).to include("title" => "Next action", "completed" => false)
     end
 
-    it "finds linked deals in another workspace the user belongs to" do
-      other_workspace = workspaces(:two)
-      Pipeline.create_default!(other_workspace)
-      Membership.create!(user: user, workspace: other_workspace, role: "salesperson")
-      deal = create_deal!(other_workspace, name: "Other workspace opp")
-      other_workspace.email_messages.create!(
-        user: user, record: deal, direction: "inbound", status: "received",
-        from_address: "client@example.com", to_address: user.email_address,
-        subject: "Proposal", body: "Hi", gmail_thread_id: "thread-shared",
-        rfc822_message_id: "<shared@mail.example.com>"
-      )
+    context "with a deal in another workspace where the user is a salesperson" do
+      let(:other_workspace) { workspaces(:two) }
+      let(:deal_owner) { users(:two) }
+      let!(:other_deal) { create_deal!(other_workspace, name: "Other workspace opp", owner: deal_owner) }
 
-      post "/api/v1/gmail/threads/status",
-        params: {
-          gmail_thread_id: "thread-shared",
-          rfc822_message_ids: ["<shared@mail.example.com>"],
-          participant_emails: ["client@example.com"]
-        },
-        headers: headers,
-        as: :json
+      before do
+        Pipeline.create_default!(other_workspace)
+        Membership.create!(user: user, workspace: other_workspace, role: "salesperson")
+        other_workspace.email_messages.create!(
+          user: deal_owner, record: other_deal, direction: "inbound", status: "received",
+          from_address: "client@example.com", to_address: deal_owner.email_address,
+          subject: "Proposal", body: "Hi", gmail_thread_id: "thread-shared",
+          rfc822_message_id: "<shared@mail.example.com>"
+        )
+      end
 
-      body = JSON.parse(response.body)
-      linked = body["linked"].find { |d| d["name"] == "Other workspace opp" }
-      expect(linked).to include("workspace_id" => other_workspace.id)
+      def linked_other_deal
+        post "/api/v1/gmail/threads/status",
+          params: {
+            gmail_thread_id: "thread-shared",
+            rfc822_message_ids: ["<shared@mail.example.com>"],
+            participant_emails: ["client@example.com"]
+          },
+          headers: headers,
+          as: :json
+
+        JSON.parse(response.body)["linked"].find { |d| d["name"] == "Other workspace opp" }
+      end
+
+      it "finds linked deals the user owns in another workspace" do
+        other_deal.update!(owner: user)
+
+        expect(linked_other_deal).to include("workspace_id" => other_workspace.id)
+      end
+
+      it "hides deals owned by others when salespeople can't see all deals" do
+        expect(linked_other_deal).to be_nil
+      end
+
+      it "shows deals owned by others when the workspace lets salespeople view all deals" do
+        other_workspace.update!(salespeople_can_view_all_deals: true)
+
+        expect(linked_other_deal).to include("workspace_id" => other_workspace.id)
+      end
     end
 
     it "suggests deals whose contacts match thread participants" do

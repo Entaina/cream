@@ -719,7 +719,7 @@ module CreamMcp
         pundit_ctx = CreamMcp.pundit_context(server_context)
         ws = pundit_ctx.workspace
         person = CreamMcp.policy_scope(pundit_ctx, ws.people).find(CreamMcp.arg(args, "person_id"))
-        product = ws.products.find(CreamMcp.arg(args, "product_id"))
+        product = CreamMcp.policy_scope(pundit_ctx, ws.products).find(CreamMcp.arg(args, "product_id"))
 
         interest = person.product_interests.build(
           workspace: ws,
@@ -761,7 +761,8 @@ module CreamMcp
       CreamMcp.with_authorization(server_context, tool: "convert_mql_to_sql") do
         pundit_ctx = CreamMcp.pundit_context(server_context)
         ws = pundit_ctx.workspace
-        interest = ::Marketing::ProductInterest.where(workspace: ws).find(CreamMcp.arg(args, "product_interest_id"))
+        interest = CreamMcp.policy_scope(pundit_ctx, ::Marketing::ProductInterest.where(workspace: ws))
+          .find(CreamMcp.arg(args, "product_interest_id"))
         CreamMcp.authorize!(pundit_ctx, interest, :convert?, policy_class: ::Marketing::ProductInterestPolicy)
 
         attributes = CreamMcp.picked(
@@ -971,7 +972,7 @@ module CreamMcp
         query = CreamMcp.arg(args, "person_query")
         raise ActiveRecord::RecordNotFound, "person_id or person_query is required" if query.blank?
 
-        CreamMcp.resolve_record_for_tasks(workspace, "person", query: query)
+        CreamMcp.resolve_record_for_tasks(pundit_ctx, "person", query: query)
       end
     end
 

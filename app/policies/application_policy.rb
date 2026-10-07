@@ -1,4 +1,19 @@
 class ApplicationPolicy
+  # The AI salesperson role can never delete anything. Prepended to every policy
+  # so it wins over any `destroy?` override.
+  module DenyDestroyForAiSalesperson
+    def destroy?
+      return false if context.ai_salesperson?
+
+      super
+    end
+  end
+
+  def self.inherited(subclass)
+    super
+    subclass.prepend(DenyDestroyForAiSalesperson)
+  end
+
   attr_reader :context, :user, :workspace, :record
 
   def initialize(context, record)

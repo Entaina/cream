@@ -630,6 +630,69 @@ RSpec.describe "Mcp", type: :request do
       expect(Deal.exists?(deal.id)).to be(false)
     end
 
+    context "as an AI salesperson" do
+      let(:user) { users(:outsider) }
+      let!(:pipeline) { Pipeline.create_default!(workspace) }
+
+      before { Membership.create!(user: user, workspace: workspace, role: "ai_salesperson") }
+
+      it "cannot delete records" do
+        deal = create_deal!(workspace, pipeline: pipeline, owner: user)
+        person = create_person!(workspace)
+
+        expect(call_tool("delete_record", {record_type: "deal", record_id: deal.id})["error"]).to eq("forbidden")
+        expect(call_tool("delete_record", {record_type: "person", record_id: person.id})["error"]).to eq("forbidden")
+        expect(Deal.exists?(deal.id)).to be(true)
+        expect(Person.exists?(person.id)).to be(true)
+      end
+
+      it "cannot merge duplicates" do
+        primary = create_person!(workspace, first_name: "Ana")
+        secondary = create_person!(workspace, first_name: "Ana")
+
+        result = call_tool("merge_person", {primary_id: primary.id, secondary_ids: [secondary.id]})
+
+        expect(result["error"]).to eq("forbidden")
+        expect(Person.exists?(secondary.id)).to be(true)
+      end
+
+      it "cannot delete stage conditions" do
+        stage = pipeline.pipeline_stages.find_by!(name: "Qualified")
+        condition = workspace.stage_conditions.create!(pipeline_stage: stage, field: "value",
+          operator: "gt", compare_value: "1000")
+
+        result = call_tool("delete_stage_condition", {id: condition.id})
+
+        expect(result["error"]).to be_present
+        expect(StageCondition.exists?(condition.id)).to be(true)
+      end
+
+      it "only sees and edits the deals it owns" do
+        own = create_deal!(workspace, pipeline: pipeline, owner: user, name: "Mine")
+        other = create_deal!(workspace, pipeline: pipeline, owner: users(:one), name: "Theirs")
+
+        expect(call_tool("update_deal", {deal_id: own.id, value: 5})["updated"]["id"]).to eq(own.id)
+        expect(call_tool("update_deal", {deal_id: other.id, value: 5})["error"]).to eq("not_found")
+        expect(call_tool("get_record", {record_type: "deal", record_id: other.id})["error"]).to eq("not_found")
+        expect(call_tool("get_record", {record_type: "deal", record_id: own.id})["id"]).to eq(own.id)
+        expect(call_tool("list_deals", {})["deals"].pluck("id")).to eq([own.id])
+      end
+
+      it "cannot unlink contacts when replacing a deal's contacts, but can add them" do
+        deal = create_deal!(workspace, pipeline: pipeline, owner: user)
+        existing = create_person!(workspace, company: deal.company, first_name: "Existente")
+        added = create_person!(workspace, company: deal.company, first_name: "Nuevo")
+        deal.update!(contact_ids: [existing.id])
+
+        forbidden = call_tool("update_deal", {deal_id: deal.id, person_ids: [added.id]})
+        expect(forbidden["error"]).to eq("forbidden")
+        expect(deal.reload.contacts).to eq([existing])
+
+        call_tool("update_deal", {deal_id: deal.id, person_ids: [existing.id, added.id]})
+        expect(deal.reload.contacts).to contain_exactly(existing, added)
+      end
+    end
+
     it "updates a company's fields" do
       company = create_company!(workspace)
 

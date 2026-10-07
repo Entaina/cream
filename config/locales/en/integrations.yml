@@ -303,6 +303,7 @@ en:
       revoke_invitation: Revoke invitation
       roles:
         admin: Admin
+        ai_salesperson: AI salesperson
         sales_director: Sales director
         salesperson: Salesperson
       search_placeholder: Search members…

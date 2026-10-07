@@ -25,6 +25,22 @@ RSpec.describe CompanyPolicy do
     end
   end
 
+  describe "for an ai salesperson" do
+    subject(:policy) { described_class.new(context_for(ai_user, workspace), company) }
+
+    let(:ai_user) { users(:outsider) }
+
+    before { Membership.create!(user: ai_user, workspace: workspace, role: "ai_salesperson") }
+
+    it "can read and write but not destroy or merge" do
+      expect(policy.show?).to be true
+      expect(policy.create?).to be true
+      expect(policy.update?).to be true
+      expect(policy.destroy?).to be false
+      expect(policy.merge?).to be false
+    end
+  end
+
   describe "for a non-member" do
     subject(:policy) { described_class.new(context_for(outsider, workspace), company) }
 

@@ -1,5 +1,5 @@
 class Membership < ApplicationRecord
-  ROLES = %w[admin sales_director salesperson].freeze
+  ROLES = %w[admin sales_director salesperson ai_salesperson].freeze
   def self.role_label_for(role)
     I18n.t("integrations.team.roles.#{role}", default: role)
   end
@@ -42,6 +42,10 @@ class Membership < ApplicationRecord
 
   def salesperson?
     role == "salesperson"
+  end
+
+  def ai_salesperson?
+    role == "ai_salesperson"
   end
 
   def role_label

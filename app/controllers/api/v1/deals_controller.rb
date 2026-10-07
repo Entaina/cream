@@ -42,6 +42,7 @@ module Api
         authorize deal
 
         attrs = deal_params(deal: deal)
+        authorize deal, :destroy? if deal.removes_contacts?(attrs[:contact_ids])
         new_stage = extract_stage_change(deal, attrs)
         if deal.update(attrs)
           deal.move_to_stage!(new_stage) if new_stage
@@ -67,13 +68,19 @@ module Api
           :execution_duration_days, :execution_starts_on, :execution_ends_on, :payment_method, :payment_on,
           contact_ids: [],
           tasks_attributes: %i[title due_on],
-          deal_products_attributes: [:id, :product_id, :edition_id, :edition_name, :quantity, :unit_price, :_destroy]
+          deal_products_attributes: [:id, :product_id, :edition_id, :edition_name, :quantity, :unit_price,
+            *nested_destroy_attribute(deal)]
         )
         permitted[:contact_ids] = resolve_contact_ids(permitted[:contact_ids]) if raw.key?(:contact_ids)
         if raw.key?(:deal_products_attributes)
           permitted[:deal_products_attributes] = resolve_deal_products_attributes(permitted[:deal_products_attributes], deal: deal)
         end
         permitted
+      end
+
+      # Removing a product line through nested attributes is a deletion, so it needs `destroy?`.
+      def nested_destroy_attribute(deal)
+        (deal.nil? || policy(deal).destroy?) ? [:_destroy] : []
       end
 
       def resolve_deal_products_attributes(lines, deal: nil)

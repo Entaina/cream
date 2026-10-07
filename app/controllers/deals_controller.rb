@@ -149,6 +149,7 @@ class DealsController < ApplicationController
   def update
     authorize @deal
     attrs = deal_params
+    authorize @deal, :destroy? if @deal.removes_contacts?(attrs[:contact_ids])
     new_stage = extract_stage_change(attrs)
     original_stage_id = @deal.pipeline_stage_id
     Deal.transaction do
@@ -288,7 +289,12 @@ class DealsController < ApplicationController
       :expected_close_date, :execution_duration_days, :execution_starts_on, :execution_ends_on,
       :payment_method, :payment_on, :invoice_number, :company_id, :partner_id, :owner_id,
       contact_ids: [], tasks_attributes: %i[title due_on], custom_fields: {},
-      deal_products_attributes: %i[id product_id edition_id edition_name quantity unit_price _destroy])
+      deal_products_attributes: [:id, :product_id, :edition_id, :edition_name, :quantity, :unit_price, *nested_destroy_attribute])
+  end
+
+  # Removing a product line through nested attributes is a deletion, so it needs `destroy?`.
+  def nested_destroy_attribute
+    (@deal.nil? || policy(@deal).destroy?) ? [:_destroy] : []
   end
 
   def quick_from_person?

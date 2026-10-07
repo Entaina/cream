@@ -21,10 +21,13 @@ class LeadFormSubmissionProcessor
     return nil if throttled?
     return nil if lead_form.mql_destination? && !mql_capture_allowed?
 
-    if lead_form.mql_destination?
-      process_mql_capture
-    else
-      process_deal_capture
+    # Public form submissions have no signed-in user: activities are labelled with the form name.
+    Current.set(automation: {"kind" => "form", "name" => lead_form.name}) do
+      if lead_form.mql_destination?
+        process_mql_capture
+      else
+        process_deal_capture
+      end
     end
   end
 

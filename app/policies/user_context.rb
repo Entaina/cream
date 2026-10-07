@@ -28,6 +28,10 @@ class UserContext
     membership&.role == "salesperson"
   end
 
+  def ai_salesperson?
+    membership&.role == "ai_salesperson"
+  end
+
   def can_view_others_tasks?
     admin? || sales_director? ||
       workspace&.salespeople_can_view_all_deals? ||

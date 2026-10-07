@@ -309,6 +309,7 @@ es:
       revoke_invitation: Revocar invitación
       roles:
         admin: Admin
+        ai_salesperson: Vendedor IA
         sales_director: Director comercial
         salesperson: Vendedor
       search_placeholder: Buscar miembros…

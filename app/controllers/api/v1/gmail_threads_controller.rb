@@ -4,6 +4,7 @@ module Api
       requires_feature :gmail_addon
 
       def status
+        authorize Deal, :index?
         result = linker.status(
           gmail_thread_id: thread_status_params[:gmail_thread_id],
           rfc822_message_ids: Array(thread_status_params[:rfc822_message_ids]),

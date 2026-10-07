@@ -385,11 +385,16 @@ module CreamMcp
     )
   end
 
-  def self.find_record(workspace, type, id)
+  def self.find_record(pundit_ctx, type, id)
+    record_scope(pundit_ctx, type).find(id)
+  end
+
+  def self.record_scope(pundit_ctx, type)
+    workspace = pundit_ctx.workspace
     case type.to_s.downcase
-    when "person" then workspace.people.find(id)
-    when "company" then workspace.companies.find(id)
-    when "deal" then workspace.deals.find(id)
+    when "person" then policy_scope(pundit_ctx, workspace.people)
+    when "company" then policy_scope(pundit_ctx, workspace.companies)
+    when "deal" then policy_scope(pundit_ctx, workspace.deals)
     else raise ArgumentError, "record_type must be one of: #{RECORD_TYPES.join(", ")}"
     end
   end
@@ -398,20 +403,15 @@ module CreamMcp
     MCP::Tool::Response.new([{type: "text", text: JSON.generate({error: error, message: message})}])
   end
 
-  def self.record_search_scope(workspace, type, query)
-    case type.to_s.downcase
-    when "person" then workspace.people.search(query)
-    when "company" then workspace.companies.search(query)
-    when "deal" then workspace.deals.search(query)
-    else raise ArgumentError, "record_type must be one of: #{RECORD_TYPES.join(", ")}"
-    end
+  def self.record_search_scope(pundit_ctx, type, query)
+    record_scope(pundit_ctx, type).search(query)
   end
 
-  def self.resolve_record_for_tasks(workspace, type, id: nil, query: nil)
+  def self.resolve_record_for_tasks(pundit_ctx, type, id: nil, query: nil)
     if id.present?
-      find_record(workspace, type, id)
+      find_record(pundit_ctx, type, id)
     elsif query.present?
-      scope = record_search_scope(workspace, type, query)
+      scope = record_search_scope(pundit_ctx, type, query)
       count = scope.count
       if count.zero?
         raise ActiveRecord::RecordNotFound, "No #{type} matching '#{query}'"
@@ -574,7 +574,7 @@ module CreamMcp
     CreamMcp.with_authorization(server_context) do
       pundit_ctx = CreamMcp.pundit_context(server_context)
       ws = pundit_ctx.workspace
-      record = CreamMcp.find_record(ws, CreamMcp.arg(args, "record_type"), CreamMcp.arg(args, "record_id"))
+      record = CreamMcp.find_record(pundit_ctx, CreamMcp.arg(args, "record_type"), CreamMcp.arg(args, "record_id"))
       CreamMcp.authorize!(pundit_ctx, record, :show?)
       base = case record
       when Person then CreamMcp.person_json(record).merge(description: record.description, linkedin_url: record.linkedin_url,
@@ -746,7 +746,7 @@ module CreamMcp
   ) do |server_context:, **args|
     CreamMcp.with_authorization(server_context) do
       ctx = CreamMcp.pundit_context(server_context)
-      person = ctx.workspace.people.find(CreamMcp.arg(args, "person_id"))
+      person = CreamMcp.policy_scope(ctx, ctx.workspace.people).find(CreamMcp.arg(args, "person_id"))
       CreamMcp.authorize!(ctx, person, :update?)
       person.update!(CreamMcp.picked(args, "first_name", "last_name", "email", "phone",
         "job_title", "location", "linkedin_url", "description", "internal_notes", "company_id"))
@@ -771,7 +771,7 @@ module CreamMcp
   ) do |server_context:, **args|
     CreamMcp.with_authorization(server_context) do
       ctx = CreamMcp.pundit_context(server_context)
-      company = ctx.workspace.companies.find(CreamMcp.arg(args, "company_id"))
+      company = CreamMcp.policy_scope(ctx, ctx.workspace.companies).find(CreamMcp.arg(args, "company_id"))
       CreamMcp.authorize!(ctx, company, :update?)
       company.update!(CreamMcp.picked(args, "name", "domain", "industry", "employee_range",
         "location", "annual_revenue", "description", "fiscal_information"))
@@ -807,11 +807,15 @@ module CreamMcp
     CreamMcp.with_authorization(server_context) do
       ctx = CreamMcp.pundit_context(server_context)
       ws = ctx.workspace
-      deal = ws.deals.find(CreamMcp.arg(args, "deal_id"))
+      deal = CreamMcp.policy_scope(ctx, ws.deals).find(CreamMcp.arg(args, "deal_id"))
       CreamMcp.authorize!(ctx, deal, :update?)
       attrs = CreamMcp.picked(args, "name", "value", "currency", "probability", "expected_close_date", "execution_duration_days",
         "execution_starts_on", "execution_ends_on", "payment_method", "payment_on", "company_id")
-      deal.contact_ids = Array(CreamMcp.arg(args, "person_ids")) unless CreamMcp.arg(args, "person_ids").nil?
+      unless CreamMcp.arg(args, "person_ids").nil?
+        # Replacing the contacts unlinks the ones left out, which is a deletion.
+        CreamMcp.authorize!(ctx, deal, :destroy?) if deal.removes_contacts?(CreamMcp.arg(args, "person_ids"))
+        deal.contact_ids = Array(CreamMcp.arg(args, "person_ids"))
+      end
       deal.update!(attrs)
       pipeline_name = CreamMcp.arg(args, "pipeline")
       stage_name = CreamMcp.arg(args, "stage")
@@ -838,7 +842,7 @@ module CreamMcp
   ) do |server_context:, **args|
     CreamMcp.with_authorization(server_context) do
       pundit_ctx = CreamMcp.pundit_context(server_context)
-      deal = pundit_ctx.workspace.deals.find(CreamMcp.arg(args, "deal_id"))
+      deal = CreamMcp.policy_scope(pundit_ctx, pundit_ctx.workspace.deals).find(CreamMcp.arg(args, "deal_id"))
       CreamMcp.authorize!(pundit_ctx, deal, :move?)
       deal.move_to_stage!(CreamMcp.arg(args, "stage"))
       CreamMcp.respond_with(updated: CreamMcp.deal_json(deal))
@@ -897,10 +901,11 @@ module CreamMcp
     CreamMcp.with_authorization(server_context) do
       ctx = CreamMcp.pundit_context(server_context)
       ws = ctx.workspace
-      primary = ws.people.find(CreamMcp.arg(args, "primary_id"))
+      people = CreamMcp.policy_scope(ctx, ws.people)
+      primary = people.find(CreamMcp.arg(args, "primary_id"))
       CreamMcp.authorize!(ctx, primary, :merge?)
       secondary_ids = Array(CreamMcp.arg(args, "secondary_ids")).map(&:to_i).uniq - [primary.id]
-      secondaries = secondary_ids.filter_map { |id| ws.people.find_by(id: id) }
+      secondaries = secondary_ids.filter_map { |id| people.find_by(id: id) }
       if secondaries.size != secondary_ids.size
         missing = secondary_ids - secondaries.map(&:id)
         return CreamMcp.error_response("invalid_argument", "Unknown person ids: #{missing.join(", ")}")
@@ -926,10 +931,11 @@ module CreamMcp
     CreamMcp.with_authorization(server_context) do
       ctx = CreamMcp.pundit_context(server_context)
       ws = ctx.workspace
-      primary = ws.companies.find(CreamMcp.arg(args, "primary_id"))
+      companies = CreamMcp.policy_scope(ctx, ws.companies)
+      primary = companies.find(CreamMcp.arg(args, "primary_id"))
       CreamMcp.authorize!(ctx, primary, :merge?)
       secondary_ids = Array(CreamMcp.arg(args, "secondary_ids")).map(&:to_i).uniq - [primary.id]
-      secondaries = secondary_ids.filter_map { |id| ws.companies.find_by(id: id) }
+      secondaries = secondary_ids.filter_map { |id| companies.find_by(id: id) }
       if secondaries.size != secondary_ids.size
         missing = secondary_ids - secondaries.map(&:id)
         return CreamMcp.error_response("invalid_argument", "Unknown company ids: #{missing.join(", ")}")
@@ -953,7 +959,7 @@ module CreamMcp
   ) do |server_context:, **args|
     CreamMcp.with_authorization(server_context) do
       ctx = CreamMcp.pundit_context(server_context)
-      record = CreamMcp.find_record(ctx.workspace, CreamMcp.arg(args, "record_type"), CreamMcp.arg(args, "record_id"))
+      record = CreamMcp.find_record(ctx, CreamMcp.arg(args, "record_type"), CreamMcp.arg(args, "record_id"))
       CreamMcp.authorize!(ctx, record, :destroy?)
       deleted = {type: record.class.name.downcase, id: record.id, name: record.display_name}
       record.destroy!
@@ -974,7 +980,7 @@ module CreamMcp
     CreamMcp.with_authorization(server_context) do
       pundit_ctx = CreamMcp.pundit_context(server_context)
       ws = pundit_ctx.workspace
-      record = CreamMcp.find_record(ws, CreamMcp.arg(args, "record_type"), CreamMcp.arg(args, "record_id"))
+      record = CreamMcp.find_record(pundit_ctx, CreamMcp.arg(args, "record_type"), CreamMcp.arg(args, "record_id"))
       note = record.notes.new(workspace: ws, user: pundit_ctx.user,
         title: CreamMcp.arg(args, "title"), body: CreamMcp.arg(args, "body"))
       CreamMcp.authorize!(pundit_ctx, note, :create?)
@@ -1028,7 +1034,7 @@ module CreamMcp
     CreamMcp.with_authorization(server_context) do
       pundit_ctx = CreamMcp.pundit_context(server_context)
       ws = pundit_ctx.workspace
-      deal = ws.deals.find(CreamMcp.arg(args, "deal_id"))
+      deal = CreamMcp.policy_scope(pundit_ctx, ws.deals).find(CreamMcp.arg(args, "deal_id"))
       email_data = {
         attrs: CreamMcp.picked(args, "to_address", "subject", "body"),
         attachments: Api::DealEmailCreator.parse_attachments(CreamMcp.arg(args, "attachments"))
@@ -1061,7 +1067,7 @@ module CreamMcp
     CreamMcp.with_authorization(server_context) do
       pundit_ctx = CreamMcp.pundit_context(server_context)
       ws = pundit_ctx.workspace
-      record = CreamMcp.find_record(ws, CreamMcp.arg(args, "record_type"), CreamMcp.arg(args, "record_id"))
+      record = CreamMcp.find_record(pundit_ctx, CreamMcp.arg(args, "record_type"), CreamMcp.arg(args, "record_id"))
       parent = CreamMcp.arg(args, "parent_comment_id").presence &&
         record.comments.find(CreamMcp.arg(args, "parent_comment_id"))
       comment = record.comments.new(workspace: ws, user: pundit_ctx.user,
@@ -1094,7 +1100,7 @@ module CreamMcp
     CreamMcp.with_authorization(server_context) do
       pundit_ctx = CreamMcp.pundit_context(server_context)
       ws = pundit_ctx.workspace
-      taskable = CreamMcp.arg(args, "record_type").present? ? CreamMcp.find_record(ws, CreamMcp.arg(args, "record_type"), CreamMcp.arg(args, "record_id")) : nil
+      taskable = CreamMcp.arg(args, "record_type").present? ? CreamMcp.find_record(pundit_ctx, CreamMcp.arg(args, "record_type"), CreamMcp.arg(args, "record_id")) : nil
       task = ws.tasks.new(
         title: CreamMcp.arg(args, "title"), due_on: CreamMcp.arg(args, "due_on"), taskable: taskable,
         user: pundit_ctx.user, assignee: pundit_ctx.user, workspace: ws
@@ -1114,7 +1120,7 @@ module CreamMcp
   ) do |server_context:, **args|
     CreamMcp.with_authorization(server_context) do
       pundit_ctx = CreamMcp.pundit_context(server_context)
-      task = pundit_ctx.workspace.tasks.find(CreamMcp.arg(args, "task_id"))
+      task = CreamMcp.policy_scope(pundit_ctx, pundit_ctx.workspace.tasks).find(CreamMcp.arg(args, "task_id"))
       CreamMcp.authorize!(pundit_ctx, task, :toggle?)
       task.toggle_completed!
       CreamMcp.respond_with(task: CreamMcp.task_json(task))
@@ -1181,7 +1187,7 @@ module CreamMcp
     CreamMcp.with_authorization(server_context) do
       pundit_ctx = CreamMcp.pundit_context(server_context)
       ws = pundit_ctx.workspace
-      record = CreamMcp.find_record(ws, CreamMcp.arg(args, "record_type"), CreamMcp.arg(args, "record_id"))
+      record = CreamMcp.find_record(pundit_ctx, CreamMcp.arg(args, "record_type"), CreamMcp.arg(args, "record_id"))
       CreamMcp.authorize!(pundit_ctx, record, :update?)
       record.custom_fields = CreamMcp.arg(args, "custom_fields")
       record.save!
@@ -1247,7 +1253,7 @@ module CreamMcp
       end
       if CreamMcp.arg(args, "record_type").present?
         record = CreamMcp.resolve_record_for_tasks(
-          ctx.workspace,
+          ctx,
           CreamMcp.arg(args, "record_type"),
           id: CreamMcp.arg(args, "record_id"),
           query: CreamMcp.arg(args, "record_query")
@@ -1315,7 +1321,7 @@ module CreamMcp
       CreamMcp.authorize!(ctx, EmailMessage, :index?)
       scope = CreamMcp.policy_scope(ctx, ctx.workspace.email_messages).includes(:record).recent_first
       if CreamMcp.arg(args, "record_type").present?
-        record = CreamMcp.find_record(ctx.workspace, CreamMcp.arg(args, "record_type"), CreamMcp.arg(args, "record_id"))
+        record = CreamMcp.find_record(ctx, CreamMcp.arg(args, "record_type"), CreamMcp.arg(args, "record_id"))
         scope = scope.where(record: record)
       end
       scope = scope.where(status: CreamMcp.arg(args, "status")) if CreamMcp.arg(args, "status").present?
@@ -1353,7 +1359,7 @@ module CreamMcp
       CreamMcp.authorize!(ctx, Activity, :index?)
       scope = CreamMcp.policy_scope(ctx, ctx.workspace.activities).includes(:user, :subject).recent_first
       if CreamMcp.arg(args, "record_type").present?
-        record = CreamMcp.find_record(ctx.workspace, CreamMcp.arg(args, "record_type"), CreamMcp.arg(args, "record_id"))
+        record = CreamMcp.find_record(ctx, CreamMcp.arg(args, "record_type"), CreamMcp.arg(args, "record_id"))
         scope = scope.where(subject: record)
       end
       CreamMcp.respond_with(activity: scope.limit(CreamMcp.list_limit(args)).map { |a| CreamMcp.activity_json(a) })
@@ -1541,7 +1547,7 @@ module CreamMcp
   ) do |server_context:, **args|
     CreamMcp.with_authorization(server_context) do
       ctx = CreamMcp.pundit_context(server_context)
-      product = ctx.workspace.products.find(CreamMcp.arg(args, "product_id"))
+      product = CreamMcp.policy_scope(ctx, ctx.workspace.products).find(CreamMcp.arg(args, "product_id"))
       CreamMcp.authorize!(ctx, product, :update?)
       product.update!(CreamMcp.picked(args, "name", "price", "description"))
       CreamMcp.respond_with(updated: CreamMcp.product_json(product))
@@ -1563,9 +1569,9 @@ module CreamMcp
   ) do |server_context:, **args|
     CreamMcp.with_authorization(server_context) do
       ctx = CreamMcp.pundit_context(server_context)
-      deal = ctx.workspace.deals.find(CreamMcp.arg(args, "deal_id"))
+      deal = CreamMcp.policy_scope(ctx, ctx.workspace.deals).find(CreamMcp.arg(args, "deal_id"))
       CreamMcp.authorize!(ctx, deal, :update?)
-      product = ctx.workspace.products.find(CreamMcp.arg(args, "product_id"))
+      product = CreamMcp.policy_scope(ctx, ctx.workspace.products).find(CreamMcp.arg(args, "product_id"))
       line = {product: product, quantity: CreamMcp.arg(args, "quantity")}
         .merge(CreamMcp.picked(args, "unit_price"))
       line[:edition_name] = CreamMcp.arg(args, "edition") if CreamMcp.arg(args, "edition").present?
@@ -1589,7 +1595,7 @@ module CreamMcp
   ) do |server_context:, **args|
     CreamMcp.with_authorization(server_context) do
       ctx = CreamMcp.pundit_context(server_context)
-      deal = ctx.workspace.deals.find(CreamMcp.arg(args, "deal_id"))
+      deal = CreamMcp.policy_scope(ctx, ctx.workspace.deals).find(CreamMcp.arg(args, "deal_id"))
       CreamMcp.authorize!(ctx, deal, :update?)
       line = deal.deal_products.find(CreamMcp.arg(args, "line_item_id"))
       attrs = CreamMcp.picked(args, "quantity", "unit_price")
@@ -1610,7 +1616,7 @@ module CreamMcp
   ) do |server_context:, **args|
     CreamMcp.with_authorization(server_context) do
       ctx = CreamMcp.pundit_context(server_context)
-      task = ctx.workspace.tasks.find(CreamMcp.arg(args, "task_id"))
+      task = CreamMcp.policy_scope(ctx, ctx.workspace.tasks).find(CreamMcp.arg(args, "task_id"))
       CreamMcp.authorize!(ctx, task, :update?)
       task.update!(CreamMcp.picked(args, "title", "due_on"))
       CreamMcp.respond_with(updated: CreamMcp.task_json(task))
@@ -1630,7 +1636,7 @@ module CreamMcp
     CreamMcp.with_authorization(server_context) do
       pundit_ctx = CreamMcp.pundit_context(server_context)
       ws = pundit_ctx.workspace
-      deal = ws.deals.find(CreamMcp.arg(args, "deal_id"))
+      deal = CreamMcp.policy_scope(pundit_ctx, ws.deals).find(CreamMcp.arg(args, "deal_id"))
       CreamMcp.authorize!(pundit_ctx, deal, :show?)
 
       limit = CreamMcp.list_limit(args, 50)
@@ -1814,7 +1820,7 @@ module CreamMcp
 
     CreamMcp.with_authorization(server_context) do
       pundit_ctx = CreamMcp.pundit_context(server_context)
-      record = CreamMcp.find_record(pundit_ctx.workspace, CreamMcp.arg(args, "record_type"), CreamMcp.arg(args, "record_id"))
+      record = CreamMcp.find_record(pundit_ctx, CreamMcp.arg(args, "record_type"), CreamMcp.arg(args, "record_id"))
       CreamMcp.authorize!(pundit_ctx, record, :show?)
       CreamMcp.respond_with(Ai::RecordSummarizer.new(record: record, user: pundit_ctx.user).call)
     rescue Ai::Client::Error => e
@@ -1834,7 +1840,7 @@ module CreamMcp
 
     CreamMcp.with_authorization(server_context) do
       pundit_ctx = CreamMcp.pundit_context(server_context)
-      record = CreamMcp.find_record(pundit_ctx.workspace, CreamMcp.arg(args, "record_type"), CreamMcp.arg(args, "record_id"))
+      record = CreamMcp.find_record(pundit_ctx, CreamMcp.arg(args, "record_type"), CreamMcp.arg(args, "record_id"))
       CreamMcp.authorize!(pundit_ctx, record, :show?)
       result = Ai::NextStepSuggester.new(record: record, user: pundit_ctx.user).call
       CreamMcp.respond_with(result.merge(
@@ -1860,7 +1866,7 @@ module CreamMcp
 
     CreamMcp.with_authorization(server_context) do
       pundit_ctx = CreamMcp.pundit_context(server_context)
-      record = CreamMcp.find_record(pundit_ctx.workspace, CreamMcp.arg(args, "record_type"), CreamMcp.arg(args, "record_id"))
+      record = CreamMcp.find_record(pundit_ctx, CreamMcp.arg(args, "record_type"), CreamMcp.arg(args, "record_id"))
       CreamMcp.authorize!(pundit_ctx, record, :show?)
       CreamMcp.respond_with(Ai::EmailDrafter.new(
         record: record,
@@ -1925,7 +1931,7 @@ module CreamMcp
 
     CreamMcp.with_authorization(server_context) do
       pundit_ctx = CreamMcp.pundit_context(server_context)
-      record = CreamMcp.find_record(pundit_ctx.workspace, CreamMcp.arg(args, "record_type"), CreamMcp.arg(args, "record_id"))
+      record = CreamMcp.find_record(pundit_ctx, CreamMcp.arg(args, "record_type"), CreamMcp.arg(args, "record_id"))
       CreamMcp.authorize!(pundit_ctx, record, :show?)
       CreamMcp.respond_with(Ai::RecordEnricher.new(record: record, user: pundit_ctx.user).call)
     rescue Ai::Client::Error => e

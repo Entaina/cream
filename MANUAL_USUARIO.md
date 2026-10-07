@@ -96,8 +96,9 @@ Si perteneces a más de un workspace, en la cabecera del menú lateral verás el
 | Admin               | Acceso total al workspace: invitar miembros, cambiar roles, editar el nombre del workspace, gestionar campos personalizados y ver **todos** los deals. |
 | Director comercial  | Ve y edita **todos** los deals; puede añadir colaboradores en cualquier deal. No gestiona invitaciones, roles ni ajustes del workspace. |
 | Vendedor            | Ve y edita solo los deals de los que es **Owner** o en los que le han dado acceso como **colaborador**. Personas, empresas, tareas y el resto de registros siguen siendo visibles para todo el workspace. |
+| Vendedor IA         | Pensado para agentes de IA que venden en nombre del equipo. Ve y edita solo los deals de los que es **Owner** (ni siquiera los compartidos como colaborador ni las opciones del workspace que abren los deals a los vendedores le afectan). **No puede eliminar nada** (deals, personas, empresas, notas, tareas, ofertas, etc.) ni fusionar duplicados. |
 
-Los **vendedores** ven en el **Dashboard** y en **Deals** únicamente sus deals (propios o compartidos). **Admin** y **Director comercial** ven todos los deals del workspace.
+Los **vendedores** ven en el **Dashboard** y en **Deals** únicamente sus deals (propios o compartidos). **Admin** y **Director comercial** ven todos los deals del workspace. El **Vendedor IA** solo ve los deals de los que es Owner.
 
 ---
 
@@ -838,7 +839,7 @@ En **Team**, los administradores además pueden:
 #### Invitar miembros
 
 1. Email del compañero.
-2. Rol: **Admin**, **Director comercial** o **Vendedor**.
+2. Rol: **Admin**, **Director comercial**, **Vendedor** o **Vendedor IA**.
 3. **Send invitation** — se envía un email con enlace (o se muestra el enlace para copiar).
 
 #### Gestionar miembros

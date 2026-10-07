@@ -64,6 +64,42 @@ RSpec.describe DealPolicy do
     end
   end
 
+  describe "ai salesperson" do
+    let(:ai_user) { users(:outsider) }
+
+    before { Membership.create!(user: ai_user, workspace: workspace, role: "ai_salesperson") }
+
+    it "can show and update their own deals but never destroy them" do
+      deal.update!(owner: ai_user)
+      policy = described_class.new(context_for(ai_user), deal)
+
+      expect(policy.show?).to be true
+      expect(policy.update?).to be true
+      expect(policy.destroy?).to be false
+    end
+
+    it "cannot see deals owned by others, even when shared or when workspace flags are on" do
+      deal.update!(owner: admin)
+      deal.deal_accesses.create!(user: ai_user)
+      workspace.update!(salespeople_can_view_all_deals: true, salespeople_can_edit_all_deals: true)
+      policy = described_class.new(context_for(ai_user), deal)
+
+      expect(policy.show?).to be false
+      expect(policy.update?).to be false
+    end
+
+    it "scopes deals to the ones they own" do
+      owned = create_deal!(workspace, owner: ai_user, name: "Mine")
+      shared = create_deal!(workspace, owner: admin, name: "Shared")
+      shared.deal_accesses.create!(user: ai_user)
+      create_deal!(workspace, owner: admin, name: "Other")
+
+      scope = described_class::Scope.new(context_for(ai_user), Deal.all).resolve
+
+      expect(scope).to contain_exactly(owned)
+    end
+  end
+
   describe "workspace deal visibility flags" do
     before { deal.update!(owner: admin) }
 

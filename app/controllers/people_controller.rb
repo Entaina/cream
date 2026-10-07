@@ -228,7 +228,12 @@ class PeopleController < ApplicationController
     params.require(:person).permit(:first_name, :last_name, :email, :phone, :job_title, :location,
       :linkedin_url, :twitter_url, :description, :internal_notes, :company_id, :owner_id, :source, :first_contact_on, :brought_by_id,
       custom_fields: {},
-      person_emails_attributes: [:id, :address, :primary, :_destroy])
+      person_emails_attributes: [:id, :address, :primary, *nested_destroy_attribute])
+  end
+
+  # Removing an email through nested attributes is a deletion, so it needs `destroy?`.
+  def nested_destroy_attribute
+    (@person.nil? || policy(@person).destroy?) ? [:_destroy] : []
   end
 
   INLINE_EDIT_FIELDS = %w[company_id owner_id].freeze

@@ -24,6 +24,7 @@ class DealAccessesController < ApplicationController
 
   def destroy
     authorize @deal, :manage_collaborators?
+    authorize @deal, :destroy?
 
     access = @deal.deal_accesses.find(params[:id])
     access.destroy!

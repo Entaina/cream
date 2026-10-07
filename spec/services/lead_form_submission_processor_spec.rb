@@ -48,6 +48,18 @@ RSpec.describe LeadFormSubmissionProcessor do
     expect(result.submission.metadata["privacy_policy_url"]).to be_present
   end
 
+  it "labels the activities it records with the form name" do
+    result = submit(contacto_lead_params)
+
+    expect(result.person.reload.lifecycle_stage).to eq("lead")
+    automation = {"kind" => "form", "name" => lead_form.name}
+    lifecycle = result.person.activities.where(action: "updated").detect { |a| a.metadata["changes"]&.key?("lifecycle_stage") }
+    expect(lifecycle.user).to be_nil
+    expect(lifecycle.metadata["automation"]).to eq(automation)
+    expect(result.deal.activities.find_by!(action: "created").metadata["automation"]).to eq(automation)
+    expect(Current.automation).to be_nil
+  end
+
   it "creates person, deal, submission and enqueues emails" do
     params = contacto_lead_params(
       "last_name" => "López",

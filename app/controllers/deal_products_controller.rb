@@ -6,6 +6,7 @@ class DealProductsController < ApplicationController
   skip_after_action :verify_authorized
   skip_after_action :verify_policy_scoped
   before_action :set_deal
+  before_action :authorize_edit, except: :destroy
 
   def create
     @line_item = @deal.deal_products.new(line_item_params)
@@ -26,6 +27,7 @@ class DealProductsController < ApplicationController
   end
 
   def destroy
+    authorize @deal, :destroy?
     @deal.deal_products.find(params[:id]).destroy
     redirect_to @deal, notice: t("flashes.deal_products.removed"), status: :see_other
   end
@@ -34,8 +36,9 @@ class DealProductsController < ApplicationController
 
   def set_deal
     @deal = policy_scope(current_workspace.deals).find(params[:deal_id])
-    authorize @deal, :update?
   end
+
+  def authorize_edit = authorize(@deal, :update?)
 
   def line_item_params
     params.require(:deal_product).permit(:product_id, :quantity, :unit_price, :edition_id, :edition_name)

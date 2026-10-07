@@ -26,11 +26,11 @@ The workspace is the **tenant boundary** — all CRM data lives inside one.
 ```
 User ←── Membership ──→ Workspace
               │
-         role: admin | sales_director | salesperson
+         role: admin | sales_director | salesperson | ai_salesperson
 ```
 
 - **`Workspace`**: `name` + unique `slug`. Owns companies, people, deals, notes, tasks, lists, activities.
-- **`Membership`**: joins user ↔ workspace. Roles `admin` | `sales_director` | `salesperson` (`Membership::ROLES`). One membership per user/workspace pair. Per-workspace prefs: `current_pipeline_id`, `sales_director_briefing_enabled`, `alert_in_app` (default true), `alert_email` (default false).
+- **`Membership`**: joins user ↔ workspace. Roles `admin` | `sales_director` | `salesperson` | `ai_salesperson` (`Membership::ROLES`). One membership per user/workspace pair. Per-workspace prefs: `current_pipeline_id`, `sales_director_briefing_enabled`, `alert_in_app` (default true), `alert_email` (default false).
 - **`User`**: can belong to **many** workspaces (`has_many :workspaces, through: :memberships`).
 
 **Registration** (`RegistrationsController#create`): creates user + workspace (form `workspace_name` or `"#{name}'s Workspace"`) + membership as `admin`.
@@ -49,7 +49,7 @@ User ←── Membership ──→ Workspace
 - `WorkspaceRecordPolicy` scopes with `scope.where(workspace: workspace)` and checks `in_workspace?`
 - Controllers always query via `current_workspace` (e.g. `policy_scope(current_workspace.deals)`)
 
-**Roles**: `admin`, `sales_director` and `salesperson` on `Membership`. Admin-only mutations (via Pundit `admin?`) include team/invites, automations, **alert rules**, webhooks, stripe connection, etc. Members can view most workspace data; alert rule CRUD is admin-only, list is member-visible.
+**Roles**: `admin`, `sales_director`, `salesperson` and `ai_salesperson` on `Membership`. `ai_salesperson` only sees/edits deals it owns (ignores collaborator access and the workspace `salespeople_can_*` flags) and can never delete: `ApplicationPolicy` prepends a guard that forces `destroy?` to false in every policy and `merge?` is denied on people/companies. Everything goes through Pundit: any action that deletes (including child records authorized via their parent deal, e.g. offers, line items, collaborators) must `authorize ..., :destroy?`, and nested `_destroy` params are only permitted when `policy(record).destroy?`. Replacing a deal's contacts (web, REST, MCP `update_deal`) also requires `destroy?` when it would unlink existing ones (`Deal#removes_contacts?`). Admin-only mutations (via Pundit `admin?`) include team/invites, automations, **alert rules**, webhooks, stripe connection, etc. Members can view most workspace data; alert rule CRUD is admin-only, list is member-visible.
 
 **Seeds**: demo workspace `Cream Demo` with multiple users (e.g. admin=admin, member=salesperson) sharing one workspace.
 

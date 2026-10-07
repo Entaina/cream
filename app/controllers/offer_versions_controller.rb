@@ -6,7 +6,8 @@ class OfferVersionsController < ApplicationController
   skip_after_action :verify_policy_scoped
   before_action :set_offer
   before_action :authorize_view, only: :show
-  before_action :authorize_edit, only: %i[new create destroy]
+  before_action :authorize_edit, only: %i[new create]
+  before_action :authorize_destroy, only: :destroy
 
   def new
     @version = @offer.versions.new
@@ -47,6 +48,8 @@ class OfferVersionsController < ApplicationController
   def authorize_view = authorize(@deal, :show?)
 
   def authorize_edit = authorize(@deal, :update?)
+
+  def authorize_destroy = authorize(@deal, :destroy?)
 
   def version_params
     params.fetch(:offer_version, {}).permit(:html_body, :comment, :file)

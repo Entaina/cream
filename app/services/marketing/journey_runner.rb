@@ -31,6 +31,15 @@ module Marketing
     end
 
     def advance!(depth = 0)
+      # Activities recorded without a signed-in user are labelled with the journey name.
+      Current.set(automation: {"kind" => "journey", "name" => @journey.name}) do
+        perform_advance!(depth)
+      end
+    end
+
+    private
+
+    def perform_advance!(depth)
       max_depth = [@journey.steps.count, 1].max + 1
       return if depth > max_depth
 

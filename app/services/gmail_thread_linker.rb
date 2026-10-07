@@ -113,7 +113,8 @@ class GmailThreadLinker
   private
 
   def linked_deals_for(gmail_thread_id:, rfc822_message_ids:)
-    workspace_ids = @user.workspaces.pluck(:id)
+    workspaces = @user.workspaces.to_a
+    workspace_ids = workspaces.map(&:id)
     scope = EmailMessage.where(workspace_id: workspace_ids, record_type: "Deal")
     deal_ids = []
 
@@ -129,7 +130,14 @@ class GmailThreadLinker
     deal_ids = deal_ids.uniq
     return [] if deal_ids.empty?
 
-    Deal.where(id: deal_ids, workspace_id: workspace_ids).includes(DEAL_INCLUDES).to_a
+    workspaces.flat_map do |workspace|
+      visible_deals(workspace).where(id: deal_ids).includes(DEAL_INCLUDES).to_a
+    end
+  end
+
+  # Deals the user may see in `workspace`, according to DealPolicy::Scope.
+  def visible_deals(workspace = @workspace)
+    Pundit.policy_scope(UserContext.new(user: @user, workspace: workspace), workspace.deals)
   end
 
   def suggested_deals_for(participant_emails:)
@@ -142,7 +150,7 @@ class GmailThreadLinker
     person_ids = emails.flat_map { |email| @workspace.people.with_email(email).pluck(:id) }.uniq
     return [] if person_ids.empty?
 
-    @workspace.deals.joins(:deal_contacts)
+    visible_deals.joins(:deal_contacts)
       .where(deal_contacts: {person_id: person_ids})
       .includes(DEAL_INCLUDES)
       .distinct
@@ -183,7 +191,7 @@ class GmailThreadLinker
   end
 
   def find_deal!(deal_id)
-    @workspace.deals.find(deal_id)
+    visible_deals.find(deal_id)
   end
 
   def resolve_pipeline_stage(stage_id)
@@ -475,7 +483,7 @@ class GmailThreadLinker
   end
 
   def reload_deal!(deal)
-    @workspace.deals.includes(DEAL_INCLUDES).find(deal.id)
+    visible_deals.includes(DEAL_INCLUDES).find(deal.id)
   end
 
   def deal_payload(deal)
