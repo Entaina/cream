@@ -53,11 +53,11 @@ module CreamMcp
       add_deal_product). Edit with update_person/update_company/update_deal (update_deal can
       move pipeline/replace contacts). Duplicates: list_person_duplicates/list_company_duplicates
       then merge_*; delete_record removes records (deleting a company also deletes its people and
-      deals). Notes, comments (add_comment), emails (list_emails/get_email/send_deal_email;
+      deals). Notes, person files (add_person_attachment), comments (add_comment), emails (list_emails/get_email/send_deal_email;
       optional on create_deal), Stripe payments
       (list_payments), activity (list_activity), recent_changes. Custom fields:
       list_custom_fields/set_custom_fields. Records include url (needs CREAM_APP_URL).
-      Marketing: MQL pool → list_mqls / get_person_marketing; convert via create_product_interest +
+      Marketing: MQL pool → list_mqls / get_person_marketing; create_mql registers one; convert via create_product_interest +
       convert_mql_to_sql; campaigns → list_campaigns, send_campaign; enroll_in_journey; set_subscription.
     TEXT
     if text.length > MAX_INSTRUCTIONS_LENGTH
@@ -74,7 +74,7 @@ module CreamMcp
       UPDATE_PERSON, UPDATE_COMPANY, UPDATE_DEAL, UPDATE_DEAL_STAGE,
       LIST_PERSON_DUPLICATES, LIST_COMPANY_DUPLICATES, MERGE_PERSON, MERGE_COMPANY, DELETE_RECORD,
       CREATE_PRODUCT, UPDATE_PRODUCT, ADD_DEAL_PRODUCT, UPDATE_DEAL_PRODUCT, UPDATE_TASK,
-      ADD_NOTE, ADD_COMMENT, SEND_DEAL_EMAIL, CREATE_TASK, COMPLETE_TASK, PIPELINE_SUMMARY,
+      ADD_NOTE, ADD_PERSON_ATTACHMENT, ADD_COMMENT, SEND_DEAL_EMAIL, CREATE_TASK, COMPLETE_TASK, PIPELINE_SUMMARY,
       LIST_CUSTOM_FIELDS, SET_CUSTOM_FIELDS, GET_DEAL_HISTORY,
       RECENT_CHANGES, SALES_FORECAST,
       SUMMARIZE_RECORD, SUGGEST_NEXT_STEPS, DRAFT_EMAIL, NATURAL_LANGUAGE_SEARCH, ENRICH_RECORD,
@@ -577,7 +577,8 @@ module CreamMcp
       record = CreamMcp.find_record(ws, CreamMcp.arg(args, "record_type"), CreamMcp.arg(args, "record_id"))
       CreamMcp.authorize!(pundit_ctx, record, :show?)
       base = case record
-      when Person then CreamMcp.person_json(record).merge(description: record.description, linkedin_url: record.linkedin_url)
+      when Person then CreamMcp.person_json(record).merge(description: record.description, linkedin_url: record.linkedin_url,
+        internal_notes: record.internal_notes)
       when Company then CreamMcp.company_json(record).merge(description: record.description,
         people: record.people.limit(10).map { |p| CreamMcp.person_json(p) },
         deals: record.deals.limit(10).map { |d| CreamMcp.deal_json(d) })
@@ -610,6 +611,7 @@ module CreamMcp
                                 job_title: {type: "string"}, location: {type: "string"},
                                 company_id: {type: "integer", description: "Existing company id (required — a person belongs to a company)"},
                                 description: {type: "string"},
+                                internal_notes: {type: "string", description: "Free-text internal notes about the person"},
                                 custom_fields: {type: "object", description: "Workspace-defined custom fields keyed by field key (see list_custom_fields)"}},
                    required: ["first_name", "company_id"]}
   ) do |server_context:, **args|
@@ -617,7 +619,8 @@ module CreamMcp
       pundit_ctx = CreamMcp.pundit_context(server_context)
       ws = pundit_ctx.workspace
       person = ws.people.new(
-        CreamMcp.picked(args, "first_name", "last_name", "email", "phone", "job_title", "location", "description")
+        CreamMcp.picked(args, "first_name", "last_name", "email", "phone", "job_title", "location", "description",
+          "internal_notes")
           .merge(company_id: CreamMcp.arg(args, "company_id"), owner: pundit_ctx.user, workspace: ws)
       )
       person.custom_fields = CreamMcp.arg(args, "custom_fields") if CreamMcp.arg(args, "custom_fields").present?
@@ -737,6 +740,7 @@ module CreamMcp
                                 email: {type: "string"}, phone: {type: "string"},
                                 job_title: {type: "string"}, location: {type: "string"},
                                 linkedin_url: {type: "string"}, description: {type: "string"},
+                                internal_notes: {type: "string"},
                                 company_id: {type: "integer", description: "Move the person to another existing company"}},
                    required: ["person_id"]}
   ) do |server_context:, **args|
@@ -745,7 +749,7 @@ module CreamMcp
       person = ctx.workspace.people.find(CreamMcp.arg(args, "person_id"))
       CreamMcp.authorize!(ctx, person, :update?)
       person.update!(CreamMcp.picked(args, "first_name", "last_name", "email", "phone",
-        "job_title", "location", "linkedin_url", "description", "company_id"))
+        "job_title", "location", "linkedin_url", "description", "internal_notes", "company_id"))
       CreamMcp.respond_with(updated: CreamMcp.person_json(person))
     end
   end
@@ -977,6 +981,33 @@ module CreamMcp
       note.save!
       CreamMcp.respond_with(created: {id: note.id, title: note.title, body: note.body,
                                       record: CreamMcp.record_ref_json(record)})
+    end
+  end
+
+  ADD_PERSON_ATTACHMENT = MCP::Tool.define(
+    name: "add_person_attachment",
+    description: "Attach a file (Base64-encoded, up to 10 MB) to a person.",
+    input_schema: {type: "object",
+                   properties: {person_id: {type: "integer"},
+                                filename: {type: "string"},
+                                content: {type: "string", description: "Base64-encoded file content"},
+                                content_type: {type: "string", description: "Optional MIME type"},
+                                name: {type: "string", description: "Optional display name (defaults to the filename)"}},
+                   required: ["person_id", "filename", "content"]}
+  ) do |server_context:, **args|
+    return CreamMcp.feature_unavailable_response(:attachments) unless CreamFeatures.enabled?(:attachments)
+
+    CreamMcp.with_authorization(server_context) do
+      pundit_ctx = CreamMcp.pundit_context(server_context)
+      ws = pundit_ctx.workspace
+      person = CreamMcp.policy_scope(pundit_ctx, ws.people).find(CreamMcp.arg(args, "person_id"))
+      attachment = Api::RecordAttachmentBuilder.new(workspace: ws, user: pundit_ctx.user, record: person)
+        .build(CreamMcp.picked(args, "filename", "content", "content_type"), name: CreamMcp.arg(args, "name"))
+      CreamMcp.authorize!(pundit_ctx, attachment, :create?)
+      attachment.save!
+      CreamMcp.respond_with(created: Api::RecordAttachmentBuilder.json(attachment).merge(person: CreamMcp.record_ref_json(person)))
+    rescue Api::RecordAttachmentBuilder::InvalidAttachment => e
+      CreamMcp.error_response("invalid_attachment", e.message)
     end
   end
 

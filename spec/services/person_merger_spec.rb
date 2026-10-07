@@ -103,6 +103,25 @@ RSpec.describe PersonMerger do
     expect(primary.first_contact_on).to eq(Date.new(2024, 1, 1))
   end
 
+  it "appends the secondaries' internal notes to the primary's without repeating them" do
+    primary = create_person!(workspace, company: company, email: "pat@acme.com", internal_notes: "Prefers calls")
+    second = create_person!(workspace, company: company, email: "other@acme.com", internal_notes: "Met at expo")
+    third = create_person!(workspace, company: company, email: "third@acme.com", internal_notes: "Prefers calls")
+
+    merge(primary: primary, secondaries: [second, third])
+
+    expect(primary.reload.internal_notes).to eq("Prefers calls\n\nMet at expo")
+  end
+
+  it "takes the secondary's internal notes when the primary has none" do
+    primary = create_person!(workspace, company: company, email: "pat@acme.com")
+    secondary = create_person!(workspace, company: company, email: "other@acme.com", internal_notes: "Met at expo")
+
+    merge(primary: primary, secondaries: [secondary])
+
+    expect(primary.reload.internal_notes).to eq("Met at expo")
+  end
+
   it "adds the secondary legacy email when it has no person_emails records" do
     primary = create_person!(workspace, company: company, email: "pat@acme.com")
     secondary = create_person!(workspace, company: company, email: "other@acme.com")

@@ -247,6 +247,9 @@ es:
       custom:
         description: Información adicional para tu workspace.
         title: Campos personalizados
+      internal_notes:
+        description: Apuntes internos sobre esta persona.
+        title: Notas
       management:
         description: Quién es responsable de esta relación.
         title: Gestión del contacto
@@ -355,6 +358,11 @@ es:
       campaigns: Campañas enviadas
       campaigns_empty: Ninguna campaña enviada a este contacto.
       campaigns_limit: Se muestran las %{count} más recientes.
+      consent_date: 'Fecha del consentimiento:'
+      consent_ip: 'IP:'
+      consent_recorded_by: 'Registrado por:'
+      consent_source: 'Origen:'
+      consent_text: 'Texto aceptado:'
       contact_management: Gestión del contacto
       convert_to_sql: Convertir a SQL
       copied: Copiado
@@ -365,6 +373,7 @@ es:
       edit_custom: Editar campos personalizados
       edit_details: Editar datos de contacto
       edit_management: Editar gestión del contacto
+      edit_notes: Editar notas
       edit_profile: Editar perfil profesional
       email_preferences: Preferencias de email
       journey_missing: Recorrido eliminado
@@ -377,7 +386,9 @@ es:
       more_actions: Más acciones del contacto
       no_delivery_events: Sin eventos de entrega registrados.
       no_interests: Sin intereses registrados.
+      no_notes: Todavía no hay notas.
       no_submissions: Sin envíos de formularios.
+      notes: Notas
       overview: Resumen del contacto
       preferences_center: Centro de preferencias
       primary_email: Principal

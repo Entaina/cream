@@ -58,12 +58,16 @@ module Api
 
         case subscription_params[:action]
         when "subscribe"
+          evidence = ::Marketing::ConsentEvidence.parse(subscription_params)
+          subscription = EmailSubscription.find_by(person: person, subscription_type: type)
+          # An active subscription keeps the evidence it was originally obtained with.
           subscription = ::Marketing::ConsentService.subscribe!(
             person: person,
             subscription_type: type,
             source: "api",
-            legal_basis: "consent"
-          )
+            legal_basis: "consent",
+            metadata: evidence.metadata(user: current_user)
+          ) unless subscription&.subscribed?
         when "unsubscribe"
           ::Marketing::ConsentService.unsubscribe!(
             person: person,
@@ -79,6 +83,8 @@ module Api
           action: subscription_params[:action],
           subscription: subscription && ::Marketing::ApiPresenter.subscription_json(subscription)
         }
+      rescue ::Marketing::ConsentEvidence::Error => e
+        render json: {errors: [e.message]}, status: :unprocessable_entity
       end
 
       private
@@ -88,11 +94,13 @@ module Api
       end
 
       def subscription_params
-        params.require(:subscription).permit(:subscription_type_id, :action)
+        params.require(:subscription).permit(
+          :subscription_type_id, :action, :consent_text, :consent_source, :consent_obtained_at, :consent_ip
+        )
       end
 
       def person_params
-        params.require(:person).permit(:first_name, :last_name, :email, :phone, :job_title, :location, :company_id,
+        params.require(:person).permit(:first_name, :last_name, :email, :phone, :job_title, :location, :internal_notes, :company_id,
           person_emails_attributes: [:id, :address, :primary, :_destroy])
       end
 
@@ -103,6 +111,7 @@ module Api
           last_name: person.last_name,
           email: person.email,
           emails: person.person_emails.ordered.map { |record| {address: record.address, primary: record.primary?} },
+          internal_notes: person.internal_notes,
           company_id: person.company_id,
           company: person.company&.name,
           created_at: person.created_at.iso8601,

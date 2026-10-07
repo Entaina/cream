@@ -64,7 +64,7 @@ RSpec.describe "Mcp", type: :request do
         "create_product", "update_product", "add_deal_product", "update_deal_product", "update_task", "get_deal_history",
         "recent_changes", "sales_forecast",
         "summarize_record", "suggest_next_steps", "draft_email", "natural_language_search", "enrich_record",
-        "list_mqls", "get_person_marketing", "send_campaign", "convert_mql_to_sql")
+        "add_person_attachment", "create_mql", "list_mqls", "get_person_marketing", "send_campaign", "convert_mql_to_sql")
     end
 
     it "lists products scoped to the token workspace" do
@@ -466,6 +466,52 @@ RSpec.describe "Mcp", type: :request do
       expect(person.email).to eq("ana@example.com")
       expect(person.job_title).to be_blank
       expect(person.first_name).to eq("Ana")
+    end
+
+    it "stores internal notes through create_person, update_person and get_record" do
+      company = create_company!(workspace)
+
+      created = call_tool("create_person", {first_name: "Ana", company_id: company.id, internal_notes: "Prefers email"})
+      person = workspace.people.find(created.dig("created", "id"))
+      expect(person.internal_notes).to eq("Prefers email")
+
+      call_tool("update_person", {person_id: person.id, internal_notes: "Prefers calls"})
+      expect(person.reload.internal_notes).to eq("Prefers calls")
+
+      expect(call_tool("get_record", {record_type: "person", record_id: person.id})["internal_notes"]).to eq("Prefers calls")
+    end
+
+    it "attaches a Base64 file to a person" do
+      person = create_person!(workspace)
+
+      result = call_tool("add_person_attachment", {
+        person_id: person.id, filename: "contract.pdf", content: Base64.strict_encode64("%PDF-1.4"),
+        content_type: "application/pdf", name: "Contract"
+      })
+
+      expect(result["created"]).to include("name" => "Contract", "filename" => "contract.pdf", "byte_size" => 8)
+      expect(person.record_attachments.first.file.download).to eq("%PDF-1.4")
+    end
+
+    it "rejects invalid attachment content and people from other workspaces" do
+      person = create_person!(workspace)
+      other = create_person!(workspaces(:two))
+
+      bad = mcp_tool_error("add_person_attachment", {person_id: person.id, filename: "a.txt", content: "***"})
+      missing = mcp_tool_error("add_person_attachment", {person_id: other.id, filename: "a.txt", content: "eA=="})
+
+      expect(bad["error"]).to eq("invalid_attachment")
+      expect(missing["error"]).to eq("not_found")
+      expect(person.record_attachments).to be_empty
+    end
+
+    it "returns feature_unavailable for attachments when the feature is disabled" do
+      allow(CreamFeatures).to receive(:enabled?).and_call_original
+      allow(CreamFeatures).to receive(:enabled?).with(:attachments).and_return(false)
+
+      result = mcp_tool_error("add_person_attachment", {person_id: create_person!(workspace).id, filename: "a.txt", content: "eA=="})
+
+      expect(result["error"]).to eq("feature_unavailable")
     end
 
     it "lists person duplicate groups by email" do

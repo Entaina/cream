@@ -14,6 +14,7 @@
       <% current_workspace.subscription_types.active.ordered.each do |type| %>
         <% subscription = subscriptions_by_type[type.id] %>
         <% status = subscription&.status || "missing" %>
+        <% evidence = subscription&.consent_evidence || {} %>
         <div class="flex flex-wrap items-center gap-2 py-1">
           <span class="text-base text-ink min-w-[8rem]"><%= type.name %></span>
           <%= subscription_status_badge(status) %>
@@ -24,6 +25,25 @@
             <%= status == "subscribed" ? t("people.show.unsubscribe") : t("people.show.subscribe") %>
           <% end %>
         </div>
+        <% if evidence["marketing_consent_text"].present? %>
+          <details class="text-sm pl-1 pb-1">
+            <summary class="cursor-pointer text-accent"><%= t("people.show.view_consent") %></summary>
+            <div class="mt-2 space-y-1 rounded-lg border border-line bg-canvas-sunken/40 p-3">
+              <p><span class="text-ink-faint"><%= t("people.show.consent_text") %></span> <%= evidence["marketing_consent_text"] %></p>
+              <p><span class="text-ink-faint"><%= t("people.show.consent_source") %></span> <%= evidence["consent_source"] %></p>
+              <% consented_at = evidence["consent_obtained_at"].presence || subscription.opted_in_at&.iso8601 %>
+              <% if consented_at.present? %>
+                <p><span class="text-ink-faint"><%= t("people.show.consent_date") %></span> <%= (l(Time.zone.parse(consented_at), format: :long) rescue consented_at) %></p>
+              <% end %>
+              <% if evidence["consent_ip"].present? %>
+                <p><span class="text-ink-faint"><%= t("people.show.consent_ip") %></span> <%= evidence["consent_ip"] %></p>
+              <% end %>
+              <% if evidence["recorded_by"].present? %>
+                <p><span class="text-ink-faint"><%= t("people.show.consent_recorded_by") %></span> <%= evidence["recorded_by"] %> (<%= subscription.source %>)</p>
+              <% end %>
+            </div>
+          </details>
+        <% end %>
       <% end %>
     </div>
 

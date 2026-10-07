@@ -265,7 +265,7 @@ From a person's record, **Merge** opens the same assistant:
 3. If the contact you're looking for doesn't appear, use the **Search for other contacts** box to find and add **any other contact in the workspace**.
 4. Confirm the action.
 
-When merging, the notes, tasks, deals, emails and timeline activity of the selected contacts move to the kept contact. The duplicates' email addresses are merged into the resulting contact (without repeating the same address). The resulting contact **stays in the company of the contact you keep**. The main contact's fields take priority; if data is missing (phone, job title, etc.), it is filled in from the duplicate. The action is **irreversible** and is recorded on the resulting contact's timeline.
+When merging, the notes, tasks, deals, emails and timeline activity of the selected contacts move to the kept contact. The duplicates' email addresses are merged into the resulting contact (without repeating the same address). The resulting contact **stays in the company of the contact you keep**. The main contact's fields take priority; if data is missing (phone, job title, etc.), it is filled in from the duplicate. The contact's internal **notes** are never lost: the duplicates' notes are appended after the kept contact's (identical texts are not repeated). The action is **irreversible** and is recorded on the resulting contact's timeline.
 
 ### Companies
 
@@ -512,7 +512,7 @@ The contact header shows their name, company and main contact details. Use **Sen
 
 - **Activity** opens by default. The main column shows, in order: **Deals** (the ones you can see, with stage, date and products; five visible and the rest under **Show N more deals**; if there are more than five, **View deals (N)** opens the tab), **Next tasks** (overdue first, then upcoming; expand the rest or completed tasks when needed) and **History** (notes, emails, comments, contact changes and **stage changes on their deals**). A stage change reads as “Ana moved deal Name from Proposal to Negotiation”; when the stage is a win, “Ana won deal Name”. The deal name is a link. Those changes appear under the **All** and **Changes** filters. Use **Older / Newer** to paginate. In the context column, **Campañas enviadas** (Campaigns sent) lists the latest marketing campaigns this contact received; **Recorridos** (Journeys) shows enrollments (active, waiting, completed or cancelled) with the current step. **Ver más** (View more) opens the full history (see [§29](#29-marketing)).
 - **Deals** contains the full list and the **All products** filter when there is more than one product, plus product interests and form submissions when enabled. Expand **Registrar interés** to add an interest.
-- **Information** groups contact details, professional profile, ownership, relationships, custom fields, email preferences and, when submissions exist, **Formularios enviados** (Form submissions) with a **Ver consentimiento** link to the accepted policy and statement. Each editable block has its own **Edit** link. Expand **Add relationship** to link another person.
+- **Information** groups contact details, professional profile, **Notas** (Notes: free internal text about the person; **Edit** opens only that block), ownership, relationships, custom fields, email preferences and, when submissions exist, **Formularios enviados** (Form submissions) with a **Ver consentimiento** link to the accepted policy and statement. Each editable block has its own **Edit** link. Expand **Add relationship** to link another person.
 - **Files**, when enabled, contains the upload form and existing attachments.
 
 Closing an editor or switching sections keeps its draft while you remain on the page. Leaving with unsaved drafts prompts you first. Drafts are not saved across a reload. Editing a block only submits that block; **Save changes** returns to Information, and **Cancel** leaves the contact unchanged.
@@ -992,6 +992,8 @@ Some clients can connect with **just the URL** (`https://your-domain/mcp`). They
 - The token has the same access as your user in that workspace. Treat it like a password.
 - If you switch workspace, create a new token while that workspace is active.
 - The MCP AI tools (`summarize_record`, `suggest_next_steps`, `draft_email`, `natural_language_search`, `enrich_record`) require the AI assistant to be enabled; see [AI assistant](#24-ai-assistant).
+- A person's **notes** (the `internal_notes` field) can also be read and edited through the REST API v1 (`/api/v1/people`) and MCP (`create_person`, `update_person`, `get_record`). To upload a file to a person there is an endpoint (`POST /api/v1/people/:id/attachments`, Base64 or multipart) and the MCP tool `add_person_attachment`; both require the attachments feature.
+- To **register an MQL** directly use `POST /api/v1/marketing/mqls` or the MCP tool `create_mql` (see [MQL pool](#mql-pool)).
 
 ---
 
@@ -1351,6 +1353,8 @@ Contacts with **active marketing permission** (at least one active subscription 
 1. Open **MQLs**. The table shows person, lifecycle (scoring), score, source forms (with **Ver consentimiento**), pending interests and visible opportunities.
 2. Filter by search, **subscription type**, **open opportunity** (any / yes / no), **product** (of the opportunity), **product interest** or **source form**.
 3. From a row with a pending interest, click **Convertir a SQL** (Convert to SQL) to create or link an opportunity for that product (pipeline, task and owner).
+
+**Registering an MQL directly (API and MCP):** an integration or agent can register an MQL without a form through `POST /api/v1/marketing/mqls` or the MCP tool `create_mql`. If the email already exists the person is updated; otherwise they are created (a company is required: `company_id` or `company_name`). The person moves to lifecycle **mql** (never demoted if already further along) and is subscribed to the given types. Consent is given **per subscription type**: at least one entry in `subscriptions` is required, and each one (which is the consent for that type) carries its **evidence**: `subscription_type_id`, `consent_text` (the exact text accepted) and `consent_source` (where or how it was obtained: form URL, event, contract…), and optionally `consent_obtained_at` and `consent_ip`. The evidence is stored on each subscription together with the user who registered it and is shown on the person's record (**Information** → **Email preferences** → **Ver consentimiento**). If the person already had an active subscription, the original evidence is kept. The same call can include internal **notes**, timeline notes, file attachments and a product interest. Everything is saved in a single transaction.
 
 **On a person's record:**
 

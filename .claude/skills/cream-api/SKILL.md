@@ -47,7 +47,8 @@ Namespace `config/routes.rb` → `namespace :api > :v1`:
 
 | Recurso | Rutas | Notas |
 |---------|-------|-------|
-| People | CRUD | `?q=` búsqueda; nested `person_emails_attributes` |
+| People | CRUD | `?q=` búsqueda; nested `person_emails_attributes`; `internal_notes` (texto libre) |
+| Person attachments | `POST /people/:person_id/attachments` | `{ attachment: { filename, content (Base64), content_type?, name? } }` o multipart `attachment[file]`; requiere `:attachments` |
 | Companies | CRUD | `?q=` búsqueda |
 | Deals | CRUD | `?q=`; stage change vía `move_to_stage!`; create acepta `notes[]`, `email` (Base64 o multipart) y `tasks_attributes` |
 | Deal notes | `POST /deals/:deal_id/notes` | `{ note: { title, body } }` |
@@ -61,11 +62,13 @@ Namespace `config/routes.rb` → `namespace :api > :v1`:
 | Recurso | Rutas | Flag / permisos |
 |---------|-------|-----------------|
 | MQL pool | `GET marketing/mqls` | `:mql_pool`, miembro |
+| Alta de MQL | `POST marketing/mqls` | `:mql_pool` + `:marketing_consent`, miembro. `{ mql: { email, company_id\|company_name, first_name, …, internal_notes, product_id, interest_description }, subscriptions: [{ subscription_type_id, consent_text, consent_source, consent_obtained_at?, consent_ip? }] (≥1, obligatorio; cada entrada es el consentimiento de ese tipo y guarda su evidencia), notes: [{title, body}], attachments: [...] }` (JSON Base64 o multipart). Transaccional; find-or-create por email (201 / 200); pasa a `mql` sin degradar; servicio [`Marketing::MqlCreator`](../../../app/services/marketing/mql_creator.rb) compartido con MCP `create_mql` |
 | Persona marketing | `GET people/:id/marketing` | `PersonPolicy#show?` |
-| Suscripción | `PATCH people/:id/subscription` | `:marketing_consent`, `PersonPolicy#update?` |
+| Suscripción | `PATCH people/:id/subscription` | `:marketing_consent`, `PersonPolicy#update?`. `{ subscription: { subscription_type_id, action: subscribe\|unsubscribe, consent_text, consent_source, consent_obtained_at?, consent_ip? } }`; para `subscribe` la evidencia (`consent_text`, `consent_source`) es obligatoria (422 si falta); una suscripción activa conserva su evidencia original; validación compartida con MCP/MQL en [`Marketing::ConsentEvidence`](../../../app/services/marketing/consent_evidence.rb) |
 | Intereses | `GET/POST people/:person_id/product_interests` | `:mql_pool` |
 | Conversión MQL→SQL | `POST marketing/mql_conversions` | `:mql_pool`, `ProductInterestPolicy#convert?` |
 | Tipos suscripción | `GET marketing/subscription_types` | `:marketing_consent`, admin |
+| Suscripciones | `GET marketing/subscriptions` | `:marketing_consent`, miembro. Filtros `subscription_type_id`, `status` (`subscribed\|unsubscribed\|pending`, 422 si no es válido), `person_id`, `limit`; incluye `person` y `consent_evidence`; solo personas visibles para el usuario; MCP `list_subscriptions` |
 | Campañas | `GET marketing/campaigns`, `GET marketing/campaigns/:id` | `:marketing_campaigns`, admin |
 | Envíos campaña | `POST marketing/campaigns/:id/sends`, `POST …/sends/:id/cancel` | admin; encola `CampaignSendJob` |
 | Segmentos | `GET marketing/segments`, `GET marketing/segments/:id` | `:marketing_segments`, admin |

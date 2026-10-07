@@ -59,6 +59,8 @@ Want to change CRM data?
 ├── New deal only → create_deal (+ optional send via email in same call if record_email enabled)
 ├── Move kanban → update_deal_stage(deal_id, stage) or update_deal(stage/pipeline)
 ├── Note on record → add_note(record_type, record_id, body)
+├── File on a person → add_person_attachment(person_id, filename, content[Base64])
+├── New MQL → create_mql(email, marketing_consent: true, company_id|company_name, …)
 ├── Thread comment → add_comment (optional parent_comment_id)
 ├── Task → create_task / update_task / complete_task
 ├── Email from deal → draft_email (optional) then send_deal_email
@@ -80,7 +82,7 @@ Want to change CRM data?
 | Update records | `update_person`, `update_company`, `update_deal` |
 | Move stage | `update_deal_stage` |
 | Stage entry conditions | `list_stage_conditions`, `create_stage_condition`, … |
-| Note / comment | `add_note`, `add_comment` |
+| Note / comment / file | `add_note`, `add_comment`, `add_person_attachment` |
 | Task lifecycle | `create_task`, `update_task`, `complete_task` |
 | Email | `send_deal_email` |
 | Pipeline stats | `pipeline_summary`, `sales_forecast` |

@@ -272,10 +272,12 @@ Rails.application.routes.draw do
           patch :subscription
         end
         resources :product_interests, only: %i[index create], module: :marketing
+        resources :attachments, only: :create, controller: "person_attachments"
       end
       namespace :marketing do
-        resources :mqls, only: :index
+        resources :mqls, only: %i[index create]
         resources :subscription_types, only: :index
+        resources :subscriptions, only: :index
         resources :campaigns, only: %i[index show] do
           resources :sends, only: :create, controller: "campaign_sends" do
             member { post :cancel }

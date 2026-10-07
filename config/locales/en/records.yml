@@ -246,6 +246,9 @@ en:
       custom:
         description: Additional information for your workspace.
         title: Custom fields
+      internal_notes:
+        description: Internal notes about this person.
+        title: Notes
       management:
         description: Who is responsible for this relationship.
         title: Contact management
@@ -351,6 +354,11 @@ en:
       campaigns: Campaigns sent
       campaigns_empty: No campaigns sent to this contact.
       campaigns_limit: Showing the %{count} most recent.
+      consent_date: 'Consent date:'
+      consent_ip: 'IP:'
+      consent_recorded_by: 'Recorded by:'
+      consent_source: 'Source:'
+      consent_text: 'Accepted text:'
       contact_management: Contact management
       convert_to_sql: Convert to SQL
       copied: Copied
@@ -361,6 +369,7 @@ en:
       edit_custom: Edit custom fields
       edit_details: Edit contact details
       edit_management: Edit contact management
+      edit_notes: Edit notes
       edit_profile: Edit professional profile
       email_preferences: Email preferences
       journey_missing: Deleted journey
@@ -373,7 +382,9 @@ en:
       more_actions: More contact actions
       no_delivery_events: No delivery events recorded.
       no_interests: No interests recorded.
+      no_notes: No notes yet.
       no_submissions: No form submissions.
+      notes: Notes
       overview: Contact overview
       preferences_center: Preferences center
       primary_email: Primary

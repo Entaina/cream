@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_06_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_07_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -1035,6 +1035,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_06_120000) do
     t.integer "lead_score", default: 0, null: false
     t.string "lifecycle_stage", default: "subscriber", null: false
     t.datetime "lead_score_decayed_at"
+    t.text "internal_notes"
     t.index ["brought_by_id"], name: "index_people_on_brought_by_id"
     t.index ["company_id"], name: "index_people_on_company_id"
     t.index ["owner_id"], name: "index_people_on_owner_id"

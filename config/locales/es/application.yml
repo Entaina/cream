@@ -36,6 +36,7 @@ es:
         description: Acerca de
         email: Email
         first_name: Nombre
+        internal_notes: Notas
         job_title: Cargo
         last_name: Apellidos
         linkedin_url: URL de LinkedIn

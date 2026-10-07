@@ -30,10 +30,10 @@ RSpec.describe "Mcp marketing tools", type: :request do
 
   let(:marketing_tool_names) do
     %w[
-      list_mqls get_person_marketing list_product_interests list_subscription_types
+      list_mqls get_person_marketing list_product_interests list_subscription_types list_subscriptions
       list_campaigns get_campaign list_segments get_segment list_journeys get_journey
       list_scoring_rules get_attribution list_email_templates list_lead_forms
-      create_product_interest convert_mql_to_sql set_subscription enroll_in_journey
+      create_mql create_product_interest convert_mql_to_sql set_subscription enroll_in_journey
       send_campaign cancel_campaign_send
     ]
   end
@@ -102,6 +102,70 @@ RSpec.describe "Mcp marketing tools", type: :request do
       result = mcp_tool_error("enroll_in_journey", {journey_id: journey.id, person_id: person.id}, token: sales_token)
 
       expect(result["error"]).to eq("not_found")
+    end
+  end
+
+  describe "create_mql" do
+    let(:product) { workspace.products.create!(name: "Workshop", price: 50) }
+    let(:arguments) do
+      {
+        email: "Mcp.Lead@Example.com", first_name: "Mcp", last_name: "Lead", company_name: "Lead Corp",
+        internal_notes: "Met at expo",
+        subscriptions: [{
+          subscription_type_id: workspace.subscription_types.find_by!(slug: "general").id,
+          consent_text: "I accept marketing emails", consent_source: "Expo 2026 signup sheet"
+        }],
+        notes: [{title: "Intro", body: "Warm lead"}],
+        attachments: [{filename: "brief.txt", content: Base64.strict_encode64("hello")}],
+        product_id: product.id, interest_description: "Wants a workshop"
+      }
+    end
+
+    it "registers an MQL with consent, notes, attachments and an interest" do
+      result = call_tool("create_mql", arguments, token: sales_token)
+
+      expect(result["created"]).to include(
+        "email" => "mcp.lead@example.com", "lifecycle_stage" => "mql", "marketing_eligible" => true,
+        "internal_notes" => "Met at expo"
+      )
+      person = workspace.people.find(result.dig("created", "id"))
+      expect(person.notes.pluck(:body)).to eq(["Warm lead"])
+      expect(person.record_attachments.map { |a| a.file.filename.to_s }).to eq(["brief.txt"])
+      expect(person.product_interests.pluck(:description)).to eq(["Wants a workshop"])
+      expect(person.email_subscriptions.first).to have_attributes(status: "subscribed", source: "mcp")
+      expect(result.dig("created", "subscriptions", 0, "consent_evidence")).to include(
+        "marketing_consent_text" => "I accept marketing emails",
+        "consent_source" => "Expo 2026 signup sheet",
+        "recorded_by" => salesperson.name
+      )
+    end
+
+    it "requires subscriptions with their consent evidence" do
+      entry = arguments[:subscriptions].first
+      missing = call_tool_raw("create_mql", arguments.except(:subscriptions))
+      no_evidence = call_tool_raw("create_mql", arguments.merge(subscriptions: [entry.except(:consent_text, :consent_source)]))
+      blank = mcp_tool_error("create_mql", arguments.merge(subscriptions: [entry.merge(consent_text: " ")]))
+      empty = call_tool_raw("create_mql", arguments.merge(subscriptions: []))
+
+      expect(JSON.parse(missing.body).dig("result", "content", 0, "text")).to include("subscriptions")
+      expect(JSON.parse(no_evidence.body).dig("result", "content", 0, "text")).to include("consent_text", "consent_source")
+      expect(JSON.parse(empty.body).dig("result", "content", 0, "text")).to include("subscriptions")
+      expect(blank["error"]).to eq("invalid_argument")
+      expect(blank["message"]).to eq(I18n.t("marketing.consent_evidence.errors.consent_text_required"))
+      expect(workspace.people.with_email("mcp.lead@example.com")).to be_empty
+    end
+
+    it "reports invalid attachments" do
+      result = mcp_tool_error("create_mql", arguments.merge(attachments: [{filename: "x.txt", content: "***"}]))
+
+      expect(result["error"]).to eq("invalid_attachment")
+      expect(workspace.people.with_email("mcp.lead@example.com")).to be_empty
+    end
+
+    it "returns feature_unavailable when mql_pool is disabled" do
+      allow(CreamFeatures).to receive(:enabled?).with(:mql_pool).and_return(false)
+
+      expect(mcp_tool_error("create_mql", arguments)["error"]).to eq("feature_unavailable")
     end
   end
 
@@ -187,20 +251,110 @@ RSpec.describe "Mcp marketing tools", type: :request do
     end
   end
 
-  describe "set_subscription" do
-    it "subscribes a person via ConsentService" do
-      person = create_person!(workspace, email: "sub@example.com")
-      type = workspace.subscription_types.find_by!(slug: "newsletter")
+  describe "list_subscriptions" do
+    let(:general) { workspace.subscription_types.find_by!(slug: "general") }
+    let(:newsletter) { workspace.subscription_types.find_by!(slug: "newsletter") }
+    let!(:ana) { create_person!(workspace, first_name: "Ana", email: "ana@example.com") }
+    let!(:bob) { create_person!(workspace, first_name: "Bob", email: "bob@example.com") }
 
-      result = call_tool("set_subscription", {
-        person_id: person.id,
-        subscription_type_id: type.id,
-        action: "subscribe"
-      })
+    before do
+      Marketing::ConsentService.subscribe!(
+        person: ana, subscription_type: general, source: "mcp", legal_basis: "consent",
+        metadata: {"marketing_consent_text" => "I agree"}
+      )
+      Marketing::ConsentService.subscribe!(person: bob, subscription_type: newsletter, source: "mcp", legal_basis: "consent")
+      Marketing::ConsentService.unsubscribe!(person: bob, subscription_type: newsletter, source: "mcp")
+    end
+
+    it "lists the workspace subscriptions with the person and the consent evidence" do
+      result = call_tool("list_subscriptions", {}, token: sales_token)
+
+      expect(result["subscriptions"].map { |row| row.dig("person", "email") }).to contain_exactly("ana@example.com", "bob@example.com")
+      ana_row = result["subscriptions"].find { |row| row.dig("person", "id") == ana.id }
+      expect(ana_row).to include("status" => "subscribed", "slug" => "general")
+      expect(ana_row["consent_evidence"]).to include("marketing_consent_text" => "I agree")
+    end
+
+    it "filters by subscription type, status and person" do
+      by_type = call_tool("list_subscriptions", {subscription_type_id: newsletter.id})
+      by_status = call_tool("list_subscriptions", {status: "subscribed"})
+      by_person = call_tool("list_subscriptions", {person_id: bob.id})
+
+      expect(by_type["subscriptions"].map { |row| row.dig("person", "id") }).to eq([bob.id])
+      expect(by_status["subscriptions"].map { |row| row.dig("person", "id") }).to eq([ana.id])
+      expect(by_person["subscriptions"].map { |row| row["status"] }).to eq(["unsubscribed"])
+    end
+
+    it "does not list subscriptions of other workspaces" do
+      stranger = create_person!(other_workspace, email: "stranger@example.com")
+      Marketing::ConsentService.subscribe!(
+        person: stranger, subscription_type: other_workspace.subscription_types.first, source: "mcp", legal_basis: "consent"
+      )
+
+      result = call_tool("list_subscriptions", {})
+
+      expect(result["subscriptions"].map { |row| row.dig("person", "email") }).not_to include("stranger@example.com")
+    end
+
+    it "returns feature_unavailable when marketing consent is disabled" do
+      allow(CreamFeatures).to receive(:enabled?).with(:marketing_consent).and_return(false)
+
+      expect(mcp_tool_error("list_subscriptions", {})["error"]).to eq("feature_unavailable")
+    end
+  end
+
+  describe "set_subscription" do
+    let(:person) { create_person!(workspace, email: "sub@example.com") }
+    let(:type) { workspace.subscription_types.find_by!(slug: "newsletter") }
+    let(:arguments) do
+      {
+        person_id: person.id, subscription_type_id: type.id, action: "subscribe",
+        consent_text: "I agree to the newsletter", consent_source: "https://example.com/signup",
+        consent_obtained_at: "2026-10-01T09:30:00Z", consent_ip: "203.0.113.7"
+      }
+    end
+
+    it "subscribes a person via ConsentService and stores the consent evidence" do
+      result = call_tool("set_subscription", arguments)
 
       expect(result["action"]).to eq("subscribe")
       expect(result["subscription"]["status"]).to eq("subscribed")
+      expect(result["subscription"]["consent_evidence"]).to include(
+        "marketing_consent_text" => "I agree to the newsletter",
+        "consent_source" => "https://example.com/signup",
+        "consent_ip" => "203.0.113.7",
+        "recorded_by_user_id" => admin.id
+      )
       expect(EmailSubscription.find_by!(person: person, subscription_type: type).subscribed?).to be(true)
+    end
+
+    it "requires the consent text and source to subscribe" do
+      %i[consent_text consent_source].each do |field|
+        result = mcp_tool_error("set_subscription", arguments.except(field))
+
+        expect(result["error"]).to eq("invalid_argument")
+        expect(result["message"]).to eq(I18n.t("marketing.consent_evidence.errors.#{field}_required"))
+      end
+      expect(EmailSubscription.where(person: person, subscription_type: type)).to be_empty
+    end
+
+    it "keeps the original evidence when the person is already subscribed" do
+      Marketing::ConsentService.subscribe!(
+        person: person, subscription_type: type, source: "lead_form:signup", legal_basis: "consent",
+        metadata: {"marketing_consent_text" => "Original text"}
+      )
+
+      call_tool("set_subscription", arguments)
+
+      subscription = EmailSubscription.find_by!(person: person, subscription_type: type)
+      expect(subscription.source).to eq("lead_form:signup")
+      expect(subscription.consent_evidence).to eq("marketing_consent_text" => "Original text")
+    end
+
+    it "does not require evidence to unsubscribe" do
+      result = call_tool("set_subscription", arguments.slice(:person_id, :subscription_type_id).merge(action: "unsubscribe"))
+
+      expect(result["action"]).to eq("unsubscribe")
     end
   end
 

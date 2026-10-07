@@ -20,6 +20,22 @@ RSpec.describe "Api::V1::People", type: :request do
     )
   end
 
+  it "creates, updates and returns internal notes" do
+    user = users(:one)
+    workspace = workspaces(:one)
+    headers = {"Authorization" => "Bearer #{user.api_tokens.create!(name: "Test", workspace: workspace).plaintext_token}"}
+    company = create_company!(workspace)
+
+    post "/api/v1/people", as: :json, headers: headers,
+      params: {person: {first_name: "Ana", company_id: company.id, internal_notes: "Prefers email"}}
+    expect(response).to have_http_status(:created)
+    expect(response.parsed_body["internal_notes"]).to eq("Prefers email")
+
+    patch "/api/v1/people/#{response.parsed_body["id"]}", as: :json, headers: headers,
+      params: {person: {internal_notes: "Prefers calls"}}
+    expect(response.parsed_body["internal_notes"]).to eq("Prefers calls")
+  end
+
   it "filters people by exact email" do
     user = users(:one)
     workspace = workspaces(:one)

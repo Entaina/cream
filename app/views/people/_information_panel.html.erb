@@ -18,6 +18,14 @@
     <% if @person.description.present? %><p class="mt-4 text-sm text-ink-soft whitespace-pre-wrap break-words"><%= @person.description %></p><% end %>
   </section>
   <section class="record-card">
+    <div class="record-card-heading"><h2 class="record-section-title"><%= t("people.show.notes") %></h2><%= link_to t("records.edit"), edit_person_path(@person, section: "internal_notes"), class: "btn-ghost", aria: { label: t("people.show.edit_notes") } %></div>
+    <% if @person.internal_notes.present? %>
+      <p class="text-sm text-ink-soft whitespace-pre-wrap break-words"><%= @person.internal_notes %></p>
+    <% else %>
+      <p class="text-sm text-ink-soft"><%= t("people.show.no_notes") %></p>
+    <% end %>
+  </section>
+  <section class="record-card">
     <div class="record-card-heading"><h2 class="record-section-title"><%= t("people.show.contact_management") %></h2><%= link_to t("records.edit"), edit_person_path(@person, section: "management"), class: "btn-ghost", aria: { label: t("people.show.edit_management") } %></div>
     <%= render "shared/attribute", label: t("records.fields.owner"), icon_name: :users, value: @person.owner&.name %>
     <%= render "shared/attribute", label: t("records.fields.created"), icon_name: :clock, value: l(@person.created_at, format: :short) %>

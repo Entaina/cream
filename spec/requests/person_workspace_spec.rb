@@ -57,6 +57,38 @@ RSpec.describe "Person workspace", type: :request do
     expect(person.first_name).to eq("Ada")
   end
 
+  it "shows and edits the notes block on the information tab" do
+    get person_path(person, tab: "information")
+    expect(document.at_css("#record-panel-information").text).to include(I18n.t("people.show.no_notes"))
+
+    get edit_person_path(person, section: "internal_notes")
+    expect(document.at_css('textarea[name="person[internal_notes]"]')).to be_present
+    expect(document.at_css('[name="person[first_name]"]')).to be_nil
+
+    patch person_path(person), params: {section: "internal_notes", person: {internal_notes: "Prefiere llamadas por la tarde"}}
+    expect(response).to redirect_to(person_path(person, tab: "information"))
+    expect(person.reload.internal_notes).to eq("Prefiere llamadas por la tarde")
+    expect(person.first_name).to eq("Ada")
+
+    get person_path(person, tab: "information")
+    expect(document.at_css("#record-panel-information").text).to include("Prefiere llamadas por la tarde")
+  end
+
+  it "shows the consent evidence registered through the API on the information tab" do
+    person.update!(email: "ada@example.com")
+    type = SubscriptionType.ensure_defaults!(workspace) && workspace.subscription_types.active.first
+    Marketing::ConsentService.subscribe!(
+      person: person, subscription_type: type, source: "api", legal_basis: "consent",
+      metadata: {"marketing_consent_text" => "I accept emails", "consent_source" => "Partner signup form",
+                 "consent_ip" => "203.0.113.7", "recorded_by" => user.name}
+    )
+
+    get person_path(person, tab: "information")
+
+    panel = document.at_css("#record-panel-information").text
+    expect(panel).to include(I18n.t("people.show.view_consent"), "I accept emails", "Partner signup form", "203.0.113.7")
+  end
+
   it "keeps the block and submitted values when validation fails" do
     patch person_path(person), params: {section: "contact", person: {first_name: "", last_name: "", phone: "123456"}}
 

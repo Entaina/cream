@@ -31,7 +31,7 @@ Tool names exposed by the **Cream MCP server** (see `tools/list` in your MCP cli
 | Tool | Required args | Notes |
 |------|---------------|-------|
 | `create_company` | `name` | Optional: domain, industry, employee_range, location, revenue, fiscal_information, description, custom_fields |
-| `create_person` | `first_name`, `company_id` | Optional: last_name, email, phone, job_title, location, description, custom_fields |
+| `create_person` | `first_name`, `company_id` | Optional: last_name, email, phone, job_title, location, description, `internal_notes`, custom_fields |
 | `create_deal` | `name`, `company_id`, `next_action_title`, `next_action_due_on` | Optional: person_ids, value, currency, pipeline, stage, probability, expected_close_date, execution_duration_days, custom_fields, `email` object |
 | `create_product` | `name` | Optional: price, segment (b2b/b2c), description |
 | `create_task` | `title` | Optional: `due_on`, `record_type`, `record_id` |
@@ -40,7 +40,7 @@ Tool names exposed by the **Cream MCP server** (see `tools/list` in your MCP cli
 
 | Tool | Required args | Notes |
 |------|---------------|-------|
-| `update_person` | `person_id` | Partial fields; empty string clears |
+| `update_person` | `person_id` | Partial fields (incl. `internal_notes`); empty string clears |
 | `update_company` | `company_id` | Partial fields |
 | `update_deal` | `deal_id` | Optional: name, value, currency, probability, expected_close_date, execution_duration_days, company_id, person_ids (replaces contacts), pipeline, stage |
 | `update_deal_stage` | `deal_id`, `stage` | Stage name within deal’s pipeline |
@@ -63,6 +63,7 @@ Tool names exposed by the **Cream MCP server** (see `tools/list` in your MCP cli
 | Tool | Required args | Notes |
 |------|---------------|-------|
 | `add_note` | `record_type`, `record_id`, `body` | Optional: `title` |
+| `add_person_attachment` | `person_id`, `filename`, `content` (Base64) | Optional: `content_type`, `name`; up to 10 MB; feature `:attachments` |
 | `add_comment` | `record_type`, `record_id`, `body` | Optional: `parent_comment_id`; feature `:comments` |
 | `send_deal_email` | `deal_id`, `subject`, `body` | Optional: `to_address`, attachments (Base64); feature `:record_email` |
 
@@ -96,7 +97,7 @@ Tool names exposed by the **Cream MCP server** (see `tools/list` in your MCP cli
 
 See [marketing.md](marketing.md) for workflows. Names:
 
-`list_mqls`, `get_person_marketing`, `list_product_interests`, `list_subscription_types`, `list_campaigns`, `get_campaign`, `list_segments`, `get_segment`, `list_journeys`, `get_journey`, `list_scoring_rules`, `get_attribution`, `list_email_templates`, `list_lead_forms`, `create_product_interest`, `convert_mql_to_sql`, `set_subscription`, `enroll_in_journey`, `send_campaign`, `cancel_campaign_send`.
+`list_mqls`, `get_person_marketing`, `list_product_interests`, `list_subscription_types`, `list_subscriptions`, `list_campaigns`, `get_campaign`, `list_segments`, `get_segment`, `list_journeys`, `get_journey`, `list_scoring_rules`, `get_attribution`, `list_email_templates`, `list_lead_forms`, `create_mql`, `create_product_interest`, `convert_mql_to_sql`, `set_subscription`, `enroll_in_journey`, `send_campaign`, `cancel_campaign_send`.
 
 ## Response shape
 

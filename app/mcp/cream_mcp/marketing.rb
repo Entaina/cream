@@ -4,10 +4,10 @@ module CreamMcp
     def self.tools
       [
         LIST_MQLS, GET_PERSON_MARKETING, LIST_PRODUCT_INTERESTS,
-        LIST_SUBSCRIPTION_TYPES, LIST_CAMPAIGNS, GET_CAMPAIGN,
+        LIST_SUBSCRIPTION_TYPES, LIST_SUBSCRIPTIONS, LIST_CAMPAIGNS, GET_CAMPAIGN,
         LIST_SEGMENTS, GET_SEGMENT, LIST_JOURNEYS, GET_JOURNEY,
         LIST_SCORING_RULES, GET_ATTRIBUTION, LIST_EMAIL_TEMPLATES, LIST_LEAD_FORMS,
-        CREATE_PRODUCT_INTEREST, CONVERT_MQL_TO_SQL, SET_SUBSCRIPTION,
+        CREATE_MQL, CREATE_PRODUCT_INTEREST, CONVERT_MQL_TO_SQL, SET_SUBSCRIPTION,
         ENROLL_IN_JOURNEY, SEND_CAMPAIGN, CANCEL_CAMPAIGN_SEND
       ]
     end
@@ -42,7 +42,8 @@ module CreamMcp
         status: subscription.status,
         opted_in_at: subscription.opted_in_at&.iso8601,
         opted_out_at: subscription.opted_out_at&.iso8601,
-        source: subscription.source
+        source: subscription.source,
+        consent_evidence: subscription.consent_evidence.presence
       }.compact
     end
 
@@ -350,6 +351,50 @@ module CreamMcp
       end
     end
 
+    LIST_SUBSCRIPTIONS = MCP::Tool.define(
+      name: "list_subscriptions",
+      description: "List subscriptions (consent per person and subscription type) in the workspace, with consent evidence. " \
+                   "Optionally filter by subscription_type_id, status or person_id; most recently changed first.",
+      input_schema: {
+        type: "object",
+        properties: {
+          subscription_type_id: {type: "integer", description: "From list_subscription_types"},
+          status: {type: "string", enum: EmailSubscription::STATUSES},
+          person_id: {type: "integer"},
+          limit: {type: "integer", minimum: 1, maximum: CreamMcp::MAX_LIST_LIMIT}
+        }
+      }
+    ) do |server_context:, **args|
+      return CreamMcp.feature_unavailable_response(:marketing_consent) unless CreamFeatures.enabled?(:marketing_consent)
+
+      CreamMcp.with_authorization(server_context, tool: "list_subscriptions") do
+        pundit_ctx = CreamMcp.pundit_context(server_context)
+        ws = pundit_ctx.workspace
+        CreamMcp.authorize!(pundit_ctx, :mql, :index?, policy_class: MqlPolicy)
+
+        status = CreamMcp.arg(args, "status")
+        if status.present? && EmailSubscription::STATUSES.exclude?(status)
+          return CreamMcp.error_response("invalid_argument", I18n.t("marketing.subscriptions.errors.invalid_status"))
+        end
+
+        people = CreamMcp.policy_scope(pundit_ctx, ws.people)
+        scope = ws.email_subscriptions.where(person_id: people.select(:id)).includes(:person, :subscription_type)
+        type_id = CreamMcp.arg(args, "subscription_type_id")
+        person_id = CreamMcp.arg(args, "person_id")
+        scope = scope.where(subscription_type_id: type_id) if type_id.present?
+        scope = scope.where(status: status) if status.present?
+        scope = scope.where(person_id: person_id) if person_id.present?
+
+        subscriptions = scope.order(updated_at: :desc, id: :desc).limit(CreamMcp.list_limit(args))
+        CreamMcp.respond_with(subscriptions: subscriptions.map { |subscription|
+          CreamMcp::Marketing.subscription_json(subscription).merge(
+            id: subscription.id,
+            person: CreamMcp.record_ref_json(subscription.person).merge(email: subscription.person.email).compact
+          )
+        })
+      end
+    end
+
     LIST_CAMPAIGNS = MCP::Tool.define(
       name: "list_campaigns",
       description: "List marketing campaigns in the workspace.",
@@ -579,6 +624,82 @@ module CreamMcp
       end
     end
 
+    CREATE_MQL = MCP::Tool.define(
+      name: "create_mql",
+      description: "Register a person as an MQL: finds or creates the person by email, moves them to the mql " \
+                   "lifecycle stage and subscribes them. Consent is given per subscription type: pass at least one entry in " \
+                   "subscriptions (see list_subscription_types), each with its mandatory evidence (consent_text, consent_source). " \
+                   "Optionally stores internal notes, timeline notes, attachments and a product interest. Provide company_id or company_name.",
+      input_schema: {
+        type: "object",
+        properties: {
+          email: {type: "string"},
+          first_name: {type: "string"}, last_name: {type: "string"},
+          phone: {type: "string"}, job_title: {type: "string"}, location: {type: "string"},
+          company_id: {type: "integer", description: "Existing company id"},
+          company_name: {type: "string", description: "Company to find (case-insensitive) or create when company_id is omitted"},
+          subscriptions: {
+            type: "array", minItems: 1,
+            description: "Subscription types the person consented to; each entry is that consent and carries its evidence",
+            items: {
+              type: "object",
+              properties: {
+                subscription_type_id: {type: "integer", description: "From list_subscription_types"},
+                consent_text: {type: "string", description: "Exact text/statement the person accepted"},
+                consent_source: {type: "string", description: "Where/how consent was obtained: form URL, event, contract reference…"},
+                consent_obtained_at: {type: "string", description: "ISO 8601 date-time the person consented; defaults to now, cannot be in the future"},
+                consent_ip: {type: "string", description: "Optional IP address the person consented from"}
+              },
+              required: %w[subscription_type_id consent_text consent_source]
+            }
+          },
+          internal_notes: {type: "string", description: "Free-text internal notes stored on the person"},
+          notes: {type: "array", items: {type: "object", properties: {title: {type: "string"}, body: {type: "string"}}, required: ["body"]},
+                  description: "Timeline notes"},
+          attachments: {type: "array", items: CreamMcp::EMAIL_ATTACHMENT_SCHEMA},
+          product_id: {type: "integer", description: "Product the person is interested in (requires interest_description)"},
+          interest_description: {type: "string"}
+        },
+        required: %w[email subscriptions]
+      }
+    ) do |server_context:, **args|
+      return CreamMcp.feature_unavailable_response(:mql_pool) unless CreamFeatures.enabled?(:mql_pool)
+      return CreamMcp.feature_unavailable_response(:marketing_consent) unless CreamFeatures.enabled?(:marketing_consent)
+
+      CreamMcp.with_authorization(server_context, tool: "create_mql") do
+        pundit_ctx = CreamMcp.pundit_context(server_context)
+        CreamMcp.authorize!(pundit_ctx, :mql, :create?, policy_class: MqlPolicy)
+
+        result = ::Marketing::MqlCreator.call(
+          workspace: pundit_ctx.workspace,
+          user: pundit_ctx.user,
+          source: "mcp",
+          authorizer: ->(record, query, **options) { CreamMcp.authorize!(pundit_ctx, record, query, **options) },
+          attributes: CreamMcp.picked(args, "email", "first_name", "last_name", "phone", "job_title", "location",
+            "company_id", "company_name", "internal_notes"),
+          subscriptions: CreamMcp.arg(args, "subscriptions"),
+          product_id: CreamMcp.arg(args, "product_id"),
+          interest_description: CreamMcp.arg(args, "interest_description"),
+          notes: CreamMcp.arg(args, "notes"),
+          attachments: Api::DealEmailCreator.parse_attachments(CreamMcp.arg(args, "attachments"))
+        )
+
+        CreamMcp.respond_with(
+          (result.created ? :created : :updated) => CreamMcp::Marketing.mql_json(result.person).merge(
+            internal_notes: result.person.internal_notes,
+            subscriptions: result.subscriptions.map { |subscription| CreamMcp::Marketing.subscription_json(subscription) },
+            product_interest: result.interest && CreamMcp::Marketing.product_interest_json(result.interest),
+            notes: result.notes.map { |note| {id: note.id, title: note.title, body: note.body} },
+            attachments: result.attachments.map { |attachment| Api::RecordAttachmentBuilder.json(attachment) }
+          ).compact
+        )
+      rescue ::Marketing::MqlCreator::Error => e
+        CreamMcp.error_response("invalid_argument", e.message)
+      rescue Api::RecordAttachmentBuilder::InvalidAttachment => e
+        CreamMcp.error_response("invalid_attachment", e.message)
+      end
+    end
+
     CREATE_PRODUCT_INTEREST = MCP::Tool.define(
       name: "create_product_interest",
       description: "Register manual product interest for an MQL before SQL conversion.",
@@ -664,13 +785,18 @@ module CreamMcp
 
     SET_SUBSCRIPTION = MCP::Tool.define(
       name: "set_subscription",
-      description: "Subscribe or unsubscribe a person from a subscription type (consent list).",
+      description: "Subscribe or unsubscribe a person from a subscription type (consent list). Subscribing requires " \
+                   "the consent evidence (consent_text, consent_source); an already active subscription keeps its original evidence.",
       input_schema: {
         type: "object",
         properties: {
           person_id: {type: "integer"},
           subscription_type_id: {type: "integer"},
-          action: {type: "string", enum: %w[subscribe unsubscribe]}
+          action: {type: "string", enum: %w[subscribe unsubscribe]},
+          consent_text: {type: "string", description: "Required to subscribe: exact text/statement the person accepted"},
+          consent_source: {type: "string", description: "Required to subscribe: where/how consent was obtained (form URL, event, contract reference…)"},
+          consent_obtained_at: {type: "string", description: "ISO 8601 date-time the person consented; defaults to now, cannot be in the future"},
+          consent_ip: {type: "string", description: "Optional IP address the person consented from"}
         },
         required: %w[person_id subscription_type_id action]
       }
@@ -686,12 +812,18 @@ module CreamMcp
 
         case CreamMcp.arg(args, "action")
         when "subscribe"
+          evidence = ::Marketing::ConsentEvidence.parse(
+            CreamMcp.picked(args, "consent_text", "consent_source", "consent_obtained_at", "consent_ip")
+          )
+          subscription = EmailSubscription.find_by(person: person, subscription_type: type)
+          # An active subscription keeps the evidence it was originally obtained with.
           subscription = ::Marketing::ConsentService.subscribe!(
             person: person,
             subscription_type: type,
             source: "mcp",
-            legal_basis: "consent"
-          )
+            legal_basis: "consent",
+            metadata: evidence.metadata(user: pundit_ctx.user)
+          ) unless subscription&.subscribed?
         when "unsubscribe"
           ::Marketing::ConsentService.unsubscribe!(
             person: person,
@@ -707,6 +839,8 @@ module CreamMcp
           subscription: subscription && CreamMcp::Marketing.subscription_json(subscription),
           action: CreamMcp.arg(args, "action")
         )
+      rescue ::Marketing::ConsentEvidence::Error => e
+        CreamMcp.error_response("invalid_argument", e.message)
       end
     end
 

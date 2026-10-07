@@ -7,10 +7,19 @@ class EmailSubscription < ApplicationRecord
 
   validates :status, inclusion: {in: STATUSES}
 
+  CONSENT_EVIDENCE_KEYS = %w[
+    marketing_consent_text consent_source consent_obtained_at consent_ip recorded_by recorded_by_user_id
+  ].freeze
+
   scope :subscribed, -> { where(status: "subscribed") }
 
   def subscribed?
     status == "subscribed"
+  end
+
+  # Evidence stored when consent was registered through the API/MCP (empty for other sources).
+  def consent_evidence
+    metadata.slice(*CONSENT_EVIDENCE_KEYS)
   end
 
   def subscribe!(source:, legal_basis: nil, metadata: {})

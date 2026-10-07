@@ -164,6 +164,13 @@ es:
         variant_b_weight: Peso B (%)
         view_attribution: Ver atribución
         winner_badge: Ganadora
+    consent_evidence:
+      errors:
+        consent_ip_invalid: consent_ip no es una dirección IP válida
+        consent_obtained_at_future: consent_obtained_at no puede estar en el futuro
+        consent_obtained_at_invalid: consent_obtained_at no es una fecha válida (usa ISO 8601)
+        consent_source_required: consent_source es obligatorio en cada suscripción (dónde o cómo se obtuvo el consentimiento)
+        consent_text_required: consent_text es obligatorio en cada suscripción (texto exacto aceptado por la persona)
     delivery_modes:
       both: Email + recorrido
       email: Email
@@ -523,6 +530,14 @@ es:
       not_eligible: La persona no es elegible para marketing
       not_pending: El interés no está pendiente
       open_inaccessible: Hay una oportunidad abierta, pero no es accesible
+    mql_creator:
+      errors:
+        company_required: Indica company_id o company_name
+        email_required: El email es obligatorio
+        subscription_duplicated: Cada tipo de suscripción solo puede aparecer una vez
+        subscription_type_not_found: No existe un tipo de suscripción activo con id %{id}
+        subscription_type_required: Cada suscripción necesita subscription_type_id
+        subscriptions_required: Indica al menos una suscripción (subscriptions) con su consentimiento
     mqls:
       index:
         col_forms: Formularios
@@ -722,6 +737,9 @@ es:
       send_email: Enviar email
       set_field: Establecer campo
       wait: Esperar
+    subscriptions:
+      errors:
+        invalid_status: status no es válido (subscribed, unsubscribed o pending)
     subscription_types:
       edit:
         page_title: Editar tipo de suscripción

@@ -162,6 +162,13 @@ en:
         variant_b_weight: Weight B (%)
         view_attribution: View attribution
         winner_badge: Winner
+    consent_evidence:
+      errors:
+        consent_ip_invalid: consent_ip is not a valid IP address
+        consent_obtained_at_future: consent_obtained_at cannot be in the future
+        consent_obtained_at_invalid: consent_obtained_at is not a valid date (use ISO 8601)
+        consent_source_required: consent_source is required on each subscription (where or how consent was obtained)
+        consent_text_required: consent_text is required on each subscription (exact text the person accepted)
     delivery_modes:
       both: Email + journey
       email: Email
@@ -513,6 +520,14 @@ en:
       not_eligible: Person is not marketing eligible
       not_pending: Interest is not pending
       open_inaccessible: An open opportunity exists but is not accessible
+    mql_creator:
+      errors:
+        company_required: Provide company_id or company_name
+        email_required: Email is required
+        subscription_duplicated: Each subscription type can only appear once
+        subscription_type_not_found: There is no active subscription type with id %{id}
+        subscription_type_required: Each subscription needs a subscription_type_id
+        subscriptions_required: Provide at least one subscription (subscriptions) with its consent
     mqls:
       index:
         col_forms: Forms
@@ -709,6 +724,9 @@ en:
       send_email: Send email
       set_field: Set field
       wait: Wait
+    subscriptions:
+      errors:
+        invalid_status: status is not valid (subscribed, unsubscribed or pending)
     subscription_types:
       edit:
         page_title: Edit subscription type

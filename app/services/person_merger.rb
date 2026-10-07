@@ -22,6 +22,7 @@ class PersonMerger
 
     ActiveRecord::Base.transaction do
       merge_scalar_fields!
+      merge_internal_notes!
       merge_person_emails!
       reassign_polymorphic_records!
       merge_deal_contacts!
@@ -70,6 +71,15 @@ class PersonMerger
 
     dates = ([primary.first_contact_on] + secondaries.map(&:first_contact_on)).compact
     primary.first_contact_on = dates.min if dates.any?
+  end
+
+  # Free-text notes are never discarded: the secondaries' notes are appended to the primary's.
+  def merge_internal_notes!
+    secondary_notes = secondaries.map { |secondary| secondary.internal_notes.to_s.strip }.reject(&:blank?)
+    return if secondary_notes.empty?
+
+    combined = ([primary.internal_notes.to_s.strip] + secondary_notes).reject(&:blank?).uniq
+    primary.internal_notes = combined.join("\n\n")
   end
 
   def merge_person_emails!

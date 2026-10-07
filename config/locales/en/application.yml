@@ -36,6 +36,7 @@ en:
         description: About
         email: Email
         first_name: First name
+        internal_notes: Notes
         job_title: Job title
         last_name: Last name
         linkedin_url: LinkedIn URL

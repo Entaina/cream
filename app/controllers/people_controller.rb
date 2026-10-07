@@ -185,7 +185,7 @@ class PeopleController < ApplicationController
   private
 
   def set_edit_section
-    @edit_section = params[:section].presence_in(%w[contact profile management custom])
+    @edit_section = params[:section].presence_in(%w[contact profile internal_notes management custom])
   end
 
   def set_person
@@ -226,7 +226,7 @@ class PeopleController < ApplicationController
 
   def person_params
     params.require(:person).permit(:first_name, :last_name, :email, :phone, :job_title, :location,
-      :linkedin_url, :twitter_url, :description, :company_id, :owner_id, :source, :first_contact_on, :brought_by_id,
+      :linkedin_url, :twitter_url, :description, :internal_notes, :company_id, :owner_id, :source, :first_contact_on, :brought_by_id,
       custom_fields: {},
       person_emails_attributes: [:id, :address, :primary, :_destroy])
   end

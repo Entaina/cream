@@ -75,6 +75,17 @@ module Marketing
       }.compact
     end
 
+    def self.mql_creation_json(result)
+      mql_json(result.person).merge(
+        created: result.created,
+        internal_notes: result.person.internal_notes,
+        subscriptions: result.subscriptions.map { |subscription| subscription_json(subscription) },
+        product_interest: result.interest && product_interest_json(result.interest),
+        notes: result.notes.map { |note| {id: note.id, title: note.title, body: note.body} },
+        attachments: result.attachments.map { |attachment| Api::RecordAttachmentBuilder.json(attachment) }
+      ).compact
+    end
+
     def self.person_marketing_json(person, workspace)
       subscriptions = person.email_subscriptions.includes(:subscription_type).map { |s| subscription_json(s) }
       interests = person.product_interests.includes(:product).ordered.map { |i| product_interest_json(i) }
@@ -141,8 +152,17 @@ module Marketing
         status: subscription.status,
         opted_in_at: subscription.opted_in_at&.iso8601,
         opted_out_at: subscription.opted_out_at&.iso8601,
-        source: subscription.source
+        source: subscription.source,
+        consent_evidence: subscription.consent_evidence.presence
       }.compact
+    end
+
+    def self.subscription_listing_json(subscription)
+      person = subscription.person
+      subscription_json(subscription).merge(
+        id: subscription.id,
+        person: {id: person.id, name: person.display_name, email: person.email, url: record_url(person)}.compact
+      )
     end
 
     def self.campaign_json(campaign, detail: false)

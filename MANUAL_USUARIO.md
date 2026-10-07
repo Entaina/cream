@@ -265,7 +265,7 @@ Desde la ficha de una persona, **Merge** abre el mismo asistente:
 3. Si no aparece el contacto que buscas, usa el buscador **Search for other contacts** para encontrar y añadir **cualquier otro contacto del workspace**.
 4. Confirma la acción.
 
-Al fusionar, las notas, tareas, deals, emails y actividad del timeline de los contactos seleccionados pasan al contacto conservado. Las direcciones de email de los duplicados se unen en el contacto resultante (sin repetir la misma dirección). El contacto resultante **permanece en la empresa del contacto que conservas**. Los campos del contacto principal tienen prioridad; si faltan datos (teléfono, cargo, etc.), se rellenan con los del duplicado. La acción es **irreversible** y queda registrada en el timeline del contacto resultante.
+Al fusionar, las notas, tareas, deals, emails y actividad del timeline de los contactos seleccionados pasan al contacto conservado. Las direcciones de email de los duplicados se unen en el contacto resultante (sin repetir la misma dirección). El contacto resultante **permanece en la empresa del contacto que conservas**. Los campos del contacto principal tienen prioridad; si faltan datos (teléfono, cargo, etc.), se rellenan con los del duplicado. Las **notas** internas del contacto no se pierden: las de los duplicados se añaden a continuación de las del contacto conservado (sin repetir textos idénticos). La acción es **irreversible** y queda registrada en el timeline del contacto resultante.
 
 ### Empresas
 
@@ -512,7 +512,7 @@ La cabecera muestra el nombre, la empresa y los datos principales de contacto. U
 
 - **Actividad** se abre por defecto. En la columna principal verás, en este orden: **Oportunidades** (las que puedes ver, con etapa, fecha y productos; cinco visibles y el resto en **Mostrar N oportunidades más**; si hay más de cinco, **Ver oportunidades (N)** abre la pestaña), **Próximas tareas** (primero vencidas y después las próximas; despliega las restantes o completadas cuando lo necesites) e **Histórico** (notas, correos, comentarios, cambios del contacto y **cambios de etapa de sus oportunidades**). Un cambio de etapa se lee como «Ana movió la oportunidad Nombre de Propuesta a Negociación»; si la etapa es de ganancia, «Ana ganó la oportunidad Nombre». El nombre de la oportunidad es un enlace. Esos cambios aparecen en los filtros **Todo** y **Cambios**. Usa **Más antiguas / Más recientes** para paginar. En la columna de contexto, **Campañas enviadas** lista las últimas campañas de marketing recibidas por el contacto; **Recorridos** muestra las inscripciones (activas, en espera, completadas o canceladas) con el paso actual. **Ver más** abre el historial completo (ver [§29](#29-marketing)).
 - **Oportunidades** contiene la lista completa y el filtro **Todos los productos** cuando hay más de un producto, además de intereses por producto y formularios enviados cuando están habilitados. Despliega **Registrar interés** para añadir un interés.
-- **Information** agrupa contacto, perfil profesional, responsable, relaciones, campos personalizados, preferencias de correo y, si hay envíos, **Formularios enviados** (enlace **Ver consentimiento** a la política y la frase aceptadas). Cada bloque editable tiene su enlace **Edit**. Despliega **Add relationship** para vincular a otra persona.
+- **Information** agrupa contacto, perfil profesional, **Notas** (texto libre interno sobre la persona; **Edit** abre solo ese bloque), responsable, relaciones, campos personalizados, preferencias de correo y, si hay envíos, **Formularios enviados** (enlace **Ver consentimiento** a la política y la frase aceptadas). Cada bloque editable tiene su enlace **Edit**. Despliega **Add relationship** para vincular a otra persona.
 - **Files**, cuando está habilitado, contiene el formulario de subida y los archivos adjuntos.
 
 Cerrar un editor o cambiar de sección conserva el borrador mientras sigas en la página. Si intentas salir con borradores sin guardar, aparece un aviso. Los borradores no se conservan al recargar. Editar un bloque solo envía sus campos; **Save changes** vuelve a Information y **Cancel** deja el contacto sin cambios.
@@ -992,6 +992,8 @@ Algunos clientes pueden conectarse **solo con la URL** (`https://tu-dominio/mcp`
 - El token da el mismo acceso que tu usuario en ese workspace. Trátalo como una contraseña.
 - Si cambias de workspace, crea un token nuevo con ese workspace activo.
 - Las herramientas de IA del MCP (`summarize_record`, `suggest_next_steps`, `draft_email`, `natural_language_search`, `enrich_record`) requieren que el asistente IA esté habilitado; ver [Asistente IA](#24-asistente-ia).
+- Las **notas** de una persona (campo `internal_notes`) se leen y se editan también desde la API REST v1 (`/api/v1/people`) y el MCP (`create_person`, `update_person`, `get_record`). Para subir un archivo a una persona hay un endpoint (`POST /api/v1/people/:id/attachments`, Base64 o multipart) y la herramienta MCP `add_person_attachment`; requieren la funcionalidad de adjuntos.
+- Para **dar de alta un MQL** directamente existen `POST /api/v1/marketing/mqls` y la herramienta MCP `create_mql` (ver [Pool MQL](#pool-mql)).
 
 ---
 
@@ -1351,6 +1353,8 @@ Contactos con **permiso de marketing vigente** (al menos una suscripción activa
 1. Abre **MQLs**. La tabla muestra persona, lifecycle (scoring), puntuación, formularios de origen (con **Ver consentimiento**), intereses pendientes y oportunidades visibles.
 2. Filtra por búsqueda, **tipo de suscripción**, **oportunidad abierta** (cualquiera / sí / no), **producto** (de la oportunidad), **interés en producto** o **formulario de origen**.
 3. Desde una fila con interés pendiente, pulsa **Convertir a SQL** para crear o vincular una oportunidad con ese producto (pipeline, tarea y responsable).
+
+**Alta directa de un MQL (API y MCP):** una integración o un agente puede registrar un MQL sin pasar por un formulario con `POST /api/v1/marketing/mqls` o la herramienta MCP `create_mql`. Si el email ya existe se actualiza la persona; si no, se crea (hace falta empresa: `company_id` o `company_name`). La persona pasa a lifecycle **mql** (sin degradar a quien ya estaba más avanzado) y se suscribe a los tipos indicados. El consentimiento se da **por tipo de suscripción**: hay que enviar al menos una entrada en `subscriptions`, y cada una (que equivale al consentimiento de ese tipo) lleva su **evidencia**: `subscription_type_id`, `consent_text` (texto exacto aceptado) y `consent_source` (dónde o cómo se obtuvo: URL del formulario, evento, contrato…), y opcionalmente `consent_obtained_at` y `consent_ip`. La evidencia se guarda en cada suscripción junto con el usuario que la registró y se ve en la ficha de la persona (**Information** → **Preferencias de correo** → **Ver consentimiento**). Si la persona ya tenía una suscripción activa, se conserva la evidencia original. En la misma llamada se pueden incluir las **notas** internas, notas del timeline, archivos adjuntos y un interés por producto. Todo se guarda en una única transacción.
 
 **En la ficha de una persona:**
 

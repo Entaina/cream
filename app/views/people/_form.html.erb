@@ -1,6 +1,7 @@
 <% sections = [
   ["contact", t("people.form.contact.title"), t("people.form.contact.description")],
   ["profile", t("people.form.profile.title"), t("people.form.profile.description")],
+  ["internal_notes", t("people.form.internal_notes.title"), t("people.form.internal_notes.description")],
   ["management", t("people.form.management.title"), t("people.form.management.description")]
 ] %>
 <% sections << ["custom", t("people.form.custom.title"), t("people.form.custom.description")] if person.custom_field_definitions.any? %>
