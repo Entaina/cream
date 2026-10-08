@@ -149,12 +149,12 @@ RSpec.describe "Client portal", type: :request do
       expect(response.body).to include("Oferta")
     end
 
-    it "sends no-store, no-referrer and noindex headers" do
+    it "sends no-store, same-origin and noindex headers" do
       sign_in_via_portal!
       get client_portal_offer_path(workspace_slug: workspace.slug, id: offer.id)
 
       expect(response.headers["Cache-Control"]).to include("no-store")
-      expect(response.headers["Referrer-Policy"]).to eq("no-referrer")
+      expect(response.headers["Referrer-Policy"]).to eq("same-origin")
       expect(response.headers["X-Robots-Tag"]).to include("noindex")
     end
 

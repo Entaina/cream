@@ -81,6 +81,26 @@ RSpec.describe "Public offer shares", type: :request do
       post public_offer_share_access_path(token: link.token, grant_token: raw)
     end
 
+    it "accepts the confirm POST from the same origin and rejects a null origin" do
+      raw = grant_token
+      previous = ActionController::Base.allow_forgery_protection
+      ActionController::Base.allow_forgery_protection = true
+
+      get public_offer_share_access_path(token: share_link.token, grant_token: raw)
+      authenticity_token = response.body[/name="authenticity_token" value="([^"]+)"/, 1]
+      path = public_offer_share_access_path(token: share_link.token, grant_token: raw)
+
+      post path, params: { authenticity_token: authenticity_token }, headers: { "HTTP_ORIGIN" => "null" }
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(OfferAccessGrant.last.used_at).to be_nil
+
+      post path, params: { authenticity_token: authenticity_token }, headers: { "HTTP_ORIGIN" => "http://www.example.com" }
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("Compartida")
+    ensure
+      ActionController::Base.allow_forgery_protection = previous
+    end
+
     it "does not spend the grant or create anything on GET" do
       raw = grant_token
 

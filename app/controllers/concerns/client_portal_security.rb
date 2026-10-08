@@ -13,11 +13,12 @@ module ClientPortalSecurity
     head :not_found unless CreamFeatures.enabled?(:client_portal)
   end
 
-  # URLs carry secret tokens, and offers may load third-party assets: never leak them via Referer,
-  # never cache proposal content, never index portal pages.
+  # Tokens stay out of cross-origin Referer, and pages are not cached or indexed.
+  # same-origin, not no-referrer: no-referrer makes the browser send Origin: null,
+  # and Rails then rejects the confirm POST with 422.
   def apply_client_portal_headers
     response.cache_control.replace(no_store: true)
-    response.headers["Referrer-Policy"] = "no-referrer"
+    response.headers["Referrer-Policy"] = "same-origin"
     response.headers["X-Robots-Tag"] = "noindex, nofollow"
   end
 end
