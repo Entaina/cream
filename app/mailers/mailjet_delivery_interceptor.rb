@@ -1,5 +1,7 @@
 # Routes Action Mailer through the workspace Mailjet account when transactional
-# sending is enabled. Campaigns still use the Send API (`MailjetAdapter`).
+# sending is enabled, otherwise through the workspace SMTP connection when one
+# exists. Campaigns still use the Send API (`MailjetAdapter`) when Mailjet is
+# connected.
 class MailjetDeliveryInterceptor
   HEADER = "X-Cream-Workspace-Id"
   SENDER_HEADER = "X-Cream-Sender-Email"
@@ -13,10 +15,17 @@ class MailjetDeliveryInterceptor
     return if workspace_id.blank?
 
     connection = MailjetConnection.find_by(workspace_id: workspace_id)
-    return unless connection&.transactional?
+    if connection&.transactional?
+      apply_from!(mail, connection, sender_email: sender_email)
+      mail.delivery_method(:smtp, smtp_settings(connection))
+      return
+    end
 
-    apply_from!(mail, connection, sender_email: sender_email)
-    mail.delivery_method(:smtp, smtp_settings(connection))
+    smtp = SmtpConnection.find_by(workspace_id: workspace_id)
+    return unless smtp&.connected?
+
+    apply_from!(mail, smtp, sender_email: sender_email)
+    mail.delivery_method(:smtp, smtp.delivery_settings)
   end
 
   def self.skip_delivery_override?

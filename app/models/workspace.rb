@@ -47,6 +47,7 @@ class Workspace < ApplicationRecord
   has_many :stage_conditions, dependent: :destroy
   has_many :stripe_connections, dependent: :destroy
   has_one :mailjet_connection, dependent: :destroy
+  has_one :smtp_connection, dependent: :destroy
   has_one :beehiiv_connection, dependent: :destroy
   has_many :stripe_payments, dependent: :destroy
   has_many :lead_forms, dependent: :destroy

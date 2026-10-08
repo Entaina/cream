@@ -421,11 +421,44 @@ en:
         title: Mailjet
         transactional: Use Mailjet for transactional email
         transactional_hint: Invitations, alerts, bookings, reports and record emails.
-          When off, those use SMTP/Mailbin.
+          When on, this takes priority over the workspace SMTP. When off, those use
+          the workspace SMTP or the server SMTP.
         webhook_hint: When you save Mailjet, Cream registers sent, open, click, bounce,
           spam, unsub and blocked (Version 2). Copy the URL only if you need to review
           it in Mailjet.
         webhook_url: Webhook URL
+      smtp:
+        address: Server
+        address_placeholder: smtp.yourdomain.com
+        authentication: Authentication
+        connect: Connect SMTP
+        connected: Connected to %{address}. From %{from}.
+        disconnect: Disconnect
+        disconnect_confirm: Disconnect SMTP from this workspace?
+        domain: HELO domain
+        domain_placeholder: yourdomain.com
+        domain_validated: Domain validated (send on behalf of each user)
+        domain_validated_hint: Enable only if the sender domain is authorized on this
+          server (SPF/DKIM). Otherwise emails use the workspace sender and Reply-To
+          to the owner.
+        from_email: From email
+        from_email_hint: Address this server accepts as From.
+        from_email_placeholder: noreply@yourdomain.com
+        from_name: From name
+        intro: Mail for this workspace (invitations, alerts, bookings, reports and
+          record emails) when Mailjet transactional sending is off. Without SMTP
+          here, the server SMTP is used. A connected Gmail account with sending
+          enabled still takes priority for that user's record emails.
+        password: Password
+        password_keep: Leave blank to keep the current password
+        password_placeholder: SMTP password
+        password_set: Password <strong class="font-mono">%{password}</strong>.
+        port: Port
+        save: Save SMTP
+        starttls: STARTTLS
+        title: SMTP
+        user_name: Username
+        user_name_placeholder: username or API key
       okm:
         ai_required: Requires <code>CREAM_AI_API_KEY</code> on the server.
         drive_id: Google Shared Drive ID

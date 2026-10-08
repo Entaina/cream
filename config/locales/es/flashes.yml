@@ -139,6 +139,10 @@ es:
     mail_merges:
       no_recipients: Ningún destinatario coincide con el origen seleccionado.
       queued: Mail merge encolado para %{count} destinatarios.
+    smtp:
+      connected: SMTP conectado.
+      disconnected: SMTP desconectado.
+      updated: Ajustes de SMTP actualizados.
     mailjet:
       connected: Mailjet conectado.
       disconnected: Mailjet desconectado.

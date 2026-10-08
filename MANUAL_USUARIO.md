@@ -4,7 +4,7 @@
 
 Cream es un CRM por **workspaces** para gestionar **personas**, **empresas** y **deals** (oportunidades), con notas, tareas, listas y un historial de actividad compartido en el equipo.
 
-> **Última revisión:** 2026-10-08 (superadmin de plataforma y dominios de registro por workspace)
+> **Última revisión:** 2026-10-08 (SMTP por workspace)
 > Este documento describe la funcionalidad **visible para el usuario**. Las funcionalidades desactivadas aparecen al final en «Próximamente».
 
 ---
@@ -153,7 +153,7 @@ Algunas entradas son **opcionales por workspace** y están **ocultas por defecto
 | **Stripe** | Pagos importados y conciliación |
 | **Webhooks** *(opcional)* | Integraciones salientes HTTP |
 | **Informes** *(opcional)* | Informes y exportación CSV |
-| **Ajustes** | Ajustes del workspace (OKM, Mailjet, permisos…) |
+| **Ajustes** | Ajustes del workspace (OKM, SMTP, Mailjet, permisos…) |
 
 **Mi perfil** (grupo desplegable; cada usuario):
 
@@ -904,6 +904,19 @@ Conecta la base de conocimiento corporativa (Google Shared Drive) para el chat c
 
 Cada workspace puede usar un drive y una service account distintos.
 
+### SMTP
+
+Cada workspace puede enviar su correo con un servidor SMTP propio (solo admins): invitaciones, alertas, reservas, informes y emails de ficha.
+
+1. En **Settings**, sección **SMTP**, indica el servidor, el puerto, el usuario, la contraseña y el **email remitente** que ese servidor acepta.
+2. Opcional: dominio HELO, autenticación (`plain`, `login` o `cram_md5`) y STARTTLS.
+3. Si el dominio está autorizado en ese servidor (SPF/DKIM), activa **Dominio validado** para que los emails de ficha salgan con el From de cada usuario. Si no, salen con el remitente del workspace y Reply-To al responsable.
+4. Pulsa **Conectar SMTP**. La contraseña no se vuelve a mostrar; déjala en blanco para conservarla.
+
+Sin SMTP aquí, esos envíos usan el SMTP del servidor. Si **Usar Mailjet para el correo transaccional** está activado, Mailjet tiene prioridad. Un Gmail conectado con envío activado sigue teniendo prioridad en los emails de ficha de ese usuario.
+
+- **Desconectar** elimina las credenciales de este workspace.
+
 ### Mailjet
 
 Conecta la cuenta de Mailjet **de este workspace** para campañas y recorridos (solo admins):
@@ -914,7 +927,7 @@ Conecta la cuenta de Mailjet **de este workspace** para campañas y recorridos (
 4. Pulsa **Conectar Mailjet**. Las claves no se vuelven a mostrar; deja los campos en blanco para conservarlas.
 5. Al guardar, Cream registra automáticamente en Mailjet los eventos sent, open, click, bounce, spam, unsub y blocked (Version 2). La **URL del webhook** que aparece abajo es de referencia por si necesitas revisarla en Mailjet.
 
-Cada workspace tiene su propia URL (incluye un token). Sin Mailjet conectado, las campañas usan SMTP/Mailbin. El correo transaccional usa Mailjet solo con la casilla activada; si no, SMTP/Mailbin.
+Cada workspace tiene su propia URL (incluye un token). Sin Mailjet conectado, las campañas usan el SMTP del workspace o el SMTP/Mailbin del servidor. El correo transaccional usa Mailjet solo con la casilla activada; si no, el SMTP del workspace o el del servidor.
 
 - **Desconectar** elimina las credenciales de este workspace.
 
@@ -1429,7 +1442,7 @@ Las **Plantillas** del menú lateral siguen disponibles como bases reutilizables
 - **Ver más** abre el historial completo con el detalle de eventos de entrega (apertura, clic, rebote…).
 - El listado usa el mismo registro de envíos que la campaña; no incluye correos uno a uno ni pasos de recorrido sin campaña.
 
-**Requisitos:** Mailjet conectado en **Settings → Mailjet** (Cream registra el Event Tracking al guardar; ver [§21](#21-ajustes-del-workspace)). Sin Mailjet, los envíos usan SMTP/Mailbin del servidor.
+**Requisitos:** Mailjet conectado en **Settings → Mailjet** (Cream registra el Event Tracking al guardar; ver [§21](#21-ajustes-del-workspace)). Sin Mailjet, los envíos usan el SMTP del workspace si está configurado y, si no, el SMTP/Mailbin del servidor.
 
 ### Segmentos
 

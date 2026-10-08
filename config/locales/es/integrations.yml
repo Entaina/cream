@@ -430,11 +430,44 @@ es:
         title: Mailjet
         transactional: Usar Mailjet para el correo transaccional
         transactional_hint: Invitaciones, alertas, reservas, informes y emails de
-          ficha. Si está desactivado, esos envíos usan SMTP/Mailbin.
+          ficha. Si está activado, tiene prioridad sobre el SMTP del workspace.
+          Si no, esos envíos usan el SMTP del workspace o el del servidor.
         webhook_hint: Al guardar Mailjet, Cream registra automáticamente sent, open,
           click, bounce, spam, unsub y blocked (Version 2). Copia la URL solo si necesitas
           revisarla en Mailjet.
         webhook_url: URL del webhook
+      smtp:
+        address: Servidor
+        address_placeholder: smtp.tudominio.com
+        authentication: Autenticación
+        connect: Conectar SMTP
+        connected: Conectado a %{address}. Remitente %{from}.
+        disconnect: Desconectar
+        disconnect_confirm: "¿Desconectar el SMTP de este workspace?"
+        domain: Dominio HELO
+        domain_placeholder: tudominio.com
+        domain_validated: Dominio validado (enviar en nombre de cada usuario)
+        domain_validated_hint: Actívalo solo si el dominio del remitente está autorizado
+          en este servidor (SPF/DKIM). Si no, los correos salen con el remitente del
+          workspace y Reply-To al responsable.
+        from_email: Email remitente
+        from_email_hint: Dirección que acepta este servidor como From.
+        from_email_placeholder: noreply@tudominio.com
+        from_name: Nombre del remitente
+        intro: Correo de este workspace (invitaciones, alertas, reservas, informes
+          y emails de ficha) cuando Mailjet transaccional no está activado. Si no
+          configuras SMTP, se usa el del servidor. Un Gmail conectado con envío
+          activado sigue teniendo prioridad en los emails de ficha de ese usuario.
+        password: Contraseña
+        password_keep: Deja en blanco para conservar la contraseña actual
+        password_placeholder: Contraseña SMTP
+        password_set: Contraseña <strong class="font-mono">%{password}</strong>.
+        port: Puerto
+        save: Guardar SMTP
+        starttls: STARTTLS
+        title: SMTP
+        user_name: Usuario
+        user_name_placeholder: usuario o API key
       okm:
         ai_required: Requiere configurar <code>CREAM_AI_API_KEY</code> en el servidor.
         drive_id: Google Shared Drive ID

@@ -185,6 +185,7 @@ Rails.application.routes.draw do
     post :sync, on: :member
   end
   resource :mailjet_connection, only: %i[create update destroy]
+  resource :smtp_connection, only: %i[create update destroy]
   resource :beehiiv_connection, only: %i[create update destroy] do
     post :sync, on: :member
   end

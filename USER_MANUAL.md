@@ -4,7 +4,7 @@
 
 Cream is a **workspace**-based CRM for managing **people**, **companies** and **deals** (opportunities), with notes, tasks, lists and an activity history shared across the team.
 
-> **Last revision:** 2026-10-08 (platform superadmin and workspace signup domains)
+> **Last revision:** 2026-10-08 (per-workspace SMTP)
 > This document describes the functionality **visible to the user**. Disabled features are listed at the end under "Coming soon".
 
 ---
@@ -153,7 +153,7 @@ Some entries are **optional per workspace** and are **hidden by default**. An ad
 | **Stripe** | Imported payments and reconciliation |
 | **Webhooks** *(optional)* | Outgoing HTTP integrations |
 | **Reports** *(optional)* | Reports and CSV export |
-| **Settings** | Workspace settings (OKM, Mailjet, permissions…) |
+| **Settings** | Workspace settings (OKM, SMTP, Mailjet, permissions…) |
 
 **Mi perfil** (My profile — each user):
 
@@ -904,6 +904,19 @@ Connect the corporate knowledge base (Google Shared Drive) for the contextual ch
 
 Each workspace can use a different drive and service account.
 
+### SMTP
+
+Each workspace can send its mail through its own SMTP server (admins only): invitations, alerts, bookings, reports and record emails.
+
+1. In **Settings**, **SMTP** section, enter the server, port, username, password and the **from email** that server accepts.
+2. Optional: HELO domain, authentication (`plain`, `login` or `cram_md5`) and STARTTLS.
+3. If the domain is authorized on that server (SPF/DKIM), enable **Domain validated** so record emails use each user's From. Otherwise they use the workspace sender and Reply-To to the owner.
+4. Click **Connect SMTP**. The password is not shown again; leave it blank to keep it.
+
+Without SMTP here, those messages use the server SMTP. If **Use Mailjet for transactional email** is on, Mailjet takes priority. A connected Gmail account with sending enabled still takes priority for that user's record emails.
+
+- **Disconnect** removes this workspace's credentials.
+
 ### Mailjet
 
 Connect **this workspace's** Mailjet account for campaigns and journeys (admins only):
@@ -914,7 +927,7 @@ Connect **this workspace's** Mailjet account for campaigns and journeys (admins 
 4. Click **Conectar Mailjet**. Keys are not shown again; leave the fields blank to keep the stored values.
 5. When you save, Cream automatically registers sent, open, click, bounce, spam, unsub and blocked events in Mailjet (Version 2). The **webhook URL** shown below is for reference if you need to verify it in Mailjet.
 
-Each workspace has its own URL (it includes a token). Without Mailjet connected, campaigns use SMTP/Mailbin. Transactional email uses Mailjet only when the checkbox is on; otherwise SMTP/Mailbin.
+Each workspace has its own URL (it includes a token). Without Mailjet connected, campaigns use the workspace SMTP or the server SMTP/Mailbin. Transactional email uses Mailjet only when the checkbox is on; otherwise the workspace SMTP or the server SMTP.
 
 - **Desconectar** removes this workspace's credentials.
 
@@ -1429,7 +1442,7 @@ Subscriptions created from a form store the same **privacy policy version** as t
 - **Ver más** (View more) opens the full history with delivery events (open, click, bounce…).
 - The list uses the same send log as the campaign; it does not include one-to-one emails or journey steps without a campaign.
 
-**Requirements:** Mailjet connected under **Settings → Mailjet** (Cream registers Event Tracking when you save; see [§21](#21-workspace-settings)). Without Mailjet, sends use server SMTP/Mailbin.
+**Requirements:** Mailjet connected under **Settings → Mailjet** (Cream registers Event Tracking when you save; see [§21](#21-workspace-settings)). Without Mailjet, sends use the workspace SMTP when configured, otherwise the server SMTP/Mailbin.
 
 ### Segments
 

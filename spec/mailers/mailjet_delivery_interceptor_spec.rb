@@ -151,6 +151,47 @@ RSpec.describe MailjetDeliveryInterceptor do
       expect(mail.reply_to).to eq(["juanpablo@other.com"])
     end
 
+    it "uses the workspace SMTP connection when Mailjet transactional sending is off" do
+      workspace.create_smtp_connection!(
+        user: user,
+        address: "smtp.workspace.test",
+        port: 2525,
+        user_name: "smtp-user",
+        password: "smtp-secret",
+        from_email: "hola@workspace.test",
+        from_name: "Workspace"
+      )
+      mail = mail_for(invitation)
+      allow(ActionMailer::Base).to receive(:delivery_method).and_return(:smtp)
+
+      described_class.delivering_email(mail)
+
+      expect(mail.delivery_method).to be_a(Mail::SMTP)
+      expect(mail.delivery_method.settings[:address]).to eq("smtp.workspace.test")
+      expect(mail.delivery_method.settings[:port]).to eq(2525)
+      expect(mail.delivery_method.settings[:user_name]).to eq("smtp-user")
+      expect(mail.delivery_method.settings[:password]).to eq("smtp-secret")
+      expect(mail.from).to eq(["hola@workspace.test"])
+    end
+
+    it "keeps Mailjet transactional delivery when a workspace SMTP connection also exists" do
+      create_connection(transactional_enabled: true, from_name: "Cream")
+      workspace.create_smtp_connection!(
+        user: user,
+        address: "smtp.workspace.test",
+        from_email: "hola@workspace.test",
+        user_name: "smtp-user",
+        password: "smtp-secret"
+      )
+      mail = mail_for(invitation)
+      allow(ActionMailer::Base).to receive(:delivery_method).and_return(:smtp)
+
+      described_class.delivering_email(mail)
+
+      expect(mail.delivery_method.settings[:address]).to eq("in-v3.mailjet.com")
+      expect(mail.from).to eq(["noreply@example.com"])
+    end
+
     it "strips the sender header even when Mailjet transactional sending is disabled" do
       responsible = users(:one)
       responsible.update!(email_address: "sales@example.com")

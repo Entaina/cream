@@ -132,6 +132,10 @@ en:
     mail_merges:
       no_recipients: No recipients matched the selected source.
       queued: Mail merge queued for %{count} recipients.
+    smtp:
+      connected: SMTP connected.
+      disconnected: SMTP disconnected.
+      updated: SMTP settings updated.
     mailjet:
       connected: Mailjet connected.
       disconnected: Mailjet disconnected.

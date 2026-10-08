@@ -7,6 +7,7 @@ module Settings
     def show
       authorize [:settings, :workspace]
       load_mailjet_connection
+      load_smtp_connection
       load_beehiiv_connection
       load_public_layout_templates
     end
@@ -51,6 +52,11 @@ module Settings
 
       @mailjet_connection = current_workspace.mailjet_connection ||
         current_workspace.build_mailjet_connection(user: current_user)
+    end
+
+    def load_smtp_connection
+      @smtp_connection = current_workspace.smtp_connection ||
+        current_workspace.build_smtp_connection(user: current_user)
     end
 
     def load_public_layout_templates
