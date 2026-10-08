@@ -1,8 +1,10 @@
-<%# locals: (workspace:) %>
+<%# locals: (workspace:, show_title: true) %>
 <% return unless CreamFeatures.enabled?(:client_portal) %>
 
 <div class="space-y-2" data-controller="clipboard">
-  <p class="text-sm font-medium text-ink"><%= t("integrations.workspace.client_portal.title") %></p>
+  <% if local_assigns.fetch(:show_title, true) %>
+    <p class="text-sm font-medium text-ink"><%= t("integrations.workspace.client_portal.title") %></p>
+  <% end %>
   <p class="text-sm text-ink-faint"><%= t("integrations.workspace.client_portal.intro") %></p>
   <div class="flex flex-wrap items-center gap-2">
     <input type="text" readonly class="input flex-1 min-w-0 font-mono text-xs"

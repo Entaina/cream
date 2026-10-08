@@ -268,6 +268,44 @@
     @apply rounded-xl border border-line bg-canvas-raised;
   }
 
+  .settings-panels {
+    @apply mt-2 grid grid-cols-1 items-start gap-2;
+  }
+
+  .settings-panel {
+    @apply min-w-0 overflow-hidden rounded-xl border border-line bg-canvas-raised;
+  }
+
+  .settings-panel-summary {
+    @apply flex cursor-pointer list-none items-center gap-3 px-4 py-3.5 select-none transition-colors hover:bg-canvas-soft/80 [&::-webkit-details-marker]:hidden;
+  }
+
+  .settings-panel[open] > .settings-panel-summary {
+    @apply border-b border-line bg-canvas-soft/50;
+  }
+
+  .settings-panel-title {
+    @apply min-w-0 flex-1 truncate font-display text-base font-semibold text-ink;
+  }
+
+  .settings-panel-status {
+    @apply shrink-0 rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:bg-green-950 dark:text-green-300;
+  }
+
+  .settings-panel-body {
+    @apply space-y-3 px-4 py-4;
+  }
+
+  .settings-panel-summary:focus-visible {
+    @apply outline-2 outline-offset-2 outline-accent;
+  }
+
+  @container (min-width: 56rem) {
+    .settings-panels {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
   .modal-dialog {
     @apply fixed top-1/2 left-1/2 z-50 w-[calc(100%-2rem)] max-h-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 overflow-y-auto p-0;
   }

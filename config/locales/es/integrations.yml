@@ -485,6 +485,9 @@ es:
           de lectura al drive…
         title: OKM
       page_title: Ajustes
+      panel:
+        active: Activo
+        connected: Conectado
       client_portal_layout:
         hint: Edita la plantilla en Formularios → Plantillas. Debe incluir {{ content
           }} donde van las páginas del portal. Puede ser la misma que la de reservas u otra.

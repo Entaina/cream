@@ -476,6 +476,9 @@ en:
           to the drive…
         title: OKM
       page_title: Settings
+      panel:
+        active: Active
+        connected: Connected
       client_portal_layout:
         hint: Edit the template under Forms → Templates. It must include {{ content
           }} where portal pages go. It can be the same as the booking one or a different one.

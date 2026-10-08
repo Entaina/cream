@@ -2,13 +2,13 @@
 <%= render "shared/page_header", title: t("integrations.workspace.title"), icon_name: :settings, actions: nil %>
 
 <div class="flex-1 overflow-y-auto scrollbar-subtle p-5">
-  <div class="max-w-2xl space-y-6">
+  <div class="@container mx-auto w-full max-w-6xl">
     <p class="text-base text-ink-soft">
       <%= t("integrations.workspace.intro", workspace: current_workspace.name).html_safe %>
     </p>
+    <div class="settings-panels">
 
-    <section class="card p-4 space-y-3">
-      <h2 class="text-base font-semibold text-ink"><%= t("integrations.workspace.general.title") %></h2>
+    <%= render layout: "settings/workspace/panel", locals: { title: t("integrations.workspace.general.title") } do %>
       <%= form_with model: current_workspace, url: settings_workspace_path, method: :patch, class: "space-y-3" do |f| %>
         <div class="flex items-end gap-2">
           <div class="flex-1">
@@ -41,17 +41,32 @@
           <% end %>
         <% end %>
       <% end %>
-    </section>
+    <% end %>
 
-    <% if CreamFeatures.enabled?(:client_portal) %>
-      <section class="card p-4">
-        <%= render "shared/client_portal_url", workspace: current_workspace %>
-      </section>
+    <% if feature_enabled?(:client_portal) %>
+      <%= render layout: "settings/workspace/panel", locals: { title: t("integrations.workspace.client_portal.title") } do %>
+        <%= render "shared/client_portal_url", workspace: current_workspace, show_title: false %>
+        <% if defined?(@public_layout_templates) %>
+          <div class="border-t border-line pt-4 space-y-3">
+            <p class="text-sm text-ink-soft"><%= t("integrations.workspace.client_portal_layout.intro") %></p>
+            <%= form_with model: current_workspace, url: settings_workspace_path, method: :patch, class: "space-y-3" do |f| %>
+              <div>
+                <%= f.label :client_portal_layout_template_id, t("integrations.workspace.public_booking_layout.template"), class: "block text-sm font-medium text-ink-soft mb-1" %>
+                <%= f.select :client_portal_layout_template_id,
+                      options_from_collection_for_select(@public_layout_templates, :id, :display_name, current_workspace.client_portal_layout_template_id),
+                      {include_blank: t("integrations.workspace.client_portal_layout.none")},
+                      class: "input w-full" %>
+                <p class="mt-1 text-sm text-ink-faint"><%= t("integrations.workspace.client_portal_layout.hint") %></p>
+              </div>
+              <%= f.submit t("integrations.workspace.public_booking_layout.save"), class: "btn-secondary" %>
+            <% end %>
+          </div>
+        <% end %>
+      <% end %>
     <% end %>
 
     <% if feature_enabled?(:calendar_booking) && defined?(@public_layout_templates) %>
-      <section class="card p-4 space-y-3">
-        <h2 class="text-base font-semibold text-ink"><%= t("integrations.workspace.public_booking_layout.title") %></h2>
+      <%= render layout: "settings/workspace/panel", locals: { title: t("integrations.workspace.public_booking_layout.title") } do %>
         <p class="text-sm text-ink-soft"><%= t("integrations.workspace.public_booking_layout.intro") %></p>
         <%= form_with model: current_workspace, url: settings_workspace_path, method: :patch, class: "space-y-3" do |f| %>
           <div>
@@ -64,29 +79,10 @@
           </div>
           <%= f.submit t("integrations.workspace.public_booking_layout.save"), class: "btn-secondary" %>
         <% end %>
-      </section>
+      <% end %>
     <% end %>
 
-    <% if feature_enabled?(:client_portal) && defined?(@public_layout_templates) %>
-      <section class="card p-4 space-y-3">
-        <h2 class="text-base font-semibold text-ink"><%= t("integrations.workspace.client_portal_layout.title") %></h2>
-        <p class="text-sm text-ink-soft"><%= t("integrations.workspace.client_portal_layout.intro") %></p>
-        <%= form_with model: current_workspace, url: settings_workspace_path, method: :patch, class: "space-y-3" do |f| %>
-          <div>
-            <%= f.label :client_portal_layout_template_id, t("integrations.workspace.public_booking_layout.template"), class: "block text-sm font-medium text-ink-soft mb-1" %>
-            <%= f.select :client_portal_layout_template_id,
-                  options_from_collection_for_select(@public_layout_templates, :id, :display_name, current_workspace.client_portal_layout_template_id),
-                  {include_blank: t("integrations.workspace.client_portal_layout.none")},
-                  class: "input w-full" %>
-            <p class="mt-1 text-sm text-ink-faint"><%= t("integrations.workspace.client_portal_layout.hint") %></p>
-          </div>
-          <%= f.submit t("integrations.workspace.public_booking_layout.save"), class: "btn-secondary" %>
-        <% end %>
-      </section>
-    <% end %>
-
-    <section class="card p-4 space-y-3">
-      <h2 class="text-base font-semibold text-ink"><%= t("integrations.workspace.features.title") %></h2>
+    <%= render layout: "settings/workspace/panel", locals: { title: t("integrations.workspace.features.title") } do %>
       <p class="text-sm text-ink-soft">
         <%= t("integrations.workspace.features.intro") %>
       </p>
@@ -118,11 +114,13 @@
         </label>
         <%= f.submit t("integrations.workspace.features.save"), class: "btn-secondary" %>
       <% end %>
-    </section>
+    <% end %>
 
     <% if feature_enabled?(:okm_chat) %>
-      <section class="card p-4 space-y-3">
-        <h2 class="text-base font-semibold text-ink"><%= t("integrations.workspace.okm.title") %></h2>
+      <%= render layout: "settings/workspace/panel", locals: {
+            title: t("integrations.workspace.okm.title"),
+            status: (current_workspace.okm_chat_enabled? ? t("integrations.workspace.panel.active") : nil)
+          } do %>
         <p class="text-sm text-ink-soft">
           <%= t("integrations.workspace.okm.intro") %>
         </p>
@@ -154,15 +152,18 @@
           </div>
           <%= f.submit t("integrations.workspace.okm.save"), class: "btn-secondary" %>
         <% end %>
-      </section>
+      <% end %>
     <% end %>
 
     <% if feature_enabled?(:marketing_consent) %>
       <% @beehiiv_connection ||= current_workspace.beehiiv_connection || current_workspace.build_beehiiv_connection(user: current_user) %>
       <% @new_beehiiv_publication ||= @beehiiv_connection.beehiiv_publications.build if @beehiiv_connection.persisted? %>
       <% subscription_types = current_workspace.subscription_types.active.ordered %>
-      <section class="card p-4 space-y-3">
-        <h2 class="text-base font-semibold text-ink"><%= t("integrations.workspace.beehiiv.title") %></h2>
+      <%= render layout: "settings/workspace/panel", locals: {
+            title: t("integrations.workspace.beehiiv.title"),
+            open: @beehiiv_connection.errors.any? || @beehiiv_publication&.errors&.any?,
+            status: (@beehiiv_connection.persisted? && @beehiiv_connection.api_key.present? ? t("integrations.workspace.panel.connected") : nil)
+          } do %>
         <p class="text-sm text-ink-soft">
           <%= t("integrations.workspace.beehiiv.intro") %>
         </p>
@@ -319,12 +320,15 @@
             </div>
           <% end %>
         <% end %>
-      </section>
+      <% end %>
     <% end %>
 
     <% @smtp_connection ||= current_workspace.smtp_connection || current_workspace.build_smtp_connection(user: current_user) %>
-    <section class="card p-4 space-y-3">
-      <h2 class="text-base font-semibold text-ink"><%= t("integrations.workspace.smtp.title") %></h2>
+    <%= render layout: "settings/workspace/panel", locals: {
+          title: t("integrations.workspace.smtp.title"),
+          open: @smtp_connection.errors.any?,
+          status: (@smtp_connection.persisted? && @smtp_connection.connected? ? t("integrations.workspace.panel.connected") : nil)
+        } do %>
       <p class="text-sm text-ink-soft">
         <%= t("integrations.workspace.smtp.intro") %>
       </p>
@@ -407,12 +411,15 @@
         <%= button_to t("integrations.workspace.smtp.disconnect"), smtp_connection_path, method: :delete, class: "btn-danger",
               form: { data: { turbo_confirm: t("integrations.workspace.smtp.disconnect_confirm") } } %>
       <% end %>
-    </section>
+    <% end %>
 
     <% if feature_enabled?(:marketing_campaigns) %>
       <% @mailjet_connection ||= current_workspace.mailjet_connection || current_workspace.build_mailjet_connection(user: current_user) %>
-      <section class="card p-4 space-y-3">
-        <h2 class="text-base font-semibold text-ink"><%= t("integrations.workspace.mailjet.title") %></h2>
+      <%= render layout: "settings/workspace/panel", locals: {
+            title: t("integrations.workspace.mailjet.title"),
+            open: @mailjet_connection.errors.any?,
+            status: (@mailjet_connection.persisted? && @mailjet_connection.connected? ? t("integrations.workspace.panel.connected") : nil)
+          } do %>
         <p class="text-sm text-ink-soft">
           <%= t("integrations.workspace.mailjet.intro") %>
         </p>
@@ -501,7 +508,8 @@
             </div>
           </div>
         <% end %>
-      </section>
+      <% end %>
     <% end %>
+    </div>
   </div>
 </div>
