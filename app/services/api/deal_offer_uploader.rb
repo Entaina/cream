@@ -1,5 +1,5 @@
 module Api
-  # Uploads a proposal (Offer) to a deal for the REST API and MCP. The content is a PDF/HTML file
+  # Uploads a proposal (Offer) to a deal for the REST API and MCP. The content is a PDF/HTML/ZIP file
   # (uploaded or Base64) or pasted HTML. If the deal already has the target offer, the content
   # becomes its next numbered version; otherwise a new offer is created with version 1.
   #

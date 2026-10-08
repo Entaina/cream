@@ -318,15 +318,15 @@ components:
         content:
           type: string
           format: byte
-          description: Base64-encoded PDF or HTML file (JSON requests).
+          description: Base64-encoded PDF, HTML, or ZIP file (JSON requests). ZIP must include an index.html or a single HTML file plus relative assets.
         content_type:
           type: string
-          enum: [application/pdf, text/html]
+          enum: [application/pdf, text/html, application/zip, application/x-zip-compressed]
           description: Optional MIME type.
         file:
           type: string
           format: binary
-          description: Uploaded PDF or HTML file (multipart/form-data requests).
+          description: Uploaded PDF, HTML, or ZIP file (multipart/form-data requests).
 
     DealOffer:
       type: object
@@ -2006,8 +2006,10 @@ paths:
       tags: [Deal offers]
       summary: Upload a proposal to a deal
       description: |
-        Uploads a proposal (offer) as a PDF/HTML file (Base64 in JSON, or `multipart/form-data`
-        with `offer[file]`) or as pasted HTML (`html_body`) — exactly one of the two. If the deal
+        Uploads a proposal (offer) as a PDF/HTML/ZIP file (Base64 in JSON, or `multipart/form-data`
+        with `offer[file]`) or as pasted HTML (`html_body`) — exactly one of the two. ZIP packages
+        must include an index.html (or a single HTML file) and relative assets; preview runs JS in a
+        sandboxed package URL. If the deal
         already has the target offer, the content becomes its **next numbered version**; otherwise
         a new offer is created with version 1 (`offer_created: true`).
 

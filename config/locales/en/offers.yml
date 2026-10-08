@@ -6,8 +6,8 @@ en:
     form:
       comment: Version note
       comment_placeholder: What changed in this version? (optional)
-      file: PDF or HTML file
-      file_hint: Attach the offer as a PDF or HTML file.
+      file: PDF, HTML, or ZIP file
+      file_hint: Attach the offer as a PDF, HTML file, or ZIP with an index.html and assets (CSS, images, JS).
       html_body: HTML
       html_body_hint: The HTML is shown as-is, not as a template. Scripts are not executed.
       html_body_placeholder: "<html>…</html>"
@@ -19,6 +19,7 @@ en:
     kind:
       html: HTML
       pdf: PDF
+      zip: ZIP
     new:
       back: "← Back to %{deal}"
       title: New offer

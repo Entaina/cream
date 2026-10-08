@@ -233,6 +233,8 @@ GEM
     multi_json (1.21.2)
     multi_xml (0.9.1)
       bigdecimal (>= 3.1, < 5)
+    neighbor (0.3.2)
+      activerecord (>= 6.1)
     net-http (0.9.1)
       uri (>= 0.11.1)
     net-imap (0.6.7)
@@ -554,6 +556,7 @@ DEPENDENCIES
   llmemory
   mailbin
   mcp (~> 1.6)
+  neighbor
   omniauth-google-oauth2
   omniauth-rails_csrf_protection
   pagy (~> 43.6)
@@ -568,6 +571,7 @@ DEPENDENCIES
   rspec-rails (~> 8.0)
   rubocop-rails-omakase
   ruby-vips (~> 2.0)
+  rubyzip
   selenium-webdriver
   solid_cable
   solid_cache
@@ -673,6 +677,7 @@ CHECKSUMS
   msgpack (1.8.5) sha256=97419eaa7b35dfe3e462c0e6c1a3dfdcbfc8756605c09e46e4c6daef127517ba
   multi_json (1.21.2) sha256=245531eaf54bdba57aba515ff08b4503505c5e09911daa89c5a561e2f85bea8e
   multi_xml (0.9.1) sha256=7ce766b59c17241ed62976caeae1fae9b2431b263398c35396239a68c4a64e57
+  neighbor (0.3.2) sha256=b795bbcc24b1b9ae82d9f7e97a3461b0b3607d24a85a7acbed776bd498e7eba8
   net-http (0.9.1) sha256=25ba0b67c63e89df626ed8fac771d0ad24ad151a858af2cc8e6a716ca4336996
   net-imap (0.6.7) sha256=b5c9573be975d856de252ee851871724da66aa2d449b2482d5690bd12bc23660
   net-pop (0.1.2) sha256=848b4e982013c15b2f0382792268763b748cce91c9e91e36b0f27ed26420dff3

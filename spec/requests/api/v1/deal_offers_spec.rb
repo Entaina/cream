@@ -1,4 +1,5 @@
 require "rails_helper"
+require "zip"
 
 RSpec.describe "Api::V1::DealOffers", type: :request do
   fixtures :users, :workspaces, :memberships
@@ -96,6 +97,25 @@ RSpec.describe "Api::V1::DealOffers", type: :request do
 
     expect(response).to have_http_status(:unprocessable_content)
     expect(response.parsed_body["errors"].first).to include("offer_id")
+  end
+
+  it "creates an offer from a Base64 ZIP with index.html" do
+    zip_bytes = Zip::OutputStream.write_buffer do |zip|
+      zip.put_next_entry("index.html")
+      zip.write("<html><body>API ZIP</body></html>")
+    end.string
+
+    upload_offer(deal, {
+      filename: "paquete.zip",
+      content: Base64.strict_encode64(zip_bytes),
+      content_type: "application/zip"
+    })
+
+    expect(response).to have_http_status(:created)
+    version = deal.offers.last.current_version
+    expect(version).to be_zip
+    expect(version.entry_path).to eq("index.html")
+    expect(response.parsed_body["version"]).to include("content_type" => "application/zip", "filename" => "paquete.zip")
   end
 
   it "uploads a file with multipart/form-data" do

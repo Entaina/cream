@@ -39,6 +39,7 @@ gem "thruster", require: false
 gem "image_processing", "~> 2.1"
 gem "ruby-vips", "~> 2.0"
 gem "csv"
+gem "rubyzip", require: "zip"
 
 group :development, :test do
   gem "dotenv-rails", require: "dotenv/load"
@@ -89,3 +90,6 @@ gem "llmemory"
 gem "rspec-rails", "~> 8.0", groups: [:development, :test]
 
 gem "liquid", "~> 5.14"
+
+# Registers PostgreSQL + ActiveRecord `vector` type (silences unknown OID warnings; see Neighbor::RegisterTypes).
+gem "neighbor"

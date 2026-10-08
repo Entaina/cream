@@ -1019,8 +1019,9 @@ module CreamMcp
 
   ADD_DEAL_OFFER = MCP::Tool.define(
     name: "add_deal_offer",
-    description: "Upload a proposal (offer) to a deal as a PDF/HTML file (Base64, up to 10 MB: filename + content) " \
-                 "or pasted html_body — one of the two. If the deal already has that offer, the content is added " \
+    description: "Upload a proposal (offer) to a deal as a PDF/HTML/ZIP file (Base64, up to 10 MB: filename + content) " \
+                 "or pasted html_body — one of the two. ZIP packages must include an index.html (or a single HTML file) " \
+                 "and relative assets. If the deal already has that offer, the content is added " \
                  "as its next numbered version; otherwise a new offer is created (version 1). The target offer is " \
                  "offer_id, else the offer matching name, else the deal's only offer (error if it has several and " \
                  "none is chosen). Name defaults to the file name when creating.",
@@ -1028,9 +1029,9 @@ module CreamMcp
                    properties: {deal_id: {type: "integer"},
                                 name: {type: "string", description: "Offer name; matches an existing offer case-insensitively"},
                                 offer_id: {type: "integer", description: "Add a version to this offer of the deal"},
-                                filename: {type: "string", description: "PDF or HTML file name"},
-                                content: {type: "string", description: "Base64-encoded PDF/HTML content"},
-                                content_type: {type: "string", description: "Optional MIME type (application/pdf or text/html)"},
+                                filename: {type: "string", description: "PDF, HTML, or ZIP file name"},
+                                content: {type: "string", description: "Base64-encoded PDF/HTML/ZIP content"},
+                                content_type: {type: "string", description: "Optional MIME type (application/pdf, text/html, or application/zip)"},
                                 html_body: {type: "string", description: "HTML to store instead of a file"},
                                 comment: {type: "string", description: "Optional version note"}},
                    required: ["deal_id"]}

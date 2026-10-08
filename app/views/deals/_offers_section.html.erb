@@ -25,7 +25,8 @@
                 <% if current.file.attached? %> · <%= number_to_human_size(current.file.byte_size) %><% end %>
               </p>
             </div>
-            <%= badge(current.pdf? ? t("offers.kind.pdf") : t("offers.kind.html"), color: current.pdf? ? "red" : "hoki") %>
+            <% current_kind = current.pdf? ? [:pdf, "red"] : (current.zip? ? [:zip, "copperfield"] : [:html, "hoki"]) %>
+            <%= badge(t("offers.kind.#{current_kind.first}"), color: current_kind.last) %>
             <%= link_to deal_offer_path(deal, offer), target: "_blank", rel: "noopener", class: "btn-secondary" do %>
               <%= icon :external, classes: "size-3.5" %> <%= t("offers.preview") %>
             <% end %>
@@ -51,7 +52,8 @@
                       <%= version.comment.presence || t("shared.empty_value") %>
                       <span class="text-xs text-ink-faint">· <%= version.user.name %> · <%= l(version.created_at.to_date, format: :short) %></span>
                     </span>
-                    <%= badge(version.pdf? ? t("offers.kind.pdf") : t("offers.kind.html"), color: version.pdf? ? "red" : "hoki") %>
+                    <% version_kind = version.pdf? ? [:pdf, "red"] : (version.zip? ? [:zip, "copperfield"] : [:html, "hoki"]) %>
+                    <%= badge(t("offers.kind.#{version_kind.first}"), color: version_kind.last) %>
                     <%= link_to deal_offer_version_path(deal, offer, version), target: "_blank", rel: "noopener", class: "btn-ghost" do %>
                       <%= icon :external, classes: "size-3.5" %> <%= t("offers.preview") %>
                     <% end %>

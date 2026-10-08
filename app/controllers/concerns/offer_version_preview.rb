@@ -1,4 +1,4 @@
-# Renders an OfferVersion for in-browser preview (PDF inline, HTML sandboxed).
+# Renders an OfferVersion for in-browser preview (PDF inline, HTML sandboxed, ZIP via signed package URL).
 module OfferVersionPreview
   extend ActiveSupport::Concern
 
@@ -11,6 +11,8 @@ module OfferVersionPreview
   def render_offer_version(version)
     if version.pdf?
       send_data version.file.download, type: "application/pdf", disposition: "inline", filename: version.file.filename.to_s
+    elsif version.zip?
+      redirect_to offer_package_file_path(token: version.package_token, path: version.entry_path)
     else
       response.headers["Content-Security-Policy"] = PREVIEW_CSP
       render body: version.html_content, content_type: "text/html"

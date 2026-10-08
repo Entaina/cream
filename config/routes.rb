@@ -236,6 +236,8 @@ Rails.application.routes.draw do
   get "b/:slug/:event_type", to: "public/bookings#show", as: :public_booking_event_type,
     constraints: {event_type: /[a-z0-9-]+/}
 
+  get "offer_packages/:token/*path", to: "public/offer_packages#show", as: :offer_package_file, format: false
+
   get "p/:workspace_slug/:slug", to: "public/landing_pages#show", as: :public_landing_page
   get "e/preferences/:token", to: "public/email_preferences#show", as: :public_email_preferences
   patch "e/preferences/:token", to: "public/email_preferences#update"

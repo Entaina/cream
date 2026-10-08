@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_08_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_08_130000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -794,9 +794,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_08_120000) do
     t.index ["user_id", "subject_id", "predicate"], name: "index_llmemory_edges_on_user_id_and_subject_id_and_predicate"
   end
 
-# Could not dump table "llmemory_embeddings" because of following StandardError
-#   Unknown type 'vector(1536)' for column 'embedding'
-
+  create_table "llmemory_embeddings", force: :cascade do |t|
+    t.string "user_id", null: false
+    t.string "source_type", null: false
+    t.string "source_id", null: false
+    t.vector "embedding", limit: 1536
+    t.text "text_content"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "source_type", "source_id"], name: "idx_on_user_id_source_type_source_id_df6fe1cd95", unique: true
+  end
 
   create_table "llmemory_episodes", id: :string, force: :cascade do |t|
     t.string "user_id", null: false
@@ -1001,6 +1008,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_08_120000) do
     t.text "comment"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "entry_path"
     t.index ["offer_id", "number"], name: "index_offer_versions_on_offer_id_and_number", unique: true
     t.index ["offer_id"], name: "index_offer_versions_on_offer_id"
     t.index ["user_id"], name: "index_offer_versions_on_user_id"
