@@ -37,4 +37,19 @@ RSpec.describe Ai::Agent::ActionExecutor do
     expect(result.success).to be(true)
     expect(company.notes.find_by(body: "Nota del agente")).to be_present
   end
+
+  it "runs a confirmed MCP write that the legacy executor does not implement" do
+    action = Ai::Agent::PendingAction.new(
+      tool: "create_company",
+      args: {"name" => "Empresa del agente"},
+      description: "create company — name: Empresa del agente",
+      workspace_id: workspace.id,
+      user_id: user.id
+    )
+
+    result = executor.execute(action)
+
+    expect(result.success).to be(true)
+    expect(workspace.companies.find_by(name: "Empresa del agente")).to be_present
+  end
 end

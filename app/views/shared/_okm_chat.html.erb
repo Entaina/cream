@@ -7,7 +7,7 @@
      data-okm-chat-record-type-value="<%= context&.dig(:record_type) %>"
      data-okm-chat-record-id-value="<%= context&.dig(:record_id) %>"
      data-okm-chat-record-label-value="<%= context&.dig(:record_label) %>"
-     data-okm-chat-copy-value="<%= json_escape(okm_copy) %>">
+     data-okm-chat-copy-value="<%= json_escape(okm_copy.to_json) %>">
   <div data-okm-chat-target="panel"
        hidden
        class="okm-chat-panel card w-[min(24rem,calc(100vw-2.5rem))] h-[min(32rem,calc(100vh-8rem))] flex flex-col shadow-lg border border-line overflow-hidden">
@@ -50,7 +50,7 @@
                 placeholder="<%= okm_copy[:placeholder] %>"
                 data-action="keydown->okm-chat#handleKeydown"></textarea>
       <div class="flex items-center justify-between gap-2">
-        <p class="text-xs text-ink-faint truncate" data-okm-chat-target="status"></p>
+        <p class="text-xs text-ink-faint truncate" data-okm-chat-target="status" aria-live="polite"></p>
         <button type="submit" class="btn-primary text-sm shrink-0" data-okm-chat-target="submit">
           <%= okm_copy[:send] %>
         </button>

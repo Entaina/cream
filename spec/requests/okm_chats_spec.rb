@@ -50,6 +50,19 @@ RSpec.describe "OKM chat", type: :request do
     allow(AgentMemoryConsolidationJob).to receive(:perform_later)
   end
 
+  it "embeds chat copy as JSON for the stimulus controller" do
+    get companies_path
+
+    expect(response).to have_http_status(:ok)
+    fragment = Nokogiri::HTML(response.body).at_css("[data-controller='okm-chat']")
+    expect(fragment).to be_present
+
+    copy = JSON.parse(fragment["data-okm-chat-copy-value"])
+    expect(copy["thinking"]).to eq("Pensando…")
+    expect(copy["close"]).to eq("Cerrar chat")
+    expect(copy["request_failed"]).to eq("No se pudo obtener respuesta.")
+  end
+
   it "streams status updates, reply, session and confirm_action events" do
     pending = Ai::Agent::PendingAction.new(
       tool: "create_task",

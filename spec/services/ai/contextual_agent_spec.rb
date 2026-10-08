@@ -58,7 +58,10 @@ RSpec.describe Ai::ContextualAgent do
       expect(args[:input]).to include("Acme Corp")
       expect(args[:input]).to include("¿Qué sabemos de este cliente?")
       tool_names = args[:tools].map { |tool| tool[:name] }
-      expect(tool_names).to include("search_okm", "search_records", "create_task", "remember", "recall")
+      expect(tool_names).to include(
+        "search_okm", "search_records", "create_task", "list_people", "send_campaign", "remember", "recall"
+      )
+      expect(tool_names).not_to include("update_record")
       expect(args[:max_iterations]).to eq(12)
     end
   end

@@ -4,7 +4,7 @@
 
 Cream is a **workspace**-based CRM for managing **people**, **companies** and **deals** (opportunities), with notes, tasks, lists and an activity history shared across the team.
 
-> **Last revision:** 2026-10-08 (collapsible workspace settings cards)
+> **Last revision:** 2026-10-08 (knowledge chat uses the MCP tools)
 > This document describes the functionality **visible to the user**. Disabled features are listed at the end under "Coming soon".
 
 ---
@@ -1105,10 +1105,10 @@ The chat is an **agent-based assistant** that combines:
 
 - The **context of the page** you are on (if applicable).
 - Example's **OKM corporate knowledge** (clients, sales, strategy, companies and people in Google Drive).
-- The **CRM data** (record search, tasks, pipeline).
+- The **CRM and marketing data** (the same lookups as the integrations: people, companies, deals, tasks, pipeline, products, emails, payments, campaigns and the rest of the read tools).
 - **Persistent memory** of preferences and relevant facts across conversations.
 
-It can also **propose changes in Cream** (create tasks, add notes, update records, move deals, complete tasks). Those changes are **not applied on their own**: the chat shows a confirmation card and you must click **Confirmar** (Confirm) to execute them.
+It can also **propose changes in Cream** (create or edit records, tasks, notes, stages, products, campaigns and the rest of the write actions). Those changes are **not applied on their own**: the chat shows a confirmation card and you must click **Confirmar** (Confirm) to execute them.
 
 ### Context depending on the page
 

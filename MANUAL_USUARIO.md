@@ -4,7 +4,7 @@
 
 Cream es un CRM por **workspaces** para gestionar **personas**, **empresas** y **deals** (oportunidades), con notas, tareas, listas y un historial de actividad compartido en el equipo.
 
-> **Última revisión:** 2026-10-08 (ajustes del workspace en tarjetas plegables)
+> **Última revisión:** 2026-10-08 (el chat de conocimiento usa las herramientas del MCP)
 > Este documento describe la funcionalidad **visible para el usuario**. Las funcionalidades desactivadas aparecen al final en «Próximamente».
 
 ---
@@ -1105,10 +1105,10 @@ El chat es un **asistente con agente** que combina:
 
 - El **contexto de la página** en la que estás (si aplica).
 - El **conocimiento corporativo OKM** de Example (clientes, ventas, estrategia, empresas y personas en Google Drive).
-- Los **datos del CRM** (búsqueda de registros, tareas, pipeline).
+- Los **datos del CRM y del marketing** (las mismas consultas que las integraciones: personas, empresas, deals, tareas, pipeline, productos, emails, pagos, campañas y el resto de lecturas).
 - **Memoria persistente** de preferencias y hechos relevantes entre conversaciones.
 
-Además, puede **proponer cambios en Cream** (crear tareas, añadir notas, actualizar registros, mover deals, completar tareas). Esos cambios **no se aplican solos**: el chat muestra una tarjeta de confirmación y debes pulsar **Confirmar** para ejecutarlos.
+Además, puede **proponer cambios en Cream** (crear o editar registros, tareas, notas, etapas, productos, campañas y el resto de acciones de escritura). Esos cambios **no se aplican solos**: el chat muestra una tarjeta de confirmación y debes pulsar **Confirmar** para ejecutarlos.
 
 ### Contexto según la página
 

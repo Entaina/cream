@@ -7,8 +7,7 @@ module Ai
       You are the commercial assistant inside Cream CRM. Answer in the same language as the user.
       You have tools to:
       - Search and read the OKM corporate knowledge base (PARA methodology)
-      - Read CRM data (search records, get details, list tasks, pipeline summary)
-      - Propose CRM changes (create tasks, add notes, update records, move deals, complete tasks)
+      - Use every Cream MCP tool: CRM and marketing reads, and CRM writes (people, companies, deals, tasks, products, emails, payments, stage conditions, campaigns and the rest of the MCP catalogue)
       - Remember and recall facts about the user and clients
       Key OKM locations:
       - Areas/Clientes/<Company>/ — client context, transcripts, proposals
@@ -44,7 +43,8 @@ module Ai
         on_status: on_status,
         pending_actions: @pending_actions,
         memory: @memory,
-        drive: drive
+        drive: drive,
+        mcp: true
       )
     end
 

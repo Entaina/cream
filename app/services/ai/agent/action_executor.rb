@@ -18,7 +18,14 @@ module Ai
         when "update_deal_stage" then execute_update_deal_stage(action.args)
         when "complete_task" then execute_complete_task(action.args)
         else
-          Result.new(success: false, message: "Unknown action: #{action.tool}", data: nil)
+          outcome = McpTools.execute_confirmed(
+            workspace: @ctx.workspace, user: @ctx.user, name: action.tool, args: action.args
+          )
+          if outcome.known
+            Result.new(success: outcome.success, message: outcome.message, data: outcome.data)
+          else
+            Result.new(success: false, message: "Unknown action: #{action.tool}", data: nil)
+          end
         end
       rescue ActiveRecord::RecordNotFound
         Result.new(success: false, message: "Record not found.", data: nil)

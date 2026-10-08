@@ -17,7 +17,12 @@ export default class extends Controller {
   }
 
   get c() {
-    return this.copyValue || {}
+    try {
+      const copy = this.copyValue
+      return copy && typeof copy === "object" ? copy : {}
+    } catch {
+      return {}
+    }
   }
 
   interpolate(template, vars = {}) {
@@ -55,8 +60,8 @@ export default class extends Controller {
   close() {
     this.open = false
     this.expanded = false
-    this.applyExpandedLayout()
     this.panelTarget.hidden = true
+    this.applyExpandedLayout()
   }
 
   toggleExpand() {
@@ -112,9 +117,9 @@ export default class extends Controller {
     this.saveHistory()
     this.inputTarget.value = ""
     this.setBusy(true)
-    this.setStatus(this.c.thinking || "")
 
     try {
+      this.setStatus(this.c.thinking || "")
       const { reply, confirmActions, sessionId } = await this.streamChat({
         message,
         history: this.history.slice(0, -1),
