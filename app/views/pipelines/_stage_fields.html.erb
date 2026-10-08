@@ -1,4 +1,4 @@
-<div class="grid min-w-[38rem] grid-cols-[auto_1fr_8rem_6rem_auto_auto_auto_auto_auto_auto] gap-2 items-center rounded-lg ring-1 ring-transparent hover:ring-line"
+<div class="grid min-w-[42rem] grid-cols-[1.75rem_minmax(8rem,1fr)_8rem_6rem_3.5rem_3.5rem_8.75rem] gap-2 items-center rounded-lg ring-1 ring-transparent hover:ring-line"
      data-nested-form-target="row">
   <span role="button" tabindex="-1"
         data-sortable-list-target="handle"
@@ -25,35 +25,37 @@
     <%= f.check_box :closed, class: "rounded border-line-strong" %>
   </label>
   <%= f.hidden_field :_destroy %>
+  <div class="flex items-center">
   <% if feature_enabled?(:stage_triggers) && f.object.persisted? %>
     <%= link_to pipeline_stage_stage_triggers_path(f.object),
-          class: "flex items-center gap-0.5 text-ink-faint hover:text-accent p-1.5 text-sm",
+          class: "flex w-9 items-center gap-0.5 text-ink-faint hover:text-accent p-1.5 text-sm",
           title: t("pipelines.stage_row.stage_triggers") do %>
       <%= icon :zap, classes: "size-3.5" %><% if (count = f.object.stage_triggers.size).positive? %><%= count %><% end %>
     <% end %>
   <% else %>
-    <span></span>
+    <span class="w-9"></span>
   <% end %>
   <% if feature_enabled?(:stage_field_formats) && f.object.persisted? %>
     <%= link_to pipeline_stage_stage_field_formats_path(f.object),
-          class: "flex items-center gap-0.5 text-ink-faint hover:text-accent p-1.5 text-sm",
+          class: "flex w-9 items-center gap-0.5 text-ink-faint hover:text-accent p-1.5 text-sm",
           title: t("pipelines.stage_row.field_formats") do %>
       <%= icon :eye, classes: "size-3.5" %><% if (count = f.object.stage_field_formats.size).positive? %><%= count %><% end %>
     <% end %>
   <% else %>
-    <span></span>
+    <span class="w-9"></span>
   <% end %>
   <% if feature_enabled?(:stage_conditions) && f.object.persisted? %>
     <%= link_to pipeline_stage_stage_conditions_path(f.object),
-          class: "flex items-center gap-0.5 text-ink-faint hover:text-accent p-1.5 text-sm",
+          class: "flex w-9 items-center gap-0.5 text-ink-faint hover:text-accent p-1.5 text-sm",
           title: t("pipelines.stage_row.entry_conditions") do %>
       <%= icon :lock, classes: "size-3.5" %><% if (count = f.object.stage_conditions.size).positive? %><%= count %><% end %>
     <% end %>
   <% else %>
-    <span></span>
+    <span class="w-9"></span>
   <% end %>
   <button type="button" data-action="nested-form#remove" class="text-ink-faint hover:text-danger p-1.5"
         title="<%= t("pipelines.stage_row.remove_stage") %>">
     <%= icon :trash, classes: "size-3.5" %>
   </button>
+  </div>
 </div>

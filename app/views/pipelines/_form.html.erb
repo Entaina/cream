@@ -44,13 +44,14 @@
     </div>
 
     <div class="overflow-x-auto">
-      <div class="hidden min-w-[38rem] grid grid-cols-[auto_1fr_8rem_6rem_auto_auto] gap-2 px-1 text-xs font-medium uppercase tracking-wider text-ink-faint sm:grid">
+      <div class="hidden min-w-[42rem] grid-cols-[1.75rem_minmax(8rem,1fr)_8rem_6rem_3.5rem_3.5rem_8.75rem] gap-2 text-xs font-medium uppercase tracking-wider text-ink-faint sm:grid">
         <span aria-hidden="true"></span>
         <span><%= t("pipelines.form.stage_name") %></span>
         <span><%= t("pipelines.form.color") %></span>
         <span><%= t("pipelines.form.probability") %></span>
-        <span><%= t("pipelines.form.won") %></span>
-        <span><%= t("pipelines.form.closed") %></span>
+        <span class="text-center"><%= t("pipelines.form.won") %></span>
+        <span class="text-center"><%= t("pipelines.form.closed") %></span>
+        <span aria-hidden="true"></span>
       </div>
 
       <div data-nested-form-target="list" data-sortable-list-target="list" class="space-y-2 mt-1">
