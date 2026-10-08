@@ -19,6 +19,29 @@
       "user_input": "LeadForm.active.find_by!(:slug => params[:slug]).success_redirect_location(:prefill => prefill)",
       "confidence": "Weak",
       "note": "Intentional external redirect after lead form submit. URL is admin-configured (success_redirect_url), validated as http(s) on save, and re-validated at runtime in LeadForm#success_redirect_location before allow_other_host: true. Prefill query params echo back only what the visitor typed (never CRM-stored data) and only when the lead was actually created (never on the bot path)."
+    },
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 105,
+      "fingerprint": "25ec30adb2b1b0b51ac8b01da094bb451db9d82969fc322eee735f3b4b92bd64",
+      "check_name": "PermitAttributes",
+      "message": "Potentially dangerous key allowed for mass assignment",
+      "file": "app/controllers/superadmin/workspace_members_controller.rb",
+      "line": 67,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params.require(:member).permit(:email_address, :role)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Superadmin::WorkspaceMembersController",
+        "method": "member_params"
+      },
+      "user_input": ":role",
+      "confidence": "Medium",
+      "cwe_id": [
+        915
+      ],
+      "note": "Falso positivo: endpoint exclusivo de superadmin (BaseController + Pundit) y Membership valida role con inclusion en Membership::ROLES (sin roles de plataforma). En create ademas se filtra contra ROLES."
     }
   ],
   "updated": "2026-09-22 13:12:00 +0200",

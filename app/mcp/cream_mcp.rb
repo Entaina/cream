@@ -53,7 +53,7 @@ module CreamMcp
       add_deal_product). Edit with update_person/update_company/update_deal (update_deal can
       move pipeline/replace contacts). Duplicates: list_person_duplicates/list_company_duplicates
       then merge_*; delete_record removes records (deleting a company also deletes its people and
-      deals). Notes, person files (add_person_attachment), comments (add_comment), emails (list_emails/get_email/send_deal_email;
+      deals). Notes, person files (add_person_attachment), deal proposals (add_deal_offer; new version if it exists), comments (add_comment), emails (list_emails/get_email/send_deal_email;
       optional on create_deal), Stripe payments
       (list_payments), activity (list_activity), recent_changes. Custom fields:
       list_custom_fields/set_custom_fields. Records include url (needs CREAM_APP_URL).
@@ -74,7 +74,7 @@ module CreamMcp
       UPDATE_PERSON, UPDATE_COMPANY, UPDATE_DEAL, UPDATE_DEAL_STAGE,
       LIST_PERSON_DUPLICATES, LIST_COMPANY_DUPLICATES, MERGE_PERSON, MERGE_COMPANY, DELETE_RECORD,
       CREATE_PRODUCT, UPDATE_PRODUCT, ADD_DEAL_PRODUCT, UPDATE_DEAL_PRODUCT, UPDATE_TASK,
-      ADD_NOTE, ADD_PERSON_ATTACHMENT, ADD_COMMENT, SEND_DEAL_EMAIL, CREATE_TASK, COMPLETE_TASK, PIPELINE_SUMMARY,
+      ADD_NOTE, ADD_PERSON_ATTACHMENT, ADD_DEAL_OFFER, ADD_COMMENT, SEND_DEAL_EMAIL, CREATE_TASK, COMPLETE_TASK, PIPELINE_SUMMARY,
       LIST_CUSTOM_FIELDS, SET_CUSTOM_FIELDS, GET_DEAL_HISTORY,
       RECENT_CHANGES, SALES_FORECAST,
       SUMMARIZE_RECORD, SUGGEST_NEXT_STEPS, DRAFT_EMAIL, NATURAL_LANGUAGE_SEARCH, ENRICH_RECORD,
@@ -1014,6 +1014,44 @@ module CreamMcp
       CreamMcp.respond_with(created: Api::RecordAttachmentBuilder.json(attachment).merge(person: CreamMcp.record_ref_json(person)))
     rescue Api::RecordAttachmentBuilder::InvalidAttachment => e
       CreamMcp.error_response("invalid_attachment", e.message)
+    end
+  end
+
+  ADD_DEAL_OFFER = MCP::Tool.define(
+    name: "add_deal_offer",
+    description: "Upload a proposal (offer) to a deal as a PDF/HTML file (Base64, up to 10 MB: filename + content) " \
+                 "or pasted html_body — one of the two. If the deal already has that offer, the content is added " \
+                 "as its next numbered version; otherwise a new offer is created (version 1). The target offer is " \
+                 "offer_id, else the offer matching name, else the deal's only offer (error if it has several and " \
+                 "none is chosen). Name defaults to the file name when creating.",
+    input_schema: {type: "object",
+                   properties: {deal_id: {type: "integer"},
+                                name: {type: "string", description: "Offer name; matches an existing offer case-insensitively"},
+                                offer_id: {type: "integer", description: "Add a version to this offer of the deal"},
+                                filename: {type: "string", description: "PDF or HTML file name"},
+                                content: {type: "string", description: "Base64-encoded PDF/HTML content"},
+                                content_type: {type: "string", description: "Optional MIME type (application/pdf or text/html)"},
+                                html_body: {type: "string", description: "HTML to store instead of a file"},
+                                comment: {type: "string", description: "Optional version note"}},
+                   required: ["deal_id"]}
+  ) do |server_context:, **args|
+    CreamMcp.with_authorization(server_context) do
+      pundit_ctx = CreamMcp.pundit_context(server_context)
+      ws = pundit_ctx.workspace
+      deal = CreamMcp.policy_scope(pundit_ctx, ws.deals).find(CreamMcp.arg(args, "deal_id"))
+      CreamMcp.authorize!(pundit_ctx, deal, :update?)
+      result = Api::DealOfferUploader.new(
+        workspace: ws, user: pundit_ctx.user, deal: deal,
+        attrs: CreamMcp.picked(args, "name", "offer_id", "comment", "html_body"),
+        file: CreamMcp.picked(args, "filename", "content", "content_type")
+      ).upload
+      if result.saved?
+        CreamMcp.respond_with(created: Api::DealOfferUploader.json(result).merge(deal: CreamMcp.record_ref_json(deal)))
+      else
+        CreamMcp.error_response("validation_error", result.errors.to_sentence)
+      end
+    rescue Api::DealOfferUploader::InvalidOffer, Api::RecordAttachmentBuilder::InvalidAttachment => e
+      CreamMcp.error_response("invalid_offer", e.message)
     end
   end
 

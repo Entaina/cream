@@ -64,6 +64,7 @@ Tool names exposed by the **Cream MCP server** (see `tools/list` in your MCP cli
 |------|---------------|-------|
 | `add_note` | `record_type`, `record_id`, `body` | Optional: `title` |
 | `add_person_attachment` | `person_id`, `filename`, `content` (Base64) | Optional: `content_type`, `name`; up to 10 MB; feature `:attachments` |
+| `add_deal_offer` | `deal_id` + (`filename`, `content` Base64 PDF/HTML **or** `html_body`) | Optional: `name`, `offer_id`, `comment`, `content_type`; adds a new numbered version if the offer exists (by `offer_id`, else `name`, else the deal's only offer), else creates the offer; up to 10 MB |
 | `add_comment` | `record_type`, `record_id`, `body` | Optional: `parent_comment_id`; feature `:comments` |
 | `send_deal_email` | `deal_id`, `subject`, `body` | Optional: `to_address`, attachments (Base64); feature `:record_email` |
 

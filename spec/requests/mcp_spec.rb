@@ -64,7 +64,7 @@ RSpec.describe "Mcp", type: :request do
         "create_product", "update_product", "add_deal_product", "update_deal_product", "update_task", "get_deal_history",
         "recent_changes", "sales_forecast",
         "summarize_record", "suggest_next_steps", "draft_email", "natural_language_search", "enrich_record",
-        "add_person_attachment", "create_mql", "list_mqls", "get_person_marketing", "send_campaign", "convert_mql_to_sql")
+        "add_person_attachment", "add_deal_offer", "create_mql", "list_mqls", "get_person_marketing", "send_campaign", "convert_mql_to_sql")
     end
 
     it "lists products scoped to the token workspace" do
@@ -512,6 +512,58 @@ RSpec.describe "Mcp", type: :request do
       result = mcp_tool_error("add_person_attachment", {person_id: create_person!(workspace).id, filename: "a.txt", content: "eA=="})
 
       expect(result["error"]).to eq("feature_unavailable")
+    end
+
+    describe "add_deal_offer" do
+      let!(:pipeline) { Pipeline.create_default!(workspace) }
+      let(:deal) { create_deal!(workspace, pipeline: pipeline) }
+      let(:pdf_content) { Base64.strict_encode64("%PDF-1.4 fake") }
+
+      it "creates an offer with version 1 and then adds a new version to it" do
+        first = call_tool("add_deal_offer", {deal_id: deal.id, filename: "propuesta.pdf", content: pdf_content,
+                                             content_type: "application/pdf"})
+
+        expect(first["created"]).to include("name" => "propuesta", "offer_created" => true)
+        expect(first["created"]["version"]).to include("number" => 1, "filename" => "propuesta.pdf")
+        expect(first.dig("created", "deal", "id")).to eq(deal.id)
+
+        second = call_tool("add_deal_offer", {deal_id: deal.id, html_body: "<p>v2</p>", comment: "Ajuste de precio"})
+
+        expect(second["created"]).to include("id" => first.dig("created", "id"), "offer_created" => false, "versions_count" => 2)
+        expect(second["created"]["version"]).to include("number" => 2, "comment" => "Ajuste de precio")
+        offer = deal.offers.sole
+        expect(offer.current_version.html_body).to eq("<p>v2</p>")
+        expect(offer.versions.first.file.download).to eq("%PDF-1.4 fake")
+      end
+
+      it "targets an offer by name or offer_id and asks when it is ambiguous" do
+        one = deal.offers.create!(workspace: workspace, user: user, name: "Uno")
+        one.versions.create!(user: user, html_body: "<p>1</p>")
+        two = deal.offers.create!(workspace: workspace, user: user, name: "Dos")
+        two.versions.create!(user: user, html_body: "<p>2</p>")
+
+        by_name = call_tool("add_deal_offer", {deal_id: deal.id, name: "dos", html_body: "<p>2b</p>"})
+        by_id = call_tool("add_deal_offer", {deal_id: deal.id, offer_id: one.id, html_body: "<p>1b</p>"})
+        ambiguous = mcp_tool_error("add_deal_offer", {deal_id: deal.id, html_body: "<p>x</p>"})
+
+        expect(by_name.dig("created", "id")).to eq(two.id)
+        expect(by_id.dig("created", "id")).to eq(one.id)
+        expect(ambiguous["error"]).to eq("invalid_offer")
+        expect([one.versions.count, two.versions.count]).to eq([2, 2])
+      end
+
+      it "rejects invalid content and deals from other workspaces" do
+        other_deal = create_deal!(workspaces(:two))
+
+        empty = mcp_tool_error("add_deal_offer", {deal_id: deal.id, name: "Vacía"})
+        bad_base64 = mcp_tool_error("add_deal_offer", {deal_id: deal.id, filename: "a.pdf", content: "***"})
+        missing = mcp_tool_error("add_deal_offer", {deal_id: other_deal.id, html_body: "<p>x</p>"})
+
+        expect(empty["error"]).to eq("validation_error")
+        expect(bad_base64["error"]).to eq("invalid_offer")
+        expect(missing["error"]).to eq("not_found")
+        expect(deal.offers).to be_empty
+      end
     end
 
     it "lists person duplicate groups by email" do

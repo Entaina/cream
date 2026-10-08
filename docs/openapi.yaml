@@ -29,6 +29,7 @@ tags:
   - name: Deals
   - name: Deal notes
   - name: Deal emails
+  - name: Deal offers
   - name: Tasks
   - name: Gmail add-on
   - name: Marketing
@@ -292,6 +293,78 @@ components:
         created_at:
           type: string
           format: date-time
+
+    DealOfferInput:
+      type: object
+      description: >-
+        Send either `html_body` or a file (`filename` + `content` as Base64 in JSON, or `file` in
+        `multipart/form-data`), not both.
+      properties:
+        name:
+          type: string
+          description: Offer name. Matches an existing offer of the deal (case-insensitive); defaults to the file name when creating.
+        offer_id:
+          type: integer
+          description: Add the new version to this offer of the deal (takes precedence over `name`).
+        comment:
+          type: string
+          description: Optional version note.
+        html_body:
+          type: string
+          description: Pasted HTML (plain document, not a template).
+        filename:
+          type: string
+          example: propuesta.pdf
+        content:
+          type: string
+          format: byte
+          description: Base64-encoded PDF or HTML file (JSON requests).
+        content_type:
+          type: string
+          enum: [application/pdf, text/html]
+          description: Optional MIME type.
+        file:
+          type: string
+          format: binary
+          description: Uploaded PDF or HTML file (multipart/form-data requests).
+
+    DealOffer:
+      type: object
+      required: [id, name, offer_created, version, versions_count]
+      properties:
+        id:
+          type: integer
+          description: Offer id.
+        name:
+          type: string
+        offer_created:
+          type: boolean
+          description: true when the offer was created; false when a new version was added to an existing one.
+        versions_count:
+          type: integer
+        version:
+          type: object
+          required: [id, number, content_type, byte_size, created_at]
+          properties:
+            id:
+              type: integer
+            number:
+              type: integer
+              description: Version number (v1, v2…); the highest one is the current version.
+            comment:
+              type: string
+              nullable: true
+            content_type:
+              type: string
+            filename:
+              type: string
+              nullable: true
+              description: null for pasted HTML.
+            byte_size:
+              type: integer
+            created_at:
+              type: string
+              format: date-time
 
     MqlInput:
       type: object
@@ -1919,6 +1992,57 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/DealEmail"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /api/v1/deals/{deal_id}/offers:
+    post:
+      tags: [Deal offers]
+      summary: Upload a proposal to a deal
+      description: |
+        Uploads a proposal (offer) as a PDF/HTML file (Base64 in JSON, or `multipart/form-data`
+        with `offer[file]`) or as pasted HTML (`html_body`) — exactly one of the two. If the deal
+        already has the target offer, the content becomes its **next numbered version**; otherwise
+        a new offer is created with version 1 (`offer_created: true`).
+
+        Target offer: `offer_id`, else the offer whose `name` matches (case-insensitive), else —
+        when neither is sent — the deal's only offer. If the deal has several offers and none is
+        chosen the request fails with 422. A `name` that matches no offer creates a new one;
+        when creating, the name defaults to the file name. Limit: 10 MB per file.
+        Requires permission to edit the deal.
+      parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
+        - $ref: "#/components/parameters/DealIdNested"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [offer]
+              properties:
+                offer:
+                  $ref: "#/components/schemas/DealOfferInput"
+          multipart/form-data:
+            schema:
+              type: object
+              required: [offer]
+              properties:
+                offer:
+                  $ref: "#/components/schemas/DealOfferInput"
+      responses:
+        "201":
+          description: Version created (and the offer, if it did not exist)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DealOffer"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "403":

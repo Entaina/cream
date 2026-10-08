@@ -312,6 +312,7 @@ Rails.application.routes.draw do
       resources :deals do
         resources :notes, only: :create, controller: "deal_notes"
         resources :emails, only: :create, controller: "deal_emails"
+        resources :offers, only: :create, controller: "deal_offers"
       end
       resources :tasks do
         member do

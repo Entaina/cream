@@ -34,13 +34,18 @@ module Api
 
     def build(raw, name: nil)
       attachment = @record.record_attachments.new(workspace: @workspace, user: @user, name: name.presence)
-
-      if raw.is_a?(ActionDispatch::Http::UploadedFile)
-        attach_uploaded_file(attachment, raw)
-      else
-        attach_base64_file(attachment, raw)
-      end
+      attach(attachment, raw)
       attachment
+    end
+
+    # Attaches the raw file to any record exposing `file` (Active Storage), e.g. an OfferVersion.
+    def attach(target, raw)
+      if raw.is_a?(ActionDispatch::Http::UploadedFile)
+        attach_uploaded_file(target, raw)
+      else
+        attach_base64_file(target, raw)
+      end
+      target
     end
 
     private
@@ -65,7 +70,7 @@ module Api
       raise InvalidAttachment, "attachment filename and content are required" if filename.blank? || content.blank?
       raise InvalidAttachment, too_large(filename) if oversized?(content)
 
-      attachment.name ||= raw[:name].presence
+      attachment.name ||= raw[:name].presence if attachment.respond_to?(:name)
       options = {io: StringIO.new(decode_base64(content, filename)), filename: filename}
       options[:content_type] = raw[:content_type] if raw[:content_type].present?
       attachment.file.attach(options)

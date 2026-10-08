@@ -60,6 +60,7 @@ Want to change CRM data?
 ├── Move kanban → update_deal_stage(deal_id, stage) or update_deal(stage/pipeline)
 ├── Note on record → add_note(record_type, record_id, body)
 ├── File on a person → add_person_attachment(person_id, filename, content[Base64])
+├── Proposal on a deal → add_deal_offer(deal_id, filename+content[Base64] | html_body) — new version if it already exists
 ├── New MQL → create_mql(email, marketing_consent: true, company_id|company_name, …)
 ├── Thread comment → add_comment (optional parent_comment_id)
 ├── Task → create_task / update_task / complete_task
@@ -82,7 +83,7 @@ Want to change CRM data?
 | Update records | `update_person`, `update_company`, `update_deal` |
 | Move stage | `update_deal_stage` |
 | Stage entry conditions | `list_stage_conditions`, `create_stage_condition`, … |
-| Note / comment / file | `add_note`, `add_comment`, `add_person_attachment` |
+| Note / comment / file / proposal | `add_note`, `add_comment`, `add_person_attachment`, `add_deal_offer` |
 | Task lifecycle | `create_task`, `update_task`, `complete_task` |
 | Email | `send_deal_email` |
 | Pipeline stats | `pipeline_summary`, `sales_forecast` |
