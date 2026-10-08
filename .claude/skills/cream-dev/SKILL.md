@@ -18,6 +18,7 @@ Local settings live in `.env` at the project root (copy from `.env.example` on f
 | `CREAM_SEED_ADMIN_EMAIL/PASSWORD` | Admin demo user for `db:seed` and login |
 | `CREAM_SEED_MEMBER_EMAIL/PASSWORD` | Member demo user |
 | `CREAM_APP_URL` | Base URL for browser verification (`cream-playwright` skill), email tracking pixels, marketing preference links, web tracking and Mailjet webhook URLs |
+| `CREAM_PUBLIC_SIGNUP` | When `false`, only invited users or emails matching a workspace signup domain can register (default `true`) |
 | `MARKETING_DATA_RETENTION_DAYS` | Days to keep `PageView` and `EmailEvent` rows (default 180; `MarketingDataRetentionJob`) |
 
 ```bash
@@ -43,6 +44,14 @@ Stop daemonized server: `kill $(cat tmp/pids/server.pid)`. Logs: `tail -f log/de
 ## Login credentials (seeded)
 
 Values come from `.env` (`CREAM_SEED_*`). After `db:seed`, the console prints the admin email/password pair.
+
+**Platform superadmin** (multi-tenant operators, not workspace admins):
+
+```bash
+bin/rails superadmin:grant[you@example.com]
+```
+
+Sign in and open **Superadmin** (lock icon in the sidebar footer) at `/superadmin` to create workspaces, set each tenant's signup email domain, and enter any workspace as admin for support.
 
 ## Skills (shared between Claude Code and Cursor)
 

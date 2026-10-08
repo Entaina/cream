@@ -73,6 +73,11 @@
 
   <%# User footer %>
   <div class="border-t border-line p-2 flex items-center gap-2">
+    <% if current_user.superadmin? %>
+      <%= link_to superadmin_root_path, class: "text-ink-faint hover:text-ink p-1.5 rounded-md hover:bg-accent-soft/70", title: t("nav.superadmin") do %>
+        <%= icon :lock, classes: "size-4" %>
+      <% end %>
+    <% end %>
     <%= link_to settings_profile_path, class: "flex items-center gap-2 min-w-0 flex-1 rounded-md p-1 -m-1 hover:bg-accent-soft/70 transition-colors" do %>
       <%= avatar current_user, size: "size-7", text: "text-xs" %>
       <div class="min-w-0 flex-1">

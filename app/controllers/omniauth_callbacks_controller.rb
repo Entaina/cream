@@ -21,6 +21,8 @@ class OmniauthCallbacksController < ApplicationController
 
     start_new_session_for user
     redirect_to after_authentication_url
+  rescue SignupForbiddenError
+    redirect_to new_session_path, alert: t("auth.sign_up_disabled")
   rescue ActiveRecord::RecordInvalid
     redirect_to new_session_path, alert: t("flashes.oauth.google_sign_in_failed")
   end

@@ -19,3 +19,9 @@ outsider:
   name: Outsider
   email_address: outsider@example.com
   password_digest: <%= password_digest %>
+
+superadmin:
+  name: Super Admin
+  email_address: superadmin@example.com
+  password_digest: <%= password_digest %>
+  superadmin: true

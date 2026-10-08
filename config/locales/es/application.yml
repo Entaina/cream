@@ -142,6 +142,7 @@ es:
       title: Crea tu cuenta
       workspace_name: Nombre del workspace
       workspace_name_placeholder: Mi Empresa S.L.
+    sign_up_disabled: El registro está restringido. Usa un enlace de invitación o un email permitido para tu organización.
     sign_in:
       create_account: Crear cuenta
       email: Email
@@ -387,6 +388,7 @@ es:
     profile: Perfil
     search: Buscar...
     show_in_menu: Mostrar en el menú
+    superadmin: Superadmin
     sign_out: Cerrar sesión
     tasks: Tareas
     team: Equipo

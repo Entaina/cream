@@ -70,8 +70,15 @@ class Workspace < ApplicationRecord
   has_many :privacy_policy_versions, dependent: :destroy
   belongs_to :public_layout_template, class_name: "LeadFormTemplate", optional: true
 
+  EMAIL_DOMAIN_FORMAT = /\A[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)+\z/
+
+  normalizes :email_domain, with: ->(d) {
+    d.to_s.strip.downcase.delete_prefix("@").presence
+  }
+
   validates :name, presence: true
   validates :slug, presence: true, uniqueness: true, format: {with: /\A[a-z0-9-]+\z/}
+  validates :email_domain, uniqueness: true, allow_nil: true, format: {with: EMAIL_DOMAIN_FORMAT, allow_blank: true}
   validates :time_zone, presence: true
   validates :ga_measurement_id, format: {with: GoogleAnalytics::GA4_ID_FORMAT}, allow_blank: true
   validate :okm_service_account_key_format, if: -> { okm_service_account_key.present? }

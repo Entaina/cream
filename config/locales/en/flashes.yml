@@ -256,3 +256,11 @@ en:
       created: Webhook created.
       deleted: Webhook deleted.
       updated: Webhook updated.
+    superadmin:
+      workspace_created: Workspace created.
+      workspace_updated: Workspace updated.
+      entered_workspace: You are now in %{name}.
+      member_added: Member added.
+      member_updated: Member role updated.
+      member_removed: Member removed.
+      invitation_sent: Invitation sent to %{email}.

@@ -1,0 +1,34 @@
+---
+es:
+  superadmin:
+    workspaces:
+      page_title: Superadmin
+      title: Workspaces
+      intro: Crea workspaces, configura dominios de email para el alta automática y gestiona miembros.
+      new: Nuevo workspace
+      new_page_title: Nuevo workspace
+      create: Crear workspace
+      edit: Editar
+      edit_page_title: "Editar %{name}"
+      edit_title: "Editar %{name}"
+      enter: Entrar al workspace
+      back: Volver al listado
+      empty: Aún no hay workspaces.
+      add_member: Añadir miembro
+      add_member_submit: Añadir
+      save_role: Guardar
+      no_members: Aún no hay miembros.
+      remove_member_confirm: "¿Quitar a este miembro del workspace?"
+      table:
+        name: Nombre
+        slug: Slug
+        domain: Dominio de email
+        members: Miembros
+        actions: Acciones
+      form:
+        slug: Slug
+        slug_placeholder: mi-empresa
+        slug_hint: Déjalo vacío para generarlo desde el nombre. Solo minúsculas, números y guiones.
+        email_domain: Dominio de email para registro
+        email_domain_hint: Los usuarios con este dominio pueden registrarse y unirse a este workspace automáticamente (cuando el registro público está restringido).
+        initial_admin: Admin inicial

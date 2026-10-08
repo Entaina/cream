@@ -4,7 +4,7 @@
 
 Cream is a **workspace**-based CRM for managing **people**, **companies** and **deals** (opportunities), with notes, tasks, lists and an activity history shared across the team.
 
-> **Last revision:** 2026-10-06 (deals: execution dates, payment method and payment date)
+> **Last revision:** 2026-10-08 (platform superadmin and workspace signup domains)
 > This document describes the functionality **visible to the user**. Disabled features are listed at the end under "Coming soon".
 
 ---
@@ -88,6 +88,10 @@ A **workspace** is the team's shared working space. All records (people, compani
 ### Switching workspaces
 
 If you belong to more than one workspace, the sidebar header shows the name of the current workspace. Click it to open the list and switch to the one you want.
+
+**Platform superadmin** (operators who run Cream for multiple customers): users with the global superadmin flag see a **lock** icon in the sidebar footer. It opens **Superadmin** (`/superadmin`), where you can create workspaces, set each tenant's **signup email domain**, manage members, and **Enter workspace** to work inside any tenant as an admin. This role is not granted from the UI — your host assigns it on the server.
+
+When public self-registration is turned off for your deployment, new accounts are only created via **invitation**, **superadmin**, or an email address whose domain matches a workspace signup domain.
 
 ### Roles
 

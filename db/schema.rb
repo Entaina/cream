@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_07_140000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_08_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -911,6 +911,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_07_140000) do
     t.date "sales_briefing_regenerations_on"
     t.boolean "alert_in_app", default: true, null: false
     t.boolean "alert_email", default: false, null: false
+    t.boolean "superadmin_access", default: false, null: false
     t.index ["current_pipeline_id"], name: "index_memberships_on_current_pipeline_id"
     t.index ["user_id"], name: "index_memberships_on_user_id"
     t.index ["workspace_id", "user_id"], name: "index_memberships_on_workspace_id_and_user_id", unique: true
@@ -1598,6 +1599,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_07_140000) do
     t.string "theme", default: "system", null: false
     t.string "locale", default: "es", null: false
     t.string "time_zone"
+    t.boolean "superadmin", default: false, null: false
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
     t.index ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true, where: "((provider IS NOT NULL) AND (uid IS NOT NULL))"
   end
@@ -1659,6 +1661,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_07_140000) do
     t.string "time_zone", default: "Europe/Madrid", null: false
     t.string "ga_measurement_id"
     t.bigint "public_layout_template_id"
+    t.string "email_domain"
+    t.index ["email_domain"], name: "index_workspaces_on_email_domain", unique: true, where: "(email_domain IS NOT NULL)"
     t.index ["public_layout_template_id"], name: "index_workspaces_on_public_layout_template_id"
     t.index ["slug"], name: "index_workspaces_on_slug", unique: true
   end

@@ -34,7 +34,9 @@
 
     <div class="flex items-center justify-between mt-4 text-sm">
       <%= link_to t("auth.sign_in.forgot_password"), new_password_path, class: "text-ink-faint hover:text-ink" %>
-      <%= link_to t("auth.sign_in.create_account"), new_registration_path, class: "font-medium text-accent hover:underline" %>
+      <% if User.public_signup_enabled? %>
+        <%= link_to t("auth.sign_in.create_account"), new_registration_path, class: "font-medium text-accent hover:underline" %>
+      <% end %>
     </div>
   </div>
 </div>

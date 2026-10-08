@@ -5,6 +5,11 @@ class RegistrationsController < ApplicationController
   allow_unauthenticated_access only: %i[new create]
 
   def new
+    unless User.public_signup_enabled?
+      redirect_to new_session_path, alert: t("auth.sign_up_disabled")
+      return
+    end
+
     @user = User.new
   end
 
@@ -12,6 +17,11 @@ class RegistrationsController < ApplicationController
     @user = User.new(user_params)
     guest_locale = cookies[:locale].presence_in(User::LOCALES)
     @user.locale = guest_locale if guest_locale
+
+    unless User.allowed_to_register?(@user.email_address)
+      redirect_to new_session_path, alert: t("auth.sign_up_disabled")
+      return
+    end
 
     if @user.save
       persist_locale_cookie(@user.locale)

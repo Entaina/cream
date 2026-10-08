@@ -143,6 +143,7 @@ en:
       title: Create your account
       workspace_name: Workspace name
       workspace_name_placeholder: Acme Inc
+    sign_up_disabled: Registration is restricted. Use an invitation link or an email address allowed for your organization.
     sign_in:
       create_account: Create account
       email: Email
@@ -387,6 +388,7 @@ en:
     profile: Profile
     search: Search...
     show_in_menu: Show in menu
+    superadmin: Superadmin
     sign_out: Sign out
     tasks: Tasks
     team: Team

@@ -12,12 +12,16 @@ class UserContext
     @membership = Membership.find_by(user: user, workspace: workspace) if user && workspace
   end
 
+  def superadmin?
+    user&.superadmin?
+  end
+
   def member?
-    membership.present?
+    superadmin? || membership.present?
   end
 
   def admin?
-    membership&.role == "admin"
+    superadmin? || membership&.role == "admin"
   end
 
   def sales_director?

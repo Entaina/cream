@@ -13,6 +13,7 @@ class ApplicationController < ActionController::Base
 
   before_action :set_current_workspace
   before_action :ensure_workspace_membership
+  before_action :ensure_superadmin_support_membership
   before_action :set_current_pipeline
   before_action :set_paper_trail_whodunnit
 
@@ -22,7 +23,7 @@ class ApplicationController < ActionController::Base
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
   rescue_from Pagy::RangeError, with: :pagy_redirect_to_last_page
 
-  helper_method :current_workspace, :current_user, :current_pipeline, :current_membership, :show_closed?
+  helper_method :current_workspace, :current_user, :current_pipeline, :current_membership, :show_closed?, :switchable_workspaces
 
   private
 
@@ -60,8 +61,28 @@ class ApplicationController < ActionController::Base
 
   def ensure_workspace_membership
     return unless current_user
+    return if superadmin_namespace?
 
     raise Pundit::NotAuthorizedError unless current_workspace && pundit_user.member?
+  end
+
+  def ensure_superadmin_support_membership
+    return unless current_user&.superadmin? && current_workspace
+    return if superadmin_namespace?
+
+    current_user.ensure_superadmin_support_membership!(current_workspace)
+  end
+
+  def superadmin_namespace?
+    self.class.module_parent == Superadmin
+  end
+
+  def switchable_workspaces
+    if current_user.superadmin?
+      Workspace.order(:name)
+    else
+      current_user.workspaces.order(:name)
+    end
   end
 
   def set_current_pipeline

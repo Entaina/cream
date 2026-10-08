@@ -29,15 +29,17 @@ User ←── Membership ──→ Workspace
          role: admin | sales_director | salesperson | ai_salesperson
 ```
 
-- **`Workspace`**: `name` + unique `slug`. Owns companies, people, deals, notes, tasks, lists, activities.
-- **`Membership`**: joins user ↔ workspace. Roles `admin` | `sales_director` | `salesperson` | `ai_salesperson` (`Membership::ROLES`). One membership per user/workspace pair. Per-workspace prefs: `current_pipeline_id`, `sales_director_briefing_enabled`, `alert_in_app` (default true), `alert_email` (default false).
-- **`User`**: can belong to **many** workspaces (`has_many :workspaces, through: :memberships`).
+- **`Workspace`**: `name` + unique `slug`. Optional unique `email_domain` for automatic signup into this tenant. Owns companies, people, deals, notes, tasks, lists, activities.
+- **`Membership`**: joins user ↔ workspace. Roles `admin` | `sales_director` | `salesperson` | `ai_salesperson` (`Membership::ROLES`). One membership per user/workspace pair. `superadmin_access` marks support memberships (hidden from team lists, excluded from last-admin checks). Per-workspace prefs: `current_pipeline_id`, `sales_director_briefing_enabled`, `alert_in_app` (default true), `alert_email` (default false).
+- **`User`**: can belong to **many** workspaces (`has_many :workspaces, through: :memberships`). Global flag `superadmin` (grant via `bin/rails superadmin:grant[email]` only — no UI).
 
-**Registration** (`RegistrationsController#create`): creates user + workspace (form `workspace_name` or `"#{name}'s Workspace"`) + membership as `admin`.
+**Superadmin** (`/superadmin`, `Superadmin::*`): create/edit workspaces, set `email_domain`, manage members/invitations, **Enter workspace** (lazy admin membership with `superadmin_access: true`). Superadmins pass `UserContext#member?` / `#admin?` in any workspace; API/MCP still use normal membership only.
 
-**Active workspace per request** — no workspace switcher in the UI yet:
+**Registration** (`RegistrationsController#create`): when `CREAM_PUBLIC_SIGNUP=true` (default), creates user + personal workspace + admin membership; when false, only invited emails or emails matching a workspace `email_domain` (legacy fallback: `CREAM_ORGANIZATION_*` env). `User#provision_default_workspace!` joins domain workspaces as admin if empty else salesperson.
 
-- `User#default_workspace` → `workspaces.order(:id).first`
+**Active workspace per request** — session `workspace_id` + switcher (`shared/_workspace_switcher`; superadmin sees all workspaces):
+
+- `User#default_workspace` → first membership, or first workspace in DB for superadmin
 - `ApplicationController#set_current_workspace` sets `Current.workspace`
 - Exposed as `current_workspace`; `ensure_workspace_membership` requires a valid membership or raises `Pundit::NotAuthorizedError`
 - Sidebar shows `current_workspace.name` (`shared/_sidebar`)

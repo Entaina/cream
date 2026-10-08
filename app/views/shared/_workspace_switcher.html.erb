@@ -1,4 +1,4 @@
-<% workspaces = current_user.workspaces.order(:name) %>
+<% workspaces = switchable_workspaces.to_a %>
 
 <% if workspaces.size > 1 %>
   <details class="group relative border-b border-line">

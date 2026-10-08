@@ -22,6 +22,7 @@ class Membership < ApplicationRecord
   before_destroy :ensure_not_last_admin
 
   scope :admins, -> { where(role: "admin") }
+  scope :real_team, -> { where(superadmin_access: false) }
 
   scope :search, ->(q) {
     if q.present?
@@ -53,7 +54,9 @@ class Membership < ApplicationRecord
   end
 
   def last_admin?
-    admin? && workspace.memberships.admins.count == 1
+    return false if superadmin_access?
+
+    admin? && workspace.memberships.admins.real_team.count == 1
   end
 
   def sales_director_briefing_visible?
@@ -116,7 +119,7 @@ class Membership < ApplicationRecord
 
   def ensure_not_demoting_last_admin
     return unless role_changed? && role_was == "admin" && role != "admin"
-    return unless workspace.memberships.admins.where.not(id: id).none?
+    return unless workspace.memberships.admins.real_team.where.not(id: id).none?
 
     errors.add(:role, :cannot_demote_last_admin)
   end

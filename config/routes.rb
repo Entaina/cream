@@ -37,6 +37,16 @@ Rails.application.routes.draw do
   resources :passwords, param: :token
   resource :registration, only: %i[new create]
 
+  namespace :superadmin do
+    root to: "workspaces#index"
+    resources :workspaces, except: :destroy do
+      member do
+        post :enter
+      end
+      resources :members, only: %i[create update destroy], controller: "workspace_members"
+    end
+  end
+
   get "auth/:provider/callback", to: "omniauth_callbacks#create"
   get "auth/failure", to: "omniauth_callbacks#failure"
 

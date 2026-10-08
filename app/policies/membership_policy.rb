@@ -6,7 +6,7 @@ class MembershipPolicy < ApplicationPolicy
     def resolve
       return scope.none unless member?
 
-      scope.where(workspace: workspace).includes(:user)
+      scope.real_team.where(workspace: workspace).includes(:user)
     end
   end
 end
