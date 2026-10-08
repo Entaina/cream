@@ -3,6 +3,10 @@ require "rails_helper"
 RSpec.describe GmailSyncJob do
   fixtures :users, :workspaces, :memberships
 
+  it "runs on its own queue so a long sync does not block other jobs" do
+    expect(described_class.queue_name).to eq("gmail_sync")
+  end
+
   it "delegates to GmailSyncService" do
     connection = workspaces(:one).gmail_connections.create!(
       user: users(:one), email: "me@gmail.com",

@@ -17,6 +17,6 @@ RSpec.describe GmailSyncSchedulerJob do
 
     expect {
       described_class.perform_now
-    }.to have_enqueued_job(GmailSyncJob).once
+    }.to have_enqueued_job(GmailSyncJob).on_queue("gmail_sync").once
   end
 end

@@ -158,7 +158,7 @@ RSpec.describe "Gmail connections", type: :request do
 
       expect {
         post sync_gmail_connection_path
-      }.to have_enqueued_job(GmailSyncJob)
+      }.to have_enqueued_job(GmailSyncJob).on_queue("gmail_sync")
 
       expect(response).to redirect_to(gmail_connection_path)
     end

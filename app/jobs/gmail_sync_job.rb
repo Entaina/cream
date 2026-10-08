@@ -1,5 +1,5 @@
 class GmailSyncJob < ApplicationJob
-  queue_as :default
+  queue_as :gmail_sync
 
   def perform(connection_id)
     connection = GmailConnection.find_by(id: connection_id)
