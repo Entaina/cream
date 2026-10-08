@@ -118,9 +118,11 @@ Rails.application.routes.draw do
       get :picker
     end
     resources :deal_accesses, only: %i[create destroy]
+    resource :portal_invite_link, controller: :deal_portal_invite_links, only: %i[create destroy]
     resources :line_items, controller: :deal_products, only: %i[create update destroy]
     resources :offers, only: %i[new create show destroy] do
       resources :versions, controller: :offer_versions, only: %i[new create show destroy]
+      resources :share_links, controller: :offer_share_links, only: :destroy
     end
     resources :versions, controller: :deal_versions, only: %i[index show]
   end
@@ -237,6 +239,31 @@ Rails.application.routes.draw do
     constraints: {event_type: /[a-z0-9-]+/}
 
   get "offer_packages/:token/*path", to: "public/offer_packages#show", as: :offer_package_file, format: false
+
+  get "s/:token", to: "public/offer_shares#show", as: :public_offer_share
+  post "s/:token", to: "public/offer_shares#create"
+  get "s/:token/ver/:grant_token", to: "public/offer_shares#confirm", as: :public_offer_share_access
+  post "s/:token/ver/:grant_token", to: "public/offer_shares#access"
+
+  scope "portal/:workspace_slug", module: "public", as: :client_portal do
+    get "/", to: "client_portal_sessions#new", as: :root
+    post "acceso", to: "client_portal_sessions#create", as: :access_request
+    get "acceso/:token", to: "client_portal_sessions#show", as: :access_consume
+    post "acceso/:token", to: "client_portal_sessions#consume"
+    delete "sesion", to: "client_portal_sessions#destroy", as: :session
+    get "privacidad", to: "client_portal_privacy#show", as: :privacy
+    get "invitar/:token", to: "deal_portal_invites#show", as: :deal_portal_invite
+    post "invitar/:token", to: "deal_portal_invites#create"
+    get "invitar/:token/ver/:grant_token", to: "deal_portal_invites#confirm", as: :deal_portal_invite_access
+    post "invitar/:token/ver/:grant_token", to: "deal_portal_invites#access"
+    resources :offers, path: "propuestas", controller: "client_portal_offers", only: %i[index show] do
+      member do
+        get :share
+        post :share, action: :create_share
+        delete "accesos/:grant_id", action: :revoke_access, as: :revoke_access
+      end
+    end
+  end
 
   get "p/:workspace_slug/:slug", to: "public/landing_pages#show", as: :public_landing_page
   get "e/preferences/:token", to: "public/email_preferences#show", as: :public_email_preferences

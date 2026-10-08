@@ -61,6 +61,8 @@ en:
     booking_created: "%{guest} booked %{event} for %{datetime}"
     comment_added: "%{actor} added a comment"
     contact_added: "%{actor} added %{contact} as a contact"
+    contact_added_via_offer_share: "%{contact} was added as a contact via proposal «%{offer}», shared by %{shared_by}"
+    contact_added_via_portal_invite: "%{contact} was added as a contact via portal invitation"
     contact_removed: "%{actor} removed %{contact} as a contact"
     contacts_updated: "%{actor} updated contacts (%{contact})"
     created: "%{actor} created this record"
@@ -72,6 +74,8 @@ en:
     merged_companies: "%{actor} merged %{names} into this record"
     merged_people: "%{actor} merged %{names} into this record"
     note_added: "%{actor} added a note"
+    offer_viewed: "%{contact} viewed proposal «%{offer}» (v%{version})"
+    offer_viewed_shared_by: "(shared by %{shared_by})"
     payment_received: "%{actor} linked a Stripe payment of %{amount}"
     payment_received_from: " from %{email}"
     person_deal_stage_changed_html: "%{actor} moved deal %{deal_link} from %{from}
@@ -304,6 +308,7 @@ en:
     until: Until %{date}
   features:
     labels:
+      client_portal: Client portal
       ai_assistant: AI Assistant
       ai_automations: AI automations
       ai_enrichment: AI enrichment

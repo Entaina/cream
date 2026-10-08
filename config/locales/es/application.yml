@@ -61,6 +61,8 @@ es:
     booking_created: "%{guest} reservó %{event} para el %{datetime}"
     comment_added: "%{actor} añadió un comentario"
     contact_added: "%{actor} añadió a %{contact} como contacto"
+    contact_added_via_offer_share: "%{contact} se añadió como contacto a través de la propuesta «%{offer}», compartida por %{shared_by}"
+    contact_added_via_portal_invite: "%{contact} se añadió como contacto mediante invitación al portal"
     contact_removed: "%{actor} eliminó a %{contact} como contacto"
     contacts_updated: "%{actor} actualizó contactos (%{contact})"
     created: "%{actor} creó este registro"
@@ -72,6 +74,8 @@ es:
     merged_companies: "%{actor} fusionó %{names} en este registro"
     merged_people: "%{actor} fusionó %{names} en este registro"
     note_added: "%{actor} añadió una nota"
+    offer_viewed: "%{contact} vio la propuesta «%{offer}» (v%{version})"
+    offer_viewed_shared_by: "(compartida por %{shared_by})"
     payment_received: "%{actor} vinculó un pago de Stripe de %{amount}"
     payment_received_from: " de %{email}"
     person_deal_stage_changed_html: "%{actor} movió la oportunidad %{deal_link} de
@@ -303,6 +307,7 @@ es:
     until: Hasta %{date}
   features:
     labels:
+      client_portal: Portal de clientes
       ai_assistant: Asistente de IA
       ai_automations: Automatizaciones de IA
       ai_enrichment: Enriquecimiento con IA

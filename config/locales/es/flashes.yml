@@ -171,6 +171,11 @@ es:
       created: Versión %{number} añadida.
       last_version: No se puede eliminar la última versión; elimina la oferta.
       removed: Versión %{number} eliminada.
+    deal_portal_invite_links:
+      ready: Enlace de invitación al portal listo para copiar.
+      revoked: Enlace de invitación al portal revocado.
+    offer_share_links:
+      revoked: Enlace compartido revocado.
     offers:
       created: Oferta añadida.
       removed: Oferta eliminada.

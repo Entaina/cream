@@ -39,7 +39,8 @@ module Settings
         :webhooks_enabled,
         :custom_fields_enabled,
         :ga_measurement_id,
-        :public_layout_template_id
+        :public_layout_template_id,
+        :client_portal_layout_template_id
       )
       permitted.delete(:okm_service_account_key) if permitted[:okm_service_account_key].blank?
       permitted
@@ -53,7 +54,7 @@ module Settings
     end
 
     def load_public_layout_templates
-      return unless CreamFeatures.enabled?(:calendar_booking)
+      return unless CreamFeatures.enabled?(:calendar_booking) || CreamFeatures.enabled?(:client_portal)
 
       @public_layout_templates = current_workspace.lead_form_templates.public_layouts.ordered
     end

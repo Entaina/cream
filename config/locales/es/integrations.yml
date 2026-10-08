@@ -381,6 +381,14 @@ es:
         save: Guardar funcionalidades
         title: Funcionalidades
         webhooks: Webhooks
+      client_portal:
+        copied_clipboard: Copiado al portapapeles
+        copy_url: Copiar URL
+        intro: Comparte esta URL con contactos que ya figuren en alguna oportunidad.
+          Para dar de alta a alguien nuevo, usa el enlace de invitación en la ficha
+          de la oportunidad (pestaña Información).
+        title: Portal de clientes
+        url_aria: URL del portal de clientes
       general:
         edit_hint: Si solo activas editar, los vendedores también podrán ver esas
           oportunidades.
@@ -444,6 +452,13 @@ es:
           de lectura al drive…
         title: OKM
       page_title: Ajustes
+      client_portal_layout:
+        hint: Edita la plantilla en Formularios → Plantillas. Debe incluir {{ content
+          }} donde van las páginas del portal. Puede ser la misma que la de reservas u otra.
+        intro: Opcional. Envuelve las páginas del portal de clientes y de las propuestas
+          compartidas con cabecera y pie de tu sitio.
+        none: Sin layout
+        title: Layout del portal de clientes
       public_booking_layout:
         hint: Edita la plantilla en Formularios → Plantillas. Debe incluir {{ content
           }} donde va el calendario de reserva.

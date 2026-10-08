@@ -77,6 +77,28 @@ module ApplicationHelper
     tag.span(initials, class: ["inline-flex items-center justify-center font-semibold shrink-0 select-none", shape, size, text, *colors])
   end
 
+  def deal_contact_display(deal_contact)
+    person = deal_contact.person
+    link = link_to(person.display_name, person_path(person), class: "text-accent hover:underline")
+    if deal_contact.via_offer_share?
+      share_link = deal_contact.offer_share_link
+      title = t(
+        "offers.via_proposal_title",
+        shared_by: share_link&.person&.display_name || t("shared.empty_value"),
+        offer: share_link&.offer&.name || t("shared.empty_value"),
+        date: l(deal_contact.created_at, format: :short)
+      )
+      return safe_join([link, " ", content_tag(:span, badge(t("offers.via_proposal"), color: "hoki"), title: title)])
+    end
+
+    if deal_contact.via_portal_invite?
+      title = t("deals.portal_invite.via_badge_title", date: l(deal_contact.created_at, format: :short))
+      return safe_join([link, " ", content_tag(:span, badge(t("deals.portal_invite.via_badge"), color: "hoki"), title: title)])
+    end
+
+    link
+  end
+
   def badge(label, color: "chicago")
     tag.span(label, class: ["inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset whitespace-nowrap", BADGE_COLORS.fetch(color, BADGE_COLORS["chicago"])])
   end
@@ -323,9 +345,29 @@ module ApplicationHelper
     when "contacts_changed"
       contact = activity.metadata["contact"]
       case activity.metadata["change"]
-      when "added" then t("activities.contact_added", actor: actor, contact: contact)
+      when "added"
+        if activity.metadata["via"] == "offer_share"
+          t("activities.contact_added_via_offer_share",
+            contact: contact,
+            offer: activity.metadata["offer"],
+            shared_by: activity.metadata["shared_by"])
+        elsif activity.metadata["via"] == "portal_invite"
+          t("activities.contact_added_via_portal_invite", contact: contact)
+        else
+          t("activities.contact_added", actor: actor, contact: contact)
+        end
       when "removed" then t("activities.contact_removed", actor: actor, contact: contact)
       else t("activities.contacts_updated", actor: actor, contact: contact)
+      end
+    when "offer_viewed"
+      sentence = t("activities.offer_viewed",
+        contact: activity.metadata["contact"],
+        offer: activity.metadata["offer"],
+        version: activity.metadata["version"])
+      if activity.metadata["shared_by"].present?
+        sentence + " " + t("activities.offer_viewed_shared_by", shared_by: activity.metadata["shared_by"])
+      else
+        sentence
       end
     when "merged"
       if activity.metadata["merged_companies"].present?

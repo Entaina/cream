@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_08_130000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_08_200000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -313,6 +313,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_08_130000) do
     t.index ["workspace_id"], name: "index_campaigns_on_workspace_id"
   end
 
+  create_table "client_portal_login_grants", force: :cascade do |t|
+    t.bigint "workspace_id", null: false
+    t.string "email", null: false
+    t.string "token_digest", null: false
+    t.datetime "expires_at", null: false
+    t.datetime "used_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["token_digest"], name: "index_client_portal_login_grants_on_token_digest", unique: true
+    t.index ["workspace_id", "email", "created_at"], name: "idx_on_workspace_id_email_created_at_e91d961aa9"
+    t.index ["workspace_id"], name: "index_client_portal_login_grants_on_workspace_id"
+  end
+
   create_table "comments", force: :cascade do |t|
     t.bigint "workspace_id", null: false
     t.string "commentable_type", null: false
@@ -397,9 +410,36 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_08_130000) do
     t.bigint "person_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "source"
+    t.bigint "offer_share_link_id"
     t.index ["deal_id", "person_id"], name: "index_deal_contacts_on_deal_id_and_person_id", unique: true
     t.index ["deal_id"], name: "index_deal_contacts_on_deal_id"
+    t.index ["offer_share_link_id"], name: "index_deal_contacts_on_offer_share_link_id"
     t.index ["person_id"], name: "index_deal_contacts_on_person_id"
+  end
+
+  create_table "deal_portal_access_grants", force: :cascade do |t|
+    t.bigint "deal_portal_invite_link_id", null: false
+    t.string "email", null: false
+    t.string "token_digest", null: false
+    t.datetime "expires_at", null: false
+    t.datetime "used_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["deal_portal_invite_link_id", "token_digest"], name: "index_deal_portal_access_grants_on_invite_and_digest", unique: true
+    t.index ["deal_portal_invite_link_id"], name: "index_deal_portal_access_grants_on_deal_portal_invite_link_id"
+  end
+
+  create_table "deal_portal_invite_links", force: :cascade do |t|
+    t.bigint "workspace_id", null: false
+    t.bigint "deal_id", null: false
+    t.string "token", null: false
+    t.datetime "revoked_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["deal_id"], name: "index_deal_portal_invite_links_on_deal_id", unique: true
+    t.index ["token"], name: "index_deal_portal_invite_links_on_token", unique: true
+    t.index ["workspace_id"], name: "index_deal_portal_invite_links_on_workspace_id"
   end
 
   create_table "deal_products", force: :cascade do |t|
@@ -1000,6 +1040,32 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_08_130000) do
     t.index ["uid"], name: "index_oauth_applications_on_uid", unique: true
   end
 
+  create_table "offer_access_grants", force: :cascade do |t|
+    t.bigint "offer_share_link_id", null: false
+    t.string "email", null: false
+    t.string "token_digest", null: false
+    t.datetime "expires_at", null: false
+    t.datetime "used_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "revoked_at"
+    t.index ["offer_share_link_id", "token_digest"], name: "index_offer_access_grants_on_share_link_and_digest", unique: true
+    t.index ["offer_share_link_id"], name: "index_offer_access_grants_on_offer_share_link_id"
+  end
+
+  create_table "offer_share_links", force: :cascade do |t|
+    t.bigint "workspace_id", null: false
+    t.bigint "offer_id", null: false
+    t.bigint "person_id", null: false
+    t.string "token", null: false
+    t.datetime "revoked_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["offer_id", "person_id"], name: "index_offer_share_links_on_offer_id_and_person_id", unique: true
+    t.index ["token"], name: "index_offer_share_links_on_token", unique: true
+    t.index ["workspace_id"], name: "index_offer_share_links_on_workspace_id"
+  end
+
   create_table "offer_versions", force: :cascade do |t|
     t.bigint "offer_id", null: false
     t.bigint "user_id", null: false
@@ -1012,6 +1078,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_08_130000) do
     t.index ["offer_id", "number"], name: "index_offer_versions_on_offer_id_and_number", unique: true
     t.index ["offer_id"], name: "index_offer_versions_on_offer_id"
     t.index ["user_id"], name: "index_offer_versions_on_user_id"
+  end
+
+  create_table "offer_views", force: :cascade do |t|
+    t.bigint "workspace_id", null: false
+    t.bigint "offer_id", null: false
+    t.bigint "offer_version_id", null: false
+    t.bigint "person_id", null: false
+    t.datetime "viewed_at", null: false
+    t.bigint "offer_share_link_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["offer_id", "viewed_at"], name: "index_offer_views_on_offer_id_and_viewed_at"
+    t.index ["offer_version_id"], name: "index_offer_views_on_offer_version_id"
+    t.index ["person_id"], name: "index_offer_views_on_person_id"
+    t.index ["workspace_id"], name: "index_offer_views_on_workspace_id"
   end
 
   create_table "offers", force: :cascade do |t|
@@ -1571,6 +1652,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_08_130000) do
     t.string "consent_field_key"
     t.text "default_consent_label"
     t.boolean "excluded_from_subscribe_all", default: false, null: false
+    t.string "client_portal_consent", default: "none", null: false
+    t.text "default_consent_label_en"
+    t.text "description_en"
     t.index ["workspace_id", "consent_field_key"], name: "index_subscription_types_on_workspace_consent_field_key", unique: true, where: "(consent_field_key IS NOT NULL)"
     t.index ["workspace_id", "slug"], name: "index_subscription_types_on_workspace_id_and_slug", unique: true
     t.index ["workspace_id"], name: "index_subscription_types_on_workspace_id"
@@ -1670,6 +1754,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_08_130000) do
     t.string "ga_measurement_id"
     t.bigint "public_layout_template_id"
     t.string "email_domain"
+    t.bigint "client_portal_layout_template_id"
+    t.index ["client_portal_layout_template_id"], name: "index_workspaces_on_client_portal_layout_template_id"
     t.index ["email_domain"], name: "index_workspaces_on_email_domain", unique: true, where: "(email_domain IS NOT NULL)"
     t.index ["public_layout_template_id"], name: "index_workspaces_on_public_layout_template_id"
     t.index ["slug"], name: "index_workspaces_on_slug", unique: true
@@ -1718,6 +1804,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_08_130000) do
   add_foreign_key "campaigns", "email_layouts", on_delete: :nullify
   add_foreign_key "campaigns", "email_templates", on_delete: :nullify
   add_foreign_key "campaigns", "workspaces"
+  add_foreign_key "client_portal_login_grants", "workspaces"
   add_foreign_key "comments", "comments", column: "parent_id"
   add_foreign_key "comments", "users"
   add_foreign_key "comments", "workspaces"
@@ -1729,7 +1816,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_08_130000) do
   add_foreign_key "deal_accesses", "deals"
   add_foreign_key "deal_accesses", "users"
   add_foreign_key "deal_contacts", "deals"
+  add_foreign_key "deal_contacts", "offer_share_links", on_delete: :nullify
   add_foreign_key "deal_contacts", "people"
+  add_foreign_key "deal_portal_access_grants", "deal_portal_invite_links"
+  add_foreign_key "deal_portal_invite_links", "deals"
+  add_foreign_key "deal_portal_invite_links", "workspaces"
   add_foreign_key "deal_products", "deals"
   add_foreign_key "deal_products", "editions"
   add_foreign_key "deal_products", "products"
@@ -1806,8 +1897,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_08_130000) do
   add_foreign_key "notifications", "workspaces"
   add_foreign_key "oauth_access_grants", "oauth_applications", column: "application_id"
   add_foreign_key "oauth_access_tokens", "oauth_applications", column: "application_id"
+  add_foreign_key "offer_access_grants", "offer_share_links"
+  add_foreign_key "offer_share_links", "offers"
+  add_foreign_key "offer_share_links", "people"
+  add_foreign_key "offer_share_links", "workspaces"
   add_foreign_key "offer_versions", "offers"
   add_foreign_key "offer_versions", "users"
+  add_foreign_key "offer_views", "offer_share_links"
+  add_foreign_key "offer_views", "offer_versions"
+  add_foreign_key "offer_views", "offers"
+  add_foreign_key "offer_views", "people"
+  add_foreign_key "offer_views", "workspaces"
   add_foreign_key "offers", "deals"
   add_foreign_key "offers", "users"
   add_foreign_key "offers", "workspaces"
@@ -1876,5 +1976,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_08_130000) do
   add_foreign_key "webhook_deliveries", "webhooks"
   add_foreign_key "webhooks", "users"
   add_foreign_key "webhooks", "workspaces"
+  add_foreign_key "workspaces", "lead_form_templates", column: "client_portal_layout_template_id", on_delete: :nullify
   add_foreign_key "workspaces", "lead_form_templates", column: "public_layout_template_id", on_delete: :nullify
 end

@@ -113,6 +113,17 @@ es:
       blank: Sin especificar
       cash: Al contado
       deferred: Aplazado
+    portal_invite:
+      copy_url: Copiar enlace
+      generate: Generar enlace de invitación
+      intro: Quien abra este enlace podrá verificar su email, quedará como contacto de esta oportunidad y entrará al portal de propuestas.
+      not_available: El enlace de invitación aún no está activo.
+      revoke: Revocar enlace
+      revoke_confirm: "¿Revocar el enlace de invitación al portal?"
+      title: Invitar al portal de clientes
+      url_aria: URL de invitación al portal
+      via_badge: Vía invitación
+      via_badge_title: "Invitación al portal · %{date}"
     form:
       contacts:
         create: Crear contacto

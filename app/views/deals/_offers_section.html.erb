@@ -1,6 +1,11 @@
 <%# locals: (deal:) %>
-<% offers = deal.offers.includes(versions: [:user, {file_attachment: :blob}]).order(created_at: :desc) %>
+<% offers = deal.offers.includes(
+     versions: [:user, {file_attachment: :blob}],
+     views: :person,
+     share_links: [:person, {views: []}]
+   ).order(created_at: :desc) %>
 <% can_edit = policy(deal).update? %>
+<% client_portal_enabled = CreamFeatures.enabled?(:client_portal) %>
 <section class="card">
   <div class="flex items-center justify-between px-4 py-3 border-b border-line">
     <h2 class="text-base font-semibold flex items-center gap-2">
@@ -11,11 +16,19 @@
     <% end %>
   </div>
 
+  <% if client_portal_enabled %>
+    <div class="px-4 py-3 border-b border-line bg-canvas-sunken/40">
+      <%= render "shared/client_portal_url", workspace: deal.workspace %>
+    </div>
+  <% end %>
+
   <% if offers.any? %>
     <ul class="divide-y divide-line">
       <% offers.each do |offer| %>
         <% versions = offer.versions.sort_by(&:number).reverse %>
         <% current = versions.first %>
+        <% offer_views = offer.views.sort_by(&:viewed_at).reverse %>
+        <% active_share_links = offer.share_links.select(&:active?) %>
         <li class="px-4 py-3">
           <div class="flex items-center gap-3">
             <div class="min-w-0 flex-1">
@@ -24,6 +37,12 @@
                 <%= t("offers.version_label", number: current.number) %> · <%= current.user.name %> · <%= l(current.created_at.to_date, format: :short) %>
                 <% if current.file.attached? %> · <%= number_to_human_size(current.file.byte_size) %><% end %>
               </p>
+              <% if client_portal_enabled && offer_views.any? %>
+                <p class="text-xs text-ink-soft mt-0.5">
+                  <%= t("offers.views.summary", count: offer_views.size) %>
+                  · <%= t("offers.views.last", date: l(offer_views.first.viewed_at, format: :short)) %>
+                </p>
+              <% end %>
             </div>
             <% current_kind = current.pdf? ? [:pdf, "red"] : (current.zip? ? [:zip, "copperfield"] : [:html, "hoki"]) %>
             <%= badge(t("offers.kind.#{current_kind.first}"), color: current_kind.last) %>
@@ -40,6 +59,50 @@
               <% end %>
             <% end %>
           </div>
+
+          <% if client_portal_enabled && offer_views.any? %>
+            <details class="record-disclosure mt-2">
+              <summary><%= t("offers.views.title") %> (<%= offer_views.size %>)</summary>
+              <ul class="mt-2 space-y-1">
+                <% offer_views.each do |view| %>
+                  <li class="text-sm px-2 py-1.5 rounded-md hover:bg-canvas-sunken">
+                    <span class="font-medium"><%= view.person.display_name %></span>
+                    <span class="text-xs text-ink-faint">
+                      · <%= l(view.viewed_at, format: :short) %>
+                      · <%= t("offers.version_label", number: view.offer_version.number) %>
+                    </span>
+                  </li>
+                <% end %>
+              </ul>
+            </details>
+          <% end %>
+
+          <% if client_portal_enabled && (active_share_links.any? || offer.share_links.any?) %>
+            <details class="record-disclosure mt-2">
+              <summary><%= t("offers.share_links.title") %></summary>
+              <ul class="mt-2 space-y-1">
+                <% offer.share_links.sort_by(&:created_at).reverse.each do |share_link| %>
+                  <% link_views = offer_views.count { |v| v.offer_share_link_id == share_link.id } %>
+                  <li class="flex flex-wrap items-center gap-2 text-sm px-2 py-1.5 rounded-md hover:bg-canvas-sunken">
+                    <span class="min-w-0 flex-1">
+                      <span class="font-medium"><%= share_link.person.display_name %></span>
+                      <span class="text-xs text-ink-faint">
+                        · <%= l(share_link.created_at, format: :short) %>
+                        · <%= t("offers.share_links.views", count: link_views) %>
+                        <% unless share_link.active? %> · <%= t("offers.share_links.revoked") %><% end %>
+                      </span>
+                    </span>
+                    <% if can_edit && share_link.active? %>
+                      <%= button_to deal_offer_share_link_path(deal, offer, share_link), method: :delete, class: "btn-ghost text-xs",
+                            form: { data: { turbo_confirm: t("offers.share_links.revoke_confirm", name: share_link.person.display_name) } } do %>
+                        <%= t("offers.share_links.revoke") %>
+                      <% end %>
+                    <% end %>
+                  </li>
+                <% end %>
+              </ul>
+            </details>
+          <% end %>
 
           <% if versions.size > 1 %>
             <details class="record-disclosure mt-2">

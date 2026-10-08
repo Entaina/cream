@@ -6,7 +6,9 @@ class Person < ApplicationRecord
     "booking" => "Reserva online",
     "referral" => "Recomendado",
     "team_member" => "Lo trae alguien del equipo",
-    "beehiiv" => "Beehiiv"
+    "beehiiv" => "Beehiiv",
+    "offer_share" => "Propuesta compartida",
+    "portal_invite" => "Invitación al portal"
   }.freeze
 
   INTERNAL_NOTES_MAX_LENGTH = 50_000
@@ -15,6 +17,8 @@ class Person < ApplicationRecord
   belongs_to :company
   belongs_to :brought_by, class_name: "User", optional: true
   has_many :deal_contacts, dependent: :destroy
+  has_many :offer_views, dependent: :destroy
+  has_many :offer_share_links, dependent: :destroy
   has_many :deals, through: :deal_contacts
   has_many :outgoing_relationships, class_name: "PersonRelationship",
     foreign_key: :from_person_id, dependent: :destroy, inverse_of: :from_person

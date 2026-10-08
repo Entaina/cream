@@ -375,6 +375,13 @@ en:
         save: Save features
         title: Features
         webhooks: Webhooks
+      client_portal:
+        copied_clipboard: Copied to clipboard
+        copy_url: Copy URL
+        intro: Share this URL with contacts who are already on a deal. To onboard someone
+          new, use the invitation link on the deal page (Information tab).
+        title: Client portal
+        url_aria: Client portal URL
       general:
         edit_hint: If you only enable edit, salespeople can also view those deals.
         name: Workspace name
@@ -436,6 +443,13 @@ en:
           to the drive…
         title: OKM
       page_title: Settings
+      client_portal_layout:
+        hint: Edit the template under Forms → Templates. It must include {{ content
+          }} where portal pages go. It can be the same as the booking one or a different one.
+        intro: Optional. Wraps client portal and shared proposal pages with your site
+          header and footer.
+        none: No layout
+        title: Client portal layout
       public_booking_layout:
         hint: Edit the template under Forms → Templates. It must include {{ content
           }} where the booking calendar appears.

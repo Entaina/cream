@@ -10,6 +10,8 @@ class OfferVersion < ApplicationRecord
   belongs_to :offer
   belongs_to :user
 
+  has_many :views, class_name: "OfferView", dependent: :destroy
+
   has_one_attached :file
 
   before_validation :assign_number, on: :create

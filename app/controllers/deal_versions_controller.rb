@@ -3,7 +3,7 @@ class DealVersionsController < ApplicationController
   # is covered by versions alone to avoid duplicate rows.
   ACTIVITY_ACTIONS = %w[
     note_added comment_added attachment_added email_opened email_clicked
-    task_completed stage_changed pipeline_changed contacts_changed products_changed
+    task_completed stage_changed pipeline_changed contacts_changed products_changed offer_viewed
   ].freeze
 
   before_action :set_deal

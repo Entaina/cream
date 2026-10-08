@@ -112,6 +112,17 @@ en:
       blank: Not specified
       cash: Cash
       deferred: Deferred
+    portal_invite:
+      copy_url: Copy link
+      generate: Generate invitation link
+      intro: Anyone who opens this link can verify their email, become a contact on this deal, and enter the proposal portal.
+      not_available: The invitation link is not active yet.
+      revoke: Revoke link
+      revoke_confirm: Revoke the portal invitation link?
+      title: Invite to client portal
+      url_aria: Portal invitation URL
+      via_badge: Via invitation
+      via_badge_title: "Portal invitation · %{date}"
     form:
       contacts:
         create: Create contact

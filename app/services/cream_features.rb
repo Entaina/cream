@@ -324,6 +324,14 @@ module CreamFeatures
       status: :ready,
       blockers: [],
       enable_steps: []
+    },
+    client_portal: {
+      enabled: true,
+      menu: false,
+      label: "Client portal",
+      status: :ready,
+      blockers: [],
+      enable_steps: []
     }
   }.freeze
 

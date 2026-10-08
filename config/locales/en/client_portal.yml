@@ -1,0 +1,85 @@
+---
+en:
+  client_portal:
+    mailer:
+      login_link:
+        action: Open portal
+        body: "Hello,\n\nUse this link to access the %{workspace} client portal."
+        body_html: Use the link below to access the <strong>%{workspace}</strong> client portal.
+        expiry: This link can only be used once and expires in 30 minutes.
+        subject: Access to %{workspace} portal
+      offer_access_link:
+        action: View proposal
+        body: "Hello,\n\nUse this link to view the proposal «%{offer}» from %{workspace}."
+        body_html: Use the link below to view the proposal <strong>%{offer}</strong> from %{workspace}.
+        expiry: This link can only be used once and expires in 1 hour. To view the proposal again, request a new link with your email.
+        subject: View proposal «%{offer}»
+      deal_portal_invite:
+        action: Open portal
+        body: "Hello,\n\nUse this link to access the %{workspace} portal as a contact on «%{deal}»."
+        body_html: Use the link below to access the <strong>%{workspace}</strong> portal as a contact on «<strong>%{deal}</strong>».
+        expiry: This link can only be used once and expires in 24 hours.
+        subject: Portal access — %{deal}
+    consent:
+      legend: Communications
+      mixed: Items marked with * are required to continue; the rest are optional. You can unsubscribe at any time.
+      optional: Optional; you can continue without ticking anything and unsubscribe at any time.
+      required: required
+      required_missing: To continue you need to accept the communications marked with *.
+      privacy_policy: Privacy policy
+    deal_invites:
+      confirm_intro: Click the button to join «%{deal}» as a contact and enter the proposal portal.
+      join: Enter portal
+      expired_body: Request a new link from the invitation page.
+      expired_title: Link expired or already used
+      intro: Enter your email to join «%{deal}» as a contact and access the proposal portal.
+      link_sent: If the email is valid, we sent you a link to enter the portal.
+      request_access: Send link
+      request_again: Request another link
+      signed_in: You can now view your proposals in the portal.
+      title: Portal invitation
+    offer_shares:
+      confirm_intro: Click the button to open the proposal. This link can only be used once.
+      open_offer: View proposal
+      expired_body: Request a new link with your email from the shared proposal page.
+      expired_title: Link expired, already used or revoked
+      intro: Enter your email to receive a one-time link to view «%{offer}».
+      link_sent: If the email is valid, we sent you a link to view the proposal.
+      request_access: Send link
+      request_again: Request another link
+      title: View proposal
+    offers:
+      access_revoked: Access for %{email} has been revoked.
+      back_to_list: Back to my proposals
+      guest_access_opened: First opened on %{date}
+      guest_access_pending: Not opened yet
+      guest_access_revoked: Revoked
+      guest_access_shared_by: Shared by %{name}
+      guest_accesses_empty: Nobody has requested access to this proposal yet.
+      guest_accesses_title: People with an access link
+      revoke_access: Revoke
+      revoke_access_confirm: Revoke access for %{email}? Their pending links will stop working and they won't be able to request new ones.
+      copy_link: Copy link
+      empty: You have no proposals available right now.
+      generate_share_link: Generate share link
+      share: Share
+      share_revoked: The sales team has disabled your share link for this proposal.
+      share_hint: Anyone with this link can request email access to view «%{name}».
+      share_title: Share proposal
+      share_url: Share link
+      signed_in_as: Signed in as %{email}
+      title: My proposals
+      view: View proposal
+    sessions:
+      confirm_intro: Click the button to enter the portal. This link can only be used once.
+      email: Email
+      enter: Enter portal
+      intro: Enter the email you use as a contact to receive an access link.
+      invalid_link: The link is invalid or has expired.
+      link_sent: If you are a contact, we sent you an access link.
+      no_access: You don't have access to the client portal.
+      send_link: Send access link
+      sign_out: Sign out
+      signed_in: You are signed in to the portal.
+      signed_out: You signed out of the portal.
+      title: Client portal

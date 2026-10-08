@@ -33,7 +33,25 @@ en:
     remove_confirm: Remove the offer "%{name}" and all its versions?
     remove_version: Remove version
     remove_version_confirm: Remove version %{number}?
+    client_portal_url: Client portal URL
+    client_portal_url_hint: Share this URL with contacts so they can access their proposals.
+    share_links:
+      revoked: Revoked
+      revoke: Revoke link
+      revoke_confirm: Revoke the link shared by %{name}?
+      title: Shared links
+      views:
+        one: "%{count} view"
+        other: "%{count} views"
     title: Offers
+    via_proposal: Via proposal
+    via_proposal_title: "Shared by %{shared_by} · %{offer} · %{date}"
+    views:
+      last: "Last: %{date}"
+      summary:
+        one: "%{count} view"
+        other: "%{count} views"
+      title: Views
     version_label: Version %{number}
     versions:
       one: "%{count} version"

@@ -1,0 +1,85 @@
+---
+es:
+  client_portal:
+    mailer:
+      login_link:
+        action: Entrar al portal
+        body: "Hola,\n\nUsa este enlace para acceder al portal de %{workspace}."
+        body_html: Usa el enlace siguiente para acceder al portal de <strong>%{workspace}</strong>.
+        expiry: El enlace solo se puede usar una vez y caduca en 30 minutos.
+        subject: Acceso al portal de %{workspace}
+      offer_access_link:
+        action: Ver la propuesta
+        body: "Hola,\n\nUsa este enlace para ver la propuesta «%{offer}» de %{workspace}."
+        body_html: Usa el enlace siguiente para ver la propuesta <strong>%{offer}</strong> de %{workspace}.
+        expiry: El enlace solo se puede usar una vez y caduca en 1 hora. Para volver a ver la propuesta, pide otro enlace con tu email.
+        subject: Ver la propuesta «%{offer}»
+      deal_portal_invite:
+        action: Entrar al portal
+        body: "Hola,\n\nUsa este enlace para acceder al portal de %{workspace} como contacto de «%{deal}»."
+        body_html: Usa el enlace siguiente para acceder al portal de <strong>%{workspace}</strong> como contacto de «<strong>%{deal}</strong>».
+        expiry: El enlace solo se puede usar una vez y caduca en 24 horas.
+        subject: Acceso al portal — %{deal}
+    consent:
+      legend: Comunicaciones
+      mixed: Las marcadas con * son necesarias para continuar; el resto son opcionales. Puedes darte de baja cuando quieras.
+      optional: Es opcional; puedes entrar sin marcar nada y darte de baja cuando quieras.
+      required: obligatoria
+      required_missing: Para continuar tienes que aceptar las comunicaciones marcadas con *.
+      privacy_policy: Política de privacidad
+    deal_invites:
+      confirm_intro: Pulsa el botón para unirte como contacto de «%{deal}» y entrar al portal de propuestas.
+      join: Entrar al portal
+      expired_body: Pide un enlace nuevo desde la página de invitación.
+      expired_title: Enlace caducado o ya usado
+      intro: Introduce tu email para unirte como contacto de «%{deal}» y acceder al portal de propuestas.
+      link_sent: Si el email es válido, te hemos enviado un enlace para entrar al portal.
+      request_access: Enviar enlace
+      request_again: Pedir otro enlace
+      signed_in: Ya puedes ver tus propuestas en el portal.
+      title: Invitación al portal
+    offer_shares:
+      confirm_intro: Pulsa el botón para abrir la propuesta. El enlace solo se puede usar una vez.
+      open_offer: Ver la propuesta
+      expired_body: Pide un enlace nuevo con tu email desde la página de la propuesta compartida.
+      expired_title: Enlace caducado, ya usado o revocado
+      intro: Introduce tu email para recibir un enlace de un solo uso y ver «%{offer}».
+      link_sent: Si el email es válido, te hemos enviado un enlace para ver la propuesta.
+      request_access: Enviar enlace
+      request_again: Pedir otro enlace
+      title: Ver propuesta
+    offers:
+      access_revoked: Se ha revocado el acceso de %{email}.
+      back_to_list: Volver a mis propuestas
+      guest_access_opened: Abierto por primera vez el %{date}
+      guest_access_pending: Aún no lo ha abierto
+      guest_access_revoked: Revocado
+      guest_access_shared_by: Compartido por %{name}
+      guest_accesses_empty: Nadie ha pedido acceso a esta propuesta todavía.
+      guest_accesses_title: Personas con enlace de acceso
+      revoke_access: Revocar
+      revoke_access_confirm: "¿Revocar el acceso de %{email}? Sus enlaces pendientes dejarán de funcionar y no podrá pedir otros."
+      copy_link: Copiar enlace
+      empty: No tienes propuestas disponibles en este momento.
+      generate_share_link: Generar enlace para compartir
+      share: Compartir
+      share_revoked: El equipo comercial ha desactivado tu enlace para compartir esta propuesta.
+      share_hint: Cualquiera con este enlace podrá pedir acceso por email para ver «%{name}».
+      share_title: Compartir propuesta
+      share_url: Enlace para compartir
+      signed_in_as: Sesión iniciada como %{email}
+      title: Mis propuestas
+      view: Ver propuesta
+    sessions:
+      confirm_intro: Pulsa el botón para entrar al portal. El enlace solo se puede usar una vez.
+      email: Email
+      enter: Entrar al portal
+      intro: Introduce el email con el que figuras como contacto para recibir un enlace de acceso.
+      invalid_link: El enlace no es válido o ha caducado.
+      link_sent: Si figuras como contacto, te hemos enviado un enlace de acceso.
+      no_access: No tienes acceso al portal de clientes.
+      send_link: Enviar enlace de acceso
+      sign_out: Cerrar sesión
+      signed_in: Has entrado al portal.
+      signed_out: Has cerrado la sesión del portal.
+      title: Portal de clientes

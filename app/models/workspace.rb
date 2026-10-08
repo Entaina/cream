@@ -69,6 +69,7 @@ class Workspace < ApplicationRecord
   has_many :product_interests, class_name: "Marketing::ProductInterest", dependent: :destroy
   has_many :privacy_policy_versions, dependent: :destroy
   belongs_to :public_layout_template, class_name: "LeadFormTemplate", optional: true
+  belongs_to :client_portal_layout_template, class_name: "LeadFormTemplate", optional: true
 
   EMAIL_DOMAIN_FORMAT = /\A[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)+\z/
 
@@ -133,11 +134,13 @@ class Workspace < ApplicationRecord
   end
 
   def public_layout_template_must_belong_to_workspace
-    return if public_layout_template_id.blank?
+    { public_layout_template_id: public_layout_template,
+      client_portal_layout_template_id: client_portal_layout_template }.each do |attribute, template|
+      next if self[attribute].blank?
 
-    template = public_layout_template
-    if template.blank? || template.workspace_id != id || !template.layout?
-      errors.add(:public_layout_template_id, :invalid)
+      if template.blank? || template.workspace_id != id || !template.layout?
+        errors.add(attribute, :invalid)
+      end
     end
   end
 

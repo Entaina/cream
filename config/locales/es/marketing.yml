@@ -758,12 +758,28 @@ es:
         default_consent_label: Texto por defecto del checkbox
         default_consent_label_hint: Etiqueta mostrada en formularios salvo que la
           plantilla o el formulario MQL la sobrescriban.
+        default_consent_label_en: Texto del checkbox en inglés
+        default_consent_label_en_hint: Se muestra en el portal de clientes a quien lo use en inglés. Si
+          lo dejas vacío, se usa el texto en español.
+        default_consent_label_en_placeholder: I want to receive the newsletter
         default_consent_label_placeholder: Quiero recibir la newsletter
+        description_en: Descripción en inglés
+        description_en_placeholder: Monthly product and company news
         description_hint: Visible para contactos en el centro de preferencias.
         description_placeholder: Novedades mensuales sobre producto y empresa
+        english_fallback_hint: Se muestra en el portal de clientes en inglés. Si lo dejas vacío, se usa
+          la descripción en español.
         exclude_subscribe_all: Excluir de «suscribir a todas»
         exclude_subscribe_all_hint_html: Si está marcado, el tag <code class="text-2xs">subscription_opt_in_all</code>
           no dará de alta este tipo (sigue disponible con su checkbox individual).
+        client_portal_consent: En el portal de clientes
+        client_portal_consent_hint: Al entrar al portal o abrir una propuesta compartida se muestra la frase de consentimiento.
+          Opcional, a quien aún no la tenga ni se haya dado de baja; obligatoria, a quien no esté suscrito, y sin marcarla
+          no puede continuar.
+        client_portal_consent_options:
+          none: No ofrecer
+          optional: Opcional
+          required: Obligatoria
         position: Orden
         slug: Identificador (slug)
         slug_hint: Solo letras minúsculas, números y guiones. No cambiar en producción.

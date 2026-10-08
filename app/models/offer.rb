@@ -7,8 +7,20 @@ class Offer < ApplicationRecord
 
   has_many :versions, -> { order(:number) }, class_name: "OfferVersion", dependent: :destroy, inverse_of: :offer,
     validate: false # validated by the caller, so errors stay on the version
+  has_many :views, class_name: "OfferView", dependent: :destroy
+  has_many :share_links, class_name: "OfferShareLink", dependent: :destroy
 
   validates :name, presence: true
+
+  scope :visible_to_contact, ->(workspace, email) {
+    normalized = OfferAccessGrant.normalize_email(email)
+    next none if normalized.blank?
+
+    person_ids = workspace.people.with_email(normalized).select(:id)
+    where(workspace_id: workspace.id)
+      .where(deal_id: DealContact.with_portal_access.where(person_id: person_ids).select(:deal_id))
+      .where(id: OfferVersion.select(:offer_id))
+  }
   validate :deal_in_workspace
 
   def current_version

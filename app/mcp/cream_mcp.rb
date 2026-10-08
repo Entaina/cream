@@ -6,7 +6,7 @@ module CreamMcp
   DEFAULT_LIST_LIMIT = 25
   MY_TASKS_DEFAULT_LIMIT = 50
   SIGNIFICANT_ACTIONS = %w[
-    stage_changed pipeline_changed contacts_changed products_changed
+    stage_changed pipeline_changed contacts_changed products_changed offer_viewed
     note_added comment_added task_completed email_replied
   ].freeze
   MAX_INSTRUCTIONS_LENGTH = 1800

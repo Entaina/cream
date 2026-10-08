@@ -139,6 +139,27 @@ RSpec.describe "Settings::Workspace", type: :request do
       expect(workspace.okm_service_account_client_email).to eq("okm@test.iam.gserviceaccount.com")
     end
 
+    it "sets the client portal layout independently from the booking layout" do
+      portal_layout = workspace.lead_form_templates.create!(kind: "layout", path: "public/layouts/portal_wrap",
+        partial: false, body: "{{ content }}")
+
+      patch settings_workspace_path, params: { workspace: { client_portal_layout_template_id: portal_layout.id } }
+
+      expect(response).to redirect_to(settings_workspace_path)
+      workspace.reload
+      expect(workspace.client_portal_layout_template).to eq(portal_layout)
+      expect(workspace.public_layout_template).to be_nil
+    end
+
+    it "rejects a client portal layout that isn't a layout template" do
+      page = workspace.lead_form_templates.create!(kind: "form", path: "public/lead_forms/portal_page",
+        partial: false, body: "<p>x</p>")
+
+      patch settings_workspace_path, params: { workspace: { client_portal_layout_template_id: page.id } }
+
+      expect(workspace.reload.client_portal_layout_template_id).to be_nil
+    end
+
     it "forbids members from updating workspace settings" do
       sign_in_as(member)
       patch switch_workspace_path, params: {workspace_id: workspace.id}

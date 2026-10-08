@@ -9,6 +9,8 @@ class SubscriptionType < ApplicationRecord
     ]
   ).freeze
 
+  CLIENT_PORTAL_CONSENT_OPTIONS = %w[none optional required].freeze
+
   DEFAULTS = [
     {
       name: "General",
@@ -42,11 +44,26 @@ class SubscriptionType < ApplicationRecord
     format: {with: LeadForm::FIELD_KEY_FORMAT},
     uniqueness: {scope: :workspace_id},
     allow_nil: true
+  validates :client_portal_consent, inclusion: { in: CLIENT_PORTAL_CONSENT_OPTIONS }
   validate :consent_field_key_not_reserved
 
   scope :active, -> { where(active: true) }
   scope :ordered, -> { order(:position, :name, :id) }
   scope :included_in_subscribe_all, -> { active.where(excluded_from_subscribe_all: false) }
+  scope :offered_in_client_portal, -> { active.where(client_portal_consent: %w[optional required]) }
+
+  # Spanish is the base text (also used by lead forms); English falls back to it when left blank.
+  def consent_label(locale = I18n.locale)
+    (default_consent_label_en.presence if locale.to_s == "en") || default_consent_label.presence || name
+  end
+
+  def localized_description(locale = I18n.locale)
+    (description_en.presence if locale.to_s == "en") || description
+  end
+
+  def client_portal_required?
+    client_portal_consent == "required"
+  end
 
   before_validation :normalize_slug
   before_validation :normalize_consent_field_key

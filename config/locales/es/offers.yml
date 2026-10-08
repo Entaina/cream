@@ -33,7 +33,25 @@ es:
     remove_confirm: "¿Eliminar la oferta «%{name}» y todas sus versiones?"
     remove_version: Eliminar versión
     remove_version_confirm: "¿Eliminar la versión %{number}?"
+    client_portal_url: URL del portal de clientes
+    client_portal_url_hint: Comparte esta URL con tus contactos para que accedan a sus propuestas.
+    share_links:
+      revoked: Revocado
+      revoke: Revocar enlace
+      revoke_confirm: "¿Revocar el enlace compartido por %{name}?"
+      title: Enlaces compartidos
+      views:
+        one: "%{count} visualización"
+        other: "%{count} visualizaciones"
     title: Ofertas
+    via_proposal: Vía propuesta
+    via_proposal_title: "Compartida por %{shared_by} · %{offer} · %{date}"
+    views:
+      last: "Última: %{date}"
+      summary:
+        one: "%{count} visualización"
+        other: "%{count} visualizaciones"
+      title: Visualizaciones
     version_label: Versión %{number}
     versions:
       one: "%{count} versión"

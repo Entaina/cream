@@ -24,6 +24,13 @@
   </div>
 
   <div>
+    <%= f.label :description_en, t("marketing.subscription_types.form.description_en"), class: "label" %>
+    <%= f.text_area :description_en, class: "input w-full resize-y", rows: 2,
+          placeholder: t("marketing.subscription_types.form.description_en_placeholder") %>
+    <p class="text-sm text-ink-faint mt-1"><%= t("marketing.subscription_types.form.english_fallback_hint") %></p>
+  </div>
+
+  <div>
     <%= f.label :position, t("marketing.subscription_types.form.position"), class: "label" %>
     <%= f.number_field :position, class: "input w-full", min: 0 %>
   </div>
@@ -44,6 +51,13 @@
     <p class="text-sm text-ink-faint mt-1"><%= t("marketing.subscription_types.form.default_consent_label_hint") %></p>
   </div>
 
+  <div>
+    <%= f.label :default_consent_label_en, t("marketing.subscription_types.form.default_consent_label_en"), class: "label" %>
+    <%= f.text_area :default_consent_label_en, class: "input w-full resize-y", rows: 2,
+          placeholder: t("marketing.subscription_types.form.default_consent_label_en_placeholder") %>
+    <p class="text-sm text-ink-faint mt-1"><%= t("marketing.subscription_types.form.default_consent_label_en_hint") %></p>
+  </div>
+
   <label class="flex items-center gap-2 text-base">
     <%= f.check_box :active %> <%= t("marketing.shared.active") %>
   </label>
@@ -52,6 +66,16 @@
     <%= f.check_box :excluded_from_subscribe_all %> <%= t("marketing.subscription_types.form.exclude_subscribe_all") %>
   </label>
   <p class="text-sm text-ink-faint -mt-2"><%= t("marketing.subscription_types.form.exclude_subscribe_all_hint_html").html_safe %></p>
+
+  <% if CreamFeatures.enabled?(:client_portal) %>
+    <div>
+      <%= f.label :client_portal_consent, t("marketing.subscription_types.form.client_portal_consent"), class: "label" %>
+      <%= f.select :client_portal_consent,
+            SubscriptionType::CLIENT_PORTAL_CONSENT_OPTIONS.map { |option| [ t("marketing.subscription_types.form.client_portal_consent_options.#{option}"), option ] },
+            {}, class: "input w-full" %>
+      <p class="text-sm text-ink-faint mt-1"><%= t("marketing.subscription_types.form.client_portal_consent_hint") %></p>
+    </div>
+  <% end %>
 
   <%= f.submit subscription_type.persisted? ? t("marketing.shared.save") : t("marketing.subscription_types.form.create"), class: "btn-primary" %>
   <%= link_to t("marketing.shared.cancel"), subscription_types_path, class: "btn-secondary ml-2" %>
