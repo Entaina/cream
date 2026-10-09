@@ -190,7 +190,13 @@ class DealsController < ApplicationController
     @deal.move_to_stage!(params.require(:pipeline_stage_id), position: params[:position]&.to_i)
 
     respond_to do |format|
-      format.turbo_stream { render_move_success_streams }
+      format.turbo_stream do
+        if params[:source] == "inline"
+          redirect_back fallback_location: deal_path(@deal), status: :see_other
+        else
+          render_move_success_streams
+        end
+      end
       format.json { head :ok }
       format.html do
         if params[:source] == "inline"

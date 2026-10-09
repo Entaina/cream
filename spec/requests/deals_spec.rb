@@ -927,6 +927,18 @@ RSpec.describe "Deals", type: :request do
       expect(deal.reload.stage_label).to eq("Qualified")
     end
 
+    it "redirects back (instead of board streams) when the inline dropdown submits via turbo stream" do
+      sign_in_as(member)
+      target = pipeline.pipeline_stages.find_by!(name: "Qualified")
+
+      patch move_deal_path(deal, source: "inline"), params: {pipeline_stage_id: target.id},
+        headers: {"HTTP_REFERER" => deal_path(deal), "Accept" => "text/vnd.turbo-stream.html, text/html"}
+
+      expect(response).to have_http_status(:see_other)
+      expect(response).to redirect_to(deal_path(deal))
+      expect(deal.reload.stage_label).to eq("Qualified")
+    end
+
     it "redirects back with an alert when inline move is blocked by stage conditions" do
       sign_in_as(member)
       target = pipeline.pipeline_stages.find_by!(name: "Qualified")
