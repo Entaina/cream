@@ -36,6 +36,10 @@ module ClientPortalAuthentication
     client_portal_session&.fetch(:email)
   end
 
+  def client_portal_preview?
+    client_portal_session&.fetch(:preview, false)
+  end
+
   def client_portal_people
     return Person.none unless client_portal_workspace && client_portal_email
 

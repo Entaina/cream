@@ -4,7 +4,7 @@
 
 Cream is a **workspace**-based CRM for managing **people**, **companies** and **deals** (opportunities), with notes, tasks, lists and an activity history shared across the team.
 
-> **Last revision:** 2026-10-08 (knowledge chat uses the MCP tools)
+> **Last revision:** 2026-10-09 (client portal preview from the contact record)
 > This document describes the functionality **visible to the user**. Disabled features are listed at the end under "Coming soon".
 
 ---
@@ -251,6 +251,7 @@ The list shows **50 records per page**. When there are more, a pagination bar ap
 - **Create a deal from the record:** click **Add deal** in the top bar. A dialog opens where you choose the **pipeline** (by default yours from *Settings → Profile*, or the workspace's if you don't have one), the **product** and the **first action** (title and date). The deal is created in the **first stage** of the chosen pipeline, with the person's company and contact; the name is generated as «Empresa — Producto» (Company — Product). After creating it you go to the deal page. If there are validation errors, they are shown inside the same dialog without leaving the record. If there are no products in the catalog, the dialog tells you that you must create one first.
 - **Person's deals:** on the **Activity** tab, the **Deals** section lists deals where the person is a contact and that you can see, newest first. Each row shows the name (link to the deal), the **stage**, the creation date and the **products**. The first five are always visible; the rest are under **Show N more deals**. If there are more than five, **View deals (N)** opens the **Deals** tab, with the full list. When those deals involve more than one distinct product, that tab includes the **All products** filter.
 - **Subscriptions** (marketing): when the consent module is active, the left panel lists each **subscription type** (general, newsletter, etc.) with its status (**Suscrito** / Subscribed, **Dado de baja** / Unsubscribed or **Pendiente** / Pending). You can **Suscribir** / **Subscribe** or **Dar de baja** / **Unsubscribe** manually, and copy the link to the contact's **preference center** (see [§29](#29-marketing)).
+- **View client portal:** when the contact has access to the [client portal](#5-people-companies-and-deals) (they are a contact on a deal with proposals), the record header shows **View client portal**. It opens a tab with the same portal the contact sees; in that **preview**, opening proposals is **not recorded** on the deal activity (it does not count as a real client visit).
 - **Lead score** and **Lifecycle**: with lead scoring enabled, the left panel shows the numeric score and lifecycle stage (*subscriber*, *lead*, *mql*, *sql*, *opportunity*, *customer*, *evangelist*). Lifecycle reflects automatic scoring; it is **not** the same as having an open sales **deal**.
 
 **Possible duplicates**

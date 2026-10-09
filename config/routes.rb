@@ -75,6 +75,7 @@ Rails.application.routes.draw do
     member do
       match :merge, via: %i[get post]
       patch :toggle_subscription
+      post :client_portal_preview
     end
     resources :relationships, only: %i[create destroy], controller: "person_relationships"
     resources :lead_submissions, only: :show, module: :people

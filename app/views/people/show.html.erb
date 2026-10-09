@@ -21,6 +21,11 @@
         </div>
       </div>
       <div class="flex items-center gap-2 shrink-0">
+        <% if CreamFeatures.enabled?(:client_portal) && @person.client_portal_email.present? %>
+          <%= button_to client_portal_preview_person_path(@person), method: :post, class: "btn-secondary", form: { target: "_blank", rel: "noopener" } do %>
+            <%= icon :external, classes: "size-3.5" %><span><%= t("people.show.client_portal_preview") %></span>
+          <% end %>
+        <% end %>
         <%= link_to edit_person_path(@person), class: "btn-secondary" do %><%= icon :pencil, classes: "size-3.5" %><span><%= t("records.edit") %></span><% end %>
         <details class="record-menu">
           <summary class="btn-ghost" aria-label="<%= t("people.show.more_actions") %>">•••</summary>

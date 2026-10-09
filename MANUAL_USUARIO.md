@@ -4,7 +4,7 @@
 
 Cream es un CRM por **workspaces** para gestionar **personas**, **empresas** y **deals** (oportunidades), con notas, tareas, listas y un historial de actividad compartido en el equipo.
 
-> **Última revisión:** 2026-10-08 (el chat de conocimiento usa las herramientas del MCP)
+> **Última revisión:** 2026-10-09 (vista previa del portal desde la ficha del contacto)
 > Este documento describe la funcionalidad **visible para el usuario**. Las funcionalidades desactivadas aparecen al final en «Próximamente».
 
 ---
@@ -251,6 +251,7 @@ El listado muestra **50 registros por página**. Cuando hay más, aparece una ba
 - **Crear deal desde la ficha:** pulsa **Add deal** en la barra superior. Se abre un cuadro donde eliges el **pipeline** (por defecto el tuyo en *Settings → Profile*, o el del workspace si no tienes uno), el **producto** y la **primera acción** (título y fecha). El deal se crea en la **primera etapa** del pipeline elegido, con la empresa y el contacto de la persona; el nombre se genera como «Empresa — Producto». Tras crearlo irás a la ficha del deal. Si hay errores de validación, se muestran dentro del mismo cuadro sin salir de la ficha. Si no hay productos en el catálogo, el cuadro te indica que debes crear uno antes.
 - **Oportunidades de la persona:** en la pestaña **Actividad**, la sección **Oportunidades** lista las oportunidades en las que la persona es contacto y que puedes ver, de la más reciente a la más antigua. Cada fila muestra el nombre (enlace a la ficha), la **etapa**, la fecha de creación y los **productos**. Ves las cinco primeras; el resto está en **Mostrar N oportunidades más**. Si hay más de cinco, **Ver oportunidades (N)** abre la pestaña **Oportunidades**, con la lista completa. Si esas oportunidades tienen más de un producto distinto, esa pestaña incluye el filtro **Todos los productos**.
 - **Suscripciones** (marketing): si el workspace tiene activo el módulo de consentimiento, en el panel izquierdo verás cada **tipo de suscripción** (general, newsletter, etc.) con su estado (**Suscrito**, **Dado de baja** o **Pendiente**). Puedes **Suscribir** o **Dar de baja** manualmente, y copiar el enlace al **centro de preferencias** del contacto para que gestione sus listas (ver [§29](#29-marketing)).
+- **Ver portal del cliente:** si el contacto tiene acceso al [portal de clientes](#5-personas-empresas-y-deals) (figura como contacto en un deal con propuestas), en la cabecera de su ficha verás **Ver portal del cliente**. Abre una pestaña con el mismo portal que ve el contacto; en esa **vista previa** las aperturas de propuestas **no se registran** en la actividad del deal (no sustituyen las visitas reales del cliente).
 - **Lead score** y **Lifecycle**: con la puntuación de leads activa, el panel izquierdo muestra la puntuación numérica y la etapa del ciclo de vida (*subscriber*, *lead*, *mql*, *sql*, *opportunity*, *customer*, *evangelist*). El lifecycle refleja la puntuación automática; **no** equivale a tener una oportunidad (deal) abierta en ventas.
 
 **Posibles duplicados**

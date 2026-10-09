@@ -1,4 +1,12 @@
 module ClientPortalHelper
+  def client_portal_preview?
+    ClientPortal::SessionCookie.read(cookies)&.fetch(:preview, false)
+  end
+
+  def client_portal_preview_email
+    ClientPortal::SessionCookie.read(cookies)&.fetch(:email)
+  end
+
   # Wraps portal pages in the layout template chosen for the portal in workspace settings, if any.
   def client_portal_page_body(workspace, &block)
     content_html = capture(&block)

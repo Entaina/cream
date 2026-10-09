@@ -20,6 +20,9 @@ en:
         body_html: Use the link below to access the <strong>%{workspace}</strong> portal as a contact on «<strong>%{deal}</strong>».
         expiry: This link can only be used once and expires in 24 hours.
         subject: Portal access — %{deal}
+    preview:
+      banner: Previewing as %{email}. Views are not recorded.
+      read_only: You can't share proposals or revoke access while previewing.
     consent:
       legend: Communications
       mixed: Items marked with * are required to continue; the rest are optional. You can unsubscribe at any time.

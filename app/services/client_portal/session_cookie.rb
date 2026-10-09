@@ -11,12 +11,21 @@ module ClientPortal
       email = raw["email"] || raw[:email]
       return if workspace_id.blank? || email.blank?
 
-      { workspace_id: workspace_id.to_i, email: OfferAccessGrant.normalize_email(email) }
+      preview = raw["preview"] || raw[:preview]
+      {
+        workspace_id: workspace_id.to_i,
+        email: OfferAccessGrant.normalize_email(email),
+        preview: ActiveModel::Type::Boolean.new.cast(preview)
+      }
     end
 
-    def self.write(cookies, workspace_id:, email:)
+    def self.write(cookies, workspace_id:, email:, preview: false)
       cookies.encrypted[KEY] = {
-        value: { workspace_id: workspace_id, email: OfferAccessGrant.normalize_email(email) },
+        value: {
+          workspace_id: workspace_id,
+          email: OfferAccessGrant.normalize_email(email),
+          preview: preview
+        },
         httponly: true,
         same_site: :lax,
         expires: EXPIRY.from_now

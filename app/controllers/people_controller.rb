@@ -4,7 +4,7 @@ class PeopleController < ApplicationController
 
   remembers_list_filters only: :index
 
-  before_action :set_person, only: %i[show edit update destroy merge toggle_subscription]
+  before_action :set_person, only: %i[show edit update destroy merge toggle_subscription client_portal_preview]
   before_action :set_edit_section, only: %i[edit update]
 
   SORTABLE = %w[first_name last_name email job_title location created_at].freeze
@@ -82,6 +82,21 @@ class PeopleController < ApplicationController
     @comment = Comment.new
     @email_message = EmailMessage.new(to_address: @person.email)
     @task = Task.new(due_on: Task.default_due_on)
+  end
+
+  def client_portal_preview
+    authorize @person, :show?
+    return head :not_found unless CreamFeatures.enabled?(:client_portal)
+
+    email = @person.client_portal_email
+    unless email
+      return redirect_to person_path(@person), alert: t("people.show.client_portal_no_access")
+    end
+
+    ClientPortal::SessionCookie.write(
+      cookies, workspace_id: current_workspace.id, email: email, preview: true
+    )
+    redirect_to client_portal_offers_path(workspace_slug: current_workspace.slug)
   end
 
   def new

@@ -30,7 +30,9 @@ module Public
       person = client_portal_person_for_deal(@offer.deal)
       return head :not_found unless person
 
-      ClientPortal::OfferViewRecorder.record!(offer: @offer, person: person, version: version)
+      unless client_portal_preview?
+        ClientPortal::OfferViewRecorder.record!(offer: @offer, person: person, version: version)
+      end
       render_offer_version(version)
     end
 
@@ -41,6 +43,8 @@ module Public
     end
 
     def create_share
+      return redirect_client_portal_preview_read_only if client_portal_preview?
+
       link = OfferShareLink.find_or_initialize_by(offer: @offer, person: @sharing_person, workspace: @workspace)
       # A link the sales team revoked stays revoked; the contact can't silently re-enable it.
       link.save! if link.new_record?
@@ -48,6 +52,8 @@ module Public
     end
 
     def revoke_access
+      return redirect_client_portal_preview_read_only if client_portal_preview?
+
       grant = OfferAccessGrant.for_offer(@offer).find_by(id: params[:grant_id])
       return head :not_found unless grant
 
@@ -83,6 +89,11 @@ module Public
     def set_sharing_person
       @sharing_person = client_portal_person_for_deal(@offer.deal)
       head :not_found unless @sharing_person
+    end
+
+    def redirect_client_portal_preview_read_only
+      redirect_to share_client_portal_offer_path(workspace_slug: @workspace.slug, id: @offer.id),
+        status: :see_other, alert: t("client_portal.preview.read_only")
     end
   end
 end

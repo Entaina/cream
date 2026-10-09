@@ -659,4 +659,62 @@ RSpec.describe "People", type: :request do
       expect(person.brought_by).to eq(teammate)
     end
   end
+
+  describe "client portal preview" do
+    let!(:pipeline) { Pipeline.create_default!(workspace) }
+
+    before do
+      allow(CreamFeatures).to receive(:enabled?).and_call_original
+      allow(CreamFeatures).to receive(:enabled?).with(:client_portal).and_return(true)
+    end
+
+    it "shows the preview button when the contact has portal access" do
+      sign_in_as(member)
+      company = create_company!(workspace)
+      person = create_person!(workspace, company: company, email: "portal@example.com")
+      deal = create_deal!(workspace, pipeline: pipeline)
+      deal.deal_contacts.create!(person: person)
+
+      get person_path(person)
+
+      expect(response.body).to include(I18n.t("people.show.client_portal_preview"))
+    end
+
+    it "hides the preview button without portal access" do
+      sign_in_as(member)
+      company = create_company!(workspace)
+      person = create_person!(workspace, company: company, email: "lonely@example.com")
+
+      get person_path(person)
+
+      expect(response.body).not_to include(I18n.t("people.show.client_portal_preview"))
+    end
+
+    it "opens the portal with a preview session" do
+      sign_in_as(member)
+      company = create_company!(workspace)
+      person = create_person!(workspace, company: company, email: "portal@example.com")
+      deal = create_deal!(workspace, pipeline: pipeline)
+      deal.deal_contacts.create!(person: person)
+
+      post client_portal_preview_person_path(person)
+
+      expect(response).to redirect_to(client_portal_offers_path(workspace_slug: workspace.slug))
+      follow_redirect!
+      expect(response.body).to include(I18n.t("client_portal.preview.banner", email: "portal@example.com"))
+    end
+
+    it "returns not found when the feature is disabled" do
+      allow(CreamFeatures).to receive(:enabled?).with(:client_portal).and_return(false)
+      sign_in_as(member)
+      company = create_company!(workspace)
+      person = create_person!(workspace, company: company, email: "portal@example.com")
+      deal = create_deal!(workspace, pipeline: pipeline)
+      deal.deal_contacts.create!(person: person)
+
+      post client_portal_preview_person_path(person)
+
+      expect(response).to have_http_status(:not_found)
+    end
+  end
 end

@@ -20,6 +20,9 @@ es:
         body_html: Usa el enlace siguiente para acceder al portal de <strong>%{workspace}</strong> como contacto de «<strong>%{deal}</strong>».
         expiry: El enlace solo se puede usar una vez y caduca en 24 horas.
         subject: Acceso al portal — %{deal}
+    preview:
+      banner: Vista previa como %{email}. Las visitas no se registran.
+      read_only: En vista previa no puedes compartir propuestas ni revocar accesos.
     consent:
       legend: Comunicaciones
       mixed: Las marcadas con * son necesarias para continuar; el resto son opcionales. Puedes darte de baja cuando quieras.

@@ -90,6 +90,22 @@ class Person < ApplicationRecord
   end
   alias_method :full_name, :display_name
 
+  # Email used for client portal access (primary column first, then person_emails).
+  def client_portal_email
+    return unless workspace
+
+    candidates = []
+    candidates << email if email.present?
+    person_emails.order(:created_at).pluck(:address).each { |address| candidates << address if address.present? }
+    candidates.uniq.each do |address|
+      normalized = OfferAccessGrant.normalize_email(address)
+      next if normalized.blank?
+
+      return normalized if ClientPortal::Access.allowed?(workspace: workspace, email: normalized)
+    end
+    nil
+  end
+
   def initials
     [first_name, last_name].reject(&:blank?).first(2).map { |w| w[0] }.join.upcase.presence || "?"
   end

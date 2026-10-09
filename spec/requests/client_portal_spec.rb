@@ -174,6 +174,26 @@ RSpec.describe "Client portal", type: :request do
       get client_portal_offer_path(workspace_slug: workspace.slug, id: offer.id)
       expect(response).to redirect_to(client_portal_root_path(workspace_slug: workspace.slug))
     end
+
+    it "still records a view with an app session when the portal session is not a preview" do
+      sign_in_as(users(:one))
+      sign_in_via_portal!
+
+      expect {
+        get client_portal_offer_path(workspace_slug: workspace.slug, id: offer.id)
+      }.to change(OfferView, :count).by(1)
+    end
+
+    it "does not record a view in preview mode" do
+      sign_in_as(users(:one))
+      post client_portal_preview_person_path(person)
+      follow_redirect!
+      expect(response.body).to include(I18n.t("client_portal.preview.banner", email: person.email))
+
+      expect {
+        get client_portal_offer_path(workspace_slug: workspace.slug, id: offer.id)
+      }.not_to change(OfferView, :count)
+    end
   end
 
   describe "contacts added through a shared proposal" do
@@ -274,6 +294,24 @@ RSpec.describe "Client portal", type: :request do
 
       post share_client_portal_offer_path(workspace_slug: workspace.slug, id: offer.id)
       expect(link.reload.revoked_at).to be_present
+    end
+
+    it "blocks sharing and revoking in preview mode" do
+      sign_in_as(users(:one))
+      post client_portal_preview_person_path(person)
+      follow_redirect!
+
+      expect {
+        post share_client_portal_offer_path(workspace_slug: workspace.slug, id: offer.id)
+      }.not_to change(OfferShareLink, :count)
+      expect(flash[:alert]).to eq(I18n.t("client_portal.preview.read_only"))
+
+      link = OfferShareLink.create!(workspace: workspace, offer: offer, person: person)
+      grant, _raw = OfferAccessGrant.issue!(share_link: link, email: "guest@example.com")
+
+      delete revoke_access_client_portal_offer_path(workspace_slug: workspace.slug, id: offer.id, grant_id: grant.id)
+      expect(flash[:alert]).to eq(I18n.t("client_portal.preview.read_only"))
+      expect(grant.reload.revoked_at).to be_nil
     end
   end
 

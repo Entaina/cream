@@ -377,6 +377,8 @@ es:
       consent_recorded_by: 'Registrado por:'
       consent_source: 'Origen:'
       consent_text: 'Texto aceptado:'
+      client_portal_no_access: Esta persona no tiene acceso al portal de clientes.
+      client_portal_preview: Ver portal del cliente
       contact_management: Gestión del contacto
       convert_to_sql: Convertir a SQL
       copied: Copiado
