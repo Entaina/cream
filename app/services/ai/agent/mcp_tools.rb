@@ -23,7 +23,7 @@ module Ai
         update_person update_company update_deal update_deal_stage
         merge_person merge_company delete_record
         create_product update_product add_deal_product update_deal_product update_task
-        add_note add_person_attachment add_deal_offer add_comment send_deal_email create_task complete_task
+        add_note add_person_attachment add_deal_offer add_comment send_deal_email send_person_email create_task complete_task
         set_custom_fields
         create_mql create_product_interest convert_mql_to_sql set_subscription
         enroll_in_journey send_campaign cancel_campaign_send
