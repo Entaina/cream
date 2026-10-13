@@ -133,9 +133,19 @@ en:
           pick_company: Pick a company first.
           select_team_member: Select a team member.
         first_contact_date: First contact date
-        hint: Optional. Contacts of the client company or partner. Hold ⌘/Ctrl to
-          pick several.
+        groups:
+          client_company: From client company
+          other_people: Other people
+          partner_company: From partner
+        hint: Optional. Search contacts across the workspace; client and partner contacts
+          are suggested first.
         new: New
+        outsider_notice_many: "%{names} are not from %{companies}. You can still save
+          the deal."
+        outsider_notice_one: "%{names} is not from %{companies}. You can still save
+          the deal."
+        remove: Remove contact
+        search_placeholder: Search people…
         select_source: Select source
         select_team_member: Select team member
         source: Contact source
@@ -178,6 +188,8 @@ en:
       back: "← Back to board"
       title: New deal
     show:
+      outsider_contact_badge: External
+      outsider_contact_title: This contact is not from the client company or partner
       add: Add
       add_collaborator: Add collaborator
       add_product: Add product

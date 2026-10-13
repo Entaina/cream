@@ -69,7 +69,6 @@ en:
         deal:
           attributes:
             base:
-              contacts_must_belong_to_companies: Every contact must belong to %{names}
               needs_next_action: A deal needs a next action (a task with a due date
                 today or later)
             execution_ends_on:

@@ -134,9 +134,19 @@ es:
           pick_company: Selecciona primero una empresa.
           select_team_member: Selecciona un miembro del equipo.
         first_contact_date: Fecha de primer contacto
-        hint: Opcional. Contactos de la empresa cliente o del partner. Mantén ⌘/Ctrl
-          para elegir varios.
+        groups:
+          client_company: De la empresa cliente
+          other_people: Otras personas
+          partner_company: Del partner
+        hint: Opcional. Busca contactos en el workspace; se sugieren primero los de
+          la empresa cliente y del partner.
         new: Nuevo
+        outsider_notice_many: "%{names} no pertenecen a %{companies}. Puedes guardar
+          la oportunidad igualmente."
+        outsider_notice_one: "%{names} no pertenece a %{companies}. Puedes guardar
+          la oportunidad igualmente."
+        remove: Quitar contacto
+        search_placeholder: Buscar personas…
         select_source: Seleccionar origen
         select_team_member: Seleccionar miembro del equipo
         source: Origen del contacto
@@ -179,6 +189,8 @@ es:
       back: "← Volver al tablero"
       title: Nueva oportunidad
     show:
+      outsider_contact_badge: Externo
+      outsider_contact_title: Este contacto no pertenece a la empresa cliente ni al partner
       add: Añadir
       add_collaborator: Añadir colaborador
       add_product: Añadir producto

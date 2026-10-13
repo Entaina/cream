@@ -1,57 +1,122 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Keeps the deal's contacts in sync with the chosen company and partner: lists
-// their people, and lets you create a new contact in the client company without leaving.
+// Deal contacts: multi-select chips with workspace search, org suggestions, and outsider warnings.
 export default class extends Controller {
-  static targets = ["companySelect", "partnerSelect", "select", "dialog", "firstName", "lastName", "email", "phone", "source", "broughtByRow", "broughtBy", "firstContactOn", "notice", "error", "submit"]
+  static targets = [
+    "companySelect", "partnerSelect", "chips", "searchInput", "menu", "hiddenFields",
+    "dialog", "firstName", "lastName", "email", "phone", "source", "broughtByRow", "broughtBy",
+    "firstContactOn", "notice", "error", "submit", "outsiderWarning", "chipField"
+  ]
   static values = {
     peopleUrl: String,
+    selected: Array,
     pickCompanyError: String,
     selectTeamMemberError: String,
     networkError: String,
     createFailed: String,
-    today: String
+    today: String,
+    noResults: String,
+    groupClient: String,
+    groupPartner: String,
+    groupOther: String,
+    outsiderNoticeOne: String,
+    outsiderNoticeMany: String,
+    removeLabel: String,
+    clientCompanyName: String,
+    partnerCompanyName: String
   }
 
   connect() {
+    this.selectedPeople = (this.hasSelectedValue ? [ ...this.selectedValue ] : [])
+    this.menuResults = []
+    this.activeIndex = -1
+    this.menuEl = this.menuTarget
+    this.menuPortaled = false
+    this.menuAnchor = document.createComment("deal-contacts-menu")
+    this.onMenuMouseDown = (event) => event.preventDefault()
+    this.onMenuClick = (event) => this.handleMenuClick(event)
+    this.boundRepositionMenu = this.repositionMenu.bind(this)
+    this.boundOnScroll = this.onScroll.bind(this)
+    this.menuEl.addEventListener("mousedown", this.onMenuMouseDown)
+    this.menuEl.addEventListener("click", this.onMenuClick)
+    this.renderChips()
+    this.syncHiddenFields()
+    this.updateOutsiderNotice()
     this.toggleBroughtBy()
   }
 
-  companyChanged() {
-    this.refreshContacts()
+  disconnect() {
+    this.menuEl.removeEventListener("mousedown", this.onMenuMouseDown)
+    this.menuEl.removeEventListener("click", this.onMenuClick)
+    clearTimeout(this.debounce)
+    this.removeMenuListeners()
+    if (this.menuPortaled) {
+      this.menuEl.remove()
+      this.menuAnchor.remove()
+    }
   }
 
-  async refreshContacts() {
+  companyChanged() {
+    this.updateChipStyles()
+    this.updateOutsiderNotice()
+  }
+
+  focusSearch(event) {
+    if (event.target === this.searchInputTarget) return
+    this.searchInputTarget.focus()
+  }
+
+  async onSearchFocus() {
+    if (this.searchInputTarget.value.trim().length === 0) {
+      await this.loadOrgSuggestions()
+    }
+  }
+
+  query() {
+    const q = this.searchInputTarget.value.trim()
+    if (q.length === 0) {
+      this.loadOrgSuggestions()
+      return
+    }
+
+    clearTimeout(this.debounce)
+    this.debounce = setTimeout(async () => {
+      try {
+        const res = await fetch(`${this.peopleUrlValue}.json?q=${encodeURIComponent(q)}`, {
+          headers: { Accept: "application/json" }
+        })
+        if (!res.ok) return
+        const people = await res.json()
+        this.menuResults = people.filter((person) => !this.hasPerson(person.id))
+        this.renderMenu()
+      } catch { /* ignore */ }
+    }, 200)
+  }
+
+  async loadOrgSuggestions() {
     const companyId = this.companySelectTarget.value
     const partnerId = this.hasPartnerSelectTarget ? this.partnerSelectTarget.value : null
-    const selectedIds = Array.from(this.selectTarget.selectedOptions).map(option => option.value)
-    this.hide(this.noticeTarget)
-
     const companyIds = [ companyId, partnerId ].filter(Boolean)
     if (companyIds.length === 0) {
-      this.selectTarget.innerHTML = ""
+      this.hideMenu()
       return
     }
 
     try {
-      const peopleArrays = await Promise.all(companyIds.map(id => this.fetchPeopleForCompany(id)))
+      const peopleArrays = await Promise.all(companyIds.map((id) => this.fetchPeopleForCompany(id)))
       const seen = new Set()
       const people = []
       for (const list of peopleArrays) {
         for (const person of list) {
-          if (!seen.has(person.id)) {
+          if (!seen.has(person.id) && !this.hasPerson(person.id)) {
             seen.add(person.id)
             people.push(person)
           }
         }
       }
       people.sort((a, b) => a.name.localeCompare(b.name))
-      this.selectTarget.innerHTML = ""
-      people.forEach(person => {
-        const option = new Option(person.name, person.id)
-        if (selectedIds.includes(String(person.id))) option.selected = true
-        this.selectTarget.add(option)
-      })
+      this.menuResults = people
+      this.renderMenu()
     } catch { /* ignore */ }
   }
 
@@ -61,6 +126,284 @@ export default class extends Controller {
     return await res.json()
   }
 
+  renderMenu() {
+    if (this.menuResults.length === 0) {
+      this.menuEl.innerHTML = `<li class="px-3 py-1.5 text-sm text-ink-faint">${this.escape(this.noResultsValue)}</li>`
+      this.openMenu()
+      this.activeIndex = -1
+      return
+    }
+
+    const companyId = this.companySelectTarget.value
+    const partnerId = this.hasPartnerSelectTarget ? this.partnerSelectTarget.value : null
+    const client = []
+    const partner = []
+    const other = []
+
+    this.menuResults.forEach((person) => {
+      const cid = person.company_id == null ? null : String(person.company_id)
+      if (companyId && cid === String(companyId)) client.push(person)
+      else if (partnerId && cid === String(partnerId)) partner.push(person)
+      else other.push(person)
+    })
+
+    let index = 0
+    const items = []
+    const pushGroup = (label, records) => {
+      if (records.length === 0) return
+      items.push(`<li class="px-3 py-1 text-xs font-semibold uppercase tracking-wide text-ink-faint bg-canvas-sunken/80">${this.escape(label)}</li>`)
+      records.forEach((record) => {
+        items.push(this.resultItem(record, index))
+        index += 1
+      })
+    }
+
+    pushGroup(this.groupClientValue, client)
+    pushGroup(this.groupPartnerValue, partner)
+    pushGroup(this.groupOtherValue, other)
+
+    this.menuResults = [ ...client, ...partner, ...other ]
+    this.activeIndex = -1
+    this.menuEl.innerHTML = items.join("")
+    this.openMenu()
+  }
+
+  resultItem(record, index) {
+    const hint = record.hint ? `<span class="text-ink-faint"> · ${this.escape(record.hint)}</span>` : ""
+    return `<li role="option" data-index="${index}"
+                class="cursor-pointer px-3 py-1.5 text-sm hover:bg-canvas-sunken">
+              <span class="font-medium">${this.escape(record.name)}</span>${hint}
+            </li>`
+  }
+
+  handleMenuClick(event) {
+    const option = event.target.closest('[role="option"]')
+    if (!option) return
+    event.preventDefault()
+    this.pick({ currentTarget: option })
+  }
+
+  pick(event) {
+    const record = this.menuResults[Number(event.currentTarget.dataset.index)]
+    if (!record) return
+    this.addPerson(record)
+    this.searchInputTarget.value = ""
+    this.hideMenu()
+  }
+
+  addPerson(record) {
+    if (this.hasPerson(record.id)) return
+    this.selectedPeople.push(record)
+    this.renderChips()
+    this.syncHiddenFields()
+    this.updateOutsiderNotice()
+  }
+
+  remove(event) {
+    event.preventDefault()
+    const id = Number(event.currentTarget.dataset.personId)
+    this.selectedPeople = this.selectedPeople.filter((person) => person.id !== id)
+    this.renderChips()
+    this.syncHiddenFields()
+    this.updateOutsiderNotice()
+  }
+
+  hasPerson(id) {
+    return this.selectedPeople.some((person) => person.id === id)
+  }
+
+  renderChips() {
+    this.chipsTarget.innerHTML = this.selectedPeople.map((person) => this.chipHtml(person)).join("")
+  }
+
+  chipHtml(person) {
+    const outsider = this.isOutsider(person)
+    const ring = outsider
+      ? "ring-1 ring-amber-400/80 border-amber-300/80 dark:border-amber-700"
+      : "border-line"
+    const hint = person.hint ? `<span class="text-ink-faint truncate max-w-[12rem]">${this.escape(person.hint)}</span>` : ""
+    return `<span data-person-id="${person.id}" class="inline-flex max-w-full items-center gap-1 rounded-full border ${ring} bg-canvas-sunken pl-2.5 pr-1 py-0.5 text-sm">
+      <span class="font-medium truncate">${this.escape(person.name)}</span>
+      ${hint}
+      <button type="button" class="rounded-full p-0.5 text-ink-faint hover:bg-canvas hover:text-ink"
+              data-person-id="${person.id}" data-action="deal-contacts#remove"
+              aria-label="${this.escape(this.removeLabelValue)}">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="size-3.5"><path d="M4.28 4.22a.75.75 0 0 0-1.06 1.06L6.94 8l-3.72 3.72a.75.75 0 1 0 1.06 1.06L8 9.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L9.06 8l3.72-3.72a.75.75 0 0 0-1.06-1.06L8 6.94 4.28 3.22Z"/></svg>
+      </button>
+    </span>`
+  }
+
+  updateChipStyles() {
+    this.renderChips()
+  }
+
+  syncHiddenFields() {
+    this.hiddenFieldsTarget.innerHTML = this.selectedPeople.map((person) =>
+      `<input type="hidden" name="deal[contact_ids][]" value="${person.id}">`
+    ).join("")
+  }
+
+  companyDisplayName() {
+    return this.pickerInputFor(this.companySelectTarget)?.value || this.clientCompanyNameValue || ""
+  }
+
+  partnerDisplayName() {
+    if (!this.hasPartnerSelectTarget) return this.partnerCompanyNameValue || ""
+    return this.pickerInputFor(this.partnerSelectTarget)?.value || this.partnerCompanyNameValue || ""
+  }
+
+  pickerInputFor(hidden) {
+    return hidden?.closest('[data-controller~="record-picker"]')?.querySelector('[data-record-picker-target="input"]')
+  }
+
+  allowedCompanyIds() {
+    return [
+      this.companySelectTarget.value,
+      this.hasPartnerSelectTarget ? this.partnerSelectTarget.value : null
+    ].filter(Boolean).map(String)
+  }
+
+  isOutsider(person) {
+    const allowed = this.allowedCompanyIds()
+    if (allowed.length === 0) return false
+    const cid = person.company_id == null ? null : String(person.company_id)
+    if (cid === null) return true
+    return !allowed.includes(cid)
+  }
+
+  updateOutsiderNotice() {
+    if (!this.hasOutsiderWarningTarget) return
+    const outsiders = this.selectedPeople.filter((person) => this.isOutsider(person))
+    if (outsiders.length === 0) {
+      this.outsiderWarningTarget.classList.add("hidden")
+      this.outsiderWarningTarget.textContent = ""
+      return
+    }
+
+    const names = outsiders.map((person) => person.name).join(", ")
+    const companies = [ this.companyDisplayName(), this.partnerDisplayName() ].filter(Boolean).join(" / ")
+    const template = outsiders.length === 1 ? this.outsiderNoticeOneValue : this.outsiderNoticeManyValue
+    this.outsiderWarningTarget.textContent = template
+      .replace("%{names}", names)
+      .replace("%{companies}", companies)
+    this.outsiderWarningTarget.classList.remove("hidden")
+  }
+
+  searchKeydown(event) {
+    if (event.key === "Backspace" && this.searchInputTarget.value.length === 0 && this.selectedPeople.length > 0) {
+      this.selectedPeople.pop()
+      this.renderChips()
+      this.syncHiddenFields()
+      this.updateOutsiderNotice()
+      event.preventDefault()
+      return
+    }
+
+    const options = this.menuOptions()
+    if (event.key === "Escape") {
+      this.hideMenu()
+      event.preventDefault()
+      return
+    }
+
+    if (this.menuEl.classList.contains("hidden") || options.length === 0) return
+
+    if (event.key === "ArrowDown") {
+      this.activeIndex = Math.min(this.activeIndex + 1, options.length - 1)
+      this.highlightOption(options)
+      event.preventDefault()
+      return
+    }
+
+    if (event.key === "ArrowUp") {
+      this.activeIndex = Math.max(this.activeIndex - 1, 0)
+      this.highlightOption(options)
+      event.preventDefault()
+      return
+    }
+
+    if (event.key === "Enter" && this.activeIndex >= 0) {
+      event.preventDefault()
+      options[this.activeIndex].click()
+    }
+  }
+
+  menuOptions() {
+    return Array.from(this.menuEl.querySelectorAll('[role="option"]'))
+  }
+
+  highlightOption(options) {
+    options.forEach((option, index) => {
+      option.classList.toggle("bg-canvas-sunken", index === this.activeIndex)
+    })
+    options[this.activeIndex]?.scrollIntoView({ block: "nearest" })
+  }
+
+  searchBlur() {
+    setTimeout(() => this.hideMenu(), 150)
+  }
+
+  openMenu() {
+    this.portalMenu()
+    this.repositionMenu()
+    this.menuEl.classList.remove("hidden")
+  }
+
+  portalMenu() {
+    if (this.menuPortaled) return
+
+    this.menuEl.parentNode.insertBefore(this.menuAnchor, this.menuEl)
+    document.body.appendChild(this.menuEl)
+    this.menuPortaled = true
+    this.menuEl.classList.add("rounded-md", "border", "border-line", "bg-canvas", "shadow-lg", "max-h-56", "overflow-y-auto")
+    window.addEventListener("scroll", this.boundOnScroll, true)
+    window.addEventListener("resize", this.boundRepositionMenu)
+  }
+
+  unportalMenu() {
+    if (!this.menuPortaled) return
+
+    this.removeMenuListeners()
+    this.menuAnchor.parentNode?.insertBefore(this.menuEl, this.menuAnchor)
+    this.menuAnchor.remove()
+    this.resetMenuStyles()
+    this.menuPortaled = false
+  }
+
+  removeMenuListeners() {
+    window.removeEventListener("scroll", this.boundOnScroll, true)
+    window.removeEventListener("resize", this.boundRepositionMenu)
+  }
+
+  repositionMenu() {
+    const anchor = this.chipFieldTarget
+    const rect = anchor.getBoundingClientRect()
+    this.menuEl.style.position = "fixed"
+    this.menuEl.style.top = `${rect.bottom + 4}px`
+    this.menuEl.style.left = `${rect.left}px`
+    this.menuEl.style.width = `${rect.width}px`
+    this.menuEl.style.zIndex = "9999"
+  }
+
+  onScroll() {
+    if (this.menuEl.classList.contains("hidden")) return
+    this.repositionMenu()
+  }
+
+  resetMenuStyles() {
+    this.menuEl.style.position = ""
+    this.menuEl.style.top = ""
+    this.menuEl.style.left = ""
+    this.menuEl.style.width = ""
+    this.menuEl.style.zIndex = ""
+  }
+
+  hideMenu() {
+    this.menuEl.classList.add("hidden")
+    this.activeIndex = -1
+    this.unportalMenu()
+  }
+
   open(event) {
     event.preventDefault()
     if (!this.companySelectTarget.value) {
@@ -68,6 +411,7 @@ export default class extends Controller {
       this.show(this.noticeTarget)
       return
     }
+    this.hide(this.noticeTarget)
     this.hide(this.errorTarget)
     this.firstNameTarget.value = ""
     this.lastNameTarget.value = ""
@@ -134,7 +478,12 @@ export default class extends Controller {
         return
       }
       const created = await res.json()
-      this.selectTarget.add(new Option(created.name, created.id, true, true))
+      this.addPerson({
+        id: created.id,
+        name: created.name,
+        company_id: Number(this.companySelectTarget.value),
+        hint: created.hint || null
+      })
       this.close()
     } catch {
       this.error(this.networkErrorValue)
@@ -150,4 +499,10 @@ export default class extends Controller {
 
   show(el) { el.classList.remove("hidden") }
   hide(el) { el.classList.add("hidden") }
+
+  escape(text) {
+    const div = document.createElement("div")
+    div.textContent = text ?? ""
+    return div.innerHTML
+  }
 }

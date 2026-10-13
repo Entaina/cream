@@ -1,10 +1,28 @@
+<% selected_people = f.object.contacts.includes(:company, :person_emails).map do |person|
+     {
+       id: person.id,
+       name: person.display_name,
+       company_id: person.company_id,
+       hint: [person.company&.name, person.email].compact_blank.join(" · ").presence
+     }
+   end %>
 <div data-controller="deal-contacts"
      data-deal-contacts-people-url-value="<%= people_path %>"
+     data-deal-contacts-selected-value="<%= ERB::Util.html_escape(selected_people.to_json) %>"
      data-deal-contacts-pick-company-error-value="<%= t("deals.form.contacts.errors.pick_company") %>"
      data-deal-contacts-select-team-member-error-value="<%= t("deals.form.contacts.errors.select_team_member") %>"
      data-deal-contacts-network-error-value="<%= t("deals.form.contacts.errors.network") %>"
      data-deal-contacts-create-failed-value="<%= t("deals.form.contacts.errors.create_failed") %>"
      data-deal-contacts-today-value="<%= Date.current.iso8601 %>"
+     data-deal-contacts-no-results-value="<%= t("shared.record_picker.no_results") %>"
+     data-deal-contacts-group-client-value="<%= t("deals.form.contacts.groups.client_company") %>"
+     data-deal-contacts-group-partner-value="<%= t("deals.form.contacts.groups.partner_company") %>"
+     data-deal-contacts-group-other-value="<%= t("deals.form.contacts.groups.other_people") %>"
+     data-deal-contacts-outsider-notice-one-value="<%= t("deals.form.contacts.outsider_notice_one") %>"
+     data-deal-contacts-outsider-notice-many-value="<%= t("deals.form.contacts.outsider_notice_many") %>"
+     data-deal-contacts-remove-label-value="<%= t("deals.form.contacts.remove") %>"
+     data-deal-contacts-client-company-name-value="<%= f.object.company&.name %>"
+     data-deal-contacts-partner-company-name-value="<%= f.object.partner&.name %>"
      class="space-y-4">
   <%= render "shared/company_select", form: f,
         select_data: {"deal-contacts-target": "companySelect", action: "change->deal-contacts#companyChanged"} %>
@@ -25,19 +43,28 @@
 
   <div>
     <%= f.label :contact_ids, t("records.fields.contacts"), class: "label" %>
-    <div class="flex items-start gap-2">
-      <% deal_contacts = []
-         deal_contacts += f.object.company.people.order(:first_name, :last_name) if f.object.company
-         deal_contacts += f.object.partner.people.order(:first_name, :last_name) if f.object.partner
-         deal_contacts.uniq! %>
-      <%= f.select :contact_ids,
-            options_from_collection_for_select(deal_contacts, :id, :display_name, f.object.contact_ids),
-            {}, multiple: true, size: 5, class: "input", data: {"deal-contacts-target": "select"} %>
-      <button type="button" class="btn-secondary shrink-0 whitespace-nowrap" data-action="deal-contacts#open">
+    <div class="flex flex-col gap-2 sm:flex-row sm:items-start">
+      <div class="relative min-w-0 flex-1">
+        <div data-deal-contacts-target="chipField"
+             data-action="click->deal-contacts#focusSearch"
+             class="input flex min-h-[2.75rem] cursor-text flex-wrap items-center gap-1.5 py-1.5 pl-2 pr-1">
+          <div data-deal-contacts-target="chips" class="contents"></div>
+          <input type="search"
+                 autocomplete="off"
+                 placeholder="<%= t("deals.form.contacts.search_placeholder") %>"
+                 class="min-w-[8rem] flex-1 border-0 bg-transparent p-1 text-sm placeholder:text-ink-faint focus:outline-none focus:ring-0"
+                 data-deal-contacts-target="searchInput"
+                 data-action="focus->deal-contacts#onSearchFocus input->deal-contacts#query keydown->deal-contacts#searchKeydown blur->deal-contacts#searchBlur" />
+        </div>
+        <ul data-deal-contacts-target="menu" role="listbox" class="hidden"></ul>
+        <div data-deal-contacts-target="hiddenFields"></div>
+      </div>
+      <button type="button" class="btn-secondary shrink-0 whitespace-nowrap sm:mt-0.5" data-action="deal-contacts#open">
         <%= icon :plus, classes: "size-3.5" %> <%= t("deals.form.contacts.new") %>
       </button>
     </div>
     <p class="mt-1 text-xs text-ink-faint"><%= t("deals.form.contacts.hint") %></p>
+    <p data-deal-contacts-target="outsiderWarning" role="status" class="hidden mt-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-100"></p>
     <p data-deal-contacts-target="notice" class="hidden mt-1 text-xs text-danger"></p>
   </div>
 

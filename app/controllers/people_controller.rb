@@ -235,6 +235,7 @@ class PeopleController < ApplicationController
     {
       id: person.id,
       name: person.display_name,
+      company_id: person.company_id,
       hint: [person.company&.name, person.email].compact_blank.join(" · ").presence
     }
   end

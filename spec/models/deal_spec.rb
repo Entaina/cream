@@ -304,13 +304,13 @@ RSpec.describe Deal, type: :model do
       expect(deal).to be_valid
     end
 
-    it "rejects a contact from another company" do
+    it "allows a contact from another company" do
       outsider = create_person!(workspace, company: create_company!(workspace))
       deal = workspace.deals.new(name: "X", pipeline: pipeline, pipeline_stage: pipeline.first_stage,
         company: company, contacts: [outsider],
         tasks: [Task.new(title: "t", due_on: Date.current + 1, workspace: workspace, user: actor, assignee: actor)])
-      expect(deal).not_to be_valid
-      expect(deal.errors[:base].join).to match(/pertenecer|must belong/)
+      expect(deal).to be_valid
+      expect(deal.outsider_contacts).to contain_exactly(outsider)
     end
 
     it "allows a contact from the partner company when partner is set" do
@@ -332,14 +332,14 @@ RSpec.describe Deal, type: :model do
       expect(deal).to be_valid
     end
 
-    it "rejects a contact from a company that is neither client nor partner" do
+    it "allows a contact from a company that is neither client nor partner" do
       partner = create_company!(workspace, name: "Avantis Group")
       outsider = create_person!(workspace, company: create_company!(workspace, name: "Other Co"))
       deal = workspace.deals.new(name: "X", pipeline: pipeline, pipeline_stage: pipeline.first_stage,
         company: company, partner: partner, contacts: [outsider],
         tasks: [Task.new(title: "t", due_on: Date.current + 1, workspace: workspace, user: actor, assignee: actor)])
-      expect(deal).not_to be_valid
-      expect(deal.errors[:base].join).to match(/pertenecer|must belong/)
+      expect(deal).to be_valid
+      expect(deal.outsider_contacts).to contain_exactly(outsider)
     end
 
     it "rejects the partner being the same as the client company" do

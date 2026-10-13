@@ -146,7 +146,7 @@ RSpec.describe "Api::V1::Deals", type: :request do
       expect(response).to have_http_status(:not_found)
     end
 
-    it "returns unprocessable entity when a contact does not belong to the deal company" do
+    it "creates a deal when a contact does not belong to the deal company" do
       other_company = create_company!(workspace)
       outsider = create_person!(workspace, company: other_company)
 
@@ -154,8 +154,9 @@ RSpec.describe "Api::V1::Deals", type: :request do
         params: valid_create_params(deal: {contact_ids: [outsider.id]}),
         headers: headers
 
-      expect(response).to have_http_status(:unprocessable_content)
-      expect(response.parsed_body["errors"].join).to match(/pertenecer|Every contact must belong/)
+      expect(response).to have_http_status(:created)
+      created_deal = workspace.deals.find(response.parsed_body["id"])
+      expect(created_deal.contacts).to contain_exactly(outsider)
     end
 
     it "creates a deal with nested notes" do

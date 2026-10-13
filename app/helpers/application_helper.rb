@@ -79,7 +79,13 @@ module ApplicationHelper
 
   def deal_contact_display(deal_contact)
     person = deal_contact.person
+    deal = deal_contact.deal
     link = link_to(person.display_name, person_path(person), class: "text-accent hover:underline")
+    parts = [link]
+    if deal && deal_contact_outsider?(deal, person)
+      parts << content_tag(:span, badge(t("deals.show.outsider_contact_badge"), color: "hoki"),
+        title: t("deals.show.outsider_contact_title"))
+    end
     if deal_contact.via_offer_share?
       share_link = deal_contact.offer_share_link
       title = t(
@@ -88,15 +94,24 @@ module ApplicationHelper
         offer: share_link&.offer&.name || t("shared.empty_value"),
         date: l(deal_contact.created_at, format: :short)
       )
-      return safe_join([link, " ", content_tag(:span, badge(t("offers.via_proposal"), color: "hoki"), title: title)])
+      parts << content_tag(:span, badge(t("offers.via_proposal"), color: "hoki"), title: title)
+      return safe_join(parts, " ")
     end
 
     if deal_contact.via_portal_invite?
       title = t("deals.portal_invite.via_badge_title", date: l(deal_contact.created_at, format: :short))
-      return safe_join([link, " ", content_tag(:span, badge(t("deals.portal_invite.via_badge"), color: "hoki"), title: title)])
+      parts << content_tag(:span, badge(t("deals.portal_invite.via_badge"), color: "hoki"), title: title)
+      return safe_join(parts, " ")
     end
 
-    link
+    safe_join(parts, " ")
+  end
+
+  def deal_contact_outsider?(deal, person)
+    return false if deal.company_id.blank?
+
+    allowed = [deal.company_id, deal.partner_id].compact
+    !allowed.include?(person.company_id)
   end
 
   def badge(label, color: "chicago")

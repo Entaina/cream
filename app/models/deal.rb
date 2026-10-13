@@ -42,7 +42,6 @@ class Deal < ApplicationRecord
   validate :execution_end_on_not_before_start
   validate :stage_belongs_to_pipeline
   validate :stage_entry_conditions_met, if: -> { persisted? && will_save_change_to_pipeline_stage_id? }
-  validate :contacts_belong_to_company
   validate :partner_differs_from_company
   validate :has_a_future_task, on: :create, unless: :duplicating
 
@@ -228,6 +227,13 @@ class Deal < ApplicationRecord
     (contact_ids - Array(ids).map(&:to_i)).any?
   end
 
+  def outsider_contacts
+    return [] if company.nil?
+
+    allowed_company_ids = [company_id, partner_id].compact
+    live_contacts.reject { |person| allowed_company_ids.include?(person.company_id) }
+  end
+
   private
 
   def normalize_payment_method
@@ -299,17 +305,6 @@ class Deal < ApplicationRecord
 
     requirements = failed.map(&:describe_requirement).join("; ")
     errors.add(:base, I18n.t("field_conditions.stage_move_blocked", stage: stage.name, requirements: requirements))
-  end
-
-  def contacts_belong_to_company
-    return if company.nil?
-
-    allowed = [company_id, partner_id].compact
-    outsiders = live_contacts.reject { |person| allowed.include?(person.company_id) }
-    return if outsiders.empty?
-
-    names = [company&.name, partner&.name].compact.to_sentence
-    errors.add(:base, :contacts_must_belong_to_companies, names: names)
   end
 
   def partner_differs_from_company

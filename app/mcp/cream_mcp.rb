@@ -662,13 +662,13 @@ module CreamMcp
   CREATE_DEAL = MCP::Tool.define(
     name: "create_deal",
     description: "Create a deal. A deal belongs to a company and needs a next action (a task with a future due date). " \
-                 "Contacts are optional but, when provided, must belong to the company. " \
+                 "Contacts are optional; they may be from any company in the workspace (prefer client or partner contacts). " \
                  "Optionally send an email to a contact in the same request (requires record_email).",
     input_schema: {type: "object",
                    properties: {name: {type: "string"},
                                 company_id: {type: "integer", description: "Company the deal belongs to"},
                                 person_ids: {type: "array", items: {type: "integer"},
-                                             description: "Optional contact person ids — must belong to the company when provided"},
+                                             description: "Optional contact person ids from the workspace"},
                                 next_action_title: {type: "string", description: "The next action to take on this deal"},
                                 next_action_due_on: {type: "string", description: "Due date for the next action, ISO (YYYY-MM-DD), in the future"},
                                 value: {type: "number"},
@@ -782,7 +782,7 @@ module CreamMcp
   UPDATE_DEAL = MCP::Tool.define(
     name: "update_deal",
     description: "Update a deal's fields. Only the fields provided are changed. person_ids replaces the deal's " \
-                 "contacts (they must belong to the deal's company). pipeline moves the deal to another pipeline " \
+                 "contacts (any person in the workspace). pipeline moves the deal to another pipeline " \
                  "(landing on its first stage unless stage is also given); stage moves it within its pipeline — " \
                  "both are logged in the activity timeline. Use set_custom_fields for custom fields.",
     input_schema: {type: "object",
@@ -799,7 +799,7 @@ module CreamMcp
                                 payment_on: {type: "string", description: "ISO date (YYYY-MM-DD); ignored when payment_method is cash"},
                                 company_id: {type: "integer", description: "Move the deal to another existing company"},
                                 person_ids: {type: "array", items: {type: "integer"},
-                                             description: "Replaces the deal's contacts — must belong to the deal's company"},
+                                             description: "Replaces the deal's contacts with workspace person ids"},
                                 pipeline: {type: "string", description: "Target pipeline name"},
                                 stage: {type: "string", description: "Target stage name within the (possibly new) pipeline"}},
                    required: ["deal_id"]}

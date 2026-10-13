@@ -18,7 +18,7 @@ RSpec.describe "People", type: :request do
       payload = JSON.parse(response.body)
       expect(payload.size).to eq(workspace.people.count)
       expect(payload.size).to be > 50
-      expect(payload.first.keys).to contain_exactly("id", "name", "hint")
+      expect(payload.first.keys).to contain_exactly("id", "name", "company_id", "hint")
     end
   end
 
