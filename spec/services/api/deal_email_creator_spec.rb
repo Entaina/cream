@@ -25,6 +25,21 @@ RSpec.describe Api::DealEmailCreator do
     expect(message.subject).to eq("Hi")
   end
 
+  it "builds a message for a person with resolved recipient" do
+    person = create_person!(workspace, email: "person@example.com")
+    creator = described_class.new(
+      workspace: workspace,
+      user: user,
+      record: person,
+      email_attrs: {subject: "Hi", body: "Body"}
+    )
+    message = creator.build
+
+    expect(message).to be_valid
+    expect(message.record).to eq(person)
+    expect(message.to_address).to eq("person@example.com")
+  end
+
   it "rejects too many attachments" do
     files = Array.new(EmailMessage::MAX_ATTACHMENTS + 1) do |i|
       ActionDispatch::Http::UploadedFile.new(

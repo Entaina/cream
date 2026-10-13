@@ -29,6 +29,16 @@ module CreamMcp
     },
     required: ["subject", "body"]
   }.freeze
+  PERSON_EMAIL_SCHEMA = {
+    type: "object",
+    properties: {
+      to_address: {type: "string", description: "Recipient email; defaults to the person's email"},
+      subject: {type: "string"},
+      body: {type: "string"},
+      attachments: {type: "array", items: EMAIL_ATTACHMENT_SCHEMA}
+    },
+    required: ["subject", "body"]
+  }.freeze
 
   def self.server_for(user:, workspace:)
     MCP::Server.new(
@@ -53,8 +63,8 @@ module CreamMcp
       add_deal_product). Edit with update_person/update_company/update_deal (update_deal can
       move pipeline/replace contacts). Duplicates: list_person_duplicates/list_company_duplicates
       then merge_*; delete_record removes records (deleting a company also deletes its people and
-      deals). Notes, person files (add_person_attachment), deal proposals (add_deal_offer; new version if it exists), comments (add_comment), emails (list_emails/get_email/send_deal_email;
-      optional on create_deal), Stripe payments
+      deals). Notes, person files (add_person_attachment), deal proposals (add_deal_offer; new version if it exists), comments (add_comment), emails (list_emails/get_email/send_deal_email/send_person_email;
+      optional on create_deal and create_mql), Stripe payments
       (list_payments), activity (list_activity), recent_changes. Custom fields:
       list_custom_fields/set_custom_fields. Records include url (needs CREAM_APP_URL).
       Marketing: MQL pool → list_mqls / get_person_marketing; create_mql registers one; convert via create_product_interest +
@@ -74,7 +84,7 @@ module CreamMcp
       UPDATE_PERSON, UPDATE_COMPANY, UPDATE_DEAL, UPDATE_DEAL_STAGE,
       LIST_PERSON_DUPLICATES, LIST_COMPANY_DUPLICATES, MERGE_PERSON, MERGE_COMPANY, DELETE_RECORD,
       CREATE_PRODUCT, UPDATE_PRODUCT, ADD_DEAL_PRODUCT, UPDATE_DEAL_PRODUCT, UPDATE_TASK,
-      ADD_NOTE, ADD_PERSON_ATTACHMENT, ADD_DEAL_OFFER, ADD_COMMENT, SEND_DEAL_EMAIL, CREATE_TASK, COMPLETE_TASK, PIPELINE_SUMMARY,
+      ADD_NOTE, ADD_PERSON_ATTACHMENT, ADD_DEAL_OFFER, ADD_COMMENT, SEND_DEAL_EMAIL, SEND_PERSON_EMAIL, CREATE_TASK, COMPLETE_TASK, PIPELINE_SUMMARY,
       LIST_CUSTOM_FIELDS, SET_CUSTOM_FIELDS, GET_DEAL_HISTORY,
       RECENT_CHANGES, SALES_FORECAST,
       SUMMARIZE_RECORD, SUGGEST_NEXT_STEPS, DRAFT_EMAIL, NATURAL_LANGUAGE_SEARCH, ENRICH_RECORD,
@@ -380,6 +390,16 @@ module CreamMcp
       workspace: pundit_ctx.workspace,
       user: pundit_ctx.user,
       deal: deal,
+      email_attrs: email_data[:attrs],
+      attachments: email_data[:attachments]
+    )
+  end
+
+  def self.build_person_email_creator(pundit_ctx, person, email_data)
+    Api::DealEmailCreator.new(
+      workspace: pundit_ctx.workspace,
+      user: pundit_ctx.user,
+      record: person,
       email_attrs: email_data[:attrs],
       attachments: email_data[:attachments]
     )
@@ -1079,6 +1099,40 @@ module CreamMcp
         attachments: Api::DealEmailCreator.parse_attachments(CreamMcp.arg(args, "attachments"))
       }
       creator = CreamMcp.build_deal_email_creator(pundit_ctx, deal, email_data)
+      message = creator.build
+      CreamMcp.authorize!(pundit_ctx, message, :create?)
+      message.save!
+      creator.deliver(message)
+      CreamMcp.respond_with(sent: Api::DealEmailCreator.json(message))
+    rescue Api::DealEmailCreator::InvalidAttachment => e
+      CreamMcp.error_response("invalid_attachment", e.message)
+    end
+  end
+
+  SEND_PERSON_EMAIL = MCP::Tool.define(
+    name: "send_person_email",
+    description: "Send a tracked email to a person (contact), associated with their record — no deal required. " \
+                 "Delivery uses Gmail when connected, otherwise SMTP. " \
+                 "If to_address is omitted, the person's email is used. Attachments are Base64-encoded.",
+    input_schema: {type: "object",
+                   properties: {person_id: {type: "integer"},
+                                to_address: {type: "string", description: "Recipient email; defaults to the person's email"},
+                                subject: {type: "string"},
+                                body: {type: "string"},
+                                attachments: {type: "array", items: EMAIL_ATTACHMENT_SCHEMA}},
+                   required: ["person_id", "subject", "body"]}
+  ) do |server_context:, **args|
+    return CreamMcp.feature_unavailable_response(:record_email) unless CreamFeatures.enabled?(:record_email)
+
+    CreamMcp.with_authorization(server_context) do
+      pundit_ctx = CreamMcp.pundit_context(server_context)
+      ws = pundit_ctx.workspace
+      person = CreamMcp.policy_scope(pundit_ctx, ws.people).find(CreamMcp.arg(args, "person_id"))
+      email_data = {
+        attrs: CreamMcp.picked(args, "to_address", "subject", "body"),
+        attachments: Api::DealEmailCreator.parse_attachments(CreamMcp.arg(args, "attachments"))
+      }
+      creator = CreamMcp.build_person_email_creator(pundit_ctx, person, email_data)
       message = creator.build
       CreamMcp.authorize!(pundit_ctx, message, :create?)
       message.save!

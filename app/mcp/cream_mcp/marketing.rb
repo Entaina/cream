@@ -629,11 +629,11 @@ module CreamMcp
       description: "Register a person as an MQL: finds or creates the person by email, moves them to the mql " \
                    "lifecycle stage and subscribes them. Consent is given per subscription type: pass at least one entry in " \
                    "subscriptions (see list_subscription_types), each with its mandatory evidence (consent_text, consent_source). " \
-                   "Optionally stores internal notes, timeline notes, attachments and a product interest. Provide company_id or company_name.",
+                   "Optionally stores internal notes, timeline notes, attachments, a product interest, and sends an email to the person (requires record_email). Provide company_id or company_name.",
       input_schema: {
         type: "object",
         properties: {
-          email: {type: "string"},
+          email: {type: "string", description: "Person email address (required for registration)"},
           first_name: {type: "string"}, last_name: {type: "string"},
           phone: {type: "string"}, job_title: {type: "string"}, location: {type: "string"},
           company_id: {type: "integer", description: "Existing company id"},
@@ -658,17 +658,26 @@ module CreamMcp
                   description: "Timeline notes"},
           attachments: {type: "array", items: CreamMcp::EMAIL_ATTACHMENT_SCHEMA},
           product_id: {type: "integer", description: "Product the person is interested in (requires interest_description)"},
-          interest_description: {type: "string"}
+          interest_description: {type: "string"},
+          outbound_email: CreamMcp::PERSON_EMAIL_SCHEMA.merge(
+            description: "Optional tracked email sent to the person after registration (requires record_email)"
+          )
         },
         required: %w[email subscriptions]
       }
     ) do |server_context:, **args|
       return CreamMcp.feature_unavailable_response(:mql_pool) unless CreamFeatures.enabled?(:mql_pool)
       return CreamMcp.feature_unavailable_response(:marketing_consent) unless CreamFeatures.enabled?(:marketing_consent)
+      if CreamMcp.arg(args, "outbound_email").present? && !CreamFeatures.enabled?(:record_email)
+        return CreamMcp.feature_unavailable_response(:record_email)
+      end
 
       CreamMcp.with_authorization(server_context, tool: "create_mql") do
         pundit_ctx = CreamMcp.pundit_context(server_context)
         CreamMcp.authorize!(pundit_ctx, :mql, :create?, policy_class: MqlPolicy)
+
+        outbound = CreamMcp.arg(args, "outbound_email")
+        email_data = outbound.present? ? CreamMcp.parse_deal_email_data(outbound) : nil
 
         result = ::Marketing::MqlCreator.call(
           workspace: pundit_ctx.workspace,
@@ -681,7 +690,8 @@ module CreamMcp
           product_id: CreamMcp.arg(args, "product_id"),
           interest_description: CreamMcp.arg(args, "interest_description"),
           notes: CreamMcp.arg(args, "notes"),
-          attachments: Api::DealEmailCreator.parse_attachments(CreamMcp.arg(args, "attachments"))
+          attachments: Api::DealEmailCreator.parse_attachments(CreamMcp.arg(args, "attachments")),
+          email_data: email_data
         )
 
         CreamMcp.respond_with(
@@ -690,12 +700,13 @@ module CreamMcp
             subscriptions: result.subscriptions.map { |subscription| CreamMcp::Marketing.subscription_json(subscription) },
             product_interest: result.interest && CreamMcp::Marketing.product_interest_json(result.interest),
             notes: result.notes.map { |note| {id: note.id, title: note.title, body: note.body} },
-            attachments: result.attachments.map { |attachment| Api::RecordAttachmentBuilder.json(attachment) }
+            attachments: result.attachments.map { |attachment| Api::RecordAttachmentBuilder.json(attachment) },
+            sent_email: result.email_message && Api::DealEmailCreator.json(result.email_message)
           ).compact
         )
       rescue ::Marketing::MqlCreator::Error => e
         CreamMcp.error_response("invalid_argument", e.message)
-      rescue Api::RecordAttachmentBuilder::InvalidAttachment => e
+      rescue Api::RecordAttachmentBuilder::InvalidAttachment, Api::DealEmailCreator::InvalidAttachment => e
         CreamMcp.error_response("invalid_attachment", e.message)
       end
     end

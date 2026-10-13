@@ -121,6 +121,13 @@ components:
       schema:
         type: integer
 
+    PersonIdNested:
+      name: person_id
+      in: path
+      required: true
+      schema:
+        type: integer
+
     TaskId:
       name: id
       in: path
@@ -448,6 +455,11 @@ components:
             upload files as `attachments[]`. Requires the `attachments` feature. Up to 10 files, 10 MB each.
           items:
             $ref: "#/components/schemas/DealEmailAttachmentInput"
+        email:
+          $ref: "#/components/schemas/PersonEmailInput"
+          description: >-
+            Optional outbound email queued atomically with the MQL registration (rolled back if the
+            email or any attachment is invalid). Requires the `record_email` feature.
 
     Subscription:
       type: object
@@ -532,6 +544,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/PersonAttachment"
+        sent_email:
+          $ref: "#/components/schemas/DealEmail"
+          description: Present when an outbound email was queued with the registration.
 
     Company:
       allOf:
@@ -941,6 +956,42 @@ components:
               - type: string
                 format: binary
                 description: Uploaded file when using multipart/form-data.
+
+    PersonEmailInput:
+      type: object
+      required: [subject, body]
+      properties:
+        to_address:
+          type: string
+          format: email
+          description: Defaults to the person's email when omitted.
+        subject:
+          type: string
+        body:
+          type: string
+        attachments:
+          type: array
+          description: >-
+            Files to attach to the email. With `application/json`, send Base64
+            objects in this array. With `multipart/form-data`, upload binary files
+            as `email[attachments][]`. Limits: up to 10 files, 10 MB per file and
+            25 MB in total.
+          items:
+            oneOf:
+              - $ref: "#/components/schemas/DealEmailAttachmentInput"
+              - type: string
+                format: binary
+                description: Uploaded file when using multipart/form-data.
+
+    PersonEmailMultipartRequest:
+      type: object
+      required: [email]
+      description: >-
+        Multipart variant of person email creation. Send `email[to_address]`,
+        `email[subject]`, `email[body]` and upload files as `email[attachments][]`.
+      properties:
+        email:
+          $ref: "#/components/schemas/PersonEmailInput"
 
     DealEmailAttachmentInput:
       type: object
@@ -1480,6 +1531,47 @@ paths:
         "422":
           $ref: "#/components/responses/ValidationError"
 
+  /api/v1/people/{person_id}/emails:
+    post:
+      tags: [Person emails]
+      summary: Send an email to a person
+      description: |
+        Queues delivery through the sender's Gmail account when connected and enabled;
+        otherwise sends via SMTP. The message is associated with the person record (not a deal).
+        Attach files as Base64 in JSON or upload binary files with `multipart/form-data`
+        (`email[attachments][]`). Requires the `record_email` feature.
+      parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
+        - $ref: "#/components/parameters/PersonIdNested"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email:
+                  $ref: "#/components/schemas/PersonEmailInput"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/PersonEmailMultipartRequest"
+      responses:
+        "201":
+          description: Queued for delivery
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DealEmail"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
   /api/v1/marketing/mqls:
     post:
       tags: [Marketing]
@@ -1487,7 +1579,7 @@ paths:
       description: |
         Finds or creates a person by email, moves them to the `mql` lifecycle stage (never demotes),
         subscribes them to the given subscription types (consent is given per type: at least one
-        entry in `subscriptions`, each with its mandatory evidence) and optionally stores internal notes, timeline notes, attachments and a product interest, all in
+        entry in `subscriptions`, each with its mandatory evidence) and optionally stores internal notes, timeline notes, attachments, a product interest, and an outbound email to the person, all in
         one transaction. Returns `201` when the person was created and `200` when an existing person
         was updated. Requires the `mql_pool` and `marketing_consent` features.
       parameters:

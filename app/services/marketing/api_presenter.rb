@@ -82,7 +82,8 @@ module Marketing
         subscriptions: result.subscriptions.map { |subscription| subscription_json(subscription) },
         product_interest: result.interest && product_interest_json(result.interest),
         notes: result.notes.map { |note| {id: note.id, title: note.title, body: note.body} },
-        attachments: result.attachments.map { |attachment| Api::RecordAttachmentBuilder.json(attachment) }
+        attachments: result.attachments.map { |attachment| Api::RecordAttachmentBuilder.json(attachment) },
+        sent_email: result.email_message && Api::DealEmailCreator.json(result.email_message)
       ).compact
     end
 

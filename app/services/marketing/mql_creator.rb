@@ -12,7 +12,7 @@ module Marketing
   class MqlCreator
     class Error < StandardError; end
 
-    Result = Data.define(:person, :created, :subscriptions, :interest, :notes, :attachments)
+    Result = Data.define(:person, :created, :subscriptions, :interest, :notes, :attachments, :email_message)
     Consent = Data.define(:subscription_type, :evidence)
 
     PERSON_FIELDS = %i[first_name last_name phone job_title location].freeze
@@ -23,7 +23,7 @@ module Marketing
     end
 
     def initialize(workspace:, user:, attributes:, source:, authorizer:, subscriptions: [],
-      product_id: nil, interest_description: nil, notes: [], attachments: [])
+      product_id: nil, interest_description: nil, notes: [], attachments: [], email_data: nil)
       @workspace = workspace
       @user = user
       @attributes = attributes.to_h.symbolize_keys
@@ -34,11 +34,15 @@ module Marketing
       @interest_description = interest_description
       @notes = Array(notes)
       @attachments = Array(attachments)
+      @email_data = email_data.presence
     end
 
     def call
       validate!
 
+      email_message = nil
+      email_creator = nil
+      result = nil
       ActiveRecord::Base.transaction do
         person, created = save_person!
         advance_lifecycle!(person)
@@ -46,9 +50,17 @@ module Marketing
         interest = create_interest!(person)
         notes = create_notes!(person)
         attachments = create_attachments!(person)
+        if @email_data
+          email_creator = build_email_creator(person)
+          email_message = email_creator.build
+          authorizer.call(email_message, :create?)
+          email_message.save!
+        end
         Marketing::SegmentWatcher.sync_person!(person)
-        Result.new(person:, created:, subscriptions:, interest:, notes:, attachments:)
+        result = Result.new(person:, created:, subscriptions:, interest:, notes:, attachments:, email_message:)
       end
+      email_creator.deliver(email_message) if email_message
+      result
     end
 
     private
@@ -66,6 +78,20 @@ module Marketing
         end
         Api::RecordAttachmentBuilder.ensure_count!(attachments)
       end
+
+      if @email_data && !CreamFeatures.enabled?(:record_email)
+        raise Error, CreamFeatures.unavailable_message(:record_email)
+      end
+    end
+
+    def build_email_creator(person)
+      Api::DealEmailCreator.new(
+        workspace: workspace,
+        user: user,
+        record: person,
+        email_attrs: @email_data[:attrs],
+        attachments: @email_data[:attachments]
+      )
     end
 
     # One entry per subscription type; the entry itself is the person's consent for that type.

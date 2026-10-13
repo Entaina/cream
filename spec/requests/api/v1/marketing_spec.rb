@@ -83,6 +83,37 @@ RSpec.describe "Api::V1::Marketing", type: :request do
       expect(body["subscriptions"]).to match([include("subscription_type_id" => general.id, "status" => "subscribed", "source" => "api")])
     end
 
+    it "queues an outbound email with MQL registration when email is provided" do
+      allow(CreamFeatures).to receive(:enabled?).with(:record_email).and_return(true)
+      allow(CreamFeatures).to receive(:enabled?).with(:gmail_sync).and_return(false)
+
+      expect {
+        post "/api/v1/marketing/mqls",
+          params: payload.merge(email: {subject: "Welcome", body: "Thanks for joining."}),
+          as: :json,
+          headers: sales_headers
+      }.to change(EmailMessage, :count).by(1)
+        .and have_enqueued_mail(RecordMailer, :tracked_email)
+
+      person = workspace.people.find(response.parsed_body["id"])
+      message = EmailMessage.order(:id).last
+      expect(message.record).to eq(person)
+      expect(response.parsed_body["sent_email"]).to include("subject" => "Welcome")
+    end
+
+    it "rolls back MQL registration when outbound email is invalid" do
+      allow(CreamFeatures).to receive(:enabled?).with(:record_email).and_return(true)
+
+      expect {
+        post "/api/v1/marketing/mqls",
+          params: payload.merge(email: {subject: "Hi", body: ""}),
+          as: :json,
+          headers: sales_headers
+      }.not_to change(workspace.people, :count)
+
+      expect(response).to have_http_status(:unprocessable_entity)
+    end
+
     it "stores the consent evidence and who registered it on the subscription" do
       post "/api/v1/marketing/mqls", params: payload, as: :json, headers: sales_headers
 

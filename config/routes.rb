@@ -317,6 +317,7 @@ Rails.application.routes.draw do
         end
         resources :product_interests, only: %i[index create], module: :marketing
         resources :attachments, only: :create, controller: "person_attachments"
+        resources :emails, only: :create, controller: "person_emails"
       end
       namespace :marketing do
         resources :mqls, only: %i[index create]

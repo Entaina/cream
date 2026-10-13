@@ -40,10 +40,12 @@ module Api
             product_id: mql_params[:product_id],
             interest_description: mql_params[:interest_description],
             notes: nested_notes,
-            attachments: ::Api::DealEmailCreator.parse_attachments(params[:attachments])
+            attachments: ::Api::DealEmailCreator.parse_attachments(params[:attachments]),
+            email_data: nested_email_params
           )
           render json: ::Marketing::ApiPresenter.mql_creation_json(result), status: result.created ? :created : :ok
-        rescue ::Marketing::MqlCreator::Error, ::Api::RecordAttachmentBuilder::InvalidAttachment => e
+        rescue ::Marketing::MqlCreator::Error, ::Api::RecordAttachmentBuilder::InvalidAttachment,
+          ::Api::DealEmailCreator::InvalidAttachment => e
           render json: {errors: [e.message]}, status: :unprocessable_entity
         rescue ActiveRecord::RecordInvalid => e
           render json: {errors: e.record.errors.full_messages}, status: :unprocessable_entity
@@ -78,6 +80,21 @@ module Api
             entry = ActionController::Parameters.new(entry) unless entry.is_a?(ActionController::Parameters)
             entry.permit(:title, :body).to_h.presence
           end
+        end
+
+        def nested_email_requested?
+          params.key?(:email) && params[:email].present?
+        end
+
+        def nested_email_params
+          return unless nested_email_requested?
+
+          entry = params[:email]
+          entry = ActionController::Parameters.new(entry) unless entry.is_a?(ActionController::Parameters)
+          {
+            attrs: entry.permit(:to_address, :subject, :body).to_h,
+            attachments: ::Api::DealEmailCreator.parse_attachments(entry[:attachments])
+          }
         end
       end
     end

@@ -3,10 +3,12 @@ module Api
     InvalidAttachment = Class.new(StandardError)
     RecordEmailDisabled = Class.new(StandardError)
 
-    def initialize(workspace:, user:, deal:, email_attrs:, attachments: [])
+    def initialize(workspace:, user:, email_attrs:, attachments: [], deal: nil, record: nil)
       @workspace = workspace
       @user = user
-      @deal = deal
+      @record = record || deal
+      raise ArgumentError, "deal or record is required" if @record.nil?
+
       @email_attrs = email_attrs.symbolize_keys
       @attachments = attachments
     end
@@ -15,7 +17,7 @@ module Api
       message = @workspace.email_messages.new(
         @email_attrs.except(:attachments).merge(
           user: @user,
-          record: @deal,
+          record: @record,
           to_address: resolved_to_address
         )
       )
@@ -50,7 +52,14 @@ module Api
     private
 
     def resolved_to_address
-      @email_attrs[:to_address].presence || @deal.contacts.first&.email
+      @email_attrs[:to_address].presence || default_to_address
+    end
+
+    def default_to_address
+      case @record
+      when Deal then @record.contacts.first&.email
+      when Person then @record.email
+      end
     end
 
     # Attachments may be uploaded files (multipart/form-data) or Base64 objects

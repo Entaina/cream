@@ -46,7 +46,7 @@ RSpec.describe "Mcp", type: :request do
       instructions = JSON.parse(response.body).dig("result", "instructions")
       expect(instructions).to be_present
       expect(instructions.length).to be <= CreamMcp::MAX_INSTRUCTIONS_LENGTH
-      expect(instructions).to include("list_my_tasks", "natural_language_search", "list_pipelines", "send_deal_email")
+      expect(instructions).to include("list_my_tasks", "natural_language_search", "list_pipelines", "send_deal_email", "send_person_email")
       expect(instructions).not_to match(/configurable stages \(/)
     end
 
@@ -57,7 +57,7 @@ RSpec.describe "Mcp", type: :request do
       tools = JSON.parse(response.body).dig("result", "tools")
       expect(tools.map { |t| t["name"] }).to include("search_records", "pipeline_summary",
         "list_custom_fields", "set_custom_fields",
-        "list_products", "list_tasks", "list_my_tasks", "list_emails", "get_email", "send_deal_email", "list_activity", "list_payments", "list_pipelines",
+        "list_products", "list_tasks", "list_my_tasks", "list_emails", "get_email", "send_deal_email", "send_person_email", "list_activity", "list_payments", "list_pipelines",
         "list_stage_conditions", "create_stage_condition", "update_stage_condition", "delete_stage_condition",
         "update_person", "update_company", "update_deal", "add_comment",
         "list_person_duplicates", "list_company_duplicates", "merge_person", "merge_company", "delete_record",
@@ -907,6 +907,26 @@ RSpec.describe "Mcp", type: :request do
 
       expect(response).to have_http_status(:success)
       expect(response.body).not_to include("Confidencial")
+    end
+
+    it "sends a person email via send_person_email and enqueues SMTP delivery" do
+      person = create_person!(workspace, email: "lead@example.com")
+      allow(CreamFeatures).to receive(:enabled?).and_call_original
+      allow(CreamFeatures).to receive(:enabled?).with(:record_email).and_return(true)
+      allow(CreamFeatures).to receive(:enabled?).with(:gmail_sync).and_return(false)
+
+      expect {
+        result = call_tool("send_person_email", {
+          person_id: person.id,
+          to_address: "lead@example.com",
+          subject: "Welcome",
+          body: "Thanks for your interest."
+        })
+
+        expect(result.dig("sent", "subject")).to eq("Welcome")
+        expect(EmailMessage.order(:id).last.record).to eq(person)
+      }.to change(EmailMessage, :count).by(1)
+        .and have_enqueued_mail(RecordMailer, :tracked_email)
     end
 
     it "sends a deal email via send_deal_email and enqueues SMTP delivery" do
