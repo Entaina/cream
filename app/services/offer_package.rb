@@ -84,14 +84,13 @@ class OfferPackage
       doc = doc.sub(/<head(\s[^>]*)?>/i) do
         "#{Regexp.last_match(0)}<base href=\"#{ERB::Util.html_escape(base_href)}\">#{SANDBOX_STORAGE_SHIM}"
       end
-      doc = doc.gsub(/(\s(?:src|href)\s*=\s*["'])\/(?!\/)([^"']*)(["'])/i) do
+      doc.gsub(/(\s(?:src|href)\s*=\s*["'])\/(?!\/)([^"']*)(["'])/i) do
         prefix = Regexp.last_match(1)
         asset = Regexp.last_match(2)
         suffix = Regexp.last_match(3)
         relative = relative_asset_path(entry_path, asset)
         "#{prefix}#{relative}#{suffix}"
       end
-      doc
     end
 
     def content_type_for(path)
@@ -111,7 +110,7 @@ class OfferPackage
     def relative_asset_path(entry_path, absolute_path)
       path_part, query = absolute_path.split("?", 2)
       from_dir = File.dirname(entry_path)
-      from = Pathname.new(from_dir == "." ? "" : from_dir)
+      from = Pathname.new((from_dir == ".") ? "" : from_dir)
       relative = Pathname.new(path_part).relative_path_from(from).to_s
       query ? "#{relative}?#{query}" : relative
     end

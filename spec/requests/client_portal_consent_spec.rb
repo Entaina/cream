@@ -66,8 +66,8 @@ RSpec.describe "Client portal consent", type: :request do
   it "records ticked consents with evidence, ignoring types that weren't offered" do
     token = login_token
     post client_portal_access_consume_path(workspace_slug: workspace.slug, token: token),
-      params: { consent_type_ids: [ newsletter.id, not_offered.id ] },
-      headers: { "User-Agent" => "RSpec" }
+      params: {consent_type_ids: [newsletter.id, not_offered.id]},
+      headers: {"User-Agent" => "RSpec"}
 
     subscription = EmailSubscription.find_by!(person: person, subscription_type: newsletter)
     expect(subscription).to be_subscribed
@@ -87,7 +87,7 @@ RSpec.describe "Client portal consent", type: :request do
       .update!(body: "<p>Política del workspace</p>")
 
     post client_portal_access_consume_path(workspace_slug: workspace.slug, token: login_token),
-      params: { consent_type_ids: [ newsletter.id ] }
+      params: {consent_type_ids: [newsletter.id]}
 
     metadata = EmailSubscription.find_by!(person: person, subscription_type: newsletter).metadata
     version = PrivacyPolicyVersion.find(metadata["privacy_policy_version_id"])
@@ -102,7 +102,7 @@ RSpec.describe "Client portal consent", type: :request do
     get public_offer_share_access_path(token: link.token, grant_token: raw)
     expect(response.body).to include("Quiero la newsletter")
 
-    post public_offer_share_access_path(token: link.token, grant_token: raw), params: { consent_type_ids: [ newsletter.id ] }
+    post public_offer_share_access_path(token: link.token, grant_token: raw), params: {consent_type_ids: [newsletter.id]}
 
     guest = Person.find_by_email(workspace, "guest@example.com")
     expect(EmailSubscription.find_by!(person: guest, subscription_type: newsletter).source).to eq("client_portal:offer_share")
@@ -113,14 +113,14 @@ RSpec.describe "Client portal consent", type: :request do
     _grant, raw = DealPortalAccessGrant.issue!(invite_link: invite, email: "invited@example.com")
 
     post client_portal_deal_portal_invite_access_path(workspace_slug: workspace.slug, token: invite.token, grant_token: raw),
-      params: { consent_type_ids: [ newsletter.id ] }
+      params: {consent_type_ids: [newsletter.id]}
 
     invited = Person.find_by_email(workspace, "invited@example.com")
     expect(EmailSubscription.find_by!(person: invited, subscription_type: newsletter).source).to eq("client_portal:portal_invite")
   end
 
   describe "language" do
-    let(:english) { { "Accept-Language" => "en-GB,en;q=0.9" } }
+    let(:english) { {"Accept-Language" => "en-GB,en;q=0.9"} }
 
     it "shows and records the English texts to English browsers" do
       newsletter.update!(default_consent_label_en: "I want the newsletter", description_en: "Monthly news")
@@ -132,7 +132,7 @@ RSpec.describe "Client portal consent", type: :request do
       expect(response.body).not_to include("Quiero la newsletter")
 
       post client_portal_access_consume_path(workspace_slug: workspace.slug, token: token),
-        params: { consent_type_ids: [ newsletter.id ] }, headers: english
+        params: {consent_type_ids: [newsletter.id]}, headers: english
 
       metadata = EmailSubscription.find_by!(person: person, subscription_type: newsletter).metadata
       expect(metadata).to include("marketing_consent_text" => "I want the newsletter", "consent_locale" => "en")
@@ -147,7 +147,7 @@ RSpec.describe "Client portal consent", type: :request do
       newsletter.update!(default_consent_label_en: "I want the newsletter")
 
       get client_portal_access_consume_path(workspace_slug: workspace.slug, token: login_token),
-        headers: { "Accept-Language" => "es-ES,es;q=0.9" }
+        headers: {"Accept-Language" => "es-ES,es;q=0.9"}
       expect(response.body).to include("Quiero la newsletter")
       expect(response.body).not_to include("I want the newsletter")
     end
@@ -168,7 +168,7 @@ RSpec.describe "Client portal consent", type: :request do
       token = login_token
 
       post client_portal_access_consume_path(workspace_slug: workspace.slug, token: token),
-        params: { consent_type_ids: [ newsletter.id ] }
+        params: {consent_type_ids: [newsletter.id]}
 
       expect(response).to have_http_status(:unprocessable_entity)
       expect(response.body).to include(I18n.t("client_portal.consent.required_missing"))
@@ -176,7 +176,7 @@ RSpec.describe "Client portal consent", type: :request do
       expect(EmailSubscription.exists?(person: person)).to be(false)
 
       post client_portal_access_consume_path(workspace_slug: workspace.slug, token: token),
-        params: { consent_type_ids: [ updates.id ] }
+        params: {consent_type_ids: [updates.id]}
       expect(response).to redirect_to(client_portal_offers_path(workspace_slug: workspace.slug))
       expect(EmailSubscription.find_by!(person: person, subscription_type: updates).metadata["client_portal_required"]).to be(true)
     end
@@ -203,7 +203,7 @@ RSpec.describe "Client portal consent", type: :request do
       }.not_to change(OfferView, :count)
       expect(response).to have_http_status(:unprocessable_entity)
 
-      post public_offer_share_access_path(token: link.token, grant_token: raw), params: { consent_type_ids: [ updates.id ] }
+      post public_offer_share_access_path(token: link.token, grant_token: raw), params: {consent_type_ids: [updates.id]}
       expect(response).to have_http_status(:ok)
     end
 

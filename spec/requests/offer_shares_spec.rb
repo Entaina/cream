@@ -53,7 +53,7 @@ RSpec.describe "Public offer shares", type: :request do
   describe "POST /s/:token" do
     it "creates a grant and enqueues mail without creating a person" do
       expect {
-        post public_offer_share_path(token: share_link.token), params: { email: "guest@example.com" }
+        post public_offer_share_path(token: share_link.token), params: {email: "guest@example.com"}
       }.to change(OfferAccessGrant, :count).by(1)
         .and have_enqueued_mail(ClientPortalMailer, :offer_access_link)
         .and change(Person, :count).by(0)
@@ -62,7 +62,7 @@ RSpec.describe "Public offer shares", type: :request do
     end
 
     it "stores only the token digest" do
-      post public_offer_share_path(token: share_link.token), params: { email: "guest@example.com" }
+      post public_offer_share_path(token: share_link.token), params: {email: "guest@example.com"}
       grant = OfferAccessGrant.last
       expect(grant.token_digest).to match(/\A\h{64}\z/)
     end
@@ -71,7 +71,7 @@ RSpec.describe "Public offer shares", type: :request do
       OneTimeGrant::MAX_ISSUED_PER_HOUR.times { |i| OfferAccessGrant.issue!(share_link: share_link, email: "g#{i}@example.com") }
 
       expect {
-        post public_offer_share_path(token: share_link.token), params: { email: "another@example.com" }
+        post public_offer_share_path(token: share_link.token), params: {email: "another@example.com"}
       }.not_to have_enqueued_mail(ClientPortalMailer, :offer_access_link)
     end
   end
@@ -90,11 +90,11 @@ RSpec.describe "Public offer shares", type: :request do
       authenticity_token = response.body[/name="authenticity_token" value="([^"]+)"/, 1]
       path = public_offer_share_access_path(token: share_link.token, grant_token: raw)
 
-      post path, params: { authenticity_token: authenticity_token }, headers: { "HTTP_ORIGIN" => "null" }
+      post path, params: {authenticity_token: authenticity_token}, headers: {"HTTP_ORIGIN" => "null"}
       expect(response).to have_http_status(:unprocessable_content)
       expect(OfferAccessGrant.last.used_at).to be_nil
 
-      post path, params: { authenticity_token: authenticity_token }, headers: { "HTTP_ORIGIN" => "http://www.example.com" }
+      post path, params: {authenticity_token: authenticity_token}, headers: {"HTTP_ORIGIN" => "http://www.example.com"}
       expect(response).to have_http_status(:ok)
       expect(response.body).to include("Compartida")
     ensure
@@ -164,7 +164,7 @@ RSpec.describe "Public offer shares", type: :request do
       open_link(raw)
       expect(response).to have_http_status(:gone)
       expect {
-        post public_offer_share_path(token: share_link.token), params: { email: "guest@example.com" }
+        post public_offer_share_path(token: share_link.token), params: {email: "guest@example.com"}
       }.not_to have_enqueued_mail(ClientPortalMailer, :offer_access_link)
     end
 
@@ -172,7 +172,7 @@ RSpec.describe "Public offer shares", type: :request do
       OfferAccessGrant::MAX_PER_EMAIL_PER_HOUR.times { grant_token }
 
       expect {
-        post public_offer_share_path(token: share_link.token), params: { email: "guest@example.com" }
+        post public_offer_share_path(token: share_link.token), params: {email: "guest@example.com"}
       }.not_to have_enqueued_mail(ClientPortalMailer, :offer_access_link)
     end
 

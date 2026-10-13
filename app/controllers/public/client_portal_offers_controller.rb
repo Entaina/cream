@@ -18,7 +18,7 @@ module Public
 
     def index
       @offers_by_deal = scoped_offers.joins(:deal)
-        .includes(deal: :company, versions: { file_attachment: :blob })
+        .includes(deal: :company, versions: {file_attachment: :blob})
         .order("deals.name ASC, offers.name ASC")
         .group_by(&:deal)
     end
@@ -68,7 +68,7 @@ module Public
     def guest_accesses
       OfferAccessGrant.for_offer(@offer).includes(offer_share_link: :person).order(created_at: :desc)
         .group_by(&:email)
-        .map { |_email, grants| { grant: grants.first, revoked: grants.any?(&:revoked?), opened_at: grants.filter_map(&:used_at).min } }
+        .map { |_email, grants| {grant: grants.first, revoked: grants.any?(&:revoked?), opened_at: grants.filter_map(&:used_at).min} }
         .select { |access| access[:revoked] || access[:opened_at] || access[:grant].expires_at.future? }
     end
 

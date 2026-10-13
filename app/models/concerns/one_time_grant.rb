@@ -19,7 +19,7 @@ module OneTimeGrant
     def build_with_token(**attrs)
       raw_token = SecureRandom.urlsafe_base64(32)
       grant = create!(**attrs, token_digest: digest(raw_token), expires_at: self::EXPIRY.from_now)
-      [ grant, raw_token ]
+      [grant, raw_token]
     end
 
     def pending_for(raw_token)

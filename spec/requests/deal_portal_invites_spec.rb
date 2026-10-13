@@ -59,7 +59,7 @@ RSpec.describe "Deal portal invites", type: :request do
     OneTimeGrant::MAX_ISSUED_PER_HOUR.times { |i| DealPortalAccessGrant.issue!(invite_link: invite, email: "g#{i}@example.com") }
 
     expect {
-      post client_portal_deal_portal_invite_path(workspace_slug: workspace.slug, token: invite.token), params: { email: "x@example.com" }
+      post client_portal_deal_portal_invite_path(workspace_slug: workspace.slug, token: invite.token), params: {email: "x@example.com"}
     }.not_to have_enqueued_mail(ClientPortalMailer, :deal_portal_invite_link)
   end
 end

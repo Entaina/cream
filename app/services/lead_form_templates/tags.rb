@@ -65,13 +65,12 @@ module LeadFormTemplates
           blank: @attributes["blank"],
           required: @attributes["required"] == true,
           autocomplete: @attributes["autocomplete"],
-          rows: @attributes["rows"]&.to_i,
           placeholder: @attributes["placeholder"],
           label: @attributes["label"],
-          value: @attributes["value"],
-          unchecked_value: @attributes["unchecked_value"],
           aria_label: @attributes["aria_label"],
-          class_name: @attributes["class"] || default_class(type)
+          class_name: @attributes["class"] || default_class(type),
+          # Omitted when absent so the renderer's defaults apply; passing nil would override them.
+          **optional_field_options
         )
       end
 
@@ -82,6 +81,12 @@ module LeadFormTemplates
         when "checkbox" then "mt-0.5 rounded border-line"
         else "input w-full"
         end
+      end
+
+      def optional_field_options
+        options = @attributes.slice("value", "unchecked_value").symbolize_keys
+        options[:rows] = @attributes["rows"].to_i if @attributes["rows"].present?
+        options
       end
     end
 

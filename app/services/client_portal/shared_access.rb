@@ -8,7 +8,7 @@ module ClientPortal
 
       deal_contact = deal.deal_contacts.find_by(person: person)
       if deal_contact.nil?
-        attrs = { person: person, source: source }
+        attrs = {person: person, source: source}
         attrs[:offer_share_link] = offer_share_link if offer_share_link
         deal.deal_contacts.create!(attrs)
       elsif deal_contact.via_offer_share? && source == "portal_invite"

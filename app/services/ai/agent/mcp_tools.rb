@@ -56,7 +56,7 @@ module Ai
         else
           propose(tool, args)
         end
-      rescue StandardError => e
+      rescue => e
         "Tool error: #{e.message}"
       end
 
@@ -71,7 +71,7 @@ module Ai
         else
           Outcome.new(known: true, success: true, message: "Hecho (#{name}). #{text.truncate(400)}", data: nil)
         end
-      rescue StandardError => e
+      rescue => e
         Outcome.new(known: true, success: false, message: e.message, data: nil)
       end
 
@@ -138,12 +138,12 @@ module Ai
 
           "#{key}: #{value.to_s.truncate(60)}"
         }.first(4).join(", ")
-        [ tool.name_value.tr("_", " "), detail.presence ].compact.join(" — ")
+        [tool.name_value.tr("_", " "), detail.presence].compact.join(" — ")
       end
 
       def server_context
         MCP::ServerContext.new(
-          { user: @user, workspace: @workspace },
+          {user: @user, workspace: @workspace},
           progress: MCP::Progress.new(notification_target: nil, progress_token: nil),
           notification_target: nil
         )

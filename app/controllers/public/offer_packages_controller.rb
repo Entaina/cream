@@ -51,7 +51,7 @@ module Public
 
     def package_base_href(version, path)
       dir = File.dirname(path)
-      asset_path = dir == "." ? "" : "#{dir}/"
+      asset_path = (dir == ".") ? "" : "#{dir}/"
       offer_package_file_url(token: version.package_token, path: asset_path)
     end
 

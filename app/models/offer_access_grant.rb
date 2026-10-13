@@ -9,7 +9,7 @@ class OfferAccessGrant < ApplicationRecord
   belongs_to :offer_share_link
 
   scope :not_revoked, -> { where(revoked_at: nil) }
-  scope :for_offer, ->(offer) { joins(:offer_share_link).where(offer_share_links: { offer_id: offer.id }) }
+  scope :for_offer, ->(offer) { joins(:offer_share_link).where(offer_share_links: {offer_id: offer.id}) }
 
   def self.normalize_email(email)
     email.to_s.strip.downcase

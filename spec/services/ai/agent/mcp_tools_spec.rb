@@ -22,25 +22,25 @@ RSpec.describe Ai::Agent::McpTools do
   end
 
   it "runs a read tool immediately" do
-    result = tools.try_execute("search_records", { "query" => company.name })
+    result = tools.try_execute("search_records", {"query" => company.name})
 
     expect(result).to include(company.name)
     expect(pending_actions).to be_empty
   end
 
   it "proposes a write tool without applying it" do
-    result = tools.try_execute("create_company", { "name" => "No creada todavía" })
+    result = tools.try_execute("create_company", {"name" => "No creada todavía"})
 
     expect(result).to include("Pendiente de confirmación")
     expect(workspace.companies.find_by(name: "No creada todavía")).to be_nil
-    expect(pending_actions.map(&:tool)).to eq([ "create_company" ])
+    expect(pending_actions.map(&:tool)).to eq(["create_company"])
   end
 
   it "hides write tools when writes are disabled" do
     readonly = described_class.new(workspace: workspace, user: user, pending_actions: pending_actions, write: false)
 
     expect(readonly.definitions.map { |tool| tool[:name] }).not_to include("create_company")
-    expect(readonly.try_execute("delete_record", { "record_type" => "company", "record_id" => company.id })).to include("Forbidden")
+    expect(readonly.try_execute("delete_record", {"record_type" => "company", "record_id" => company.id})).to include("Forbidden")
     expect(company.reload).to be_present
   end
 end

@@ -143,7 +143,7 @@ RSpec.describe "Settings::Workspace", type: :request do
       portal_layout = workspace.lead_form_templates.create!(kind: "layout", path: "public/layouts/portal_wrap",
         partial: false, body: "{{ content }}")
 
-      patch settings_workspace_path, params: { workspace: { client_portal_layout_template_id: portal_layout.id } }
+      patch settings_workspace_path, params: {workspace: {client_portal_layout_template_id: portal_layout.id}}
 
       expect(response).to redirect_to(settings_workspace_path)
       workspace.reload
@@ -155,7 +155,7 @@ RSpec.describe "Settings::Workspace", type: :request do
       page = workspace.lead_form_templates.create!(kind: "form", path: "public/lead_forms/portal_page",
         partial: false, body: "<p>x</p>")
 
-      patch settings_workspace_path, params: { workspace: { client_portal_layout_template_id: page.id } }
+      patch settings_workspace_path, params: {workspace: {client_portal_layout_template_id: page.id}}
 
       expect(workspace.reload.client_portal_layout_template_id).to be_nil
     end

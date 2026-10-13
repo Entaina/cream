@@ -135,8 +135,8 @@ class Workspace < ApplicationRecord
   end
 
   def public_layout_template_must_belong_to_workspace
-    { public_layout_template_id: public_layout_template,
-      client_portal_layout_template_id: client_portal_layout_template }.each do |attribute, template|
+    {public_layout_template_id: public_layout_template,
+     client_portal_layout_template_id: client_portal_layout_template}.each do |attribute, template|
       next if self[attribute].blank?
 
       if template.blank? || template.workspace_id != id || !template.layout?

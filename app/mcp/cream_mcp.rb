@@ -573,7 +573,7 @@ module CreamMcp
   ) do |server_context:, **args|
     CreamMcp.with_authorization(server_context) do
       pundit_ctx = CreamMcp.pundit_context(server_context)
-      ws = pundit_ctx.workspace
+      pundit_ctx.workspace
       record = CreamMcp.find_record(pundit_ctx, CreamMcp.arg(args, "record_type"), CreamMcp.arg(args, "record_id"))
       CreamMcp.authorize!(pundit_ctx, record, :show?)
       base = case record
@@ -1225,7 +1225,7 @@ module CreamMcp
   ) do |server_context:, **args|
     CreamMcp.with_authorization(server_context) do
       pundit_ctx = CreamMcp.pundit_context(server_context)
-      ws = pundit_ctx.workspace
+      pundit_ctx.workspace
       record = CreamMcp.find_record(pundit_ctx, CreamMcp.arg(args, "record_type"), CreamMcp.arg(args, "record_id"))
       CreamMcp.authorize!(pundit_ctx, record, :update?)
       record.custom_fields = CreamMcp.arg(args, "custom_fields")

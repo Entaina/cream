@@ -10,6 +10,6 @@ class CreateClientPortalLoginGrants < ActiveRecord::Migration[8.0]
     end
 
     add_index :client_portal_login_grants, :token_digest, unique: true
-    add_index :client_portal_login_grants, [ :workspace_id, :email, :created_at ]
+    add_index :client_portal_login_grants, [:workspace_id, :email, :created_at]
   end
 end

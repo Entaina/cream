@@ -44,7 +44,7 @@ class SubscriptionType < ApplicationRecord
     format: {with: LeadForm::FIELD_KEY_FORMAT},
     uniqueness: {scope: :workspace_id},
     allow_nil: true
-  validates :client_portal_consent, inclusion: { in: CLIENT_PORTAL_CONSENT_OPTIONS }
+  validates :client_portal_consent, inclusion: {in: CLIENT_PORTAL_CONSENT_OPTIONS}
   validate :consent_field_key_not_reserved
 
   scope :active, -> { where(active: true) }

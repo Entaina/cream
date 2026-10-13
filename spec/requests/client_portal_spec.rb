@@ -34,7 +34,7 @@ RSpec.describe "Client portal", type: :request do
   describe "requesting a login link" do
     it "enqueues the login mail for known contacts and always shows the same message" do
       expect {
-        post client_portal_access_request_path(workspace_slug: workspace.slug), params: { email: person.email }
+        post client_portal_access_request_path(workspace_slug: workspace.slug), params: {email: person.email}
       }.to have_enqueued_mail(ClientPortalMailer, :login_link)
 
       expect(response).to redirect_to(client_portal_root_path(workspace_slug: workspace.slug))
@@ -44,7 +44,7 @@ RSpec.describe "Client portal", type: :request do
 
     it "does not enqueue mail for unknown emails but responds the same" do
       expect {
-        post client_portal_access_request_path(workspace_slug: workspace.slug), params: { email: "unknown@example.com" }
+        post client_portal_access_request_path(workspace_slug: workspace.slug), params: {email: "unknown@example.com"}
       }.not_to have_enqueued_mail(ClientPortalMailer, :login_link)
 
       expect(response).to redirect_to(client_portal_root_path(workspace_slug: workspace.slug))
@@ -54,7 +54,7 @@ RSpec.describe "Client portal", type: :request do
       ClientPortalLoginGrant::MAX_PER_EMAIL_PER_HOUR.times { ClientPortalLoginGrant.issue!(workspace: workspace, email: person.email) }
 
       expect {
-        post client_portal_access_request_path(workspace_slug: workspace.slug), params: { email: person.email }
+        post client_portal_access_request_path(workspace_slug: workspace.slug), params: {email: person.email}
       }.not_to have_enqueued_mail(ClientPortalMailer, :login_link)
     end
   end
@@ -206,7 +206,7 @@ RSpec.describe "Client portal", type: :request do
 
     it "are not sent a login link" do
       expect {
-        post client_portal_access_request_path(workspace_slug: workspace.slug), params: { email: guest.email }
+        post client_portal_access_request_path(workspace_slug: workspace.slug), params: {email: guest.email}
       }.not_to have_enqueued_mail(ClientPortalMailer, :login_link)
     end
 

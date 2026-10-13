@@ -99,7 +99,7 @@ RSpec.describe "Deal offers", type: :request do
       expect(response).to have_http_status(:unprocessable_content)
 
       post deal_offers_path(deal), params: {offer: {name: "Doble"},
-        offer_version: {html_body: "<p>x</p>", file: upload(pdf_bytes, "application/pdf", "a.pdf")}}
+                                            offer_version: {html_body: "<p>x</p>", file: upload(pdf_bytes, "application/pdf", "a.pdf")}}
       expect(response).to have_http_status(:unprocessable_content)
 
       post deal_offers_path(deal), params: {offer: {name: "Texto"}, offer_version: {file: upload("plain text", "text/plain", "a.txt")}}

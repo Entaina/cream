@@ -29,7 +29,7 @@ RSpec.describe DealStageComponent, type: :component do
       expect(page).to have_text(stage.name)
     end
     expect(rendered_content).to include("source=inline")
-    expect(rendered_content.scan(/<form/).size).to eq(pipeline.pipeline_stages.count - 1)
+    expect(rendered_content.scan("<form").size).to eq(pipeline.pipeline_stages.count - 1)
     expect(rendered_content).to include('aria-current="true"')
   end
 
