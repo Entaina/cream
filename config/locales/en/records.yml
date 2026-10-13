@@ -133,10 +133,15 @@ en:
           pick_company: Pick a company first.
           select_team_member: Select a team member.
         first_contact_date: First contact date
+        add_all: Add all
+        back: Back
         groups:
           client_company: From client company
+          companies: Companies
           other_people: Other people
           partner_company: From partner
+        no_contacts_in_company: No contacts at this company.
+        view_contacts: view contacts
         hint: Optional. Search contacts across the workspace; client and partner contacts
           are suggested first.
         new: New

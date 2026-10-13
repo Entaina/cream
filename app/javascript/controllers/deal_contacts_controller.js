@@ -1,14 +1,15 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Deal contacts: multi-select chips with workspace search, org suggestions, and outsider warnings.
+// Deal contacts: multi-select chips, workspace search, browse contacts by company.
 export default class extends Controller {
   static targets = [
     "companySelect", "partnerSelect", "chips", "searchInput", "menu", "hiddenFields",
     "dialog", "firstName", "lastName", "email", "phone", "source", "broughtByRow", "broughtBy",
-    "firstContactOn", "notice", "error", "submit", "outsiderWarning", "chipField"
+    "firstContactOn", "notice", "error", "submit", "outsiderWarning", "chipField", "companyShortcuts"
   ]
   static values = {
     peopleUrl: String,
+    companiesUrl: String,
     selected: Array,
     pickCompanyError: String,
     selectTeamMemberError: String,
@@ -19,6 +20,11 @@ export default class extends Controller {
     groupClient: String,
     groupPartner: String,
     groupOther: String,
+    groupCompanies: String,
+    viewContactsLabel: String,
+    addAllLabel: String,
+    noContactsInCompany: String,
+    backLabel: String,
     outsiderNoticeOne: String,
     outsiderNoticeMany: String,
     removeLabel: String,
@@ -28,7 +34,9 @@ export default class extends Controller {
 
   connect() {
     this.selectedPeople = (this.hasSelectedValue ? [ ...this.selectedValue ] : [])
-    this.menuResults = []
+    this.menuEntries = []
+    this.browseCompany = null
+    this.browseReturnTo = null
     this.activeIndex = -1
     this.menuEl = this.menuTarget
     this.menuPortaled = false
@@ -42,6 +50,7 @@ export default class extends Controller {
     this.renderChips()
     this.syncHiddenFields()
     this.updateOutsiderNotice()
+    this.renderCompanyShortcuts()
     this.toggleBroughtBy()
   }
 
@@ -59,6 +68,8 @@ export default class extends Controller {
   companyChanged() {
     this.updateChipStyles()
     this.updateOutsiderNotice()
+    this.renderCompanyShortcuts()
+    if (this.browseCompany) this.hideMenu()
   }
 
   focusSearch(event) {
@@ -67,12 +78,16 @@ export default class extends Controller {
   }
 
   async onSearchFocus() {
+    if (this.browseCompany) return
     if (this.searchInputTarget.value.trim().length === 0) {
       await this.loadOrgSuggestions()
     }
   }
 
   query() {
+    this.browseCompany = null
+    this.browseReturnTo = null
+
     const q = this.searchInputTarget.value.trim()
     if (q.length === 0) {
       this.loadOrgSuggestions()
@@ -82,18 +97,60 @@ export default class extends Controller {
     clearTimeout(this.debounce)
     this.debounce = setTimeout(async () => {
       try {
-        const res = await fetch(`${this.peopleUrlValue}.json?q=${encodeURIComponent(q)}`, {
-          headers: { Accept: "application/json" }
-        })
-        if (!res.ok) return
-        const people = await res.json()
-        this.menuResults = people.filter((person) => !this.hasPerson(person.id))
-        this.renderMenu()
+        const [ people, companies ] = await Promise.all([
+          this.fetchPeopleSearch(q),
+          this.fetchCompaniesSearch(q)
+        ])
+        const filteredPeople = people.filter((person) => !this.hasPerson(person.id))
+        const pinned = this.pinnedCompanies(q)
+        const seenIds = new Set(pinned.map((c) => c.id))
+        const mergedCompanies = [
+          ...pinned,
+          ...companies.filter((c) => !seenIds.has(c.id))
+        ]
+        this.renderSearchMenu(filteredPeople, mergedCompanies)
       } catch { /* ignore */ }
     }, 200)
   }
 
+  async fetchPeopleSearch(q) {
+    const res = await fetch(`${this.peopleUrlValue}.json?q=${encodeURIComponent(q)}`, {
+      headers: { Accept: "application/json" }
+    })
+    if (!res.ok) return []
+    return await res.json()
+  }
+
+  async fetchCompaniesSearch(q) {
+    const res = await fetch(`${this.companiesUrlValue}?q=${encodeURIComponent(q)}`, {
+      headers: { Accept: "application/json" }
+    })
+    if (!res.ok) return []
+    return await res.json()
+  }
+
+  pinnedCompanies(q) {
+    const needle = this.normalize(q)
+    if (!needle) return []
+
+    const pinned = []
+    const companyId = this.companySelectTarget.value
+    const partnerId = this.hasPartnerSelectTarget ? this.partnerSelectTarget.value : null
+    const clientName = this.companyDisplayName()
+    const partnerName = this.partnerDisplayName()
+
+    if (companyId && clientName && this.normalize(clientName).includes(needle)) {
+      pinned.push({ id: Number(companyId), name: clientName, hint: null })
+    }
+    if (partnerId && partnerName && partnerId !== companyId && this.normalize(partnerName).includes(needle)) {
+      pinned.push({ id: Number(partnerId), name: partnerName, hint: null })
+    }
+    return pinned
+  }
+
   async loadOrgSuggestions() {
+    if (this.browseCompany) return
+
     const companyId = this.companySelectTarget.value
     const partnerId = this.hasPartnerSelectTarget ? this.partnerSelectTarget.value : null
     const companyIds = [ companyId, partnerId ].filter(Boolean)
@@ -115,8 +172,7 @@ export default class extends Controller {
         }
       }
       people.sort((a, b) => a.name.localeCompare(b.name))
-      this.menuResults = people
-      this.renderMenu()
+      this.renderSearchMenu(people, [])
     } catch { /* ignore */ }
   }
 
@@ -126,69 +182,246 @@ export default class extends Controller {
     return await res.json()
   }
 
-  renderMenu() {
-    if (this.menuResults.length === 0) {
-      this.menuEl.innerHTML = `<li class="px-3 py-1.5 text-sm text-ink-faint">${this.escape(this.noResultsValue)}</li>`
-      this.openMenu()
-      this.activeIndex = -1
-      return
-    }
-
+  renderSearchMenu(people, companies) {
     const companyId = this.companySelectTarget.value
     const partnerId = this.hasPartnerSelectTarget ? this.partnerSelectTarget.value : null
     const client = []
     const partner = []
     const other = []
 
-    this.menuResults.forEach((person) => {
+    people.forEach((person) => {
       const cid = person.company_id == null ? null : String(person.company_id)
       if (companyId && cid === String(companyId)) client.push(person)
       else if (partnerId && cid === String(partnerId)) partner.push(person)
       else other.push(person)
     })
 
+    this.menuEntries = []
     let index = 0
     const items = []
-    const pushGroup = (label, records) => {
+
+    const pushPersonGroup = (label, records) => {
       if (records.length === 0) return
-      items.push(`<li class="px-3 py-1 text-xs font-semibold uppercase tracking-wide text-ink-faint bg-canvas-sunken/80">${this.escape(label)}</li>`)
+      items.push(this.groupHeader(label))
       records.forEach((record) => {
-        items.push(this.resultItem(record, index))
+        items.push(this.personMenuItem(record, index))
+        this.menuEntries.push({ type: "person", record })
         index += 1
       })
     }
 
-    pushGroup(this.groupClientValue, client)
-    pushGroup(this.groupPartnerValue, partner)
-    pushGroup(this.groupOtherValue, other)
+    pushPersonGroup(this.groupClientValue, client)
+    pushPersonGroup(this.groupPartnerValue, partner)
+    pushPersonGroup(this.groupOtherValue, other)
 
-    this.menuResults = [ ...client, ...partner, ...other ]
+    if (companies.length > 0) {
+      items.push(this.groupHeader(this.groupCompaniesValue))
+      companies.forEach((company) => {
+        items.push(this.companyMenuItem(company, index))
+        this.menuEntries.push({ type: "company", record: company })
+        index += 1
+      })
+    }
+
+    if (items.length === 0) {
+      this.menuEl.innerHTML = `<li class="px-3 py-1.5 text-sm text-ink-faint">${this.escape(this.noResultsValue)}</li>`
+      this.menuEntries = []
+      this.openMenu()
+      this.activeIndex = -1
+      return
+    }
+
     this.activeIndex = -1
     this.menuEl.innerHTML = items.join("")
     this.openMenu()
   }
 
-  resultItem(record, index) {
+  async openCompanyBrowse(companyId, companyName, returnTo) {
+    this.browseCompany = { id: Number(companyId), name: companyName }
+    this.browseReturnTo = returnTo
+    await this.refreshCompanyBrowseMenu()
+  }
+
+  async refreshCompanyBrowseMenu() {
+    if (!this.browseCompany) return
+
+    const all = await this.fetchPeopleForCompany(this.browseCompany.id)
+    const available = all.filter((person) => !this.hasPerson(person.id))
+    this.renderCompanyBrowseMenu(available)
+  }
+
+  renderCompanyBrowseMenu(people) {
+    this.menuEntries = []
+    const items = []
+
+    const addAllBtn = people.length > 0
+      ? `<button type="button" data-menu-action="add-all-browse"
+                class="ml-auto shrink-0 text-xs font-medium text-accent hover:underline">
+           ${this.escape(this.addAllLabelValue)}
+         </button>`
+      : ""
+
+    items.push(`<li class="sticky top-0 z-10 flex items-center gap-2 border-b border-line bg-canvas px-3 py-2">
+      <button type="button" data-menu-action="browse-back" aria-label="${this.escape(this.backLabelValue)}"
+              class="rounded-md p-1 text-ink-faint hover:bg-canvas-sunken hover:text-ink">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="size-4"><path fill-rule="evenodd" d="M9.78 4.22a.75.75 0 0 1 0 1.06L7.06 8l2.72 2.72a.75.75 0 1 1-1.06 1.06L5.47 8.53a.75.75 0 0 1 0-1.06l3.25-3.25a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd"/></svg>
+      </button>
+      <span class="min-w-0 truncate text-sm font-semibold">${this.escape(this.browseCompany.name)}</span>
+      ${addAllBtn}
+    </li>`)
+
+    if (people.length === 0) {
+      items.push(`<li class="px-3 py-2 text-sm text-ink-faint">${this.escape(this.noContactsInCompanyValue)}</li>`)
+    } else {
+      let index = 0
+      people.forEach((record) => {
+        items.push(this.personMenuItem(record, index))
+        this.menuEntries.push({ type: "browse-person", record })
+        index += 1
+      })
+    }
+
+    this.activeIndex = -1
+    this.menuEl.innerHTML = items.join("")
+    this.openMenu()
+  }
+
+  groupHeader(label) {
+    return `<li class="px-3 py-1 text-xs font-semibold uppercase tracking-wide text-ink-faint bg-canvas-sunken/80">${this.escape(label)}</li>`
+  }
+
+  personMenuItem(record, index) {
     const hint = record.hint ? `<span class="text-ink-faint"> · ${this.escape(record.hint)}</span>` : ""
-    return `<li role="option" data-index="${index}"
+    return `<li role="option" data-menu-index="${index}"
                 class="cursor-pointer px-3 py-1.5 text-sm hover:bg-canvas-sunken">
               <span class="font-medium">${this.escape(record.name)}</span>${hint}
             </li>`
   }
 
-  handleMenuClick(event) {
-    const option = event.target.closest('[role="option"]')
-    if (!option) return
-    event.preventDefault()
-    this.pick({ currentTarget: option })
+  companyMenuItem(company, index) {
+    const hint = company.hint ? `<span class="text-ink-faint"> · ${this.escape(company.hint)}</span>` : ""
+    const action = `<span class="text-ink-faint"> · ${this.escape(this.viewContactsLabelValue)}</span>`
+    return `<li role="option" data-menu-index="${index}"
+                class="cursor-pointer px-3 py-1.5 text-sm hover:bg-canvas-sunken">
+              <span class="font-medium">${this.escape(company.name)}</span>${hint}${action}
+            </li>`
   }
 
-  pick(event) {
-    const record = this.menuResults[Number(event.currentTarget.dataset.index)]
-    if (!record) return
-    this.addPerson(record)
+  handleMenuClick(event) {
+    const actionEl = event.target.closest("[data-menu-action]")
+    if (actionEl) {
+      event.preventDefault()
+      const action = actionEl.dataset.menuAction
+      if (action === "browse-back") {
+        this.companyBrowseBack()
+        return
+      }
+      if (action === "add-all-browse") {
+        this.addAllBrowsePeople()
+        return
+      }
+    }
+
+    const option = event.target.closest('[role="option"]')
+    if (!option || option.dataset.menuIndex === undefined) return
+    event.preventDefault()
+
+    const entry = this.menuEntries[Number(option.dataset.menuIndex)]
+    if (!entry) return
+
+    if (entry.type === "person") {
+      this.addPerson(entry.record)
+      this.searchInputTarget.value = ""
+      this.browseCompany = null
+      this.hideMenu()
+      return
+    }
+
+    if (entry.type === "company") {
+      const q = this.searchInputTarget.value.trim()
+      this.openCompanyBrowse(entry.record.id, entry.record.name, { type: "search", q })
+      return
+    }
+
+    if (entry.type === "browse-person") {
+      this.addPerson(entry.record)
+      this.refreshCompanyBrowseMenu()
+    }
+  }
+
+  companyBrowseBack() {
+    const returnTo = this.browseReturnTo
+    this.browseCompany = null
+    this.browseReturnTo = null
+
+    if (!returnTo || returnTo.type === "shortcut") {
+      this.hideMenu()
+      return
+    }
+
+    if (returnTo.type === "search") {
+      const q = returnTo.q || ""
+      this.searchInputTarget.value = q
+      if (q.length === 0) {
+        this.loadOrgSuggestions()
+      } else {
+        this.query()
+      }
+    }
+  }
+
+  addAllBrowsePeople() {
+    for (const entry of this.menuEntries) {
+      if (entry.type === "browse-person") this.addPerson(entry.record)
+    }
+    this.browseCompany = null
+    this.browseReturnTo = null
     this.searchInputTarget.value = ""
     this.hideMenu()
+  }
+
+  openCompanyShortcut(event) {
+    event.preventDefault()
+    const id = event.currentTarget.dataset.companyId
+    const name = event.currentTarget.dataset.companyName
+    if (!id || !name) return
+    this.searchInputTarget.focus()
+    this.openCompanyBrowse(id, name, { type: "shortcut" })
+  }
+
+  renderCompanyShortcuts() {
+    if (!this.hasCompanyShortcutsTarget) return
+
+    const shortcuts = []
+    const companyId = this.companySelectTarget.value
+    const partnerId = this.hasPartnerSelectTarget ? this.partnerSelectTarget.value : null
+    const clientName = this.companyDisplayName()
+    const partnerName = this.partnerDisplayName()
+
+    if (companyId && clientName) {
+      shortcuts.push({ id: companyId, name: clientName })
+    }
+    if (partnerId && partnerName && partnerId !== companyId) {
+      shortcuts.push({ id: partnerId, name: partnerName })
+    }
+
+    if (shortcuts.length === 0) {
+      this.companyShortcutsTarget.innerHTML = ""
+      this.companyShortcutsTarget.classList.add("hidden")
+      return
+    }
+
+    this.companyShortcutsTarget.classList.remove("hidden")
+    this.companyShortcutsTarget.innerHTML = shortcuts.map((shortcut) =>
+      `<button type="button"
+               class="inline-flex items-center gap-1 rounded-full border border-line bg-canvas-sunken px-2.5 py-1 text-xs font-medium text-ink hover:bg-canvas hover:border-line-strong"
+               data-action="deal-contacts#openCompanyShortcut"
+               data-company-id="${shortcut.id}"
+               data-company-name="${this.attrEscape(shortcut.name)}">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="size-3.5 text-ink-faint"><path d="M8 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM3.156 13.25a5.25 5.25 0 0 1 9.688 0 .75.75 0 0 1-.351.961 7 7 0 0 1-8.986 0 .75.75 0 0 1-.351-.961ZM8 1a4 4 0 0 0-4 4v.5a.75.75 0 0 0 1.5 0V5a2.5 2.5 0 0 1 5 0v.5a.75.75 0 0 0 1.5 0V5a4 4 0 0 0-4-4Z"/></svg>
+        <span class="truncate max-w-[14rem]">${this.escape(shortcut.name)}</span>
+       </button>`
+    ).join("")
   }
 
   addPerson(record) {
@@ -301,7 +534,11 @@ export default class extends Controller {
 
     const options = this.menuOptions()
     if (event.key === "Escape") {
-      this.hideMenu()
+      if (this.browseCompany) {
+        this.companyBrowseBack()
+      } else {
+        this.hideMenu()
+      }
       event.preventDefault()
       return
     }
@@ -401,6 +638,8 @@ export default class extends Controller {
   hideMenu() {
     this.menuEl.classList.add("hidden")
     this.activeIndex = -1
+    this.browseCompany = null
+    this.browseReturnTo = null
     this.unportalMenu()
   }
 
@@ -500,9 +739,20 @@ export default class extends Controller {
   show(el) { el.classList.remove("hidden") }
   hide(el) { el.classList.add("hidden") }
 
+  normalize(text) {
+    return (text ?? "").normalize("NFD").replace(/\p{M}/gu, "").toLowerCase()
+  }
+
   escape(text) {
     const div = document.createElement("div")
     div.textContent = text ?? ""
     return div.innerHTML
+  }
+
+  attrEscape(text) {
+    return String(text ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/"/g, "&quot;")
+      .replace(/</g, "&lt;")
   }
 }

@@ -8,6 +8,7 @@
    end %>
 <div data-controller="deal-contacts"
      data-deal-contacts-people-url-value="<%= people_path %>"
+     data-deal-contacts-companies-url-value="<%= picker_companies_path(format: :json) %>"
      data-deal-contacts-selected-value="<%= ERB::Util.html_escape(selected_people.to_json) %>"
      data-deal-contacts-pick-company-error-value="<%= t("deals.form.contacts.errors.pick_company") %>"
      data-deal-contacts-select-team-member-error-value="<%= t("deals.form.contacts.errors.select_team_member") %>"
@@ -18,6 +19,11 @@
      data-deal-contacts-group-client-value="<%= t("deals.form.contacts.groups.client_company") %>"
      data-deal-contacts-group-partner-value="<%= t("deals.form.contacts.groups.partner_company") %>"
      data-deal-contacts-group-other-value="<%= t("deals.form.contacts.groups.other_people") %>"
+     data-deal-contacts-group-companies-value="<%= t("deals.form.contacts.groups.companies") %>"
+     data-deal-contacts-view-contacts-label-value="<%= t("deals.form.contacts.view_contacts") %>"
+     data-deal-contacts-add-all-label-value="<%= t("deals.form.contacts.add_all") %>"
+     data-deal-contacts-no-contacts-in-company-value="<%= t("deals.form.contacts.no_contacts_in_company") %>"
+     data-deal-contacts-back-label-value="<%= t("deals.form.contacts.back") %>"
      data-deal-contacts-outsider-notice-one-value="<%= t("deals.form.contacts.outsider_notice_one") %>"
      data-deal-contacts-outsider-notice-many-value="<%= t("deals.form.contacts.outsider_notice_many") %>"
      data-deal-contacts-remove-label-value="<%= t("deals.form.contacts.remove") %>"
@@ -63,6 +69,7 @@
         <%= icon :plus, classes: "size-3.5" %> <%= t("deals.form.contacts.new") %>
       </button>
     </div>
+    <div data-deal-contacts-target="companyShortcuts" class="hidden mt-1.5 flex flex-wrap gap-1.5" role="group"></div>
     <p class="mt-1 text-xs text-ink-faint"><%= t("deals.form.contacts.hint") %></p>
     <p data-deal-contacts-target="outsiderWarning" role="status" class="hidden mt-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-100"></p>
     <p data-deal-contacts-target="notice" class="hidden mt-1 text-xs text-danger"></p>

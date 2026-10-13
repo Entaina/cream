@@ -134,10 +134,15 @@ es:
           pick_company: Selecciona primero una empresa.
           select_team_member: Selecciona un miembro del equipo.
         first_contact_date: Fecha de primer contacto
+        add_all: Añadir todos
+        back: Volver
         groups:
           client_company: De la empresa cliente
+          companies: Empresas
           other_people: Otras personas
           partner_company: Del partner
+        no_contacts_in_company: No hay contactos en esta empresa.
+        view_contacts: ver contactos
         hint: Opcional. Busca contactos en el workspace; se sugieren primero los de
           la empresa cliente y del partner.
         new: Nuevo
