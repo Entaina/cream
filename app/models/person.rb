@@ -151,7 +151,11 @@ class Person < ApplicationRecord
   end
 
   def normalize_email_column
-    self.email = email.to_s.strip.downcase.presence
+    return if email.blank?
+
+    parsed = EmailAddressParser.parse(email)
+    self.email = parsed&.email || email.to_s.strip.downcase.presence
+    EmailAddressParser.apply_name_to_record!(self, parsed)
   end
 
   def assign_workspace_to_person_emails

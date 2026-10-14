@@ -46,6 +46,16 @@
     <% if feature_enabled?(:client_portal) %>
       <%= render layout: "settings/workspace/panel", locals: { title: t("integrations.workspace.client_portal.title") } do %>
         <%= render "shared/client_portal_url", workspace: current_workspace, show_title: false %>
+        <div class="border-t border-line pt-4 space-y-3">
+          <%= form_with model: current_workspace, url: settings_workspace_path, method: :patch, class: "space-y-3" do |f| %>
+            <div>
+              <%= f.label :mail_from_name, t("integrations.workspace.client_portal.mail_from_name"), class: "block text-sm font-medium text-ink-soft mb-1" %>
+              <%= f.text_field :mail_from_name, class: "input w-full", placeholder: current_workspace.name %>
+              <p class="mt-1 text-sm text-ink-faint"><%= t("integrations.workspace.client_portal.mail_from_name_hint") %></p>
+            </div>
+            <%= f.submit t("integrations.workspace.client_portal.mail_from_name_save"), class: "btn-secondary" %>
+          <% end %>
+        </div>
         <% if defined?(@public_layout_templates) %>
           <div class="border-t border-line pt-4 space-y-3">
             <p class="text-sm text-ink-soft"><%= t("integrations.workspace.client_portal_layout.intro") %></p>

@@ -16,6 +16,30 @@ RSpec.describe Person, type: :model do
     expect(person.errors[:internal_notes]).to be_present
   end
 
+  it "parses mailbox format in email and fills names when blank" do
+    company = create_company!(workspace)
+    person = workspace.people.new(company: company, email: "Sol Fernandez <solranada@gmail.com> ,")
+
+    expect(person).to be_valid
+    expect(person.email).to eq("solranada@gmail.com")
+    expect(person.first_name).to eq("Sol")
+    expect(person.last_name).to eq("Fernandez")
+  end
+
+  it "does not overwrite existing names when parsing email" do
+    company = create_company!(workspace)
+    person = workspace.people.new(
+      company: company,
+      first_name: "Existing",
+      last_name: "User",
+      email: "Other Name <other@example.com>"
+    )
+
+    person.valid?
+    expect(person.first_name).to eq("Existing")
+    expect(person.email).to eq("other@example.com")
+  end
+
   it "requires a company" do
     person = workspace.people.new(first_name: "Pat")
     expect(person).not_to be_valid

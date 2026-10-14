@@ -58,6 +58,9 @@ function threadPayload_(threadId, messageId, subject, messages) {
   var participants = [];
   messages.forEach(function(item) {
     participants.push(item.from, item.to, item.cc);
+    emailsInText_(item.body).forEach(function(email) {
+      participants.push(email);
+    });
     if (item.rfc822_message_id) rfc822Ids.push(item.rfc822_message_id);
   });
   return {
@@ -889,6 +892,35 @@ function companyConfirmationCard_(threadData, dealName, companyName, e) {
     .build();
 }
 
+function emailsInText_(text) {
+  if (!text || String(text).trim() === "(no body)") {
+    return [];
+  }
+  var re = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/gi;
+  var seen = {};
+  var out = [];
+  var imageExt = /\.(png|jpe?g|gif|webp|svg)$/i;
+  var source = String(text);
+  var match;
+  while ((match = re.exec(source)) !== null) {
+    var email = match[0].toLowerCase();
+    if (seen[email]) {
+      continue;
+    }
+    var at = email.lastIndexOf("@");
+    if (at < 1) {
+      continue;
+    }
+    var domain = email.slice(at + 1);
+    if (imageExt.test(domain)) {
+      continue;
+    }
+    seen[email] = true;
+    out.push(email);
+  }
+  return out;
+}
+
 function parseEmailParts_(raw) {
   if (!raw) {
     return [];
@@ -929,6 +961,13 @@ function threadParticipantOptions_(threadData, excludedEmails) {
         options.push(part);
       });
     });
+    emailsInText_(message.body).forEach(function(email) {
+      if (seen[email] || excluded[email]) {
+        return;
+      }
+      seen[email] = true;
+      options.push({ label: email, email: email });
+    });
   });
   return options;
 }
@@ -944,7 +983,7 @@ function addContactSelectionWidgets_(section, threadData, excludedEmails) {
       var label = part.label === part.email ?
         part.email :
         part.label + " <" + part.email + ">";
-      picker.addItem(label, part.email, false);
+      picker.addItem(label, participantContactValue_(part), false);
     });
     section.addWidget(picker);
   }
@@ -961,6 +1000,25 @@ function addContactSelectionWidgets_(section, threadData, excludedEmails) {
   );
 }
 
+function participantContactValue_(part) {
+  if (part.label === part.email) {
+    return part.email;
+  }
+  return part.label + " <" + part.email + ">";
+}
+
+function contactEmailKey_(raw) {
+  if (!raw) {
+    return "";
+  }
+  var parts = parseEmailParts_(String(raw).trim());
+  if (parts.length) {
+    return parts[0].email;
+  }
+  var trimmed = String(raw).trim().toLowerCase();
+  return trimmed.indexOf("@") >= 0 ? trimmed : "";
+}
+
 function parseContactEmailsParam_(value) {
   if (!value) {
     return [];
@@ -969,7 +1027,7 @@ function parseContactEmailsParam_(value) {
     return value;
   }
   return String(value).split(",").map(function(item) {
-    return item.trim().toLowerCase();
+    return item.trim();
   }).filter(Boolean);
 }
 
@@ -977,15 +1035,15 @@ function collectContactEmailsFromForm_(e) {
   var emails = formStringValues_(e, "participant_emails").slice();
   var manual = formValue_(e, "manual_contact_email");
   if (manual && String(manual).trim()) {
-    emails.push(String(manual).trim().toLowerCase());
+    emails.push(String(manual).trim());
   }
   var seen = {};
-  return emails.filter(function(email) {
-    email = String(email).toLowerCase().trim();
-    if (!email || seen[email]) {
+  return emails.filter(function(raw) {
+    var key = contactEmailKey_(raw);
+    if (!key || seen[key]) {
       return false;
     }
-    seen[email] = true;
+    seen[key] = true;
     return true;
   });
 }
@@ -993,7 +1051,7 @@ function collectContactEmailsFromForm_(e) {
 function contactParamsFromForm_(e) {
   var emails = collectContactEmailsFromForm_(e);
   var manual = formValue_(e, "manual_contact_email");
-  var manualEmail = manual && String(manual).trim().toLowerCase();
+  var manualEmail = manual && contactEmailKey_(manual);
   var name = formValue_(e, "manual_contact_name");
   return {
     contact_emails: emails,
@@ -1091,11 +1149,11 @@ function saveAddContact(e) {
       throw new Error("Select a participant or enter an email.");
     }
     var manual = formValue_(e, "manual_contact_email");
-    var manualEmail = manual && String(manual).trim().toLowerCase();
+    var manualEmail = manual && contactEmailKey_(manual);
     var name = formValue_(e, "manual_contact_name");
-    var contacts = emails.map(function(email) {
-      var entry = { email: email };
-      if (manualEmail && email === manualEmail && name && String(name).trim()) {
+    var contacts = emails.map(function(raw) {
+      var entry = { email: raw };
+      if (manualEmail && contactEmailKey_(raw) === manualEmail && name && String(name).trim()) {
         entry.name = String(name).trim();
       }
       return entry;

@@ -4,7 +4,11 @@ class ClientPortalMailer < ApplicationMailer
     @url = client_portal_access_consume_url(workspace_slug: workspace.slug, token: token)
 
     with_mailer_locale do
-      mail(to: email, subject: I18n.t("client_portal.mailer.login_link.subject", workspace: workspace.name))
+      mail(
+        to: email,
+        subject: I18n.t("client_portal.mailer.login_link.subject", workspace: workspace.name),
+        **portal_from_options
+      )
     end
   end
 
@@ -19,7 +23,11 @@ class ClientPortalMailer < ApplicationMailer
     )
 
     with_mailer_locale do
-      mail(to: grant.email, subject: I18n.t("client_portal.mailer.deal_portal_invite.subject", deal: @deal.name))
+      mail(
+        to: grant.email,
+        subject: I18n.t("client_portal.mailer.deal_portal_invite.subject", deal: @deal.name),
+        **portal_from_options
+      )
     end
   end
 
@@ -30,7 +38,11 @@ class ClientPortalMailer < ApplicationMailer
     @url = public_offer_share_access_url(token: share_link.token, grant_token: raw_token)
 
     with_mailer_locale do
-      mail(to: grant.email, subject: I18n.t("client_portal.mailer.offer_access_link.subject", offer: @offer.name))
+      mail(
+        to: grant.email,
+        subject: I18n.t("client_portal.mailer.offer_access_link.subject", offer: @offer.name),
+        **portal_from_options
+      )
     end
   end
 
@@ -38,5 +50,10 @@ class ClientPortalMailer < ApplicationMailer
 
   def mailjet_workspace
     @workspace
+  end
+
+  def portal_from_options
+    from = @workspace&.portal_mail_from
+    from ? { from: from } : {}
   end
 end

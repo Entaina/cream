@@ -77,13 +77,16 @@ class Workspace < ApplicationRecord
   normalizes :email_domain, with: ->(d) {
     d.to_s.strip.downcase.delete_prefix("@").presence
   }
+  normalizes :mail_from_name, with: ->(n) { n.to_s.strip.presence }
 
   validates :name, presence: true
   validates :slug, presence: true, uniqueness: true, format: {with: /\A[a-z0-9-]+\z/}
   validates :email_domain, uniqueness: true, allow_nil: true, format: {with: EMAIL_DOMAIN_FORMAT, allow_blank: true}
   validates :time_zone, presence: true
   validates :ga_measurement_id, format: {with: GoogleAnalytics::GA4_ID_FORMAT}, allow_blank: true
+  validates :mail_from_name, length: {maximum: 100}, allow_blank: true
   validate :okm_service_account_key_format, if: -> { okm_service_account_key.present? }
+  validate :mail_from_name_format
   validate :public_layout_template_must_belong_to_workspace
 
   before_validation :normalize_ga_measurement_id
@@ -105,6 +108,10 @@ class Workspace < ApplicationRecord
 
   def briefing_actor
     memberships.admins.includes(:user).first&.user || users.first
+  end
+
+  def portal_mail_from
+    MailerFromResolver.portal_from(self)
   end
 
   def feature_enabled?(key)
@@ -143,6 +150,12 @@ class Workspace < ApplicationRecord
         errors.add(attribute, :invalid)
       end
     end
+  end
+
+  def mail_from_name_format
+    return if mail_from_name.blank?
+
+    errors.add(:mail_from_name, :invalid) if mail_from_name.match?(/[\r\n]/)
   end
 
   def okm_service_account_key_format

@@ -313,6 +313,25 @@ RSpec.describe "Api::V1::GmailThreads", type: :request do
       expect(deal.activities.where(action: "contacts_changed").pluck(:user_id).uniq).to eq([user.id])
     end
 
+    it "creates a deal with a named primary contact from the From header" do
+      named_thread = thread_payload.deep_dup
+      named_thread[:messages].first[:from] = "Sol Fernandez <client@example.com>"
+
+      post "/api/v1/gmail/threads/link",
+        params: {
+          new_deal: {name: "Named primary", pipeline_stage_id: pipeline.pipeline_stages.first.id, create_company: true},
+          thread: named_thread
+        },
+        headers: headers,
+        as: :json
+
+      expect(response).to have_http_status(:created)
+      deal = Deal.find(JSON.parse(response.body).dig("deal", "id"))
+      person = deal.contacts.find_by!(email: "client@example.com")
+      expect(person.first_name).to eq("Sol")
+      expect(person.last_name).to eq("Fernandez")
+    end
+
     it "creates a deal with extra contacts from contact_emails" do
       extended_thread = thread_payload.deep_dup
       extended_thread[:messages].first[:cc] = "Colleague <colleague@example.com>"

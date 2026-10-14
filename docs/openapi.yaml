@@ -232,6 +232,9 @@ components:
         email:
           type: string
           format: email
+          description: >-
+            Plain email or mailbox format `Name <email@domain>`. Only the address is stored;
+            first and last name may be inferred when those fields are blank.
         phone:
           type: string
         job_title:
@@ -254,6 +257,9 @@ components:
               address:
                 type: string
                 format: email
+                description: >-
+                  Plain email or mailbox format `Name <email@domain>`. Only the address is stored;
+                  the person's first and last name may be inferred when blank.
               primary:
                 type: boolean
               _destroy:

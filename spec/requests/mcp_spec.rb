@@ -468,6 +468,21 @@ RSpec.describe "Mcp", type: :request do
       expect(person.first_name).to eq("Ana")
     end
 
+    it "parses mailbox format in create_person email" do
+      company = create_company!(workspace)
+
+      created = call_tool("create_person", {
+        company_id: company.id,
+        first_name: "",
+        email: "Sol Fernandez <solranada@gmail.com> ,"
+      })
+
+      person = workspace.people.find(created.dig("created", "id"))
+      expect(person.email).to eq("solranada@gmail.com")
+      expect(person.first_name).to eq("Sol")
+      expect(person.last_name).to eq("Fernandez")
+    end
+
     it "stores internal notes through create_person, update_person and get_record" do
       company = create_company!(workspace)
 

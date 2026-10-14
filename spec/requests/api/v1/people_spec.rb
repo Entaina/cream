@@ -20,6 +20,22 @@ RSpec.describe "Api::V1::People", type: :request do
     )
   end
 
+  it "accepts mailbox format in email and stores address and names" do
+    user = users(:one)
+    workspace = workspaces(:one)
+    headers = {"Authorization" => "Bearer #{user.api_tokens.create!(name: "Test", workspace: workspace).plaintext_token}"}
+    company = create_company!(workspace)
+
+    post "/api/v1/people", as: :json, headers: headers,
+      params: {person: {company_id: company.id, email: "Sol Fernandez <solranada@gmail.com> ,"}}
+
+    expect(response).to have_http_status(:created)
+    body = response.parsed_body
+    expect(body["email"]).to eq("solranada@gmail.com")
+    expect(body["first_name"]).to eq("Sol")
+    expect(body["last_name"]).to eq("Fernandez")
+  end
+
   it "creates, updates and returns internal notes" do
     user = users(:one)
     workspace = workspaces(:one)

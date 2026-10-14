@@ -387,6 +387,10 @@ es:
         intro: Comparte esta URL con contactos que ya figuren en alguna oportunidad.
           Para dar de alta a alguien nuevo, usa el enlace de invitación en la ficha
           de la oportunidad (pestaña Información).
+        mail_from_name: Nombre del remitente en emails del portal
+        mail_from_name_hint: Lo verán los contactos al recibir el enlace de acceso al portal.
+          Si lo dejas vacío, se usa el remitente por defecto de la instancia.
+        mail_from_name_save: Guardar remitente
         title: Portal de clientes
         url_aria: URL del portal de clientes
       general:

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_08_210000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_14_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -1774,6 +1774,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_08_210000) do
     t.bigint "public_layout_template_id"
     t.string "email_domain"
     t.bigint "client_portal_layout_template_id"
+    t.string "mail_from_name"
     t.index ["client_portal_layout_template_id"], name: "index_workspaces_on_client_portal_layout_template_id"
     t.index ["email_domain"], name: "index_workspaces_on_email_domain", unique: true, where: "(email_domain IS NOT NULL)"
     t.index ["public_layout_template_id"], name: "index_workspaces_on_public_layout_template_id"

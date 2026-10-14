@@ -5,12 +5,30 @@ RSpec.describe ClientPortalMailer, type: :mailer do
 
   let(:workspace) { workspaces(:one) }
 
+  before do
+    ActionMailer::Base.default from: "Cream <noreply@example.com>"
+  end
+
   describe "#login_link" do
     it "sends to the contact with the consume URL" do
       mail = described_class.login_link(workspace: workspace, email: "a@example.com", token: "tok123")
 
       expect(mail.to).to eq(["a@example.com"])
       expect(mail.body.encoded).to include("tok123")
+    end
+
+    it "uses the workspace portal sender name when configured" do
+      workspace.update!(mail_from_name: "Entaina")
+
+      mail = described_class.login_link(workspace: workspace, email: "a@example.com", token: "tok123")
+
+      expect(mail.header["From"].value).to eq("Entaina <noreply@example.com>")
+    end
+
+    it "keeps the default from when mail_from_name is blank" do
+      mail = described_class.login_link(workspace: workspace, email: "a@example.com", token: "tok123")
+
+      expect(mail.header["From"].value).to eq("Cream <noreply@example.com>")
     end
   end
 

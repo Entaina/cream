@@ -125,7 +125,8 @@ module Marketing
     end
 
     def email
-      @email ||= attributes[:email].to_s.strip.downcase.presence
+      @email ||= EmailAddressParser.extract(attributes[:email]) ||
+        attributes[:email].to_s.strip.downcase.presence
     end
 
     def save_person!
@@ -133,7 +134,8 @@ module Marketing
       return [update_person!(person), false] if person
 
       person = workspace.people.new(attributes.slice(*PERSON_FIELDS).merge(
-        email: email, company: resolve_company!, owner: user, internal_notes: attributes[:internal_notes].presence
+        email: attributes[:email].presence,
+        company: resolve_company!, owner: user, internal_notes: attributes[:internal_notes].presence
       ))
       authorizer.call(person, :create?)
       person.save!

@@ -380,6 +380,10 @@ en:
         copy_url: Copy URL
         intro: Share this URL with contacts who are already on a deal. To onboard someone
           new, use the invitation link on the deal page (Information tab).
+        mail_from_name: Sender name for portal emails
+        mail_from_name_hint: Contacts see this when they receive a portal access link.
+          Leave blank to use the instance default sender.
+        mail_from_name_save: Save sender name
         title: Client portal
         url_aria: Client portal URL
       general:

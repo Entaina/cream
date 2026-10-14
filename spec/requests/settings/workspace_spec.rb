@@ -56,6 +56,13 @@ RSpec.describe "Settings::Workspace", type: :request do
       expect(workspace.reload.time_zone).to eq("Europe/London")
     end
 
+    it "allows admins to set the client portal mail sender name" do
+      patch settings_workspace_path, params: {workspace: {mail_from_name: "Entaina"}}
+
+      expect(response).to redirect_to(settings_workspace_path)
+      expect(workspace.reload.mail_from_name).to eq("Entaina")
+    end
+
     it "allows admins to enable sales director for the workspace" do
       allow(CreamFeatures).to receive(:enabled?).and_call_original
       allow(CreamFeatures).to receive(:enabled?).with(:sales_director).and_return(true)

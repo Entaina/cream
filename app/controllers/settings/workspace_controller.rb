@@ -41,7 +41,8 @@ module Settings
         :custom_fields_enabled,
         :ga_measurement_id,
         :public_layout_template_id,
-        :client_portal_layout_template_id
+        :client_portal_layout_template_id,
+        :mail_from_name
       )
       permitted.delete(:okm_service_account_key) if permitted[:okm_service_account_key].blank?
       permitted

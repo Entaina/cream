@@ -16,7 +16,11 @@ class PersonEmail < ApplicationRecord
   private
 
   def normalize_address
-    self.address = address.to_s.strip.downcase.presence
+    return if address.blank?
+
+    parsed = EmailAddressParser.parse(address)
+    self.address = parsed&.email || address.to_s.strip.downcase.presence
+    EmailAddressParser.apply_name_to_record!(person, parsed) if person
   end
 
   def address_unique_for_person

@@ -29,22 +29,6 @@ class GmailThreadLinker
     icloud.com me.com proton.me protonmail.com aol.com
   ].freeze
 
-  EmailAddressParser = Class.new do
-    def self.extract(raw)
-      return nil if raw.blank?
-
-      match = raw.to_s.match(/<([^>]+)>/)
-      email = (match ? match[1] : raw).strip.downcase
-      email.match?(URI::MailTo::EMAIL_REGEXP) ? email : nil
-    end
-
-    def self.extract_all(raw)
-      return [] if raw.blank?
-
-      raw.to_s.split(/[,;]/).filter_map { |part| extract(part) }.uniq
-    end
-  end
-
   def initialize(workspace:, user:)
     @workspace = workspace
     @user = user
@@ -202,15 +186,23 @@ class GmailThreadLinker
   end
 
   def first_external_email(thread)
-    thread_participant_emails(thread).find { |email| !owned_email?(email) }
+    first_external_contact(thread)&.dig(:email)
+  end
+
+  def first_external_contact(thread)
+    thread_participant_contacts(thread).find { |entry| !owned_email?(entry[:email]) }
   end
 
   def thread_participant_emails(thread)
+    thread_participant_contacts(thread).pluck(:email)
+  end
+
+  def thread_participant_contacts(thread)
     Array(thread[:messages]).flat_map do |message|
-      EmailAddressParser.extract_all(message[:from]) +
-        EmailAddressParser.extract_all(message[:to]) +
-        EmailAddressParser.extract_all(message[:cc])
-    end.uniq
+      [message[:from], message[:to], message[:cc]].flat_map do |raw|
+        raw.to_s.split(/[,;]/).filter_map { |part| contact_entry_from_raw(part) }
+      end
+    end.uniq { |entry| entry[:email] }
   end
 
   def people_for_new_deal(attrs, thread:, company:, external_email:)
@@ -232,29 +224,45 @@ class GmailThreadLinker
   end
 
   def build_new_deal_contact_entries(attrs, thread:)
-    emails = Array(attrs[:contact_emails]).filter_map { |raw| normalize_email(raw) }.uniq
-    emails.reject! { |email| owned_email?(email) }
+    entries = Array(attrs[:contact_emails]).filter_map { |raw| contact_entry_from_raw(raw) }
+    entries.reject! { |entry| owned_email?(entry[:email]) }
 
-    primary = first_external_email(thread)
-    emails << primary if primary.present? && !emails.include?(primary)
+    primary = first_external_contact(thread)
+    if primary.present? && entries.none? { |entry| entry[:email] == primary[:email] }
+      entries << primary
+    end
 
     named_email = normalize_email(attrs[:named_contact_email])
     contact_name = attrs[:contact_name].to_s.strip.presence
 
-    emails.uniq.map do |email|
-      {email: email, name: ((named_email.present? && email == named_email) ? contact_name : nil)}
+    entries.uniq { |entry| entry[:email] }.map do |entry|
+      name = entry[:name]
+      if name.blank? && named_email.present? && entry[:email] == named_email
+        name = contact_name
+      end
+      {email: entry[:email], name: name}
     end
   end
 
   def normalize_contact_entries(contacts)
     Array(contacts).filter_map do |entry|
       hash = entry.symbolize_keys
-      email = normalize_email(hash[:email])
-      next if email.blank?
+      parsed_entry = contact_entry_from_raw(hash[:email])
+      next if parsed_entry.nil?
 
-      name = hash[:name].to_s.strip.presence
-      {email: email, name: name}
+      name = hash[:name].to_s.strip.presence || parsed_entry[:name]
+      {email: parsed_entry[:email], name: name}
     end.uniq { |entry| entry[:email] }
+  end
+
+  def contact_entry_from_raw(raw)
+    return nil if raw.blank?
+
+    parsed = EmailAddressParser.parse(raw)
+    email = parsed&.email || normalize_email(raw)
+    return nil if email.blank?
+
+    {email: email, name: parsed&.name}
   end
 
   def normalize_email(raw)
