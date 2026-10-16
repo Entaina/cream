@@ -48,26 +48,40 @@ class BookingConfirmationEmail
   def call
     template = @event_type.email_template
     return unless template
-    return unless @booking.deal
 
     extra_tokens = self.class.tokens_for(@booking)
     rendered_body = template.render_for(@booking, extra_tokens:)
     rendered_subject = template.render_subject_for(@booking, extra_tokens:)
 
-    message = @booking_page.workspace.email_messages.create!(
-      user: @booking_page.host,
-      record: @booking.deal,
-      to_address: @booking.email,
-      subject: rendered_subject,
-      body: rendered_body
-    )
-    attach_template_files(message, template)
-    SendViaGmailJob.perform_later(message.id)
+    record = @booking.deal || @booking.person
+    if record
+      deliver_as_record_email(record:, template:, subject: rendered_subject, body: rendered_body)
+    else
+      deliver_without_record(subject: rendered_subject, body: rendered_body)
+    end
   rescue => e
     Rails.logger.error("Booking confirmation email failed for Booking##{@booking.id}: #{e.class}: #{e.message}")
   end
 
   private
+
+  # Bookings linked to a deal or person keep the email on that record's timeline.
+  def deliver_as_record_email(record:, template:, subject:, body:)
+    message = @booking_page.workspace.email_messages.create!(
+      user: @booking_page.host,
+      record: record,
+      to_address: @booking.email,
+      subject: subject,
+      body: body
+    )
+    attach_template_files(message, template)
+    SendViaGmailJob.perform_later(message.id)
+  end
+
+  # Bookings without CRM association send the email but leave no record behind.
+  def deliver_without_record(subject:, body:)
+    SendBookingConfirmationJob.perform_later(@booking.id, subject, body)
+  end
 
   def attach_template_files(message, template)
     return unless template.attachments.attached?

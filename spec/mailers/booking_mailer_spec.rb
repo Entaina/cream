@@ -55,6 +55,18 @@ RSpec.describe BookingMailer, type: :mailer do
       expect(mail.subject).to include("Ana")
     end
 
+    it "links the person when the booking has no deal" do
+      person = workspace.people.create!(
+        first_name: "Ana", last_name: "Lopez", email: "ana@example.com",
+        company: LeadForm.placeholder_company_for(workspace)
+      )
+      booking.update!(person: person)
+
+      mail = described_class.host_notification(booking: booking, host: user)
+
+      expect(mail.text_part.body.decoded).to include("/people/#{person.id}")
+    end
+
     it "attaches an ics file for the booking" do
       booking.update!(
         google_event_id: "evt1",
@@ -75,6 +87,17 @@ RSpec.describe BookingMailer, type: :mailer do
       booking.update!(google_ical_uid: "custom-uid@google.com")
       stored = described_class.host_notification(booking: booking, host: user).attachments["event.ics"].body.decoded
       expect(stored).to include("UID:custom-uid@google.com")
+    end
+  end
+
+  describe "#guest_confirmation" do
+    it "sends the rendered email to the guest from the host" do
+      mail = described_class.guest_confirmation(booking: booking, subject: "Reserva", body: "<p>Hola Ana</p>")
+
+      expect(mail.to).to eq(["ana@example.com"])
+      expect(mail.subject).to eq("Reserva")
+      expect(mail.reply_to).to eq([user.email_address])
+      expect(mail.body.encoded).to include("Hola Ana")
     end
   end
 end

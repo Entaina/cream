@@ -1,4 +1,8 @@
 class BookingMailer < ApplicationMailer
+  include ActionView::Helpers::SanitizeHelper
+  include ActionView::Helpers::TextHelper
+  include EmailHelper
+
   def reminder(booking)
     @booking = booking
     @event_type = booking.booking_event_type
@@ -17,6 +21,7 @@ class BookingMailer < ApplicationMailer
     @booking_page = booking.booking_page
     @starts_at_display = booking.localized_starts_at_with_zone
     @deal_url = booking.deal && deal_url(booking.deal)
+    @person_url = booking.person && !booking.deal && person_url(booking.person)
 
     with_mailer_locale(host.locale) do
       attachments["event.ics"] = {
@@ -25,6 +30,22 @@ class BookingMailer < ApplicationMailer
       }
       mail(to: host.email_address, subject: host_notification_subject)
     end
+  end
+
+  def guest_confirmation(booking:, subject:, body:, attachment_files: [])
+    @booking = booking
+    @body = body
+    @full_document = full_html_document?(@body)
+    @body_html = email_delivery_html(@body)
+    host = booking.booking_page.host
+    attachment_files.each { |file| attachments[file[:filename]] = file[:content] }
+
+    mail_options = {to: booking.email, subject: subject, layout: @full_document ? false : "mailer"}
+    if host.email_address.present?
+      mail_options[:from] = host.name.present? ? "#{host.name} <#{host.email_address}>" : host.email_address
+      mail_options[:reply_to] = host.email_address
+    end
+    mail(**mail_options)
   end
 
   private

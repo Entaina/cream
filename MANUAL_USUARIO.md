@@ -4,7 +4,7 @@
 
 Cream es un CRM por **workspaces** para gestionar **personas**, **empresas** y **deals** (oportunidades), con notas, tareas, listas y un historial de actividad compartido en el equipo.
 
-> **Última revisión:** 2026-10-14 (pegado y API de contactos en formato «Nombre <email>»)
+> **Última revisión:** 2026-10-16 (asociación CRM opcional en reservas)
 > Este documento describe la funcionalidad **visible para el usuario**. Las funcionalidades desactivadas aparecen al final en «Próximamente».
 
 ---
@@ -1298,7 +1298,8 @@ Toda la configuración se hace desde **Reservas** (no hace falta usar seeds ni d
 | Nombre | Título interno de la página |
 | Slug | Identificador en la URL pública (`/b/slug`) |
 | Anfitrión | Usuario cuyo Google Calendar consulta disponibilidad y recibe las citas |
-| Pipeline CRM | Pipeline donde se crean persona y deal al reservar |
+| Asociación CRM | Qué se crea en el CRM al reservar: **Persona y deal** (por defecto), **Solo persona (sin deal)** o **Ninguna (solo gestión de la reserva)** |
+| Pipeline CRM | Solo con **Persona y deal**: pipeline donde se crean persona y deal al reservar |
 | Reutilizar deal existente | Si la persona ya tiene un deal en la primera etapa de este pipeline, la reserva se asocia a ese deal; si no, se crea uno nuevo |
 | Mensaje de bienvenida | Texto en la cabecera de la página pública |
 | Avatar URL / Logo URL | Imágenes opcionales del perfil |
@@ -1337,10 +1338,13 @@ En **Ajustes → Workspace**, opcionalmente elige una **plantilla de layout de r
 
 - Se consulta la **disponibilidad real** contra los calendarios configurados (por defecto `primary`).
 - Al confirmar, se crea el **evento en Google Calendar** con quien reserva, los invitados opcionales (hasta 5) y el anfitrión como asistentes.
-- En Cream se crea o reutiliza la **persona** (por email) y se crea o reutiliza el **deal** en el pipeline indicado según la opción **Reutilizar deal existente**, con tarea de seguimiento para el anfitrión cuando el deal es nuevo.
-- El anfitrión recibe aviso según sus canales en **Settings → Profile → Alertas** (campana y/o email), con los datos de la reserva y un enlace al deal. El email adjunta un archivo `.ics` de la misma cita que ya está en Google Calendar, para que no se cree una segunda reunión.
+- En Cream, según la **Asociación CRM** de la página:
+  - **Persona y deal:** se crea o reutiliza la **persona** (por email) y se crea o reutiliza el **deal** en el pipeline indicado según la opción **Reutilizar deal existente**, con tarea de seguimiento para el anfitrión cuando el deal es nuevo.
+  - **Solo persona (sin deal):** se crea o reutiliza la persona y no se crea deal. El correo de confirmación y las respuestas quedan en la ficha de la persona.
+  - **Ninguna:** no se crea ni se enlaza persona ni deal; la reserva solo se gestiona desde **Reservas**. El correo de confirmación se envía pero no se guarda en ninguna ficha.
+- El anfitrión recibe aviso según sus canales en **Settings → Profile → Alertas** (campana y/o email), con los datos de la reserva y un enlace al deal (o a la persona si no hay deal). El email adjunta un archivo `.ics` de la misma cita que ya está en Google Calendar, para que no se cree una segunda reunión.
 - Si el tipo de evento tiene **plantilla de email al invitado**, el invitado recibe además un correo de confirmación (estilo Calendly) con botón Meet, fecha, mensaje personalizado y enlaces **Cancelar** (`/b/slug/cancelar/…`) y **Reprogramar** (`/b/slug/reprogramar/…`). Sin plantilla, solo recibe la invitación de Google Calendar.
-- En la ficha del **deal** y del **contacto**, el timeline de **Actividad** registra la reserva (invitado, tipo de cita y fecha/hora), también cuando se reutiliza un deal existente.
+- En la ficha del **deal** y del **contacto** (los que existan según la asociación elegida), el timeline de **Actividad** registra la reserva (invitado, tipo de cita y fecha/hora), también cuando se reutiliza un deal existente.
 
 ### Página pública (visitante)
 

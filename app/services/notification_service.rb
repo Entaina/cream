@@ -94,7 +94,7 @@ class NotificationService
         title: I18n.t("notifications.events.booking.title"),
         body: I18n.t("notifications.events.booking.body",
           event: event_name, name: booking.display_name, email: booking.email, when: when_label),
-        url: record_path_for(booking.deal) || Rails.application.routes.url_helpers.bookings_path
+        url: record_path_for(booking.deal || booking.person) || Rails.application.routes.url_helpers.bookings_path
       )
     end
   end

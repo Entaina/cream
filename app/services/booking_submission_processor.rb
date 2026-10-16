@@ -14,11 +14,13 @@ class BookingSubmissionProcessor
   end
 
   def call
+    return Result.new(person: nil, deal: nil) if @booking_page.crm_none?
+
     ActiveRecord::Base.transaction do
       person, created = find_or_create_person!
       company = created ? LeadForm.placeholder_company_for(@workspace) : person.company
       person.update!(company:) if person.company_id != company.id
-      deal = find_or_create_deal!(person:, company:)
+      deal = find_or_create_deal!(person:, company:) if @booking_page.crm_deal?
       Result.new(person:, deal:)
     end
   end

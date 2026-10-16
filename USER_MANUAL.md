@@ -4,7 +4,7 @@
 
 Cream is a **workspace**-based CRM for managing **people**, **companies** and **deals** (opportunities), with notes, tasks, lists and an activity history shared across the team.
 
-> **Last revision:** 2026-10-14 (paste and API contact mailbox format "Name <email>")
+> **Last revision:** 2026-10-16 (optional CRM association for bookings)
 > This document describes the functionality **visible to the user**. Disabled features are listed at the end under "Coming soon".
 
 ---
@@ -1298,7 +1298,8 @@ All the configuration is done from **Reservas** (no need to use seeds or preload
 | Nombre (Name) | Internal title of the page |
 | Slug | Identifier in the public URL (`/b/slug`) |
 | Anfitrión (Host) | User whose Google Calendar is checked for availability and receives the appointments |
-| Pipeline CRM | Pipeline where the person and deal are created upon booking |
+| Asociación CRM (CRM association) | What is created in the CRM when someone books: **Person and deal** (default), **Person only (no deal)** or **None (booking management only)** |
+| Pipeline CRM | Only with **Person and deal**: pipeline where the person and deal are created upon booking |
 | Reutilizar deal existente (Reuse existing deal) | If the person already has a deal in the first stage of this pipeline, the booking is linked to that deal; otherwise a new one is created |
 | Mensaje de bienvenida (Welcome message) | Text in the public page header |
 | Avatar URL / Logo URL | Optional profile images |
@@ -1337,10 +1338,13 @@ Under **Settings → Workspace**, you can optionally pick a **public booking lay
 
 - **Real availability** is checked against the configured calendars (`primary` by default).
 - Upon confirmation, the **event is created in Google Calendar** with the person who booked, optional guests (up to 5), and the host as attendees.
-- In Cream, the **person** is created or reused (by email) and the **deal** is created or reused in the specified pipeline according to **Reuse existing deal**, with a follow-up task for the host when the deal is new.
-- The host is notified according to their channels in **Settings → Profile → Alertas** (bell and/or email), with the booking details and a link to the deal. The email attaches an `.ics` file for the same meeting already on Google Calendar, so it is not added as a second event.
+- In Cream, depending on the page's **CRM association**:
+  - **Person and deal:** the **person** is created or reused (by email) and the **deal** is created or reused in the specified pipeline according to **Reuse existing deal**, with a follow-up task for the host when the deal is new.
+  - **Person only (no deal):** the person is created or reused and no deal is created. The confirmation email and replies are kept on the person's record.
+  - **None:** no person or deal is created or linked; the booking is managed only from **Reservas**. The confirmation email is sent but not stored on any record.
+- The host is notified according to their channels in **Settings → Profile → Alertas** (bell and/or email), with the booking details and a link to the deal (or to the person when there is no deal). The email attaches an `.ics` file for the same meeting already on Google Calendar, so it is not added as a second event.
 - If the event type has a **guest email template**, the invitee also gets a Calendly-style confirmation (Meet button, custom message, **Cancel** and **Reschedule** links at `/b/slug/cancelar/…` and `/b/slug/reprogramar/…`). Without a template, they only receive the Google Calendar invitation.
-- On the **deal** and **contact** record pages, the **Activity** timeline logs the booking (guest, meeting type and date/time), including when an existing deal is reused.
+- On the **deal** and **contact** record pages (whichever exist for the chosen association), the **Activity** timeline logs the booking (guest, meeting type and date/time), including when an existing deal is reused.
 
 ### Public page (visitor)
 

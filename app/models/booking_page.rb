@@ -6,10 +6,11 @@ class BookingPage < ApplicationRecord
   MIN_SECONDS_TO_SUBMIT = 3
   MAX_BOOKINGS_PER_EMAIL_PER_DAY = 5
   MAX_BOOKINGS_PER_PAGE_PER_HOUR = 100
+  CRM_ASSOCIATIONS = %w[deal person none].freeze
 
   belongs_to :workspace
   belongs_to :host, class_name: "User"
-  belongs_to :pipeline
+  belongs_to :pipeline, optional: true
 
   has_many :event_types, class_name: "BookingEventType", dependent: :destroy, inverse_of: :booking_page
   has_many :bookings, dependent: :destroy
@@ -18,6 +19,8 @@ class BookingPage < ApplicationRecord
 
   validates :name, :slug, presence: true
   validates :slug, uniqueness: true, format: {with: /\A[a-z0-9-]+\z/}
+  validates :crm_association, inclusion: {in: CRM_ASSOCIATIONS}
+  validates :pipeline, presence: true, if: :crm_deal?
   validate :associations_belong_to_workspace
   validate :calendar_ids_selected
   validate :event_types_present
@@ -26,6 +29,12 @@ class BookingPage < ApplicationRecord
 
   scope :active, -> { where(active: true) }
   scope :ordered, -> { order(:name, :id) }
+
+  def crm_deal? = crm_association == "deal"
+
+  def crm_person? = crm_association == "person"
+
+  def crm_none? = crm_association == "none"
 
   def calendar_connection
     workspace.calendar_connections.find_by(user: host)

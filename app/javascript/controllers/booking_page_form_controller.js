@@ -5,7 +5,8 @@ const GRIP_ICON = `<svg class="size-3.5 pointer-events-none" viewBox="0 0 16 16"
 export default class extends Controller {
   static targets = [
     "hostSelect", "calendarList", "calendarHint", "calendarError",
-    "calendarRow", "calendarIdsInputs", "eventCalendarBadge"
+    "calendarRow", "calendarIdsInputs", "eventCalendarBadge",
+    "crmAssociationSelect", "dealOptions"
   ]
   static values = {
     calendarsUrl: String,
@@ -35,6 +36,10 @@ export default class extends Controller {
 
   disconnect() {
     this.endCalendarDrag()
+  }
+
+  crmAssociationChanged() {
+    this.dealOptionsTarget.classList.toggle("hidden", this.crmAssociationSelectTarget.value !== "deal")
   }
 
   hostChanged() {

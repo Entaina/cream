@@ -33,4 +33,29 @@ RSpec.describe BookingPage, type: :model do
 
     expect(page.ready_for_booking?).to be false
   end
+
+  describe "crm_association" do
+    def page_with_event_type(**attrs)
+      page = build_page(**attrs)
+      page.event_types.build(BookingEventType.blank_attributes.merge(slug: "call", name_i18n: {"es" => "Llamada"}))
+      page
+    end
+
+    it "defaults to deal and requires a pipeline" do
+      page = page_with_event_type(pipeline: nil)
+
+      expect(page.crm_association).to eq("deal")
+      expect(page).not_to be_valid
+      expect(page.errors[:pipeline]).to be_present
+    end
+
+    it "does not require a pipeline for person and none" do
+      expect(page_with_event_type(crm_association: "person", pipeline: nil)).to be_valid
+      expect(page_with_event_type(crm_association: "none", pipeline: nil)).to be_valid
+    end
+
+    it "rejects unknown values" do
+      expect(page_with_event_type(crm_association: "company")).not_to be_valid
+    end
+  end
 end

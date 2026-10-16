@@ -327,4 +327,85 @@ RSpec.describe "Booking pages CRUD", type: :request do
       expect(booking_page.reload.reuse_existing_deal).to be(false)
     end
   end
+
+  describe "CRM association" do
+    let!(:booking_page) do
+      page = workspace.booking_pages.new(
+        name: "Agenda",
+        slug: "agenda-crm-mode",
+        host: user,
+        pipeline: pipeline,
+        timezone: "Europe/Madrid",
+        calendar_ids: ["primary"]
+      )
+      page.event_types.build(
+        slug: "video",
+        name_i18n: {"es" => "Video", "en" => "Video"},
+        duration_minutes: 30,
+        location_type: "google_meet",
+        weekly_hours: BookingEventType::DEFAULT_WEEKLY_HOURS,
+        slot_increment_minutes: 15,
+        min_notice_hours: 0,
+        visible: true,
+        position: 0
+      )
+      page.save!
+      page
+    end
+
+    it "defaults to deal association" do
+      expect(booking_page.crm_association).to eq("deal")
+    end
+
+    it "persists person-only association" do
+      patch booking_page_path(booking_page), params: {
+        booking_page: {
+          name: booking_page.name,
+          slug: booking_page.slug,
+          host_id: user.id,
+          crm_association: "person",
+          pipeline_id: "",
+          timezone: "Europe/Madrid",
+          booking_window_days: 60,
+          active: true,
+          calendar_ids: ["primary"],
+          event_types_attributes: {
+            "0" => {
+              id: booking_page.event_types.first.id,
+              slug: "video",
+              duration_minutes: 30,
+              location_type: "google_meet",
+              color: "hoki",
+              slot_increment_minutes: 15,
+              buffer_before_minutes: 0,
+              buffer_after_minutes: 0,
+              min_notice_hours: 0,
+              visible: "1",
+              position: 0,
+              weekly_hours: BookingEventType::DEFAULT_WEEKLY_HOURS.to_json,
+              name_i18n: {es: "Video", en: "Video"},
+              description_i18n: {es: "", en: ""}
+            }
+          }
+        }
+      }
+
+      expect(response).to redirect_to(booking_pages_path)
+      booking_page.reload
+      expect(booking_page.crm_association).to eq("person")
+      expect(booking_page.pipeline).to be_nil
+    end
+
+    it "lists pages without a pipeline and shows the CRM association form field" do
+      booking_page.update!(crm_association: "none", pipeline: nil)
+
+      get booking_pages_path
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(I18n.t("booking.pages.form.crm_association_none"))
+
+      get edit_booking_page_path(booking_page)
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(I18n.t("booking.pages.form.crm_association"))
+    end
+  end
 end

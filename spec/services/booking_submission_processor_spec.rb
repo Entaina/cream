@@ -134,4 +134,37 @@ RSpec.describe BookingSubmissionProcessor, type: :service do
     result = process
     expect(result.deal.pipeline).to eq(pipeline)
   end
+
+  context "when the page is configured to associate only a person" do
+    before { booking_page.update!(crm_association: "person", pipeline: nil) }
+
+    it "creates the person without a deal" do
+      expect {
+        result = process
+        expect(result.person.email).to eq("ana@example.com")
+        expect(result.deal).to be_nil
+      }.to change(Person, :count).by(1)
+        .and change(Deal, :count).by(0)
+    end
+
+    it "reuses an existing person without creating a deal" do
+      person = create_person!(workspace, company: create_company!(workspace), email: "ana@example.com")
+
+      expect { @result = process }.to change(Deal, :count).by(0).and change(Person, :count).by(0)
+      expect(@result.person).to eq(person)
+      expect(@result.deal).to be_nil
+    end
+  end
+
+  context "when the page is configured without CRM association" do
+    before { booking_page.update!(crm_association: "none", pipeline: nil) }
+
+    it "creates neither person nor deal, even if the person exists" do
+      create_person!(workspace, company: create_company!(workspace), email: "ana@example.com")
+
+      expect { @result = process }.to change(Person, :count).by(0).and change(Deal, :count).by(0)
+      expect(@result.person).to be_nil
+      expect(@result.deal).to be_nil
+    end
+  end
 end

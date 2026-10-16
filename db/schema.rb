@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_14_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_16_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -183,7 +183,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_14_120000) do
   create_table "booking_pages", force: :cascade do |t|
     t.bigint "workspace_id", null: false
     t.bigint "host_id", null: false
-    t.bigint "pipeline_id", null: false
+    t.bigint "pipeline_id"
     t.string "name", null: false
     t.string "slug", null: false
     t.text "welcome_message"
@@ -197,6 +197,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_14_120000) do
     t.datetime "updated_at", null: false
     t.boolean "reuse_existing_deal", default: true, null: false
     t.bigint "success_template_id"
+    t.string "crm_association", default: "deal", null: false
     t.index ["host_id"], name: "index_booking_pages_on_host_id"
     t.index ["pipeline_id"], name: "index_booking_pages_on_pipeline_id"
     t.index ["slug"], name: "index_booking_pages_on_slug", unique: true

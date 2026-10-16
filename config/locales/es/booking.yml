@@ -78,6 +78,7 @@ es:
         greeting: Hola %{name},
         subject: "[Cream] Nueva reserva: %{event_name} · %{guest_name}"
         view_deal: Ver oportunidad
+        view_person: Ver contacto
       reminder:
         address: Dirección
         date: Fecha
@@ -184,6 +185,12 @@ es:
         connect_calendar: Conectar Google Calendar
         connect_calendar_now: Conectar ahora
         connect_calendar_short: Conectar Google Calendar
+        crm_association: Asociación CRM
+        crm_association_deal: Persona y deal
+        crm_association_hint: Define qué se crea en el CRM al reservar y dónde se
+          guardan los correos de la reserva.
+        crm_association_none: Ninguna (solo gestión de la reserva)
+        crm_association_person: Solo persona (sin deal)
         crm_pipeline: Pipeline CRM
         event_types: Tipos de evento
         event_types_hint: Arrastra para cambiar el orden. Pulsa una tarjeta para editarla.

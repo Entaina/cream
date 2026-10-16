@@ -478,4 +478,75 @@ RSpec.describe BookingCreator, type: :service do
     expect(existing_deal.activities.where(action: "booking_created")).to exist
     expect(person.activities.where(action: "booking_created")).to exist
   end
+
+  describe "CRM association modes" do
+    let(:call_params) do
+      {
+        datetime: "2026-07-28T10:00:00",
+        timezone: "Europe/Madrid",
+        lang: "es",
+        first_name: "Ana",
+        last_name: "Lopez",
+        email: "ana@example.com"
+      }
+    end
+    let(:template) do
+      workspace.email_templates.create!(user: user, name: "Confirmación", subject: "Reserva {event_name}", body: "Hola {first_name}")
+    end
+
+    def create_booking
+      described_class.call(
+        booking_page: booking_page,
+        event_type: event_type,
+        params: call_params,
+        request: request,
+        client: client
+      )
+    end
+
+    context "with person only" do
+      before do
+        booking_page.update!(crm_association: "person", pipeline: nil)
+        event_type.update!(email_template: template)
+      end
+
+      it "links the booking to the person without a deal and files the email on the person" do
+        result = nil
+        expect { result = create_booking }
+          .to change(Deal, :count).by(0)
+          .and have_enqueued_job(SendViaGmailJob)
+
+        booking = result.booking
+        person = workspace.people.with_email("ana@example.com").first
+        expect(booking.deal).to be_nil
+        expect(booking.person).to eq(person)
+        expect(person.activities.find_by(action: "booking_created")).to be_present
+        expect(workspace.email_messages.order(:id).last.record).to eq(person)
+        expect(user.notifications.order(:id).last.url)
+          .to eq(Rails.application.routes.url_helpers.person_path(person))
+      end
+    end
+
+    context "without CRM association" do
+      before do
+        booking_page.update!(crm_association: "none", pipeline: nil)
+        event_type.update!(email_template: template)
+      end
+
+      it "creates the booking without person or deal and sends the email without a record" do
+        result = nil
+        expect { result = create_booking }
+          .to change(Person, :count).by(0)
+          .and change(Deal, :count).by(0)
+          .and change(EmailMessage, :count).by(0)
+          .and have_enqueued_job(SendBookingConfirmationJob).with(kind_of(Integer), "Reserva Online", /Hola Ana/)
+
+        expect(result.booking).to be_persisted
+        expect(result.booking.person).to be_nil
+        expect(result.booking.deal).to be_nil
+        expect(user.notifications.order(:id).last.url)
+          .to eq(Rails.application.routes.url_helpers.bookings_path)
+      end
+    end
+  end
 end

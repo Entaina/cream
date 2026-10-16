@@ -77,6 +77,7 @@ en:
         greeting: Hi %{name},
         subject: "[Cream] New booking: %{event_name} · %{guest_name}"
         view_deal: View deal
+        view_person: View contact
       reminder:
         address: Address
         date: Date
@@ -182,6 +183,12 @@ en:
         connect_calendar: Connect Google Calendar
         connect_calendar_now: Connect now
         connect_calendar_short: Connect Google Calendar
+        crm_association: CRM association
+        crm_association_deal: Person and deal
+        crm_association_hint: Defines what is created in the CRM when someone books
+          and where the booking emails are stored.
+        crm_association_none: None (booking management only)
+        crm_association_person: Person only (no deal)
         crm_pipeline: CRM pipeline
         event_types: Event types
         event_types_hint: Drag to reorder. Click a card to edit it.

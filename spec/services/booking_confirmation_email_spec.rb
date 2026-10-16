@@ -129,4 +129,34 @@ RSpec.describe BookingConfirmationEmail, type: :service do
       expect(rendered).to include("ES", "MEET", "PHONE", "Mensaje propio")
     end
   end
+
+  describe ".call without a deal" do
+    let(:person) do
+      workspace.people.create!(
+        first_name: "Ana",
+        last_name: "Lopez",
+        email: "ana@example.com",
+        company: LeadForm.placeholder_company_for(workspace)
+      )
+    end
+
+    it "files the email on the person when the booking has one" do
+      booking.update!(deal: nil, person: person)
+
+      expect(SendViaGmailJob).to receive(:perform_later).once
+      expect(SendBookingConfirmationJob).not_to receive(:perform_later)
+
+      described_class.call(booking)
+      expect(workspace.email_messages.last.record).to eq(person)
+    end
+
+    it "enqueues a record-less delivery when the booking has neither person nor deal" do
+      booking.update!(deal: nil, person: nil)
+
+      expect(SendViaGmailJob).not_to receive(:perform_later)
+      expect(SendBookingConfirmationJob).to receive(:perform_later).with(booking.id, "Online", /\|es\|/)
+
+      expect { described_class.call(booking) }.not_to change(EmailMessage, :count)
+    end
+  end
 end

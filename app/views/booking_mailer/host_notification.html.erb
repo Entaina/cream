@@ -14,6 +14,11 @@
     <%= link_to t("booking.mailer.host_notification.view_deal"), @deal_url %>
   </p>
 <% end %>
+<% if @person_url %>
+  <p>
+    <%= link_to t("booking.mailer.host_notification.view_person"), @person_url %>
+  </p>
+<% end %>
 <p style="color:#999;font-size:12px;margin-top:16px;">
   <%= t("booking.mailer.host_notification.footer") %>
 </p>

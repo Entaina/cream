@@ -42,7 +42,11 @@
       <dl class="grid gap-2 text-sm sm:grid-cols-2">
         <div><dt class="text-ink-faint"><%= t("booking.pages.index.fields.slug") %></dt><dd><code class="text-xs"><%= page.slug %></code></dd></div>
         <div><dt class="text-ink-faint"><%= t("booking.pages.index.fields.host") %></dt><dd><%= page.host.name %></dd></div>
-        <div><dt class="text-ink-faint"><%= t("booking.pages.index.fields.pipeline") %></dt><dd><%= page.pipeline.name %></dd></div>
+        <% if page.crm_deal? %>
+          <div><dt class="text-ink-faint"><%= t("booking.pages.index.fields.pipeline") %></dt><dd><%= page.pipeline.name %></dd></div>
+        <% else %>
+          <div><dt class="text-ink-faint"><%= t("booking.pages.form.crm_association") %></dt><dd><%= t("booking.pages.form.crm_association_#{page.crm_association}") %></dd></div>
+        <% end %>
         <div><dt class="text-ink-faint"><%= t("booking.pages.index.fields.event_types") %></dt><dd><%= page.event_types.count %></dd></div>
       </dl>
 

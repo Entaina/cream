@@ -134,7 +134,7 @@ class BookingPagesController < ApplicationController
 
   def booking_page_params
     params.require(:booking_page).permit(
-      :name, :slug, :host_id, :pipeline_id, :reuse_existing_deal, :welcome_message, :avatar_url, :logo_url,
+      :name, :slug, :host_id, :crm_association, :pipeline_id, :reuse_existing_deal, :welcome_message, :avatar_url, :logo_url,
       :timezone, :booking_window_days, :active, :success_template_id,
       calendar_ids: [],
       event_types_attributes: [
