@@ -1291,7 +1291,7 @@ Si cambian los permisos en Google o dejan de cargarse tus calendarios, entra en 
 
 Toda la configuración se hace desde **Reservas** (no hace falta usar seeds ni datos precargados).
 
-Cualquier miembro ve las páginas en el listado, con su URL pública. Solo el **anfitrión** de cada página puede editarla o eliminarla. En **Reservas recibidas** cada persona ve y puede cancelar únicamente las reservas de las páginas de las que es anfitrión.
+Cualquier miembro ve las páginas en el listado, con su URL pública. Solo el **anfitrión** de cada página y los **otros anfitriones** que añada pueden editarla o eliminarla. En **Reservas recibidas** cada persona ve y puede cancelar únicamente las reservas de las páginas en las que participa. El anfitrión de una página es siempre quien la crea.
 
 **Página pública**
 
@@ -1299,7 +1299,8 @@ Cualquier miembro ve las páginas en el listado, con su URL pública. Solo el **
 |-------|-------------|
 | Nombre | Título interno de la página |
 | Slug | Identificador en la URL pública (`/b/slug`) |
-| Anfitrión | Usuario cuyo Google Calendar consulta disponibilidad y recibe las citas |
+| Anfitrión | Quien crea la página. Su Google Calendar recibe las citas y no se puede cambiar |
+| Otros anfitriones | Opcional. Usuarios del workspace que participan en las reuniones reservadas y pueden editar la página (ver «Reservas con varios anfitriones») |
 | Asociación CRM | Qué se crea en el CRM al reservar: **Persona y deal** (por defecto), **Solo persona (sin deal)** o **Ninguna (solo gestión de la reserva)** |
 | Pipeline CRM | Solo con **Persona y deal**: pipeline donde se crean persona y deal al reservar |
 | Reutilizar deal existente | Si la persona ya tiene un deal en la primera etapa de este pipeline, la reserva se asocia a ese deal; si no, se crea uno nuevo |
@@ -1307,7 +1308,7 @@ Cualquier miembro ve las páginas en el listado, con su URL pública. Solo el **
 | Avatar URL / Logo URL | Imágenes opcionales del perfil |
 | Zona horaria | Zona de las **franjas horarias** del anfitrión. Quien reserva ve los huecos convertidos a su zona; Google Calendar guarda el mismo instante. |
 | Ventana de reserva (días) | Cuántos días hacia adelante se pueden elegir fechas |
-| Calendarios | Calendarios de Google donde comprobar huecos; arrastra para ordenarlos — el primero marcado con escritura recibe las reservas (badge «Recibe nuevas citas») |
+| Tus calendarios | Tus calendarios de Google donde comprobar huecos; cada usuario solo ve y elige los suyos. Arrastra para ordenarlos — en el anfitrión, el primero marcado con escritura recibe las reservas (badge «Recibe nuevas citas») |
 | Plantilla de acuse | Opcional. Tras confirmar, abre `/b/slug/recibido?evento=slug-tipo` con esa plantilla Liquid (sin nombre, email ni teléfono en la URL). Si se deja vacía, la confirmación sigue en Cream (Meet, `.ics`) |
 | Página activa | Si está desmarcada, la URL pública no acepta reservas |
 
@@ -1336,15 +1337,25 @@ Copia la **URL pública** y compártela con clientes. Si la página tiene varios
 
 En **Ajustes → Workspace**, opcionalmente elige una **plantilla de layout de reservas públicas** (tipo *Layout* en **Formularios → Plantillas**). Debe incluir `{{ content }}` donde irá el widget; así la página `/b/…` muestra la cabecera y el pie de tu web alrededor del calendario.
 
+### Reservas con varios anfitriones
+
+Una página puede tener más de un anfitrión, por ejemplo para reservar una reunión con dos personas del equipo:
+
+- Al crear o editar la página, el anfitrión elige **Otros anfitriones**. Cada usuario añadido recibe un aviso (campana y/o email, según sus **Alertas**) con un enlace para elegir sus calendarios, y desde ese momento puede editar la página, añadir o quitar anfitriones y eliminarla. Solo el anfitrión original no se puede quitar, porque las citas se crean en su calendario.
+- Cada persona ve y elige únicamente **sus** calendarios. Los de los demás no se muestran.
+- Los huecos ofrecidos son los que están libres en los calendarios seleccionados por **todos** los anfitriones.
+- Si algún anfitrión no ha seleccionado ningún calendario, o no tiene Google Calendar conectado, se considera que no tiene huecos y la página no ofrece ninguno. El formulario avisa de quién falta por elegir calendarios.
+- Todos los anfitriones son asistentes del evento de Google Calendar (reciben invitación, cambios y cancelaciones) y reciben el mismo aviso de cada reserva, según sus **Alertas**.
+
 ### Qué ocurre al reservar
 
 - Se consulta la **disponibilidad real** contra los calendarios configurados (por defecto `primary`).
-- Al confirmar, se crea el **evento en Google Calendar** con quien reserva, los invitados opcionales (hasta 5) y el anfitrión como asistentes.
+- Al confirmar, se crea el **evento en Google Calendar** con quien reserva, los invitados opcionales (hasta 5) y los anfitriones como asistentes.
 - En Cream, según la **Asociación CRM** de la página:
   - **Persona y deal:** se crea o reutiliza la **persona** (por email) y se crea o reutiliza el **deal** en el pipeline indicado según la opción **Reutilizar deal existente**, con tarea de seguimiento para el anfitrión cuando el deal es nuevo.
   - **Solo persona (sin deal):** se crea o reutiliza la persona y no se crea deal. El correo de confirmación y las respuestas quedan en la ficha de la persona.
   - **Ninguna:** no se crea ni se enlaza persona ni deal; la reserva solo se gestiona desde **Reservas**. El correo de confirmación se envía pero no se guarda en ninguna ficha.
-- El anfitrión recibe aviso según sus canales en **Settings → Profile → Alertas** (campana y/o email), con los datos de la reserva y un enlace al deal (o a la persona si no hay deal). El email adjunta un archivo `.ics` de la misma cita que ya está en Google Calendar, para que no se cree una segunda reunión.
+- Cada anfitrión recibe aviso según sus canales en **Settings → Profile → Alertas** (campana y/o email), con los datos de la reserva y un enlace al deal (o a la persona si no hay deal). El email adjunta un archivo `.ics` de la misma cita que ya está en Google Calendar, para que no se cree una segunda reunión.
 - Si el tipo de evento tiene **plantilla de email al invitado**, el invitado recibe además un correo de confirmación (estilo Calendly) con botón Meet, fecha, mensaje personalizado y enlaces **Cancelar** (`/b/slug/cancelar/…`) y **Reprogramar** (`/b/slug/reprogramar/…`). Sin plantilla, solo recibe la invitación de Google Calendar.
 - En la ficha del **deal** y del **contacto** (los que existan según la asociación elegida), el timeline de **Actividad** registra la reserva (invitado, tipo de cita y fecha/hora), también cuando se reutiliza un deal existente.
 

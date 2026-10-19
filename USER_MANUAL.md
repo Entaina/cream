@@ -1291,7 +1291,7 @@ If permissions change in Google or your calendars stop loading, go to **Google C
 
 All the configuration is done from **Reservas** (no need to use seeds or preloaded data).
 
-Every member sees the pages in the list, including the public URL. Only the **host** of each page can edit or delete it. Under **Reservas recibidas** (Received bookings) each person sees and can cancel only the bookings of the pages they host.
+Every member sees the pages in the list, including the public URL. Only the **host** of each page and the **other hosts** they add can edit or delete it. Under **Reservas recibidas** (Received bookings) each person sees and can cancel only the bookings of the pages they take part in. The host of a page is always the person who creates it.
 
 **Public page**
 
@@ -1299,7 +1299,8 @@ Every member sees the pages in the list, including the public URL. Only the **ho
 |-------|-------------|
 | Nombre (Name) | Internal title of the page |
 | Slug | Identifier in the public URL (`/b/slug`) |
-| Anfitrión (Host) | User whose Google Calendar is checked for availability and receives the appointments |
+| Anfitrión (Host) | Whoever creates the page. Their Google Calendar receives the appointments and it cannot be changed |
+| Otros anfitriones (Other hosts) | Optional. Workspace users who join the booked meetings and can edit the page (see "Bookings with several hosts") |
 | Asociación CRM (CRM association) | What is created in the CRM when someone books: **Person and deal** (default), **Person only (no deal)** or **None (booking management only)** |
 | Pipeline CRM | Only with **Person and deal**: pipeline where the person and deal are created upon booking |
 | Reutilizar deal existente (Reuse existing deal) | If the person already has a deal in the first stage of this pipeline, the booking is linked to that deal; otherwise a new one is created |
@@ -1307,7 +1308,7 @@ Every member sees the pages in the list, including the public URL. Only the **ho
 | Avatar URL / Logo URL | Optional profile images |
 | Zona horaria (Time zone) | Time zone of the host’s **weekly hours**. Visitors see slots converted to their zone; Google Calendar stores the same instant. |
 | Ventana de reserva (días) (Booking window, days) | How many days ahead dates can be chosen |
-| Calendarios (Calendars) | Google calendars where slots are checked; drag to reorder — the first one marked writable receives the bookings ("Recibe nuevas citas" badge) |
+| Tus calendarios (Your calendars) | Your Google calendars where slots are checked; each user only sees and chooses their own. Drag to reorder — for the host, the first one marked writable receives the bookings ("Recibe nuevas citas" badge) |
 | Plantilla de acuse (Acknowledgment template) | Optional. After booking, opens `/b/slug/recibido?evento=type-slug` with that Liquid template (no name, email or phone in the URL). If blank, confirmation stays in Cream (Meet, `.ics`) |
 | Página activa (Page active) | If unchecked, the public URL does not accept bookings |
 
@@ -1336,15 +1337,25 @@ Copy the **public URL** and share it with clients. If the page has several types
 
 Under **Settings → Workspace**, you can optionally pick a **public booking layout template** (*Layout* type under **Forms → Templates**). It must include `{{ content }}` where the booking widget goes, so `/b/…` pages show your site header and footer around the calendar.
 
+### Bookings with several hosts
+
+A page can have more than one host, for example to book a meeting with two team members:
+
+- When creating or editing the page, the host picks **Otros anfitriones** (Other hosts). Each added user gets a notice (bell and/or email, according to their **Alertas**) with a link to choose their calendars, and from then on can edit the page, add or remove hosts, and delete it. Only the original host cannot be removed, because appointments are created in their calendar.
+- Each person only sees and chooses **their own** calendars. Other people's calendars are never shown.
+- The slots offered are those that are free on the calendars selected by **all** hosts.
+- If any host has not selected a calendar, or has no Google Calendar connected, they are considered to have no free slots and the page offers none. The form shows who still needs to choose calendars.
+- All hosts are attendees of the Google Calendar event (they get the invitation, changes and cancellations) and receive the same notice for every booking, according to their **Alertas**.
+
 ### What happens when someone books
 
 - **Real availability** is checked against the configured calendars (`primary` by default).
-- Upon confirmation, the **event is created in Google Calendar** with the person who booked, optional guests (up to 5), and the host as attendees.
+- Upon confirmation, the **event is created in Google Calendar** with the person who booked, optional guests (up to 5), and the hosts as attendees.
 - In Cream, depending on the page's **CRM association**:
   - **Person and deal:** the **person** is created or reused (by email) and the **deal** is created or reused in the specified pipeline according to **Reuse existing deal**, with a follow-up task for the host when the deal is new.
   - **Person only (no deal):** the person is created or reused and no deal is created. The confirmation email and replies are kept on the person's record.
   - **None:** no person or deal is created or linked; the booking is managed only from **Reservas**. The confirmation email is sent but not stored on any record.
-- The host is notified according to their channels in **Settings → Profile → Alertas** (bell and/or email), with the booking details and a link to the deal (or to the person when there is no deal). The email attaches an `.ics` file for the same meeting already on Google Calendar, so it is not added as a second event.
+- Each host is notified according to their channels in **Settings → Profile → Alertas** (bell and/or email), with the booking details and a link to the deal (or to the person when there is no deal). The email attaches an `.ics` file for the same meeting already on Google Calendar, so it is not added as a second event.
 - If the event type has a **guest email template**, the invitee also gets a Calendly-style confirmation (Meet button, custom message, **Cancel** and **Reschedule** links at `/b/slug/cancelar/…` and `/b/slug/reprogramar/…`). Without a template, they only receive the Google Calendar invitation.
 - On the **deal** and **contact** record pages (whichever exist for the chosen association), the **Activity** timeline logs the booking (guest, meeting type and date/time), including when an existing deal is reused.
 

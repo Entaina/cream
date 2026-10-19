@@ -32,6 +32,20 @@ class BookingMailer < ApplicationMailer
     end
   end
 
+  def co_host_invitation(booking_page:, recipient:, actor:)
+    @booking_page = booking_page
+    @recipient = recipient
+    @actor = actor
+    @edit_url = edit_booking_page_url(booking_page)
+
+    with_mailer_locale(recipient.locale) do
+      mail(
+        to: recipient.email_address,
+        subject: I18n.t("booking.mailer.co_host_invitation.subject", page: booking_page.name)
+      )
+    end
+  end
+
   def guest_confirmation(booking:, subject:, body:, attachment_files: [])
     @booking = booking
     @body = body
@@ -68,5 +82,5 @@ class BookingMailer < ApplicationMailer
     )
   end
 
-  def mailjet_workspace = @booking.workspace
+  def mailjet_workspace = (@booking || @booking_page)&.workspace
 end

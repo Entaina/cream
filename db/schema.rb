@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_19_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_19_130000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -178,6 +178,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_19_120000) do
     t.index ["booking_page_id"], name: "index_booking_event_types_on_booking_page_id"
     t.index ["email_template_id"], name: "index_booking_event_types_on_email_template_id"
     t.index ["success_template_id"], name: "index_booking_event_types_on_success_template_id"
+  end
+
+  create_table "booking_page_members", force: :cascade do |t|
+    t.bigint "booking_page_id", null: false
+    t.bigint "user_id", null: false
+    t.jsonb "calendar_ids", default: [], null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["booking_page_id", "user_id"], name: "index_booking_page_members_on_booking_page_id_and_user_id", unique: true
+    t.index ["booking_page_id"], name: "index_booking_page_members_on_booking_page_id"
+    t.index ["user_id"], name: "index_booking_page_members_on_user_id"
   end
 
   create_table "booking_pages", force: :cascade do |t|
@@ -1803,6 +1814,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_19_120000) do
   add_foreign_key "booking_event_types", "booking_pages"
   add_foreign_key "booking_event_types", "email_templates", on_delete: :nullify
   add_foreign_key "booking_event_types", "lead_form_templates", column: "success_template_id"
+  add_foreign_key "booking_page_members", "booking_pages"
+  add_foreign_key "booking_page_members", "users"
   add_foreign_key "booking_pages", "lead_form_templates", column: "success_template_id"
   add_foreign_key "booking_pages", "pipelines"
   add_foreign_key "booking_pages", "users", column: "host_id"

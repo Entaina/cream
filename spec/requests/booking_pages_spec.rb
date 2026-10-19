@@ -39,4 +39,27 @@ RSpec.describe "Booking pages calendars", type: :request do
     expect(response).to have_http_status(:unprocessable_content)
     expect(response.parsed_body["error"]).to eq("not_connected")
   end
+
+  it "lists only the current user's calendars, ignoring host_id" do
+    other = users(:two)
+    workspace.calendar_connections.create!(
+      user: user, email: "me@example.com", refresh_token: "rt", access_token: "at", expires_at: 1.hour.from_now
+    )
+    workspace.calendar_connections.create!(
+      user: other, email: "other@example.com", refresh_token: "rt", access_token: "at", expires_at: 1.hour.from_now
+    )
+    own_client = instance_double(GoogleCalendar::Client, list_calendars: [
+      {id: "mine", summary: "Mine", primary: true, writable: true}
+    ])
+    allow(GoogleCalendar::Client).to receive(:new) do |connection|
+      raise "listed another user's calendars" unless connection.user_id == user.id
+
+      own_client
+    end
+
+    get calendars_booking_pages_path, params: {host_id: other.id}
+
+    expect(response).to have_http_status(:ok)
+    expect(response.parsed_body["calendars"].map { |calendar| calendar["id"] }).to eq(["mine"])
+  end
 end

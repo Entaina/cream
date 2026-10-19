@@ -100,4 +100,17 @@ RSpec.describe BookingMailer, type: :mailer do
       expect(mail.body.encoded).to include("Hola Ana")
     end
   end
+
+  describe "#co_host_invitation" do
+    let(:recipient) { users(:two) }
+
+    it "invites the user to choose their calendars with a link to the page editor" do
+      mail = described_class.co_host_invitation(booking_page: booking_page, recipient: recipient, actor: user)
+
+      expect(mail.to).to eq([recipient.email_address])
+      expect(mail.subject).to include(booking_page.name)
+      expect(mail.body.encoded).to include(user.name, booking_page.name)
+      expect(mail.body.encoded).to include("/booking_pages/#{booking_page.id}/edit")
+    end
+  end
 end

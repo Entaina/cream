@@ -2,11 +2,11 @@
       class: "space-y-6",
       data: {
         controller: "booking-page-form",
-        booking_page_form_calendars_url_value: calendars_booking_pages_path,
-        booking_page_form_selected_ids_value: booking_page.calendar_ids.to_json,
+        booking_page_form_selected_ids_value: @selected_calendar_ids.to_json,
+        booking_page_form_event_calendar_value: booking_page.host_id == current_user.id,
         booking_page_form_calendars_value: @available_calendars.to_json,
         booking_page_form_calendars_error_value: @calendars_load_error.to_s,
-        booking_page_form_host_connected_value: @host_calendar_connection&.connected? == true,
+        booking_page_form_host_connected_value: @user_calendar_connection&.connected? == true,
         booking_page_form_i18n_value: booking_page_form_stimulus_i18n.to_json
       } do |f| %>
   <% if booking_page.errors.any? %>
@@ -30,14 +30,19 @@
         <% end %>
       </div>
       <div>
-        <%= f.label :host_id, t("booking.pages.form.host"), class: "label" %>
-        <%= f.collection_select :host_id, @hosts, :id, :name, {},
-              class: "input mt-1 w-full",
-              data: {
-                booking_page_form_target: "hostSelect",
-                action: "change->booking-page-form#hostChanged"
-              } %>
-        <p class="text-xs text-ink-faint mt-1"><%= t("booking.pages.form.host_calendar_hint") %></p>
+        <p class="label"><%= t("booking.pages.form.host") %></p>
+        <p class="mt-1 text-sm"><%= booking_page.host.name %></p>
+      </div>
+      <div>
+        <%= f.label :co_host_ids, t("booking.pages.form.co_hosts"), class: "label" %>
+        <%= f.collection_select :co_host_ids, @co_host_candidates, :id, :name, {},
+              multiple: true, class: "input mt-1 w-full" %>
+        <p class="text-xs text-ink-faint mt-1"><%= t("booking.pages.form.co_hosts_hint") %></p>
+        <% if @pending_calendar_participants.any? %>
+          <p class="text-xs text-golden-800 mt-1">
+            <%= t("booking.pages.form.co_hosts_pending", names: @pending_calendar_participants.to_sentence) %>
+          </p>
+        <% end %>
       </div>
       <div>
         <%= f.label :crm_association, t("booking.pages.form.crm_association"), class: "label" %>
@@ -89,9 +94,10 @@
           <%= f.number_field :booking_window_days, min: 1, class: "input mt-1 w-full" %>
         </div>
       </div>
+      <% co_host_view = booking_page.host_id != current_user.id %>
       <div>
         <p class="label"><%= t("booking.pages.form.calendar_section") %></p>
-        <p class="text-xs text-ink-faint mb-2"><%= t("booking.pages.form.calendar_order_hint") %></p>
+        <p class="text-xs text-ink-faint mb-2"><%= t(co_host_view ? "booking.pages.form.calendar_order_hint_co_host" : "booking.pages.form.calendar_order_hint") %></p>
         <div data-booking-page-form-target="calendarError"
              class="hidden text-sm text-red-600 mb-2"></div>
         <% if @calendars_load_error.present? %>
@@ -99,18 +105,18 @@
             <%= @calendars_load_error %>
             <% if @calendars_load_error_code == :api_disabled && @calendars_load_help_url.present? %>
               <%= link_to t("booking.pages.form.calendar_activate_api"), @calendars_load_help_url, class: "text-accent hover:underline ml-1", target: "_blank", rel: "noopener" %>
-            <% elsif @host_calendar_connection&.user_id == current_user.id && @calendars_load_error_code != :api_disabled %>
+            <% elsif @user_calendar_connection&.user_id == current_user.id && @calendars_load_error_code != :api_disabled %>
               <%= link_to t("booking.pages.form.calendar_reconnect"), calendar_connection_path, class: "text-accent hover:underline ml-1" %>
             <% end %>
           </p>
-        <% elsif @host_calendar_connection&.connected? && @host_calendar_connection.missing_scopes_message %>
+        <% elsif @user_calendar_connection&.connected? && @user_calendar_connection.missing_scopes_message %>
           <p class="text-sm text-golden-800 bg-golden-100 rounded-md px-3 py-2 mb-2">
-            <%= @host_calendar_connection.missing_scopes_message %>
-            <% if @host_calendar_connection.user_id == current_user.id %>
+            <%= @user_calendar_connection.missing_scopes_message %>
+            <% if @user_calendar_connection.user_id == current_user.id %>
               <%= link_to t("booking.pages.form.calendar_reconnect"), calendar_connection_path, class: "text-accent hover:underline ml-1" %>
             <% end %>
           </p>
-        <% elsif @host_calendar_connection.blank? || !@host_calendar_connection.connected? %>
+        <% elsif @user_calendar_connection.blank? || !@user_calendar_connection.connected? %>
           <p class="text-sm text-ink-soft mb-2">
             <%= t("booking.pages.form.host_not_connected") %>
             <%= link_to t("booking.pages.form.connect_calendar_now"), calendar_connection_path, class: "text-accent hover:underline" %>
@@ -120,7 +126,7 @@
         <div data-booking-page-form-target="calendarIdsInputs"></div>
         <p data-booking-page-form-target="calendarHint"
            class="text-xs text-ink-faint mt-2 <%= "hidden" if @available_calendars.blank? %>">
-          <%= t("booking.pages.form.calendar_hint") %>
+          <%= t(co_host_view ? "booking.pages.form.calendar_hint_co_host" : "booking.pages.form.calendar_hint") %>
         </p>
       </div>
       <div>

@@ -37,6 +37,22 @@ RSpec.describe BookingPagePolicy do
     expect(described_class::Scope.new(context_for(admin), BookingPage.all).resolve).to include(saved)
   end
 
+  it "lets a co-host edit and delete the page" do
+    saved = create_booking_page!(host: host)
+    saved.members.create!(user: admin)
+    policy = described_class.new(context_for(admin), saved)
+
+    expect(policy.update?).to be true
+    expect(policy.destroy?).to be true
+  end
+
+  it "forbids a member who is neither host nor co-host" do
+    saved = create_booking_page!(host: host)
+    saved.members.create!(user: users(:three))
+
+    expect(described_class.new(context_for(admin), saved).update?).to be false
+  end
+
   def create_booking_page!(host:)
     pipeline = Pipeline.default_for(workspace) || Pipeline.create_default!(workspace)
     page = workspace.booking_pages.new(

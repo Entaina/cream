@@ -2,7 +2,7 @@ class BookingPagePolicy < WorkspaceRecordPolicy
   def calendars? = member?
 
   def update?
-    in_workspace? && record.host_id == user.id
+    in_workspace? && record.participant?(user)
   end
 
   def destroy?

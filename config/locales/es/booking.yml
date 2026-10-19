@@ -63,6 +63,15 @@ es:
       physical: Presencial
       to_be_decided: A coordinar
     mailer:
+      co_host_invitation:
+        body: "%{actor} te ha añadido a la página de reservas «%{page}» en %{workspace_name}.
+          Elige tus calendarios para que haya huecos disponibles: hasta entonces
+          la página no ofrecerá ninguna reserva."
+        edit_link: Elegir mis calendarios
+        footer: Recibes este correo porque tienes activadas las alertas por correo
+          en tu perfil de Cream.
+        greeting: Hola %{name},
+        subject: "[Cream] Te han añadido a la página de reservas «%{page}»"
       confirmation:
         default_message: Salvo que acordemos lo contrario nos vemos en el enlace de
           Google Meet que recibirás en la invitación de calendario.
@@ -173,15 +182,25 @@ es:
         calendar_drag_title: Arrastrar para reordenar
         calendar_hint: Arrastra el asa para cambiar el orden. El badge «Recibe nuevas
           citas» indica dónde se crearán los eventos.
+        calendar_hint_co_host: Tu disponibilidad se cruza con la del resto de participantes
+          para calcular los huecos.
         calendar_order_hint: Marca los calendarios donde comprobar disponibilidad
           y arrastra para ordenarlos. Las nuevas citas se crean en el primero marcado
           con permiso de escritura.
+        calendar_order_hint_co_host: Marca los calendarios donde comprobar tu disponibilidad.
+          Si no marcas ninguno, la página no tendrá huecos disponibles.
         calendar_primary: "(principal)"
         calendar_readonly: "· solo lectura"
         calendar_reconnect: Reconectar Google Calendar
-        calendar_section: Calendarios
+        calendar_section: Tus calendarios
         calendar_writable: "· escritura"
         cancel: Cancelar
+        co_hosts: Otros anfitriones
+        co_hosts_hint: Participan en las reuniones reservadas y pueden editar esta
+          página. Cada uno elige sus propios calendarios y la disponibilidad se calcula
+          cruzándolos todos.
+        co_hosts_pending: "Sin calendarios elegidos todavía: %{names}. Hasta entonces
+          la página no tendrá huecos disponibles."
         connect_calendar: Conectar Google Calendar
         connect_calendar_now: Conectar ahora
         connect_calendar_short: Conectar Google Calendar
@@ -194,10 +213,8 @@ es:
         crm_pipeline: Pipeline CRM
         event_types: Tipos de evento
         event_types_hint: Arrastra para cambiar el orden. Pulsa una tarjeta para editarla.
-        host: Anfitrión (calendario)
-        host_calendar_hint: Debe tener Google Calendar conectado para consultar disponibilidad
-          y crear citas.
-        host_not_connected: El anfitrión no tiene Google Calendar conectado.
+        host: Anfitrión
+        host_not_connected: No tienes Google Calendar conectado.
         logo_url: Logo URL
         name: Nombre
         public_page: Página pública
@@ -228,12 +245,10 @@ es:
         calendar_readonly: "· solo lectura"
         calendar_writable: "· escritura"
         event_calendar_badge: Recibe nuevas citas
-        insufficient_scopes: El anfitrión necesita actualizar los permisos de Google
-          Calendar.
+        insufficient_scopes: Necesitas actualizar los permisos de Google Calendar.
         load_failed: No se pudieron cargar los calendarios. Inténtalo de nuevo.
-        loading_calendars: Cargando calendarios…
         no_calendars_found: No se encontraron calendarios en la cuenta conectada.
-        not_connected: El anfitrión seleccionado no tiene Google Calendar conectado.
+        not_connected: No tienes Google Calendar conectado.
       index:
         active: Activa
         connect_before_publish: Conecta Google Calendar antes de publicar una página.

@@ -5,6 +5,10 @@ es:
       booking:
         body: "%{event}: %{name} (%{email}) — %{when}"
         title: Nueva reserva
+      booking_page_invite:
+        body: "%{actor} te ha añadido a «%{page}». Elige tus calendarios para que
+          haya huecos disponibles"
+        title: Te han añadido a una página de reservas
       email_followup:
         body: Sin respuesta de %{address} al email «%{subject}»
         title: Seguimiento

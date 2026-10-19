@@ -29,6 +29,11 @@ class BookingAvailabilityService
     @calendar_warning = nil
     month_start = Date.strptime("#{month_string}-01", "%Y-%m-%d")
     month_end = month_start.end_of_month
+    if co_hosts_without_availability?
+      days = (month_start..month_end).map { |date| {date: date.iso8601, available: false} }
+      return Result.new(days:, slots: nil, warning: nil)
+    end
+
     busy = fetch_busy(
       local_beginning_of_day(@guest_timezone, month_start) - 1.day,
       local_end_of_day(@guest_timezone, month_end) + 1.day
@@ -44,6 +49,8 @@ class BookingAvailabilityService
   def daily(date_string)
     @calendar_warning = nil
     date = Date.iso8601(date_string)
+    return Result.new(days: nil, slots: [], warning: nil) if co_hosts_without_availability?
+
     busy = fetch_busy(
       local_beginning_of_day(@guest_timezone, date) - 1.day,
       local_end_of_day(@guest_timezone, date) + 1.day
@@ -54,6 +61,8 @@ class BookingAvailabilityService
   end
 
   def slot_available?(starts_at)
+    return false if co_hosts_without_availability?
+
     time = starts_at.in_time_zone(@guest_timezone).change(sec: 0)
     return false unless within_booking_window?(time.to_date)
     return false unless slot_in_schedule?(time)
@@ -171,18 +180,35 @@ class BookingAvailabilityService
     slot_range(host_start)
   end
 
-  def fetch_busy(range_start, range_end)
-    return [] if @client.nil?
+  # A co-host with no calendars selected (or no operational Google connection)
+  # has no free time, so nobody can book the page.
+  def co_hosts_without_availability?
+    return @co_hosts_without_availability if defined?(@co_hosts_without_availability)
 
-    busy = Timeout.timeout(GOOGLE_BUSY_TIMEOUT) do
-      @client.free_busy(
+    @co_hosts_without_availability = !@booking_page.co_hosts_ready?
+  end
+
+  def fetch_busy(range_start, range_end)
+    busy = []
+    busy.concat(participant_busy(@client, @booking_page.calendar_ids, range_start, range_end)) if @client
+
+    @booking_page.co_host_participants.each do |participant|
+      client = GoogleCalendar::Client.new(participant.connection)
+      busy.concat(participant_busy(client, participant.calendar_ids, range_start, range_end))
+    end
+
+    filter_ignored_booking_busy(busy.sort_by { |period| period[:start] })
+  end
+
+  def participant_busy(client, calendar_ids, range_start, range_end)
+    Timeout.timeout(GOOGLE_BUSY_TIMEOUT) do
+      client.free_busy(
         time_min: range_start,
         time_max: range_end,
-        calendar_ids: @booking_page.calendar_ids,
+        calendar_ids: calendar_ids,
         timezone: @host_timezone.tzinfo.name
       )
     end
-    filter_ignored_booking_busy(busy)
   rescue Timeout::Error
     @calendar_warning ||= I18n.t("booking.warnings.calendar_timeout")
     []

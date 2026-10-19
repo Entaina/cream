@@ -82,19 +82,32 @@ class NotificationService
     end
   end
 
-  def self.notify_booking(booking:)
-    host = booking.booking_page.host
+  def self.notify_booking(booking:, recipient:)
     event_name = booking.booking_event_type.localized_name
     when_label = booking.localized_starts_at_with_zone
 
-    with_recipient_locale(host) do
-      host.notifications.create!(
+    with_recipient_locale(recipient) do
+      recipient.notifications.create!(
         workspace: booking.workspace,
         kind: "booking",
         title: I18n.t("notifications.events.booking.title"),
         body: I18n.t("notifications.events.booking.body",
           event: event_name, name: booking.display_name, email: booking.email, when: when_label),
         url: record_path_for(booking.deal || booking.person) || Rails.application.routes.url_helpers.bookings_path
+      )
+    end
+  end
+
+  def self.notify_booking_page_invite(recipient:, booking_page:, actor:)
+    with_recipient_locale(recipient) do
+      recipient.notifications.create!(
+        workspace: booking_page.workspace,
+        actor: actor,
+        kind: "booking_page_invite",
+        title: I18n.t("notifications.events.booking_page_invite.title"),
+        body: I18n.t("notifications.events.booking_page_invite.body",
+          actor: actor.name, page: booking_page.name),
+        url: Rails.application.routes.url_helpers.edit_booking_page_path(booking_page)
       )
     end
   end

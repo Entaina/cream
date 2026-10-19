@@ -202,4 +202,97 @@ RSpec.describe BookingAvailabilityService do
 
     expect(available).to be(true)
   end
+
+  describe "with co-hosts" do
+    let(:co_host) { users(:two) }
+    let(:co_client) { instance_double(GoogleCalendar::Client) }
+    let(:zone) { ActiveSupport::TimeZone["Europe/Madrid"] }
+
+    before do
+      travel_to Time.zone.parse("2026-07-28 08:00")
+      allow(client).to receive(:free_busy).and_return([])
+      allow(co_client).to receive(:free_busy).and_return([])
+      allow(GoogleCalendar::Client).to receive(:new).and_return(co_client)
+      booking_page.update!(co_host_ids: [co_host.id])
+    end
+
+    def connect_co_host!
+      workspace.calendar_connections.create!(
+        user: co_host, email: "co@example.com", refresh_token: "rt", access_token: "at", expires_at: 1.hour.from_now
+      )
+    end
+
+    def select_co_host_calendars!(ids)
+      booking_page.reload.assign_calendar_ids_for(co_host, ids)
+      booking_page.save!
+    end
+
+    def daily_slots
+      described_class.daily(
+        booking_page: booking_page.reload, event_type: event_type, date: "2026-07-28",
+        timezone: "Europe/Madrid", client: client
+      ).slots
+    end
+
+    it "excludes slots that are busy for the host or for the co-host" do
+      select_co_host_calendars!(["co-cal"])
+      connect_co_host!
+      host_busy = zone.parse("2026-07-28 10:00")
+      co_busy = zone.parse("2026-07-28 11:00")
+      allow(client).to receive(:free_busy).and_return([{start: host_busy, end: host_busy + 30.minutes}])
+      allow(co_client).to receive(:free_busy).and_return([{start: co_busy, end: co_busy + 30.minutes}])
+
+      slots = daily_slots
+
+      expect(slots).not_to include("10:00", "11:00")
+      expect(slots).to include("10:30", "11:30")
+    end
+
+    it "queries each participant with only their own calendars" do
+      select_co_host_calendars!(["co-cal"])
+      connect_co_host!
+
+      daily_slots
+
+      expect(client).to have_received(:free_busy).with(hash_including(calendar_ids: ["primary"]))
+      expect(co_client).to have_received(:free_busy).with(hash_including(calendar_ids: ["co-cal"]))
+    end
+
+    it "offers no slots when the co-host has not selected any calendar" do
+      connect_co_host!
+
+      expect(daily_slots).to eq([])
+      month = described_class.monthly(
+        booking_page: booking_page.reload, event_type: event_type, month: "2026-07",
+        timezone: "Europe/Madrid", client: client
+      )
+      expect(month.days).to all(include(available: false))
+      expect(
+        described_class.slot_available?(
+          booking_page: booking_page, event_type: event_type,
+          starts_at: zone.parse("2026-07-28 10:00"), timezone: "Europe/Madrid", client: client
+        )
+      ).to be(false)
+    end
+
+    it "offers no slots when the co-host is not connected to Google" do
+      select_co_host_calendars!(["co-cal"])
+
+      expect(daily_slots).to eq([])
+    end
+
+    it "keeps working with a co-host Google error, reporting a warning" do
+      select_co_host_calendars!(["co-cal"])
+      connect_co_host!
+      allow(co_client).to receive(:free_busy).and_raise(GoogleCalendar::Error, "offline")
+
+      result = described_class.daily(
+        booking_page: booking_page.reload, event_type: event_type, date: "2026-07-28",
+        timezone: "Europe/Madrid", client: client
+      )
+
+      expect(result.slots).to include("10:00")
+      expect(result.warning).to eq("offline")
+    end
+  end
 end

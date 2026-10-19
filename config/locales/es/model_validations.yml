@@ -10,6 +10,7 @@ es:
           MB
         calendar_ids_required: selecciona al menos un calendario
         cannot_be_changed: no se puede cambiar
+        cannot_be_host: no puede ser el anfitrión
         cannot_be_same_person: no puede ser la misma persona
         cannot_demote_last_admin: no se puede degradar al último administrador
         cannot_remove_last_admin: no se puede eliminar al último administrador del

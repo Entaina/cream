@@ -70,7 +70,7 @@ class BookingCreator
 
     enqueue_reminder!(booking)
     enqueue_confirmation!(booking)
-    notify_host!(booking)
+    notify_participants!(booking)
     track_booking_activity!(booking)
 
     if booking.person
@@ -114,11 +114,13 @@ class BookingCreator
     booking.deal&.update!(campaign: campaign)
   end
 
-  def notify_host!(booking)
-    host = @booking_page.host
-    AlertChannelDelivery.for(user: host, workspace: @booking_page.workspace).deliver do |channels|
-      NotificationService.notify_booking(booking:) if channels.in_app?
-      BookingMailer.host_notification(booking:, host:).deliver_later if channels.email?
+  def notify_participants!(booking)
+    @booking_page.participants.each do |participant|
+      user = participant.user
+      AlertChannelDelivery.for(user:, workspace: @booking_page.workspace).deliver do |channels|
+        NotificationService.notify_booking(booking:, recipient: user) if channels.in_app?
+        BookingMailer.host_notification(booking:, host: user).deliver_later if channels.email?
+      end
     end
   end
 
@@ -181,8 +183,15 @@ class BookingCreator
     emails = [normalized_email, *normalized_guests]
     host_email = organizer_email
     emails << host_email if host_email.present? && emails.exclude?(host_email)
+    co_host_emails.each { |email| emails << email if emails.exclude?(email) }
 
     emails.map { |email| {email:} }
+  end
+
+  def co_host_emails
+    @booking_page.co_host_participants.filter_map do |participant|
+      (participant.connection&.email.presence || participant.user.email_address).to_s.strip.downcase.presence
+    end
   end
 
   def organizer_email

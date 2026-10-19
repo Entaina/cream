@@ -549,4 +549,78 @@ RSpec.describe BookingCreator, type: :service do
       end
     end
   end
+
+  describe "with co-hosts" do
+    let(:co_host) { users(:two) }
+    let(:booking_params) do
+      {
+        datetime: "2026-07-28T10:00:00",
+        timezone: "Europe/Madrid",
+        first_name: "Ana",
+        last_name: "Lopez",
+        email: "ana@example.com"
+      }
+    end
+
+    before do
+      workspace.calendar_connections.create!(
+        user: user, email: "host@gmail.com", refresh_token: "rt", access_token: "at", expires_at: 1.hour.from_now
+      )
+      workspace.calendar_connections.create!(
+        user: co_host, email: "Co@Gmail.com", refresh_token: "rt", access_token: "at", expires_at: 1.hour.from_now
+      )
+      booking_page.update!(co_host_ids: [co_host.id])
+    end
+
+    def create_booking
+      described_class.call(
+        booking_page: booking_page.reload, event_type: event_type, params: booking_params, request: request, client: client
+      )
+    end
+
+    it "adds every co-host to the Google event attendees" do
+      create_booking
+
+      expect(client).to have_received(:create_event).with(
+        hash_including(
+          event: hash_including(
+            attendees: [{email: "ana@example.com"}, {email: "host@gmail.com"}, {email: "co@gmail.com"}]
+          )
+        )
+      )
+    end
+
+    it "falls back to the co-host account email when they have no calendar email" do
+      workspace.calendar_connections.find_by!(user: co_host).update!(email: nil)
+
+      create_booking
+
+      expect(client).to have_received(:create_event).with(
+        hash_including(event: hash_including(attendees: include({email: co_host.email_address})))
+      )
+    end
+
+    it "notifies the host and each co-host in the app" do
+      expect { create_booking }
+        .to change { user.notifications.where(kind: "booking").count }.by(1)
+        .and change { co_host.notifications.where(kind: "booking").count }.by(1)
+    end
+
+    it "emails each participant who enabled the email channel" do
+      memberships(:one_one).update!(alert_in_app: false, alert_email: true)
+      memberships(:one_member).update!(alert_in_app: false, alert_email: true)
+
+      expect { create_booking }
+        .to have_enqueued_mail(BookingMailer, :host_notification).with(booking: kind_of(Booking), host: user)
+        .and have_enqueued_mail(BookingMailer, :host_notification).with(booking: kind_of(Booking), host: co_host)
+    end
+
+    it "respects each participant's own alert preferences" do
+      memberships(:one_member).update!(alert_in_app: false, alert_email: false)
+
+      expect { create_booking }
+        .to change { co_host.notifications.count }.by(0)
+        .and change { user.notifications.where(kind: "booking").count }.by(1)
+    end
+  end
 end

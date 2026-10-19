@@ -4,16 +4,16 @@ const GRIP_ICON = `<svg class="size-3.5 pointer-events-none" viewBox="0 0 16 16"
 
 export default class extends Controller {
   static targets = [
-    "hostSelect", "calendarList", "calendarHint", "calendarError",
+    "calendarList", "calendarHint", "calendarError",
     "calendarRow", "calendarIdsInputs", "eventCalendarBadge",
     "crmAssociationSelect", "dealOptions"
   ]
   static values = {
-    calendarsUrl: String,
     selectedIds: Array,
     calendars: Array,
     calendarsError: String,
     hostConnected: Boolean,
+    eventCalendar: { type: Boolean, default: true },
     i18n: Object
   }
 
@@ -40,38 +40,6 @@ export default class extends Controller {
 
   crmAssociationChanged() {
     this.dealOptionsTarget.classList.toggle("hidden", this.crmAssociationSelectTarget.value !== "deal")
-  }
-
-  hostChanged() {
-    const hostId = this.hostSelectTarget.value
-    if (!hostId) return
-
-    this.calendarListTarget.innerHTML = `<p class="text-sm text-ink-faint">${this.escape(this.t("loading_calendars"))}</p>`
-    this.clearCalendarIdsInputs()
-    this.hideError()
-
-    fetch(`${this.calendarsUrlValue}?host_id=${encodeURIComponent(hostId)}`, {
-      headers: { Accept: "application/json" }
-    })
-      .then((response) => response.json().then((body) => ({ ok: response.ok, body })))
-      .then(({ ok, body }) => {
-        if (!ok) {
-          if (body.error === "insufficient_scopes") {
-            this.renderUnavailable("insufficient_scopes", body.message)
-          } else if (body.message) {
-            this.renderUnavailable(body.error || "load_failed", body.message, body.help_url)
-          } else {
-            this.renderUnavailable(body.error)
-          }
-          return
-        }
-
-        const selected = this.defaultSelectedIds(body.calendars)
-        this.renderCalendars(body.calendars, selected)
-      })
-      .catch(() => {
-        this.renderUnavailable("load_failed")
-      })
   }
 
   renderCalendars(calendars, selectedIds) {
@@ -220,7 +188,7 @@ export default class extends Controller {
   }
 
   updateEventCalendarBadges() {
-    let eventCalendarAssigned = false
+    let eventCalendarAssigned = !this.eventCalendarValue
 
     this.calendarRowTargets.forEach((row) => {
       const badge = row.querySelector("[data-booking-page-form-target='eventCalendarBadge']")
@@ -271,11 +239,6 @@ export default class extends Controller {
 
     this.calendarErrorTarget.innerHTML = `${this.escape(message)}${helpLink}`
     this.calendarErrorTarget.classList.remove("hidden")
-  }
-
-  defaultSelectedIds(calendars) {
-    const primary = calendars.find((calendar) => calendar.primary)
-    return [ primary?.id || calendars[0]?.id ].filter(Boolean)
   }
 
   clearCalendarIdsInputs() {

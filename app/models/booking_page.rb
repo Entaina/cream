@@ -8,12 +8,16 @@ class BookingPage < ApplicationRecord
   MAX_BOOKINGS_PER_PAGE_PER_HOUR = 100
   CRM_ASSOCIATIONS = %w[deal person none].freeze
 
+  Participant = Data.define(:user, :calendar_ids, :connection)
+
   belongs_to :workspace
   belongs_to :host, class_name: "User"
   belongs_to :pipeline, optional: true
 
   has_many :event_types, class_name: "BookingEventType", dependent: :destroy, inverse_of: :booking_page
   has_many :bookings, dependent: :destroy
+  has_many :members, class_name: "BookingPageMember", dependent: :destroy, inverse_of: :booking_page, autosave: true
+  has_many :co_hosts, through: :members, source: :user
 
   accepts_nested_attributes_for :event_types, allow_destroy: true, reject_if: :all_blank_event_type?
 
@@ -41,7 +45,63 @@ class BookingPage < ApplicationRecord
   end
 
   def ready_for_booking?
-    active? && calendar_connection&.operational? && calendar_ids.present? && event_types.visible.exists?
+    active? && calendar_connection&.operational? && calendar_ids.present? && event_types.visible.exists? &&
+      co_hosts_ready?
+  end
+
+  # Host first, then every co-host. Each participant carries only their own
+  # selected calendars and Google connection.
+  def participants
+    [
+      Participant.new(user: host, calendar_ids: Array(calendar_ids), connection: calendar_connection),
+      *co_host_participants
+    ]
+  end
+
+  def co_host_participants
+    members.map do |member|
+      Participant.new(user: member.user, calendar_ids: Array(member.calendar_ids), connection: member.calendar_connection)
+    end
+  end
+
+  # A co-host without calendars or without an operational Google connection
+  # has no free slots, so the page cannot offer any.
+  def co_hosts_ready?
+    co_host_participants.all? { |participant| participant.calendar_ids.present? && participant.connection&.operational? }
+  end
+
+  def participant?(user)
+    return false if user.nil?
+
+    host_id == user.id || members.any? { |member| member.user_id == user.id }
+  end
+
+  def calendar_ids_for(user)
+    return Array(calendar_ids) if user.id == host_id
+
+    Array(members.find { |member| member.user_id == user.id }&.calendar_ids)
+  end
+
+  def assign_calendar_ids_for(user, ids)
+    ids = Array(ids).map(&:to_s).reject(&:blank?)
+    if user.id == host_id
+      self.calendar_ids = ids
+    else
+      members.find { |member| member.user_id == user.id }&.calendar_ids = ids
+    end
+  end
+
+  # Assigns the attributes and the acting user's own calendars and saves
+  # everything atomically, so co-host changes are rolled back on failure.
+  def update_as(user, attributes, calendar_ids: nil)
+    saved = false
+    transaction do
+      assign_attributes(attributes)
+      assign_calendar_ids_for(user, calendar_ids) if !calendar_ids.nil? && participant?(user)
+      saved = save
+      raise ActiveRecord::Rollback unless saved
+    end
+    saved
   end
 
   def event_calendar_id
