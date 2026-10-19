@@ -4,7 +4,7 @@
 
 Cream es un CRM por **workspaces** para gestionar **personas**, **empresas** y **deals** (oportunidades), con notas, tareas, listas y un historial de actividad compartido en el equipo.
 
-> **Última revisión:** 2026-10-16 (asociación CRM opcional en reservas)
+> **Última revisión:** 2026-10-19 (solo el anfitrión edita su página y ve sus reservas)
 > Este documento describe la funcionalidad **visible para el usuario**. Las funcionalidades desactivadas aparecen al final en «Próximamente».
 
 ---
@@ -1290,6 +1290,8 @@ Si cambian los permisos en Google o dejan de cargarse tus calendarios, entra en 
 ### Configurar una página pública
 
 Toda la configuración se hace desde **Reservas** (no hace falta usar seeds ni datos precargados).
+
+Cualquier miembro ve las páginas en el listado, con su URL pública. Solo el **anfitrión** de cada página puede editarla o eliminarla. En **Reservas recibidas** cada persona ve y puede cancelar únicamente las reservas de las páginas de las que es anfitrión.
 
 **Página pública**
 

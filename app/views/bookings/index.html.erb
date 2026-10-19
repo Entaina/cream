@@ -19,7 +19,7 @@
           <%= badge t("booking.bookings.index.status.cancelled"), color: "chicago" %>
         <% end %>
         <div class="ml-auto flex gap-2">
-          <% if booking.status == "confirmed" && booking.starts_at > Time.current %>
+          <% if policy(booking).cancel? && booking.status == "confirmed" && booking.starts_at > Time.current %>
             <%= button_to t("booking.bookings.index.cancel"),
                   cancel_booking_path(booking),
                   method: :patch,
