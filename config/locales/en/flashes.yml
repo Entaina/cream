@@ -167,6 +167,7 @@ en:
     offer_versions:
       created: Version %{number} added.
       last_version: The last version can't be removed; remove the offer instead.
+      published: Version %{number} is now visible to the client.
       removed: Version %{number} removed.
     deal_portal_invite_links:
       ready: Portal invitation link is ready to copy.

@@ -6,7 +6,7 @@ class OfferVersionsController < ApplicationController
   skip_after_action :verify_policy_scoped
   before_action :set_offer
   before_action :authorize_view, only: :show
-  before_action :authorize_edit, only: %i[new create]
+  before_action :authorize_edit, only: %i[new create publish]
   before_action :authorize_destroy, only: :destroy
 
   def new
@@ -25,6 +25,13 @@ class OfferVersionsController < ApplicationController
   # Preview of one specific version, meant to be opened in its own browser tab.
   def show
     render_offer_version(@offer.versions.find(params[:id]))
+  end
+
+  # Makes a draft version visible to clients. Newer drafts stay drafts.
+  def publish
+    version = @offer.versions.find(params[:id])
+    version.publish!
+    redirect_to deal_path(@deal, tab: "offers"), notice: t("flashes.offer_versions.published", number: version.number), status: :see_other
   end
 
   # The last remaining version can't be removed: delete the offer instead.

@@ -46,6 +46,15 @@ RSpec.describe "Api::V1::DealOffers", type: :request do
     expect(deal.offers.last.current_version.html_body).to eq("<h1>Hola</h1>")
   end
 
+  it "creates the uploaded version as a draft that clients cannot see" do
+    upload_offer(deal, {name: "Oferta ACME", html_body: "<p>v1</p>"})
+
+    expect(response.parsed_body["version"]).to include("draft" => true, "published_at" => nil)
+    offer = deal.offers.last
+    expect(offer.current_version).to be_draft
+    expect(offer.client_version).to be_nil
+  end
+
   it "adds a new version when an offer with that name already exists" do
     offer = create_offer!(name: "Oferta ACME")
 

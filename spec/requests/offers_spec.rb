@@ -153,6 +153,70 @@ RSpec.describe "Deal offers", type: :request do
     end
   end
 
+  describe "draft and publishing" do
+    it "creates offers and new versions as drafts" do
+      post deal_offers_path(deal), params: {offer: {name: "Borrador"}, offer_version: {html_body: "<p>v1</p>"}}
+      offer = deal.offers.find_by!(name: "Borrador")
+      expect(offer.current_version).to be_draft
+      expect(offer.client_version).to be_nil
+
+      post deal_offer_versions_path(deal, offer), params: {offer_version: {html_body: "<p>v2</p>"}}
+      expect(offer.reload.versions.pluck(:published_at)).to all(be_nil)
+    end
+
+    it "makes a draft visible without publishing the newer drafts" do
+      offer = create_offer!
+      v1 = offer.current_version
+      v2 = offer.versions.create!(user: member, html_body: "<p>v2</p>")
+      v3 = offer.versions.create!(user: member, html_body: "<p>v3</p>")
+
+      patch publish_deal_offer_version_path(deal, offer, v2)
+
+      expect(response).to redirect_to(deal_path(deal, tab: "offers"))
+      expect(v2.reload).to be_published
+      expect(v1.reload).to be_draft
+      expect(v3.reload).to be_draft
+      expect(offer.client_version).to eq(v2)
+      expect(offer.current_version).to eq(v3)
+    end
+
+    it "keeps the original publication time when publishing again" do
+      offer = create_offer!
+      version = offer.current_version
+      patch publish_deal_offer_version_path(deal, offer, version)
+      published_at = version.reload.published_at
+
+      travel_to(1.hour.from_now) { patch publish_deal_offer_version_path(deal, offer, version) }
+
+      expect(version.reload.published_at).to eq(published_at)
+    end
+
+    it "shows the draft state and the publish button in the offers tab" do
+      allow(CreamFeatures).to receive(:enabled?).and_call_original
+      allow(CreamFeatures).to receive(:enabled?).with(:client_portal).and_return(true)
+      offer = create_offer!
+
+      get deal_path(deal, tab: "offers")
+      expect(response.body).to include(I18n.t("offers.draft"))
+      expect(response.body).to include(I18n.t("offers.not_visible"))
+      expect(response.body).to include(publish_deal_offer_version_path(deal, offer, offer.current_version))
+
+      offer.current_version.publish!
+      get deal_path(deal, tab: "offers")
+      expect(response.body).to include(I18n.t("offers.client_sees", number: 1))
+      expect(response.body).not_to include(publish_deal_offer_version_path(deal, offer, offer.current_version))
+    end
+
+    it "does not let a user who cannot edit the deal publish" do
+      offer = create_offer!
+      sign_in_as(users(:outsider))
+
+      patch publish_deal_offer_version_path(deal, offer, offer.current_version)
+
+      expect(offer.current_version).to be_draft
+    end
+  end
+
   describe "preview" do
     it "previews pasted HTML sandboxed so it cannot run scripts" do
       offer = create_offer!(html: "<h1>Hola</h1><script>alert(1)</script>")

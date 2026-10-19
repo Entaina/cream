@@ -1044,7 +1044,8 @@ module CreamMcp
                  "and relative assets. If the deal already has that offer, the content is added " \
                  "as its next numbered version; otherwise a new offer is created (version 1). The target offer is " \
                  "offer_id, else the offer matching name, else the deal's only offer (error if it has several and " \
-                 "none is chosen). Name defaults to the file name when creating.",
+                 "none is chosen). Name defaults to the file name when creating. The version is created as a draft: " \
+                 "clients cannot see it until a user makes it visible in the CRM.",
     input_schema: {type: "object",
                    properties: {deal_id: {type: "integer"},
                                 name: {type: "string", description: "Offer name; matches an existing offer case-insensitively"},

@@ -367,6 +367,14 @@ components:
             comment:
               type: string
               nullable: true
+            draft:
+              type: boolean
+              description: Always true on upload. Clients can't see the version until a user makes it visible in the CRM.
+            published_at:
+              type: string
+              format: date-time
+              nullable: true
+              description: null while the version is a draft.
             content_type:
               type: string
             filename:
@@ -2115,6 +2123,8 @@ paths:
         when neither is sent — the deal's only offer. If the deal has several offers and none is
         chosen the request fails with 422. A `name` that matches no offer creates a new one;
         when creating, the name defaults to the file name. Limit: 10 MB per file.
+        The uploaded version is created as a **draft**: the client portal and shared links keep
+        showing the latest visible version until a user makes the draft visible in the CRM.
         Requires permission to edit the deal.
       parameters:
         - $ref: "#/components/parameters/WorkspaceId"

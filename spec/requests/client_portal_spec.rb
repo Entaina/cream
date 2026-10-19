@@ -12,7 +12,7 @@ RSpec.describe "Client portal", type: :request do
   let(:person) { create_person!(workspace, email: "portal@example.com") }
   let!(:offer) do
     o = deal.offers.create!(workspace: workspace, user: users(:one), name: "Propuesta")
-    o.versions.create!(user: users(:one), html_body: "<p>Oferta</p>")
+    o.versions.create!(user: users(:one), html_body: "<p>Oferta</p>", published_at: Time.current)
     o
   end
 
@@ -149,6 +149,35 @@ RSpec.describe "Client portal", type: :request do
       expect(response.body).to include("Oferta")
     end
 
+    it "keeps showing the latest published version while a newer draft exists" do
+      offer.versions.create!(user: users(:one), html_body: "<p>Borrador</p>")
+      sign_in_via_portal!
+
+      get client_portal_offer_path(workspace_slug: workspace.slug, id: offer.id)
+      expect(response.body).to include("Oferta")
+      expect(response.body).not_to include("Borrador")
+      expect(OfferView.last.offer_version.number).to eq(1)
+
+      offer.versions.find_by!(number: 2).publish!
+      get client_portal_offer_path(workspace_slug: workspace.slug, id: offer.id)
+      expect(response.body).to include("Borrador")
+    end
+
+    it "hides offers that only have drafts, in the list and by direct link" do
+      draft_offer = deal.offers.create!(workspace: workspace, user: users(:one), name: "Solo borrador")
+      draft_offer.versions.create!(user: users(:one), html_body: "<p>x</p>")
+      sign_in_via_portal!
+
+      get client_portal_offers_path(workspace_slug: workspace.slug)
+      expect(response.body).to include("Propuesta")
+      expect(response.body).not_to include("Solo borrador")
+
+      expect {
+        get client_portal_offer_path(workspace_slug: workspace.slug, id: draft_offer.id)
+      }.not_to change(OfferView, :count)
+      expect(response).to have_http_status(:not_found)
+    end
+
     it "sends no-store, same-origin and noindex headers" do
       sign_in_via_portal!
       get client_portal_offer_path(workspace_slug: workspace.slug, id: offer.id)
@@ -161,7 +190,7 @@ RSpec.describe "Client portal", type: :request do
     it "returns not found for offers outside the contact scope, without recording a view" do
       other_deal = create_deal!(workspace, pipeline: pipeline)
       other_offer = other_deal.offers.create!(workspace: workspace, user: users(:one), name: "Otra")
-      other_offer.versions.create!(user: users(:one), html_body: "<p>x</p>")
+      other_offer.versions.create!(user: users(:one), html_body: "<p>x</p>", published_at: Time.current)
 
       sign_in_via_portal!
       expect {

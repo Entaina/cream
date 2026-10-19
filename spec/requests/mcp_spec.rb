@@ -539,7 +539,7 @@ RSpec.describe "Mcp", type: :request do
                                              content_type: "application/pdf"})
 
         expect(first["created"]).to include("name" => "propuesta", "offer_created" => true)
-        expect(first["created"]["version"]).to include("number" => 1, "filename" => "propuesta.pdf")
+        expect(first["created"]["version"]).to include("number" => 1, "filename" => "propuesta.pdf", "draft" => true)
         expect(first.dig("created", "deal", "id")).to eq(deal.id)
 
         second = call_tool("add_deal_offer", {deal_id: deal.id, html_body: "<p>v2</p>", comment: "Ajuste de precio"})

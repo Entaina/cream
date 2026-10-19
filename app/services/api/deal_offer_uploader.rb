@@ -23,6 +23,8 @@ module Api
           id: version.id,
           number: version.number,
           comment: version.comment,
+          draft: version.draft?,
+          published_at: version.published_at&.iso8601,
           content_type: version.file.attached? ? version.file.content_type : "text/html",
           filename: version.file.attached? ? version.file.filename.to_s : nil,
           byte_size: version.file.attached? ? version.file.byte_size : version.html_body.to_s.bytesize,

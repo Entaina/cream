@@ -24,7 +24,7 @@ module Public
     end
 
     def show
-      version = @offer.current_version
+      version = @offer.client_version
       return head :not_found unless version
 
       person = client_portal_person_for_deal(@offer.deal)

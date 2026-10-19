@@ -2,6 +2,8 @@
 en:
   offers:
     add: Add offer
+    client_sees: The client sees version %{number}
+    draft: Draft
     empty: This deal has no offers yet.
     form:
       comment: Version note
@@ -14,6 +16,7 @@ en:
       name: Name
       name_hint: Optional when attaching a file; the file name is used.
       name_placeholder: Offer for ACME, 2026
+      draft_hint: The version stays a draft until you make it visible to the client.
       or: or paste the HTML
       submit: Add offer
     kind:
@@ -25,10 +28,14 @@ en:
       title: New offer
     new_version:
       action: New version
-      hint: This will be saved as version %{number} and become the current one. Previous versions are kept.
+      hint: This will be saved as draft version %{number}. The client keeps seeing the latest visible version until you make this one visible. Previous versions are kept.
       submit: Add version
       title: New version of "%{name}"
+    not_visible: Not yet visible to the client
     preview: Preview
+    publish: Make visible
+    publish_confirm: Make version %{number} visible to the client?
+    visible: Visible to the client
     remove: Remove offer
     remove_confirm: Remove the offer "%{name}" and all its versions?
     remove_version: Remove version

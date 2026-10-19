@@ -19,12 +19,18 @@ class Offer < ApplicationRecord
     person_ids = workspace.people.with_email(normalized).select(:id)
     where(workspace_id: workspace.id)
       .where(deal_id: DealContact.with_portal_access.where(person_id: person_ids).select(:deal_id))
-      .where(id: OfferVersion.select(:offer_id))
+      .where(id: OfferVersion.published.select(:offer_id))
   }
   validate :deal_in_workspace
 
+  # Latest version, draft or not: what the sales team previews in the CRM.
   def current_version
     versions.reorder(number: :desc).first
+  end
+
+  # Latest published version: the only one clients (portal, shared links) can see.
+  def client_version
+    versions.published.reorder(number: :desc).first
   end
 
   private

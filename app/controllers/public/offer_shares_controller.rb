@@ -51,7 +51,7 @@ module Public
       return render_access_expired unless grant
 
       offer = @share_link.offer
-      version = offer.current_version
+      version = offer.client_version
       person = ClientPortal::SharedAccess.ensure_contact!(
         deal: offer.deal,
         email: grant.email,
@@ -75,7 +75,7 @@ module Public
     # The link dies with the sharer's place on the deal, and with an offer that has nothing to show.
     def share_link_usable?
       offer = @share_link.offer
-      offer.current_version.present? &&
+      offer.client_version.present? &&
         offer.deal.deal_contacts.exists?(person_id: @share_link.person_id)
     end
 

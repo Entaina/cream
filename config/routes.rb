@@ -122,7 +122,9 @@ Rails.application.routes.draw do
     resource :portal_invite_link, controller: :deal_portal_invite_links, only: %i[create destroy]
     resources :line_items, controller: :deal_products, only: %i[create update destroy]
     resources :offers, only: %i[new create show destroy] do
-      resources :versions, controller: :offer_versions, only: %i[new create show destroy]
+      resources :versions, controller: :offer_versions, only: %i[new create show destroy] do
+        member { patch :publish }
+      end
       resources :share_links, controller: :offer_share_links, only: :destroy
     end
     resources :versions, controller: :deal_versions, only: %i[index show]

@@ -10,7 +10,7 @@ RSpec.describe "Offer share link revocation", type: :request do
   let(:person) { create_person!(workspace, email: "sharer@example.com") }
   let!(:offer) do
     o = deal.offers.create!(workspace: workspace, user: member, name: "Propuesta")
-    o.versions.create!(user: member, html_body: "<p>x</p>")
+    o.versions.create!(user: member, html_body: "<p>x</p>", published_at: Time.current)
     o
   end
   let!(:share_link) { OfferShareLink.create!(workspace: workspace, offer: offer, person: person) }

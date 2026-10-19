@@ -27,6 +27,7 @@
       <% offers.each do |offer| %>
         <% versions = offer.versions.sort_by(&:number).reverse %>
         <% current = versions.first %>
+        <% client_version = versions.find(&:published?) %>
         <% offer_views = offer.views.sort_by(&:viewed_at).reverse %>
         <% active_share_links = offer.share_links.select(&:active?) %>
         <li class="px-4 py-3">
@@ -37,6 +38,11 @@
                 <%= t("offers.version_label", number: current.number) %> · <%= current.user.name %> · <%= l(current.created_at.to_date, format: :short) %>
                 <% if current.file.attached? %> · <%= number_to_human_size(current.file.byte_size) %><% end %>
               </p>
+              <% if client_portal_enabled %>
+                <p class="text-xs text-ink-soft mt-0.5">
+                  <%= client_version ? t("offers.client_sees", number: client_version.number) : t("offers.not_visible") %>
+                </p>
+              <% end %>
               <% if client_portal_enabled && offer_views.any? %>
                 <p class="text-xs text-ink-soft mt-0.5">
                   <%= t("offers.views.summary", count: offer_views.size) %>
@@ -46,8 +52,17 @@
             </div>
             <% current_kind = current.pdf? ? [:pdf, "red"] : (current.zip? ? [:zip, "copperfield"] : [:html, "hoki"]) %>
             <%= badge(t("offers.kind.#{current_kind.first}"), color: current_kind.last) %>
+            <% if client_portal_enabled %>
+              <%= current.published? ? badge(t("offers.visible"), color: "green") : badge(t("offers.draft"), color: "golden") %>
+            <% end %>
             <%= link_to deal_offer_path(deal, offer), target: "_blank", rel: "noopener", class: "btn-secondary" do %>
               <%= icon :external, classes: "size-3.5" %> <%= t("offers.preview") %>
+            <% end %>
+            <% if can_edit && current.draft? %>
+              <%= button_to publish_deal_offer_version_path(deal, offer, current), method: :patch, class: "btn-secondary",
+                    form: { data: { turbo_confirm: t("offers.publish_confirm", number: current.number) } } do %>
+                <%= t("offers.publish") %>
+              <% end %>
             <% end %>
             <% if can_edit %>
               <%= link_to new_deal_offer_version_path(deal, offer), class: "btn-ghost" do %>
@@ -117,8 +132,17 @@
                     </span>
                     <% version_kind = version.pdf? ? [:pdf, "red"] : (version.zip? ? [:zip, "copperfield"] : [:html, "hoki"]) %>
                     <%= badge(t("offers.kind.#{version_kind.first}"), color: version_kind.last) %>
+                    <% if client_portal_enabled %>
+                      <%= version.published? ? badge(t("offers.visible"), color: "green") : badge(t("offers.draft"), color: "golden") %>
+                    <% end %>
                     <%= link_to deal_offer_version_path(deal, offer, version), target: "_blank", rel: "noopener", class: "btn-ghost" do %>
                       <%= icon :external, classes: "size-3.5" %> <%= t("offers.preview") %>
+                    <% end %>
+                    <% if can_edit && version.draft? %>
+                      <%= button_to publish_deal_offer_version_path(deal, offer, version), method: :patch, class: "btn-secondary",
+                            form: { data: { turbo_confirm: t("offers.publish_confirm", number: version.number) } } do %>
+                        <%= t("offers.publish") %>
+                      <% end %>
                     <% end %>
                     <% if can_edit %>
                       <%= button_to deal_offer_version_path(deal, offer, version), method: :delete, class: "text-ink-faint hover:text-danger p-1",

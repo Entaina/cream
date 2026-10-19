@@ -2,6 +2,8 @@
 es:
   offers:
     add: Añadir oferta
+    client_sees: El cliente ve la versión %{number}
+    draft: Borrador
     empty: Esta oportunidad todavía no tiene ofertas.
     form:
       comment: Nota de la versión
@@ -14,6 +16,7 @@ es:
       name: Nombre
       name_hint: Opcional si adjuntas un archivo; se usará el nombre del archivo.
       name_placeholder: Oferta para ACME, 2026
+      draft_hint: La versión queda en borrador hasta que la hagas visible para el cliente.
       or: o pega el HTML
       submit: Añadir oferta
     kind:
@@ -25,10 +28,14 @@ es:
       title: Nueva oferta
     new_version:
       action: Nueva versión
-      hint: Se guardará como versión %{number} y pasará a ser la vigente. Las versiones anteriores se conservan.
+      hint: Se guardará como versión %{number} en borrador. El cliente seguirá viendo la última versión visible hasta que hagas visible esta. Las versiones anteriores se conservan.
       submit: Añadir versión
       title: Nueva versión de «%{name}»
+    not_visible: Aún no visible para el cliente
     preview: Previsualizar
+    publish: Hacer visible
+    publish_confirm: "¿Hacer visible la versión %{number} para el cliente?"
+    visible: Visible para el cliente
     remove: Eliminar oferta
     remove_confirm: "¿Eliminar la oferta «%{name}» y todas sus versiones?"
     remove_version: Eliminar versión

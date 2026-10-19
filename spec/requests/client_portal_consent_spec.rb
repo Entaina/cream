@@ -11,7 +11,7 @@ RSpec.describe "Client portal consent", type: :request do
   let(:person) { create_person!(workspace, email: "portal@example.com") }
   let!(:offer) do
     o = deal.offers.create!(workspace: workspace, user: users(:one), name: "Propuesta")
-    o.versions.create!(user: users(:one), html_body: "<p>Oferta</p>")
+    o.versions.create!(user: users(:one), html_body: "<p>Oferta</p>", published_at: Time.current)
     o
   end
   let!(:newsletter) do

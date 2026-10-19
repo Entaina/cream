@@ -12,7 +12,7 @@ RSpec.describe "Public offer shares", type: :request do
   let(:sharer) { create_person!(workspace, email: "sharer@example.com") }
   let!(:offer) do
     o = deal.offers.create!(workspace: workspace, user: users(:one), name: "Propuesta")
-    o.versions.create!(user: users(:one), html_body: "<p>Compartida</p>")
+    o.versions.create!(user: users(:one), html_body: "<p>Compartida</p>", published_at: Time.current)
     o
   end
   let!(:share_link) do
@@ -39,6 +39,12 @@ RSpec.describe "Public offer shares", type: :request do
 
     it "returns not found when revoked" do
       share_link.revoke!
+      get public_offer_share_path(token: share_link.token)
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it "returns not found when the offer has no published version" do
+      offer.versions.update_all(published_at: nil)
       get public_offer_share_path(token: share_link.token)
       expect(response).to have_http_status(:not_found)
     end
@@ -110,6 +116,15 @@ RSpec.describe "Public offer shares", type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(OfferAccessGrant.last.used_at).to be_nil
+    end
+
+    it "renders the latest published version, ignoring newer drafts" do
+      offer.versions.create!(user: users(:one), html_body: "<p>Borrador</p>")
+
+      open_link(grant_token)
+      expect(response.body).to include("Compartida")
+      expect(response.body).not_to include("Borrador")
+      expect(OfferView.last.offer_version.number).to eq(1)
     end
 
     it "on POST creates person and marked deal contact, records the view and renders the offer" do

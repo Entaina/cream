@@ -22,6 +22,16 @@ class OfferVersion < ApplicationRecord
   validate :zip_entry_path_present
 
   scope :newest_first, -> { order(number: :desc) }
+  scope :published, -> { where.not(published_at: nil) }
+
+  def published? = published_at.present?
+
+  def draft? = !published?
+
+  # Makes the version visible to clients (portal and shared links). No-op when already published.
+  def publish!
+    update!(published_at: Time.current) if draft?
+  end
 
   def pdf?
     pending_file_content_type == "application/pdf"

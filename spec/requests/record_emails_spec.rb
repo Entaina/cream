@@ -124,7 +124,8 @@ RSpec.describe "Record emails", type: :request do
         }.to change(EmailMessage, :count).by(1).and have_enqueued_job(EmailFollowUpJob)
 
         message = EmailMessage.order(:id).last
-        expect(message.follow_up_at).to be_within(1.minute).of(7.days.from_now)
+        expected_follow_up = Time.use_zone(member.effective_time_zone(workspace)) { 7.days.from_now }
+        expect(message.follow_up_at).to be_within(1.minute).of(expected_follow_up)
         expect(message).to be_awaiting_follow_up
       end
 
