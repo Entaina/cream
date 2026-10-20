@@ -4,7 +4,7 @@
 
 Cream is a **workspace**-based CRM for managing **people**, **companies** and **deals** (opportunities), with notes, tasks, lists and an activity history shared across the team.
 
-> **Last revision:** 2026-10-19 (draft mode for proposal versions)
+> **Last revision:** 2026-10-20 (commercial data in the deal “At a glance” panel)
 > This document describes the functionality **visible to the user**. Disabled features are listed at the end under "Coming soon".
 
 ---
@@ -300,7 +300,7 @@ When merging, the contacts, deals, notes, tasks, emails and timeline activity of
 
 ### Deals
 
-- They represent sales opportunities with **value**, **currency**, **stage**, **probability**, **expected close date**, optional **execution duration** (days), optional **execution start and end dates**, optional **payment method** (*Cash* or *Deferred*), optional **payment date** and optional **invoice number** (*Nº factura*). When the payment method is **Cash**, the payment date is set to the **execution start date** on save. You enter the exact amount (including cents) and it is shown the same way on the **record page**, **table** and **board**; whole euros are shown without trailing zeros.
+- They represent sales opportunities with **value**, **currency**, **stage**, **probability**, **expected close date**, optional **execution duration** (days), optional **execution start and end dates**, optional **payment method** (*Cash* or *Deferred*), optional **payment date** and optional **invoice number** (*Nº factura*). When the payment method is **Cash**, the payment date is set to the **execution start date** on save. You enter the exact amount (including cents) and it is shown the same way on the **record page**, **table** and **board**; whole euros are shown without trailing zeros. The **At a glance** panel on the record's **Activity** tab lists all these data (plus stage, company and owner); empty ones show “—”.
 - They are linked to a **company** and an **owner**; **contacts** are optional.
 - They can include **product lines** (catalog products with quantity and price).
 - When **creating a deal** (`New deal`):

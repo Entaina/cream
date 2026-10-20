@@ -557,6 +557,7 @@ es:
       company: Empresa
       contacts: Contactos
       created: Creado
+      currency: Moneda
       custom_fields: Campos personalizados
       domain: Dominio
       email: Email

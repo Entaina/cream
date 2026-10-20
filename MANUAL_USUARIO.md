@@ -4,7 +4,7 @@
 
 Cream es un CRM por **workspaces** para gestionar **personas**, **empresas** y **deals** (oportunidades), con notas, tareas, listas y un historial de actividad compartido en el equipo.
 
-> **Última revisión:** 2026-10-19 (modo borrador en las versiones de las propuestas)
+> **Última revisión:** 2026-10-20 (datos comerciales en «De un vistazo» del deal)
 > Este documento describe la funcionalidad **visible para el usuario**. Las funcionalidades desactivadas aparecen al final en «Próximamente».
 
 ---
@@ -300,7 +300,7 @@ Al fusionar, los contactos, deals, notas, tareas, emails y actividad del timelin
 
 ### Deals
 
-- Representan oportunidades de venta con **valor**, **moneda**, **etapa**, **probabilidad**, **fecha de cierre prevista**, **duración de la ejecución** (días, opcional), **inicio y fin de ejecución** (fechas opcionales), **forma de pago** (*Al contado* o *Aplazado*, opcional), **fecha de pago** (opcional) y, opcionalmente, **número de factura** (*Nº factura*). Si la forma de pago es **Al contado**, la fecha de pago coincide con la **fecha de inicio de ejecución** al guardar. El valor se escribe con la cifra exacta (incluido céntimos) y se muestra igual en la **ficha**, la **tabla** y el **tablero**; si no hay céntimos, no se añaden ceros.
+- Representan oportunidades de venta con **valor**, **moneda**, **etapa**, **probabilidad**, **fecha de cierre prevista**, **duración de la ejecución** (días, opcional), **inicio y fin de ejecución** (fechas opcionales), **forma de pago** (*Al contado* o *Aplazado*, opcional), **fecha de pago** (opcional) y, opcionalmente, **número de factura** (*Nº factura*). Si la forma de pago es **Al contado**, la fecha de pago coincide con la **fecha de inicio de ejecución** al guardar. El valor se escribe con la cifra exacta (incluido céntimos) y se muestra igual en la **ficha**, la **tabla** y el **tablero**; si no hay céntimos, no se añaden ceros. El panel **De un vistazo** de la pestaña **Actividad** de la ficha muestra todos estos datos (además de etapa, empresa y propietario); los que estén vacíos aparecen como «—».
 - Se asocian a una **empresa** y un **propietario**; los **contactos** son opcionales.
 - Pueden incluir **líneas de producto** (productos del catálogo con cantidad y precio).
 - Al **crear un deal** (`New deal`):

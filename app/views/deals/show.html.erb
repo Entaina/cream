@@ -92,7 +92,16 @@
             <h2 class="record-section-title mb-4"><%= t("records.at_a_glance") %></h2>
             <dl class="record-context-list">
               <div><dt><%= t("records.fields.stage") %></dt><dd><%= render DealStageComponent.new(deal: @deal) %></dd></div>
-              <div><dt><%= t("records.fields.probability") %></dt><dd><%= deal_field_display(@deal, :probability) %></dd></div>
+              <div><dt><%= t("records.fields.value") %></dt><dd><%= deal_field_display(@deal, :value).presence || t("shared.empty_value") %></dd></div>
+              <div><dt><%= t("records.fields.currency") %></dt><dd><%= @deal.currency.presence || t("shared.empty_value") %></dd></div>
+              <div><dt><%= t("records.fields.invoice_number") %></dt><dd><%= deal_field_display(@deal, :invoice_number).presence || t("shared.empty_value") %></dd></div>
+              <div><dt><%= t("records.fields.probability") %></dt><dd><%= deal_field_display(@deal, :probability).presence || t("shared.empty_value") %></dd></div>
+              <div><dt><%= t("records.fields.close_date") %></dt><dd><%= deal_field_display(@deal, :expected_close_date).presence || t("shared.empty_value") %></dd></div>
+              <div><dt><%= t("records.fields.execution_duration") %></dt><dd><%= deal_field_display(@deal, :execution_duration_days).presence || t("shared.empty_value") %></dd></div>
+              <div><dt><%= t("records.fields.execution_starts_on") %></dt><dd><%= deal_field_display(@deal, :execution_starts_on).presence || t("shared.empty_value") %></dd></div>
+              <div><dt><%= t("records.fields.execution_ends_on") %></dt><dd><%= deal_field_display(@deal, :execution_ends_on).presence || t("shared.empty_value") %></dd></div>
+              <div><dt><%= t("records.fields.payment_method") %></dt><dd><%= deal_field_display(@deal, :payment_method).presence || t("shared.empty_value") %></dd></div>
+              <div><dt><%= t("records.fields.payment_on") %></dt><dd><%= deal_field_display(@deal, :payment_on).presence || t("shared.empty_value") %></dd></div>
               <div><dt><%= t("records.fields.company") %></dt><dd><%= @deal.company&.name || t("shared.empty_value") %></dd></div>
               <div><dt><%= t("records.fields.owner") %></dt><dd><%= @deal.owner&.name || t("shared.tasks.unassigned") %></dd></div>
             </dl>

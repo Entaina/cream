@@ -552,6 +552,7 @@ en:
       company: Company
       contacts: Contacts
       created: Created
+      currency: Currency
       custom_fields: Custom fields
       domain: Domain
       email: Email

@@ -26,6 +26,24 @@ RSpec.describe "Deal workspace", type: :request do
     expect(document.at_css("#deal_stage_stepper")).to be_present
   end
 
+  it "lists the commercial data in the at-a-glance panel" do
+    glance_deal = create_deal!(workspace, pipeline: pipeline, name: "Glance deal", value: 1200, currency: "EUR",
+      invoice_number: "FAC-2026-001", probability: 40, expected_close_date: Date.new(2026, 10, 5),
+      execution_duration_days: 90, execution_starts_on: Date.new(2026, 11, 1),
+      execution_ends_on: Date.new(2027, 1, 30), payment_method: "deferred", payment_on: Date.new(2027, 2, 15))
+
+    get deal_path(glance_deal)
+
+    glance = document.at_css("#record-panel-activity .record-context-list").text
+    labels = %w[value currency invoice_number probability close_date execution_duration execution_starts_on
+      execution_ends_on payment_method payment_on].map { |key| I18n.t("records.fields.#{key}") }
+    expect(glance).to include(*labels)
+    expect(glance).to include("1.200", "EUR", "FAC-2026-001", "40%", I18n.t("deals.payment_methods.deferred"))
+
+    get deal_path(deal)
+    expect(document.at_css("#record-panel-activity .record-context-list").text).to include(I18n.t("shared.empty_value"))
+  end
+
   it "shows pending tasks by urgency and keeps completed tasks collapsed" do
     future = deal.tasks.create!(workspace: workspace, user: user, title: "Future task", due_on: Date.current + 4)
     overdue = deal.tasks.create!(workspace: workspace, user: user, title: "Overdue task", due_on: Date.current - 2)
