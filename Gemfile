@@ -71,7 +71,7 @@ group :test do
   gem "selenium-webdriver"
 end
 
-gem "herb", "~> 0.11.0", group: :development
+gem "herb", "~> 0.11.1", group: :development
 
 gem "mcp", "~> 1.6"
 gem "doorkeeper", "~> 5.9"
