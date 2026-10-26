@@ -164,7 +164,7 @@ Implication: a field only persists if it appears in the stored schema **and** pa
 
 **Deal behaviour**: reuse open deal in form pipeline; optional `pipeline_stage_id` advances without regressing; `resolve_pipeline(help_type:)` uses `pipeline_routes` JSON on the form (not template-specific code).
 
-When adding a new public form: Liquid page + optional partials in DB, new `LeadForm` row. Field names only need to match `FIELD_KEY_FORMAT`; no Ruby whitelist to update. Define select options inline with `choices:` in the template. See command `.claude/commands/nuevo-formulario-lead.md`.
+When adding a new public form: Liquid page + optional partials in DB, new `LeadForm` row. Field names only need to match `FIELD_KEY_FORMAT`; no Ruby whitelist to update. Define select options inline with `choices:` in the template.
 
 ## Marketing hub
 

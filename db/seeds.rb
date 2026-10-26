@@ -51,15 +51,15 @@ ActiveRecord::Base.transaction do
   end
 
   companies_data = [
-    {name: "Vercel", domain: "vercel.com", industry: "Developer Tools", employee_range: "201-500", location: "San Francisco, USA", annual_revenue: 120_000_000, description: "Frontend cloud platform. Creators of Next.js."},
-    {name: "Linear", domain: "linear.app", industry: "SaaS", employee_range: "51-200", location: "Remote", annual_revenue: 35_000_000, description: "Issue tracking tool teams actually love."},
-    {name: "Notion", domain: "notion.so", industry: "Productivity", employee_range: "501-1000", location: "San Francisco, USA", annual_revenue: 250_000_000, description: "All-in-one workspace for notes, docs and wikis."},
-    {name: "Factorial", domain: "factorialhr.com", industry: "HR Tech", employee_range: "501-1000", location: "Barcelona, Spain", annual_revenue: 80_000_000, description: "HR software for SMBs."},
-    {name: "Cabify", domain: "cabify.com", industry: "Mobility", employee_range: "1000+", location: "Madrid, Spain", annual_revenue: 600_000_000, description: "Ride-hailing across Spain and Latin America."},
-    {name: "Typeform", domain: "typeform.com", industry: "SaaS", employee_range: "201-500", location: "Barcelona, Spain", annual_revenue: 95_000_000, description: "People-friendly forms and surveys."},
-    {name: "Wallapop", domain: "wallapop.com", industry: "Marketplace", employee_range: "201-500", location: "Barcelona, Spain", annual_revenue: 70_000_000, description: "Second-hand marketplace."},
-    {name: "Stripe", domain: "stripe.com", industry: "Fintech", employee_range: "1000+", location: "Dublin, Ireland", annual_revenue: 1_000_000_000, description: "Payments infrastructure for the internet."},
-    {name: "StartupXYZ", domain: "startupxyz.io", industry: "SaaS", employee_range: "1-10", location: "Bilbao, Spain", annual_revenue: 500_000, description: "Early-stage startup."}
+    {name: "Nimbus Cloud", domain: "nimbuscloud.example", industry: "Developer Tools", employee_range: "201-500", location: "San Francisco, USA", annual_revenue: 120_000_000, description: "Frontend cloud platform for web teams."},
+    {name: "Trackwise", domain: "trackwise.example", industry: "SaaS", employee_range: "51-200", location: "Remote", annual_revenue: 35_000_000, description: "Issue tracking tool teams actually love."},
+    {name: "Pagecraft", domain: "pagecraft.example", industry: "Productivity", employee_range: "501-1000", location: "San Francisco, USA", annual_revenue: 250_000_000, description: "All-in-one workspace for notes, docs and wikis."},
+    {name: "Plantilla HR", domain: "plantillahr.example", industry: "HR Tech", employee_range: "501-1000", location: "Barcelona, Spain", annual_revenue: 80_000_000, description: "HR software for SMBs."},
+    {name: "Rutas", domain: "rutas.example", industry: "Mobility", employee_range: "1000+", location: "Madrid, Spain", annual_revenue: 600_000_000, description: "Ride-hailing across Spain and Latin America."},
+    {name: "Formulae", domain: "formulae.example", industry: "SaaS", employee_range: "201-500", location: "Barcelona, Spain", annual_revenue: 95_000_000, description: "People-friendly forms and surveys."},
+    {name: "Segunda Mano", domain: "segundamano.example", industry: "Marketplace", employee_range: "201-500", location: "Barcelona, Spain", annual_revenue: 70_000_000, description: "Second-hand marketplace."},
+    {name: "Paylane", domain: "paylane.example", industry: "Fintech", employee_range: "1000+", location: "Dublin, Ireland", annual_revenue: 1_000_000_000, description: "Payments infrastructure for the internet."},
+    {name: "StartupXYZ", domain: "startupxyz.example", industry: "SaaS", employee_range: "1-10", location: "Bilbao, Spain", annual_revenue: 500_000, description: "Early-stage startup."}
   ]
 
   companies = companies_data.map do |attrs|
@@ -67,18 +67,18 @@ ActiveRecord::Base.transaction do
   end
 
   people_data = [
-    {first_name: "Guillermo", last_name: "Rauch", email: "guillermo@vercel.com", job_title: "CEO", company: "Vercel", location: "San Francisco, USA", phone: "+1 415 555 0101"},
-    {first_name: "Karri", last_name: "Saarinen", email: "karri@linear.app", job_title: "CEO & Co-founder", company: "Linear", location: "Helsinki, Finland"},
-    {first_name: "Tuomas", last_name: "Artman", email: "tuomas@linear.app", job_title: "CTO", company: "Linear", location: "Zurich, Switzerland"},
-    {first_name: "Ivan", last_name: "Zhao", email: "ivan@notion.so", job_title: "CEO", company: "Notion", location: "San Francisco, USA"},
-    {first_name: "Jordi", last_name: "Romero", email: "jordi@factorialhr.com", job_title: "CEO", company: "Factorial", location: "Barcelona, Spain", phone: "+34 600 111 222"},
-    {first_name: "Bernat", last_name: "Farrero", email: "bernat@factorialhr.com", job_title: "CRO", company: "Factorial", location: "Barcelona, Spain"},
-    {first_name: "Juan", last_name: "de Antonio", email: "juan@cabify.com", job_title: "CEO", company: "Cabify", location: "Madrid, Spain"},
-    {first_name: "Laura", last_name: "Sanz", email: "laura.sanz@typeform.com", job_title: "VP Sales", company: "Typeform", location: "Barcelona, Spain", phone: "+34 655 333 444"},
-    {first_name: "Marc", last_name: "Vidal", email: "marc.vidal@wallapop.com", job_title: "Head of Partnerships", company: "Wallapop", location: "Barcelona, Spain"},
-    {first_name: "Patrick", last_name: "Collison", email: "patrick@stripe.com", job_title: "CEO", company: "Stripe", location: "San Francisco, USA"},
-    {first_name: "Sara", last_name: "Moreno", email: "sara.moreno@typeform.com", job_title: "Independent consultant", company: "Typeform", location: "Valencia, Spain"},
-    {first_name: "David", last_name: "García", email: "david@startupxyz.io", job_title: "Founder", company: "StartupXYZ", location: "Bilbao, Spain"}
+    {first_name: "Elena", last_name: "Ríos", email: "elena@nimbuscloud.example", job_title: "CEO", company: "Nimbus Cloud", location: "San Francisco, USA", phone: "+1 415 555 0101"},
+    {first_name: "Mikko", last_name: "Laine", email: "mikko@trackwise.example", job_title: "CEO & Co-founder", company: "Trackwise", location: "Helsinki, Finland"},
+    {first_name: "Lukas", last_name: "Weber", email: "lukas@trackwise.example", job_title: "CTO", company: "Trackwise", location: "Zurich, Switzerland"},
+    {first_name: "Grace", last_name: "Chen", email: "grace@pagecraft.example", job_title: "CEO", company: "Pagecraft", location: "San Francisco, USA"},
+    {first_name: "Pau", last_name: "Serra", email: "pau@plantillahr.example", job_title: "CEO", company: "Plantilla HR", location: "Barcelona, Spain", phone: "+34 600 111 222"},
+    {first_name: "Marta", last_name: "Vila", email: "marta@plantillahr.example", job_title: "CRO", company: "Plantilla HR", location: "Barcelona, Spain"},
+    {first_name: "Javier", last_name: "Ortega", email: "javier@rutas.example", job_title: "CEO", company: "Rutas", location: "Madrid, Spain"},
+    {first_name: "Lucía", last_name: "Navarro", email: "lucia.navarro@formulae.example", job_title: "VP Sales", company: "Formulae", location: "Barcelona, Spain", phone: "+34 655 333 444"},
+    {first_name: "Oriol", last_name: "Puig", email: "oriol.puig@segundamano.example", job_title: "Head of Partnerships", company: "Segunda Mano", location: "Barcelona, Spain"},
+    {first_name: "Sean", last_name: "Murphy", email: "sean@paylane.example", job_title: "CEO", company: "Paylane", location: "San Francisco, USA"},
+    {first_name: "Sara", last_name: "Moreno", email: "sara.moreno@formulae.example", job_title: "Independent consultant", company: "Formulae", location: "Valencia, Spain"},
+    {first_name: "David", last_name: "García", email: "david@startupxyz.example", job_title: "Founder", company: "StartupXYZ", location: "Bilbao, Spain"}
   ]
 
   people = people_data.map do |attrs|
@@ -88,15 +88,15 @@ ActiveRecord::Base.transaction do
   end
 
   deals_data = [
-    {name: "Vercel — Enterprise plan", stage: "negotiation", value: 48_000, probability: 70, close_in: 20, company: "Vercel", contact: "guillermo@vercel.com"},
-    {name: "Linear — Team expansion", stage: "proposal", value: 18_500, probability: 55, close_in: 35, company: "Linear", contact: "karri@linear.app"},
-    {name: "Notion — Annual contract", stage: "qualified", value: 65_000, probability: 35, close_in: 60, company: "Notion", contact: "ivan@notion.so"},
-    {name: "Factorial — Integration partnership", stage: "won", value: 32_000, probability: 100, close_in: -10, company: "Factorial", contact: "jordi@factorialhr.com"},
-    {name: "Cabify — Pilot program", stage: "lead", value: 12_000, probability: 15, close_in: 90, company: "Cabify", contact: "juan@cabify.com"},
-    {name: "Typeform — Renewal + upsell", stage: "negotiation", value: 27_500, probability: 80, close_in: 12, company: "Typeform", contact: "laura.sanz@typeform.com"},
-    {name: "Wallapop — API licensing", stage: "proposal", value: 22_000, probability: 45, close_in: 40, company: "Wallapop", contact: "marc.vidal@wallapop.com"},
-    {name: "Stripe — Co-marketing deal", stage: "lead", value: 8_000, probability: 10, close_in: 120, company: "Stripe", contact: "patrick@stripe.com"},
-    {name: "StartupXYZ — Starter plan", stage: "lost", value: 4_500, probability: 0, close_in: -30, company: "StartupXYZ", contact: "david@startupxyz.io"}
+    {name: "Nimbus Cloud — Enterprise plan", stage: "negotiation", value: 48_000, probability: 70, close_in: 20, company: "Nimbus Cloud", contact: "elena@nimbuscloud.example"},
+    {name: "Trackwise — Team expansion", stage: "proposal", value: 18_500, probability: 55, close_in: 35, company: "Trackwise", contact: "mikko@trackwise.example"},
+    {name: "Pagecraft — Annual contract", stage: "qualified", value: 65_000, probability: 35, close_in: 60, company: "Pagecraft", contact: "grace@pagecraft.example"},
+    {name: "Plantilla HR — Integration partnership", stage: "won", value: 32_000, probability: 100, close_in: -10, company: "Plantilla HR", contact: "pau@plantillahr.example"},
+    {name: "Rutas — Pilot program", stage: "lead", value: 12_000, probability: 15, close_in: 90, company: "Rutas", contact: "javier@rutas.example"},
+    {name: "Formulae — Renewal + upsell", stage: "negotiation", value: 27_500, probability: 80, close_in: 12, company: "Formulae", contact: "lucia.navarro@formulae.example"},
+    {name: "Segunda Mano — API licensing", stage: "proposal", value: 22_000, probability: 45, close_in: 40, company: "Segunda Mano", contact: "oriol.puig@segundamano.example"},
+    {name: "Paylane — Co-marketing deal", stage: "lead", value: 8_000, probability: 10, close_in: 120, company: "Paylane", contact: "sean@paylane.example"},
+    {name: "StartupXYZ — Starter plan", stage: "lost", value: 4_500, probability: 0, close_in: -30, company: "StartupXYZ", contact: "david@startupxyz.example"}
   ]
 
   # The default "Ventas" pipeline is created automatically with the workspace.
@@ -132,32 +132,32 @@ ActiveRecord::Base.transaction do
   ].map { |attrs| workspace.products.create!(attrs) }
 
   # Product lines on a few deals (deal value is recomputed from the lines).
-  deals[0].deal_products.create!(product: products[1], quantity: 6)            # Vercel — 6× Enterprise
+  deals[0].deal_products.create!(product: products[1], quantity: 6)            # Nimbus Cloud — 6× Enterprise
   deals[0].deal_products.create!(product: products[2], quantity: 1)            # + onboarding
   deals[0].deal_accesses.create!(user: member) if deals[0].owner != member          # shared with member (salesperson)
-  deals[1].deal_products.create!(product: products[0], quantity: 12)           # Linear — 12× Pro
-  deals[5].deal_products.create!(product: products[0], quantity: 20, unit_price: 1_000) # Typeform — negotiated price
+  deals[1].deal_products.create!(product: products[0], quantity: 12)           # Trackwise — 12× Pro
+  deals[5].deal_products.create!(product: products[0], quantity: 20, unit_price: 1_000) # Formulae — negotiated price
 
   notes_data = [
-    [deals[0], admin, "Pricing pushback", "Guillermo wants a 15% discount for the 3-year commitment. Need approval from finance before Friday."],
-    [deals[1], member, "Demo recap", "Showed the workflow builder. Karri loved the API-first approach. Sending the proposal this week."],
+    [deals[0], admin, "Pricing pushback", "Elena wants a 15% discount for the 3-year commitment. Need approval from finance before Friday."],
+    [deals[1], member, "Demo recap", "Showed the workflow builder. Mikko loved the API-first approach. Sending the proposal this week."],
     [deals[5], admin, nil, "Renewal confirmed verbally. Upsell to the analytics add-on still under discussion."],
     [companies[3], member, "Partnership context", "They want to embed our widget in their marketplace. Legal review pending on data processing terms."],
-    [people[0], admin, nil, "Met at Next.js Conf. Prefers async communication, email over calls."],
-    [people[7], member, "Intro call", "Laura is the decision maker for the renewal. Budget cycle closes in Q3."]
+    [people[0], admin, nil, "Met at a frontend conference. Prefers async communication, email over calls."],
+    [people[7], member, "Intro call", "Lucía is the decision maker for the renewal. Budget cycle closes in Q3."]
   ]
   notes_data.each do |record, author, title, body|
     record.notes.create!(workspace: workspace, user: author, title: title, body: body)
   end
 
   tasks_data = [
-    [deals[0], admin, admin, "Send revised pricing to Guillermo", 2],
-    [deals[1], member, member, "Write proposal for Linear", 4],
+    [deals[0], admin, admin, "Send revised pricing to Elena", 2],
+    [deals[1], member, member, "Write proposal for Trackwise", 4],
     [deals[5], admin, member, "Prepare renewal contract", 1],
-    [companies[2], member, admin, "Research Notion's procurement process", 7],
-    [people[4], admin, admin, "Follow up with Jordi after legal review", -2],
+    [companies[2], member, admin, "Research Pagecraft's procurement process", 7],
+    [people[4], admin, admin, "Follow up with Pau after legal review", -2],
     [nil, member, member, "Clean up duplicate contacts", 10],
-    [deals[3], admin, admin, "Kick-off call with Factorial team", -5]
+    [deals[3], admin, admin, "Kick-off call with Plantilla HR team", -5]
   ]
   tasks_data.each_with_index do |(record, creator, assignee, title, due_in), i|
     task = workspace.tasks.create!(taskable: record, user: creator, assignee: assignee, title: title, due_on: Date.current + due_in.days)

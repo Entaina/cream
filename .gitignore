@@ -40,6 +40,9 @@
 !/app/assets/builds/.keep
 /.claude/settings.json
 /.claude/settings.local.json
+/.basecamp/
+/.cursor/plans/
+/gmail_addon/.clasp.json
 
 # Ignore playwright-cli session artifacts (snapshots, console logs).
 /.playwright-cli

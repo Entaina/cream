@@ -43,7 +43,7 @@ clasp push
 clasp open-script    # opens the editor (clasp open no longer exists in recent clasp)
 ```
 
-The `scriptId` is in [`gmail_addon/.clasp.json`](../gmail_addon/.clasp.json).
+Before the first push, copy [`gmail_addon/.clasp.json.example`](../gmail_addon/.clasp.json.example) to `gmail_addon/.clasp.json` (git-ignored) and set your `scriptId`, and replace `YOUR-CREAM-DOMAIN` in `appsscript.json` with your Cream domain.
 
 ### 1.2. OAuth callback URI
 
