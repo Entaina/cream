@@ -78,7 +78,7 @@ gem "doorkeeper", "~> 5.9"
 gem "pundit", "~> 2.4"
 gem "pagy", "~> 43.8"
 gem "rails-i18n", "~> 8.0"
-gem "view_component", "~> 4.15"
+gem "view_component", "~> 4.19"
 gem "paper_trail", "~> 17.0"
 gem "redcarpet", "~> 3.6"
 
