@@ -26,9 +26,9 @@ login. There is no need to create new credentials.
 | Item | Value |
 |------|-------|
 | OAuth Client ID | `1053838014961-judjenugflkd742skf17u6cbr6hknli4.apps.googleusercontent.com` |
-| Public dev URL (ngrok) | `https://dynamic-enormously-minnow.ngrok-free.app` (value of `CREAM_APP_URL`) |
+| Public dev URL (tunnel) | Your `CREAM_APP_URL` (e.g. ngrok or similar HTTPS tunnel to localhost) |
 | Production domain | `crm.example.com` |
-| Dev redirect URI | `https://dynamic-enormously-minnow.ngrok-free.app/auth/google_gmail/callback` |
+| Dev redirect URI | `{CREAM_APP_URL}/auth/google_gmail/callback` |
 | Prod redirect URI | `https://crm.example.com/auth/google_gmail/callback` |
 | Login callback (already existing) | `.../auth/google_oauth2/callback` |
 
@@ -66,7 +66,7 @@ Search bar → **`Credentials`** → under **"OAuth 2.0 Client IDs"**
 open your client → under **"Authorized redirect URIs"** → **ADD URI**
 and add (without deleting the login ones):
 ```
-https://dynamic-enormously-minnow.ngrok-free.app/auth/google_gmail/callback
+https://YOUR_TUNNEL_HOST/auth/google_gmail/callback
 https://crm.example.com/auth/google_gmail/callback
 ```
 **Save** (Google takes a few minutes to propagate).

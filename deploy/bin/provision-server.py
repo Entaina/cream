@@ -124,13 +124,17 @@ def upload_source_and_build(host: str, user: str, password: str, remote_dir: str
 
     tarball = Path(tempfile.mkdtemp()) / "cream-src.tgz"
     excludes = {".git", "tmp", "log", "storage", "node_modules", ".bundle"}
+    skip_names = {".env", ".env.local", ".env.production", "cream-backup.json"}
 
     with tarfile.open(tarball, "w:gz") as archive:
         for path in REPO_ROOT.rglob("*"):
-            if any(part in excludes for part in path.relative_to(REPO_ROOT).parts):
+            rel = path.relative_to(REPO_ROOT)
+            if any(part in excludes for part in rel.parts):
+                continue
+            if path.name in skip_names or path.name.startswith(".env"):
                 continue
             if path.is_file():
-                archive.add(path, arcname=path.relative_to(REPO_ROOT))
+                archive.add(path, arcname=rel)
 
     if scp(host, user, password, tarball, "/tmp/cream-src.tgz") != 0:
         return 1
@@ -140,6 +144,7 @@ set -euo pipefail
 rm -rf {remote_dir}-src
 mkdir -p {remote_dir}-src
 tar xzf /tmp/cream-src.tgz -C {remote_dir}-src
+rm -f /tmp/cream-src.tgz
 cd {remote_dir}-src
 docker build -t ghcr.io/entaina/cream:latest .
 """
