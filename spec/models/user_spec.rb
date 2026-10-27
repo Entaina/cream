@@ -6,6 +6,22 @@ RSpec.describe User, type: :model do
     expect(user.email_address).to eq("downcased@example.com")
   end
 
+  it "requires passwords of at least 8 characters" do
+    user = User.new(name: "Short", email_address: "short@example.com", password: "a" * 7)
+    expect(user).not_to be_valid
+    expect(user.errors.of_kind?(:password, :too_short)).to be true
+
+    user.password = "a" * 8
+    expect(user).to be_valid
+  end
+
+  it "keeps existing users valid without touching their password" do
+    created = User.create!(name: "Existing", email_address: "existing@example.com", password: "password")
+    user = User.find(created.id)
+    user.name = "Renamed"
+    expect(user).to be_valid
+  end
+
   describe "theme" do
     it "defaults to system" do
       user = User.create!(name: "Theme User", email_address: "theme@example.com", password: "password")

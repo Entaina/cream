@@ -52,7 +52,7 @@ RSpec.describe "Passwords", type: :request do
   describe "PUT /passwords/:token" do
     it "updates the password" do
       expect {
-        put password_path(user.password_reset_token), params: {password: "new", password_confirmation: "new"}
+        put password_path(user.password_reset_token), params: {password: "newpassword", password_confirmation: "newpassword"}
         expect(response).to redirect_to(new_session_path)
       }.to change { user.reload.password_digest }
 
@@ -80,6 +80,18 @@ RSpec.describe "Passwords", type: :request do
 
       follow_redirect!
       expect_notice(I18n.t("auth.flashes.passwords_did_not_match"))
+    end
+
+    it "rejects passwords shorter than 8 characters" do
+      token = user.password_reset_token
+
+      expect {
+        put password_path(token), params: {password: "short12", password_confirmation: "short12"}
+        expect(response).to redirect_to(edit_password_path(token))
+      }.not_to change { user.reload.password_digest }
+
+      follow_redirect!
+      expect(response.body).to include(I18n.t("errors.messages.too_short", count: 8))
     end
   end
 end

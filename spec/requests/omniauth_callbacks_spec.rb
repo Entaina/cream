@@ -14,11 +14,12 @@ RSpec.describe "OmniauthCallbacks", type: :request do
     OmniAuth.config.test_mode = false
   end
 
-  def mock_google_auth(uid:, email:, name:)
+  def mock_google_auth(uid:, email:, name:, email_verified: true)
     OmniAuth.config.mock_auth[:google_oauth2] = OmniAuth::AuthHash.new(
       provider: "google_oauth2",
       uid: uid,
-      info: OmniAuth::AuthHash::InfoHash.new(email: email, name: name)
+      info: OmniAuth::AuthHash::InfoHash.new(email: email, name: name),
+      extra: OmniAuth::AuthHash.new(raw_info: {"email_verified" => email_verified})
     )
   end
 
@@ -109,6 +110,38 @@ RSpec.describe "OmniauthCallbacks", type: :request do
     ensure
       ENV["CREAM_ORGANIZATION_EMAIL_DOMAIN"] = original_domain
       ENV["CREAM_ORGANIZATION_WORKSPACE_NAME"] = original_name
+    end
+
+    it "rejects a new Google account whose email is not verified" do
+      mock_google_auth(uid: "unverified", email: "unverified@example.com", name: "Unverified", email_verified: false)
+
+      expect {
+        get "/auth/google_oauth2/callback"
+      }.not_to change(User, :count)
+
+      expect(response).to redirect_to(new_session_path)
+      expect(flash[:alert]).to eq(I18n.t("auth.sign_up_disabled"))
+      expect(cookies[:session_id]).to be_blank
+    end
+
+    it "does not link an unverified Google email to an existing user" do
+      mock_google_auth(uid: "unverified-link", email: user.email_address, name: user.name, email_verified: false)
+
+      get "/auth/google_oauth2/callback"
+
+      expect(user.reload.uid).not_to eq("unverified-link")
+      expect(response).to redirect_to(new_session_path)
+      expect(cookies[:session_id]).to be_blank
+    end
+
+    it "still signs in a user already linked by provider and uid" do
+      user.update!(provider: "google_oauth2", uid: "linked")
+      mock_google_auth(uid: "linked", email: user.email_address, name: user.name, email_verified: false)
+
+      get "/auth/google_oauth2/callback"
+
+      expect(response).to redirect_to(root_path)
+      expect(cookies[:session_id]).to be_present
     end
   end
 

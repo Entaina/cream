@@ -31,6 +31,7 @@ class User < ApplicationRecord
   validates :pending_workspace_name, length: {maximum: 255}, allow_blank: true
   validates :theme, inclusion: {in: THEMES}
   validates :locale, inclusion: {in: LOCALES}
+  validates :password, length: {minimum: 8}, allow_nil: true
 
   def self.organization_workspace_configured?
     ENV["CREAM_ORGANIZATION_EMAIL_DOMAIN"].present? &&
@@ -119,6 +120,8 @@ class User < ApplicationRecord
 
     user = find_by(provider: provider, uid: uid)
     unless user
+      raise SignupForbiddenError unless google_email_verified?(auth)
+
       user = find_by(email_address: email)
       if user
         link_oauth_identity!(user, provider:, uid:)
@@ -261,5 +264,17 @@ class User < ApplicationRecord
 
   def self.merge_sidebar_order(saved_order, default_keys)
     SidebarMenu.merge_order(saved_order, default_keys)
+  end
+
+  def self.google_email_verified?(auth)
+    raw = auth.extra&.raw_info
+    if raw.respond_to?(:email_verified)
+      return ActiveModel::Type::Boolean.new.cast(raw.email_verified)
+    end
+    if raw.is_a?(Hash)
+      return ActiveModel::Type::Boolean.new.cast(raw["email_verified"])
+    end
+
+    false
   end
 end

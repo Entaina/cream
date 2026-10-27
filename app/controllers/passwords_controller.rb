@@ -27,7 +27,12 @@ class PasswordsController < ApplicationController
       @user.sessions.destroy_all
       redirect_to new_session_path, notice: t("auth.flashes.password_reset")
     else
-      redirect_to edit_password_path(params[:token]), alert: t("auth.flashes.passwords_did_not_match")
+      alert = if @user.errors.of_kind?(:password_confirmation, :confirmation)
+        t("auth.flashes.passwords_did_not_match")
+      else
+        @user.errors.full_messages.to_sentence
+      end
+      redirect_to edit_password_path(params[:token]), alert: alert
     end
   end
 
