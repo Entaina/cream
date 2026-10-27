@@ -21,8 +21,8 @@ module Public
       PageView.record!(
         workspace: workspace,
         anonymous_id: anonymous_id,
-        url: params[:url].to_s,
-        referrer: params[:referrer],
+        url: params[:url].to_s.truncate(2048),
+        referrer: params[:referrer]&.to_s&.truncate(2048),
         utm: params.permit(:utm_source, :utm_medium, :utm_campaign, :utm_term, :utm_content).to_h,
         session_id: params[:session_id],
         person: person,

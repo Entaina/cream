@@ -23,6 +23,22 @@ RSpec.describe "Public web tracking", type: :request do
       expect(response).to have_http_status(:ok)
       expect(PageView.last.utm_source).to eq("google")
     end
+
+    it "truncates url and referrer to 2048 characters" do
+      long = "https://example.com/#{"a" * 5000}"
+
+      post public_tracking_path, params: {workspace: workspace.slug, url: long, referrer: long}
+
+      page_view = PageView.last
+      expect(page_view.url.length).to eq(2048)
+      expect(page_view.referrer.length).to eq(2048)
+    end
+
+    it "keeps a missing referrer as nil" do
+      post public_tracking_path, params: {workspace: workspace.slug, url: "https://example.com/"}
+
+      expect(PageView.last.referrer).to be_nil
+    end
   end
 
   describe "GET /cream.js" do
