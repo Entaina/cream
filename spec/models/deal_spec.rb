@@ -494,6 +494,29 @@ RSpec.describe Deal, type: :model do
       expect(workspace.activities.where(action: "products_changed", subject_type: "Deal")).to be_empty
     end
 
+    it "removes trigger runs and alert deliveries and unlinks product interests" do
+      trigger = workspace.stage_triggers.create!(
+        name: "On enter", pipeline_stage: deal.pipeline_stage,
+        execution_mode: "llm", instructions: "x"
+      )
+      run = workspace.stage_trigger_runs.create!(stage_trigger: trigger, deal: deal, status: "succeeded")
+      rule = workspace.alert_rules.create!(name: "Close date", trigger_field: "deal_expected_close_date")
+      delivery = rule.alert_deliveries.create!(deal: deal, user: users(:one))
+      person = deal.contacts.first
+      product = workspace.products.create!(name: "Course", price: 10)
+      interest = Marketing::ProductInterest.create!(
+        workspace: workspace, person: person, product: product, deal: deal,
+        description: "Asked", source_kind: "manual", occurred_at: Time.current
+      )
+
+      expect { deal.destroy! }.to change(Deal, :count).by(-1)
+
+      expect(StageTriggerRun.find_by(id: run.id)).to be_nil
+      expect(AlertDelivery.find_by(id: delivery.id)).to be_nil
+      expect(interest.reload.deal_id).to be_nil
+      expect(Person.find_by(id: person.id)).to eq(person)
+    end
+
     it "still logs when a contact is unlinked from a living deal" do
       contact = deal.contacts.first
 

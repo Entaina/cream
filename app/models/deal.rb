@@ -29,6 +29,9 @@ class Deal < ApplicationRecord
   has_many :bookings, dependent: :nullify
   has_many :offers, dependent: :destroy
   has_one :portal_invite_link, class_name: "DealPortalInviteLink", dependent: :destroy
+  has_many :stage_trigger_runs, dependent: :destroy
+  has_many :alert_deliveries, dependent: :destroy
+  has_many :product_interests, class_name: "Marketing::ProductInterest", dependent: :nullify
   accepts_nested_attributes_for :deal_products, allow_destroy: true,
     reject_if: ->(attrs) { attrs[:product_id].blank? }
   accepts_nested_attributes_for :tasks,
