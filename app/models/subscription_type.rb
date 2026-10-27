@@ -24,7 +24,7 @@ class SubscriptionType < ApplicationRecord
       slug: "newsletter",
       description: "Boletín y novedades",
       consent_field_key: "newsletter_opt_in",
-      default_consent_label: "Quiero recibir la newsletter de Entaina"
+      default_consent_label: "Quiero recibir la newsletter de entaina"
     },
     {
       name: "Producto",
