@@ -10,6 +10,12 @@ es:
       unsubscribe_all: Darse de baja de todas las comunicaciones
       unsubscribe_all_confirm: "¿Dejar de recibir cualquier email de marketing de
         %{workspace}?"
+    email_tracking_leaving:
+      body: Este enlace de un email te lleva a %{host}. Continúa solo si confías en
+        este sitio.
+      continue: Continuar
+      page_title: Saliendo de Cream
+      title: Vas a salir de Cream
     email_unsubscribed:
       body: Has sido dado de baja correctamente. No recibirás más emails de marketing
         en esta categoría.
