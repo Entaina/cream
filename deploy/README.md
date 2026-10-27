@@ -210,8 +210,10 @@ curl -I https://CREAM_DOMAIN/up
 If you filled in the `CREAM_SEED_*` variables in `.env`:
 
 ```bash
-docker compose exec web bin/rails db:seed
+docker compose exec -e CREAM_ALLOW_SEED=true web bin/rails db:seed
 ```
+
+In production `db:seed` does nothing unless `CREAM_ALLOW_SEED=true` is set, because it deletes and recreates the `cream-demo` workspace. Run it only on a fresh installation.
 
 `db:seed` imports **demo example** Liquid templates into the organization workspace (from `lib/lead_form_templates/` in the image) and creates example lead forms when `CREAM_ORGANIZATION_*` is configured.
 

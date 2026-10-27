@@ -1,3 +1,8 @@
+if Rails.env.production? && ENV["CREAM_ALLOW_SEED"] != "true"
+  warn "Skipping db:seed in production (set CREAM_ALLOW_SEED=true to override)."
+  return
+end
+
 # Demo workspace with realistic CRM data. Idempotent: wipes and recreates the demo workspace.
 demo = Workspace.find_by(slug: "cream-demo")
 demo&.destroy
