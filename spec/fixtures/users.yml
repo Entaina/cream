@@ -1,27 +1,33 @@
 <% password_digest = BCrypt::Password.create("password") %>
+<% verified_at = Time.utc(2026, 1, 1) %>
 
 one:
   name: User One
   email_address: one@example.com
   password_digest: <%= password_digest %>
+  email_verified_at: <%= verified_at %>
 
 two:
   name: User Two
   email_address: two@example.com
   password_digest: <%= password_digest %>
+  email_verified_at: <%= verified_at %>
 
 three:
   name: User Three
   email_address: three@example.com
   password_digest: <%= password_digest %>
+  email_verified_at: <%= verified_at %>
 
 outsider:
   name: Outsider
   email_address: outsider@example.com
   password_digest: <%= password_digest %>
+  email_verified_at: <%= verified_at %>
 
 superadmin:
   name: Super Admin
   email_address: superadmin@example.com
   password_digest: <%= password_digest %>
+  email_verified_at: <%= verified_at %>
   superadmin: true

@@ -101,9 +101,17 @@ es:
       password_reset_invalid: El enlace de restablecimiento no es válido o ha caducado.
       password_reset_sent: Instrucciones enviadas (si existe un usuario con ese email).
       passwords_did_not_match: Las contraseñas no coinciden.
+      email_unverified: Confirma tu email antes de entrar. Te hemos enviado un enlace nuevo.
+      email_verification_invalid: El enlace de confirmación no es válido o ha caducado.
+      email_verification_sent: Te hemos enviado un enlace para confirmar el email. Ábrelo para activar la cuenta.
       sign_in_with_invited_email: Inicia sesión con %{email} para aceptar esta invitación.
       try_again_later: Inténtalo de nuevo más tarde.
       welcome_workspace: "¡Bienvenido a %{workspace}!"
+    email_verification:
+      email_placeholder: tu@empresa.com
+      submit: Enviar enlace
+      subtitle: Te enviaremos un enlace para activar la cuenta. Si no lo pediste, ignóralo.
+      title: Confirma tu email
     google: Continuar con Google
     invitation:
       accept: Aceptar invitación
@@ -152,6 +160,7 @@ es:
       email: Email
       forgot_password: "¿Olvidaste la contraseña?"
       or: o
+      resend_verification: Reenviar confirmación de email
       password: Contraseña
       submit: Iniciar sesión
       subtitle: El CRM que tu equipo disfrutará.

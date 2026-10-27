@@ -35,6 +35,7 @@ Rails.application.routes.draw do
 
   resource :session
   resources :passwords, param: :token
+  resources :email_verifications, only: %i[new create show], param: :token
   resource :registration, only: %i[new create]
 
   namespace :superadmin do

@@ -30,5 +30,5 @@ es:
         slug_placeholder: mi-empresa
         slug_hint: Déjalo vacío para generarlo desde el nombre. Solo minúsculas, números y guiones.
         email_domain: Dominio de email para registro
-        email_domain_hint: Los usuarios con este dominio pueden registrarse y unirse a este workspace automáticamente (cuando el registro público está restringido).
+        email_domain_hint: Los usuarios con este dominio pueden registrarse y, tras confirmar su email, unirse a este workspace automáticamente (cuando el registro público está restringido).
         initial_admin: Admin inicial

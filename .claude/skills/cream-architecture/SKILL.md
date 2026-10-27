@@ -35,7 +35,7 @@ User ←── Membership ──→ Workspace
 
 **Superadmin** (`/superadmin`, `Superadmin::*`): create/edit workspaces, set `email_domain`, manage members/invitations, **Enter workspace** (lazy admin membership with `superadmin_access: true`). Superadmins pass `UserContext#member?` / `#admin?` in any workspace; API/MCP still use normal membership only.
 
-**Registration** (`RegistrationsController#create`): when `CREAM_PUBLIC_SIGNUP=true` (default outside production; production defaults to `false` when unset), creates user + personal workspace + admin membership; when false, only invited emails or emails matching a workspace `email_domain` (legacy fallback: `CREAM_ORGANIZATION_*` env). `User#provision_default_workspace!` joins domain workspaces as admin if empty else salesperson.
+**Registration** (`RegistrationsController#create`): password signup stores an unverified user and emails a confirmation link. No session and no workspace membership until that link is opened. `CREAM_PUBLIC_SIGNUP=true` (default outside production; production defaults to `false` when unset) then creates a personal workspace (admin). When false, only invited emails or emails matching a workspace `email_domain` can register (legacy fallback: `CREAM_ORGANIZATION_*` env). `User#provision_default_workspace!` runs after confirmation and joins domain workspaces as admin if empty else salesperson. Google sign-in counts as verified; linking it to an unverified password account replaces that password. Accepting an invitation verifies the email.
 
 **Active workspace per request** — session `workspace_id` + switcher (`shared/_workspace_switcher`; superadmin sees all workspaces):
 

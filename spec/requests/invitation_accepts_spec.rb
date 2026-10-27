@@ -45,7 +45,36 @@ RSpec.describe "InvitationAccepts", type: :request do
 
       expect(response).to redirect_to(root_path)
       expect(invitation.reload.accepted?).to be true
-      expect(User.find_by(email_address: "brandnew@example.com").workspaces).to include(workspace)
+      user = User.find_by!(email_address: "brandnew@example.com")
+      expect(user.workspaces).to include(workspace)
+      expect(user.email_verified?).to be true
+    end
+
+    it "lets the invited person replace an unconfirmed account that used their email" do
+      squatter = User.create!(
+        name: "Squatter",
+        email_address: "brandnew@example.com",
+        password: "attacker-password"
+      )
+      invitation = create_invitation(email: squatter.email_address)
+
+      get accept_invitation_path(token: invitation.plaintext_token)
+      expect(response.body).to include(I18n.t("auth.invitation.create_and_accept"))
+
+      post accept_invitation_path(token: invitation.plaintext_token), params: {
+        user: {
+          name: "Brand New",
+          password: "invitee-password",
+          password_confirmation: "invitee-password"
+        }
+      }
+
+      squatter.reload
+      expect(squatter.email_verified?).to be true
+      expect(squatter.authenticate("attacker-password")).to be_falsey
+      expect(squatter.authenticate("invitee-password")).to eq(squatter)
+      expect(squatter.workspaces).to include(workspace)
+      expect(invitation.reload.accepted?).to be true
     end
 
     it "accepts invitation for a signed-in matching user" do

@@ -4,7 +4,7 @@
 
 Cream es un CRM por **workspaces** para gestionar **personas**, **empresas** y **deals** (oportunidades), con notas, tareas, listas y un historial de actividad compartido en el equipo.
 
-> **Última revisión:** 2026-10-20 (datos comerciales en «De un vistazo» del deal)
+> **Última revisión:** 2026-10-27 (confirmación de email al crear cuenta)
 > Este documento describe la funcionalidad **visible para el usuario**. Las funcionalidades desactivadas aparecen al final en «Próximamente».
 
 ---
@@ -59,11 +59,17 @@ En la esquina superior derecha de la pantalla de acceso (y registro) verás el s
 
 ### Crear cuenta
 
-En **Crear cuenta** introduces tu nombre, email, contraseña y el nombre del workspace. Al registrarte:
+En **Crear cuenta** introduces tu nombre, email, contraseña y el nombre del workspace. Cream envía un enlace a ese email. Hasta que lo abres, la cuenta no puede entrar con contraseña y no pertenece a ningún workspace.
 
-- Se crea tu usuario.
-- Se crea un workspace nuevo con el nombre indicado (o «Nombre's Workspace» si no indicas uno).
-- Eres **admin** de ese workspace.
+Al abrir el enlace:
+
+- Se confirma que el email es tuyo.
+- Si el registro público está abierto, se crea un workspace con el nombre indicado (o «Nombre's Workspace» si no indicas uno) y eres **admin**.
+- Si tu dominio coincide con el dominio de registro de un workspace, entras en ese workspace como comercial, o como admin si todavía no hay equipo.
+
+Si no pediste la cuenta, ignora el correo: sin ese enlace no se activa. En la pantalla de acceso, **Reenviar confirmación de email** vuelve a enviar el enlace.
+
+**Iniciar sesión con Google** ya confirma el email. Si alguien había creado antes una cuenta sin confirmar con ese mismo email, esa contraseña deja de valer.
 
 ### Cambiar tu nombre
 
@@ -91,7 +97,7 @@ Si perteneces a más de un workspace, en la cabecera del menú lateral verás el
 
 **Superadmin de plataforma** (operadores que gestionan Cream para varios clientes): los usuarios con el flag global de superadmin ven un icono de **candado** en el pie del menú lateral. Abre **Superadmin** (`/superadmin`), donde puedes crear workspaces, definir el **dominio de email de registro** de cada tenant, gestionar miembros y **Entrar al workspace** para trabajar dentro de cualquier tenant como admin. Este rol no se concede desde la interfaz — lo asigna el host en el servidor.
 
-Si el registro público está desactivado en tu despliegue, las cuentas nuevas solo se crean por **invitación**, **superadmin** o con un email cuyo dominio coincida con el dominio de registro de un workspace.
+Si el registro público está desactivado en tu despliegue, las cuentas nuevas solo se crean por **invitación**, **superadmin** o con un email cuyo dominio coincida con el dominio de registro de un workspace. En ese último caso también hay que abrir el enlace de confirmación que llega al email antes de entrar.
 
 ### Roles
 

@@ -18,14 +18,20 @@ ActiveRecord::Base.transaction do
   admin = User.find_or_create_by!(email_address: ENV.fetch("CREAM_SEED_ADMIN_EMAIL")) do |u|
     u.name = "Admin Example"
     u.password = ENV.fetch("CREAM_SEED_ADMIN_PASSWORD")
+    u.email_verified_at = Time.current
   end
   member = User.find_or_create_by!(email_address: ENV.fetch("CREAM_SEED_MEMBER_EMAIL")) do |u|
     u.name = "Ana Example"
     u.password = ENV.fetch("CREAM_SEED_MEMBER_PASSWORD")
+    u.email_verified_at = Time.current
   end
   director = User.find_or_create_by!(email_address: "carlos@example.com") do |u|
     u.name = "Carlos Example"
     u.password = ENV.fetch("CREAM_SEED_MEMBER_PASSWORD")
+    u.email_verified_at = Time.current
+  end
+  [admin, member, director].each do |user|
+    user.update!(email_verified_at: Time.current) if user.email_verified_at.nil?
   end
   workspace.memberships.create!(user: admin, role: "admin")
   workspace.memberships.create!(user: member, role: "salesperson")

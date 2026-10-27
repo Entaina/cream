@@ -60,6 +60,16 @@ RSpec.describe "Passwords", type: :request do
       expect_notice(I18n.t("auth.flashes.password_reset"))
     end
 
+    it "confirms the email when an unconfirmed account resets the password" do
+      pending = User.create!(name: "Pending", email_address: "pending-reset@example.com", password: "password")
+
+      put password_path(pending.password_reset_token), params: {password: "newpassword", password_confirmation: "newpassword"}
+
+      expect(response).to redirect_to(new_session_path)
+      expect(pending.reload.email_verified?).to be true
+      expect(pending.authenticate("newpassword")).to eq(pending)
+    end
+
     it "rejects non matching passwords" do
       token = user.password_reset_token
 

@@ -34,6 +34,19 @@ RSpec.describe "Sessions", type: :request do
       expect(selected_option["value"]).to eq(preferred_pipeline.id.to_s)
     end
 
+    it "rejects a correct password until the email is confirmed" do
+      pending = User.create!(name: "Pending", email_address: "pending@example.com", password: "password")
+
+      expect {
+        post session_path, params: {email_address: pending.email_address, password: "password"}
+      }.to have_enqueued_mail(EmailVerificationsMailer, :verify)
+
+      expect(response).to redirect_to(new_session_path)
+      expect(cookies[:session_id]).to be_blank
+      follow_redirect!
+      expect_notice(I18n.t("auth.flashes.email_unverified"))
+    end
+
     it "rejects invalid credentials" do
       post session_path, params: {email_address: user.email_address, password: "wrong"}
 

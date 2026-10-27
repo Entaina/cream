@@ -4,7 +4,7 @@
 
 Cream is a **workspace**-based CRM for managing **people**, **companies** and **deals** (opportunities), with notes, tasks, lists and an activity history shared across the team.
 
-> **Last revision:** 2026-10-20 (commercial data in the deal “At a glance” panel)
+> **Last revision:** 2026-10-27 (email confirmation on account creation)
 > This document describes the functionality **visible to the user**. Disabled features are listed at the end under "Coming soon".
 
 ---
@@ -59,11 +59,17 @@ In the top-right corner of the sign-in (and registration) screen you will see th
 
 ### Create account
 
-In **Create account** you enter your name, email, password and the workspace name. When you sign up:
+In **Create account** you enter your name, email, password and the workspace name. Cream sends a link to that email. Until you open it, the account cannot sign in with a password and does not belong to any workspace.
 
-- Your user is created.
-- A new workspace is created with the given name (or «Name's Workspace» if you don't provide one).
-- You are the **admin** of that workspace.
+When you open the link:
+
+- Cream confirms the email is yours.
+- If public signup is on, a workspace is created with the given name (or «Name's Workspace» if you don't provide one) and you are its **admin**.
+- If your domain matches a workspace signup domain, you join that workspace as a salesperson, or as an admin when it has no team yet.
+
+If you did not ask for the account, ignore the email: it is not activated without that link. On the sign-in screen, **Resend email confirmation** sends the link again.
+
+**Sign in with Google** already confirms the email. If someone had created an unconfirmed account with that same email, that password stops working.
 
 ### Change your name
 
@@ -91,7 +97,7 @@ If you belong to more than one workspace, the sidebar header shows the name of t
 
 **Platform superadmin** (operators who run Cream for multiple customers): users with the global superadmin flag see a **lock** icon in the sidebar footer. It opens **Superadmin** (`/superadmin`), where you can create workspaces, set each tenant's **signup email domain**, manage members, and **Enter workspace** to work inside any tenant as an admin. This role is not granted from the UI — your host assigns it on the server.
 
-When public self-registration is turned off for your deployment, new accounts are only created via **invitation**, **superadmin**, or an email address whose domain matches a workspace signup domain.
+When public self-registration is turned off for your deployment, new accounts are only created via **invitation**, **superadmin**, or an email address whose domain matches a workspace signup domain. In that last case you still have to open the confirmation link sent to the email before you can sign in.
 
 ### Roles
 

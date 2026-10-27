@@ -42,6 +42,7 @@ RSpec.describe "OmniauthCallbacks", type: :request do
 
       expect(user.reload.provider).to eq("google_oauth2")
       expect(user.uid).to eq("67890")
+      expect(user.authenticate("password")).to eq(user)
       expect(response).to redirect_to(root_path)
       expect(cookies[:session_id]).to be_present
     end
@@ -58,6 +59,7 @@ RSpec.describe "OmniauthCallbacks", type: :request do
       new_user = User.find_by!(email_address: "new@example.com")
       expect(new_user.provider).to eq("google_oauth2")
       expect(new_user.uid).to eq("new-user")
+      expect(new_user.email_verified?).to be true
       expect(new_user.workspaces.count).to eq(1)
       expect(new_user.memberships.first.role).to eq("admin")
       expect(response).to redirect_to(root_path)
@@ -108,6 +110,24 @@ RSpec.describe "OmniauthCallbacks", type: :request do
       ENV["CREAM_ORGANIZATION_EMAIL_DOMAIN"] = original_domain
       ENV["CREAM_ORGANIZATION_WORKSPACE_NAME"] = original_name
     end
+  end
+
+  it "replaces the password when Google is linked to an unconfirmed account" do
+    squatter = User.create!(
+      name: "Squatter",
+      email_address: "squatter@example.com",
+      password: "attacker-password"
+    )
+    mock_google_auth(uid: "google-ana", email: squatter.email_address, name: "Ana")
+
+    get "/auth/google_oauth2/callback"
+
+    squatter.reload
+    expect(squatter.provider).to eq("google_oauth2")
+    expect(squatter.uid).to eq("google-ana")
+    expect(squatter.email_verified?).to be true
+    expect(squatter.authenticate("attacker-password")).to be_falsey
+    expect(response).to redirect_to(root_path)
   end
 
   describe "GET /auth/failure" do

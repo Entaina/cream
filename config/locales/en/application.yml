@@ -102,9 +102,17 @@ en:
       password_reset_sent: Password reset instructions sent (if user with that email
         address exists).
       passwords_did_not_match: Passwords did not match.
+      email_unverified: Confirm your email before signing in. We sent you a new link.
+      email_verification_invalid: This confirmation link is invalid or has expired.
+      email_verification_sent: We sent you a link to confirm your email. Open it to activate the account.
       sign_in_with_invited_email: Sign in with %{email} to accept this invitation.
       try_again_later: Try again later.
       welcome_workspace: Welcome to %{workspace}!
+    email_verification:
+      email_placeholder: you@company.com
+      submit: Email me the link
+      subtitle: We will send a link to activate the account. If you did not request it, ignore it.
+      title: Confirm your email
     google: Continue with Google
     invitation:
       accept: Accept invitation
@@ -153,6 +161,7 @@ en:
       email: Email
       forgot_password: Forgot password?
       or: or
+      resend_verification: Resend email confirmation
       password: Password
       submit: Sign in
       subtitle: The CRM your team will love.

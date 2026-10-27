@@ -30,6 +30,13 @@ es:
       metadata_heading: Origen
       subject: Nuevo lead · %{form_name}%{lead_suffix}
       subject_lead_suffix: " · %{descriptor}"
+  email_verifications_mailer:
+    verify:
+      expires: Este enlace caduca en %{distance}.
+      ignore: Si no has creado esta cuenta, ignora este mensaje. Sin este enlace no se activa.
+      intro: Confirma tu email para activar tu cuenta en Cream. Hasta entonces no podrás entrar.
+      link_text: Confirmar email
+      subject: Confirma tu email en Cream
   passwords_mailer:
     reset:
       expires: Este enlace caduca en %{distance}.

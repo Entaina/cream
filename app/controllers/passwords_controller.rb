@@ -21,7 +21,9 @@ class PasswordsController < ApplicationController
   end
 
   def update
+    was_unverified = !@user.email_verified?
     if @user.update(params.permit(:password, :password_confirmation))
+      @user.confirm_email_and_provision! if was_unverified
       @user.sessions.destroy_all
       redirect_to new_session_path, notice: t("auth.flashes.password_reset")
     else

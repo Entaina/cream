@@ -3,7 +3,13 @@ class SignupForbiddenError < StandardError; end
 class User < ApplicationRecord
   include IanaTimeZone
 
+  EMAIL_VERIFICATION_EXPIRES_IN = 2.days
+
   has_secure_password
+  generates_token_for :email_verification, expires_in: EMAIL_VERIFICATION_EXPIRES_IN do
+    email_verified_at&.to_i
+  end
+
   has_many :sessions, dependent: :destroy
   has_many :memberships, dependent: :destroy
   has_many :workspaces, through: :memberships
@@ -22,6 +28,7 @@ class User < ApplicationRecord
 
   validates :name, presence: true
   validates :email_address, presence: true, uniqueness: true
+  validates :pending_workspace_name, length: {maximum: 255}, allow_blank: true
   validates :theme, inclusion: {in: THEMES}
   validates :locale, inclusion: {in: LOCALES}
 
@@ -106,14 +113,15 @@ class User < ApplicationRecord
   def self.find_or_create_from_omniauth(auth, pending_invitation_token: nil)
     provider = auth.provider
     uid = auth.uid
-    email = auth.info.email
+    email = auth.info.email.to_s.strip.downcase
     name = auth.info.name
+    raise SignupForbiddenError if email.blank?
 
     user = find_by(provider: provider, uid: uid)
     unless user
       user = find_by(email_address: email)
       if user
-        user.update!(provider: provider, uid: uid)
+        link_oauth_identity!(user, provider:, uid:)
       else
         pending_invitation = Invitation.find_by_token(pending_invitation_token) if pending_invitation_token.present?
         unless allowed_to_register?(email, pending_invitation: pending_invitation)
@@ -125,7 +133,8 @@ class User < ApplicationRecord
           email_address: email,
           password: SecureRandom.hex(32),
           provider: provider,
-          uid: uid
+          uid: uid,
+          email_verified_at: Time.current
         )
       end
     end
@@ -134,15 +143,52 @@ class User < ApplicationRecord
       invitation = Invitation.find_by_token(pending_invitation_token)
       if invitation&.pending? && invitation.email_address == user.email_address
         invitation.accept_for!(user)
+        user.update!(pending_workspace_name: nil) if user.pending_workspace_name.present?
         return user
       end
     end
 
     if user.workspaces.none?
-      provision_default_workspace!(user)
+      provision_default_workspace!(user, workspace_name: user.pending_workspace_name)
+      user.update!(pending_workspace_name: nil) if user.pending_workspace_name.present?
     end
 
     user
+  end
+
+  # Google has already checked the mailbox. An unverified password account may
+  # have been created by someone else, so that password must stop working.
+  def self.link_oauth_identity!(user, provider:, uid:)
+    if user.email_verified?
+      user.update!(provider: provider, uid: uid)
+    else
+      user.update!(
+        provider: provider,
+        uid: uid,
+        password: SecureRandom.hex(32),
+        email_verified_at: Time.current
+      )
+    end
+  end
+
+  def email_verified?
+    email_verified_at.present?
+  end
+
+  def email_verification_token
+    generate_token_for(:email_verification)
+  end
+
+  def confirm_email_and_provision!
+    transaction do
+      self.email_verified_at ||= Time.current
+      if workspaces.none? && self.class.allowed_to_register?(email_address)
+        self.class.provision_default_workspace!(self, workspace_name: pending_workspace_name)
+      end
+      self.pending_workspace_name = nil
+      save!
+    end
+    workspaces.reset
   end
 
   def initials

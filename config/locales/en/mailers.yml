@@ -30,6 +30,14 @@ en:
       metadata_heading: Source
       subject: New lead · %{form_name}%{lead_suffix}
       subject_lead_suffix: " · %{descriptor}"
+  email_verifications_mailer:
+    verify:
+      expires: This link expires in %{distance}.
+      ignore: If you did not create this account, ignore this message. It will not
+        be activated without this link.
+      intro: Confirm your email to activate your Cream account. You cannot sign in until you do.
+      link_text: Confirm email
+      subject: Confirm your email on Cream
   passwords_mailer:
     reset:
       expires: This link will expire in %{distance}.

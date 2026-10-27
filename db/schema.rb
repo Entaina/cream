@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_19_130000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_27_100000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -1724,6 +1724,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_19_130000) do
     t.string "locale", default: "es", null: false
     t.string "time_zone"
     t.boolean "superadmin", default: false, null: false
+    t.datetime "email_verified_at"
+    t.string "pending_workspace_name"
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
     t.index ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true, where: "((provider IS NOT NULL) AND (uid IS NOT NULL))"
   end

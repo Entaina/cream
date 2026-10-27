@@ -19,10 +19,10 @@ class InvitationAcceptsController < ApplicationController
       @ready_to_accept = true
     elsif current_user
       @email_mismatch = true
-    elsif User.exists?(email_address: @invitation.email_address)
+    elsif (existing = User.find_by(email_address: @invitation.email_address))&.email_verified?
       @existing_user = true
     else
-      @user = User.new(email_address: @invitation.email_address)
+      @user = existing || User.new(email_address: @invitation.email_address)
     end
   end
 
@@ -64,7 +64,15 @@ class InvitationAcceptsController < ApplicationController
   end
 
   def accept_with_registration
-    @user = User.new(user_params.merge(email_address: @invitation.email_address))
+    existing = User.find_by(email_address: @invitation.email_address)
+    if existing&.email_verified?
+      redirect_to accept_invitation_path(params[:token]), alert: t("auth.flashes.sign_in_with_invited_email", email: @invitation.email_address)
+      return
+    end
+
+    @user = existing || User.new
+    @user.assign_attributes(user_params.merge(email_address: @invitation.email_address, email_verified_at: Time.current))
+    @user.pending_workspace_name = nil
 
     if @user.save
       @invitation.accept_for!(@user)
