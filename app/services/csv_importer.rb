@@ -9,6 +9,8 @@ class CsvImporter
     "Deal" => :import_deals
   }.freeze
 
+  ESCAPED_FORMULA = /\A'[=+\-@]/
+
   def self.import(record_type, workspace:, user:, io:)
     new(workspace: workspace, user: user).public_send(IMPORTERS.fetch(record_type), io)
   end
@@ -83,7 +85,14 @@ class CsvImporter
 
   def each_row(io)
     CSV.parse(io.read, headers: true).each_with_index do |row, index|
-      yield row, index + 2
+      yield unescape_formulas(row), index + 2
+    end
+  end
+
+  # Reverses CsvExporter.escape_formula so exported files re-import losslessly.
+  def unescape_formulas(row)
+    row.to_h.transform_values do |value|
+      value.is_a?(String) && value.match?(ESCAPED_FORMULA) ? value.delete_prefix("'") : value
     end
   end
 

@@ -11,9 +11,17 @@ class CsvExporter
     new(scope: scope, custom_fields: custom_fields).public_send(EXPORTERS.fetch(record_type))
   end
 
+  FORMULA_PREFIXES = /\A[=+\-@]/
+
   def initialize(scope:, custom_fields: [])
     @scope = scope
     @custom_fields = custom_fields
+  end
+
+  def self.escape_formula(value)
+    return value unless value.is_a?(String) && value.match?(FORMULA_PREFIXES)
+
+    "'#{value}"
   end
 
   def export_people
@@ -24,7 +32,7 @@ class CsvExporter
         csv << [
           person.first_name, person.last_name, person.email, person.phone,
           person.job_title, person.location, person.company&.name
-        ] + custom_field_values(person)
+        ].map { |cell| self.class.escape_formula(cell) } + custom_field_values(person).map { |cell| self.class.escape_formula(cell) }
       end
     end
   end
@@ -37,7 +45,7 @@ class CsvExporter
         csv << [
           company.name, company.domain, company.industry, company.employee_range,
           company.location, company.annual_revenue
-        ] + custom_field_values(company)
+        ].map { |cell| self.class.escape_formula(cell) } + custom_field_values(company).map { |cell| self.class.escape_formula(cell) }
       end
     end
   end
@@ -52,7 +60,7 @@ class CsvExporter
           deal.name, deal.company&.name, deal.stage_label, deal.value, deal.currency,
           deal.probability, deal.expected_close_date, deal.execution_duration_days,
           deal.execution_starts_on, deal.execution_ends_on, deal.payment_method, deal.payment_on, deal.invoice_number
-        ] + custom_field_values(deal)
+        ].map { |cell| self.class.escape_formula(cell) } + custom_field_values(deal).map { |cell| self.class.escape_formula(cell) }
       end
     end
   end
