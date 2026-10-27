@@ -10,8 +10,10 @@ module Public
     def create
       return head :not_found unless CreamFeatures.enabled?(:marketing_consent)
 
+      return head :unauthorized if @publication.webhook_signing_secret.blank?
+
       payload = request.raw_post
-      verify_signature!(payload) if @publication.webhook_signing_secret.present?
+      verify_signature!(payload)
 
       parsed = JSON.parse(payload)
       Marketing::Beehiiv::WebhookProcessor.process!(publication: @publication, payload: parsed)
