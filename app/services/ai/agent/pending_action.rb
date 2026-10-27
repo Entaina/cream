@@ -13,11 +13,11 @@ module Ai
       end
 
       def sign
-        self.class.verifier.generate(payload)
+        self.class.verifier.generate(payload, expires_in: 15.minutes, purpose: :agent_pending_action)
       end
 
       def self.from_verified(token)
-        data = verifier.verify(token)
+        data = verifier.verify(token, purpose: :agent_pending_action)
         new(
           tool: data["tool"],
           args: data["args"],

@@ -142,6 +142,41 @@ RSpec.describe "OKM chat", type: :request do
     expect(response).to have_http_status(:forbidden)
   end
 
+  describe "action token lifetime" do
+    include ActiveSupport::Testing::TimeHelpers
+
+    let(:action) do
+      Ai::Agent::PendingAction.new(
+        tool: "add_note",
+        args: {"record_type" => "company", "record_id" => company.id, "body" => "Nota tardía"},
+        description: "Añadir nota",
+        workspace_id: workspace.id,
+        user_id: user.id
+      )
+    end
+
+    it "rejects a token older than 15 minutes" do
+      token = action.sign
+
+      travel 16.minutes do
+        post okm_chat_actions_path, params: {token: token}, as: :json
+      end
+
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response.parsed_body["error"]).to eq("Invalid or expired action token.")
+      expect(company.notes.find_by(body: "Nota tardía")).to be_nil
+    end
+
+    it "rejects a token signed without the pending action purpose" do
+      token = Ai::Agent::PendingAction.verifier.generate(action.payload)
+
+      post okm_chat_actions_path, params: {token: token}, as: :json
+
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(company.notes.find_by(body: "Nota tardía")).to be_nil
+    end
+  end
+
   it "returns 404 when the feature is disabled globally" do
     allow(CreamFeatures).to receive(:enabled?).with(:okm_chat).and_return(false)
 
