@@ -18,7 +18,7 @@ Local settings live in `.env` at the project root (copy from `.env.example` on f
 | `CREAM_SEED_ADMIN_EMAIL/PASSWORD` | Admin demo user for `db:seed` and login |
 | `CREAM_SEED_MEMBER_EMAIL/PASSWORD` | Member demo user |
 | `CREAM_APP_URL` | Base URL for browser verification (`cream-playwright` skill), email tracking pixels, marketing preference links, web tracking and Mailjet webhook URLs |
-| `CREAM_PUBLIC_SIGNUP` | When `false`, only invited users or emails matching a workspace signup domain can register (default `true`) |
+| `CREAM_PUBLIC_SIGNUP` | When `false`, only invited users or emails matching a workspace signup domain can register (default `true` outside production; production defaults to `false` when unset) |
 | `MARKETING_DATA_RETENTION_DAYS` | Days to keep `PageView` and `EmailEvent` rows (default 180; `MarketingDataRetentionJob`) |
 
 ```bash

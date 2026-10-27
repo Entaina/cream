@@ -67,7 +67,7 @@ All configuration lives in `.env` (see [.env.example](.env.example) for the full
 |---|---|
 | `CREAM_SEED_ADMIN_EMAIL` / `CREAM_SEED_ADMIN_PASSWORD` | Demo admin account created by `db:seed` |
 | `CREAM_SEED_MEMBER_EMAIL` / `CREAM_SEED_MEMBER_PASSWORD` | Demo member account |
-| `CREAM_PUBLIC_SIGNUP` | When `false`, registration and Google sign-in only for invited users or emails matching a workspace `email_domain` (default `true`) |
+| `CREAM_PUBLIC_SIGNUP` | When `false`, registration and Google sign-in only for invited users or emails matching a workspace `email_domain` (default `true` outside production; production defaults to `false` when unset) |
 | `CREAM_ORGANIZATION_EMAIL_DOMAIN` | Legacy fallback when no workspace has `email_domain` set for that domain |
 | `CREAM_ORGANIZATION_WORKSPACE_NAME` | Workspace slug/name used with the legacy org domain vars |
 

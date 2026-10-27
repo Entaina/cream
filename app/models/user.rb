@@ -38,7 +38,8 @@ class User < ApplicationRecord
   end
 
   def self.public_signup_enabled?
-    ActiveModel::Type::Boolean.new.cast(ENV.fetch("CREAM_PUBLIC_SIGNUP", "true"))
+    fallback = Rails.env.production? ? "false" : "true"
+    ActiveModel::Type::Boolean.new.cast(ENV.fetch("CREAM_PUBLIC_SIGNUP", fallback))
   end
 
   def self.email_domain_from_address(email_address)
