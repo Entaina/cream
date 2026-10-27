@@ -9,6 +9,19 @@ RSpec.describe "Api docs", type: :request do
       expect(response.body).to include("swagger-ui")
       expect(response.body).to include("/api/openapi.yaml")
     end
+
+    it "loads external Swagger assets with subresource integrity" do
+      get "/api/docs"
+
+      doc = Nokogiri::HTML(response.body)
+      external = doc.css("script[src^='https://'], link[rel='stylesheet'][href^='https://']")
+
+      expect(external).not_to be_empty
+      external.each do |node|
+        expect(node["integrity"]).to start_with("sha384-")
+        expect(node["crossorigin"]).to eq("anonymous")
+      end
+    end
   end
 
   describe "GET /api/openapi.yaml" do
