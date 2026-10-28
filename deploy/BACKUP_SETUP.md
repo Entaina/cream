@@ -13,7 +13,8 @@ and manual restoration from Google Drive.
 | Format | `pg_dump -Fc` (PostgreSQL custom, compressed) |
 | Destination | Folder in Google Drive (Shared drive of your organization) |
 | Authentication | Google Cloud service account + JSON key on disk |
-| File name | `cream_backup_<environment>_<date>.dump` (e.g. `cream_backup_production_2026-07-02.dump`) |
+| File name | `cream_backup_<environment>_<date>.dump` (optional `.age` suffix when `BACKUP_AGE_PUBLIC_KEY` is set) |
+| Encryption (optional) | `age` with `BACKUP_AGE_PUBLIC_KEY` on backup; restore with `BACKUP_AGE_IDENTITY_FILE` or `BACKUP_AGE_IDENTITY` |
 | Retention | Deletes backups older than **30 days**, except those from the **1st day of each month** (same environment only) |
 
 The daily job **does not run in development** even if you have the variables configured.
@@ -106,6 +107,28 @@ A **Google Workspace administrator** must:
 |----------|-------------|
 | `GOOGLE_DRIVE_SERVICE_ACCOUNT_KEY_PATH` | Path to the service account JSON file |
 | `GOOGLE_DRIVE_BACKUP_FOLDER_ID` | ID of the folder in Drive |
+| `BACKUP_AGE_PUBLIC_KEY` | Optional. `age` public key (`age1...`): backups are encrypted and uploaded as `.dump.age` |
+| `BACKUP_AGE_IDENTITY_FILE` / `BACKUP_AGE_IDENTITY` | Only to restore `.dump.age` backups: path to the `age` private key, or the key itself |
+
+### Backup encryption (age)
+
+Without encryption, anyone with access to the Drive folder can read every contact, deal and email in the dumps. To encrypt them:
+
+1. On your machine, generate a key pair with [`age`](https://github.com/FiloSottile/age):
+
+   ```bash
+   age-keygen -o cream-backup-age.txt
+   ```
+
+   The command prints the public key (`age1...`). The file holds the private key (`AGE-SECRET-KEY-...`).
+2. Store `cream-backup-age.txt` in the password manager. **Do not leave it on the server**: without it, encrypted backups cannot be restored, and anyone who has it can read them.
+3. Add the public key to the server `.env` and recreate the container:
+
+   ```bash
+   BACKUP_AGE_PUBLIC_KEY=age1...
+   ```
+
+From then on, daily backups are uploaded as `cream_backup_<environment>_<date>.dump.age`. If encryption fails, the backup fails and nothing is uploaded.
 
 ### Local development
 
@@ -203,6 +226,15 @@ Restore a specific file (it can be from another environment if you know the name
 
 ```bash
 bin/rails "cream:backup:restore[cream_backup_production_2026-07-01.dump]"
+# Encrypted backups (same flow; name ends with .dump.age):
+bin/rails "cream:backup:restore[cream_backup_production_2026-07-01.dump.age]"
+```
+
+Plain `.dump` files from before encryption stay restorable without any age key. Encrypted backups require the matching **identity** (private key), not the public key used for upload. Pass it only for the restore, with `-e` so it reaches the container:
+
+```bash
+docker compose exec -e CONFIRM=1 -e BACKUP_AGE_IDENTITY="$(cat cream-backup-age.txt)" web \
+  bin/rails "cream:backup:restore[cream_backup_production_2026-07-01.dump.age]"
 ```
 
 In **production** the restore is destructive (`pg_restore --clean`). It must be confirmed:
@@ -253,6 +285,7 @@ docker compose logs web | grep DatabaseBackupJob
 ## 8. Security
 
 - The JSON key is a secret: `600` permissions on the server, never in git.
+- With `BACKUP_AGE_PUBLIC_KEY` set, Drive only holds encrypted dumps; the `age` private key stays off the server.
 - Restoring in production requires `CONFIRM=1`.
 - Backups from different environments coexist in the same folder thanks to the
   `cream_backup_<environment>_` prefix; retention only deletes files from the environment running the backup.

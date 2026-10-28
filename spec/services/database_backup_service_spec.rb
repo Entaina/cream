@@ -49,6 +49,45 @@ RSpec.describe DatabaseBackupService do
     end
   end
 
+  it "uploads an age-encrypted dump and removes the encrypted temp file" do
+    allow(service).to receive(:run_pg_dump) { |path| File.write(path, "dump-data") }
+    encrypted_path = nil
+    allow(DatabaseBackupAge).to receive(:encrypt_if_configured) do |path, name|
+      encrypted_path = "#{path}.age"
+      File.write(encrypted_path, "encrypted")
+      [encrypted_path, "#{name}.age"]
+    end
+
+    travel_to Time.zone.parse("2026-07-02 02:00:00") do
+      result = service.call
+
+      expect(result.uploaded_file_name).to eq("cream_backup_test_2026-07-02.dump.age")
+      expect(storage).to have_received(:upload).with(encrypted_path, name: "cream_backup_test_2026-07-02.dump.age")
+      expect(File.exist?(encrypted_path)).to be(false)
+    end
+  end
+
+  it "uploads nothing when age encryption fails" do
+    allow(service).to receive(:run_pg_dump) { |path| File.write(path, "dump-data") }
+    allow(DatabaseBackupAge).to receive(:encrypt_if_configured).and_raise(DatabaseBackupAge::Error, "age encryption failed")
+
+    expect { service.call }.to raise_error(DatabaseBackupAge::Error)
+    expect(storage).not_to have_received(:upload)
+  end
+
+  it "applies the retention policy to encrypted backups too" do
+    allow(service).to receive(:run_pg_dump) { |path| File.write(path, "dump-data") }
+    old_encrypted = backup_file("cream_backup_test_2026-05-15.dump.age")
+    monthly_encrypted = backup_file("cream_backup_test_2026-05-01.dump.age")
+    allow(storage).to receive(:list_backups).and_return([old_encrypted, monthly_encrypted])
+
+    travel_to Time.zone.parse("2026-07-02 02:00:00") do
+      expect(service.call.deleted_files).to eq([old_encrypted.name])
+    end
+    expect(storage).to have_received(:delete).with(old_encrypted.id)
+    expect(storage).not_to have_received(:delete).with(monthly_encrypted.id)
+  end
+
   it "raises when pg_dump fails" do
     allow(Open3).to receive(:capture3).and_return(["", "connection refused", instance_double(Process::Status, success?: false, exitstatus: 1)])
 

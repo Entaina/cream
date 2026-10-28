@@ -14,7 +14,7 @@ class GoogleDriveBackupStorage
   end
 
   def self.backup_name_pattern(environment = Rails.env)
-    /\Acream_backup_#{Regexp.escape(environment.to_s)}_(\d{4}-\d{2}-\d{2})\.dump\z/
+    /\Acream_backup_#{Regexp.escape(environment.to_s)}_(\d{4}-\d{2}-\d{2})\.dump(\.age)?\z/
   end
 
   def initialize(drive_service: nil, environment: Rails.env)

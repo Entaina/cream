@@ -14,13 +14,14 @@ FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
 # Rails app lives here
 WORKDIR /rails
 
-# Install base packages (postgresql-client-16 matches the Postgres 16 server in deploy/docker-compose.yml)
+# Install base packages (postgresql-client-16 matches the Postgres 16 server in deploy/docker-compose.yml;
+# age encrypts/decrypts backups, see deploy/BACKUP_SETUP.md)
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y curl gnupg libjemalloc2 libvips lsb-release && \
     curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor -o /usr/share/keyrings/postgresql.gpg && \
     echo "deb [signed-by=/usr/share/keyrings/postgresql.gpg] http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
     apt-get update -qq && \
-    apt-get install --no-install-recommends -y postgresql-client-16 && \
+    apt-get install --no-install-recommends -y postgresql-client-16 age && \
     ln -s /usr/lib/$(uname -m)-linux-gnu/libjemalloc.so.2 /usr/local/lib/libjemalloc.so && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 

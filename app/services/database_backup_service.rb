@@ -15,15 +15,21 @@ class DatabaseBackupService
   def call
     backup_date = Date.current
     file_name = backup_filename(backup_date)
+    upload_name = nil
 
     Tempfile.create(["cream_backup_#{@environment}_", ".dump"]) do |tempfile|
       run_pg_dump(tempfile.path)
-      @storage.upload(tempfile.path, name: file_name)
+      upload_path, upload_name = DatabaseBackupAge.encrypt_if_configured(tempfile.path, file_name)
+      begin
+        @storage.upload(upload_path, name: upload_name)
+      ensure
+        FileUtils.rm_f(upload_path) unless upload_path == tempfile.path
+      end
     end
 
     deleted_files = apply_retention_policy
 
-    Result.new(uploaded_file_name: file_name, deleted_files: deleted_files)
+    Result.new(uploaded_file_name: upload_name, deleted_files: deleted_files)
   end
 
   private

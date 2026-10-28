@@ -26,6 +26,17 @@ RSpec.describe GoogleDriveBackupStorage do
     end
   end
 
+  describe ".backup_name_pattern" do
+    it "matches plain and age-encrypted dumps of the environment only" do
+      pattern = described_class.backup_name_pattern("test")
+
+      expect("cream_backup_test_2026-06-01.dump").to match(pattern)
+      expect("cream_backup_test_2026-06-01.dump.age").to match(pattern)
+      expect("cream_backup_test_2026-06-01.dump.gpg").not_to match(pattern)
+      expect("cream_backup_production_2026-06-01.dump.age").not_to match(pattern)
+    end
+  end
+
   describe "#list_backups" do
     it "returns only cream backup files from the folder" do
       backup = instance_double(

@@ -64,6 +64,52 @@ RSpec.describe DatabaseRestoreService do
       .to raise_error(DatabaseRestoreService::Error, /Backup not found in Drive/)
   end
 
+  it "decrypts age backups before pg_restore" do
+    encrypted = backup_file("cream_backup_test_2026-07-01.dump.age")
+    allow(storage).to receive(:list_backups).and_return([encrypted])
+    allow(DatabaseBackupAge).to receive(:decrypt_if_needed).and_return("/tmp/decrypted.dump")
+
+    service.call
+
+    expect(DatabaseBackupAge).to have_received(:decrypt_if_needed).with(kind_of(String), encrypted.name)
+    expect(service).to have_received(:run_pg_restore).with("/tmp/decrypted.dump")
+  end
+
+  it "deletes the decrypted dump after restoring" do
+    encrypted = backup_file("cream_backup_test_2026-07-01.dump.age")
+    allow(storage).to receive(:list_backups).and_return([encrypted])
+    decrypted_path = nil
+    allow(DatabaseBackupAge).to receive(:decrypt_if_needed) do |path, _name|
+      decrypted_path = "#{path}.decrypted.dump"
+      File.write(decrypted_path, "plain")
+      decrypted_path
+    end
+
+    service.call
+
+    expect(service).to have_received(:run_pg_restore).with(decrypted_path)
+    expect(File.exist?(decrypted_path)).to be(false)
+  end
+
+  it "restores the latest backup whether or not it is encrypted" do
+    older_plain = backup_file("cream_backup_test_2026-06-30.dump")
+    newer_encrypted = backup_file("cream_backup_test_2026-07-01.dump.age")
+    allow(storage).to receive(:list_backups).and_return([newer_encrypted, older_plain])
+    allow(DatabaseBackupAge).to receive(:decrypt_if_needed).and_return("/tmp/decrypted.dump")
+
+    expect(service.call.restored_file_name).to eq(newer_encrypted.name)
+  end
+
+  it "does not decrypt plain .dump backups" do
+    plain = backup_file("cream_backup_test_2026-07-01.dump")
+    allow(storage).to receive(:list_backups).and_return([plain])
+    allow(DatabaseBackupAge).to receive(:decrypt_if_needed).and_call_original
+
+    service.call
+
+    expect(service).to have_received(:run_pg_restore).with(kind_of(String))
+  end
+
   it "raises when pg_restore fails" do
     allow(storage).to receive(:list_backups).and_return([backup_file("cream_backup_test_2026-07-01.dump")])
     allow(service).to receive(:run_pg_restore).and_call_original

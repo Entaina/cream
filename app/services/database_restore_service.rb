@@ -15,8 +15,14 @@ class DatabaseRestoreService
     backup = file_name.present? ? find_by_name!(file_name) : latest_backup!
 
     Tempfile.create(["cream_restore_", ".dump"]) do |tempfile|
+      restore_path = tempfile.path
       @storage.download(backup.id, tempfile.path)
-      run_pg_restore(tempfile.path)
+      restore_path = DatabaseBackupAge.decrypt_if_needed(tempfile.path, backup.name)
+      run_pg_restore(restore_path)
+    ensure
+      if restore_path != tempfile.path && File.exist?(restore_path)
+        File.delete(restore_path)
+      end
     end
 
     Result.new(restored_file_name: backup.name)
