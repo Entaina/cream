@@ -12,6 +12,8 @@ RSpec.describe PersonMerger do
     Current.workspace = workspace
   end
 
+  after { Current.reset }
+
   def merge(primary:, secondaries:)
     described_class.call(primary: primary, secondaries: secondaries, user: user)
   end
