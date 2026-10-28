@@ -636,3 +636,10 @@ en:
     time_zone: Workspace time zone
     time_zone_hint: Default zone for members without a personal choice. Also defines
       “today” for alerts and briefings.
+  settings:
+    connected_apps:
+      title: Connected apps
+      intro: OAuth applications that can access your account on your behalf (MCP, API clients).
+      empty: You have not authorized any applications.
+      revoke: Revoke access
+      revoked: Application access revoked.

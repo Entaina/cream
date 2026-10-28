@@ -637,3 +637,10 @@ es:
     time_zone: Zona horaria del workspace
     time_zone_hint: Zona por defecto para miembros que no eligen una personal. También
       define el «día de hoy» en alertas y briefings.
+  settings:
+    connected_apps:
+      title: Aplicaciones conectadas
+      intro: Aplicaciones OAuth que pueden acceder a tu cuenta en tu nombre (MCP, clientes API).
+      empty: No has autorizado ninguna aplicación.
+      revoke: Revocar acceso
+      revoked: Acceso de la aplicación revocado.

@@ -2,6 +2,7 @@
 es:
   integrations:
     api_tokens:
+      connected_apps_link: Ver las aplicaciones conectadas con OAuth.
       create: Crear token
       created: Creado
       empty_subtitle: Crea un token para conectar un cliente MCP a este workspace.

@@ -20,6 +20,8 @@ Rails.application.routes.draw do
     resource :workspace, only: %i[show update], controller: :workspace
     resource :team, only: :show, controller: :team
     resource :profile, only: %i[show update], controller: :profile
+    get "connected_apps", to: "connected_apps#show", as: :connected_apps
+    delete "connected_apps/:id", to: "connected_apps#destroy", as: :connected_app
     resources :custom_fields, except: %i[show]
   end
 

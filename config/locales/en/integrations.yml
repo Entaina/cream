@@ -2,6 +2,7 @@
 en:
   integrations:
     api_tokens:
+      connected_apps_link: See apps connected with OAuth.
       create: Create token
       created: Created
       empty_subtitle: Create a token to connect an MCP client to this workspace.
