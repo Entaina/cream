@@ -75,6 +75,8 @@ es:
       new:
         able_to: 'Esta aplicación podrá:'
         prompt: "¿Permitir que %{client_name} se conecte a tu workspace de Cream?"
+        redirect_host_html: 'Tras autorizar, volverás a <strong>%{host}</strong>.'
+        unverified_client: Este cliente OAuth no está verificado por Cream.
         title: Autorización requerida
       show:
         title: 'Código de autorización:'

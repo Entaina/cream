@@ -15,6 +15,11 @@
     <p class="text-base text-ink-soft">
       <%= raw t(".prompt", client_name: content_tag(:strong, class: "text-ink") { @pre_auth.client.name }) %>
     </p>
+    <% redirect_host = (URI.parse(@pre_auth.redirect_uri).host rescue nil) %>
+    <% if redirect_host.present? %>
+      <p class="text-sm text-ink-faint"><%= t(".redirect_host_html", host: redirect_host) %></p>
+    <% end %>
+    <p class="text-xs text-amber-700 dark:text-amber-400"><%= t(".unverified_client") %></p>
 
     <% if @pre_auth.scopes.count > 0 %>
       <div>

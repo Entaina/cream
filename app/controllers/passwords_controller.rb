@@ -25,6 +25,7 @@ class PasswordsController < ApplicationController
     if @user.update(params.permit(:password, :password_confirmation))
       @user.confirm_email_and_provision! if was_unverified
       @user.sessions.destroy_all
+      revoke_oauth_tokens_for!(@user)
       redirect_to new_session_path, notice: t("auth.flashes.password_reset")
     else
       alert = if @user.errors.of_kind?(:password_confirmation, :confirmation)
@@ -37,6 +38,11 @@ class PasswordsController < ApplicationController
   end
 
   private
+
+  def revoke_oauth_tokens_for!(user)
+    Doorkeeper::AccessToken.where(resource_owner_id: user.id, revoked_at: nil)
+      .update_all(revoked_at: Time.current)
+  end
 
   def set_user_by_token
     @user = User.find_by_password_reset_token!(params[:token])

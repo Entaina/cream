@@ -27,6 +27,11 @@ Doorkeeper.configure do
 
   # MCP clients are public clients: PKCE required, no client secret.
   force_pkce
+  pkce_code_challenge_methods %w[S256]
+
+  forbid_redirect_uri do |uri|
+    %w[javascript vbscript data].include?(uri.scheme.to_s.downcase)
+  end
 
   # RFC 8252: native/CLI clients use HTTP loopback redirects.
   # Require HTTPS for everything else.

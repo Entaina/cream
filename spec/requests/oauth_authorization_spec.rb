@@ -48,10 +48,35 @@ RSpec.describe "OAuth authorization", type: :request do
       expect(response.body).not_to include("btn btn-success")
     end
 
+    it "shows where the user will return and that the client is not verified" do
+      sign_in_as(user)
+
+      get "/oauth/authorize", params: params
+
+      expect(response.body).to include("<strong>claude.ai</strong>")
+      expect(response.body).to include(I18n.t("doorkeeper.authorizations.new.unverified_client"))
+    end
+
+    it "does not offer consent for the plain PKCE method" do
+      sign_in_as(user)
+
+      get "/oauth/authorize", params: params.merge(code_challenge: "plain-verifier-" + ("x" * 40), code_challenge_method: "plain")
+
+      expect(response).to have_http_status(:bad_request)
+      expect(response.body).not_to include(I18n.t("doorkeeper.authorizations.new.title"))
+      expect(response.body).to include("S256")
+    end
+
     it "redirects to login when there is no session" do
       get "/oauth/authorize", params: params
 
       expect(response).to redirect_to(new_session_url)
+    end
+
+    it "does not accept script or data redirect URIs for OAuth clients" do
+      %w[javascript:alert(1)//x vbscript:msgbox(1) data:text/html,hi].each do |uri|
+        expect(Doorkeeper::Application.new(name: "Bad", redirect_uri: uri, confidential: false, scopes: "mcp")).not_to be_valid
+      end
     end
 
     context "with an HTTP localhost loopback redirect" do

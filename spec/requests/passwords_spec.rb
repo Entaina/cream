@@ -60,6 +60,26 @@ RSpec.describe "Passwords", type: :request do
       expect_notice(I18n.t("auth.flashes.password_reset"))
     end
 
+    it "revokes the user's OAuth tokens but not other users' tokens" do
+      application = Doorkeeper::Application.create!(name: "Claude", redirect_uri: "https://claude.ai/cb", confidential: false, scopes: "mcp")
+      own = Doorkeeper::AccessToken.create!(application: application, resource_owner_id: user.id, scopes: "mcp", use_refresh_token: true)
+      other = Doorkeeper::AccessToken.create!(application: application, resource_owner_id: users(:two).id, scopes: "mcp")
+
+      put password_path(user.password_reset_token), params: {password: "newpassword", password_confirmation: "newpassword"}
+
+      expect(own.reload).to be_revoked
+      expect(other.reload).not_to be_revoked
+    end
+
+    it "keeps the OAuth tokens when the new password is rejected" do
+      application = Doorkeeper::Application.create!(name: "Claude", redirect_uri: "https://claude.ai/cb", confidential: false, scopes: "mcp")
+      own = Doorkeeper::AccessToken.create!(application: application, resource_owner_id: user.id, scopes: "mcp")
+
+      put password_path(user.password_reset_token), params: {password: "newpassword", password_confirmation: "different"}
+
+      expect(own.reload).not_to be_revoked
+    end
+
     it "confirms the email when an unconfirmed account resets the password" do
       pending = User.create!(name: "Pending", email_address: "pending-reset@example.com", password: "password")
 

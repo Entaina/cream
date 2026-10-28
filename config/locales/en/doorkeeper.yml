@@ -73,6 +73,8 @@ en:
       new:
         able_to: 'This application will be able to:'
         prompt: Allow %{client_name} to connect to your Cream workspace?
+        redirect_host_html: 'After authorization, you will return to <strong>%{host}</strong>.'
+        unverified_client: This OAuth client is not verified by Cream.
         title: Authorization required
       show:
         title: 'Authorization code:'

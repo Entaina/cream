@@ -106,6 +106,56 @@ RSpec.describe "OAuth tokens", type: :request do
       expect(body["selected_workspace_id"]).to eq(workspace.id)
     end
 
+    describe "refresh token max age" do
+      let(:limit_start) { DoorkeeperRefreshTokenMaxAge::ENFORCED_FROM }
+
+      def refresh_token_issued_at(time)
+        token = Doorkeeper::AccessToken.create!(
+          application: application,
+          resource_owner_id: user.id,
+          scopes: "api",
+          expires_in: 2.hours.to_i,
+          use_refresh_token: true
+        )
+        token.update_column(:created_at, time)
+        token.plaintext_refresh_token
+      end
+
+      def refresh(refresh_token)
+        post "/oauth/token", params: {grant_type: "refresh_token", client_id: application.uid, refresh_token: refresh_token}
+      end
+
+      it "rejects refresh tokens unused for more than 90 days" do
+        travel_to(limit_start + 200.days) do
+          refresh(refresh_token_issued_at(91.days.ago))
+        end
+
+        expect(response).to have_http_status(:bad_request)
+        expect(JSON.parse(response.body)["error"]).to eq("invalid_grant")
+      end
+
+      it "still refreshes tokens used within the last 90 days" do
+        travel_to(limit_start + 200.days) do
+          refresh(refresh_token_issued_at(89.days.ago))
+        end
+
+        expect(response).to have_http_status(:ok)
+        expect(JSON.parse(response.body)["refresh_token"]).to be_present
+      end
+
+      it "gives tokens issued before the limit 90 days from its start" do
+        travel_to(limit_start + 89.days) do
+          refresh(refresh_token_issued_at(limit_start - 200.days))
+        end
+        expect(response).to have_http_status(:ok)
+
+        travel_to(limit_start + 91.days) do
+          refresh(refresh_token_issued_at(limit_start - 200.days))
+        end
+        expect(response).to have_http_status(:bad_request)
+      end
+    end
+
     it "rejects expired OAuth access tokens on the API" do
       access_token = Doorkeeper::AccessToken.create!(
         application: application,
