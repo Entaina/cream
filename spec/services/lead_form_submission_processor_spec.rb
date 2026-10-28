@@ -143,6 +143,17 @@ RSpec.describe LeadFormSubmissionProcessor do
     expect(message.body).to eq("Hola Ana, tu consulta sobre curso: Quiero más info.")
   end
 
+  it "escapes HTML typed by the visitor in the lead email" do
+    template = create_email_template!(workspace, user: member, subject: "Gracias", body: "<p>Hola {first_name}: {message}</p>")
+    lead_form.update!(email_template: template)
+
+    submit(contacto_lead_params("first_name" => "<b>Ana</b>", "message" => "<a href=\"https://evil.test\">premio</a>"))
+
+    body = EmailMessage.order(:id).last.body
+    expect(body).not_to include("<a href", "<b>")
+    expect(body).to include("&lt;a href=&quot;https://evil.test&quot;&gt;premio&lt;/a&gt;")
+  end
+
   it "attaches email template files to the lead confirmation message" do
     template = create_email_template!(
       workspace,

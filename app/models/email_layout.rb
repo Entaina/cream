@@ -9,15 +9,17 @@ class EmailLayout < ApplicationRecord
 
   scope :ordered, -> { order(:name, :id) }
 
-  def render_with(content_html, record:, extra_tokens: {})
-    rendered = content_html.to_s
-    if body.include?("{{") || body.include?("{%")
-      tokens = extra_tokens.stringify_keys.merge("content" => rendered)
-      rendered = Marketing::LiquidRenderer.render(body, record: record, extra_tokens: tokens)
+  # Tokens are resolved in the layout before the content goes in, so token-like
+  # text inside already rendered content is never interpolated a second time.
+  def render_with(content_html, record:, extra_tokens: {}, escape_html: false)
+    marker = "cream-layout-content-#{SecureRandom.hex(8)}"
+    layout = if body.include?("{{") || body.include?("{%")
+      tokens = extra_tokens.stringify_keys.merge("content" => marker)
+      Marketing::LiquidRenderer.render(body, record: record, extra_tokens: tokens, escape_html: escape_html)
     else
-      rendered = body.gsub(CONTENT_PLACEHOLDER, rendered)
+      body.gsub(CONTENT_PLACEHOLDER, marker)
     end
-    EmailTemplate.interpolate_string(rendered, record, extra_tokens)
+    EmailTemplate.interpolate_string(layout, record, extra_tokens, escape_html: escape_html).gsub(marker) { content_html.to_s }
   end
 
   def preview_body_for(template_body)

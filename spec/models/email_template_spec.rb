@@ -56,6 +56,61 @@ RSpec.describe EmailTemplate, type: :model do
       expect(template.render_for(person)).to eq("Hello #{person.display_name} from #{person.company.name}")
     end
 
+    it "escapes submitted token values in quill and html bodies" do
+      %w[quill html].each do |editor|
+        template = workspace.email_templates.create!(
+          user: user, name: "Auto #{editor}", subject: "Hi", body_editor: editor, body: "<p>Hola {first_name}</p>"
+        )
+
+        rendered = template.render_for(person, extra_tokens: {"first_name" => "<img src=x onerror=alert(1)>"})
+
+        expect(rendered).to eq("<p>Hola &lt;img src=x onerror=alert(1)&gt;</p>")
+      end
+    end
+
+    it "escapes submitted token values in liquid bodies" do
+      template = workspace.email_templates.create!(
+        user: user, name: "Liquid", subject: "Hi", body_editor: "html",
+        body: "<p>Hola {{ first_name }}{% if message != blank %}: {{ message }}{% endif %}</p>"
+      )
+
+      rendered = template.render_for(person, extra_tokens: {"first_name" => "<b>Ana</b>", "message" => "<a href=\"https://evil.test\">x</a>"})
+
+      expect(rendered).to eq("<p>Hola &lt;b&gt;Ana&lt;/b&gt;: &lt;a href=&quot;https://evil.test&quot;&gt;x&lt;/a&gt;</p>")
+    end
+
+    it "escapes submitted token values used by the layout and keeps the body markup" do
+      layout = workspace.email_layouts.create!(name: "Branded", body: "<div>{{ content }}<footer>{{ first_name }} {email}</footer></div>")
+      template = workspace.email_templates.create!(
+        user: user, name: "Wrapped", subject: "Hi", body: "<p>Hola</p>", email_layout: layout
+      )
+
+      rendered = template.render_for(person, extra_tokens: {"first_name" => "<b>Ana</b>", "email" => "<i>x</i>"})
+
+      expect(rendered).to eq("<div><p>Hola</p><footer>&lt;b&gt;Ana&lt;/b&gt; &lt;i&gt;x&lt;/i&gt;</footer></div>")
+    end
+
+    it "does not expand tokens smuggled into submitted values through the layout" do
+      layout = workspace.email_layouts.create!(name: "Simple", body: "<div>{content}</div>")
+      template = workspace.email_templates.create!(
+        user: user, name: "Inner", subject: "Hi", body: "<p>Hola {first_name}</p>", email_layout: layout
+      )
+
+      rendered = template.render_for(person, extra_tokens: {"first_name" => "{message}", "message" => "<a href=\"https://evil.test\">x</a>"})
+
+      expect(rendered).to eq("<div><p>Hola {message}</p></div>")
+    end
+
+    it "does not escape tokens when rendering without submitted values" do
+      layout = workspace.email_layouts.create!(name: "Simple", body: "<div>{content}<p>{first_name}</p></div>")
+      template = workspace.email_templates.create!(
+        user: user, name: "Plain", subject: "Hi", body: "<p>Hello {first_name}</p>", email_layout: layout
+      )
+      person.update!(first_name: "Ana & Co")
+
+      expect(template.render_for(person)).to eq("<div><p>Hello Ana & Co</p><p>Ana & Co</p></div>")
+    end
+
     it "wraps rendered body with layout content placeholder" do
       layout = workspace.email_layouts.create!(
         name: "Branded",

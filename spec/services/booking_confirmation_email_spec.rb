@@ -102,6 +102,18 @@ RSpec.describe BookingConfirmationEmail, type: :service do
       expect(message.body).to include(booking.cancel_url)
     end
 
+    it "escapes the guest message and keeps management links working" do
+      allow(SendViaGmailJob).to receive(:perform_later)
+      template.update!(body: %(<p>{guest_message}</p><a href="{cancel_url}">Cancelar</a>))
+      booking.update!(message: %(<a href="https://evil.test">premio</a>))
+
+      described_class.call(booking)
+
+      body = workspace.email_messages.last.body
+      expect(body).to include("<p>&lt;a href=&quot;https://evil.test&quot;&gt;premio&lt;/a&gt;</p>")
+      expect(Nokogiri::HTML.fragment(body).at_css("a")["href"]).to eq(booking.cancel_url)
+    end
+
     it "does nothing without an email template" do
       event_type.update!(email_template: nil)
 

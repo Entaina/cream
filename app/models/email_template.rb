@@ -27,13 +27,16 @@ class EmailTemplate < ApplicationRecord
     tags.reject { |tag| QUILL_SUPPORTED_TAGS.include?(tag) }
   end
 
-  def self.interpolate_string(text, record, extra_tokens = {})
+  def self.interpolate_string(text, record, extra_tokens = {}, escape_html: false)
     text.to_s.gsub(/\{(\w+)\}/) do
       token = Regexp.last_match(1)
       value = extra_tokens[token] || extra_tokens[token.to_sym]
-      next value.to_s unless value.nil?
+      unless value.nil?
+        next escape_html ? ERB::Util.html_escape(value.to_s) : value.to_s
+      end
 
-      template_value(record, token)
+      raw = template_value(record, token)
+      escape_html ? ERB::Util.html_escape(raw.to_s) : raw.to_s
     end
   end
 
@@ -54,8 +57,16 @@ class EmailTemplate < ApplicationRecord
     "quill"
   end
 
+  # Extra tokens carry what a visitor typed (lead form autoresponders, booking
+  # confirmations), so their values are HTML-escaped in the body and layout.
   def render_for(record, extra_tokens: {})
-    wrap_with_layout(interpolate(render_body(record, extra_tokens), record, extra_tokens), record, extra_tokens)
+    escape_html = extra_tokens.present?
+    wrap_with_layout(
+      interpolate(render_body(record, extra_tokens, escape_html:), record, extra_tokens, escape_html:),
+      record,
+      extra_tokens,
+      escape_html:
+    )
   end
 
   def render_subject_for(record, extra_tokens: {})
@@ -98,11 +109,11 @@ class EmailTemplate < ApplicationRecord
 
   private
 
-  def render_body(record, extra_tokens)
+  def render_body(record, extra_tokens, escape_html: false)
     text = body
     return text unless liquid?
 
-    Marketing::LiquidRenderer.render(text, record: record, extra_tokens: extra_tokens)
+    Marketing::LiquidRenderer.render(text, record: record, extra_tokens: extra_tokens, escape_html: escape_html)
   end
 
   def render_subject(record, extra_tokens)
@@ -112,14 +123,14 @@ class EmailTemplate < ApplicationRecord
     Marketing::LiquidRenderer.render(text, record: record, extra_tokens: extra_tokens)
   end
 
-  def interpolate(text, record, extra_tokens)
-    self.class.interpolate_string(text, record, extra_tokens)
+  def interpolate(text, record, extra_tokens, escape_html: false)
+    self.class.interpolate_string(text, record, extra_tokens, escape_html: escape_html)
   end
 
-  def wrap_with_layout(content_html, record, extra_tokens)
+  def wrap_with_layout(content_html, record, extra_tokens, escape_html: false)
     return content_html unless email_layout
 
-    email_layout.render_with(content_html, record: record, extra_tokens: extra_tokens)
+    email_layout.render_with(content_html, record: record, extra_tokens: extra_tokens, escape_html: escape_html)
   end
 
   def attachments_within_limits

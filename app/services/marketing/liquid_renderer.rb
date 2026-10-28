@@ -1,8 +1,10 @@
 module Marketing
   class LiquidRenderer
-    def self.render(text, record:, extra_tokens: {})
+    def self.render(text, record:, extra_tokens: {}, escape_html: false)
       template = Liquid::Template.parse(text.to_s, environment: LeadFormTemplates::Renderer.build_environment)
-      template.render!(assigns_for(record, extra_tokens)).to_s
+      assigns = assigns_for(record, extra_tokens)
+      assigns = assigns.transform_values { |value| value.is_a?(String) ? ERB::Util.html_escape(value).to_str : value } if escape_html
+      template.render!(assigns).to_s
     rescue Liquid::Error
       text.to_s
     end
