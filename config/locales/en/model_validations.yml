@@ -86,6 +86,8 @@ en:
             pipeline_routes:
               invalid_key: 'invalid key: %{key}'
               invalid_pipeline: invalid pipeline for %{help_type}
+            slug:
+              reserved: is reserved
         lead_form_template:
           attributes:
             slug:

@@ -92,6 +92,8 @@ es:
             pipeline_routes:
               invalid_key: 'clave no válida: %{key}'
               invalid_pipeline: pipeline no válido para %{help_type}
+            slug:
+              reserved: está reservado
         lead_form_template:
           attributes:
             slug:

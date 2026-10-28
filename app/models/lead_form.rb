@@ -2,6 +2,7 @@ class LeadForm < ApplicationRecord
   DESTINATIONS = %w[deal mql].freeze
 
   PLACEHOLDER_COMPANY_NAME = "Particulares".freeze
+  RESERVED_SLUGS = %w[template-preview].freeze
   HONEYPOT_FIELD = "_honeypot".freeze
   TIMESTAMP_FIELD = "_ts".freeze
   # Anti-spam: a human needs at least this long to fill the form.
@@ -49,6 +50,7 @@ class LeadForm < ApplicationRecord
   validates :destination, inclusion: {in: DESTINATIONS}
   validates :first_task_title, presence: true, if: :deal_destination?
   validates :slug, uniqueness: true, format: {with: /\A[a-z0-9-]+\z/}
+  validate :slug_not_reserved
   validates :template_key, inclusion: {in: ->(form) { form.class.available_template_keys(workspace: form.workspace) }}
   validates :first_task_due_days, numericality: {only_integer: true, greater_than_or_equal_to: 0}
   validates :success_redirect_url, format: {with: URI::DEFAULT_PARSER.make_regexp(%w[http https])}, allow_blank: true
@@ -261,6 +263,12 @@ class LeadForm < ApplicationRecord
 
   def normalize_hidden_field_keys
     self.hidden_field_keys = Array(hidden_field_keys).map { |key| key.to_s.strip.downcase }.compact_blank.uniq
+  end
+
+  def slug_not_reserved
+    return if slug.blank?
+
+    errors.add(:slug, :reserved) if RESERVED_SLUGS.include?(slug)
   end
 
   def hidden_field_keys_are_valid

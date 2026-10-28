@@ -365,6 +365,86 @@ RSpec.describe LeadFormSubmissionProcessor do
     expect(deal.company).to eq(company)
   end
 
+  it "matches company_cif against whole words of the free-text fiscal information" do
+    company = workspace.companies.create!(name: "Acme SL", fiscal_information: "CIF: B-12.345.678\nCalle Mayor 1")
+    workspace.companies.create!(name: "Otra SL", fiscal_information: "CIF B123456789")
+    processor = ->(cif) { described_class.new(lead_form:, params: {"company_cif" => cif}, request:) }
+
+    expect(processor.call("b12345678").send(:find_company_by_cif)).to eq(company)
+    expect(processor.call("B1234").send(:find_company_by_cif)).to be_nil
+  end
+
+  context "when the submitted email belongs to an existing contact" do
+    let(:company) { create_company!(workspace, name: "Acme SL") }
+    let!(:existing) { create_person!(workspace, company: company, email: "lead@example.com") }
+
+    before { lead_form.update!(template_key: "demo", collects_company: true) }
+
+    def render_company_cif_field!
+      template = workspace.lead_form_templates.find_by!(path: LeadFormTemplate.form_page_path_for("demo"))
+      template.update!(body: template.body.sub(
+        /(\{% field type: "text", name: "company_name".*?%\})/,
+        %(\\1\n{% field type: "text", name: "company_cif", label: "CIF" %})
+      ))
+      template.refresh_submission_schema!
+    end
+
+    it "keeps their company and the company of their open deal" do
+      deal = create_deal!(workspace, pipeline: pipeline, company: company, contacts: [existing])
+      create_company!(workspace, name: "Otra SL")
+
+      expect {
+        submit(demo_lead_params("company_name" => "Otra SL"))
+      }.not_to change(Company, :count)
+
+      expect(existing.reload.company).to eq(company)
+      expect(deal.reload.company).to eq(company)
+    end
+
+    it "does not create a company from the submitted name" do
+      expect {
+        submit(demo_lead_params("company_name" => "Nueva SL"))
+      }.not_to change(Company, :count)
+
+      expect(existing.reload.company).to eq(company)
+      expect(Deal.order(:id).last.company).to eq(company)
+    end
+
+    it "does not fill the fiscal data of their company" do
+      render_company_cif_field!
+
+      submit(demo_lead_params("company_name" => "Acme SL", "company_cif" => "B99999999"))
+
+      expect(company.reload.fiscal_information).to be_blank
+    end
+
+    it "keeps their company on MQL forms" do
+      allow(CreamFeatures).to receive(:enabled?).and_call_original
+      allow(CreamFeatures).to receive(:enabled?).with(:mql_pool).and_return(true)
+      allow(CreamFeatures).to receive(:enabled?).with(:marketing_consent).and_return(true)
+      lead_form.update!(destination: "mql")
+      render_company_cif_field!
+
+      expect {
+        submit(demo_lead_params("company_name" => "Nueva SL", "company_cif" => "B99999999", "_submission_key" => SecureRandom.uuid))
+      }.not_to change(Company, :count)
+
+      expect(existing.reload.company).to eq(company)
+      expect(company.reload.fiscal_information).to be_blank
+    end
+
+    it "moves them and their open deal off the placeholder company" do
+      placeholder = LeadForm.placeholder_company_for(workspace)
+      existing.update!(company: placeholder)
+      deal = create_deal!(workspace, pipeline: pipeline, company: placeholder, contacts: [existing])
+
+      submit(demo_lead_params("company_name" => "Nueva SL"))
+
+      expect(existing.reload.company.name).to eq("Nueva SL")
+      expect(deal.reload.company).to eq(existing.company)
+    end
+  end
+
   it "rejects company_cif when the rendered form does not include that field" do
     lead_form.update!(template_key: "demo", collects_company: true)
 

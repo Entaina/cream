@@ -48,9 +48,7 @@ class LeadFormSubmissionProcessor
     ActiveRecord::Base.transaction do
       person, created = find_or_create_person!(lock_email: true)
       fill_person_blanks!(person) unless created
-      company = resolve_company!(person:, created:)
-      fill_company_blanks!(company)
-      person.update!(company: company) if person.company_id != company.id
+      assign_submitted_company!(person) if company_assignable?(person, created)
       submission = persist_submission!(deal: nil, person:, capture_destination: "mql")
       propagate_mql_consent!(person:, submission:)
       person.update!(lifecycle_stage: "lead") if person.lifecycle_stage == "subscriber"
@@ -67,10 +65,8 @@ class LeadFormSubmissionProcessor
     ActiveRecord::Base.transaction do
       person, created = find_or_create_person!
       fill_person_blanks!(person) unless created
-      company = resolve_company!(person:, created:)
-      fill_company_blanks!(company)
-      person.update!(company: company) if person.company_id != company.id
-      deal, deal_created = find_or_create_deal!(person:, company:)
+      assign_submitted_company!(person) if company_assignable?(person, created)
+      deal, deal_created = find_or_create_deal!(person:, company: person.company)
       create_first_task!(deal) unless deal_created
       attach_deal_product!(deal)
       submission = persist_submission!(deal:, person:, capture_destination: "deal")
@@ -187,11 +183,20 @@ class LeadFormSubmissionProcessor
     person.update!(updates) if updates.any?
   end
 
-  def resolve_company!(person:, created:)
-    return resolve_submitted_company! if requires_company_name?
-    return LeadForm.placeholder_company_for(workspace) if created
+  # Anyone can submit a public form with someone else's email, so a submission
+  # only picks the company of a new person or of one still on the placeholder.
+  def company_assignable?(person, created)
+    created || (requires_company_name? && placeholder_company?(person.company))
+  end
 
-    person.company
+  def assign_submitted_company!(person)
+    company = requires_company_name? ? resolve_submitted_company! : LeadForm.placeholder_company_for(workspace)
+    fill_company_blanks!(company)
+    person.update!(company: company) if person.company_id != company.id
+  end
+
+  def placeholder_company?(company)
+    company.nil? || company.name == LeadForm::PLACEHOLDER_COMPANY_NAME
   end
 
   def requires_company_name?
@@ -218,7 +223,13 @@ class LeadFormSubmissionProcessor
     cif = params["company_cif"].to_s.strip
     return if cif.blank?
 
-    workspace.companies.where("fiscal_information ILIKE ?", "%#{ActiveRecord::Base.sanitize_sql_like(cif)}%").first
+    # fiscal_information is free text ("CIF: B-12.345.678, Calle..."), so the
+    # CIF must match a whole word, not a substring.
+    normalized = cif.upcase.gsub(/[\s.-]/, "")
+    workspace.companies.where(
+      "? = ANY(regexp_split_to_array(regexp_replace(upper(coalesce(fiscal_information, '')), '[.-]', '', 'g'), '[^A-Z0-9]+'))",
+      normalized
+    ).first
   end
 
   def find_company_by_name
@@ -242,7 +253,7 @@ class LeadFormSubmissionProcessor
     existing = person.deals.open_deals.where(pipeline_id: pipeline.id).order(created_at: :desc).first
 
     if existing
-      existing.update!(company: company) if existing.company_id != company.id
+      existing.update!(company: company) if existing.company_id != company.id && placeholder_company?(existing.company)
       advance_stage!(existing, pipeline)
       return [existing, false]
     end

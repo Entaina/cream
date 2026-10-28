@@ -14,6 +14,15 @@ RSpec.describe LeadForm, type: :model do
     expect(form.first_task_due_days).to eq(1)
   end
 
+  it "rejects the slug used by template previews" do
+    form = create_lead_form!(workspace, user: member)
+    form.slug = LeadFormTemplates::PagePreview::PREVIEW_SLUG
+
+    expect(form).not_to be_valid
+    expect(form.errors.added?(:slug, :reserved)).to be(true)
+    expect(form.errors.full_messages_for(:slug).join).not_to include("translation missing")
+  end
+
   it "requires first task title" do
     form = create_lead_form!(workspace, user: member)
     form.first_task_title = ""
