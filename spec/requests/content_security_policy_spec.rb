@@ -40,34 +40,35 @@ RSpec.describe "Content security policy", type: :request do
     policy.split(";").map(&:strip).find { |part| part.start_with?("#{name} ") }
   end
 
-  it "enforces the policy on app pages" do
+  it "reports violations on app pages to the CSP report endpoint without enforcing the policy" do
     get new_session_path
 
     expect(response).to have_http_status(:ok)
-    expect(response.headers["Content-Security-Policy-Report-Only"]).to be_nil
-    policy = response.headers["Content-Security-Policy"]
+    expect(response.headers["Content-Security-Policy"]).to be_nil
+    policy = response.headers["Content-Security-Policy-Report-Only"]
     expect(policy).to include("object-src 'none'")
     expect(policy).to include("base-uri 'self'")
+    expect(directive(policy, "report-uri")).to eq("report-uri /csp_reports")
     expect(directive(policy, "script-src")).to match(/'nonce-[^']+'/)
     expect(directive(policy, "script-src")).not_to include("'unsafe-inline'")
     expect(directive(policy, "style-src")).to include("https://fonts.googleapis.com")
     expect(directive(policy, "connect-src")).to include("wss:")
   end
 
-  it "enforces the policy inside the signed-in app" do
+  it "reports violations inside the signed-in app" do
     sign_in_as(user)
 
     get deals_path
 
     expect(response).to have_http_status(:ok)
-    expect(response.headers["Content-Security-Policy"]).to include("object-src 'none'")
-    expect(response.headers["Content-Security-Policy-Report-Only"]).to be_nil
+    expect(response.headers["Content-Security-Policy"]).to be_nil
+    expect(response.headers["Content-Security-Policy-Report-Only"]).to include("report-uri /csp_reports")
   end
 
   it "allows the Swagger UI bundle and its nonced bootstrap script on the API docs" do
     get api_docs_path
 
-    policy = response.headers["Content-Security-Policy"]
+    policy = response.headers["Content-Security-Policy-Report-Only"]
     script_src = directive(policy, "script-src")
     expect(script_src).to include("https://cdn.jsdelivr.net")
     expect(directive(policy, "style-src")).to include("https://cdn.jsdelivr.net")
@@ -106,12 +107,9 @@ RSpec.describe "Content security policy", type: :request do
     expect(response).to have_http_status(:ok)
     expect(response.headers["Content-Security-Policy"]).to be_nil
     expect(response.headers["Content-Security-Policy-Report-Only"]).to include("object-src 'none'")
-
-    get lead_form_templates_path
-    expect(response.headers["Content-Security-Policy"]).to include("object-src 'none'")
   end
 
-  it "keeps inline event handlers out of app views, which the enforced policy blocks" do
+  it "keeps inline event handlers out of app views, which a nonce-based policy blocks" do
     handler = /\son[a-z]+=["']|\bon[a-z]+:\s*["']/
     offenders = Rails.root.glob("app/{views,helpers,components}/**/*.{erb,rb}").filter_map do |path|
       path.relative_path_from(Rails.root).to_s if path.read.match?(handler)

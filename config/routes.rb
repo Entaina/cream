@@ -367,5 +367,7 @@ Rails.application.routes.draw do
   get "privacy", to: "legal_pages#privacy"
   get "support", to: "legal_pages#support"
 
+  post "csp_reports", to: "csp_reports#create", as: :csp_reports
+
   get "up" => "rails/health#show", :as => :rails_health_check
 end
