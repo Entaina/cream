@@ -1,6 +1,7 @@
 class Person < ApplicationRecord
   include CrmRecord
   include WorkspaceScopedAssociations
+  include HttpUrlFormat
 
   SOURCES = {
     "web_form" => "Formulario web",
@@ -43,6 +44,7 @@ class Person < ApplicationRecord
   validates :internal_notes, length: {maximum: INTERNAL_NOTES_MAX_LENGTH}
   validates :first_name, presence: true, unless: -> { last_name.present? }
   validates :email, format: {with: URI::MailTo::EMAIL_REGEXP}, allow_blank: true
+  validates_http_url :linkedin_url, :twitter_url
   validates :source, inclusion: {in: SOURCES.keys}, allow_blank: true
   validates :brought_by_id, presence: true, if: -> { source == "team_member" }
   validate :brought_by_in_workspace, if: -> { brought_by_id.present? }

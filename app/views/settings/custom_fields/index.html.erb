@@ -11,7 +11,7 @@
 <div class="flex-1 overflow-y-auto scrollbar-subtle p-5">
   <div class="max-w-2xl space-y-6">
     <p class="text-base text-ink-soft">
-      <%= t("integrations.custom_fields.intro", workspace: current_workspace.name).html_safe %>
+      <%= t("integrations.custom_fields.intro_html", workspace: current_workspace.name) %>
       <% unless @admin %>
         <%= t("integrations.custom_fields.admin_only") %>
       <% end %>

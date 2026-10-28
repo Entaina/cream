@@ -9,7 +9,7 @@
               amount: number_to_currency(@stripe_payment.amount_decimal,
                 unit: @stripe_payment.currency.casecmp?("eur") ? "€" : @stripe_payment.currency.upcase,
                 precision: 2),
-              customer: @stripe_payment.customer_email || @stripe_payment.customer_name).html_safe %>
+              customer: @stripe_payment.customer_email || @stripe_payment.customer_name) %>
       </div>
     <% end %>
     <%= render "form", deal: @deal %>

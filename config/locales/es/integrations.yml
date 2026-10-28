@@ -33,7 +33,7 @@ es:
         clientes.
       booking_pages_title: Páginas de reservas
       connect: Conectar Google Calendar
-      connected_as: Conectado como %{email}.
+      connected_as_html: Conectado como %{email}.
       disconnect: Desconectar
       disconnected_intro: Conecta tu Google Calendar para habilitar la disponibilidad
         en tiempo real y la creación automática de eventos con Google Meet.
@@ -70,7 +70,7 @@ es:
       formula_expression: Expresión de fórmula
       formula_hint: Usa tokens {field_name} o {cf.key}. Admite +, -, *, / y paréntesis.
       formula_placeholder: "{value} * {probability} / 100"
-      intro: Define atributos extra para personas, empresas y oportunidades en %{workspace}.
+      intro_html: Define atributos extra para personas, empresas y oportunidades en %{workspace}.
       name_placeholder: Nivel de cliente
       new: Nuevo campo
       new_page_title: Nuevo campo personalizado
@@ -96,7 +96,7 @@ es:
       connect_full: Conectar con registro completo de respuestas
       connect_send: Conectar solo para envío
       connect_send_receive: Conectar para envío y detección de respuestas
-      connected: Gmail conectado para <strong>%{email}</strong>.
+      connected_html: Gmail conectado para <strong>%{email}</strong>.
       disconnect: Desconectar
       disconnected_intro: Conecta tu cuenta de Gmail para enviar emails de ficha desde
         tu propia dirección. Puedes empezar solo con envío y añadir detección de respuestas
@@ -298,8 +298,8 @@ es:
         title: Pagos Stripe
     team:
       clear: Limpiar
-      intro_admin: Gestiona miembros, roles e invitaciones del workspace <strong>%{workspace}</strong>.
-      intro_member: Miembros del workspace <strong>%{workspace}</strong>.
+      intro_admin_html: Gestiona miembros, roles e invitaciones del workspace <strong>%{workspace}</strong>.
+      intro_member_html: Miembros del workspace <strong>%{workspace}</strong>.
       invitation_link: 'Enlace de invitación (copiar y compartir):'
       invite_as: Invitado como %{role}
       invite_email: Email
@@ -413,7 +413,7 @@ es:
         salespeople_view: Los vendedores pueden ver las oportunidades de otros
         save: Guardar
         title: General
-      intro: Opciones del workspace <strong>%{workspace}</strong>.
+      intro_html: Opciones del workspace <strong>%{workspace}</strong>.
       mailjet:
         api_key: API Key
         api_key_keep: Deja en blanco para conservar la clave actual

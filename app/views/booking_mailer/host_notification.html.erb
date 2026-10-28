@@ -4,7 +4,7 @@
         event_name: @event_type.localized_name,
         guest_name: @booking.display_name,
         guest_email: @booking.email,
-        workspace_name: @booking_page.workspace.name).html_safe %>
+        workspace_name: @booking_page.workspace.name) %>
 </p>
 <ul>
   <li><strong><%= t("booking.mailer.host_notification.date_time") %>:</strong> <%= @starts_at_display %></li>

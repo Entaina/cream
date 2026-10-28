@@ -25,7 +25,7 @@ es:
       footer_deal_link: Ver oportunidad en Cream
       form_data_heading: Datos del formulario
       greeting: Hola %{name},
-      intro: Se ha recibido un nuevo envío en el formulario <strong>%{form_name}</strong>.
+      intro_html: Se ha recibido un nuevo envío en el formulario <strong>%{form_name}</strong>.
       intro_text: Se ha recibido un nuevo envío en el formulario %{form_name}.
       metadata_heading: Origen
       subject: Nuevo lead · %{form_name}%{lead_suffix}

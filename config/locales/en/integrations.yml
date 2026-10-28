@@ -31,7 +31,7 @@ en:
       booking_pages_hint: Manage event types and share the public URL with your clients.
       booking_pages_title: Booking pages
       connect: Connect Google Calendar
-      connected_as: Connected as %{email}.
+      connected_as_html: Connected as %{email}.
       disconnect: Disconnect
       disconnected_intro: Connect Google Calendar for real-time availability and automatic
         Google Meet events.
@@ -68,7 +68,7 @@ en:
       formula_expression: Formula expression
       formula_hint: Use {field_name} or {cf.key} tokens. Supports +, -, *, / and parentheses.
       formula_placeholder: "{value} * {probability} / 100"
-      intro: Define extra attributes for people, companies and deals in %{workspace}.
+      intro_html: Define extra attributes for people, companies and deals in %{workspace}.
       name_placeholder: Customer tier
       new: New field
       new_page_title: New custom field
@@ -94,7 +94,7 @@ en:
       connect_full: Connect with full reply logging
       connect_send: Connect for sending only
       connect_send_receive: Connect for sending and reply detection
-      connected: Gmail connected for <strong>%{email}</strong>.
+      connected_html: Gmail connected for <strong>%{email}</strong>.
       disconnect: Disconnect
       disconnected_intro: Connect your Gmail account to send record emails from your
         own address. You can start with send-only and add reply detection later.
@@ -292,8 +292,8 @@ en:
         title: Stripe payments
     team:
       clear: Clear
-      intro_admin: Manage workspace members, roles, and invitations for <strong>%{workspace}</strong>.
-      intro_member: Workspace members of <strong>%{workspace}</strong>.
+      intro_admin_html: Manage workspace members, roles, and invitations for <strong>%{workspace}</strong>.
+      intro_member_html: Workspace members of <strong>%{workspace}</strong>.
       invitation_link: 'Invitation link (copy and share):'
       invite_as: Invited as %{role}
       invite_email: Email
@@ -405,7 +405,7 @@ en:
         salespeople_view: Salespeople can view other users' deals
         save: Save
         title: General
-      intro: Configure workspace options for <strong>%{workspace}</strong>.
+      intro_html: Configure workspace options for <strong>%{workspace}</strong>.
       mailjet:
         api_key: API Key
         api_key_keep: Leave blank to keep the current key

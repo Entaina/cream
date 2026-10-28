@@ -4,7 +4,7 @@
     <div class="p-5 space-y-4 bg-canvas-raised rounded-xl">
       <h3 class="text-base font-semibold text-ink"><%= t("tasks.next_task_prompt.title") %></h3>
       <p class="text-base text-ink-soft">
-        <%= t("tasks.next_task_prompt.body_html", name: prompt["name"]).html_safe %>
+        <%= t("tasks.next_task_prompt.body_html", name: prompt["name"]) %>
       </p>
 
       <%= form_with model: Task.new(due_on: Task.default_due_on), url: tasks_path, class: "space-y-3" do |f| %>

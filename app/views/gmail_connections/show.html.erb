@@ -4,7 +4,7 @@
 <div class="p-5 max-w-xl">
   <div class="card p-4 space-y-3">
     <% if @connection.persisted? && @connection.connected? %>
-      <p class="text-base text-ink-soft"><%= t("integrations.gmail.connected", email: @connection.email).html_safe %></p>
+      <p class="text-base text-ink-soft"><%= t("integrations.gmail.connected_html", email: @connection.email) %></p>
       <p class="text-sm text-ink-faint">
         <% if @connection.send_receive_full_mode? %>
           <%= t("integrations.gmail.mode_full") %>

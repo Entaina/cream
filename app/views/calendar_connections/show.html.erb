@@ -5,7 +5,7 @@
   <div class="max-w-2xl space-y-6">
   <% if @connection.connected? %>
     <div class="card p-6 space-y-4">
-      <p><%= t("integrations.calendar.connected_as", email: @connection.email).html_safe %></p>
+      <p><%= t("integrations.calendar.connected_as_html", email: @connection.email) %></p>
       <% if @connection.missing_scopes_message %>
         <p class="text-sm text-golden-800 bg-golden-100 rounded-md px-3 py-2"><%= @connection.missing_scopes_message %></p>
       <% else %>

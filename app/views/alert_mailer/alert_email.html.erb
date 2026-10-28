@@ -4,7 +4,7 @@
   <%= t("alert_mailer.alert_email.body_html",
         deal_name: @deal.name,
         company_name: @deal.company.name,
-        workspace_name: @rule.workspace.name).html_safe %>
+        workspace_name: @rule.workspace.name) %>
 </p>
 <p>
   <%= link_to t("alert_mailer.alert_email.view_deal"), @deal_url %>

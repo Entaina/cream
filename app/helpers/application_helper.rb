@@ -641,7 +641,7 @@ module ApplicationHelper
     when "date"
       value.is_a?(Date) ? l(value, format: :short) : l(Date.parse(value.to_s), format: :short)
     when "url"
-      link_to(value, value, target: "_blank", class: "text-accent hover:underline break-all")
+      safe_http_url_link(value)
     when "email"
       mail_to(value, value, class: "text-accent hover:underline")
     when "multi_select"
@@ -754,5 +754,14 @@ module ApplicationHelper
 
   def deal_contact_attribute(deal, attribute)
     deal.contacts.filter_map { |contact| contact.public_send(attribute).presence }.join(", ")
+  end
+
+  def safe_http_url_link(value)
+    uri = URI.parse(value.to_s)
+    return ERB::Util.h(value) unless uri.is_a?(URI::HTTP) && uri.host.present?
+
+    link_to(value, uri.to_s, target: "_blank", rel: "noopener noreferrer", class: "text-accent hover:underline break-all")
+  rescue URI::InvalidURIError
+    ERB::Util.h(value)
   end
 end
