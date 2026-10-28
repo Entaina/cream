@@ -134,6 +134,32 @@ RSpec.describe Public::BookingApiController, type: :request do
       expect(BookingCreator).to have_received(:call)
     end
 
+    it "rejects the booking when Turnstile is enabled and the token is invalid" do
+      allow(TurnstileVerifier).to receive(:enabled?).and_return(true)
+      allow(TurnstileVerifier).to receive(:valid?).and_return(false)
+      allow(BookingCreator).to receive(:call)
+
+      post public_booking_api_book_path(booking_page.slug),
+        params: valid_booking_params("cf-turnstile-response" => "bad"),
+        as: :json
+
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(TurnstileVerifier).to have_received(:valid?).with(token: "bad", ip: anything)
+      expect(BookingCreator).not_to have_received(:call)
+    end
+
+    it "creates the booking when the Turnstile token is valid" do
+      allow(TurnstileVerifier).to receive(:enabled?).and_return(true)
+      allow(TurnstileVerifier).to receive(:valid?).and_return(true)
+      allow(BookingCreator).to receive(:call).and_return(BookingCreator::Result.new(booking: booking))
+
+      post public_booking_api_book_path(booking_page.slug),
+        params: valid_booking_params("cf-turnstile-response" => "ok"),
+        as: :json
+
+      expect(response).to have_http_status(:created)
+    end
+
     it "includes reminder_minutes_before when a reminder is scheduled" do
       allow(BookingCreator).to receive(:call).and_return(BookingCreator::Result.new(booking: booking))
 

@@ -17,7 +17,7 @@ export default class extends Controller {
     "submitLabel", "confirmedHeading", "confirmationDetails", "icsDownload", "bookAnotherLabel",
     "firstNameInput", "lastNameInput", "emailInput", "phoneInput", "messageInput", "honeypotInput", "honeypotLabel",
     "localeEs", "localeEn", "progress", "progressEvent", "progressEventSeparator", "progressSchedule", "progressDetails",
-    "progressEventLabel", "progressScheduleLabel", "progressDetailsLabel", "rescheduleBanner"
+    "progressEventLabel", "progressScheduleLabel", "progressDetailsLabel", "rescheduleBanner", "turnstile"
   ]
 
   static values = {
@@ -627,8 +627,18 @@ export default class extends Controller {
       guests: this.collectGuestEmails(),
       _ts: this.timestampValue,
       _honeypot: this.hasHoneypotInputTarget ? this.honeypotInputTarget.value : "",
+      "cf-turnstile-response": this.turnstileResponse(),
       ...this.tracking
     }
+  }
+
+  turnstileResponse() {
+    if (!this.hasTurnstileTarget) return ""
+    return this.turnstileTarget.querySelector('[name="cf-turnstile-response"]')?.value || ""
+  }
+
+  resetTurnstile() {
+    if (this.hasTurnstileTarget && window.turnstile) window.turnstile.reset(this.turnstileTarget)
   }
 
   buildReschedulePayload() {
@@ -666,6 +676,7 @@ export default class extends Controller {
 
     this.submitLabelTarget.disabled = false
     this.submitLabelTarget.textContent = this.rescheduleFlow ? this.copy.rescheduleSubmit : this.copy.schedule
+    this.resetTurnstile()
 
     if (response.status === 409) {
       this.formErrorTarget.textContent = this.copy.slotTaken

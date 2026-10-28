@@ -96,5 +96,13 @@ RSpec.describe "Public booking management", type: :request do
       expect(response.body).to include('data-booking-reschedule-mode-value="true"')
       expect(response.body).to include("data-booking-reschedule-token-value")
     end
+
+    it "does not render the Turnstile widget, since rescheduling needs the booking token" do
+      allow(TurnstileVerifier).to receive_messages(enabled?: true, site_key: "site-key-123")
+
+      get public_booking_reschedule_path(booking_page.slug, token)
+
+      expect(response.body).not_to include("cf-turnstile")
+    end
   end
 end

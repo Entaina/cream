@@ -49,6 +49,24 @@ RSpec.describe "Public booking page", type: :request do
     expect(response.body).to include(I18n.t("booking.public_ui.chooseEvent", locale: :es))
   end
 
+  it "renders the Turnstile widget when Turnstile is enabled" do
+    allow(TurnstileVerifier).to receive_messages(enabled?: true, site_key: "site-key-123")
+
+    get public_booking_page_path(booking_page.slug)
+
+    expect(response.body).to include('data-sitekey="site-key-123"')
+    expect(response.body).to include('data-booking-target="turnstile"')
+    expect(response.body).to include("https://challenges.cloudflare.com/turnstile/v0/api.js")
+  end
+
+  it "does not render the Turnstile widget when Turnstile is disabled" do
+    allow(TurnstileVerifier).to receive(:enabled?).and_return(false)
+
+    get public_booking_page_path(booking_page.slug)
+
+    expect(response.body).not_to include("cf-turnstile")
+  end
+
   it "renders English aria labels when lang=en" do
     get public_booking_page_path(booking_page.slug, lang: "en")
 

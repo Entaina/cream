@@ -141,6 +141,10 @@
               <label for="booking_honeypot" data-booking-target="honeypotLabel"></label>
               <input type="text" id="booking_honeypot" name="_honeypot" tabindex="-1" autocomplete="off" data-booking-target="honeypotInput">
             </div>
+            <% if TurnstileVerifier.enabled? && !@reschedule_mode %>
+              <div class="cf-turnstile" data-sitekey="<%= TurnstileVerifier.site_key %>" data-appearance="interaction-only" data-booking-target="turnstile"></div>
+              <%= javascript_include_tag "https://challenges.cloudflare.com/turnstile/v0/api.js", async: true, defer: true, nonce: true %>
+            <% end %>
             <p data-booking-target="formError" class="public-booking-form-error hidden"></p>
             <button type="submit" class="btn-primary public-booking-submit" data-booking-target="submitLabel"></button>
           </form>

@@ -8,6 +8,7 @@ module Public
     before_action :ensure_feature_enabled
     before_action :set_booking_page
     before_action :silently_accept_if_abusive, only: :book
+    before_action :verify_turnstile!, only: :book
     before_action :set_calendar_client, only: %i[book reschedule]
 
     rate_limit to: 60, within: 1.minute, only: %i[event_types availability],
@@ -234,6 +235,15 @@ module Public
       end
       payload[:confirmation_email] = true if event_type.confirmation_email_enabled?
       payload
+    end
+
+    def verify_turnstile!
+      return unless TurnstileVerifier.enabled?
+      return if TurnstileVerifier.valid?(token: params["cf-turnstile-response"], ip: request.remote_ip)
+
+      I18n.with_locale(resolved_locale) do
+        render json: {error: I18n.t("public.lead_forms.turnstile_failed")}, status: :unprocessable_entity
+      end
     end
 
     def render_rate_limited
