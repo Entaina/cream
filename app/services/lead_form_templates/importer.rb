@@ -34,6 +34,9 @@ module LeadFormTemplates
         record.save!
       end
 
+      SubscriptionType.ensure_defaults!(@workspace)
+      @workspace.lead_form_templates.select(&:form_page?).each(&:refresh_submission_schema!)
+
       {created: created, updated: updated, total: @workspace.lead_form_templates.count}
     end
 

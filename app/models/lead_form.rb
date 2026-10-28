@@ -146,12 +146,18 @@ class LeadForm < ApplicationRecord
     template = workspace.lead_form_templates.find_by(path: LeadFormTemplate.form_page_path_for(template_key))
     return [] unless template
 
-    if template.submission_schema.present?
+    field_names = if template.submission_schema.present?
       Array(template.submission_schema["fields"]).map { |field| field["name"] }
     else
       html = LeadFormTemplates::FormHtmlRenderer.render(lead_form: self)
       LeadFormTemplates::HtmlSchema.parse(html).fields.map(&:name)
     end
+
+    consent_pool = self.class.consent_field_keys_for(workspace) + [
+      Marketing::ConsentService::SUBSCRIBE_ALL_FIELD_KEY,
+      "gdpr_consent"
+    ]
+    field_names & consent_pool
   end
 
   def template_includes_consent_field?(key = expected_mql_consent_field_key)

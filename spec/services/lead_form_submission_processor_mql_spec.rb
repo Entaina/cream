@@ -31,6 +31,7 @@ RSpec.describe LeadFormSubmissionProcessor, "MQL destination" do
     allow(CreamFeatures).to receive(:enabled?).with(:mql_pool).and_return(true)
     allow(CreamFeatures).to receive(:enabled?).with(:marketing_consent).and_return(true)
     SubscriptionType.ensure_defaults!(workspace)
+    render_general_opt_in_in_template!(workspace)
   end
 
   it "creates person and submission without deal" do

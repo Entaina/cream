@@ -32,6 +32,7 @@ RSpec.describe Marketing::ConsentService do
     end
 
     it "subscribes to general via legacy marketing_consent field" do
+      render_general_opt_in_in_template!(workspace)
       mql_form = create_lead_form!(workspace, user: users(:one), destination: "mql")
       params = {"marketing_consent" => "1"}
 
@@ -48,6 +49,7 @@ RSpec.describe Marketing::ConsentService do
     end
 
     it "includes marketing consent text for the primary MQL subscription type" do
+      render_general_opt_in_in_template!(workspace)
       mql_form = create_lead_form!(
         workspace,
         user: users(:one),
@@ -180,6 +182,50 @@ RSpec.describe Marketing::ConsentService do
       )
 
       expect(EmailSubscription.find_by(person: person, subscription_type: events)).to be_nil
+    end
+
+    it "ignores a subscription whose checkbox the form does not render" do
+      general = workspace.subscription_types.find_by!(slug: "general")
+
+      described_class.propagate_subscription_fields!(
+        person: person,
+        workspace: workspace,
+        params: {"marketing_consent" => "1"},
+        request: request,
+        lead_form: lead_form
+      )
+
+      expect(EmailSubscription.find_by(person: person, subscription_type: general)).to be_nil
+    end
+
+    it "ignores subscribe_all and per-type fields on a form that only renders the privacy checkbox" do
+      reserva_form = create_lead_form!(workspace, user: users(:one), template_key: "reserva")
+
+      expect {
+        described_class.propagate_subscription_fields!(
+          person: person,
+          workspace: workspace,
+          params: {"subscribe_all" => "1", "newsletter_opt_in" => "1", "gdpr_consent" => "1"},
+          request: request,
+          lead_form: reserva_form
+        )
+      }.not_to change(EmailSubscription, :count)
+    end
+
+    it "ignores every subscription on a form that renders no consent field" do
+      lead_form
+      template = workspace.lead_form_templates.find_by!(path: LeadFormTemplate.form_page_path_for("contacto"))
+      template.update!(body: template.body.gsub(/\{% partial '(newsletter_opt_in|subscribe_all_opt_in|consent_fields)' %\}/, ""))
+
+      expect {
+        described_class.propagate_subscription_fields!(
+          person: person,
+          workspace: workspace,
+          params: {"subscribe_all" => "1", "newsletter_opt_in" => "1"},
+          request: request,
+          lead_form: lead_form
+        )
+      }.not_to change(EmailSubscription, :count)
     end
 
     it "does nothing for subscribe_all when marketing consent feature is disabled" do

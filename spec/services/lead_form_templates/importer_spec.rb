@@ -19,6 +19,15 @@ RSpec.describe LeadFormTemplates::Importer do
     expect(workspace.lead_form_templates.find_by!(path: "public/layouts/booking_default").kind).to eq("layout")
   end
 
+  it "compiles form schemas with the subscription opt-ins of the imported partials" do
+    expect(workspace.subscription_types).to be_empty
+
+    described_class.import!(workspace)
+
+    fields = workspace.lead_form_templates.find_by!(path: "public/lead_forms/contacto").submission_schema["fields"].map { |field| field["name"] }
+    expect(fields).to include("newsletter_opt_in", "subscribe_all", "gdpr_consent")
+  end
+
   it "is idempotent on a second run" do
     described_class.import!(workspace)
 

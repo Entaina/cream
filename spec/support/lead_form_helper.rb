@@ -12,6 +12,16 @@ module LeadFormHelper
     LeadFormTemplates::Importer.import!(workspace)
   end
 
+  # Las plantillas por defecto no pintan la casilla de la suscripción MQL; en
+  # producción el admin la añade (el formulario avisa si falta).
+  def render_general_opt_in_in_template!(workspace, template_key: "contacto")
+    path = LeadFormTemplate.form_page_path_for(template_key)
+    import_lead_form_templates!(workspace) unless workspace.lead_form_templates.exists?(path: path)
+    partial = workspace.lead_form_templates.find_by!(path: "#{LeadFormTemplate::PARTIALS_PREFIX}consent_fields")
+    partial.update!(body: %({% subscription_opt_in slug: "general" %}\n#{partial.body}))
+    workspace.lead_form_templates.find_by!(path: path).refresh_submission_schema!
+  end
+
   def create_lead_form!(workspace, user:, pipeline: nil, **attrs)
     template_key = (attrs[:template_key] || attrs["template_key"] || "contacto").to_s
     path = LeadFormTemplate.form_page_path_for(template_key)

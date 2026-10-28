@@ -15,6 +15,15 @@ RSpec.describe LeadFormTemplates::SchemaCompiler do
     expect(company).to include("requires_collects_company" => true)
   end
 
+  it "creates the default subscription types so their opt-in fields are compiled" do
+    workspace.subscription_types.delete_all
+    template = workspace.lead_form_templates.find_by!(path: "public/lead_forms/contacto")
+
+    names = described_class.compile(template: template)["fields"].map { |field| field["name"] }
+
+    expect(names).to include("newsletter_opt_in")
+  end
+
   it "marks edition_id as requiring open editions with dynamic allowed values" do
     template = workspace.lead_form_templates.find_by!(path: "public/lead_forms/reserva")
     schema = described_class.compile(template: template)

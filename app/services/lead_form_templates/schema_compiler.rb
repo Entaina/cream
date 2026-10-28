@@ -13,6 +13,8 @@ module LeadFormTemplates
     end
 
     def compile
+      SubscriptionType.ensure_defaults!(@workspace)
+
       base_names = field_names(collects_company: false, with_product: false)
       with_company_names = field_names(collects_company: true, with_product: false)
       full_fields = render_fields(collects_company: true, with_product: true).index_by(&:name)

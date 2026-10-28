@@ -26,7 +26,9 @@ module Marketing
         privacy_policy_trace(privacy_policy_version:, params:, lead_form:)
       )
 
-      subscribe_all = subscribe_all_checked?(params)
+      allowed_consent_keys = lead_form.template_consent_field_keys
+      subscribe_all = subscribe_all_checked?(params) &&
+        allowed_consent_keys.include?(SUBSCRIBE_ALL_FIELD_KEY)
       subscribe_all_types = if subscribe_all
         subscribe_all_types_for(
           workspace,
@@ -40,7 +42,7 @@ module Marketing
         should_subscribe = if subscribe_all
           subscribe_all_type_ids.include?(type.id)
         else
-          per_type_consent_checked?(params, type)
+          per_type_consent_checked?(params, type, allowed_keys: allowed_consent_keys)
         end
         next unless should_subscribe
 
@@ -94,8 +96,11 @@ module Marketing
       }
     end
 
-    def self.per_type_consent_checked?(params, subscription_type)
-      field_key_for(subscription_type).present? && consent_param_checked?(params, subscription_type)
+    def self.per_type_consent_checked?(params, subscription_type, allowed_keys:)
+      key = field_key_for(subscription_type)
+      key.present? &&
+        allowed_keys.include?(key) &&
+        consent_param_checked?(params, subscription_type)
     end
 
     def self.consent_param_checked?(params, subscription_type)
