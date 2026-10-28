@@ -75,7 +75,7 @@ module Api
         if raw.key?(:deal_products_attributes)
           permitted[:deal_products_attributes] = resolve_deal_products_attributes(permitted[:deal_products_attributes], deal: deal)
         end
-        permitted
+        resolve_deal_scoped_params!(permitted)
       end
 
       # Removing a product line through nested attributes is a deletion, so it needs `destroy?`.

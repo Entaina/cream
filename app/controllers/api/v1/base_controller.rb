@@ -2,6 +2,7 @@ module Api
   module V1
     class BaseController < ActionController::API
       include Pundit::Authorization
+      include WorkspaceScopedParams
       include RequiresFeature
 
       requires_feature :api_v1

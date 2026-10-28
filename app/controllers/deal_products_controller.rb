@@ -41,6 +41,10 @@ class DealProductsController < ApplicationController
   def authorize_edit = authorize(@deal, :update?)
 
   def line_item_params
-    params.require(:deal_product).permit(:product_id, :quantity, :unit_price, :edition_id, :edition_name)
+    permitted = params.require(:deal_product).permit(:product_id, :quantity, :unit_price, :edition_id, :edition_name)
+    if permitted[:product_id].present?
+      permitted[:product_id] = current_workspace.products.find(permitted[:product_id]).id
+    end
+    permitted
   end
 end

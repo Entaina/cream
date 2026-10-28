@@ -241,10 +241,11 @@ class PeopleController < ApplicationController
   end
 
   def person_params
-    params.require(:person).permit(:first_name, :last_name, :email, :phone, :job_title, :location,
+    permitted = params.require(:person).permit(:first_name, :last_name, :email, :phone, :job_title, :location,
       :linkedin_url, :twitter_url, :description, :internal_notes, :company_id, :owner_id, :source, :first_contact_on, :brought_by_id,
       custom_fields: {},
       person_emails_attributes: [:id, :address, :primary, *nested_destroy_attribute])
+    resolve_person_scoped_params!(permitted)
   end
 
   # Removing an email through nested attributes is a deletion, so it needs `destroy?`.

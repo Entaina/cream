@@ -89,7 +89,11 @@ class EmailTemplatesController < ApplicationController
   end
 
   def template_params
-    params.require(:email_template).permit(:name, :subject, :body, :body_editor, :email_layout_id, :shared, attachments: [])
+    permitted = params.require(:email_template).permit(:name, :subject, :body, :body_editor, :email_layout_id, :shared, attachments: [])
+    if permitted.key?(:email_layout_id) && permitted[:email_layout_id].present?
+      permitted[:email_layout_id] = resolve_email_layout_id(permitted[:email_layout_id])
+    end
+    permitted
   end
 
   def purge_attachments

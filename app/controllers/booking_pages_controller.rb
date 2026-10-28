@@ -151,6 +151,18 @@ class BookingPagesController < ApplicationController
     ).tap do |permitted|
       permitted[:calendar_ids] = Array(permitted[:calendar_ids]).map(&:to_s).reject(&:blank?)
       permitted[:co_host_ids] = permitted_co_host_ids(permitted[:co_host_ids]) if permitted.key?(:co_host_ids)
+      if permitted[:pipeline_id].present?
+        permitted[:pipeline_id] = current_workspace.pipelines.find(permitted[:pipeline_id]).id
+      end
+      event_types = permitted[:event_types_attributes]
+      event_types = event_types.values if event_types.respond_to?(:values)
+      Array(event_types).each do |attrs|
+        next unless attrs.is_a?(ActionController::Parameters) || attrs.is_a?(Hash)
+
+        if attrs[:email_template_id].present?
+          attrs[:email_template_id] = resolve_email_template_id(attrs[:email_template_id])
+        end
+      end
     end
   end
 

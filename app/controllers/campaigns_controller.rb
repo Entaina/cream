@@ -243,10 +243,17 @@ class CampaignsController < ApplicationController
   end
 
   def campaign_params
-    params.require(:campaign).permit(
+    permitted = params.require(:campaign).permit(
       :name, :status, :starts_on, :goal,
       :utm_source, :utm_medium, :utm_campaign, :utm_term, :utm_content,
       :email_template_id, :email_layout_id, :email_subject, :email_body, :email_body_editor
     )
+    if permitted.key?(:email_template_id) && permitted[:email_template_id].present?
+      permitted[:email_template_id] = resolve_email_template_id(permitted[:email_template_id])
+    end
+    if permitted.key?(:email_layout_id) && permitted[:email_layout_id].present?
+      permitted[:email_layout_id] = resolve_email_layout_id(permitted[:email_layout_id])
+    end
+    permitted
   end
 end

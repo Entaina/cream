@@ -1,5 +1,6 @@
 class ApplicationController < ActionController::Base
   include Authentication
+  include WorkspaceScopedParams
   include Pundit::Authorization
   include Pagy::Method
   include SetLocale

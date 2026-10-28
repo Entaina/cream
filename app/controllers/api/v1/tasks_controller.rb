@@ -93,7 +93,8 @@ module Api
       private
 
       def task_params
-        params.require(:task).permit(:title, :due_on, :assignee_id, :taskable_type, :taskable_id, :completed)
+        permitted = params.require(:task).permit(:title, :due_on, :assignee_id, :taskable_type, :taskable_id, :completed)
+        resolve_task_scoped_params!(permitted)
       end
 
       def next_task_params

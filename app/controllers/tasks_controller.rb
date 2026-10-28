@@ -66,7 +66,8 @@ class TasksController < ApplicationController
   end
 
   def task_params
-    params.require(:task).permit(:title, :due_on, :assignee_id)
+    permitted = params.require(:task).permit(:title, :due_on, :assignee_id)
+    resolve_task_scoped_params!(permitted)
   end
 
   def set_taskable

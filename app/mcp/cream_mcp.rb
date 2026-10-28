@@ -316,6 +316,22 @@ module CreamMcp
     Pundit.policy_scope(pundit_ctx, scope)
   end
 
+  def self.resolve_company_id!(workspace, company_id)
+    return company_id if company_id.blank?
+
+    workspace.companies.find(company_id).id
+  end
+
+  def self.resolve_person_ids!(pundit_ctx, ids)
+    requested = Array(ids).map(&:to_i).uniq
+    return [] if requested.empty?
+
+    allowed = policy_scope(pundit_ctx, pundit_ctx.workspace.people).where(id: requested).pluck(:id)
+    return requested if allowed.size == requested.size
+
+    raise ActiveRecord::RecordNotFound, "Person not found in workspace"
+  end
+
   def self.with_authorization(server_context, tool: nil, &block)
     started_at = Process.clock_gettime(Process::CLOCK_MONOTONIC) if tool
     block.call
@@ -638,10 +654,11 @@ module CreamMcp
     CreamMcp.with_authorization(server_context) do
       pundit_ctx = CreamMcp.pundit_context(server_context)
       ws = pundit_ctx.workspace
+      company_id = CreamMcp.resolve_company_id!(ws, CreamMcp.arg(args, "company_id"))
       person = ws.people.new(
         CreamMcp.picked(args, "first_name", "last_name", "email", "phone", "job_title", "location", "description",
           "internal_notes")
-          .merge(company_id: CreamMcp.arg(args, "company_id"), owner: pundit_ctx.user, workspace: ws)
+          .merge(company_id: company_id, owner: pundit_ctx.user, workspace: ws)
       )
       person.custom_fields = CreamMcp.arg(args, "custom_fields") if CreamMcp.arg(args, "custom_fields").present?
       CreamMcp.authorize!(pundit_ctx, person, :create?)
@@ -717,12 +734,14 @@ module CreamMcp
       pipeline = (pipeline_name && ws.pipelines.find_by("name ILIKE ?", pipeline_name)) || Pipeline.default_for(ws)
       stage_name = CreamMcp.arg(args, "stage")
       stage = (stage_name && pipeline&.pipeline_stages&.find_by("name ILIKE ?", stage_name)) || pipeline&.first_stage
+      company_id = CreamMcp.resolve_company_id!(ws, CreamMcp.arg(args, "company_id"))
       deal = ws.deals.new(
         CreamMcp.picked(args, "name", "value", "currency", "probability", "expected_close_date", "execution_duration_days",
-          "execution_starts_on", "execution_ends_on", "payment_method", "payment_on", "company_id")
-          .merge(owner: pundit_ctx.user, workspace: ws, pipeline: pipeline, pipeline_stage: stage)
+          "execution_starts_on", "execution_ends_on", "payment_method", "payment_on")
+          .merge(company_id: company_id, owner: pundit_ctx.user, workspace: ws, pipeline: pipeline, pipeline_stage: stage)
       )
-      deal.contact_ids = Array(CreamMcp.arg(args, "person_ids"))
+      person_ids = CreamMcp.arg(args, "person_ids")
+      deal.contact_ids = CreamMcp.resolve_person_ids!(pundit_ctx, person_ids) if person_ids.present?
       deal.tasks.build(title: CreamMcp.arg(args, "next_action_title"), due_on: CreamMcp.arg(args, "next_action_due_on"),
         workspace: ws, user: pundit_ctx.user, assignee: pundit_ctx.user)
       deal.custom_fields = CreamMcp.arg(args, "custom_fields") if CreamMcp.arg(args, "custom_fields").present?
@@ -768,8 +787,12 @@ module CreamMcp
       ctx = CreamMcp.pundit_context(server_context)
       person = CreamMcp.policy_scope(ctx, ctx.workspace.people).find(CreamMcp.arg(args, "person_id"))
       CreamMcp.authorize!(ctx, person, :update?)
-      person.update!(CreamMcp.picked(args, "first_name", "last_name", "email", "phone",
-        "job_title", "location", "linkedin_url", "description", "internal_notes", "company_id"))
+      attrs = CreamMcp.picked(args, "first_name", "last_name", "email", "phone",
+        "job_title", "location", "linkedin_url", "description", "internal_notes")
+      unless CreamMcp.arg(args, "company_id").nil?
+        attrs[:company_id] = CreamMcp.resolve_company_id!(ctx.workspace, CreamMcp.arg(args, "company_id"))
+      end
+      person.update!(attrs)
       CreamMcp.respond_with(updated: CreamMcp.person_json(person))
     end
   end
@@ -830,11 +853,15 @@ module CreamMcp
       deal = CreamMcp.policy_scope(ctx, ws.deals).find(CreamMcp.arg(args, "deal_id"))
       CreamMcp.authorize!(ctx, deal, :update?)
       attrs = CreamMcp.picked(args, "name", "value", "currency", "probability", "expected_close_date", "execution_duration_days",
-        "execution_starts_on", "execution_ends_on", "payment_method", "payment_on", "company_id")
+        "execution_starts_on", "execution_ends_on", "payment_method", "payment_on")
+      unless CreamMcp.arg(args, "company_id").nil?
+        attrs[:company_id] = CreamMcp.resolve_company_id!(ws, CreamMcp.arg(args, "company_id"))
+      end
       unless CreamMcp.arg(args, "person_ids").nil?
+        resolved_ids = CreamMcp.resolve_person_ids!(ctx, CreamMcp.arg(args, "person_ids"))
         # Replacing the contacts unlinks the ones left out, which is a deletion.
-        CreamMcp.authorize!(ctx, deal, :destroy?) if deal.removes_contacts?(CreamMcp.arg(args, "person_ids"))
-        deal.contact_ids = Array(CreamMcp.arg(args, "person_ids"))
+        CreamMcp.authorize!(ctx, deal, :destroy?) if deal.removes_contacts?(resolved_ids)
+        deal.contact_ids = resolved_ids
       end
       deal.update!(attrs)
       pipeline_name = CreamMcp.arg(args, "pipeline")

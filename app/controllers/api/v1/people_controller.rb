@@ -102,8 +102,9 @@ module Api
       end
 
       def person_params(person: nil)
-        params.require(:person).permit(:first_name, :last_name, :email, :phone, :job_title, :location, :internal_notes, :company_id,
+        permitted = params.require(:person).permit(:first_name, :last_name, :email, :phone, :job_title, :location, :internal_notes, :company_id,
           person_emails_attributes: [:id, :address, :primary, *nested_destroy_attribute(person)])
+        resolve_person_scoped_params!(permitted)
       end
 
       # Removing an email through nested attributes is a deletion, so it needs `destroy?`.

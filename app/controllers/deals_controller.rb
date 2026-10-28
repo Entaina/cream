@@ -291,11 +291,12 @@ class DealsController < ApplicationController
   end
 
   def deal_params
-    params.require(:deal).permit(:name, :pipeline_id, :pipeline_stage_id, :value, :currency, :probability,
+    permitted = params.require(:deal).permit(:name, :pipeline_id, :pipeline_stage_id, :value, :currency, :probability,
       :expected_close_date, :execution_duration_days, :execution_starts_on, :execution_ends_on,
       :payment_method, :payment_on, :invoice_number, :company_id, :partner_id, :owner_id,
       contact_ids: [], tasks_attributes: %i[title due_on], custom_fields: {},
       deal_products_attributes: [:id, :product_id, :edition_id, :edition_name, :quantity, :unit_price, *nested_destroy_attribute])
+    resolve_deal_scoped_params!(permitted)
   end
 
   # Removing a product line through nested attributes is a deletion, so it needs `destroy?`.
