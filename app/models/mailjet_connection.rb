@@ -2,6 +2,8 @@ class MailjetConnection < ApplicationRecord
   belongs_to :workspace
   belongs_to :user
 
+  encrypts :api_key, :secret_key
+
   before_validation :assign_webhook_token, on: :create
 
   validates :workspace_id, uniqueness: true

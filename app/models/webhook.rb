@@ -6,6 +6,9 @@ class Webhook < ApplicationRecord
 
   belongs_to :workspace
   belongs_to :user
+
+  encrypts :secret
+
   has_many :webhook_deliveries, dependent: :destroy
 
   validates :url, presence: true, format: {with: URI::DEFAULT_PARSER.make_regexp(%w[http https])}

@@ -2,6 +2,8 @@ class StripeConnection < ApplicationRecord
   belongs_to :workspace
   belongs_to :user
 
+  encrypts :api_key
+
   has_many :stripe_payments, dependent: :destroy
 
   validates :workspace_id, uniqueness: true

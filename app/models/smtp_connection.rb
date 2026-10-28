@@ -4,6 +4,8 @@ class SmtpConnection < ApplicationRecord
   belongs_to :workspace
   belongs_to :user
 
+  encrypts :password
+
   validates :workspace_id, uniqueness: true
   validates :address, :from_email, presence: true
   validates :from_email, format: {with: URI::MailTo::EMAIL_REGEXP}

@@ -1,6 +1,8 @@
 class Workspace < ApplicationRecord
   include IanaTimeZone
 
+  encrypts :okm_service_account_key
+
   WORKSPACE_FEATURE_TOGGLES = {
     reports: :reports_enabled,
     marketing_attribution: :marketing_attribution_enabled,

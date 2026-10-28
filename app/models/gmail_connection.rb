@@ -6,6 +6,8 @@ class GmailConnection < ApplicationRecord
   belongs_to :workspace
   belongs_to :user
 
+  encrypts :access_token, :refresh_token
+
   validates :user_id, uniqueness: {scope: :workspace_id}
 
   # Connected once we hold a refresh token — that's what lets us send without

@@ -1,6 +1,9 @@
 class BeehiivConnection < ApplicationRecord
   belongs_to :workspace
   belongs_to :user
+
+  encrypts :api_key
+
   has_many :beehiiv_publications, dependent: :destroy
 
   validates :workspace_id, uniqueness: true
