@@ -28,7 +28,7 @@ RSpec.describe "subscription_opt_in Liquid tag" do
     html = render_markup('{% subscription_opt_in slug: "newsletter" %}')
 
     expect(html).to include('name="lead[newsletter_opt_in]"')
-    expect(html).to include("Quiero recibir la newsletter de Entaina")
+    expect(html).to include("Quiero recibir la newsletter de entaina")
   end
 
   it "uses marketing consent text for the primary MQL subscription type" do
