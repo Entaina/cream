@@ -15,7 +15,7 @@ and manual restoration from Google Drive.
 | Authentication | Google Cloud service account + JSON key on disk |
 | File name | `cream_backup_<environment>_<date>.dump` (optional `.age` suffix when `BACKUP_AGE_PUBLIC_KEY` is set) |
 | Encryption (optional) | `age` with `BACKUP_AGE_PUBLIC_KEY` on backup; restore with `BACKUP_AGE_IDENTITY_FILE` or `BACKUP_AGE_IDENTITY` |
-| Retention | Deletes backups older than **30 days**, except those from the **1st day of each month** (same environment only) |
+| Retention | Moves backups older than **30 days** to the Shared Drive trash (except those from the **1st day of each month**; same environment only). The service account cannot permanently delete files. |
 
 The daily job **does not run in development** even if you have the variables configured.
 Locally you can test with the rake task `cream:backup:run`.

@@ -73,12 +73,24 @@ RSpec.describe GoogleDriveBackupStorage do
   end
 
   describe "#delete" do
-    it "deletes a file from Drive" do
-      allow(drive_service).to receive(:delete_file)
+    it "moves a file to the Drive trash" do
+      allow(drive_service).to receive(:update_file)
 
       storage.delete("file1")
 
-      expect(drive_service).to have_received(:delete_file).with("file1", supports_all_drives: true)
+      expect(drive_service).to have_received(:update_file).with(
+        "file1",
+        an_object_having_attributes(trashed: true),
+        supports_all_drives: true
+      )
+    end
+
+    it "ignores a 404 when the file is already gone" do
+      allow(drive_service).to receive(:update_file).and_raise(
+        Google::Apis::ClientError.new("not found", status_code: 404)
+      )
+
+      expect { storage.delete("missing") }.not_to raise_error
     end
   end
 

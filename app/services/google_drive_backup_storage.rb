@@ -52,7 +52,16 @@ class GoogleDriveBackupStorage
   end
 
   def delete(file_id)
-    @drive_service.delete_file(file_id, supports_all_drives: true)
+    metadata = Google::Apis::DriveV3::File.new(trashed: true)
+    @drive_service.update_file(
+      file_id,
+      metadata,
+      supports_all_drives: true
+    )
+  rescue Google::Apis::ClientError => e
+    raise unless e.status_code == 404
+
+    nil
   end
 
   def download(file_id, dest_path)
