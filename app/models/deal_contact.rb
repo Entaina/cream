@@ -1,5 +1,7 @@
 # Join between a deal and the people (contacts) involved in it.
 class DealContact < ApplicationRecord
+  include WorkspaceScopedAssociations
+
   SOURCES = %w[offer_share portal_invite].freeze
 
   belongs_to :deal
@@ -8,6 +10,7 @@ class DealContact < ApplicationRecord
 
   validates :person_id, uniqueness: {scope: :deal_id}
   validates :source, inclusion: {in: SOURCES}, allow_nil: true
+  validate :person_in_deal_workspace
 
   # Contacts that only came in through a shared proposal see that proposal, not the portal.
   scope :with_portal_access, -> { where.not(source: "offer_share").or(where(source: nil)) }
@@ -24,6 +27,14 @@ class DealContact < ApplicationRecord
   after_destroy :track_contact_removed
 
   private
+
+  def person_in_deal_workspace
+    return unless new_record? || will_save_change_to_person_id? || will_save_change_to_deal_id?
+    return if deal.nil? || person.nil?
+    return if person.workspace_id == deal.workspace_id
+
+    errors.add(:person, :must_belong_to_same_workspace)
+  end
 
   def track_contact_added
     deal.track_activity("contacts_changed", metadata: contact_metadata("added"))

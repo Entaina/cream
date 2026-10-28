@@ -1,4 +1,6 @@
 class EmailTemplate < ApplicationRecord
+  include WorkspaceScopedAssociations
+
   BODY_EDITORS = %w[quill html].freeze
   QUILL_SUPPORTED_TAGS = %w[p br strong b em i u s a ul ol li span].freeze
 
@@ -11,6 +13,7 @@ class EmailTemplate < ApplicationRecord
   validates :name, :body, presence: true
   validates :body_editor, inclusion: {in: BODY_EDITORS}
   validate :attachments_within_limits
+  validates_same_workspace :email_layout
 
   scope :visible_to, ->(user) {
     where(user: user).or(where(shared: true))

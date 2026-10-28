@@ -1,4 +1,6 @@
 class Booking < ApplicationRecord
+  include WorkspaceScopedAssociations
+
   STATUSES = %w[confirmed cancelled].freeze
   GUEST_MANAGE_PURPOSE = :guest_manage
   MAX_GUESTS = 5
@@ -20,6 +22,8 @@ class Booking < ApplicationRecord
   validates :message, length: {maximum: 500}, allow_blank: true
   validates :status, inclusion: {in: STATUSES}
   validate :guest_emails_valid
+  validates_same_workspace :booking_page, :person, :deal, :campaign
+  validate :booking_event_type_in_workspace
 
   scope :confirmed, -> { where(status: "confirmed") }
 
@@ -143,6 +147,16 @@ class Booking < ApplicationRecord
   end
 
   private
+
+  def booking_event_type_in_workspace
+    return unless workspace_link_changing?(:booking_event_type)
+    return if booking_event_type.nil? || workspace_id.nil?
+
+    page_ws = booking_event_type.booking_page&.workspace_id
+    return if page_ws.nil? || page_ws == workspace_id
+
+    errors.add(:booking_event_type, :must_belong_to_same_workspace)
+  end
 
   def guest_emails_valid
     emails = Array(guest_emails).map(&:to_s).reject(&:blank?)

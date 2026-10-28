@@ -1,4 +1,6 @@
 class Task < ApplicationRecord
+  include WorkspaceScopedAssociations
+
   def self.default_due_on = Date.current + 1.day
 
   belongs_to :workspace
@@ -7,6 +9,7 @@ class Task < ApplicationRecord
   belongs_to :user
 
   validates :title, presence: true
+  validates_polymorphic_same_workspace :taskable, if: -> { taskable.present? }
 
   before_save :assign_from_mentions
 

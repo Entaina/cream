@@ -1,5 +1,6 @@
 class Person < ApplicationRecord
   include CrmRecord
+  include WorkspaceScopedAssociations
 
   SOURCES = {
     "web_form" => "Formulario web",
@@ -45,6 +46,7 @@ class Person < ApplicationRecord
   validates :source, inclusion: {in: SOURCES.keys}, allow_blank: true
   validates :brought_by_id, presence: true, if: -> { source == "team_member" }
   validate :brought_by_in_workspace, if: -> { brought_by_id.present? }
+  validates_same_workspace :company
   validate :at_most_one_primary_email
 
   before_validation :clear_brought_by_unless_team_source

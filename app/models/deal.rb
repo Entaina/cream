@@ -1,5 +1,6 @@
 class Deal < ApplicationRecord
   include CrmRecord
+  include WorkspaceScopedAssociations
 
   PAYMENT_METHODS = %w[cash deferred].freeze
 
@@ -46,6 +47,8 @@ class Deal < ApplicationRecord
   validate :stage_belongs_to_pipeline
   validate :stage_entry_conditions_met, if: -> { persisted? && will_save_change_to_pipeline_stage_id? }
   validate :partner_differs_from_company
+  validates_same_workspace :company, :partner, :pipeline, :pipeline_stage, :campaign
+  validate :contacts_in_same_workspace, on: :create
   validate :has_a_future_task, on: :create, unless: :duplicating
 
   before_validation :normalize_payment_method
@@ -290,6 +293,17 @@ class Deal < ApplicationRecord
     elsif workspace
       self.pipeline ||= Pipeline.default_for(workspace)
       self.pipeline_stage ||= pipeline&.first_stage
+    end
+  end
+
+  def contacts_in_same_workspace
+    return if workspace_id.nil?
+
+    contacts.each do |contact|
+      next if contact.workspace_id == workspace_id
+
+      errors.add(:contacts, :must_belong_to_same_workspace)
+      break
     end
   end
 

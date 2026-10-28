@@ -1,6 +1,8 @@
 # A product line on a deal. Unit price is copied from the catalogue on creation
 # and can then be edited per line. The deal value is the sum of its line subtotals.
 class DealProduct < ApplicationRecord
+  include WorkspaceScopedAssociations
+
   belongs_to :deal
   belongs_to :product
   belongs_to :edition, optional: true
@@ -12,6 +14,7 @@ class DealProduct < ApplicationRecord
   validates :quantity, numericality: {only_integer: true, greater_than: 0}
   validates :unit_price, numericality: {greater_than_or_equal_to: 0}
   validate :edition_belongs_to_product
+  validates_same_workspace :product
 
   # On creation the unit price is taken from the catalogue, unless one was
   # explicitly provided; it can be edited afterwards (see DealProductsController#update).

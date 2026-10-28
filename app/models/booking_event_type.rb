@@ -1,5 +1,6 @@
 class BookingEventType < ApplicationRecord
   include BookingSuccessTemplateAssignable
+  include WorkspaceScopedAssociations
 
   LOCATION_TYPES = %w[google_meet physical to_be_decided].freeze
   COLORS = %w[hoki copperfield golden chicago green blue].freeze
@@ -28,6 +29,7 @@ class BookingEventType < ApplicationRecord
   validates :location_type, inclusion: {in: LOCATION_TYPES}
   validates :color, inclusion: {in: COLORS}
   validate :name_i18n_present
+  validates_same_workspace :email_template
 
   before_validation :normalize_weekly_hours, :normalize_slug, :normalize_reminder_minutes_before
 

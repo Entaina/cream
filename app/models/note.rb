@@ -1,9 +1,12 @@
 class Note < ApplicationRecord
+  include WorkspaceScopedAssociations
+
   belongs_to :workspace
   belongs_to :notable, polymorphic: true
   belongs_to :user
 
   validates :body, presence: true
+  validates_polymorphic_same_workspace :notable
 
   after_create :track_on_record
 

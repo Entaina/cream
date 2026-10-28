@@ -1,4 +1,6 @@
 class Comment < ApplicationRecord
+  include WorkspaceScopedAssociations
+
   COMMENTABLE_TYPES = %w[Company Person Deal].freeze
 
   belongs_to :workspace
@@ -9,6 +11,8 @@ class Comment < ApplicationRecord
 
   validates :body, presence: true
   validate :commentable_type_allowed
+  validates_polymorphic_same_workspace :commentable
+  validate :parent_in_same_workspace, if: -> { parent_id.present? }
 
   after_create :track_on_record
   after_create :notify_mentions
@@ -21,6 +25,13 @@ class Comment < ApplicationRecord
   end
 
   private
+
+  def parent_in_same_workspace
+    return unless workspace_link_changing?(:parent)
+    return if parent.nil? || parent.workspace_id == workspace_id
+
+    errors.add(:parent, :must_belong_to_same_workspace)
+  end
 
   def commentable_type_allowed
     return if COMMENTABLE_TYPES.include?(commentable_type)

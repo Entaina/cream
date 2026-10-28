@@ -1,4 +1,6 @@
 class Campaign < ApplicationRecord
+  include WorkspaceScopedAssociations
+
   STATUSES = %w[draft scheduled sending sent].freeze
 
   belongs_to :workspace
@@ -13,6 +15,7 @@ class Campaign < ApplicationRecord
   validates :name, presence: true
   validates :status, inclusion: {in: STATUSES}
   validates :email_body_editor, inclusion: {in: EmailTemplate::BODY_EDITORS}
+  validates_same_workspace :email_template, :email_layout
 
   scope :ordered, -> { order(created_at: :desc, id: :desc) }
 
