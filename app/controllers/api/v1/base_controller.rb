@@ -4,10 +4,13 @@ module Api
       include Pundit::Authorization
       include WorkspaceScopedParams
       include RequiresFeature
+      include BearerRateLimit
 
       requires_feature :api_v1
 
       rescue_from Pundit::NotAuthorizedError, with: :render_forbidden
+
+      rate_limit to: 600, within: 1.minute, by: :rate_limit_identity, scope: "api_v1"
 
       before_action :authenticate_api_request!
 

@@ -1,6 +1,10 @@
 # MCP server endpoint (Streamable HTTP transport). Authenticated via Bearer token
 # (Cream API token or Doorkeeper OAuth access token with scope `mcp`).
 class McpController < ActionController::API
+  include BearerRateLimit
+
+  rate_limit to: 120, within: 1.minute, by: :rate_limit_identity, only: :handle
+
   before_action :authenticate_mcp_request!
 
   def handle

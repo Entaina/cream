@@ -2,6 +2,8 @@
 # MCP clients (Claude, inspector, etc.) POST here to obtain a client_id before the
 # authorization code + PKCE flow. Clients are registered as public (no secret).
 class OauthRegistrationsController < ActionController::API
+  rate_limit to: 20, within: 1.minute, only: :create
+
   def create
     payload = params.permit(:client_name, :scope, redirect_uris: [])
     redirect_uris = Array(payload[:redirect_uris]).map(&:to_s).select(&:present?)
