@@ -19,6 +19,14 @@
         <label for="name" class="block text-sm font-medium text-ink-soft mb-1"><%= t("integrations.api_tokens.token_name") %></label>
         <input type="text" name="name" id="name" placeholder="<%= t("integrations.api_tokens.token_name_placeholder") %>" class="input w-full">
       </div>
+      <div>
+        <label for="token_scope" class="block text-sm font-medium text-ink-soft mb-1"><%= t("integrations.api_tokens.scope") %></label>
+        <%= select_tag :token_scope, options_for_select(ApiToken::SCOPES.map { |scope| [t("integrations.api_tokens.scopes.#{scope}"), scope] }), class: "input" %>
+      </div>
+      <div>
+        <label for="expires_in_days" class="block text-sm font-medium text-ink-soft mb-1"><%= t("integrations.api_tokens.expiry") %></label>
+        <%= select_tag :expires_in_days, options_for_select([[t("integrations.api_tokens.never_expires"), ""]] + ApiToken::EXPIRY_DAYS.map { |days| [t("integrations.api_tokens.expires_in_days", count: days), days] }), class: "input" %>
+      </div>
       <%= submit_tag t("integrations.api_tokens.create"), class: "btn-primary" %>
     <% end %>
 
@@ -32,6 +40,10 @@
                 <%= t("integrations.api_tokens.created") %> <%= l token.created_at, format: :short %>
                 <% if token.last_used_at %>
                   · <%= t("integrations.api_tokens.last_used") %> <%= l token.last_used_at, format: :short %>
+                <% end %>
+                · <%= t("integrations.api_tokens.scopes.#{token.token_scope}") %>
+                <% if token.expires_at %>
+                  · <%= t("integrations.api_tokens.expires") %> <%= l token.expires_at, format: :short %>
                 <% end %>
               </p>
             </div>

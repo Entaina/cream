@@ -4,7 +4,7 @@ class McpController < ActionController::API
   before_action :authenticate_mcp_request!
 
   def handle
-    server = CreamMcp.server_for(user: @mcp_user, workspace: @mcp_workspace)
+    server = CreamMcp.server_for(user: @mcp_user, workspace: @mcp_workspace, read_only: @mcp_read_only)
     transport = MCP::Server::Transports::StreamableHTTPTransport.new(
       server,
       stateless: true,
@@ -39,6 +39,7 @@ class McpController < ActionController::API
 
       @mcp_user = api_token.user
       @mcp_workspace = api_token.workspace
+      @mcp_read_only = api_token.read_only?
     else
       access_token = Doorkeeper::AccessToken.by_token(token)
       return unauthorized! unless access_token&.accessible?

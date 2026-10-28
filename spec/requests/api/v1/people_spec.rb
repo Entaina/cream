@@ -20,6 +20,31 @@ RSpec.describe "Api::V1::People", type: :request do
     )
   end
 
+  it "lets read-only tokens read but not write" do
+    user = users(:one)
+    workspace = workspaces(:one)
+    token = user.api_tokens.create!(name: "Reader", workspace: workspace, token_scope: "read")
+    headers = {"Authorization" => "Bearer #{token.plaintext_token}"}
+
+    get "/api/v1/people", headers: headers
+    expect(response).to have_http_status(:success)
+
+    expect {
+      post "/api/v1/people", as: :json, headers: headers,
+        params: {person: {company_id: create_company!(workspace).id, email: "new@example.com"}}
+    }.not_to change(Person, :count)
+    expect(response).to have_http_status(:forbidden)
+  end
+
+  it "rejects expired tokens" do
+    user = users(:one)
+    token = user.api_tokens.create!(name: "Old", workspace: workspaces(:one), expires_at: 1.minute.ago)
+
+    get "/api/v1/people", headers: {"Authorization" => "Bearer #{token.plaintext_token}"}
+
+    expect(response).to have_http_status(:unauthorized)
+  end
+
   it "accepts mailbox format in email and stores address and names" do
     user = users(:one)
     workspace = workspaces(:one)

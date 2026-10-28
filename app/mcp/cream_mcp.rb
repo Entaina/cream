@@ -40,13 +40,19 @@ module CreamMcp
     required: ["subject", "body"]
   }.freeze
 
-  def self.server_for(user:, workspace:)
+  READ_ONLY_TOOL_PREFIXES = %w[list_ get_ search_].freeze
+  READ_ONLY_TOOL_NAMES = %w[
+    pipeline_summary recent_changes sales_forecast summarize_record suggest_next_steps
+    draft_email natural_language_search enrich_record
+  ].freeze
+
+  def self.server_for(user:, workspace:, read_only: false)
     MCP::Server.new(
       name: "cream",
       title: "Cream CRM",
       version: "1.0.0",
       instructions: server_instructions(workspace),
-      tools: tools,
+      tools: read_only ? read_only_tools : tools,
       server_context: {user: user, workspace: workspace}
     )
   end
@@ -89,6 +95,13 @@ module CreamMcp
       RECENT_CHANGES, SALES_FORECAST,
       SUMMARIZE_RECORD, SUGGEST_NEXT_STEPS, DRAFT_EMAIL, NATURAL_LANGUAGE_SEARCH, ENRICH_RECORD,
       *Marketing.tools]
+  end
+
+  def self.read_only_tools
+    tools.select do |tool|
+      name = tool.name_value
+      READ_ONLY_TOOL_NAMES.include?(name) || name.start_with?(*READ_ONLY_TOOL_PREFIXES)
+    end
   end
 
   def self.respond_with(payload)

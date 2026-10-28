@@ -50,6 +50,40 @@ RSpec.describe "Mcp", type: :request do
       expect(instructions).not_to match(/configurable stages \(/)
     end
 
+    it "only exposes read tools to read-only api tokens" do
+      reader = user.api_tokens.create!(name: "Reader", workspace: workspace, token_scope: "read")
+
+      post mcp_url, params: tools_list_payload, as: :json, headers: mcp_headers(reader.plaintext_token)
+
+      names = JSON.parse(response.body).dig("result", "tools").map { |t| t["name"] }
+      expect(names).to include("search_records", "list_people", "get_record", "pipeline_summary")
+      expect(names).not_to include("create_person", "update_deal", "delete_record", "send_deal_email", "send_campaign")
+    end
+
+    it "does not run write tools for read-only api tokens" do
+      reader = user.api_tokens.create!(name: "Reader", workspace: workspace, token_scope: "read")
+
+      expect {
+        call_tool_raw("create_person", {first_name: "Eve", company_id: companies(:acme).id}, token: reader.plaintext_token)
+      }.not_to change(Person, :count)
+      expect(JSON.parse(response.body).dig("error", "data")).to eq("Tool not found: create_person")
+    end
+
+    it "keeps exposing write tools to write api tokens" do
+      post mcp_url, params: tools_list_payload, as: :json, headers: mcp_headers(plaintext)
+
+      names = JSON.parse(response.body).dig("result", "tools").map { |t| t["name"] }
+      expect(names).to include("create_person", "update_deal", "delete_record")
+    end
+
+    it "rejects expired api tokens" do
+      expired = user.api_tokens.create!(name: "Old", workspace: workspace, expires_at: 1.minute.ago)
+
+      post mcp_url, params: initialize_payload, as: :json, headers: mcp_headers(expired.plaintext_token)
+
+      expect(response).to have_http_status(:unauthorized)
+    end
+
     it "lists tools with api token" do
       post mcp_url, params: tools_list_payload, as: :json, headers: mcp_headers(plaintext)
 

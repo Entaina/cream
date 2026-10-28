@@ -104,6 +104,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_27_120100) do
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.bigint "workspace_id", null: false
+    t.datetime "expires_at"
+    t.string "token_scope", default: "write", null: false
     t.index ["token_digest"], name: "index_api_tokens_on_token_digest", unique: true
     t.index ["user_id"], name: "index_api_tokens_on_user_id"
     t.index ["workspace_id"], name: "index_api_tokens_on_workspace_id"

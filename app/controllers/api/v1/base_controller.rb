@@ -22,6 +22,7 @@ module Api
           return head :unauthorized unless api_token
           return head :forbidden if requested_workspace_id.present? &&
             requested_workspace_id.to_i != api_token.workspace_id
+          return render_forbidden if api_token.read_only? && !(request.get? || request.head?)
 
           @current_user = api_token.user
           @current_workspace = api_token.workspace

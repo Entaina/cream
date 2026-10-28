@@ -6,12 +6,22 @@ en:
       created: Created
       empty_subtitle: Create a token to connect an MCP client to this workspace.
       empty_title: No API tokens yet
+      expires: Expires
+      expires_in_days:
+        one: "%{count} day"
+        other: "%{count} days"
+      expiry: Expiry
       intro: Use API tokens to connect MCP clients (Claude, Cursor, etc.) to your
         workspace. OAuth is also available via the MCP authorization flow.
       last_used: Last used
+      never_expires: Never
       new_token_hint: Your new token (copy it now)
       page_title: API tokens
       revoke: Revoke token
+      scope: Permissions
+      scopes:
+        read: Read only
+        write: Read and write
       title: API tokens
       token_name: Token name
       token_name_placeholder: My MCP client

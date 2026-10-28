@@ -1,10 +1,15 @@
 class ApiToken < ApplicationRecord
   TOKEN_PREFIX = "cream_".freeze
+  SCOPES = %w[write read].freeze
+  EXPIRY_DAYS = [30, 90, 365].freeze
 
   belongs_to :user
   belongs_to :workspace
 
   validates :name, presence: true
+  validates :token_scope, inclusion: {in: SCOPES}
+
+  scope :active, -> { where("expires_at IS NULL OR expires_at > ?", Time.current) }
 
   # The plaintext token is only available right after creation.
   attr_reader :plaintext_token
@@ -14,11 +19,15 @@ class ApiToken < ApplicationRecord
   def self.authenticate(plaintext)
     return nil if plaintext.blank?
 
-    find_by(token_digest: digest(plaintext))&.tap { |t| t.update_column(:last_used_at, Time.current) }
+    active.find_by(token_digest: digest(plaintext))&.tap { |t| t.update_column(:last_used_at, Time.current) }
   end
 
   def self.digest(plaintext)
     OpenSSL::Digest::SHA256.hexdigest(plaintext)
+  end
+
+  def read_only?
+    token_scope == "read"
   end
 
   private

@@ -6,7 +6,9 @@ class ApiTokensController < ApplicationController
   def create
     token = current_user.api_tokens.build(
       name: params[:name].presence || "API token",
-      workspace: current_workspace
+      workspace: current_workspace,
+      token_scope: params[:token_scope].presence || "write",
+      expires_at: requested_expiry
     )
     authorize token
 
@@ -23,5 +25,12 @@ class ApiTokensController < ApplicationController
     authorize token
     token.destroy!
     redirect_to api_tokens_path, notice: t("flashes.api_tokens.revoked")
+  end
+
+  private
+
+  def requested_expiry
+    days = params[:expires_in_days].to_i
+    days.days.from_now if ApiToken::EXPIRY_DAYS.include?(days)
   end
 end

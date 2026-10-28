@@ -6,13 +6,23 @@ es:
       created: Creado
       empty_subtitle: Crea un token para conectar un cliente MCP a este workspace.
       empty_title: Aún no hay tokens de API
+      expires: Caduca
+      expires_in_days:
+        one: "%{count} día"
+        other: "%{count} días"
+      expiry: Caducidad
       intro: Usa tokens de API para conectar clientes MCP (Claude, Cursor, etc.) a
         tu workspace. OAuth también está disponible mediante el flujo de autorización
         MCP.
       last_used: Último uso
+      never_expires: Nunca
       new_token_hint: Tu nuevo token (cópialo ahora)
       page_title: Tokens de API
       revoke: Revocar token
+      scope: Permisos
+      scopes:
+        read: Solo lectura
+        write: Lectura y escritura
       title: Tokens de API
       token_name: Nombre del token
       token_name_placeholder: Mi cliente MCP
