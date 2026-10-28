@@ -56,7 +56,7 @@ services:
       - proxy
 
   db:
-    image: pgvector/pgvector:pg16
+    image: pgvector/pgvector:pg16-bookworm
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${CREAM_DATABASE_USER}

@@ -243,7 +243,9 @@ docker compose up -d db web
 
 ### PostgreSQL with pgvector (agent memory)
 
-The DB uses the `pgvector/pgvector:pg16` image (`vector` extension for llmemory). The `pgdata` volume is compatible when switching from `postgres:16`.
+The DB uses the `pgvector/pgvector:pg16-bookworm` image (`vector` extension for llmemory). Pin the Debian suite in the tag (`-bookworm` or `-trixie`); the bare `pg16` tag can change glibc when pgvector rebases on a new Debian release and trigger [collation version mismatch](https://www.postgresql.org/docs/current/catalog-pg-database.html#COLLATION-VERSION-MISMATCH) warnings on existing volumes. Do **not** switch the server to `pg16-trixie` while `cream_production` was created on bookworm (glibc 2.36).
+
+The `pgdata` volume is compatible when switching from `postgres:16`.
 
 If the server still has the old compose file (`image: postgres`), update it and recreate the `db` container:
 
