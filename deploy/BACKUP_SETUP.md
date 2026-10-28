@@ -214,34 +214,32 @@ No old backups deleted.
 
 ### Restore
 
-Restores the **latest backup for the current environment**:
+Without a file name, the task restores the **latest backup for the current environment**. With a name, it restores that file (it can be from another environment):
 
 ```bash
+# Local
 bin/rails cream:backup:restore
-# Production:
-docker compose exec web bin/rails cream:backup:restore
-```
-
-Restore a specific file (it can be from another environment if you know the name):
-
-```bash
 bin/rails "cream:backup:restore[cream_backup_production_2026-07-01.dump]"
-# Encrypted backups (same flow; name ends with .dump.age):
-bin/rails "cream:backup:restore[cream_backup_production_2026-07-01.dump.age]"
 ```
 
-Plain `.dump` files from before encryption stay restorable without any age key. Encrypted backups require the matching **identity** (private key), not the public key used for upload. Pass it only for the restore, with `-e` so it reaches the container:
+In **production** the restore is destructive (`pg_restore --clean` replaces the whole database) and must be confirmed with `CONFIRM=1`. Pass it with `-e`: a variable set in front of `docker compose` stays on the host and the task aborts. Always give the exact file name (see the Drive folder): right after a manual backup, the latest one is today's.
+
+Plain `.dump` backups need no key:
 
 ```bash
-docker compose exec -e CONFIRM=1 -e BACKUP_AGE_IDENTITY="$(cat cream-backup-age.txt)" web \
+docker compose exec -e CONFIRM=1 web bin/rails "cream:backup:restore[cream_backup_production_2026-07-01.dump]"
+```
+
+Encrypted `.dump.age` backups need the matching **identity** (private key), not the public key used for upload. Paste the `AGE-SECRET-KEY-1...` line from the password manager so it never touches the server disk or the shell history; `-e BACKUP_AGE_IDENTITY` without a value forwards it from the shell, so it does not show up in the process arguments:
+
+```bash
+read -rs BACKUP_AGE_IDENTITY && export BACKUP_AGE_IDENTITY
+docker compose exec -e CONFIRM=1 -e BACKUP_AGE_IDENTITY web \
   bin/rails "cream:backup:restore[cream_backup_production_2026-07-01.dump.age]"
+unset BACKUP_AGE_IDENTITY
 ```
 
-In **production** the restore is destructive (`pg_restore --clean`). It must be confirmed:
-
-```bash
-CONFIRM=1 docker compose exec web bin/rails cream:backup:restore
-```
+The app writes the key to a `600` temp file, decrypts, restores and deletes both files.
 
 ---
 
@@ -272,7 +270,10 @@ queue and cable databases are not included (they can be regenerated).
 | `404` / folder not found | Wrong `GOOGLE_DRIVE_BACKUP_FOLDER_ID` | Copy the ID from the folder URL |
 | `pg_dump failed` | Incompatible PostgreSQL client or unreachable DB | The image uses `postgresql-client-16`; check the connection to `db` |
 | Job does not run in dev | Expected behavior | Use `cream:backup:run` manually |
-| Restore aborted in prod | Missing confirmation | Prefix the command with `CONFIRM=1` |
+| Restore aborted in prod | `CONFIRM=1` did not reach the container | Pass it as `docker compose exec -e CONFIRM=1 web ...` |
+| `Backup is age-encrypted but BACKUP_AGE_IDENTITY_FILE or BACKUP_AGE_IDENTITY is not configured` | The private key did not reach the container | `export BACKUP_AGE_IDENTITY` and add `-e BACKUP_AGE_IDENTITY`; the database is not touched |
+| `age decryption failed` | Wrong private key for that backup | Use the key whose public key was in `BACKUP_AGE_PUBLIC_KEY` when it was uploaded |
+| `age encryption failed` in the backup job | Invalid `BACKUP_AGE_PUBLIC_KEY` | Check the `age1...` value; nothing was uploaded |
 
 ### Automatic backup logs
 

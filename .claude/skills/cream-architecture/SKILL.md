@@ -213,6 +213,7 @@ Before considering a task done:
 - **Secrets**: GitHub environment **`production`** — `SSH_*`, `GHCR_READ_TOKEN`, `GHCR_USERNAME`, `DEPLOY_PATH` (see [`deploy/README.md`](../../../deploy/README.md))
 - **Tenancy in prod**: same workspace model as dev; seeds create org workspace `Example` when `CREAM_ORGANIZATION_*` env vars are set in server `.env`
 - **OAuth prod callback**: `https://crm.example.com/auth/google_oauth2/callback` (must match Google Cloud Console)
+- **Backups**: `DatabaseBackupJob` daily at 2:00 → Google Drive, `age`-encrypted (`.dump.age`) when `BACKUP_AGE_PUBLIC_KEY` is set; restore with `cream:backup:restore` (destructive, `-e CONFIRM=1`). Commands: skill `cream-dev`; guide: [`deploy/BACKUP_SETUP.md`](../../../deploy/BACKUP_SETUP.md)
 
 Do not confuse repo-root `docker-compose.yml` (local PostgreSQL only) with [`deploy/docker-compose.yml`](../../../deploy/docker-compose.yml) (Traefik + web + db for production).
 

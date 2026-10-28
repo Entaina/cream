@@ -1,6 +1,6 @@
 ---
 name: cream-dev
-description: How to run, build and debug the Cream CRM app locally — docker compose database, Rails server, Tailwind build, seeds and login credentials. Also covers production auto-deploy on push to main (GHCR + SSH) and installing the Gmail add-on for a Google Workspace organization. Use whenever starting the app, running migrations, reseeding, troubleshooting the dev environment, deploying/updating production, or publishing or domain-installing the Gmail add-on.
+description: How to run, build and debug the Cream CRM app locally — docker compose database, Rails server, Tailwind build, seeds and login credentials. Also covers production auto-deploy on push to main (GHCR + SSH), database backups and restore (Google Drive, age encryption) and installing the Gmail add-on for a Google Workspace organization. Use whenever starting the app, running migrations, reseeding, troubleshooting the dev environment, deploying/updating production, backing up or restoring the database, or publishing or domain-installing the Gmail add-on.
 ---
 
 # Cream — Development environment
@@ -183,6 +183,35 @@ Copies `deploy/docker-compose.yml` + `.env` to `/home/deploy/cream`. Falls back 
 | `db` | PostgreSQL 16, volume `pgdata` |
 
 Secrets live only in `/home/deploy/cream/.env` on the server (from `deploy/.env.production.example`). Never commit production `.env`.
+
+### Database backups and restore
+
+Full guide: [`deploy/BACKUP_SETUP.md`](../../../deploy/BACKUP_SETUP.md).
+
+- `DatabaseBackupJob` runs every day at 2:00 in production (Solid Queue in Puma): `pg_dump -Fc` of the primary database, uploaded to the Drive folder `GOOGLE_DRIVE_BACKUP_FOLDER_ID` as `cream_backup_production_<date>.dump`. Retention: 30 days plus the 1st of each month.
+- With `BACKUP_AGE_PUBLIC_KEY=age1...` in the server `.env`, the dump is encrypted with `age` and uploaded as `.dump.age`; if encryption fails, nothing is uploaded. `age` is installed in the image, not on the host.
+- The private key (`age-keygen -o ~/cream-backup-age.txt` on a local machine) lives in the password manager, **never on the server**. Without it `.dump.age` backups cannot be restored. Older plain `.dump` backups restore without any key.
+
+On the server, from `/home/deploy/cream`:
+
+```bash
+# Backup now (prints "Uploaded: <file name>")
+docker compose exec web bin/rails cream:backup:run
+
+# Restore a plain .dump — destructive, replaces the whole database
+docker compose exec -e CONFIRM=1 web bin/rails "cream:backup:restore[cream_backup_production_2026-07-01.dump]"
+
+# Restore an encrypted .dump.age — paste the AGE-SECRET-KEY-1... line when asked
+read -rs BACKUP_AGE_IDENTITY && export BACKUP_AGE_IDENTITY
+docker compose exec -e CONFIRM=1 -e BACKUP_AGE_IDENTITY web \
+  bin/rails "cream:backup:restore[cream_backup_production_2026-07-01.dump.age]"
+unset BACKUP_AGE_IDENTITY
+```
+
+- `CONFIRM=1` must go through `-e`: in front of `docker compose` it stays on the host and the task aborts.
+- `-e BACKUP_AGE_IDENTITY` without a value forwards the shell variable, so the key is not in the process arguments; `read -rs` keeps it out of the history.
+- Always pass the exact file name (from the Drive folder). Without it the task restores the latest backup, which right after a manual backup is today's.
+- Never test a restore against production: restore into a scratch database with `DatabaseRestoreService.new(db_config: ...)`.
 
 ### Verify production UI
 

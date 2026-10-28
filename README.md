@@ -88,6 +88,7 @@ bin/rubocop         # style (rubocop-rails-omakase)
 | [USER_MANUAL.md](USER_MANUAL.md) | End-user documentation (English) |
 | [MANUAL_USUARIO.md](MANUAL_USUARIO.md) | End-user documentation (Spanish) |
 | [deploy/README.md](deploy/README.md) | Production deployment (Docker, GitHub Actions, Traefik) |
+| [deploy/BACKUP_SETUP.md](deploy/BACKUP_SETUP.md) | Daily database backups to Google Drive, `age` encryption and restore |
 | [deploy/GMAIL_ADDON_SETUP.md](deploy/GMAIL_ADDON_SETUP.md) | Gmail add-on: Apps Script, Marketplace listing, organization install |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute |
 | [SECURITY.md](SECURITY.md) | Reporting vulnerabilities |
@@ -95,6 +96,26 @@ bin/rubocop         # style (rubocop-rails-omakase)
 ## Deployment
 
 Production runs as a Docker Compose stack (app + PostgreSQL + Traefik with Let's Encrypt), with images published to GHCR and automatic deployment on push to `main` via GitHub Actions. See [deploy/README.md](deploy/README.md).
+
+### Backups and restore
+
+Production dumps the database every day at 2:00 and uploads it to Google Drive, encrypted with `age` when `BACKUP_AGE_PUBLIC_KEY` is set. On the server, from `/home/deploy/cream`:
+
+```bash
+# Backup now
+docker compose exec web bin/rails cream:backup:run
+
+# Restore (destructive: replaces the whole database)
+docker compose exec -e CONFIRM=1 web bin/rails "cream:backup:restore[cream_backup_production_2026-07-01.dump]"
+
+# Restore an encrypted backup: paste the AGE-SECRET-KEY-1... line when asked
+read -rs BACKUP_AGE_IDENTITY && export BACKUP_AGE_IDENTITY
+docker compose exec -e CONFIRM=1 -e BACKUP_AGE_IDENTITY web \
+  bin/rails "cream:backup:restore[cream_backup_production_2026-07-01.dump.age]"
+unset BACKUP_AGE_IDENTITY
+```
+
+Setup, key generation and troubleshooting: [deploy/BACKUP_SETUP.md](deploy/BACKUP_SETUP.md).
 
 ## Gmail add-on: install for the organization
 

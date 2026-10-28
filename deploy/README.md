@@ -301,5 +301,26 @@ Variables in `.env`:
 |---|---|
 | `GOOGLE_DRIVE_SERVICE_ACCOUNT_KEY_PATH` | Path to the service account JSON (in the container: `/run/secrets/cream-backup.json`) |
 | `GOOGLE_DRIVE_BACKUP_FOLDER_ID` | ID of the folder in the Drive shared drive |
+| `BACKUP_AGE_PUBLIC_KEY` | Optional `age` public key (`age1...`): backups are encrypted and uploaded as `.dump.age` |
 
 Place `cream-backup.json` in `/home/deploy/cream/` (next to the compose file). The volume mounts it into the `web` container.
+
+To encrypt backups, generate a key pair on your machine with `age-keygen -o ~/cream-backup-age.txt` (`sudo apt install age`). Put the public key in `.env` and keep the file with the private key in the password manager, never on the server. The server needs nothing else: `age` is in the image.
+
+Manual backup and restore, from `/home/deploy/cream`:
+
+```bash
+# Backup now
+docker compose exec web bin/rails cream:backup:run
+
+# Restore a plain .dump (destructive: replaces the whole database)
+docker compose exec -e CONFIRM=1 web bin/rails "cream:backup:restore[cream_backup_production_2026-07-01.dump]"
+
+# Restore an encrypted .dump.age: paste the AGE-SECRET-KEY-1... line when asked
+read -rs BACKUP_AGE_IDENTITY && export BACKUP_AGE_IDENTITY
+docker compose exec -e CONFIRM=1 -e BACKUP_AGE_IDENTITY web \
+  bin/rails "cream:backup:restore[cream_backup_production_2026-07-01.dump.age]"
+unset BACKUP_AGE_IDENTITY
+```
+
+Pass `CONFIRM=1` with `-e` (in front of `docker compose` it stays on the host) and always give the exact file name from the Drive folder.
