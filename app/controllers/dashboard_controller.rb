@@ -15,7 +15,7 @@ class DashboardController < ApplicationController
     @pending_tasks = current_workspace.tasks.pending
       .where(assignee: current_user)
       .due_order.includes(:taskable, :assignee).limit(8)
-    @recent_activities = current_workspace.activities.includes(:user, :subject).recent_first.limit(15)
+    @recent_activities = policy_scope(current_workspace.activities).includes(:user, :subject).recent_first.limit(15)
     @pipelines = current_workspace.pipelines.ordered
     @pipeline = current_pipeline
     stages = if current_pipeline

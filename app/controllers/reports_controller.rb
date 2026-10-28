@@ -11,7 +11,7 @@ class ReportsController < ApplicationController
     authorize :report, :index?
     @pipelines = current_workspace.pipelines.ordered
     @config = report_config
-    @result = ReportRunner.new(workspace: current_workspace, **@config).run
+    @result = ReportRunner.new(workspace: current_workspace, viewer: pundit_user, **@config).run
 
     respond_to do |format|
       format.html { @reports = policy_scope(current_workspace.reports).visible_to(current_user).ordered }

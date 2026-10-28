@@ -20,8 +20,9 @@ class ReportRunner
   Row = Data.define(:key, :label, :value, :color, :segments)
   Result = Data.define(:rows, :metric, :metric_label, :total, :max, :all_pipelines_stage_chart)
 
-  def initialize(workspace:, record_type:, metric:, group_by:, date_range:, pipeline_id: nil, include_closed: false)
+  def initialize(workspace:, record_type:, metric:, group_by:, date_range:, pipeline_id: nil, include_closed: false, viewer: nil)
     @workspace = workspace
+    @viewer = viewer
     @record_type = record_type
     @metric = metric
     @group_by = group_by
@@ -57,10 +58,15 @@ class ReportRunner
 
   def base_scope
     scope = @workspace.public_send(@record_type.tableize)
+    scope = scoped_deals(scope) if @record_type == "Deal" && @viewer
     start = range_start
     scope = scope.where(model.arel_table[:created_at].gteq(start)) if start
     scope = scope.where(pipeline_id: @pipeline_id) if @pipeline_id && @record_type == "Deal"
     scope
+  end
+
+  def scoped_deals(scope)
+    DealPolicy::Scope.new(@viewer, scope).resolve
   end
 
   def range_start

@@ -2,7 +2,8 @@ class ReportMailer < ApplicationMailer
   def scheduled_report(report)
     @report = report
     @config = report.config_params
-    @result = ReportRunner.new(workspace: report.workspace, **@config).run
+    viewer = UserContext.new(user: report.user, workspace: report.workspace)
+    @result = ReportRunner.new(workspace: report.workspace, viewer: viewer, **@config).run
 
     with_mailer_locale(report.user.locale) do
       mail(

@@ -12,7 +12,8 @@ class StageTriggersController < ApplicationController
 
   def show
     authorize @stage_trigger
-    @runs = @stage_trigger.runs.includes(:deal, :user).recent_first.limit(50)
+    visible_deals = policy_scope(current_workspace.deals)
+    @runs = @stage_trigger.runs.includes(:deal, :user).where(deal: visible_deals).recent_first.limit(50)
   end
 
   def new

@@ -628,9 +628,11 @@ module CreamMcp
       base = case record
       when Person then CreamMcp.person_json(record).merge(description: record.description, linkedin_url: record.linkedin_url,
         internal_notes: record.internal_notes)
-      when Company then CreamMcp.company_json(record).merge(description: record.description,
-        people: record.people.limit(10).map { |p| CreamMcp.person_json(p) },
-        deals: record.deals.limit(10).map { |d| CreamMcp.deal_json(d) })
+      when Company
+        visible_deals = CreamMcp.policy_scope(pundit_ctx, record.deals).limit(10)
+        CreamMcp.company_json(record).merge(description: record.description,
+          people: record.people.limit(10).map { |p| CreamMcp.person_json(p) },
+          deals: visible_deals.map { |d| CreamMcp.deal_json(d) })
       when Deal then CreamMcp.deal_json(record)
       end
       comments = if CreamFeatures.enabled?(:comments)
