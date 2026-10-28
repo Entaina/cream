@@ -12,9 +12,7 @@ class WebhookDeliveryJob < ApplicationJob
     request["X-Cream-Signature"] = signature(webhook.secret, payload) if webhook.secret.present?
     request.body = payload.to_json
 
-    response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: uri.scheme == "https") do |http|
-      http.request(request)
-    end
+    response = SafeOutboundHttp.start(uri) { |http| http.request(request) }
 
     delivery.update!(
       response_code: response.code.to_i,

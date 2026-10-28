@@ -10,8 +10,6 @@ class SlackNotifier
     request["Content-Type"] = "application/json"
     request.body = {text: message}.to_json
 
-    Net::HTTP.start(uri.hostname, uri.port, use_ssl: uri.scheme == "https") do |http|
-      http.request(request)
-    end
+    SafeOutboundHttp.start(uri) { |http| http.request(request) }
   end
 end
