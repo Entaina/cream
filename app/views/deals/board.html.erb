@@ -59,7 +59,7 @@
     <%= select_tag :sort,
           options_for_select(board_deal_sort_options(pipeline: @pipeline, custom_fields: @custom_fields), board_sort_selected),
           class: "input w-48",
-          onchange: "this.form.requestSubmit()" %>
+          data: { controller: "submit-on-change", action: "change->submit-on-change#submit" } %>
     <%= hidden_field_tag :dir, board_sort_direction %>
     <button type="submit"
             name="dir"

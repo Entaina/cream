@@ -11,6 +11,13 @@ RSpec.describe ApplicationHelper, type: :helper do
       expect(link["rel"]).to eq("noopener noreferrer")
     end
 
+    it "uses the given label as link text" do
+      link = Nokogiri::HTML.fragment(helper.safe_http_url_link("https://linkedin.com/in/ana", "Ver perfil")).at_css("a")
+
+      expect(link.text).to eq("Ver perfil")
+      expect(link["href"]).to eq("https://linkedin.com/in/ana")
+    end
+
     it "shows script URLs as plain text" do
       html = helper.safe_http_url_link("javascript:alert(1)")
 

@@ -9,7 +9,7 @@
   <% if auto_submit && form_url.present? %>
     <%= form_with url: form_url, method: form_method, class: "space-y-1" do %>
       <%= label_tag :preview_product_id, t("marketing.lead_form_templates.preview_product.label"), class: "label" %>
-      <%= select_tag :preview_product_id, select_options, select_html.merge(onchange: "this.form.requestSubmit()") %>
+      <%= select_tag :preview_product_id, select_options, select_html.merge(data: { controller: "submit-on-change", action: "change->submit-on-change#submit" }) %>
     <% end %>
   <% else %>
     <div>

@@ -35,7 +35,10 @@
       </thead>
       <tbody>
         <% @products.each do |product| %>
-          <tr class="cursor-pointer" onclick="Turbo.visit('<%= edit_product_path(product) %>')">
+          <tr class="cursor-pointer"
+              data-controller="row-link"
+              data-row-link-url-value="<%= edit_product_path(product) %>"
+              data-action="click->row-link#navigate auxclick->row-link#navigate">
             <td class="font-medium"><%= product.name %></td>
             <td class="text-ink-soft truncate max-w-md"><%= product.description %></td>
             <td>
@@ -46,7 +49,7 @@
               <% end %>
             </td>
             <td class="text-ink-soft tabular-nums"><%= money(product.price) %></td>
-            <td onclick="event.stopPropagation()">
+            <td data-controller="stop-propagation" data-action="click->stop-propagation#stop">
               <%= button_to product_path(product), method: :delete, class: "text-ink-faint hover:text-danger p-1",
                     form: { data: { turbo_confirm: t("products.index.delete_confirm", name: product.name) } } do %>
                 <%= icon :trash, classes: "size-3.5" %>

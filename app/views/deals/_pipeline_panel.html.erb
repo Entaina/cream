@@ -7,7 +7,7 @@
         <%= form_with url: move_pipeline_deal_path(@deal), method: :patch,
               data: { turbo_confirm: t("deals.show.move_pipeline_confirm") } do %>
           <%= select_tag :pipeline_id, options_for_select(pipelines.map { |p| [p.name, p.id] }, @deal.pipeline_id),
-                class: "input", onchange: "this.form.requestSubmit()" %>
+                class: "input", data: { controller: "submit-on-change", action: "change->submit-on-change#submit" } %>
         <% end %>
       </div>
     <% end %>

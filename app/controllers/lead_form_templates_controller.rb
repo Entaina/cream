@@ -3,6 +3,8 @@ class LeadFormTemplatesController < ApplicationController
 
   requires_feature :lead_forms
   before_action :set_template, only: %i[edit update destroy preview]
+  # The preview renders the template as published; see WorkspaceTemplateCsp.
+  content_security_policy_report_only only: :preview
 
   def index
     @kind = params[:kind].presence_in(%w[partial view booking layout]) || "all"

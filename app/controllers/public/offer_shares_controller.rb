@@ -3,6 +3,7 @@ module Public
     include ClientPortalSecurity
     include ClientPortalConsent
     include OfferVersionPreview
+    include WorkspaceTemplateCsp
 
     layout "public_client_portal"
 

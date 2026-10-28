@@ -31,8 +31,8 @@
                       action: "change->auto-submit#submit record-picker:selected->auto-submit#submit"
                     } do |f| %>
                 <%= render "edition_picker", form: f, compact: true, product: line.product %>
-                <%= f.number_field :quantity, min: 1, step: 1, class: "input w-16 py-1", onchange: "this.form.requestSubmit()" %>
-                <%= f.number_field :unit_price, min: 0, step: 0.01, class: "input w-28 py-1", onchange: "this.form.requestSubmit()" %>
+                <%= f.number_field :quantity, min: 1, step: 1, class: "input w-16 py-1", data: { controller: "submit-on-change", action: "change->submit-on-change#submit" } %>
+                <%= f.number_field :unit_price, min: 0, step: 0.01, class: "input w-28 py-1", data: { controller: "submit-on-change", action: "change->submit-on-change#submit" } %>
               <% end %>
             </td>
             <td class="text-ink-soft tabular-nums"><%= money(line.subtotal, deal.currency) %></td>

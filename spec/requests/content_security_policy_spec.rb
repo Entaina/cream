@@ -40,14 +40,84 @@ RSpec.describe "Content security policy", type: :request do
     policy.split(";").map(&:strip).find { |part| part.start_with?("#{name} ") }
   end
 
-  it "reports violations without enforcing the policy" do
+  it "enforces the policy on app pages" do
     get new_session_path
 
     expect(response).to have_http_status(:ok)
-    expect(response.headers["Content-Security-Policy"]).to be_nil
-    policy = response.headers["Content-Security-Policy-Report-Only"]
+    expect(response.headers["Content-Security-Policy-Report-Only"]).to be_nil
+    policy = response.headers["Content-Security-Policy"]
     expect(policy).to include("object-src 'none'")
     expect(policy).to include("base-uri 'self'")
+    expect(directive(policy, "script-src")).to match(/'nonce-[^']+'/)
+    expect(directive(policy, "script-src")).not_to include("'unsafe-inline'")
+    expect(directive(policy, "style-src")).to include("https://fonts.googleapis.com")
+    expect(directive(policy, "connect-src")).to include("wss:")
+  end
+
+  it "enforces the policy inside the signed-in app" do
+    sign_in_as(user)
+
+    get deals_path
+
+    expect(response).to have_http_status(:ok)
+    expect(response.headers["Content-Security-Policy"]).to include("object-src 'none'")
+    expect(response.headers["Content-Security-Policy-Report-Only"]).to be_nil
+  end
+
+  it "allows the Swagger UI bundle and its nonced bootstrap script on the API docs" do
+    get api_docs_path
+
+    policy = response.headers["Content-Security-Policy"]
+    script_src = directive(policy, "script-src")
+    expect(script_src).to include("https://cdn.jsdelivr.net")
+    expect(directive(policy, "style-src")).to include("https://cdn.jsdelivr.net")
+    nonce = script_src[/'nonce-([^']+)'/, 1]
+    expect(response.body).to include(%(<script nonce="#{nonce}">))
+  end
+
+  it "keeps public lead forms embeddable without adding the app policy" do
+    allow(CreamFeatures).to receive(:enabled?).with(:lead_forms).and_return(true)
+    lead_form = create_lead_form!(workspace, user: user)
+
+    get public_lead_form_path(lead_form.slug)
+
+    expect(response).to have_http_status(:ok)
+    expect(response.headers["Content-Security-Policy"]).to eq("frame-ancestors *")
+    expect(response.headers["Content-Security-Policy-Report-Only"]).to be_nil
+  end
+
+  it "only reports on the client portal, which renders the workspace layout template" do
+    allow(CreamFeatures).to receive(:enabled?).with(:client_portal).and_return(true)
+
+    get client_portal_root_path(workspace_slug: workspace.slug)
+
+    expect(response).to have_http_status(:ok)
+    expect(response.headers["Content-Security-Policy"]).to be_nil
+    expect(response.headers["Content-Security-Policy-Report-Only"]).to include("object-src 'none'")
+  end
+
+  it "only reports on the template preview, which renders the template as published" do
+    sign_in_as(user)
+    import_lead_form_templates!(workspace)
+    template = workspace.lead_form_templates.find_by!(path: "public/lead_forms/contacto")
+
+    get preview_lead_form_template_path(template)
+
+    expect(response).to have_http_status(:ok)
+    expect(response.headers["Content-Security-Policy"]).to be_nil
+    expect(response.headers["Content-Security-Policy-Report-Only"]).to include("object-src 'none'")
+
+    get lead_form_templates_path
+    expect(response.headers["Content-Security-Policy"]).to include("object-src 'none'")
+  end
+
+  it "keeps inline event handlers out of app views, which the enforced policy blocks" do
+    handler = /\son[a-z]+=["']|\bon[a-z]+:\s*["']/
+    offenders = Rails.root.glob("app/{views,helpers,components}/**/*.{erb,rb}").filter_map do |path|
+      path.relative_path_from(Rails.root).to_s if path.read.match?(handler)
+    end
+
+    expect(offenders).to be_empty
   end
 
   it "allows Turnstile on the public booking page with a per-request nonce" do

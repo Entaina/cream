@@ -7,7 +7,7 @@
             <%= select_tag :product_id,
                   options_from_collection_for_select(@deal_product_options, :id, :name, @deal_product_id),
                   include_blank: t("people.show.all_products"), class: "input text-xs py-1 w-36",
-                  onchange: "this.form.requestSubmit()" %>
+                  data: { controller: "submit-on-change", action: "change->submit-on-change#submit" } %>
           <% end %>
         <% end %>
       </div>

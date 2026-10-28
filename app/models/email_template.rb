@@ -57,15 +57,15 @@ class EmailTemplate < ApplicationRecord
     "quill"
   end
 
-  # Extra tokens carry what a visitor typed (lead form autoresponders, booking
-  # confirmations), so their values are HTML-escaped in the body and layout.
+  # Token values can be what a visitor typed, either now (extra tokens of lead form
+  # autoresponders and booking confirmations) or earlier (a contact created from a
+  # public form), so they are HTML-escaped in the body and layout.
   def render_for(record, extra_tokens: {})
-    escape_html = extra_tokens.present?
     wrap_with_layout(
-      interpolate(render_body(record, extra_tokens, escape_html:), record, extra_tokens, escape_html:),
+      interpolate(render_body(record, extra_tokens, escape_html: true), record, extra_tokens, escape_html: true),
       record,
       extra_tokens,
-      escape_html:
+      escape_html: true
     )
   end
 
@@ -76,19 +76,19 @@ class EmailTemplate < ApplicationRecord
   def render_custom_for(record, subject: nil, body: nil, extra_tokens: {})
     rendered_subject = subject.present? ? render_string(subject, record, extra_tokens) : render_subject_for(record, extra_tokens:)
     rendered_body = if body.present?
-      wrap_with_layout(render_string(body, record, extra_tokens), record, extra_tokens)
+      wrap_with_layout(render_string(body, record, extra_tokens, escape_html: true), record, extra_tokens, escape_html: true)
     else
       render_for(record, extra_tokens:)
     end
     [rendered_subject, rendered_body]
   end
 
-  def render_string(text, record, extra_tokens = {})
+  def render_string(text, record, extra_tokens = {}, escape_html: false)
     result = text.to_s
     if result.include?("{%") || result.include?("{{")
-      result = Marketing::LiquidRenderer.render(result, record: record, extra_tokens: extra_tokens)
+      result = Marketing::LiquidRenderer.render(result, record: record, extra_tokens: extra_tokens, escape_html: escape_html)
     end
-    interpolate(result, record, extra_tokens)
+    interpolate(result, record, extra_tokens, escape_html: escape_html)
   end
 
   def liquid?

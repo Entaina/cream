@@ -25,7 +25,7 @@
               @assignee_filter == :all ? "all" : (@assignee_filter == current_user.id ? "" : @assignee_filter)
             ),
             class: "input w-44",
-            onchange: "this.form.requestSubmit()" %>
+            data: { controller: "submit-on-change", action: "change->submit-on-change#submit" } %>
     <% end %>
   <% end %>
 </div>

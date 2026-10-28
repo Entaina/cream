@@ -1,5 +1,7 @@
 module Public
   class LandingPagesController < ApplicationController
+    include WorkspaceTemplateCsp
+
     layout "public_lead_form"
 
     allow_unauthenticated_access only: :show

@@ -101,15 +101,15 @@
             </td>
             <td class="text-ink-soft"><%= deal.contacts.filter_map { |contact| contact.first_name.presence }.to_sentence %></td>
             <td class="text-ink-soft"><%= deal.contacts.filter_map { |contact| contact.last_name.presence }.to_sentence %></td>
-            <td class="text-ink-soft select-text cursor-text" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()"><%= deal_contact_attribute(deal, :email) %></td>
-            <td class="text-ink-soft select-text cursor-text" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()"><%= deal_contact_attribute(deal, :phone) %></td>
+            <td class="text-ink-soft select-text cursor-text" data-controller="stop-propagation" data-action="click->stop-propagation#stop mousedown->stop-propagation#stop"><%= deal_contact_attribute(deal, :email) %></td>
+            <td class="text-ink-soft select-text cursor-text" data-controller="stop-propagation" data-action="click->stop-propagation#stop mousedown->stop-propagation#stop"><%= deal_contact_attribute(deal, :phone) %></td>
             <td class="text-ink-soft"><%= deal.expected_close_date && l(deal.expected_close_date, format: :short) %></td>
             <td class="text-ink-soft tabular-nums"><%= deal_field_display(deal, :execution_duration_days) %></td>
             <td class="text-ink-soft"><%= deal_field_display(deal, :execution_starts_on) %></td>
             <td class="text-ink-soft"><%= deal_field_display(deal, :execution_ends_on) %></td>
             <td class="text-ink-soft"><%= deal_field_display(deal, :payment_method) %></td>
             <td class="text-ink-soft"><%= deal_field_display(deal, :payment_on) %></td>
-            <td class="text-ink-soft select-text cursor-text" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()"><%= deal.invoice_number %></td>
+            <td class="text-ink-soft select-text cursor-text" data-controller="stop-propagation" data-action="click->stop-propagation#stop mousedown->stop-propagation#stop"><%= deal.invoice_number %></td>
             <td><%= avatar(deal.owner, size: "size-5", text: "text-2xs") if deal.owner %></td>
             <%= render "shared/magic_column_cells", record: deal %>
             <%= render "shared/custom_field_cells", fields: @custom_fields, record: deal %>

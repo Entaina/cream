@@ -31,11 +31,11 @@
     <%= select_tag :company_id,
           options_for_select([ [ t("shared.lists.no_company"), ListFilters::NONE ] ] + @companies.map { |company| [ company.name, company.id ] }, filter_value(:company_id)),
           include_blank: t("shared.lists.all_companies"), class: "input w-44",
-          onchange: "this.form.requestSubmit()" %>
+          data: { controller: "submit-on-change", action: "change->submit-on-change#submit" } %>
     <%= select_tag :owner_id,
           options_for_select([ [ t("shared.lists.unassigned"), ListFilters::NONE ] ] + @owners.map { |owner| [ owner.name, owner.id ] }, filter_value(:owner_id)),
           include_blank: t("shared.lists.all_owners"), class: "input w-44",
-          onchange: "this.form.requestSubmit()" %>
+          data: { controller: "submit-on-change", action: "change->submit-on-change#submit" } %>
     <%= render "shared/date_range_filter", label: t("shared.lists.created"), from: :created_from, to: :created_to %>
     <%= render "shared/custom_field_filters", fields: @custom_fields, cf: filter_value(:cf) %>
     <% if filters_active? %>

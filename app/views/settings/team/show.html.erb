@@ -64,7 +64,7 @@
               </div>
               <% if @admin && membership.user_id != current_user.id %>
                 <%= form_with model: membership, url: membership_path(membership), method: :patch, class: "flex items-center gap-2" do |f| %>
-                  <%= f.select :role, Membership.role_options, {}, class: "input text-sm py-1", onchange: "this.form.requestSubmit()" %>
+                  <%= f.select :role, Membership.role_options, {}, class: "input text-sm py-1", data: { controller: "submit-on-change", action: "change->submit-on-change#submit" } %>
                 <% end %>
                 <%= button_to membership_path(membership), method: :delete,
                       class: "text-ink-faint hover:text-danger p-1.5 rounded-md hover:bg-danger-soft",

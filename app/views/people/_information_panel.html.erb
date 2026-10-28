@@ -12,8 +12,8 @@
     <div class="divide-y divide-line/60">
       <%= render "shared/attribute", label: t("records.fields.job_title"), icon_name: :users, value: @person.job_title %>
       <%= render "shared/attribute", label: t("records.fields.company"), icon_name: :building, value: @person.company ? link_to(@person.company.name, company_path(@person.company), class: "text-accent hover:underline") : nil %>
-      <%= render "shared/attribute", label: t("records.fields.linkedin"), icon_name: :external, value: @person.linkedin_url.present? ? link_to(t("records.profile_link"), @person.linkedin_url, target: "_blank", rel: "noopener", class: "text-accent hover:underline") : nil %>
-      <%= render "shared/attribute", label: t("records.fields.twitter"), icon_name: :external, value: @person.twitter_url.present? ? link_to(t("records.profile_link"), @person.twitter_url, target: "_blank", rel: "noopener", class: "text-accent hover:underline") : nil %>
+      <%= render "shared/attribute", label: t("records.fields.linkedin"), icon_name: :external, value: @person.linkedin_url.present? ? safe_http_url_link(@person.linkedin_url, t("records.profile_link")) : nil %>
+      <%= render "shared/attribute", label: t("records.fields.twitter"), icon_name: :external, value: @person.twitter_url.present? ? safe_http_url_link(@person.twitter_url, t("records.profile_link")) : nil %>
     </div>
     <% if @person.description.present? %><p class="mt-4 text-sm text-ink-soft whitespace-pre-wrap break-words"><%= @person.description %></p><% end %>
   </section>

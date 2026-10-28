@@ -756,11 +756,11 @@ module ApplicationHelper
     deal.contacts.filter_map { |contact| contact.public_send(attribute).presence }.join(", ")
   end
 
-  def safe_http_url_link(value)
+  def safe_http_url_link(value, label = value)
     uri = URI.parse(value.to_s)
     return ERB::Util.h(value) unless uri.is_a?(URI::HTTP) && uri.host.present?
 
-    link_to(value, uri.to_s, target: "_blank", rel: "noopener noreferrer", class: "text-accent hover:underline break-all")
+    link_to(label, uri.to_s, target: "_blank", rel: "noopener noreferrer", class: "text-accent hover:underline break-all")
   rescue URI::InvalidURIError
     ERB::Util.h(value)
   end

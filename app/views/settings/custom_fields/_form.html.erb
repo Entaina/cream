@@ -29,7 +29,7 @@
       <% field_types = field_types - [ "formula" ] unless feature_enabled?(:formula_fields) %>
       <%= f.select :field_type, field_types.map { |ft| [CustomField.new(field_type: ft).field_type_label, ft] }, {},
             class: "input",
-            onchange: "document.getElementById('custom-field-options-panel').classList.toggle('hidden', !['select','multi_select'].includes(this.value)); document.getElementById('custom-field-formula-panel').classList.toggle('hidden', this.value !== 'formula'); document.getElementById('custom-field-reference-panel').classList.toggle('hidden', this.value !== 'record_reference')" %>
+            data: { controller: "custom-field-type", action: "change->custom-field-type#toggle" } %>
     </div>
   </div>
 

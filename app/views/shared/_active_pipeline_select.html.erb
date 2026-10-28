@@ -5,5 +5,5 @@
         options_for_select(pipelines.map { |p| [ p.name, p.id ] }, selected_pipeline&.id),
         **(include_all ? { include_blank: t("shared.lists.all_pipelines") } : {}),
         class: select_class,
-        onchange: "this.form.requestSubmit()" %>
+        data: { controller: "submit-on-change", action: "change->submit-on-change#submit" } %>
 <% end %>

@@ -1,5 +1,7 @@
 module Public
   class BookingsController < ApplicationController
+    include WorkspaceTemplateCsp
+
     layout "public_booking"
 
     allow_unauthenticated_access

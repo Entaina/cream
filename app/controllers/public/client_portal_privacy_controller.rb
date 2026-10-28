@@ -1,6 +1,7 @@
 module Public
   class ClientPortalPrivacyController < ApplicationController
     include ClientPortalSecurity
+    include WorkspaceTemplateCsp
 
     layout "public_client_portal"
 

@@ -2,6 +2,7 @@ module Public
   class DealPortalInvitesController < ApplicationController
     include ClientPortalSecurity
     include ClientPortalConsent
+    include WorkspaceTemplateCsp
 
     layout "public_client_portal"
 

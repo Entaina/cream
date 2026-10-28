@@ -1,6 +1,9 @@
 <%# locals: (payment:) %>
 <% confidence_colors = { "high" => "green", "medium" => "golden", "low" => "chicago" } %>
-<tr class="cursor-pointer" onclick="Turbo.visit('<%= stripe_payment_path(payment) %>')">
+<tr class="cursor-pointer"
+    data-controller="row-link"
+    data-row-link-url-value="<%= stripe_payment_path(payment) %>"
+    data-action="click->row-link#navigate auxclick->row-link#navigate">
   <td class="whitespace-nowrap text-ink-soft"><%= l(payment.paid_at, format: :short) %></td>
   <td class="text-right tabular-nums font-medium whitespace-nowrap">
     <%= number_to_currency(payment.amount_decimal,
@@ -14,7 +17,7 @@
     <div class="text-sm text-ink-faint truncate"><%= payment.customer_email %></div>
   </td>
   <td class="max-w-64 text-ink-soft"><div class="truncate"><%= payment.description %></div></td>
-  <td onclick="event.stopPropagation()">
+  <td data-controller="stop-propagation" data-action="click->stop-propagation#stop">
     <% if payment.matched? && payment.deal %>
       <%= link_to payment.deal.name, deal_path(payment.deal), class: "text-accent hover:underline" %>
     <% elsif payment.pending_review? && payment.suggested_deal %>
@@ -33,7 +36,7 @@
       <span class="text-sm text-ink-faint"><%= t("integrations.stripe.payments.no_match") %></span>
     <% end %>
   </td>
-  <td onclick="event.stopPropagation()">
+  <td data-controller="stop-propagation" data-action="click->stop-propagation#stop">
     <div class="flex items-center gap-1.5 justify-end flex-wrap">
       <% if payment.pending_review? %>
         <% if payment.suggested_deal %>

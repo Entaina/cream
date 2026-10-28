@@ -101,14 +101,24 @@ RSpec.describe EmailTemplate, type: :model do
       expect(rendered).to eq("<div><p>Hola {message}</p></div>")
     end
 
-    it "does not escape tokens when rendering without submitted values" do
+    it "escapes record values when rendering without submitted values" do
       layout = workspace.email_layouts.create!(name: "Simple", body: "<div>{content}<p>{first_name}</p></div>")
       template = workspace.email_templates.create!(
-        user: user, name: "Plain", subject: "Hi", body: "<p>Hello {first_name}</p>", email_layout: layout
+        user: user, name: "Plain", subject: "Hi {first_name}", body: "<p>Hello {first_name}</p>", email_layout: layout
       )
-      person.update!(first_name: "Ana & Co")
+      person.update!(first_name: "<b>Ana</b> & Co")
 
-      expect(template.render_for(person)).to eq("<div><p>Hello Ana & Co</p><p>Ana & Co</p></div>")
+      expect(template.render_for(person)).to eq("<div><p>Hello &lt;b&gt;Ana&lt;/b&gt; &amp; Co</p><p>&lt;b&gt;Ana&lt;/b&gt; &amp; Co</p></div>")
+      expect(template.render_subject_for(person)).to eq("Hi <b>Ana</b> & Co")
+    end
+
+    it "escapes record values in liquid bodies and custom campaign bodies" do
+      template = workspace.email_templates.create!(user: user, name: "Liquid record", subject: "Hi", body_editor: "html", body: "<p>{{ company }}</p>")
+      person.company.update!(name: "<script>x</script>")
+
+      expect(template.render_for(person)).to eq("<p>&lt;script&gt;x&lt;/script&gt;</p>")
+      _subject, body = template.render_custom_for(person, subject: "Hola {company}", body: "<p>{company} · {{ company }}</p>")
+      expect(body).to eq("<p>&lt;script&gt;x&lt;/script&gt; · &lt;script&gt;x&lt;/script&gt;</p>")
     end
 
     it "wraps rendered body with layout content placeholder" do
