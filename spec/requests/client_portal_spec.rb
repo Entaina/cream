@@ -134,6 +134,79 @@ RSpec.describe "Client portal", type: :request do
       get client_portal_offers_path(workspace_slug: workspace.slug)
       expect(response).to redirect_to(client_portal_root_path(workspace_slug: workspace.slug))
     end
+
+    it "rejects a copy of the cookie after signing out" do
+      sign_in_via_portal!
+      copied_cookie = cookies[:client_portal]
+      delete client_portal_session_path(workspace_slug: workspace.slug)
+      expect(ClientPortalSession.last.revoked_at).to be_present
+
+      cookies[:client_portal] = copied_cookie
+      get client_portal_offers_path(workspace_slug: workspace.slug)
+      expect(response).to redirect_to(client_portal_root_path(workspace_slug: workspace.slug))
+    end
+
+    it "creates a server-side session for the contact" do
+      expect { sign_in_via_portal! }.to change(ClientPortalSession, :count).by(1)
+
+      expect(ClientPortalSession.last).to have_attributes(workspace_id: workspace.id, email: person.email,
+        preview: false, revoked_at: nil)
+    end
+
+    it "expires the session after seven days" do
+      sign_in_via_portal!
+
+      travel ClientPortalSession::EXPIRY + 1.minute do
+        get client_portal_offers_path(workspace_slug: workspace.slug)
+        expect(response).to redirect_to(client_portal_root_path(workspace_slug: workspace.slug))
+      end
+    end
+
+    describe "cookies that carry the workspace and email directly" do
+      def legacy_cookie(expires: 7.days.from_now)
+        jar = ActionDispatch::Request.new(Rails.application.env_config.deep_dup).cookie_jar
+        jar.encrypted[:client_portal] = {
+          value: {workspace_id: workspace.id, email: person.email, preview: false},
+          expires: expires
+        }
+        jar[:client_portal]
+      end
+
+      it "keeps them signed in through a server-side session" do
+        cookies[:client_portal] = legacy_cookie
+
+        expect {
+          get client_portal_offers_path(workspace_slug: workspace.slug)
+          get client_portal_offers_path(workspace_slug: workspace.slug)
+        }.to change(ClientPortalSession, :count).by(1)
+        expect(response).to have_http_status(:ok)
+        expect(ClientPortalSession.last).to have_attributes(workspace_id: workspace.id, email: person.email)
+      end
+
+      it "rejects a copy of them after signing out" do
+        copied_cookie = legacy_cookie
+        cookies[:client_portal] = copied_cookie
+        get client_portal_offers_path(workspace_slug: workspace.slug)
+        delete client_portal_session_path(workspace_slug: workspace.slug)
+
+        cookies[:client_portal] = copied_cookie
+        get client_portal_offers_path(workspace_slug: workspace.slug)
+        expect(response).to redirect_to(client_portal_root_path(workspace_slug: workspace.slug))
+      end
+
+      it "honours the expiry they were issued with" do
+        cookie = legacy_cookie(expires: 1.day.from_now)
+        cookies[:client_portal] = cookie
+        get client_portal_offers_path(workspace_slug: workspace.slug)
+        expect(response).to have_http_status(:ok)
+
+        travel 2.days do
+          cookies[:client_portal] = cookie
+          get client_portal_offers_path(workspace_slug: workspace.slug)
+          expect(response).to redirect_to(client_portal_root_path(workspace_slug: workspace.slug))
+        end
+      end
+    end
   end
 
   describe "viewing an offer" do

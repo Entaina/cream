@@ -33,6 +33,8 @@ class User < ApplicationRecord
   validates :locale, inclusion: {in: LOCALES}
   validates :password, length: {minimum: 8}, allow_nil: true
 
+  after_update_commit :drop_support_memberships, if: -> { saved_change_to_superadmin?(to: false) }
+
   def self.organization_workspace_configured?
     ENV["CREAM_ORGANIZATION_EMAIL_DOMAIN"].present? &&
       ENV["CREAM_ORGANIZATION_WORKSPACE_NAME"].present?
@@ -279,5 +281,11 @@ class User < ApplicationRecord
     end
 
     false
+  end
+
+  private
+
+  def drop_support_memberships
+    memberships.where(superadmin_access: true).destroy_all
   end
 end

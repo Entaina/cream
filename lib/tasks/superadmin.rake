@@ -18,4 +18,11 @@ namespace :superadmin do
     user.update!(superadmin: false)
     puts "Revoked superadmin from #{user.email_address}"
   end
+
+  desc "Remove support memberships of users who are no longer superadmin (bin/rails superadmin:prune_support_memberships)"
+  task prune_support_memberships: :environment do
+    stale = Membership.where(superadmin_access: true).joins(:user).where(users: {superadmin: false})
+    removed = stale.destroy_all.size
+    puts "Removed #{removed} support memberships"
+  end
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_27_120100) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_29_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -338,6 +338,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_27_120100) do
     t.index ["token_digest"], name: "index_client_portal_login_grants_on_token_digest", unique: true
     t.index ["workspace_id", "email", "created_at"], name: "idx_on_workspace_id_email_created_at_e91d961aa9"
     t.index ["workspace_id"], name: "index_client_portal_login_grants_on_workspace_id"
+  end
+
+  create_table "client_portal_sessions", force: :cascade do |t|
+    t.bigint "workspace_id", null: false
+    t.string "email", null: false
+    t.string "token_digest", null: false
+    t.boolean "preview", default: false, null: false
+    t.datetime "expires_at", null: false
+    t.datetime "revoked_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["expires_at"], name: "index_client_portal_sessions_on_expires_at"
+    t.index ["token_digest"], name: "index_client_portal_sessions_on_token_digest", unique: true
+    t.index ["workspace_id"], name: "index_client_portal_sessions_on_workspace_id"
   end
 
   create_table "comments", force: :cascade do |t|
@@ -1846,6 +1860,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_27_120100) do
   add_foreign_key "campaigns", "email_templates", on_delete: :nullify
   add_foreign_key "campaigns", "workspaces"
   add_foreign_key "client_portal_login_grants", "workspaces"
+  add_foreign_key "client_portal_sessions", "workspaces", on_delete: :cascade
   add_foreign_key "comments", "comments", column: "parent_id"
   add_foreign_key "comments", "users"
   add_foreign_key "comments", "workspaces"

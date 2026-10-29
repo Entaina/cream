@@ -15,6 +15,30 @@ RSpec.describe User, type: :model do
     expect(user).to be_valid
   end
 
+  describe "revoking superadmin" do
+    let(:user) { User.create!(name: "Support", email_address: "support@example.com", password: "password", superadmin: true) }
+    let(:visited) { Workspace.create!(name: "Visited") }
+    let(:joined) { Workspace.create!(name: "Joined") }
+
+    before do
+      visited.memberships.create!(user: User.create!(name: "Admin", email_address: "admin@example.com", password: "password"), role: "admin")
+      user.ensure_superadmin_support_membership!(visited)
+      joined.memberships.create!(user: user, role: "salesperson")
+    end
+
+    it "removes support memberships and keeps the regular ones" do
+      user.update!(superadmin: false)
+
+      expect(user.memberships.reload.map(&:workspace)).to eq([joined])
+    end
+
+    it "keeps support memberships on unrelated updates" do
+      user.update!(name: "Renamed")
+
+      expect(user.memberships.reload.where(superadmin_access: true).count).to eq(1)
+    end
+  end
+
   it "keeps existing users valid without touching their password" do
     created = User.create!(name: "Existing", email_address: "existing@example.com", password: "password")
     user = User.find(created.id)
