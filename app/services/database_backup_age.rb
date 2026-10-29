@@ -2,7 +2,8 @@ require "fileutils"
 require "open3"
 require "tempfile"
 
-# Optional age encryption for pg_dump backups (public key encrypts, identity decrypts).
+# age encryption for pg_dump backups (public key encrypts, identity decrypts).
+# Required in production; optional elsewhere.
 module DatabaseBackupAge
   Error = Class.new(StandardError)
 
@@ -14,7 +15,11 @@ module DatabaseBackupAge
 
   def encrypt_if_configured(source_path, file_name)
     recipient = ENV["BACKUP_AGE_PUBLIC_KEY"].to_s.strip
-    return [source_path, file_name] if recipient.blank?
+    if recipient.blank?
+      raise Error, "BACKUP_AGE_PUBLIC_KEY is required in production" if Rails.env.production?
+
+      return [source_path, file_name]
+    end
 
     encrypted_path = "#{source_path}.age"
     _stdout, stderr, status = Open3.capture3("age", "-r", recipient, "-o", encrypted_path, source_path)

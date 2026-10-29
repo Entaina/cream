@@ -96,6 +96,17 @@ RSpec.describe DatabaseBackupAge do
       expect(described_class.encrypt_if_configured("/tmp/x.dump", "b.dump")).to eq(["/tmp/x.dump", "b.dump"])
     end
 
+    it "refuses to return a plain dump in production" do
+      allow(ENV).to receive(:[]).with("BACKUP_AGE_PUBLIC_KEY").and_return(" ")
+      allow(Rails.env).to receive(:production?).and_return(true)
+      allow(Open3).to receive(:capture3)
+
+      expect {
+        described_class.encrypt_if_configured("/tmp/x.dump", "b.dump")
+      }.to raise_error(DatabaseBackupAge::Error, /BACKUP_AGE_PUBLIC_KEY is required in production/)
+      expect(Open3).not_to have_received(:capture3)
+    end
+
     it "encrypts with the configured recipient and appends .age to the name" do
       allow(ENV).to receive(:[]).with("BACKUP_AGE_PUBLIC_KEY").and_return("age1recipient")
       allow(Open3).to receive(:capture3).and_return(["", "", instance_double(Process::Status, success?: true)])

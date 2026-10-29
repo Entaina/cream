@@ -207,10 +207,15 @@ curl -I https://CREAM_DOMAIN/up
 
 ### 6. (Optional) Demo data
 
-If you filled in the `CREAM_SEED_*` variables in `.env`:
+The seed users' emails and passwords are not stored in the server `.env`. Type them when you run the seeds; `-e NAME` without a value forwards each one from the shell:
 
 ```bash
-docker compose exec -e CREAM_ALLOW_SEED=true web bin/rails db:seed
+read -r CREAM_SEED_ADMIN_EMAIL && read -rs CREAM_SEED_ADMIN_PASSWORD
+read -r CREAM_SEED_MEMBER_EMAIL && read -rs CREAM_SEED_MEMBER_PASSWORD
+export CREAM_SEED_ADMIN_EMAIL CREAM_SEED_ADMIN_PASSWORD CREAM_SEED_MEMBER_EMAIL CREAM_SEED_MEMBER_PASSWORD
+docker compose exec -e CREAM_ALLOW_SEED=true -e CREAM_SEED_ADMIN_EMAIL -e CREAM_SEED_ADMIN_PASSWORD \
+  -e CREAM_SEED_MEMBER_EMAIL -e CREAM_SEED_MEMBER_PASSWORD web bin/rails db:seed
+unset CREAM_SEED_ADMIN_PASSWORD CREAM_SEED_MEMBER_PASSWORD
 ```
 
 In production `db:seed` does nothing unless `CREAM_ALLOW_SEED=true` is set, because it deletes and recreates the `cream-demo` workspace. Run it only on a fresh installation.
@@ -303,11 +308,11 @@ Variables in `.env`:
 |---|---|
 | `GOOGLE_DRIVE_SERVICE_ACCOUNT_KEY_PATH` | Path to the service account JSON (in the container: `/run/secrets/cream-backup.json`) |
 | `GOOGLE_DRIVE_BACKUP_FOLDER_ID` | ID of the folder in the Drive shared drive |
-| `BACKUP_AGE_PUBLIC_KEY` | Optional `age` public key (`age1...`): backups are encrypted and uploaded as `.dump.age` |
+| `BACKUP_AGE_PUBLIC_KEY` | Required: `age` public key (`age1...`). Backups are encrypted and uploaded as `.dump.age`; without it the backup fails and uploads nothing |
 
 Place `cream-backup.json` in `/home/deploy/cream/` (next to the compose file). The volume mounts it into the `web` container.
 
-To encrypt backups, generate a key pair on your machine with `age-keygen -o ~/cream-backup-age.txt` (`sudo apt install age`). Put the public key in `.env` and keep the file with the private key in the password manager, never on the server. The server needs nothing else: `age` is in the image.
+Generate a key pair on your machine with `age-keygen -o ~/cream-backup-age.txt` (`sudo apt install age`). Put the public key in `.env` and keep the file with the private key in the password manager, never on the server. The server needs nothing else: `age` is in the image.
 
 Manual backup and restore, from `/home/deploy/cream`:
 

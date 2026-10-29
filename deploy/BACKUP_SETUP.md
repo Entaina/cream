@@ -13,8 +13,8 @@ and manual restoration from Google Drive.
 | Format | `pg_dump -Fc` (PostgreSQL custom, compressed) |
 | Destination | Folder in Google Drive (Shared drive of your organization) |
 | Authentication | Google Cloud service account + JSON key on disk |
-| File name | `cream_backup_<environment>_<date>.dump` (optional `.age` suffix when `BACKUP_AGE_PUBLIC_KEY` is set) |
-| Encryption (optional) | `age` with `BACKUP_AGE_PUBLIC_KEY` on backup; restore with `BACKUP_AGE_IDENTITY_FILE` or `BACKUP_AGE_IDENTITY` |
+| File name | `cream_backup_<environment>_<date>.dump.age` in production (`.dump` without `BACKUP_AGE_PUBLIC_KEY`, outside production only) |
+| Encryption | `age` with `BACKUP_AGE_PUBLIC_KEY` on backup (required in production); restore with `BACKUP_AGE_IDENTITY_FILE` or `BACKUP_AGE_IDENTITY` |
 | Retention | Moves backups older than **30 days** to the Shared Drive trash (except those from the **1st day of each month**; same environment only). The service account cannot permanently delete files. |
 
 The daily job **does not run in development** even if you have the variables configured.
@@ -107,7 +107,7 @@ A **Google Workspace administrator** must:
 |----------|-------------|
 | `GOOGLE_DRIVE_SERVICE_ACCOUNT_KEY_PATH` | Path to the service account JSON file |
 | `GOOGLE_DRIVE_BACKUP_FOLDER_ID` | ID of the folder in Drive |
-| `BACKUP_AGE_PUBLIC_KEY` | Optional. `age` public key (`age1...`): backups are encrypted and uploaded as `.dump.age` |
+| `BACKUP_AGE_PUBLIC_KEY` | Required in production. `age` public key (`age1...`): backups are encrypted and uploaded as `.dump.age`. Without it the production backup fails and uploads nothing |
 | `BACKUP_AGE_IDENTITY_FILE` / `BACKUP_AGE_IDENTITY` | Only to restore `.dump.age` backups: path to the `age` private key, or the key itself |
 
 ### Backup encryption (age)
@@ -128,7 +128,7 @@ Without encryption, anyone with access to the Drive folder can read every contac
    BACKUP_AGE_PUBLIC_KEY=age1...
    ```
 
-From then on, daily backups are uploaded as `cream_backup_<environment>_<date>.dump.age`. If encryption fails, the backup fails and nothing is uploaded.
+From then on, daily backups are uploaded as `cream_backup_<environment>_<date>.dump.age`. If encryption fails, the backup fails and nothing is uploaded. In production the backup also fails, without uploading anything, when `BACKUP_AGE_PUBLIC_KEY` is missing.
 
 ### Local development
 
@@ -274,6 +274,7 @@ queue and cable databases are not included (they can be regenerated).
 | `Backup is age-encrypted but BACKUP_AGE_IDENTITY_FILE or BACKUP_AGE_IDENTITY is not configured` | The private key did not reach the container | `export BACKUP_AGE_IDENTITY` and add `-e BACKUP_AGE_IDENTITY`; the database is not touched |
 | `age decryption failed` | Wrong private key for that backup | Use the key whose public key was in `BACKUP_AGE_PUBLIC_KEY` when it was uploaded |
 | `age encryption failed` in the backup job | Invalid `BACKUP_AGE_PUBLIC_KEY` | Check the `age1...` value; nothing was uploaded |
+| `BACKUP_AGE_PUBLIC_KEY is required in production` | The public key is not in the server `.env` | Add it (§ Backup encryption) and recreate the container; nothing was uploaded |
 
 ### Automatic backup logs
 

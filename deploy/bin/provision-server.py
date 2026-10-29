@@ -110,10 +110,6 @@ def build_production_env(local_env: dict[str, str], master_key: str) -> str:
         "CREAM_PUBLIC_SIGNUP=false",
         f"CREAM_ORGANIZATION_EMAIL_DOMAIN={local_env.get('CREAM_ORGANIZATION_EMAIL_DOMAIN', 'example.com')}",
         f"CREAM_ORGANIZATION_WORKSPACE_NAME={local_env.get('CREAM_ORGANIZATION_WORKSPACE_NAME', 'Example')}",
-        f"CREAM_SEED_ADMIN_EMAIL={local_env.get('CREAM_SEED_ADMIN_EMAIL', '')}",
-        f"CREAM_SEED_ADMIN_PASSWORD={local_env.get('CREAM_SEED_ADMIN_PASSWORD', '')}",
-        f"CREAM_SEED_MEMBER_EMAIL={local_env.get('CREAM_SEED_MEMBER_EMAIL', '')}",
-        f"CREAM_SEED_MEMBER_PASSWORD={local_env.get('CREAM_SEED_MEMBER_PASSWORD', '')}",
         f"RAILS_LOG_LEVEL={local_env.get('RAILS_LOG_LEVEL', 'info')}",
     ]
     return "\n".join(lines) + "\n"
