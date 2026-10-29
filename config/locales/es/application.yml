@@ -558,6 +558,14 @@ es:
       no_reply: Sin respuesta.
       open: Abrir chat de base de conocimiento
       placeholder: Pregunta sobre clientes, ventas o estrategia…
+      preview:
+        body: Mensaje
+        campaign: Campaña
+        scheduled_at: Programado para
+        segment: Segmento
+        subject: Asunto
+        template: Plantilla
+        to: Para
       request_failed: No se pudo obtener respuesta.
       send: Enviar
       shrink: Reducir chat

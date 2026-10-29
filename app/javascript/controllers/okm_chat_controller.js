@@ -198,7 +198,7 @@ export default class extends Controller {
         } else if (event.type === "session" && event.session_id) {
           sessionId = event.session_id
         } else if (event.type === "confirm_action") {
-          confirmActions.push({ description: event.description, token: event.token })
+          confirmActions.push({ description: event.description, preview: event.preview, token: event.token })
         } else if (event.type === "error") {
           error = event.message || this.c.request_failed
         }
@@ -221,6 +221,7 @@ export default class extends Controller {
     const text = document.createElement("p")
     text.textContent = action.description
     card.appendChild(text)
+    if (action.preview) card.appendChild(this.buildActionPreview(action.preview))
 
     const buttons = document.createElement("div")
     buttons.className = "flex gap-2"
@@ -243,6 +244,31 @@ export default class extends Controller {
     wrapper.appendChild(card)
     this.messagesTarget.appendChild(wrapper)
     this.messagesTarget.scrollTop = this.messagesTarget.scrollHeight
+  }
+
+  // Rendered as text only: the content may come from an untrusted email.
+  buildActionPreview(preview) {
+    const labels = this.c.preview || {}
+    const list = document.createElement("dl")
+    list.className = "space-y-1 text-sm"
+
+    Object.entries(preview).forEach(([key, value]) => {
+      if (value === null || value === undefined || value === "") return
+
+      const term = document.createElement("dt")
+      term.className = "text-xs font-medium text-ink-faint"
+      term.textContent = labels[key] || key
+
+      const detail = document.createElement("dd")
+      detail.className = key === "body"
+        ? "whitespace-pre-wrap break-words max-h-60 overflow-y-auto rounded border border-line bg-canvas px-2 py-1"
+        : "break-words"
+      detail.textContent = String(value)
+
+      list.appendChild(term)
+      list.appendChild(detail)
+    })
+    return list
   }
 
   async executeAction(action, wrapper, button) {

@@ -84,6 +84,19 @@ RSpec.describe "Mcp", type: :request do
       expect(response).to have_http_status(:unauthorized)
     end
 
+    it "annotates read, destructive and sending tools" do
+      post mcp_url, params: tools_list_payload, as: :json, headers: mcp_headers(plaintext)
+
+      annotations = JSON.parse(response.body).dig("result", "tools").to_h { |t| [t["name"], t["annotations"]] }
+      expect(annotations["list_people"]).to include("readOnlyHint" => true, "destructiveHint" => false)
+      expect(annotations["delete_record"]).to include("readOnlyHint" => false, "destructiveHint" => true)
+      expect(annotations["merge_person"]).to include("destructiveHint" => true)
+      expect(annotations["send_deal_email"]).to include("destructiveHint" => true, "openWorldHint" => true)
+      expect(annotations["send_campaign"]).to include("destructiveHint" => true, "openWorldHint" => true)
+      expect(annotations["create_person"]).to include("readOnlyHint" => false, "destructiveHint" => false)
+      expect(annotations.values).to all(be_present)
+    end
+
     it "lists tools with api token" do
       post mcp_url, params: tools_list_payload, as: :json, headers: mcp_headers(plaintext)
 

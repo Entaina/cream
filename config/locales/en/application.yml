@@ -557,6 +557,14 @@ en:
       no_reply: No reply.
       open: Open knowledge base chat
       placeholder: Ask about customers, sales or strategy…
+      preview:
+        body: Message
+        campaign: Campaign
+        scheduled_at: Scheduled for
+        segment: Segment
+        subject: Subject
+        template: Template
+        to: To
       request_failed: Could not get a response.
       send: Send
       shrink: Shrink chat

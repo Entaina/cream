@@ -126,10 +126,52 @@ module Ai
           tool: tool.name_value,
           args: args,
           description: description,
+          preview: confirmation_preview(tool.name_value, args),
           workspace_id: @workspace.id,
           user_id: @user.id
         )
         "Acción propuesta: #{description}. Pendiente de confirmación del usuario. No se ha ejecutado aún."
+      end
+
+      # What the user sees in full before confirming a send. An incoming email can
+      # carry prompt injection, so the user must read what will actually go out.
+      def confirmation_preview(name, args)
+        case name
+        when "send_deal_email"
+          deal = scoped(@workspace.deals).find_by(id: args["deal_id"])
+          email_preview(args, deal&.contacts&.first&.email)
+        when "send_person_email"
+          person = scoped(@workspace.people).find_by(id: args["person_id"])
+          email_preview(args, person&.email)
+        when "send_campaign"
+          campaign_preview(args)
+        end
+      end
+
+      def email_preview(args, default_to)
+        {
+          "to" => args["to_address"].presence || default_to,
+          "subject" => args["subject"].to_s,
+          "body" => args["body"].to_s
+        }
+      end
+
+      def campaign_preview(args)
+        campaign = scoped(@workspace.campaigns).find_by(id: args["campaign_id"])
+        segment = scoped(@workspace.segments).find_by(id: args["segment_id"])
+        template_id = args["email_template_id"].presence
+        template = template_id ? scoped(@workspace.email_templates).find_by(id: template_id) : campaign&.email_template
+        {
+          "campaign" => campaign&.name,
+          "segment" => segment&.name,
+          "template" => template&.name,
+          "subject" => campaign&.email_subject.presence || template&.subject,
+          "scheduled_at" => args["scheduled_at"].presence
+        }.compact
+      end
+
+      def scoped(relation)
+        Pundit.policy_scope!(UserContext.new(user: @user, workspace: @workspace), relation)
       end
 
       def confirmation_description(tool, args)

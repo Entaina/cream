@@ -36,6 +36,7 @@ class OkmChatsController < ApplicationController
       stream_event(
         type: "confirm_action",
         description: action.description,
+        preview: action.preview,
         token: action.sign
       )
     end
@@ -63,6 +64,8 @@ class OkmChatsController < ApplicationController
     end
 
     authorize current_workspace, :show?
+
+    return render json: {error: "Action already executed."}, status: :conflict unless action.consume!
 
     result = Ai::Agent::ActionExecutor.new(workspace: current_workspace, user: current_user).execute(action)
 

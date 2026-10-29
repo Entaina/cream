@@ -94,6 +94,7 @@ RSpec.describe "OKM chat", type: :request do
     expect(events.map { |event| event["type"] }).to include("status", "reply", "session", "confirm_action")
     expect(events.find { |e| e["type"] == "reply" }["content"]).to eq("Propongo crear la tarea.")
     expect(events.find { |e| e["type"] == "confirm_action" }["description"]).to eq("Crear tarea «Llamar»")
+    expect(events.find { |e| e["type"] == "confirm_action" }).to have_key("preview")
     expect(Ai::ContextualAgent).to have_received(:new).with(
       hash_including(workspace: workspace, user: user, record: company, message: "Crea una tarea")
     )
@@ -125,6 +126,58 @@ RSpec.describe "OKM chat", type: :request do
     expect(response).to have_http_status(:success)
     expect(response.parsed_body["success"]).to be(true)
     expect(company.notes.find_by(body: "Nota confirmada")).to be_present
+  end
+
+  it "runs each action token only once" do
+    allow(Rails).to receive(:cache).and_return(ActiveSupport::Cache::MemoryStore.new)
+    action = Ai::Agent::PendingAction.new(
+      tool: "add_note",
+      args: {"record_type" => "company", "record_id" => company.id, "body" => "Solo una vez"},
+      description: "Añadir nota",
+      workspace_id: workspace.id,
+      user_id: user.id
+    )
+    token = action.sign
+
+    post okm_chat_actions_path, params: {token: token}, as: :json
+    expect(response).to have_http_status(:success)
+
+    expect {
+      post okm_chat_actions_path, params: {token: token}, as: :json
+    }.not_to change { company.notes.where(body: "Solo una vez").count }
+    expect(response).to have_http_status(:conflict)
+  end
+
+  it "rejects tokens signed before actions had a nonce" do
+    action = Ai::Agent::PendingAction.new(
+      tool: "add_note",
+      args: {"record_type" => "company", "record_id" => company.id, "body" => "Token antiguo"},
+      description: "Añadir nota",
+      workspace_id: workspace.id,
+      user_id: user.id
+    )
+    token = Ai::Agent::PendingAction.verifier.generate(action.payload.except("nonce"), expires_in: 15.minutes, purpose: :agent_pending_action)
+
+    post okm_chat_actions_path, params: {token: token}, as: :json
+
+    expect(response).to have_http_status(:conflict)
+    expect(company.notes.find_by(body: "Token antiguo")).to be_nil
+  end
+
+  it "does not spend the token of another user's action" do
+    allow(Rails).to receive(:cache).and_return(ActiveSupport::Cache::MemoryStore.new)
+    action = Ai::Agent::PendingAction.new(
+      tool: "add_note",
+      args: {"record_type" => "company", "record_id" => company.id, "body" => "Nota ajena"},
+      description: "Añadir nota",
+      workspace_id: workspace.id,
+      user_id: users(:two).id
+    )
+
+    post okm_chat_actions_path, params: {token: action.sign}, as: :json
+
+    expect(response).to have_http_status(:forbidden)
+    expect(action.consume!).to be(true)
   end
 
   it "rejects an action token from another user" do

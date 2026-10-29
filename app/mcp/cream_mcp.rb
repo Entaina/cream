@@ -45,6 +45,8 @@ module CreamMcp
     pipeline_summary recent_changes sales_forecast summarize_record suggest_next_steps
     draft_email natural_language_search enrich_record
   ].freeze
+  DESTRUCTIVE_TOOL_NAMES = %w[delete_record delete_stage_condition merge_person merge_company].freeze
+  SEND_TOOL_NAMES = %w[send_deal_email send_person_email send_campaign].freeze
 
   def self.server_for(user:, workspace:, read_only: false)
     MCP::Server.new(
@@ -94,13 +96,25 @@ module CreamMcp
       LIST_CUSTOM_FIELDS, SET_CUSTOM_FIELDS, GET_DEAL_HISTORY,
       RECENT_CHANGES, SALES_FORECAST,
       SUMMARIZE_RECORD, SUGGEST_NEXT_STEPS, DRAFT_EMAIL, NATURAL_LANGUAGE_SEARCH, ENRICH_RECORD,
-      *Marketing.tools]
+      *Marketing.tools].each { |tool| tool.annotations(tool_annotations(tool.name_value)) unless tool.annotations_value }
   end
 
   def self.read_only_tools
-    tools.select do |tool|
-      name = tool.name_value
-      READ_ONLY_TOOL_NAMES.include?(name) || name.start_with?(*READ_ONLY_TOOL_PREFIXES)
+    tools.select { |tool| read_only_tool?(tool.name_value) }
+  end
+
+  def self.read_only_tool?(name)
+    READ_ONLY_TOOL_NAMES.include?(name) || name.start_with?(*READ_ONLY_TOOL_PREFIXES)
+  end
+
+  # Hints MCP clients use to decide which tool calls to confirm with the user.
+  def self.tool_annotations(name)
+    if read_only_tool?(name)
+      {read_only_hint: true, destructive_hint: false, idempotent_hint: true, open_world_hint: false}
+    elsif SEND_TOOL_NAMES.include?(name)
+      {destructive_hint: true, open_world_hint: true}
+    else
+      {destructive_hint: DESTRUCTIVE_TOOL_NAMES.include?(name), open_world_hint: false}
     end
   end
 
