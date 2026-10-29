@@ -249,7 +249,10 @@ class CampaignsController < ApplicationController
       :email_template_id, :email_layout_id, :email_subject, :email_body, :email_body_editor
     )
     if permitted.key?(:email_template_id) && permitted[:email_template_id].present?
-      permitted[:email_template_id] = resolve_email_template_id(permitted[:email_template_id])
+      permitted[:email_template_id] = resolve_email_template_id(
+        permitted[:email_template_id],
+        current_id: @campaign&.email_template_id
+      )
     end
     if permitted.key?(:email_layout_id) && permitted[:email_layout_id].present?
       permitted[:email_layout_id] = resolve_email_layout_id(permitted[:email_layout_id])

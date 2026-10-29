@@ -160,7 +160,12 @@ class BookingPagesController < ApplicationController
         next unless attrs.is_a?(ActionController::Parameters) || attrs.is_a?(Hash)
 
         if attrs[:email_template_id].present?
-          attrs[:email_template_id] = resolve_email_template_id(attrs[:email_template_id])
+          event_type_id = attrs[:id].presence || attrs["id"].presence
+          existing = @booking_page&.event_types&.find_by(id: event_type_id)
+          attrs[:email_template_id] = resolve_email_template_id(
+            attrs[:email_template_id],
+            current_id: existing&.email_template_id
+          )
         end
       end
     end

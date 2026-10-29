@@ -4,7 +4,7 @@ class MailMergeJob < ApplicationJob
   def perform(workspace_id, user_id, record_type, record_ids, subject, body, template_id = nil)
     workspace = Workspace.find(workspace_id)
     user = User.find(user_id)
-    template = template_id && workspace.email_templates.find_by(id: template_id)
+    template = template_id && workspace.email_templates.visible_to(user).find_by(id: template_id)
     batch_id = SecureRandom.uuid
 
     klass = record_type.constantize

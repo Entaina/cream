@@ -31,7 +31,7 @@ class MailMergesController < ApplicationController
       recipients.record_ids,
       params[:subject],
       params[:body],
-      params[:template_id].presence
+      resolved_mail_merge_template_id
     )
 
     redirect_to mail_merge_path(record_type: recipients.record_type),
@@ -59,11 +59,29 @@ class MailMergesController < ApplicationController
     when /\Alist:(\d+)\z/
       list = current_workspace.lists.find(Regexp.last_match(1))
       ids = list.list_entries.where(record_type: list.record_type).pluck(:record_id).map(&:to_s)
+      ids = visible_record_ids(list.record_type, ids)
       Recipients.new(list.record_type, ids)
     else
       record_type = params[:record_type].presence_in(RECORD_TYPES) || "Person"
       ids = params[:record_ids].to_s.split(",").map(&:strip).reject(&:blank?)
+      ids = visible_record_ids(record_type, ids)
       Recipients.new(record_type, ids)
     end
+  end
+
+  def visible_record_ids(record_type, ids)
+    return [] if ids.empty?
+
+    policy_scope(current_workspace.public_send(record_type.tableize))
+      .where(id: ids)
+      .pluck(:id)
+      .map(&:to_s)
+  end
+
+  def resolved_mail_merge_template_id
+    raw_id = params[:template_id].presence
+    return nil if raw_id.blank?
+
+    current_workspace.email_templates.visible_to(current_user).find(raw_id).id
   end
 end

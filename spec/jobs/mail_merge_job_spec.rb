@@ -25,4 +25,22 @@ RSpec.describe MailMergeJob, type: :job do
     expect(message.attachments.first.filename.to_s).to eq("template.txt")
     expect(RecordMailer).to have_received(:tracked_email).with(message: message)
   end
+
+  it "ignores a template the sender cannot see" do
+    other_user = users(:two)
+    private_template = workspace.email_templates.create!(
+      user: other_user, name: "Private", subject: "Hi", body: "Secret {name}", shared: false
+    )
+
+    mail = instance_double(ActionMailer::MessageDelivery, deliver_now: true)
+    allow(RecordMailer).to receive(:tracked_email).and_return(mail)
+
+    described_class.perform_now(
+      workspace.id, user.id, "Person", [person.id], "Hi", "Plain body", private_template.id
+    )
+
+    message = workspace.email_messages.order(:id).last
+    expect(message.body).to eq("Plain body")
+    expect(message.attachments.count).to eq(0)
+  end
 end

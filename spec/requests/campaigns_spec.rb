@@ -19,6 +19,21 @@ RSpec.describe "Campaigns", type: :request do
     sign_in_as(admin)
   end
 
+  it "rejects another user's private email template" do
+    other_admin = users(:two)
+    private_template = create_email_template!(
+      workspace, user: other_admin, name: "Private campaign tpl", shared: false
+    )
+
+    expect {
+      post campaigns_path, params: {
+        campaign: {name: "Marzo", status: "draft", email_template_id: private_template.id}
+      }
+    }.not_to change(Campaign, :count)
+
+    expect(response).to have_http_status(:not_found)
+  end
+
   it "creates a campaign with inline email content" do
     post campaigns_path, params: {
       campaign: {

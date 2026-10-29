@@ -288,6 +288,96 @@ RSpec.describe "Booking pages CRUD", type: :request do
       expect(video_type.reload.email_template_id).to eq(template.id)
     end
 
+    it "rejects another user's private email template on a new event type" do
+      co_host = users(:two)
+      private_template = workspace.email_templates.create!(
+        user: co_host, name: "Private confirm", subject: "Hi", body: "Body", shared: false
+      )
+
+      patch booking_page_path(booking_page), params: {
+        booking_page: {
+          name: booking_page.name,
+          slug: booking_page.slug,
+          host_id: user.id,
+          pipeline_id: pipeline.id,
+          timezone: "Europe/Madrid",
+          booking_window_days: 60,
+          active: true,
+          calendar_ids: ["primary"],
+          event_types_attributes: {
+            "0" => {
+              id: video_type.id,
+              slug: "video",
+              duration_minutes: 30,
+              location_type: "google_meet",
+              color: "hoki",
+              slot_increment_minutes: 15,
+              buffer_before_minutes: 0,
+              buffer_after_minutes: 0,
+              min_notice_hours: 0,
+              email_template_id: private_template.id,
+              visible: "1",
+              position: 0,
+              weekly_hours: BookingEventType::DEFAULT_WEEKLY_HOURS.to_json,
+              name_i18n: {es: "Video", en: "Video"},
+              description_i18n: {es: "", en: ""}
+            }
+          }
+        }
+      }
+
+      expect(response).to have_http_status(:not_found)
+      expect(video_type.reload.email_template_id).to be_nil
+    end
+
+    it "keeps an existing private template assigned when the co-host updates the page" do
+      co_host = users(:two)
+      private_template = workspace.email_templates.create!(
+        user: user, name: "Host private", subject: "Hi", body: "Body", shared: false
+      )
+      video_type.update!(email_template: private_template)
+      booking_page.members.create!(user: co_host, calendar_ids: ["primary"])
+
+      sign_in_as(co_host)
+      patch switch_workspace_path, params: {workspace_id: workspace.id}
+      patch booking_page_path(booking_page), params: {
+        booking_page: {
+          name: "Agenda co-host",
+          slug: booking_page.slug,
+          host_id: user.id,
+          pipeline_id: pipeline.id,
+          timezone: "Europe/Madrid",
+          booking_window_days: 60,
+          active: true,
+          calendar_ids: ["primary"],
+          co_host_ids: [co_host.id],
+          event_types_attributes: {
+            "0" => {
+              id: video_type.id,
+              slug: "video",
+              duration_minutes: 30,
+              location_type: "google_meet",
+              color: "hoki",
+              slot_increment_minutes: 15,
+              buffer_before_minutes: 0,
+              buffer_after_minutes: 0,
+              min_notice_hours: 0,
+              email_template_id: private_template.id,
+              visible: "1",
+              position: 0,
+              weekly_hours: BookingEventType::DEFAULT_WEEKLY_HOURS.to_json,
+              name_i18n: {es: "Video", en: "Video"},
+              description_i18n: {es: "", en: ""}
+            }
+          }
+        }
+      }
+
+      expect(response).to redirect_to(booking_pages_path)
+      expect(video_type.reload.email_template_id).to eq(private_template.id)
+      expect(booking_page.reload.name).to eq("Agenda co-host")
+    end
+
     it "persists reuse_existing_deal" do
       expect(booking_page.reuse_existing_deal).to be(true)
 

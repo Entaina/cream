@@ -19,13 +19,20 @@ RSpec.describe "Mail merges", type: :request do
     include_context "with mail merge enabled"
 
     it "enqueues the job with the parsed record IDs" do
+      people = [
+        create_person!(workspace, company: companies(:acme)),
+        create_person!(workspace, company: companies(:acme), email: "second@example.com"),
+        create_person!(workspace, company: companies(:acme), email: "third@example.com")
+      ]
+      ids = people.map { |person| person.id.to_s }.join(", ")
+
       post mail_merge_path, params: {
-        source: "manual", record_type: "Person", record_ids: " 1, 2 ,3 ",
+        source: "manual", record_type: "Person", record_ids: " #{ids} ",
         subject: "Hi {name}", body: "Hello"
       }
 
       expect(MailMergeJob).to have_been_enqueued.with(
-        workspace.id, member.id, "Person", %w[1 2 3], "Hi {name}", "Hello", nil
+        workspace.id, member.id, "Person", people.map { |p| p.id.to_s }, "Hi {name}", "Hello", nil
       )
       expect(response).to redirect_to(mail_merge_path(record_type: "Person"))
     end
@@ -94,6 +101,72 @@ RSpec.describe "Mail merges", type: :request do
 
       expect(MailMergeJob).not_to have_been_enqueued
       expect(response).to redirect_to(root_path)
+    end
+  end
+
+  describe "deal visibility" do
+    include_context "with mail merge enabled"
+
+    let(:admin) { users(:one) }
+    let(:salesperson) { users(:two) }
+    let!(:pipeline) { Pipeline.create_default!(workspace) }
+    let!(:hidden_deal) do
+      create_deal!(workspace, pipeline: pipeline, owner: admin, name: "Hidden merge deal")
+    end
+
+    before do
+      workspace.update!(salespeople_can_view_all_deals: false)
+      sign_in_as(salesperson)
+      patch switch_workspace_path, params: {workspace_id: workspace.id}
+    end
+
+    it "drops hidden deals from a manual source" do
+      post mail_merge_path, params: {
+        source: "manual", record_type: "Deal", record_ids: hidden_deal.id.to_s,
+        subject: "Hi", body: "Hello"
+      }
+
+      expect(MailMergeJob).not_to have_been_enqueued
+      expect(response).to redirect_to(mail_merge_path(record_type: "Deal"))
+      expect(flash[:alert]).to eq(I18n.t("flashes.mail_merges.no_recipients"))
+    end
+
+    it "drops hidden deals from a list source" do
+      list = workspace.lists.create!(name: "Deals", record_type: "Deal")
+      list.list_entries.create!(record: hidden_deal)
+
+      post mail_merge_path, params: {source: "list:#{list.id}", subject: "Hi", body: "Hello"}
+
+      expect(MailMergeJob).not_to have_been_enqueued
+      expect(response).to redirect_to(mail_merge_path(record_type: "Deal"))
+    end
+  end
+
+  describe "private email templates" do
+    include_context "with mail merge enabled"
+
+    let(:owner) { users(:one) }
+    let(:other_member) { users(:two) }
+    let!(:private_template) do
+      workspace.email_templates.create!(
+        user: owner, name: "Private", subject: "Hi", body: "Secret", shared: false
+      )
+    end
+    let(:person) { create_person!(workspace, company: companies(:acme)) }
+
+    before do
+      sign_in_as(other_member)
+      patch switch_workspace_path, params: {workspace_id: workspace.id}
+    end
+
+    it "rejects another user's private template" do
+      post mail_merge_path, params: {
+        source: "manual", record_type: "Person", record_ids: person.id.to_s,
+        subject: "Hi", body: "Hello", template_id: private_template.id
+      }
+
+      expect(MailMergeJob).not_to have_been_enqueued
+      expect(response).to have_http_status(:not_found)
     end
   end
 end

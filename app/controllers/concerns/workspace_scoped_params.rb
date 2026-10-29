@@ -99,10 +99,14 @@ module WorkspaceScopedParams
     permitted
   end
 
-  def resolve_email_template_id(raw_id)
+  def resolve_email_template_id(raw_id, current_id: nil)
     return nil if raw_id.blank?
 
-    current_workspace.email_templates.find(raw_id).id
+    if current_id.present? && raw_id.to_s == current_id.to_s
+      return current_id.to_i
+    end
+
+    current_workspace.email_templates.visible_to(current_user).find(raw_id).id
   end
 
   def resolve_email_layout_id(raw_id)
