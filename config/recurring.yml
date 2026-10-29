@@ -16,6 +16,9 @@ production:
   purge_expired_client_portal_sessions:
     command: "ClientPortalSession.expired.delete_all"
     schedule: every day at 4:30am
+  purge_expired_sessions:
+    command: "Session.where(\"expires_at <= ?\", Time.current).in_batches.destroy_all"
+    schedule: every day at 4:40am
   deliver_scheduled_reports:
     class: ScheduledReportsJob
     schedule: every day at 7am

@@ -17,6 +17,5 @@ Rails.application.configure do
   config.content_security_policy_nonce_generator = ->(_request) { SecureRandom.base64(16) }
   config.content_security_policy_nonce_directives = %w[script-src]
 
-  # Violations are only reported (see "[CSP]" lines in the log) until they are fixed.
-  config.content_security_policy_report_only = true
+  config.content_security_policy_report_only = false
 end

@@ -4,6 +4,7 @@ module Api
       def index
         companies = policy_scope(current_workspace.companies)
         companies = companies.search(params[:q]) if params[:q].present?
+        companies = api_page(companies.order(:id))
         render json: companies.map { |company| company_json(company) }
       end
 

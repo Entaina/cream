@@ -6,7 +6,7 @@ Doorkeeper.configure do
 
   # Authenticate the resource owner with Cream's session cookie (Rails 8 auth).
   resource_owner_authenticator do
-    if (session_record = Session.find_by(id: cookies.signed[:session_id]))
+    if (session_record = Session.active.find_by(id: cookies.signed[:session_id]))
       session_record.user
     else
       session[:return_to_after_authenticating] = request.fullpath

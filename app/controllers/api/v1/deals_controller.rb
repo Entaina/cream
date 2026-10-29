@@ -5,6 +5,7 @@ module Api
         deals = policy_scope(current_workspace.deals).includes(:company, :pipeline_stage, :contacts,
           deal_products: [:product, :edition])
         deals = deals.search(params[:q]) if params[:q].present?
+        deals = api_page(deals.order(:id))
         render json: deals.map { |deal| deal_json(deal) }
       end
 

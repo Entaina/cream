@@ -3,6 +3,7 @@ module Api
     class PipelinesController < BaseController
       def index
         pipelines = policy_scope(current_workspace.pipelines).ordered.includes(:pipeline_stages)
+        pipelines = api_page(pipelines.order(:id))
         render json: pipelines.map { |pipeline| pipeline_json(pipeline) }
       end
 

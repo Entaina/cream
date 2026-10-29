@@ -8,6 +8,9 @@ module Api
 
       requires_feature :api_v1
 
+      DEFAULT_LIST_LIMIT = 100
+      MAX_LIST_LIMIT = 500
+
       rescue_from Pundit::NotAuthorizedError, with: :render_forbidden
 
       rate_limit to: 600, within: 1.minute, by: :rate_limit_identity, scope: "api_v1"
@@ -45,7 +48,15 @@ module Api
           return head(requested_workspace_id.present? ? :forbidden : :unauthorized) unless @current_workspace
         end
 
+        return render_forbidden unless pundit_user.member?
+
         set_request_actor!
+      end
+
+      def api_page(scope)
+        limit = (params[:limit].presence || DEFAULT_LIST_LIMIT).to_i.clamp(1, MAX_LIST_LIMIT)
+        offset = [params[:offset].to_i, 0].max
+        scope.limit(limit).offset(offset)
       end
 
       def requested_workspace_id

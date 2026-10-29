@@ -477,4 +477,45 @@ RSpec.describe "Api::V1::Deals", type: :request do
       )
     end
   end
+
+  describe "GET /api/v1/deals" do
+    it "returns forbidden when the token user is no longer a workspace member" do
+      member = users(:two)
+      member_token = member.api_tokens.create!(name: "Ex-member", workspace: workspace)
+      member_headers = {"Authorization" => "Bearer #{member_token.plaintext_token}"}
+      member.memberships.find_by!(workspace: workspace).destroy!
+
+      get "/api/v1/deals", headers: member_headers
+
+      expect(response).to have_http_status(:forbidden)
+      expect(response.parsed_body).to eq("error" => "Forbidden")
+    end
+
+    it "paginates results with limit and offset" do
+      create_deal!(workspace, pipeline: pipeline, name: "First")
+      create_deal!(workspace, pipeline: pipeline, name: "Second")
+      create_deal!(workspace, pipeline: pipeline, name: "Third")
+
+      get "/api/v1/deals", params: {limit: 1, offset: 1}, headers: headers
+
+      expect(response).to have_http_status(:ok)
+      ids = response.parsed_body.map { |row| row["id"] }
+      expect(ids.size).to eq(1)
+      expected_ids = policy_scope_deal_ids(workspace, user).sort
+      expect(ids).to eq([expected_ids[1]])
+    end
+
+    it "caps limit at the configured maximum" do
+      stub_const("Api::V1::BaseController::MAX_LIST_LIMIT", 2)
+      3.times { |i| create_deal!(workspace, pipeline: pipeline, name: "Bulk #{i}") }
+
+      get "/api/v1/deals", params: {limit: 10_000}, headers: headers
+
+      expect(response.parsed_body.size).to eq(2)
+    end
+  end
+
+  def policy_scope_deal_ids(workspace, viewer)
+    Pundit.policy_scope(UserContext.new(user: viewer, workspace: workspace), workspace.deals).pluck(:id)
+  end
 end

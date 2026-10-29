@@ -73,6 +73,16 @@ RSpec.describe "OAuth authorization", type: :request do
       expect(response).to redirect_to(new_session_url)
     end
 
+    it "redirects to login when the web session has expired" do
+      sign_in_as(user)
+      Current.session.update!(expires_at: 1.hour.ago)
+
+      get "/oauth/authorize", params: params
+
+      expect(response).to redirect_to(new_session_url)
+      expect(response.body).not_to include(I18n.t("doorkeeper.authorizations.new.title"))
+    end
+
     it "does not accept script or data redirect URIs for OAuth clients" do
       %w[javascript:alert(1)//x vbscript:msgbox(1) data:text/html,hi].each do |uri|
         expect(Doorkeeper::Application.new(name: "Bad", redirect_uri: uri, confidential: false, scopes: "mcp")).not_to be_valid

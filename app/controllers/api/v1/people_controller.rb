@@ -5,6 +5,7 @@ module Api
         people = policy_scope(current_workspace.people).includes(:company, :person_emails)
         people = people.search(params[:q]) if params[:q].present?
         people = people.with_email(params[:email]) if params[:email].present?
+        people = api_page(people.order(:id))
         render json: people.map { |person| person_json(person) }
       end
 

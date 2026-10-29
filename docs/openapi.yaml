@@ -79,6 +79,27 @@ components:
         format: email
       description: Exact email match (case-insensitive) against primary or any secondary person email.
 
+    ListLimit:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 500
+        default: 100
+      description: Maximum records to return (default 100, max 500).
+
+    ListOffset:
+      name: offset
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+      description: Number of records to skip before returning results.
+
     PersonId:
       name: id
       in: path
@@ -1389,6 +1410,8 @@ paths:
         - $ref: "#/components/parameters/WorkspaceId"
         - $ref: "#/components/parameters/SearchQuery"
         - $ref: "#/components/parameters/PersonEmailQuery"
+        - $ref: "#/components/parameters/ListLimit"
+        - $ref: "#/components/parameters/ListOffset"
       responses:
         "200":
           description: OK
@@ -1681,6 +1704,8 @@ paths:
       parameters:
         - $ref: "#/components/parameters/WorkspaceId"
         - $ref: "#/components/parameters/SearchQuery"
+        - $ref: "#/components/parameters/ListLimit"
+        - $ref: "#/components/parameters/ListOffset"
       responses:
         "200":
           description: OK
@@ -1801,6 +1826,8 @@ paths:
       description: Returns the workspace pipelines with their ordered stages (use stage IDs when creating or moving deals).
       parameters:
         - $ref: "#/components/parameters/WorkspaceId"
+        - $ref: "#/components/parameters/ListLimit"
+        - $ref: "#/components/parameters/ListOffset"
       responses:
         "200":
           description: OK
@@ -1847,6 +1874,8 @@ paths:
         - $ref: "#/components/parameters/WorkspaceId"
         - $ref: "#/components/parameters/SearchQuery"
         - $ref: "#/components/parameters/ProductSegmentQuery"
+        - $ref: "#/components/parameters/ListLimit"
+        - $ref: "#/components/parameters/ListOffset"
       responses:
         "200":
           description: OK
@@ -1891,6 +1920,8 @@ paths:
       parameters:
         - $ref: "#/components/parameters/WorkspaceId"
         - $ref: "#/components/parameters/SearchQuery"
+        - $ref: "#/components/parameters/ListLimit"
+        - $ref: "#/components/parameters/ListOffset"
       responses:
         "200":
           description: OK
@@ -2168,6 +2199,8 @@ paths:
       summary: List tasks
       parameters:
         - $ref: "#/components/parameters/WorkspaceId"
+        - $ref: "#/components/parameters/ListLimit"
+        - $ref: "#/components/parameters/ListOffset"
       responses:
         "200":
           description: OK

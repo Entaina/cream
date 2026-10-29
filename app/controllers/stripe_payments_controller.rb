@@ -30,7 +30,7 @@ class StripePaymentsController < ApplicationController
     authorize payment
 
     deal_id = params[:deal_id].presence || payment.suggested_deal_id
-    deal = current_workspace.deals.find_by(id: deal_id)
+    deal = policy_scope(current_workspace.deals).find_by(id: deal_id)
     if deal.nil?
       redirect_back_to_inbox(alert: t("flashes.stripe.pick_deal")) and return
     end

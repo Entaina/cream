@@ -40,12 +40,12 @@ RSpec.describe "Content security policy", type: :request do
     policy.split(";").map(&:strip).find { |part| part.start_with?("#{name} ") }
   end
 
-  it "reports violations on app pages to the CSP report endpoint without enforcing the policy" do
+  it "enforces the policy on app pages and reports violations to the CSP endpoint" do
     get new_session_path
 
     expect(response).to have_http_status(:ok)
-    expect(response.headers["Content-Security-Policy"]).to be_nil
-    policy = response.headers["Content-Security-Policy-Report-Only"]
+    expect(response.headers["Content-Security-Policy-Report-Only"]).to be_nil
+    policy = response.headers["Content-Security-Policy"]
     expect(policy).to include("object-src 'none'")
     expect(policy).to include("base-uri 'self'")
     expect(directive(policy, "report-uri")).to eq("report-uri /csp_reports")
@@ -55,20 +55,20 @@ RSpec.describe "Content security policy", type: :request do
     expect(directive(policy, "connect-src")).to include("wss:")
   end
 
-  it "reports violations inside the signed-in app" do
+  it "enforces the policy inside the signed-in app" do
     sign_in_as(user)
 
     get deals_path
 
     expect(response).to have_http_status(:ok)
-    expect(response.headers["Content-Security-Policy"]).to be_nil
-    expect(response.headers["Content-Security-Policy-Report-Only"]).to include("report-uri /csp_reports")
+    expect(response.headers["Content-Security-Policy-Report-Only"]).to be_nil
+    expect(response.headers["Content-Security-Policy"]).to include("report-uri /csp_reports")
   end
 
   it "allows the Swagger UI bundle and its nonced bootstrap script on the API docs" do
     get api_docs_path
 
-    policy = response.headers["Content-Security-Policy-Report-Only"]
+    policy = response.headers["Content-Security-Policy"]
     script_src = directive(policy, "script-src")
     expect(script_src).to include("https://cdn.jsdelivr.net")
     expect(directive(policy, "style-src")).to include("https://cdn.jsdelivr.net")

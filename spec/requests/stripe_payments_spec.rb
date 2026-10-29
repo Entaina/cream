@@ -104,6 +104,21 @@ RSpec.describe "Stripe payments", type: :request do
       expect(flash[:alert]).to be_present
     end
 
+    it "rejects a deal the salesperson cannot see in the same workspace" do
+      workspace.update!(salespeople_can_view_all_deals: false)
+      salesperson = users(:two)
+      hidden_deal = create_deal!(workspace, pipeline: pipeline, owner: user, name: "Hidden stripe deal")
+      payment = create_payment!
+      sign_in_as(salesperson)
+      patch switch_workspace_path, params: {workspace_id: workspace.id}
+
+      post match_stripe_payment_path(payment, deal_id: hidden_deal.id)
+
+      expect(payment.reload).to be_pending_review
+      expect(payment.deal_id).to be_nil
+      expect(flash[:alert]).to eq(I18n.t("flashes.stripe.pick_deal"))
+    end
+
     it "404s for a payment of another workspace" do
       payment = create_payment!(workspaces(:two))
       sign_in_as(user)

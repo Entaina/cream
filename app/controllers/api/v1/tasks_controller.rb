@@ -3,6 +3,7 @@ module Api
     class TasksController < BaseController
       def index
         tasks = policy_scope(current_workspace.tasks).includes(:assignee, :taskable)
+        tasks = api_page(tasks.order(:id))
         render json: tasks.map { |task| task_json(task) }
       end
 

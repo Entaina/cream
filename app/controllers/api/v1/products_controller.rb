@@ -5,6 +5,7 @@ module Api
         products = policy_scope(current_workspace.products).ordered.includes(:editions)
         products = products.search(params[:q]) if params[:q].present?
         products = products.with_segment(params[:segment]) if params[:segment].present?
+        products = api_page(products.order(:id))
         render json: products.map { |product| product_json(product) }
       end
 
