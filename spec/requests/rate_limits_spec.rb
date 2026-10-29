@@ -10,8 +10,10 @@ RSpec.describe "API rate limits", type: :request do
   let(:other_token) { user.api_tokens.create!(name: "Other", workspace: workspace).plaintext_token }
 
   before do
-    allow(ActionController::API.cache_store).to receive(:increment) do |*args, **options|
-      counter.increment(*args, **options)
+    [ActionController::API.cache_store, ActionController::Base.cache_store].uniq.each do |store|
+      allow(store).to receive(:increment) do |*args, **options|
+        counter.increment(*args, **options)
+      end
     end
   end
 
@@ -99,6 +101,30 @@ RSpec.describe "API rate limits", type: :request do
       expect(response).to have_http_status(:created)
 
       post oauth_register_path, params: registration, as: :json
+      expect(response).to have_http_status(:too_many_requests)
+    end
+  end
+
+  describe "OAuth token endpoint" do
+    it "rejects an IP once it goes over the limit" do
+      exhaust("rate-limit:doorkeeper/tokens:127.0.0.1", 29)
+
+      post "/oauth/token", params: {grant_type: "authorization_code", code: "guess", client_id: "unknown"}
+      expect(response).to have_http_status(:unauthorized).or have_http_status(:bad_request)
+
+      post "/oauth/token", params: {grant_type: "authorization_code", code: "guess", client_id: "unknown"}
+      expect(response).to have_http_status(:too_many_requests)
+    end
+  end
+
+  describe "OAuth authorization endpoint" do
+    it "rejects an IP once it goes over the limit, signed in or not" do
+      exhaust("rate-limit:doorkeeper/authorizations:127.0.0.1", 29)
+
+      get "/oauth/authorize", params: {response_type: "code", client_id: "unknown"}
+      expect(response).to have_http_status(:redirect)
+
+      get "/oauth/authorize", params: {response_type: "code", client_id: "unknown"}
       expect(response).to have_http_status(:too_many_requests)
     end
   end

@@ -15,7 +15,6 @@ en:
       intro: Use API tokens to connect MCP clients (Claude, Cursor, etc.) to your
         workspace. OAuth is also available via the MCP authorization flow.
       last_used: Last used
-      never_expires: Never
       new_token_hint: Your new token (copy it now)
       page_title: API tokens
       revoke: Revoke token

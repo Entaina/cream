@@ -34,7 +34,9 @@ RSpec.describe "ApiTokens", type: :request do
       expect(response).to redirect_to(api_tokens_path)
       follow_redirect!
       expect(response.body).to include("cream_")
-      expect(user.api_tokens.last).to have_attributes(token_scope: "write", expires_at: nil)
+      token = user.api_tokens.last
+      expect(token.token_scope).to eq("write")
+      expect(token.expires_at).to be_within(1.minute).of(90.days.from_now)
     end
 
     it "creates a read-only token with an expiry" do
@@ -53,10 +55,17 @@ RSpec.describe "ApiTokens", type: :request do
       expect(response).to redirect_to(api_tokens_path)
     end
 
-    it "ignores expiry periods that are not offered" do
-      post api_tokens_path, params: {name: "Odd", expires_in_days: "5"}
+    it "falls back to 90 days for expiry periods that are not offered" do
+      post api_tokens_path, params: {name: "Odd", expires_in_days: ""}
 
-      expect(user.api_tokens.last.expires_at).to be_nil
+      expect(user.api_tokens.last.expires_at).to be_within(1.minute).of(90.days.from_now)
+    end
+
+    it "does not offer tokens that never expire" do
+      get api_tokens_path
+
+      expect(response.body).to include(%(<option selected="selected" value="90">))
+      expect(response.body).not_to include(%(<option value="">))
     end
   end
 

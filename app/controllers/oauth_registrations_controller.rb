@@ -1,6 +1,8 @@
 # RFC 7591 dynamic client registration, as required by the MCP authorization spec.
 # MCP clients (Claude, inspector, etc.) POST here to obtain a client_id before the
 # authorization code + PKCE flow. Clients are registered as public (no secret).
+# Registration is anonymous, so it only issues mcp clients: api clients reach
+# every workspace of the user and are created with `bin/rails oauth:create_api_client`.
 class OauthRegistrationsController < ActionController::API
   rate_limit to: 20, within: 1.minute, only: :create
 
@@ -8,7 +10,7 @@ class OauthRegistrationsController < ActionController::API
     payload = params.permit(:client_name, :scope, redirect_uris: [])
     redirect_uris = Array(payload[:redirect_uris]).map(&:to_s).select(&:present?)
     scope = payload[:scope].presence || "mcp"
-    allowed_scopes = %w[mcp api]
+    allowed_scopes = %w[mcp]
 
     return render_error("invalid_redirect_uri", "redirect_uris is required") if redirect_uris.empty?
     return render_error("invalid_scope", "scope must be one of: #{allowed_scopes.join(", ")}") unless allowed_scopes.include?(scope)

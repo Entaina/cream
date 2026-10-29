@@ -58,19 +58,13 @@ https://script.google.com/macros/d/TU_SCRIPT_ID/usercallback
 
 ### 1.3. Register the OAuth client in CReaM
 
+On the production server, from `~/cream`:
+
 ```bash
-curl -X POST "https://crm.example.com/oauth/register" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "client_name": "CReaM Gmail add-on",
-    "scope": "api",
-    "redirect_uris": [
-      "https://script.google.com/macros/d/TU_SCRIPT_ID/usercallback"
-    ]
-  }'
+docker compose exec -T web bin/rails "oauth:create_api_client[CReaM Gmail add-on,https://script.google.com/macros/d/TU_SCRIPT_ID/usercallback]"
 ```
 
-Save the returned **`client_id`**. A single client works for the whole organization.
+Save the printed **`client_id`**. `POST /oauth/register` only issues `mcp` clients, so it cannot create this one. A single client works for the whole organization.
 
 ### 1.4. Script properties (required)
 
@@ -313,7 +307,7 @@ If you change the Script ID or the `/usercallback` URI, register a new OAuth cli
 | **Se necesita autorización para realizar esta acción** / Authorization is required to perform that action | The running deployment still calls the Gmail API with `gmail.readonly`, which this add-on no longer requests | Deploy the version without that scope. Do not send the user to the script project |
 | **not_connected** when creating/linking a deal | No OAuth or invalid token | **Connect with CReaM**; check the Script Properties |
 | **not_connected** after a few hours (older add-on) | Expired access token cleared session on first API 401 | Deploy the latest add-on (`clasp push` + new deployment version); it refreshes automatically. Reconnect only if it persists |
-| **not_connected** after connecting | Wrong `client_id` or redirect URI | Re-run `logCreamRedirectUri`, register OAuth again |
+| **not_connected** after connecting | Wrong `client_id` or redirect URI | Re-run `logCreamRedirectUri`, create the OAuth client again (§1.3) |
 | **Code challenge is required** | Misconfigured PKCE | OAuth2 library v43; `generateCodeVerifier()` only when requesting the authorization URL |
 | **Redirect URI mismatch** | URI other than `/usercallback` | Register exactly the URI from `logCreamRedirectUri` |
 | Icon does not appear in Gmail | `gmail-addon-icon.png` not deployed | Deploy CReaM; verify `https://crm.example.com/gmail-addon-icon.png` |
@@ -324,7 +318,7 @@ If you change the Script ID or the `/usercallback` URI, register a new OAuth cli
 | Admin → Apps list is empty | Account lacks the Marketplace administrator privilege | Use an account with that privilege. Cloud project Owner is not enough |
 | **Partially granted** after a scope change | New scope declared on the listing, not granted for the domain | §3.5 **Grant access**. Cloud Console cannot do this. This does not apply to `gmail.readonly`: the add-on does not request it, and granting it does not remove the Apps Script access page |
 | Admin cannot find the app | Restrictive Marketplace policy | §3.2 Settings + admin install |
-| Persistent **401** (after add-on refresh retry) | Revoked refresh token or wrong `api` scope | **Disconnect** → **Connect with CReaM**; check OAuth registration with `"scope": "api"` |
+| Persistent **401** (after add-on refresh retry) | Revoked refresh token or wrong `api` scope | **Disconnect** → **Connect with CReaM**; check the OAuth client was created with `oauth:create_api_client` (§1.3), which gives it the `api` scope |
 
 ---
 
@@ -343,7 +337,7 @@ If you change the Script ID or the `/usercallback` URI, register a new OAuth cli
 |---------|-----|
 | CReaM | https://crm.example.com |
 | Add-on icon | https://crm.example.com/gmail-addon-icon.png |
-| Register OAuth | `POST https://crm.example.com/oauth/register` |
+| Create the OAuth client | `bin/rails "oauth:create_api_client[name,redirect_uri]"` on the server (§1.3) |
 | Internal Marketplace apps | https://workspace.google.com/marketplace/mydomainapps |
 | Enable Marketplace SDK | https://console.cloud.google.com/apis/library/appsmarket-component.googleapis.com |
 | SDK configuration | https://console.cloud.google.com/apis/api/appsmarket-component.googleapis.com/googleapps_sdk |

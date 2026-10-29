@@ -31,6 +31,7 @@ class ApiTokensController < ApplicationController
 
   def requested_expiry
     days = params[:expires_in_days].to_i
-    days.days.from_now if ApiToken::EXPIRY_DAYS.include?(days)
+    days = ApiToken::DEFAULT_EXPIRY_DAYS unless ApiToken::EXPIRY_DAYS.include?(days)
+    days.days.from_now
   end
 end

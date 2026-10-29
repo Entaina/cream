@@ -2,19 +2,19 @@ require "rails_helper"
 
 RSpec.describe "OauthRegistrations", type: :request do
   describe "POST /oauth/register" do
-    it "registers a public api client for the Gmail add-on" do
-      post oauth_register_path,
-        params: {
-          client_name: "CReaM Gmail add-on",
-          scope: "api",
-          redirect_uris: ["https://script.google.com/macros/d/test/usercallback"]
-        },
-        as: :json
+    it "does not register api clients" do
+      expect {
+        post oauth_register_path,
+          params: {
+            client_name: "CReaM Gmail add-on",
+            scope: "api",
+            redirect_uris: ["https://script.google.com/macros/d/test/usercallback"]
+          },
+          as: :json
+      }.not_to change(Doorkeeper::Application, :count)
 
-      expect(response).to have_http_status(:created)
-      body = JSON.parse(response.body)
-      expect(body["scope"]).to eq("api")
-      expect(body["client_name"]).to eq("CReaM Gmail add-on")
+      expect(response).to have_http_status(:bad_request)
+      expect(JSON.parse(response.body)["error"]).to eq("invalid_scope")
     end
 
     it "rejects an unknown scope" do

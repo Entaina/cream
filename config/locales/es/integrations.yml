@@ -16,7 +16,6 @@ es:
         tu workspace. OAuth también está disponible mediante el flujo de autorización
         MCP.
       last_used: Último uso
-      never_expires: Nunca
       new_token_hint: Tu nuevo token (cópialo ahora)
       page_title: Tokens de API
       revoke: Revocar token

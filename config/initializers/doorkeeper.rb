@@ -48,4 +48,6 @@ end
 # Use the main app layout so OAuth consent matches the Cream design system.
 Rails.application.config.to_prepare do
   Doorkeeper::AuthorizationsController.layout "application"
+  Doorkeeper::AuthorizationsController.rate_limit to: 30, within: 1.minute, prepend: true
+  Doorkeeper::TokensController.rate_limit to: 30, within: 1.minute, only: :create, prepend: true
 end

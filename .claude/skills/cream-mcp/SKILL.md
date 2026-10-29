@@ -50,7 +50,7 @@ Metadata (público):
 
 Registro dinámico de clientes (RFC 7591):
 
-- `POST /oauth/register` — clientes **públicos**, PKCE obligatorio, scopes `mcp` o `api`
+- `POST /oauth/register` — clientes **públicos**, PKCE obligatorio, solo scope `mcp`. Los clientes `api` (add-on de Gmail) se crean en el servidor con `bin/rails "oauth:create_api_client[nombre,redirect_uri]"`
 
 Flujo: registro → authorization code + PKCE → token con scope `mcp` → `POST /mcp`.
 

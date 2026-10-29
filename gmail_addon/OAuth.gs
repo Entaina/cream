@@ -16,7 +16,7 @@ function getCreamBaseUrl_() {
 function getCreamClientId_() {
   var clientId = PropertiesService.getScriptProperties().getProperty(CREAM_PROP_CLIENT_ID);
   if (!clientId) {
-    throw new Error("Set Script Property CREAM_CLIENT_ID from POST /oauth/register");
+    throw new Error("Set Script Property CREAM_CLIENT_ID from bin/rails oauth:create_api_client");
   }
   return clientId;
 }
