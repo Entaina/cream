@@ -49,6 +49,27 @@ RSpec.describe "Public Beehiiv webhooks", type: :request do
     expect(EmailSubscription.find_by!(person: person, subscription_type: newsletter).status).to eq("subscribed")
   end
 
+  context "with forgery protection enabled, as in production" do
+    around do |example|
+      original = ActionController::Base.allow_forgery_protection
+      ActionController::Base.allow_forgery_protection = true
+      example.run
+    ensure
+      ActionController::Base.allow_forgery_protection = original
+    end
+
+    before { allow(BeehiivPushJob).to receive(:perform_later) }
+
+    it "accepts signed webhooks, which carry no CSRF token" do
+      post public_beehiiv_webhook_path(token: publication.webhook_token),
+        params: payload,
+        headers: svix_headers(payload)
+
+      expect(response).to have_http_status(:ok)
+      expect(Person.find_by_email(workspace, "webhook@example.com")).to be_present
+    end
+  end
+
   it "rejects an invalid signature" do
     post public_beehiiv_webhook_path(token: publication.webhook_token),
       params: payload,

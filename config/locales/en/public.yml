@@ -15,6 +15,13 @@ en:
       continue: Continue
       page_title: Leaving Cream
       title: You are about to leave Cream
+    email_unsubscribe_confirm:
+      body: Do you want to stop receiving these emails from %{workspace}?
+      body_all: Do you want to stop receiving any marketing email from %{workspace}?
+      manage: Manage preferences
+      page_title: Confirm unsubscribe
+      submit: Unsubscribe
+      title: Confirm unsubscribe
     email_unsubscribed:
       body: You have been unsubscribed successfully. You will not receive more marketing
         emails in this category.

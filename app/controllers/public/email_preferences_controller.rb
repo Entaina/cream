@@ -2,13 +2,22 @@ module Public
   class EmailPreferencesController < ApplicationController
     layout "public_lead_form"
 
-    allow_unauthenticated_access only: %i[show update unsubscribe]
+    allow_unauthenticated_access only: %i[show update confirm_unsubscribe unsubscribe]
+    # RFC 8058 one-click unsubscribe is a POST from the mail client, without session or
+    # CSRF token; the signed preference token is the authorization.
+    skip_forgery_protection only: :unsubscribe
     skip_before_action :set_current_workspace, :ensure_workspace_membership
     skip_after_action :verify_authorized
     skip_after_action :verify_policy_scoped
 
     before_action :ensure_feature_enabled
     before_action :set_person, except: :unsubscribe
+
+    # Link scanners in mail servers follow GET links, so GET only asks for confirmation.
+    def confirm_unsubscribe
+      @workspace = @person.workspace
+      @unsubscribe_params = {type: params[:type].presence, all: params[:all].presence}.compact
+    end
 
     def show
       @workspace = @person.workspace

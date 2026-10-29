@@ -16,6 +16,13 @@ es:
       continue: Continuar
       page_title: Saliendo de Cream
       title: Vas a salir de Cream
+    email_unsubscribe_confirm:
+      body: "¿Quieres dejar de recibir estos emails de %{workspace}?"
+      body_all: "¿Quieres dejar de recibir cualquier email de marketing de %{workspace}?"
+      manage: Gestionar preferencias
+      page_title: Confirmar baja
+      submit: Darme de baja
+      title: Confirmar baja
     email_unsubscribed:
       body: Has sido dado de baja correctamente. No recibirás más emails de marketing
         en esta categoría.

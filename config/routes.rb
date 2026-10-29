@@ -275,7 +275,8 @@ Rails.application.routes.draw do
   get "p/:workspace_slug/:slug", to: "public/landing_pages#show", as: :public_landing_page
   get "e/preferences/:token", to: "public/email_preferences#show", as: :public_email_preferences
   patch "e/preferences/:token", to: "public/email_preferences#update"
-  match "e/unsubscribe/:token", to: "public/email_preferences#unsubscribe", via: %i[get post], as: :public_email_unsubscribe
+  get "e/unsubscribe/:token", to: "public/email_preferences#confirm_unsubscribe", as: :public_email_unsubscribe
+  post "e/unsubscribe/:token", to: "public/email_preferences#unsubscribe"
   post "e/events", to: "public/email_events#create", as: :public_email_events
   post "e/beehiiv/:token", to: "public/beehiiv_webhooks#create", as: :public_beehiiv_webhook
   post "t", to: "public/tracking#create", as: :public_tracking
