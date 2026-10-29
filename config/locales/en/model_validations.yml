@@ -40,6 +40,7 @@ en:
         must_be_array_of_objects: must be an array of objects
         must_be_array_of_strings: must be an array of strings
         must_be_empty_for_team_briefings: must be empty for team briefings
+        must_be_public_host: must be a public internet host
         must_be_workspace_member: must be a workspace member
         must_belong_to_deal_workspace: must belong to the deal workspace
         must_belong_to_same_product: must belong to the same product

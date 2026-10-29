@@ -53,7 +53,7 @@ class ReportsController < ApplicationController
   def report_csv
     CSV.generate do |csv|
       csv << [@config[:group_by], @result.metric_label]
-      @result.rows.each { |row| csv << [row.label, row.value] }
+      @result.rows.each { |row| csv << [CsvExporter.escape_formula(row.label), CsvExporter.escape_formula(row.value)] }
     end
   end
 

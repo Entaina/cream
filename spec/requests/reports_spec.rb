@@ -38,6 +38,17 @@ RSpec.describe "Reports", type: :request do
       expect(response.body).to include("stage,#{Report.metric_label("count")}")
     end
 
+    it "escapes spreadsheet formulas in the exported labels" do
+      stage = Pipeline.default_for(workspace).first_stage
+      stage.update!(name: '=HYPERLINK("https://evil.example","x")')
+      create_deal!(workspace, stage: stage)
+
+      get reports_path(record_type: "Deal", metric: "count", group_by: "stage", format: :csv)
+
+      rows = CSV.parse(response.body)
+      expect(rows).to include([%('=HYPERLINK("https://evil.example","x")), "1.0"])
+    end
+
     it "filters deal reports by pipeline" do
       pipeline = workspace.pipelines.first
       other_pipeline = pipeline.duplicate(name: "Hiring").tap(&:save!)

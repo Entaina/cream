@@ -5,6 +5,9 @@ RSpec.describe MailjetDeliveryInterceptor do
 
   let(:workspace) { workspaces(:one) }
   let(:user) { users(:one) }
+
+  before { allow(Resolv).to receive(:getaddresses).and_return(["93.184.216.34"]) }
+
   let(:invitation) do
     workspace.invitations.create!(
       invited_by: user,
@@ -172,6 +175,21 @@ RSpec.describe MailjetDeliveryInterceptor do
       expect(mail.delivery_method.settings[:user_name]).to eq("smtp-user")
       expect(mail.delivery_method.settings[:password]).to eq("smtp-secret")
       expect(mail.from).to eq(["hola@workspace.test"])
+    end
+
+    it "does not deliver through a workspace SMTP host that now resolves to a private address" do
+      workspace.create_smtp_connection!(
+        user: user,
+        address: "smtp.workspace.test",
+        user_name: "smtp-user",
+        password: "smtp-secret",
+        from_email: "hola@workspace.test"
+      )
+      allow(Resolv).to receive(:getaddresses).with("smtp.workspace.test").and_return(["127.0.0.1"])
+      allow(ActionMailer::Base).to receive(:delivery_method).and_return(:smtp)
+      expect(Net::SMTP).not_to receive(:new)
+
+      expect { mail_for(invitation).deliver }.to raise_error(SmtpConnection::UnsafeAddressError)
     end
 
     it "keeps Mailjet transactional delivery when a workspace SMTP connection also exists" do

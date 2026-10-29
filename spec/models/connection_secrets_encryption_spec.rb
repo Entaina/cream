@@ -6,6 +6,8 @@ RSpec.describe "Connection secrets encryption" do
   let(:user) { users(:one) }
   let(:workspace) { workspaces(:one) }
 
+  before { allow(Resolv).to receive(:getaddresses).and_return(["93.184.216.34"]) }
+
   builders = {
     GmailConnection => ->(ws, u) { GmailConnection.create!(workspace: ws, user: u, access_token: "gmail-access", refresh_token: "gmail-refresh") },
     CalendarConnection => ->(ws, u) { CalendarConnection.create!(workspace: ws, user: u, access_token: "cal-access", refresh_token: "cal-refresh") },

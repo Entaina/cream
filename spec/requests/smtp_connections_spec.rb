@@ -7,6 +7,8 @@ RSpec.describe "SMTP connections", type: :request do
   let(:workspace) { workspaces(:one) }
   let(:member) { users(:two) }
 
+  before { allow(Resolv).to receive(:getaddresses).and_return(["93.184.216.34"]) }
+
   def connection_params(**overrides)
     {
       smtp_connection: {
@@ -58,6 +60,18 @@ RSpec.describe "SMTP connections", type: :request do
       expect(connection.from_email).to eq("noreply@example.com")
       expect(connection.user).to eq(admin)
       expect(connection.enable_starttls_auto).to be(true)
+    end
+
+    it "rejects a host on the internal network" do
+      allow(Resolv).to receive(:getaddresses).with("db").and_return(["172.18.0.2"])
+      sign_in_as(admin)
+
+      expect {
+        post smtp_connection_path, params: connection_params(address: "db", port: 5432)
+      }.not_to change(SmtpConnection, :count)
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to include(I18n.t("activerecord.errors.messages.must_be_public_host"))
     end
 
     it "is admin-only" do

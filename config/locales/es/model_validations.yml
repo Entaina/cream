@@ -43,6 +43,7 @@ es:
         must_be_array_of_objects: debe ser un array de objetos
         must_be_array_of_strings: debe ser un array de cadenas
         must_be_empty_for_team_briefings: debe estar vacío en briefings de equipo
+        must_be_public_host: debe ser un servidor público de internet
         must_be_workspace_member: debe ser miembro del workspace
         must_belong_to_deal_workspace: debe pertenecer al workspace de la oportunidad
         must_belong_to_same_product: debe pertenecer al mismo producto

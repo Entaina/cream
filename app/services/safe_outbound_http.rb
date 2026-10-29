@@ -42,15 +42,21 @@ class SafeOutboundHttp
   def self.resolve_public!(uri)
     parsed = uri.is_a?(URI) ? uri : URI.parse(uri.to_s)
     raise ArgumentError, "unsupported scheme" unless parsed.scheme&.downcase&.in?(%w[http https])
-    raise ArgumentError, "missing host" if parsed.hostname.blank?
 
-    addresses = Resolv.getaddresses(parsed.hostname)
+    [parsed, resolve_public_host!(parsed.hostname)]
+  end
+  private_class_method :resolve_public!
+
+  # Returns the first address of a host whose addresses are all public.
+  def self.resolve_public_host!(hostname)
+    raise ArgumentError, "missing host" if hostname.blank?
+
+    addresses = Resolv.getaddresses(hostname)
     raise ArgumentError, "host does not resolve" if addresses.empty?
     raise ArgumentError, "host resolves to private address" if addresses.any? { |addr| private_ip?(addr) }
 
-    [parsed, addresses.first]
+    addresses.first
   end
-  private_class_method :resolve_public!
 
   def self.private_ip?(address)
     ip = IPAddr.new(address)
