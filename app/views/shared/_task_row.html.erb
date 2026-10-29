@@ -1,16 +1,24 @@
 <%# locals: (task:, show_taskable: false) %>
+<% can_edit = policy(task).update? %>
 <li class="flex items-center gap-2.5 card px-3 py-2 <%= "opacity-60" if task.completed? %>" data-controller="task-edit">
-  <%= button_to toggle_task_path(task), method: :patch,
-        class: [ "size-4 rounded-full border flex items-center justify-center cursor-pointer transition-colors shrink-0",
-                 task.completed? ? "bg-green-500 border-green-500 text-white" : "border-line-strong hover:border-green-500" ] do %>
-    <%= icon(:check, classes: "size-2.5") if task.completed? %>
+  <% if can_edit %>
+    <%= button_to toggle_task_path(task), method: :patch,
+          class: [ "size-4 rounded-full border flex items-center justify-center cursor-pointer transition-colors shrink-0",
+                   task.completed? ? "bg-green-500 border-green-500 text-white" : "border-line-strong hover:border-green-500" ] do %>
+      <%= icon(:check, classes: "size-2.5") if task.completed? %>
+    <% end %>
+    <button type="button"
+            class="text-base flex-1 min-w-0 truncate text-left cursor-pointer hover:text-accent <%= "line-through text-ink-faint" if task.completed? %>"
+            data-action="task-edit#open"
+            title="<%= t("shared.tasks.edit") %>">
+      <%= mention_html(task.title) %>
+    </button>
+  <% else %>
+    <span class="size-4 rounded-full border flex items-center justify-center shrink-0 <%= task.completed? ? "bg-green-500 border-green-500 text-white" : "border-line-strong" %>">
+      <%= icon(:check, classes: "size-2.5") if task.completed? %>
+    </span>
+    <span class="text-base flex-1 min-w-0 truncate <%= "line-through text-ink-faint" if task.completed? %>"><%= mention_html(task.title) %></span>
   <% end %>
-  <button type="button"
-          class="text-base flex-1 min-w-0 truncate text-left cursor-pointer hover:text-accent <%= "line-through text-ink-faint" if task.completed? %>"
-          data-action="task-edit#open"
-          title="<%= t("shared.tasks.edit") %>">
-    <%= mention_html(task.title) %>
-  </button>
   <% if show_taskable && task.taskable %>
     <%= link_to record_path_for(task.taskable), class: "flex items-center gap-1 text-xs text-ink-faint hover:text-ink shrink-0" do %>
       <%= icon record_icon_for(task.taskable_type), classes: "size-3" %>
@@ -25,15 +33,18 @@
   <% if task.assignee %>
     <%= avatar task.assignee, size: "size-5", text: "text-2xs" %>
   <% end %>
+  <% if can_edit %>
   <button type="button"
           class="text-ink-faint hover:text-ink p-0.5 rounded cursor-pointer"
           title="<%= t("shared.tasks.edit") %>"
           data-action="task-edit#open">
     <%= icon :pencil, classes: "size-3.5" %>
   </button>
+  <% if policy(task).destroy? %>
   <%= button_to task_path(task), method: :delete, form: { data: { turbo_confirm: t("shared.tasks.delete_confirm") } },
         class: "text-ink-faint hover:text-danger p-0.5 rounded cursor-pointer", title: t("shared.tasks.delete") do %>
     <%= icon :trash, classes: "size-3.5" %>
+  <% end %>
   <% end %>
 
   <dialog data-task-edit-target="dialog" class="modal-dialog max-w-md rounded-xl border border-line shadow-lg backdrop:bg-chicago-950/40">
@@ -60,4 +71,5 @@
       <% end %>
     </div>
   </dialog>
+  <% end %>
 </li>

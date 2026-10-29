@@ -160,17 +160,20 @@ class User < ApplicationRecord
   end
 
   # Google has already checked the mailbox. An unverified password account may
-  # have been created by someone else, so that password must stop working.
+  # have been created by someone else, so that password and its sessions must stop working.
   def self.link_oauth_identity!(user, provider:, uid:)
     if user.email_verified?
       user.update!(provider: provider, uid: uid)
     else
-      user.update!(
-        provider: provider,
-        uid: uid,
-        password: SecureRandom.hex(32),
-        email_verified_at: Time.current
-      )
+      transaction do
+        user.update!(
+          provider: provider,
+          uid: uid,
+          password: SecureRandom.hex(32),
+          email_verified_at: Time.current
+        )
+        user.sessions.destroy_all
+      end
     end
   end
 

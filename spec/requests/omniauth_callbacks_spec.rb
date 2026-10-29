@@ -163,6 +163,28 @@ RSpec.describe "OmniauthCallbacks", type: :request do
     expect(response).to redirect_to(root_path)
   end
 
+  it "ends the sessions of an unconfirmed account when Google is linked to it" do
+    squatter = User.create!(name: "Squatter", email_address: "squatter@example.com", password: "attacker-password")
+    attacker_session = squatter.sessions.create!(user_agent: "attacker", ip_address: "203.0.113.9")
+    mock_google_auth(uid: "google-ana", email: squatter.email_address, name: "Ana")
+
+    get "/auth/google_oauth2/callback"
+
+    expect(Session.exists?(attacker_session.id)).to be false
+    expect(squatter.sessions.count).to eq(1)
+    expect(cookies[:session_id]).to be_present
+  end
+
+  it "keeps the other sessions of a confirmed account when Google is linked to it" do
+    verified = User.create!(name: "Ana", email_address: "ana-verified@example.com", password: "password-123", email_verified_at: Time.current)
+    other_session = verified.sessions.create!(user_agent: "laptop", ip_address: "203.0.113.10")
+    mock_google_auth(uid: "google-ana-verified", email: verified.email_address, name: "Ana")
+
+    get "/auth/google_oauth2/callback"
+
+    expect(Session.exists?(other_session.id)).to be true
+  end
+
   describe "GET /auth/failure" do
     it "redirects to sign in with an alert" do
       get "/auth/failure"

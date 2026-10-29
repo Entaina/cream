@@ -131,6 +131,23 @@ RSpec.describe "Workspace isolation of submitted ids", type: :request do
       end
     end
 
+    describe "companies" do
+      it "rejects an owner who is not a member of the workspace" do
+        patch company_path(company), params: {company: {owner_id: outsider.id}}
+
+        expect(response).to have_http_status(:not_found)
+        expect(company.reload.owner_id).not_to eq(outsider.id)
+      end
+
+      it "keeps accepting members and clearing the owner" do
+        patch company_path(company), params: {company: {owner_id: users(:two).id}}
+        expect(company.reload.owner).to eq(users(:two))
+
+        patch company_path(company), params: {company: {owner_id: ""}}
+        expect(company.reload.owner).to be_nil
+      end
+    end
+
     describe "tasks" do
       let!(:deal) { create_deal!(workspace, pipeline: pipeline) }
 

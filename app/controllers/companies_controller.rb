@@ -154,7 +154,9 @@ class CompaniesController < ApplicationController
   end
 
   def company_params
-    params.require(:company).permit(:name, :domain, :description, :industry, :employee_range,
+    permitted = params.require(:company).permit(:name, :domain, :description, :industry, :employee_range,
       :location, :linkedin_url, :twitter_url, :annual_revenue, :owner_id, :fiscal_information, custom_fields: {})
+    permitted[:owner_id] = resolve_workspace_user_id(permitted[:owner_id]) if permitted.key?(:owner_id)
+    permitted
   end
 end

@@ -64,6 +64,28 @@ RSpec.describe "Role restrictions", type: :request do
     expect(note.reload.body).to eq("Changed")
   end
 
+  it "does not show Slack integrations or webhooks, whose URLs are secrets, to salespeople" do
+    allow(CreamFeatures).to receive(:enabled?).and_call_original
+    allow(CreamFeatures).to receive(:enabled?).with(:slack_integrations).and_return(true)
+    allow(CreamFeatures).to receive(:enabled?).with(:webhooks).and_return(true)
+    workspace.update!(webhooks_enabled: true)
+    workspace.slack_integrations.create!(webhook_url: "https://hooks.slack.com/services/T000/B000/secret-slack",
+      notify_events: [SlackIntegration::NOTIFY_EVENTS.first])
+    workspace.webhooks.create!(user: admin, url: "https://example.com/hook?key=secret-hook", events: [Webhook::EVENTS.first])
+
+    get slack_integrations_path
+    expect(response).to redirect_to(root_path)
+    get webhooks_path
+    expect(response).to redirect_to(root_path)
+
+    follow_redirect!
+    expect(response.body).not_to include("secret-slack", "secret-hook", slack_integrations_path, webhooks_path)
+
+    sign_in_to_workspace!(admin)
+    get root_path
+    expect(response.body).to include(%(href="#{webhooks_path}"))
+  end
+
   it "does not open another user's private email template by URL" do
     template = workspace.email_templates.create!(name: "Private", subject: "S", body: "<p>B</p>", user: admin, shared: false)
 

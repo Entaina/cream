@@ -48,6 +48,9 @@ module ApplicationHelper
     "red" => "bg-red-300"
   }.freeze
 
+  # Menu entries whose pages show secrets: listed only to whoever may open them.
+  ADMIN_ONLY_MENU_RECORDS = {slack_integrations: "SlackIntegration", webhooks: "Webhook"}.freeze
+
   def cream_operator_name
     ENV.fetch("CREAM_OPERATOR_NAME", "Example")
   end
@@ -577,6 +580,7 @@ module ApplicationHelper
       feature_key = key.to_sym
       return unless CreamFeatures.menu_entries.key?(feature_key)
       return unless current_workspace&.feature_enabled?(feature_key)
+      return if ADMIN_ONLY_MENU_RECORDS.key?(feature_key) && !policy(ADMIN_ONLY_MENU_RECORDS[feature_key].constantize).index?
 
       path = CreamFeatures.menu_path(feature_key)
       sidebar_nav_item(key, t("nav.features.#{feature_key}"), path, CreamFeatures.menu_icon(feature_key),

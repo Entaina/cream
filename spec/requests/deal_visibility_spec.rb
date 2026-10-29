@@ -140,6 +140,92 @@ RSpec.describe "Deal visibility outside the deal pages", type: :request do
     end
   end
 
+  describe "tasks" do
+    let(:person) { create_person!(workspace, first_name: "Lead") }
+    let!(:hidden_task) { workspace.tasks.create!(title: "Hidden task", user: admin, assignee: admin, taskable: hidden_deal) }
+    let!(:shared_task) { workspace.tasks.create!(title: "Shared task", user: admin, assignee: admin, taskable: shared_deal) }
+    let!(:assigned_hidden_task) do
+      workspace.tasks.create!(title: "Assigned hidden task", user: admin, assignee: salesperson, taskable: hidden_deal)
+    end
+    let!(:person_task) { workspace.tasks.create!(title: "Person task", user: admin, assignee: admin, taskable: person) }
+
+    describe "web" do
+      before { sign_in_to_workspace!(salesperson) }
+
+      it "does not let a salesperson edit or complete a task on a deal they cannot see" do
+        patch task_path(hidden_task), params: {task: {title: "Changed"}}
+        patch toggle_task_path(hidden_task)
+
+        expect(hidden_task.reload.title).to eq("Hidden task")
+        expect(hidden_task).not_to be_completed
+      end
+
+      it "lets a salesperson edit tasks on deals they can edit, their own tasks and tasks on people" do
+        patch task_path(shared_task), params: {task: {title: "Shared changed"}}
+        patch task_path(assigned_hidden_task), params: {task: {title: "Assigned changed"}}
+        patch toggle_task_path(person_task)
+
+        expect(shared_task.reload.title).to eq("Shared changed")
+        expect(assigned_hidden_task.reload.title).to eq("Assigned changed")
+        expect(person_task.reload).to be_completed
+      end
+
+      it "shows tasks read-only on deals the salesperson can view but not edit" do
+        workspace.update!(salespeople_can_view_all_deals: true)
+
+        get deal_path(hidden_deal)
+
+        expect(response.body).to include("Hidden task")
+        expect(response.body).not_to include(toggle_task_path(hidden_task))
+        expect(response.body).to include(toggle_task_path(assigned_hidden_task))
+
+        patch task_path(hidden_task), params: {task: {title: "Changed"}}
+        expect(hidden_task.reload.title).to eq("Hidden task")
+      end
+    end
+
+    describe "REST API" do
+      let(:headers) { {"Authorization" => "Bearer #{api_token_for(salesperson, workspace)}"} }
+
+      it "lists only tasks the salesperson may see" do
+        get "/api/v1/tasks", headers: headers
+
+        titles = response.parsed_body.map { |task| task["title"] }
+        expect(titles).to include("Shared task", "Assigned hidden task", "Person task")
+        expect(titles).not_to include("Hidden task")
+      end
+
+      it "does not show, update or delete a task on a hidden deal" do
+        get "/api/v1/tasks/#{hidden_task.id}", headers: headers
+        expect(response).to have_http_status(:not_found)
+
+        patch "/api/v1/tasks/#{hidden_task.id}", params: {task: {title: "Changed"}}, headers: headers
+        delete "/api/v1/tasks/#{hidden_task.id}", headers: headers
+
+        expect(hidden_task.reload.title).to eq("Hidden task")
+      end
+    end
+
+    describe "MCP" do
+      let(:plaintext) { api_token_for(salesperson, workspace) }
+
+      it "lists only tasks the salesperson may see" do
+        result = call_tool("list_tasks", {limit: 100})
+
+        expect(result.to_json).to include("Shared task", "Assigned hidden task", "Person task")
+        expect(result.to_json).not_to include("\"Hidden task\"")
+      end
+
+      it "does not complete or update a task on a hidden deal" do
+        call_tool_raw("complete_task", {task_id: hidden_task.id})
+        call_tool_raw("update_task", {task_id: hidden_task.id, title: "Changed"})
+
+        expect(hidden_task.reload).not_to be_completed
+        expect(hidden_task.title).to eq("Hidden task")
+      end
+    end
+  end
+
   describe "MCP" do
     let(:plaintext) { api_token_for(salesperson, workspace) }
 
