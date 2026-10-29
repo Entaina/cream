@@ -276,7 +276,7 @@ RSpec.describe LeadFormSubmissionProcessor do
       expect(result.deal).to eq(existing_deal)
       expect(result.submission.id).not_to eq(submission.id)
       expect(result.person.first_name).to eq("Existente")
-      expect(result.person.last_name).to eq("Nuevo")
+      expect(result.person.last_name).to eq("")
       expect(result.submission.data).to include("how_heard" => "otro", "message" => "Hola", "last_name" => "Nuevo")
       expect(submission.reload.data).to include("how_heard" => "evento")
       expect(result.deal.pipeline_stage).to eq(existing_deal.pipeline_stage)
@@ -443,6 +443,64 @@ RSpec.describe LeadFormSubmissionProcessor do
       expect(existing.reload.company.name).to eq("Nueva SL")
       expect(deal.reload.company).to eq(existing.company)
     end
+
+    it "does not fill their blank fields with the submitted values" do
+      existing.update!(phone: nil)
+
+      result = submit(demo_lead_params("company_name" => "Acme SL", "first_name" => "Otro", "phone" => "699000000"))
+
+      expect(existing.reload).to have_attributes(first_name: "Pat", last_name: "Doe", phone: nil)
+      expect(result.submission.data).to include("phone" => "699000000")
+    end
+
+    it "does not link the visitor's page views to them" do
+      allow(CreamFeatures).to receive(:enabled?).and_call_original
+      allow(CreamFeatures).to receive(:enabled?).with(:web_tracking).and_return(true)
+      page_view = workspace.page_views.create!(anonymous_id: "anon-attacker", url: "https://example.com/pricing", occurred_at: Time.current)
+
+      submit(demo_lead_params("company_name" => "Acme SL", "cream_aid" => "anon-attacker"))
+
+      expect(page_view.reload.person_id).to be_nil
+    end
+
+    it "does not score them but still creates the deal and its task" do
+      expect(Marketing::ScoringEngine).not_to receive(:apply_event!)
+      expect(Ai::AutomationHooks).not_to receive(:score_deal)
+
+      expect {
+        result = submit(demo_lead_params("company_name" => "Acme SL"))
+        expect(result.deal.contacts).to contain_exactly(existing)
+        expect(result.deal.tasks.map(&:title)).to include("Contactar lead")
+      }.to change(Deal, :count).by(1)
+        .and change(Task, :count).by(1)
+    end
+
+    it "does not score them or link page views on MQL forms" do
+      allow(CreamFeatures).to receive(:enabled?).and_call_original
+      %i[mql_pool marketing_consent web_tracking].each do |flag|
+        allow(CreamFeatures).to receive(:enabled?).with(flag).and_return(true)
+      end
+      lead_form.update!(destination: "mql")
+      page_view = workspace.page_views.create!(anonymous_id: "anon-attacker", url: "https://example.com/pricing", occurred_at: Time.current)
+      expect(Marketing::ScoringEngine).not_to receive(:apply_event!)
+
+      result = submit(demo_lead_params("company_name" => "Acme SL", "cream_aid" => "anon-attacker", "_submission_key" => SecureRandom.uuid))
+
+      expect(result.person).to eq(existing)
+      expect(result.submission).to be_persisted
+      expect(page_view.reload.person_id).to be_nil
+    end
+  end
+
+  it "scores a new person and their new deal" do
+    allow(Marketing::ScoringEngine).to receive(:apply_event!)
+    allow(Ai::AutomationHooks).to receive(:score_deal)
+
+    result = submit(contacto_lead_params("email" => "nuevo@example.com"))
+
+    expect(Marketing::ScoringEngine).to have_received(:apply_event!).with(hash_including(person: result.person, event: "lead_submission"))
+    expect(Marketing::ScoringEngine).to have_received(:apply_event!).with(hash_including(person: result.person, event: "form_field"))
+    expect(Ai::AutomationHooks).to have_received(:score_deal).with(deal: result.deal)
   end
 
   it "rejects company_cif when the rendered form does not include that field" do

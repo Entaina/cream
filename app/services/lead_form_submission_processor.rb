@@ -1,8 +1,6 @@
 class LeadFormSubmissionProcessor
   Result = Data.define(:submission, :deal, :person)
 
-  PERSON_FILLABLE_FIELDS = %w[first_name last_name phone job_title].freeze
-
   def self.call(lead_form:, params:, request:, product: nil, open_editions: nil)
     new(lead_form:, params:, request:, product:, open_editions:).call
   end
@@ -47,15 +45,14 @@ class LeadFormSubmissionProcessor
 
     ActiveRecord::Base.transaction do
       person, created = find_or_create_person!(lock_email: true)
-      fill_person_blanks!(person) unless created
       assign_submitted_company!(person) if company_assignable?(person, created)
       submission = persist_submission!(deal: nil, person:, capture_destination: "mql")
       propagate_mql_consent!(person:, submission:)
       person.update!(lifecycle_stage: "lead") if person.lifecycle_stage == "subscriber"
       assign_campaign_from_utm!(submission)
-      link_anonymous_page_views!(person)
+      link_anonymous_page_views!(person) if created
       create_product_interest_from_form!(person:, submission:)
-      apply_marketing_events!(person:, submission:)
+      apply_marketing_events!(person:, submission:, created:)
       enqueue_mql_emails(submission:, person:)
       Result.new(submission:, deal: nil, person:)
     end
@@ -64,7 +61,6 @@ class LeadFormSubmissionProcessor
   def process_deal_capture
     ActiveRecord::Base.transaction do
       person, created = find_or_create_person!
-      fill_person_blanks!(person) unless created
       assign_submitted_company!(person) if company_assignable?(person, created)
       deal, deal_created = find_or_create_deal!(person:, company: person.company)
       create_first_task!(deal) unless deal_created
@@ -81,9 +77,9 @@ class LeadFormSubmissionProcessor
       )
       person.update!(lifecycle_stage: "lead") if person.lifecycle_stage == "subscriber"
       assign_campaign_from_utm!(submission)
-      link_anonymous_page_views!(person)
-      apply_marketing_events!(person:, submission:)
-      Ai::AutomationHooks.score_deal(deal: deal)
+      link_anonymous_page_views!(person) if created
+      apply_marketing_events!(person:, submission:, created:)
+      Ai::AutomationHooks.score_deal(deal: deal) if created
       enqueue_deal_emails(submission:, deal:, person:)
       Result.new(submission:, deal:, person:)
     end
@@ -171,16 +167,6 @@ class LeadFormSubmissionProcessor
     ActiveRecord::Base.connection.execute(
       ActiveRecord::Base.sanitize_sql_array(["SELECT pg_advisory_xact_lock(hashtext(?))", "mql:#{workspace.id}:#{email}"])
     )
-  end
-
-  def fill_person_blanks!(person)
-    updates = PERSON_FILLABLE_FIELDS.each_with_object({}) do |field, attrs|
-      next if person.public_send(field).present?
-
-      value = person_field_value(field)
-      attrs[field] = value if value.present?
-    end
-    person.update!(updates) if updates.any?
   end
 
   # Anyone can submit a public form with someone else's email, so a submission
@@ -386,9 +372,13 @@ class LeadFormSubmissionProcessor
     )
   end
 
-  def apply_marketing_events!(person:, submission:)
-    Marketing::ScoringEngine.apply_event!(person: person, event: "lead_submission", metadata: submission.metadata)
-    Marketing::ScoringEngine.apply_event!(person: person, event: "form_field", metadata: submission.data)
+  # Anyone can submit a public form with someone else's email, so only the
+  # person the submission creates is scored or linked to the visitor's page views.
+  def apply_marketing_events!(person:, submission:, created:)
+    if created
+      Marketing::ScoringEngine.apply_event!(person: person, event: "lead_submission", metadata: submission.metadata)
+      Marketing::ScoringEngine.apply_event!(person: person, event: "form_field", metadata: submission.data)
+    end
     Marketing::JourneyTrigger.enqueue_lead_form_submitted!(person: person, lead_form: lead_form)
     Marketing::SegmentWatcher.sync_person!(person)
   end
@@ -433,12 +423,6 @@ class LeadFormSubmissionProcessor
 
   def normalized_email
     params["email"].to_s.strip.downcase.presence
-  end
-
-  def person_field_value(field)
-    return resolved_phone if field == "phone"
-
-    params[field].presence
   end
 
   def resolved_phone
