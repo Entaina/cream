@@ -111,7 +111,7 @@ RSpec.describe "Api::V1::Marketing", type: :request do
           headers: sales_headers
       }.not_to change(workspace.people, :count)
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
 
     it "stores the consent evidence and who registered it on the subscription" do
@@ -153,7 +153,7 @@ RSpec.describe "Api::V1::Marketing", type: :request do
         post "/api/v1/marketing/mqls", params: payload.merge(mql: payload[:mql].merge(internal_notes: too_long)), as: :json, headers: sales_headers
       }.not_to change(workspace.people, :count)
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(response.parsed_body["errors"].join).to include(Person.human_attribute_name(:internal_notes))
     end
 
@@ -162,7 +162,7 @@ RSpec.describe "Api::V1::Marketing", type: :request do
         subscriptions = [payload[:subscriptions].first.except(field)]
         post "/api/v1/marketing/mqls", params: payload.merge(subscriptions: subscriptions), as: :json, headers: sales_headers
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.parsed_body["errors"]).to eq([I18n.t("marketing.consent_evidence.errors.#{field}_required")])
       end
       expect(workspace.people.with_email("new.lead@example.com")).to be_empty
@@ -177,7 +177,7 @@ RSpec.describe "Api::V1::Marketing", type: :request do
         subscriptions = [payload[:subscriptions].first.merge(override)]
         post "/api/v1/marketing/mqls", params: payload.merge(subscriptions: subscriptions), as: :json, headers: sales_headers
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.parsed_body["errors"]).to eq([I18n.t("marketing.consent_evidence.errors.#{key}")])
       end
     end
@@ -235,7 +235,7 @@ RSpec.describe "Api::V1::Marketing", type: :request do
 
       post "/api/v1/marketing/mqls", params: payload, as: :json, headers: sales_headers
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(response.parsed_body["errors"]).to eq([I18n.t("marketing.mql_creator.errors.subscriptions_required")])
       expect(workspace.people.with_email("new.lead@example.com")).to be_empty
     end
@@ -251,7 +251,7 @@ RSpec.describe "Api::V1::Marketing", type: :request do
       }.each do |subscriptions, message|
         post "/api/v1/marketing/mqls", params: payload.merge(subscriptions: subscriptions), as: :json, headers: sales_headers
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.parsed_body["errors"]).to eq([message])
       end
       expect(workspace.people.with_email("new.lead@example.com")).to be_empty
@@ -259,10 +259,10 @@ RSpec.describe "Api::V1::Marketing", type: :request do
 
     it "requires an email and a company" do
       post "/api/v1/marketing/mqls", params: payload.merge(mql: payload[:mql].merge(email: "")), as: :json, headers: sales_headers
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
 
       post "/api/v1/marketing/mqls", params: payload.merge(mql: payload[:mql].except(:company_name)), as: :json, headers: sales_headers
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(response.parsed_body["errors"]).to eq([I18n.t("marketing.mql_creator.errors.company_required")])
     end
 
@@ -273,7 +273,7 @@ RSpec.describe "Api::V1::Marketing", type: :request do
         post "/api/v1/marketing/mqls", params: payload, as: :json, headers: sales_headers
       }.not_to change(workspace.people, :count)
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(Marketing::ProductInterest.where(workspace: workspace)).to be_empty
     end
 
@@ -282,7 +282,7 @@ RSpec.describe "Api::V1::Marketing", type: :request do
 
       post "/api/v1/marketing/mqls", params: payload, as: :json, headers: sales_headers
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(workspace.people.with_email("new.lead@example.com")).to be_empty
     end
 
@@ -508,7 +508,7 @@ RSpec.describe "Api::V1::Marketing", type: :request do
     it "rejects an unknown status" do
       get "/api/v1/marketing/subscriptions", params: {status: "bogus"}, headers: headers
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(response.parsed_body["errors"]).to eq([I18n.t("marketing.subscriptions.errors.invalid_status")])
     end
 
@@ -565,7 +565,7 @@ RSpec.describe "Api::V1::Marketing", type: :request do
       %i[consent_text consent_source].each do |field|
         patch_subscription({subscription_type_id: type.id, action: "subscribe"}.merge(evidence.except(field)))
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.parsed_body["errors"]).to eq([I18n.t("marketing.consent_evidence.errors.#{field}_required")])
       end
       expect(EmailSubscription.where(person: person, subscription_type: type)).to be_empty

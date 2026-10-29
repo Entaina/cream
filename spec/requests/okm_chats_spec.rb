@@ -162,7 +162,7 @@ RSpec.describe "OKM chat", type: :request do
         post okm_chat_actions_path, params: {token: token}, as: :json
       end
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(response.parsed_body["error"]).to eq("Invalid or expired action token.")
       expect(company.notes.find_by(body: "Nota tardía")).to be_nil
     end
@@ -172,7 +172,7 @@ RSpec.describe "OKM chat", type: :request do
 
       post okm_chat_actions_path, params: {token: token}, as: :json
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(company.notes.find_by(body: "Nota tardía")).to be_nil
     end
   end

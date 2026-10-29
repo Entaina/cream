@@ -4,7 +4,7 @@ This guide covers everything you need to run Cream locally, plus pointers for op
 
 ## Requirements
 
-- **Ruby 3.4.3** (see `.ruby-version`; use rbenv, mise, asdf or similar)
+- **Ruby 3.4.12** (see `.ruby-version`; use rbenv, mise, asdf or similar)
 - **Docker + Docker Compose** (for PostgreSQL 16 with pgvector)
 - **Git**
 

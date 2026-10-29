@@ -143,7 +143,7 @@ RSpec.describe Public::BookingApiController, type: :request do
         params: valid_booking_params("cf-turnstile-response" => "bad"),
         as: :json
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(TurnstileVerifier).to have_received(:valid?).with(token: "bad", ip: anything)
       expect(BookingCreator).not_to have_received(:call)
     end

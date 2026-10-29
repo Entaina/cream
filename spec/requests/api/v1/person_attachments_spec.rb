@@ -39,11 +39,11 @@ RSpec.describe "Api::V1::PersonAttachments", type: :request do
   it "rejects invalid Base64 and missing content with 422" do
     post "/api/v1/people/#{person.id}/attachments",
       params: {attachment: {filename: "a.txt", content: "***"}}, as: :json, headers: headers
-    expect(response).to have_http_status(:unprocessable_entity)
+    expect(response).to have_http_status(:unprocessable_content)
 
     post "/api/v1/people/#{person.id}/attachments",
       params: {attachment: {filename: "a.txt"}}, as: :json, headers: headers
-    expect(response).to have_http_status(:unprocessable_entity)
+    expect(response).to have_http_status(:unprocessable_content)
     expect(person.record_attachments).to be_empty
   end
 
@@ -53,7 +53,7 @@ RSpec.describe "Api::V1::PersonAttachments", type: :request do
     post "/api/v1/people/#{person.id}/attachments",
       params: {attachment: {filename: "a.txt", content: Base64.strict_encode64("12345")}}, as: :json, headers: headers
 
-    expect(response).to have_http_status(:unprocessable_entity)
+    expect(response).to have_http_status(:unprocessable_content)
     expect(response.parsed_body["errors"].first).to include("exceeds")
   end
 

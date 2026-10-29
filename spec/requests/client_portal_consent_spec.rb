@@ -170,7 +170,7 @@ RSpec.describe "Client portal consent", type: :request do
       post client_portal_access_consume_path(workspace_slug: workspace.slug, token: token),
         params: {consent_type_ids: [newsletter.id]}
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(response.body).to include(I18n.t("client_portal.consent.required_missing"))
       expect(ClientPortalLoginGrant.last.used_at).to be_nil
       expect(EmailSubscription.exists?(person: person)).to be(false)
@@ -201,7 +201,7 @@ RSpec.describe "Client portal consent", type: :request do
       expect {
         post public_offer_share_access_path(token: link.token, grant_token: raw)
       }.not_to change(OfferView, :count)
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
 
       post public_offer_share_access_path(token: link.token, grant_token: raw), params: {consent_type_ids: [updates.id]}
       expect(response).to have_http_status(:ok)
@@ -214,7 +214,7 @@ RSpec.describe "Client portal consent", type: :request do
       expect {
         post client_portal_deal_portal_invite_access_path(workspace_slug: workspace.slug, token: invite.token, grant_token: raw)
       }.not_to change(DealContact, :count)
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
   end
 
