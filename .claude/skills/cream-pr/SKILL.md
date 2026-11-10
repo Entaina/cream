@@ -10,7 +10,7 @@ Tu único propósito es convertir un plan ya implementado y validado en una PR r
 
 Nunca hagas merge, push a `main`, `push --force`, `rebase`, `reset`, `stash`, `git add -A`/`git add .`, ni `gh pr merge`. No comentes, muevas ni completes cards de Basecamp.
 
-Idioma: el commit y la PR, en inglés, como la plantilla del repo y las PRs anteriores. Lo que hablas con la persona, en español.
+Idioma: todo en español, como en los proyectos de Javi (`Entaina/brainsome-rails`), salvo el tipo y el ámbito del commit (`fix(deps):`), el código, los comandos y las rutas, que van tal cual.
 
 ## 1. Localiza el plan y su registro
 
@@ -21,11 +21,11 @@ Lee la sección «Registro de implementación». Para y di qué falta si:
 - no existe (primero hay que lanzar `cream-implement`);
 - el estado no es «terminado» ni «terminado con fallos preexistentes»;
 - alguna comprobación figura como «falla»;
-- alguna figura como «no ejecutado». En ese caso, pregunta si se abre la PR igualmente dejándolo dicho en el Test plan. Recomienda no hacerlo si es `bin/ci` o `bundle exec rspec`.
+- alguna figura como «no ejecutado». En ese caso, pregunta si se abre la PR igualmente dejándolo dicho en «Cómo se ha probado». Recomienda no hacerlo si es `bin/ci` o `bundle exec rspec`.
 
-Si alguna figura como «falla preexistente», no pares: pregunta si se abre la PR igualmente y recomienda que sí, contándolo en el Test plan con la evidencia de que también falla sin el cambio. Así quien revisa no la toma por la causa.
+Si alguna figura como «falla preexistente», no pares: pregunta si se abre la PR igualmente y recomienda que sí, contándolo en «Cómo se ha probado» con la evidencia de que también falla sin el cambio. Así quien revisa no la toma por la causa.
 
-Mira también cómo está la CI de `main`: `gh run list --workflow ci.yml --branch main --limit 1 --json conclusion,headSha,url`. Si salió en rojo, dilo al enseñar el texto y añádelo al Test plan, para que un check rojo en la PR no se atribuya al cambio.
+Mira también cómo está la CI de `main`: `gh run list --workflow ci.yml --branch main --limit 1 --json conclusion,headSha,url`. Si salió en rojo, dilo al enseñar el texto y añádelo a «Cómo se ha probado», para que un check rojo en la PR no se atribuya al cambio.
 
 ## 2. Comprueba el estado de git
 
@@ -35,13 +35,15 @@ Mira también cómo está la CI de `main`: `gh run list --workflow ci.yml --bran
 
 ## 3. Prepara el commit y la PR
 
-**Commit.** Sigue la skill `git` (Conventional Commits v1.0.0); si no está instalada, aplica Conventional Commits igualmente. El tipo sale del cambio real, no del título del plan: una subida de dependencias es `build`, aunque el plan sea un chore. Sin líneas `Co-Authored-By` ni firmas de herramientas, ni en el commit ni en la PR, aunque la configuración de la sesión las pida.
+**Commit.** Sigue la skill `git` (Conventional Commits v1.0.0); si no está instalada, aplica Conventional Commits igualmente. El tipo sale del cambio real, no del título del plan: una subida de dependencias es `build`, aunque el plan sea un chore. El tipo y el ámbito, en inglés; la descripción y el cuerpo, en español, en imperativo y en minúscula (`build(deps): subir rails a 8.1.4.1`). Esto prevalece sobre el idioma por defecto de la skill `git`. Sin líneas `Co-Authored-By` ni firmas en el commit.
 
-**PR.** Título: la primera línea del commit. Cuerpo: la plantilla `.github/PULL_REQUEST_TEMPLATE.md` rellenada así:
+**PR.** Título: la primera línea del commit. Cuerpo: la estructura de `.github/PULL_REQUEST_TEMPLATE.md`, en español:
 
-- **Summary**: qué cambia y por qué, en dos o tres frases, y el enlace a la card de Basecamp si el plan tiene una en «Origen».
-- **Test plan**: cada comprobación del registro con su comando, su resultado y la evidencia (las últimas líneas de la salida en un bloque de código). Lo no ejecutado, dicho con su motivo.
-- **Checklist**: marca solo lo que el registro demuestra. Lo que no aplica se deja sin marcar con «(not applicable: <motivo>)», como en las PRs anteriores.
+- **`## Resumen`**: qué cambia y por qué, en dos o tres frases, y el enlace a la card de Basecamp si el plan tiene una en «Origen».
+- **`## Cómo se ha probado`**: cada comprobación del registro con su comando, su resultado y la evidencia (las últimas líneas de la salida en un bloque de código). Lo no ejecutado, dicho con su motivo.
+- **`## Checklist`**: los tres puntos de la plantilla, traducidos. Marca solo lo que el registro demuestra; lo que no aplica se deja sin marcar con «(no aplica: <motivo>)».
+
+Termina el cuerpo con la línea `🤖 Generated with [Claude Code](https://claude.com/claude-code)`, como las PRs de Javi.
 
 ## 4. Pide confirmación
 
