@@ -226,9 +226,9 @@ GEM
     mcp (1.8.1)
       json_schemer (>= 2.4)
     mini_mime (1.1.5)
-    minitest (6.0.6)
+    minitest (6.1.0)
       drb (~> 2.0)
-      prism (~> 1.5)
+      prism (>= 1.5, < 3)
     msgpack (1.8.5)
     multi_json (1.21.2)
     multi_xml (0.9.1)
@@ -506,9 +506,10 @@ GEM
     uri (1.1.2)
     useragent (0.16.11)
     version_gem (1.1.15)
-    view_component (4.19.0)
+    view_component (4.23.0)
       actionview (>= 7.1.0)
       activesupport (>= 7.1.0)
+      prism (>= 1.0)
     web-console (4.3.0)
       actionview (>= 8.0.0)
       bindex (>= 0.4.0)
@@ -579,7 +580,7 @@ DEPENDENCIES
   thruster
   turbo-rails
   tzinfo-data
-  view_component (~> 4.19)
+  view_component (~> 4.23)
   web-console
 
 CHECKSUMS
@@ -671,7 +672,7 @@ CHECKSUMS
   matrix (0.4.3) sha256=a0d5ab7ddcc1973ff690ab361b67f359acbb16958d1dc072b8b956a286564c5b
   mcp (1.8.1) sha256=1b81902c1edf01775a4bc080af68e84909e2dfe91fffe381f86e5075847ca284
   mini_mime (1.1.5) sha256=8681b7e2e4215f2a159f9400b5816d85e9d8c6c6b491e96a12797e798f8bccef
-  minitest (6.0.6) sha256=153ea36d1d987a62942382b61075745042a2b3123b1cd48f4c3675af9cc7d6f1
+  minitest (6.1.0) sha256=ff373595aa8888631e8a5463986a76b3845346ae6d7fa46e139c1633d418076e
   msgpack (1.8.5) sha256=97419eaa7b35dfe3e462c0e6c1a3dfdcbfc8756605c09e46e4c6daef127517ba
   multi_json (1.21.2) sha256=245531eaf54bdba57aba515ff08b4503505c5e09911daa89c5a561e2f85bea8e
   multi_xml (0.9.1) sha256=7ce766b59c17241ed62976caeae1fae9b2431b263398c35396239a68c4a64e57
@@ -785,7 +786,7 @@ CHECKSUMS
   uri (1.1.2) sha256=89292e98eabbef6248b0a0ed5e7e398e152f83f17560023a6d94a7f492b169fb
   useragent (0.16.11) sha256=700e6413ad4bb954bb63547fa098dddf7b0ebe75b40cc6f93b8d54255b173844
   version_gem (1.1.15) sha256=a73241587b29252e3567e0c818ded80730eb754d43b508f6ce4db22ca9ba27d0
-  view_component (4.19.0) sha256=e75d3d5cf1f56c47118752436173e0d417d31ce79412919bc4232060257fe615
+  view_component (4.23.0) sha256=2bcb6fe6251edaec534d4aefc5f735096a8393c3b9b627f6de59fbc859858a01
   web-console (4.3.0) sha256=e13b71301cdfc2093f155b5aa3a622db80b4672d1f2f713119cc7ec7ac6a6da4
   websocket (1.2.11) sha256=b7e7a74e2410b5e85c25858b26b3322f29161e300935f70a0e0d3c35e0462737
   websocket-driver (0.8.2) sha256=97c556b019bf3410b4961002ac501621e9322d3f8a7bc02161a09301cc4c4146
