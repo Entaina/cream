@@ -24,6 +24,8 @@ Flow:
 push main → build image → push GHCR → SSH to deploy@server → docker compose pull/up web
 ```
 
+The deploy job is opt-in: add the repository variable **`DEPLOY_ENABLED`** = `true` (Settings → Secrets and variables → Actions → Variables). Without it the workflow only publishes the image.
+
 ### Secrets in GitHub (environment `production`)
 
 Create the environment in **Settings → Environments → New environment → `production`**.
