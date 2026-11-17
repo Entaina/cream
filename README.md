@@ -4,6 +4,8 @@
 
 **An open source CRM for teams**: people, companies and deals organized by workspace, with notes, tasks, lists and a shared activity timeline.
 
+Cream is the CRM we use every day at [entaina](https://entaina.ai/cream/?utm_source=github&utm_medium=referral&utm_campaign=cream-open-source&utm_content=readme). One person built it by directing AI, in about 160 hours. Read the story (in Spanish) at [entaina.ai/cream](https://entaina.ai/cream/?utm_source=github&utm_medium=referral&utm_campaign=cream-open-source&utm_content=readme).
+
 [![CI](https://github.com/Entaina/cream/actions/workflows/ci.yml/badge.svg)](https://github.com/Entaina/cream/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Ruby](https://img.shields.io/badge/Ruby-3.4-cc342d?logo=ruby&logoColor=white)](.ruby-version)
